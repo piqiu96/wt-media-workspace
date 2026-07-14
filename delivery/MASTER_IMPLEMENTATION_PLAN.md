@@ -110,6 +110,23 @@ DONE
 | 完成日期 | `DONE` 后记录 |
 | Commit/Tag | 相关提交和版本标签 |
 
+当前进度总览：
+
+| 里程碑 | 当前状态 | 已完成或可复用事实 | 当前结论 |
+|---|---|---|---|
+| M0 | `IN_PROGRESS` | 治理、仓库骨架、基础健康检查和历史 CI/Contract Map | 需完成 M0-R1～R6 的真实构建和启动门禁 |
+| M1 | `NOT_STARTED` | Contract 兼容、注册心跳、noop task、Local API/SSE 的历史基础实现 | 需完成持久化、正式 task schema、真实 Desktop 和恢复闭环 |
+| M2 | `NOT_STARTED` | 认证、媒体账号基础、Profile 扫描、运行环境和并发保护的历史实现 | 按新 M2-C1～C11 审计复用并补齐完整产品域 |
+| M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
+
+每个里程碑的最终综合验收至少包含：
+
+1. 自动单元、Contract、集成和回归测试；
+2. MySQL、BitBrowser、对象存储、平台接口等适用的真实依赖证据；
+3. 浏览器或 Desktop 中的角色/UI/人工链路验收；
+4. 中断、重启、幂等、恢复和敏感信息安全验收；
+5. Diff 范围检查、Evidence、Checkpoint 和各仓库独立提交。
+
 ### M0：项目治理与工程基线
 
 | 字段 | 内容 |
@@ -273,25 +290,31 @@ M2-C11 真实 MySQL、BitBrowser、代理、Cookie、Desktop 综合验收
 目标闭环：
 
 ```text
-链接导入 / 关键词搜索 / 作者监控
-→ 抓取任务
-→ crawl_result
+即时多链接 / 手动关键词查询
+→ 临时结果
+→ 运营选择
 → source_content
-→ content_lead
 → material
+
+关键词 / 作者监控策略
+→ crawl_strategy
+→ crawl_task
+→ source_content
+→ 自动或人工转 material
 ```
 
 候选 CHG：
 
 ```text
-M3-C1 抓取任务 Contract 和基础模型
-M3-C2 抖音多链接导入
-M3-C3 抖音关键词搜索
-M3-C4 抖音作者监控和定时任务
-M3-C5 crawl_result 与 source_content 去重
-M3-C6 content_lead 查看、筛选和领取
-M3-C7 精准词规则与 material 转化
-M3-C8 内容发现真实业务闭环验收
+M3-C1 抖音外部接口 Spike、Cloud-Agent Contract 和正式任务 Schema
+M3-C2 crawl_strategy、crawl_task、Scheduler、快照与幂等
+M3-C3 抖音多链接即时查询与选择导入
+M3-C4 抖音手动关键词即时查询与选择导入
+M3-C5 关键词/作者监控、立即执行、初始化与重试
+M3-C6 source_content 全局去重、状态和最新原始 JSON
+M3-C7 待选内容列表、筛选、忽略、恢复、权限与日志
+M3-C8 source_content 到 material 的事务转换和幂等
+M3-C9 真实抖音接口、Scheduler 和素材入库综合验收
 ```
 
 明确不做：
@@ -302,14 +325,21 @@ M3-C8 内容发现真实业务闭环验收
 - Excel 导入；
 - 竞品账号监控；
 - 动态抓取工作流平台。
+- 独立 `crawl_result`；
+- `content_lead`；
+- 候选内容领取锁。
 
 退出条件：
 
+- 即时多链接和手动关键词查询不创建 `crawl_task`，未选择结果不写正式数据；
+- 定时、立即执行、初始化和重试必须创建 `crawl_task` 并保存策略快照；
+- Scheduler 具备防重、同策略串行和重启恢复；
 - 重复作品不会重复创建 `source_content`；
 - 抓取失败不会产生正式素材；
-- 精准词和泛化词行为明确不同；
-- 原始抓取数据可追溯；
-- 一次真实关键词或作者任务能够生成可用 `material`。
+- 精准策略可自动转素材，泛化策略进入人工筛选，不新增精准词对象类型；
+- `source_content` 保存最新来源字段和最新原始 JSON，可忽略和恢复；
+- `source_content -> material` 事务幂等，同一内容不重复创建素材；
+- M3-C9 通过真实抖音接口、自动测试、Web UI、失败重试、调度恢复和独立提交验收。
 
 ### M4：素材使用与本地合成闭环
 
@@ -337,14 +367,16 @@ material
 候选 CHG：
 
 ```text
-M4-C1 material_usage 与素材领取
-M4-C2 合成模板、版本与参数 Schema
-M4-C3 合成策略、版本和快照
-M4-C4 compose_pool_item 与合成任务台
-M4-C5 Agent FFmpeg 环境和能力检查
-M4-C6 本地视频合成 Executor
-M4-C7 composite_output、失败重试和强制中断
-M4-C8 本地合成真实视频闭环验收
+M4-C1 material 生命周期、公共/私有素材和私转公审核
+M4-C2 material_usage 领取、下载、放弃与恢复
+M4-C3 合成模板、版本与参数 Schema
+M4-C4 合成策略、版本、快照与多版本选择
+M4-C5 compose_pool_item、合成任务台、批量、取消与卡死处理
+M4-C6 Local Agent SQLite、文件索引、Desktop 桥和 FFmpeg 环境
+M4-C7 素材下载、Hash/文件校验、重试与重新定位
+M4-C8 本地视频合成 Executor
+M4-C9 composite_output、失败重试、强制中断和本地文件管理
+M4-C10 本地合成真实视频综合验收
 ```
 
 关键约束：
@@ -358,11 +390,16 @@ M4-C8 本地合成真实视频闭环验收
 
 退出条件：
 
+- material 支持 active、paused、retired 生命周期，公共/私有范围和私转公审核；
+- `material_usage` 支持领取、下载、放弃和恢复，且权限范围明确；
+- 合成前素材必须下载并通过 Hash、文件存在性和可读性校验；
+- compose_pool_item 支持批量、取消、卡死和异常池处理；
 - 能从一个真实素材生成可播放视频；
 - 来源素材、模板版本、策略版本和参数快照可追溯；
 - FFmpeg 不兼容时禁止执行；
-- 失败和重试状态明确；
-- 成功成片能够进入发布流程。
+- Local Agent SQLite、文件索引和 Desktop 真实桥接可验证；
+- 失败、重试、强制中断和本地文件状态明确；
+- M4-C10 通过真实文件、FFmpeg、Desktop UI、Agent 重启恢复和独立提交验收。
 
 ### M5：云端自动生产与云端成片池
 
@@ -380,23 +417,28 @@ M4-C8 本地合成真实视频闭环验收
 
 ```text
 production_rule
+→ material
+→ compose_pool_item
+→ task
 → Cloud Agent
 → composite_output
 → composite_output_pool
 → composite_output_claim
-→ 下载到本地
+→ Local Agent 下载到本地
 ```
 
 候选 CHG：
 
 ```text
-M5-C1 production_rule 与调度
-M5-C2 Cloud Agent 合成模式和对象存储
-M5-C3 composite_output_pool 和范围策略
-M5-C4 自动分配、人工分配与独占领取
-M5-C5 云端下载和本地成片记录
-M5-C6 7 天清理与重复风险提示
-M5-C7 云端生产和成片池综合验收
+M5-C1 production_rule 范围、调度和单次/每日数量
+M5-C2 素材风险校验、审核池和处置
+M5-C3 Cloud Agent 共享合成核心、对象存储与完整性
+M5-C4 compose_pool_item/task、重试、卡死和异常处理
+M5-C5 composite_output_pool 和可见范围策略
+M5-C6 composite_output_claim 独占领取和自动/人工释放
+M5-C7 云端下载、Hash 校验和本地成片记录
+M5-C8 7 天清理、重复风险和生产/发布摘要回写
+M5-C9 云端生产与成片池综合验收
 ```
 
 明确不做：
@@ -410,10 +452,14 @@ M5-C7 云端生产和成片池综合验收
 退出条件：
 
 - Local Agent 和 Cloud Agent 复用同一合成核心；
+- 云端生产保留 `material -> compose_pool_item -> task` 正式链路；
+- 对象存储上传、Hash、下载、生命周期和恢复可验证；
+- 高风险素材进入审核池，处置行为有日志；
 - 同一成片不会被多人重复领取；
-- 领取失败不会永久锁死；
-- 下载后能进入本地成片管理；
-- 清理任务和重复风险提示可验证。
+- 领取失败、超时和高级运营释放不会永久锁死；
+- 下载通过完整性校验并进入本地成片管理；
+- 清理、重复风险和生产/发布摘要回写可验证；
+- M5-C9 通过真实 Cloud Agent、对象存储、调度、领取并发、下载恢复和独立提交验收。
 
 ### M6：发布通用底座与 B站辅助发布
 
@@ -432,26 +478,29 @@ M5-C7 云端生产和成片池综合验收
 ```text
 composite_output
 → publication
-→ 发布任务
+→ task
 → Agent 打开指定 Profile
 → 上传和填写
-→ waiting_manual_submit
+→ pending_manual_submit
 → 运营人工提交
-→ 链接补录和结果回写
+→ 链接校验/补录
+→ published
+→ tracked_object
 ```
 
 候选 CHG：
 
 ```text
-M6-C1 publication 模型和正式状态
-M6-C2 发布任务 Contract 和串行队列
-M6-C3 平台 Adapter 通用接口
-M6-C4 B站固定流程与元素 JSON
-M6-C5 单条发布
-M6-C6 批量配置和串行执行
-M6-C7 人工提交、链接补录和手工补录
-M6-C8 失败、丢弃、重试和 result_uncertain
-M6-C9 B站真实辅助发布验收
+M6-C1 publication 模型、正式状态、创建规则与权限
+M6-C2 发布管理工作台、状态页签、预检、重复和链接校验
+M6-C3 发布 task Contract、Profile 串行队列与重启恢复
+M6-C4 平台 Adapter、platform_publish_config 和版本
+M6-C5 B站字段、固定流程、元素 JSON 与 Executor
+M6-C6 B站单条辅助发布和 pending_manual_submit
+M6-C7 批量配置、账号筛选快照和连续严格串行发布
+M6-C8 人工提交、链接补录/纠正、手工补录和 tracked_object
+M6-C9 failed、cancelled、result_uncertain、精确重试与审计
+M6-C10 B站真实辅助发布综合验收
 ```
 
 关键约束：
@@ -463,11 +512,15 @@ M6-C9 B站真实辅助发布验收
 
 退出条件：
 
+- 发布管理提供待发布、执行中、待人工提交、待补链接、失败、已发布和全部页签；
+- 正式状态统一使用 `pending_manual_submit` 和 `cancelled`，`result_uncertain` 是任务/错误结果，不是新的 publication 主状态；
 - 完成一条真实 B站辅助发布；
 - 批量任务严格串行；
-- 异常状态和重试行为明确；
-- 人工提交后可以补录链接；
-- Agent 重启后可以识别未完成任务。
+- 人工提交后可以补录或纠正链接，链接有效且 publication=`published` 时创建或复用 `tracked_object`；
+- 重试创建新的实际 task，不覆盖历史尝试；
+- 异常、取消、结果不确定和精确重试行为明确；
+- Agent 重启后可以识别未完成任务；
+- M6-C10 通过真实 B站、三角色 UI、Profile 串行、人工提交/补录、重启恢复和独立提交验收。
 
 ### M7：百家号辅助发布
 
@@ -484,10 +537,11 @@ M6-C9 B站真实辅助发布验收
 候选 CHG：
 
 ```text
-M7-C1 百家号字段和元素配置
-M7-C2 百家号 Adapter
-M7-C3 百家号单条和批量辅助发布
-M7-C4 百家号真实发布与 B站回归验收
+M7-C1 百家号字段、元素配置和版本
+M7-C2 百家号 Adapter 与 Executor
+M7-C3 百家号单条、批量和连续辅助发布
+M7-C4 人工提交、手工补录、链接校验和异常恢复
+M7-C5 百家号真实发布与 B站完整回归验收
 ```
 
 退出条件：
@@ -495,8 +549,9 @@ M7-C4 百家号真实发布与 B站回归验收
 - 没有复制 B站通用发布逻辑；
 - Cloud 不包含页面元素操作细节；
 - Adapter 不直接修改 Cloud 正式状态；
-- 百家号真实辅助发布完成；
-- B站功能回归通过。
+- 百家号单条、批量、连续发布和手工补录均可完成；
+- 链接校验、`tracked_object` 创建和异常恢复复用通用发布底座；
+- M7-C5 完成百家号真实辅助发布、B站完整回归、UI/恢复/安全和独立提交验收。
 
 ### M8：互动管理闭环
 
@@ -513,24 +568,23 @@ M7-C4 百家号真实发布与 B站回归验收
 核心对象：
 
 ```text
-interaction_batch
-→ tracked_object
+tracked_object
 → interaction_task
-→ interaction_item
-→ task
+→ 每个账号一个实际 task
 ```
 
 候选 CHG：
 
 ```text
-M8-C1 互动核心模型
-M8-C2 目标圈定和 interaction_item 生成
-M8-C3 公共模板和个人模板
-M8-C4 DeepSeek 评论生成
-M8-C5 点赞和收藏 Executor
-M8-C6 评论 Executor
-M8-C7 窗口粒度、风控和异常处理
-M8-C8 互动真实业务闭环验收
+M8-C1 外部 tracked_object 录入、去重、状态和目标列表
+M8-C2 interaction_task、账号级 task 和动作快照
+M8-C3 公共评论模板和个人评论模板
+M8-C4 DeepSeek 候选评论生成与人工确认
+M8-C5 全局基础风控、执行预检和账号/Profile 校验
+M8-C6 点赞和收藏 Executor、状态预判与幂等
+M8-C7 评论 Executor、提交确认和结果不确定处理
+M8-C8 任务台、队列、暂停/继续/取消、验证码接管、精确重试、审计与导出
+M8-C9 互动真实业务综合验收
 ```
 
 明确不建设：
@@ -539,17 +593,23 @@ M8-C8 互动真实业务闭环验收
 - 转发；
 - 私信；
 - 主动搜索互动作品。
+- 独立 `interaction_batch`；
+- `interaction_item`。
 
 这些不是暂缓功能，不允许创建占位接口或未来状态。
 
 退出条件：
 
 - 一个 `tracked_object` 对应一个 `interaction_task`；
-- 每个账号生成一个 `interaction_item`；
+- 批量选择多个作品时分别创建 `interaction_task`，批量操作不形成独立核心对象；
+- 每个账号直接生成一个实际 `task`，并保存动作快照；
 - 每次真实执行和重试产生新的 `task`；
 - 个人模板仅本人可见；
+- 风控、账号、Profile、代理和登录状态预检通过后才执行；
+- 支持暂停、继续、取消、验证码人工接管和动作级精确重试；
 - 高风险结果不确定时停止自动重试；
-- 不存在明确排除能力的残留实现。
+- 不存在明确排除能力的残留实现；
+- M8-C9 通过真实点赞/收藏/评论、UI、并发、人工接管、恢复、安全和独立提交验收。
 
 ### M9：效果采集与数据统计
 
@@ -566,13 +626,14 @@ M8-C8 互动真实业务闭环验收
 候选 CHG：
 
 ```text
-M9-C1 跟踪对象和 metric_snapshot
+M9-C1 platform_metric_snapshot 模型、采集 Contract 与调度
 M9-C2 B站效果采集
 M9-C3 百家号效果采集
-M9-C4 素材、策略、账号和平台聚合
-M9-C5 基础运营看板
-M9-C6 生产信号与重复风险数据
-M9-C7 统计闭环验收
+M9-C4 工作量和内容发现/素材/生产/发布/互动业务聚合
+M9-C5 用户、账号、Profile、代理和运行环境统计与新鲜度
+M9-C6 看板、趋势、排名、漏斗、积压、提醒和下钻
+M9-C7 Excel 导出、权限、历史范围快照与明细对账
+M9-C8 数据统计综合验收
 ```
 
 关键约束：
@@ -580,15 +641,18 @@ M9-C7 统计闭环验收
 - Analytics 只读取正式业务事实；
 - 统计异常不能修改原始业务数据；
 - 原始快照和聚合结果分离；
-- 首版不建设复杂实时数仓。
+- 首版不建设复杂实时数仓；
+- 不建设 `production_signal`，生产提示和重复风险从正式业务事实派生。
 
 退出条件：
 
-- 发布链接可以建立跟踪对象；
+- `tracked_object` 已由 M6/M8 创建，M9 不重新定义或延迟创建；
 - 定时采集生成不可变快照；
-- 可以按主要业务维度查询效果；
+- 可以按用户、游戏、平台、账号、Profile、代理、素材、策略和时间查询工作与效果；
+- 支持趋势、排名、漏斗、积压、提醒、下钻、Excel 导出和明细对账；
+- 历史范围使用业务发生时快照，不随后续主数据变化改写；
 - 采集失败不影响发布业务；
-- 可以形成最小再生产信号。
+- M9-C8 通过真实 B站/百家号采集、调度恢复、权限、UI、导出、对账和独立提交验收。
 
 ### M10：打包、升级、诊断与稳定性验收
 
@@ -605,26 +669,33 @@ M9-C7 统计闭环验收
 候选 CHG：
 
 ```text
-M10-C1 Agent 正式打包和受控依赖
-M10-C2 FFmpeg 分发、校验和许可证
-M10-C3 Desktop 三平台安装包
-M10-C4 版本兼容和更新机制
-M10-C5 日志脱敏和诊断包
-M10-C6 中断恢复、安全和故障演练
-M10-C7 全系统发布验收
+M10-C1 Cloud Docker Compose、反向代理、HTTPS、配置和 Migration 部署
+M10-C2 MySQL/Object Storage 备份、恢复和回滚
+M10-C3 Agent 正式打包、受控依赖和可复现构建
+M10-C4 FFmpeg/FFprobe 分发、Manifest、Hash 和许可证
+M10-C5 Desktop 生产级 WebView、Sidecar 生命周期和本地数据目录
+M10-C6 Windows x64、macOS Intel/Apple Silicon 安装包、签名和公证
+M10-C7 组件更新、版本兼容、升级、回滚和用户数据保留
+M10-C8 Cloud/本地状态页、告警、日志脱敏和诊断包
+M10-C9 中断恢复、安全、备份恢复和升级故障演练
+M10-C10 全系统生产发布综合验收
 ```
 
 退出条件：
 
 - 用户不需要安装系统 Python；
 - 不依赖系统 FFmpeg；
-- 三种桌面目标可以构建；
+- Cloud 可通过 HTTPS 部署，Migration、备份、恢复和回滚可演练；
+- MySQL 和 Object Storage 均有可验证备份/恢复；
+- 三种桌面目标可以构建、安装、启动、卸载，macOS 完成签名和公证；
+- Desktop 使用 M0/M1 的真实集成并完成生产级 Sidecar、目录、权限和更新加固；
 - 不兼容版本禁止执行敏感任务；
+- 升级失败可回滚且不删除用户数据；
 - 普通日志不存在敏感信息；
-- 可以导出诊断信息；
+- Cloud 和本地状态页、告警、诊断包可以定位关键故障；
 - 关键中断恢复场景通过；
 - `release-matrix.yaml` 存在正式可用版本组合；
-- 全系统最终验收通过。
+- M10-C10 通过安装、升级、回滚、备份恢复、安全、诊断、三平台和全业务回归验收。
 
 ## 4. CHG 粒度
 

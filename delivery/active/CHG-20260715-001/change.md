@@ -117,7 +117,7 @@ failing verification
 | T-03 | Correct engineering/contract governance descriptions for real Desktop, persistent task infrastructure and formal schema gates. | DONE | Architecture/contract-map consistency scan. |
 | T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | DONE | Exit-gate checklist against current code facts. |
 | T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | DONE | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
-| T-06 | Correct M3-M10 flows, objects, dependencies, missing CHGs and acceptance gates. | TODO | Chapters 4-8 and architecture crosswalk; forbidden-object scan. |
+| T-06 | Correct M3-M10 flows, objects, dependencies, missing CHGs and acceptance gates. | DONE | Chapters 4-8 and architecture crosswalk; forbidden-object scan. |
 | T-07 | Align Ledger, human/machine contract governance, release wording and generated AI context. | TODO | Workspace governance scripts and single Active CHG verification. |
 | T-08 | Run full Workspace regression, record diff/coverage evidence, and prepare the CHG for user review/closure. | TODO | `verify_m0_config.py`, Workspace tests, new alignment verifier, `git diff --check`. |
 
@@ -177,12 +177,13 @@ Completed:
 - T-03 aligned the engineering architecture, human contract map and release-matrix planning note with real Desktop, persistent task/Agent state, scheduler/object-storage ordering and formal task-schema gates.
 - T-04 reopened M0 as `IN_PROGRESS`, reset M1 to `NOT_STARTED`, retained historical scaffold/noop evidence, and defined M0-R1..R6 plus M1-R1..R8 real component and mock-free end-to-end gates.
 - T-05 reset M2 to `NOT_STARTED` and mapped the complete Chapter 3 account/environment domain to M2-C1..C11, with historical C1-C6 code and evidence retained only as reusable inputs.
+- T-06 corrected M3-M10 canonical flows, restored missing task/infrastructure dependencies, expanded candidate CHGs and added automated/real/UI/recovery/security acceptance gates.
 
 Current:
-- T-06 M3-M10 correction.
+- T-07 governance alignment and T-08 automated verification/evidence.
 
 Next:
-- Replace downstream stale objects, restore missing task/dependency links and add product-complete acceptance gates for M3-M10.
+- Add a test-first alignment verifier, run the full Workspace matrix and prepare final evidence/checkpoint.
 
 Blocked:
 - None.
@@ -195,6 +196,7 @@ Recent verification:
 - `python3 scripts/verify_m0_config.py` passes with the mixed active/placeholder contract state documented consistently.
 - M0/M1 exit-gate review now rejects echo builds, Mock-only Desktop entry points, in-memory production task state and placeholder task schemas.
 - Chapter 3 crosswalk maps every user/account/Profile/proxy/Cookie/onboarding/runtime/UI cluster to exactly one new M2 delivery group.
+- Product/milestone crosswalk is PASS: M3-M10 now use canonical objects and each infrastructure dependency precedes its first consumer.
 
 ## 13. DONE Gate
 

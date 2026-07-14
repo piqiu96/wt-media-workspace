@@ -4,7 +4,7 @@
 - Task: `T-02` through `T-06`
 - Date: 2026-07-15
 - Type: product and plan cross-reference
-- Status: IN_PROGRESS
+- Status: PASS
 
 ## Canonical Object and Ownership Resolutions
 
@@ -31,17 +31,18 @@
 | BitBrowser binding, Profile synchronization and Cloud assignment | Chapter 3 | M2 | M2-C3/C4. |
 | Proxy, Cookie, account health and onboarding | Chapter 3 | M2 | M2-C5/C6/C7. |
 | Agent runtime, environment, Profile concurrency and product UI acceptance | Chapters 2-3 | M2 | M2-C8 through C11. |
-| Douyin instant query, monitoring, `source_content` and material conversion | Chapter 4 | M3 | To be rewritten in T-06. |
-| Material lifecycle and local composition | Chapter 5 | M4 | To be rewritten in T-06. |
-| Cloud composition and output pool | Chapter 5 | M5 | To be rewritten in T-06. |
-| Common publication plus Bilibili | Chapter 6 | M6 | To be rewritten in T-06. |
-| Baijiahao adapter and regression | Chapter 6 | M7 | To be rewritten in T-06. |
-| Interaction target, task and action execution | Chapter 7 | M8 | To be rewritten in T-06. |
-| Metric collection, operations statistics and dashboards | Chapter 8 | M9 | To be rewritten in T-06. |
-| Deployment, packaging, update, diagnostics and recovery | Chapter 2 and engineering architecture | M10 | To be rewritten in T-06. |
+| Douyin instant query, monitoring, `source_content` and material conversion | Chapter 4 | M3 | M3-C1 through C9. |
+| Material lifecycle and local composition | Chapter 5 | M4 | M4-C1 through C10. |
+| Cloud composition and output pool | Chapter 5 | M5 | M5-C1 through C9. |
+| Common publication plus Bilibili | Chapter 6 | M6 | M6-C1 through C10. |
+| Baijiahao adapter and regression | Chapter 6 | M7 | M7-C1 through C5. |
+| Interaction target, task and action execution | Chapter 7 | M8 | M8-C1 through C9. |
+| Metric collection, operations statistics and dashboards | Chapter 8 | M9 | M9-C1 through C8. |
+| Deployment, packaging, update, diagnostics and recovery | Chapter 2 and engineering architecture | M10 | M10-C1 through C10. |
 
 ## Verification Notes
 
 - Historical/deprecation tables may name removed objects to state that they are not built.
 - Current operational flows and candidate CHGs must use only canonical objects.
-- Final coverage and status are recorded after T-06 rewrites the Master Plan.
+- All capability clusters now have one owning product chapter, one first delivery milestone and an explicit candidate CHG range.
+- The Master Plan places formal task schemas and persistent task infrastructure in M1, Scheduler before M3 monitoring, Object Storage before M5 cloud outputs, and `tracked_object` creation in M6/M8 before M9 metrics.
