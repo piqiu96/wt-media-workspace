@@ -115,10 +115,10 @@ DONE
 | 状态 | `IN_PROGRESS` |
 | 目标 | 建立四仓库协作、Codex 执行控制、基础构建、测试和质量门禁，为后续长期实施提供稳定环境。 |
 | 依赖 | None |
-| Active CHG | `CHG-20260714-003` |
-| Evidence | CHG-002 执行控制提交；CHG-003 evidence；后续 M0 综合验收 evidence。 |
+| Active CHG | None |
+| Evidence | CHG-002 执行控制提交；CHG-003 Master Plan 固化提交；CHG-004 工程骨架审计 evidence 与三端 M0 骨架提交；后续 M0 综合验收 evidence。 |
 | 完成日期 | None |
-| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 pending。 |
+| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit pending。 |
 
 候选 CHG：
 

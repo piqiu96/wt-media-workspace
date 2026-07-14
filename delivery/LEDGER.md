@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260714-004 | M0 engineering skeleton audit and dirty worktree closure | DONE | wt-media-workspace |
