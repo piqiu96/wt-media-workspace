@@ -1,0 +1,20 @@
+---
+name: agent-platform-adapter-change
+description: Add or modify Agent platform adapters for Douyin, Bilibili, or Baijiahao.
+---
+
+# Agent Platform Adapter Change
+
+Use this skill when changing platform-specific execution behavior.
+
+## Check
+
+- Platform differences stay under `src/wt_media_agent/platforms`.
+- High-risk actions report uncertain results when confirmation fails.
+- Runtime adapters do not contain platform business rules.
+- Agent does not decide formal Cloud business status.
+- External e2e actions require explicit opt-in.
+
+## Output
+
+Summarize platform, action type, risk handling, and test isolation.

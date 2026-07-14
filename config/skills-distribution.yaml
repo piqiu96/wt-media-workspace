@@ -1,0 +1,35 @@
+schema_version: 1
+skills_revision: "2026.07.14.bootstrap"
+
+targets:
+  root:
+    path: ".."
+    commit_generated: false
+    groups:
+      - common
+      - workspace
+      - cloud
+      - agent
+      - desktop
+  cloud:
+    path: "../wt-media-cloud"
+    commit_generated: true
+    groups:
+      - common
+      - cloud
+  agent:
+    path: "../wt-media-agent"
+    commit_generated: true
+    groups:
+      - common
+      - agent
+  desktop:
+    path: "../wt-media-desktop"
+    commit_generated: true
+    groups:
+      - common
+      - desktop
+
+tools:
+  - codex
+  - claude

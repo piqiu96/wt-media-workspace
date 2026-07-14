@@ -1,0 +1,23 @@
+schema_version: 1
+
+releases:
+  - release: "0.1.0-bootstrap"
+    status: scaffold
+    date: "2026-07-14"
+    components:
+      cloud: "0.1.0"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.1.0"
+    contracts:
+      cloud_api: v1
+      cloud_agent_api: v1
+      business_schemas: v1
+      task_schemas: v1
+      business_enums: v1
+      cloud_error_codes: v1
+      local_agent_api: v1
+      local_event_schemas: v1
+      local_status_enums: v1
+      local_error_codes: v1
+      revision: "2026.07.14.1"

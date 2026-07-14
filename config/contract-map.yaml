@@ -1,0 +1,60 @@
+schema_version: 1
+
+contracts:
+  cloud_api:
+    owner: wt-media-cloud
+    path: ../wt-media-cloud/contracts/cloud-api
+    consumers:
+      - wt-media-cloud/web
+      - wt-media-desktop
+  cloud_agent_api:
+    owner: wt-media-cloud
+    path: ../wt-media-cloud/contracts/cloud-agent-api
+    consumers:
+      - wt-media-agent
+  business_schemas:
+    owner: wt-media-cloud
+    path: ../wt-media-cloud/contracts/business-schemas
+    consumers:
+      - wt-media-agent
+      - wt-media-desktop
+  task_schemas:
+    owner: wt-media-cloud
+    path: ../wt-media-cloud/contracts/task-schemas
+    consumers:
+      - wt-media-agent
+      - wt-media-desktop
+  business_enums:
+    owner: wt-media-cloud
+    path: ../wt-media-cloud/contracts/business-enums
+    consumers:
+      - wt-media-cloud/web
+      - wt-media-agent
+      - wt-media-desktop
+  cloud_error_codes:
+    owner: wt-media-cloud
+    path: ../wt-media-cloud/contracts/cloud-error-codes
+    consumers:
+      - wt-media-cloud/web
+      - wt-media-agent
+      - wt-media-desktop
+  local_agent_api:
+    owner: wt-media-agent
+    path: ../wt-media-agent/contracts/local-agent-api
+    consumers:
+      - wt-media-desktop
+  local_event_schemas:
+    owner: wt-media-agent
+    path: ../wt-media-agent/contracts/local-event-schemas
+    consumers:
+      - wt-media-desktop
+  local_status_enums:
+    owner: wt-media-agent
+    path: ../wt-media-agent/contracts/local-status-enums
+    consumers:
+      - wt-media-desktop
+  local_error_codes:
+    owner: wt-media-agent
+    path: ../wt-media-agent/contracts/local-error-codes
+    consumers:
+      - wt-media-desktop
