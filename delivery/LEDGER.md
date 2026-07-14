@@ -6,4 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260714-012 | M1-C5 Local Agent HTTP SSE offline queue | IMPLEMENTING | wt-media-workspace |
