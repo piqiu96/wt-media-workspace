@@ -88,7 +88,7 @@ None.
 | T-02 | Add Cloud-owned Cloud-Agent `v1` compatibility contract and runtime endpoint. | DONE | `evidence/cloud-contract-and-endpoint.md` |
 | T-03 | Add Agent consumer compatibility version checks. | DONE | `evidence/agent-compatibility.md` |
 | T-04 | Update Workspace Contract Map, Release Matrix, verification script, and evidence. | DONE | `evidence/workspace-config.md` |
-| T-05 | Run integrated acceptance, commit affected repos, push, and close CHG. | TODO | Git status, CI status, final evidence |
+| T-05 | Run integrated acceptance, commit affected repos, push, and close CHG. | IN_PROGRESS | `evidence/integration-and-diff.md` |
 
 ## 9. Repository Checklist
 
@@ -130,7 +130,7 @@ None.
 | AC-04 | Agent can determine whether Cloud-Agent contract metadata is compatible. | Agent unit tests | PASS |
 | AC-05 | Workspace machine-readable config records active `cloud_agent_api` without duplicating full definitions. | `scripts/verify_m0_config.py` or successor validation | PASS |
 | AC-06 | Release Matrix records a verified M1-C1 combination. | File inspection and config verification | PASS |
-| AC-07 | No registration, heartbeat, task execution, Desktop page, or account/Profile behavior is introduced. | Diff scan | TODO |
+| AC-07 | No registration, heartbeat, task execution, Desktop page, or account/Profile behavior is introduced. | Diff scan | PASS |
 | AC-08 | Affected repositories are committed independently and pushed. | Git log/status | TODO |
 
 ## 11. Evidence
@@ -166,12 +166,15 @@ Completed:
 - Updated Workspace Contract Map and Release Matrix.
 - Updated Workspace config verification tests.
 - Verified Workspace tests, Skill source checks, and config validation.
+- Ran integrated local acceptance across Workspace, Cloud, Agent, and Desktop.
+- Verified Cloud compatibility endpoint response.
+- Confirmed diff scan has no out-of-scope implementation.
 
 Current:
 - T-05 integrated acceptance, commit/push, and close CHG.
 
 Next:
-- Commit Workspace config slice, then run integrated acceptance and diff scan.
+- Commit final evidence snapshot, push affected repositories, then remove completed active record.
 
 Blocked:
 - None.
@@ -187,6 +190,8 @@ Recent verification:
 - `python3 -m unittest discover -s tests`
 - `python3 scripts/verify_skills.py`
 - `python3 scripts/verify_m0_config.py`
+- `npm run verify`
+- out-of-scope `rg` scans over changed runtime files
 
 ## 13. DONE Gate
 
