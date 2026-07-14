@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260714-017 | M2-C3 比特浏览器用户与 Profile 绑定 | IMPLEMENTING | wt-media-workspace |
