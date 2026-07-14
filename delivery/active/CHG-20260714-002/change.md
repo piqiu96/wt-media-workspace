@@ -86,7 +86,7 @@ None.
 | T-02 | Add `executing-wt-media-change` Skill and rule references. | DONE | `python3 scripts/verify_skills.py`, rule text inspection. |
 | T-03 | Extend `prepare_ai_workspace.py --change` and generated context. | DONE | Manual command run and generated file inspection. |
 | T-04 | Record final verification evidence and close DONE gate. | DONE | Unit tests, test summary, diff summary, runtime repo status check. |
-| T-05 | Commit workspace/root changes and remove completed active record from active index. | TODO | Git status and commit log checks. |
+| T-05 | Commit workspace/root changes and remove completed active record from active index. | DONE | Git status and commit log checks. |
 
 ## 9. Repository Checklist
 
@@ -160,10 +160,10 @@ Completed:
 - T-04 added script tests, recorded final evidence, and closed the acceptance matrix.
 
 Current:
-- T-05 final commits and completed active record handling.
+- CHG-002 complete.
 
 Next:
-- Commit remaining evidence/tests and remove the completed active CHG from active index.
+- Remove the completed active CHG from `delivery/active` and `delivery/LEDGER.md`; Git keeps the full history and evidence.
 
 Blocked:
 - None.
@@ -183,6 +183,14 @@ Recent verification:
 - `python3 -m unittest discover -s tests`
 - `python3 scripts/prepare_ai_workspace.py --no-write --change CHG-20260714-002`
 - `git status --short` in `wt-media-cloud`, `wt-media-agent`, and `wt-media-desktop`
+- Workspace commits:
+  - `63092e8 chore: establish CHG execution records`
+  - `1504355 chore: add CHG execution skill`
+  - `e20f672 chore: generate current CHG context`
+  - `681d9c9 test: cover CHG workspace preparation`
+- Root commits:
+  - `fc0c13e chore: require CHG execution skill`
+  - `54e46e5 chore: ignore generated AI context`
 
 ## 13. DONE Gate
 
@@ -195,4 +203,4 @@ Recent verification:
 - [x] Runtime repositories untouched by this CHG.
 - [x] Required baselines updated.
 - [x] Affected repositories committed independently.
-- [ ] Completed active record handling is consistent with Git-history retention.
+- [x] Completed active record handling is consistent with Git-history retention.
