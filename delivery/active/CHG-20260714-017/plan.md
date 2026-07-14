@@ -21,42 +21,42 @@
 **Files:** create `src/wt_media_agent/runtimes/bitbrowser.py`; create `tests/test_bitbrowser_runtime.py`; modify Agent config.
 
 - [ ] Write failing tests for zero-based 100-item paging, error/timeout JSON handling, field allow-listing, and uniform `userId` validation.
-- [ ] Run `uv run pytest tests/test_bitbrowser_runtime.py -q` and confirm missing module failure.
-- [ ] Implement injectable HTTP transport, typed snapshot/Profile values, and explicit errors.
-- [ ] Re-run focused tests and require PASS.
+- [x] Run the focused unittest and confirm missing module failure.
+- [x] Implement injectable HTTP transport, typed snapshot/Profile values, and explicit errors.
+- [x] Re-run focused tests and require PASS.
 
 ### Task 2: Agent Local API and provider contracts
 
 **Files:** modify `local_api/server.py`; add `contracts/local-agent-api/v1/local-agent.openapi.yaml`, event/status/error v1 files; modify tests/readmes.
 
-- [ ] Add failing Local API tests for Profile scan success and unavailable/mismatch errors.
-- [ ] Implement `POST /api/v1/bit-browser/profile-scans` without exposing the configured Bit API URL or raw response.
-- [ ] Publish actual M1 health/status/events plus C3 scan definitions at revision `2026.07.14.6`.
-- [ ] Run Agent full tests, Ruff, contract YAML parse, and real local health verification.
+- [x] Add failing Local API tests for Profile scan success and unavailable/mismatch errors.
+- [x] Implement `POST /api/v1/bit-browser/profile-scans` without exposing the configured Bit API URL or raw response.
+- [x] Publish actual M1 health/status/events plus C3 scan definitions at revision `2026.07.14.6`.
+- [x] Run the Agent full unittest suite, contract YAML parse, and real local health verification; Ruff is not a declared Agent dependency or CI gate.
 
 ### Task 3: Cloud staged binding domain and persistence
 
 **Files:** create `internal/modules/profilebinding/{service,store_mysql}.go` plus tests; add migration `20260714_003_browser_profiles.sql`; extend identity/media-account persistence only through explicit interfaces.
 
-- [ ] Write failing service tests for ready/mixed/empty/mismatch scans, no pre-confirm writes, self-confirm, Diff apply, and no rebind.
-- [ ] Implement domain service and safe public values.
-- [ ] Write failing sqlmock/migration tests, then implement transactionally confirmed binding/Profile upsert/missing-state apply.
-- [ ] Require focused and full Go tests PASS.
+- [x] Write failing service tests for ready/mixed/empty/mismatch scans, no pre-confirm writes, self-confirm, Diff apply, and no rebind.
+- [x] Implement domain service and safe public values.
+- [x] Write failing sqlmock/migration tests, then implement transactionally confirmed binding/Profile upsert/missing-state apply.
+- [x] Require focused and full Go tests PASS.
 
 ### Task 4: Cloud API, media-account binding, Web, and provider contracts
 
 **Files:** add profile routes/tests/contracts and Web client/tests; extend media-account service/store/routes and migration constraints.
 
-- [ ] Add failing authenticated route tests for submit/review/confirm and same-user Profile binding.
-- [ ] Implement routes using C1 session identity; do not accept an actor ID body field.
-- [ ] Add failing Vitest client tests for scan review/confirm and secret stripping; implement minimal review UI.
-- [ ] Publish Cloud revision `2026.07.14.3` and run Go/Web/YAML/security gates.
+- [x] Add failing authenticated route tests for submit/review/confirm and same-user Profile binding.
+- [x] Implement routes using C1 session identity; do not accept an actor ID body field.
+- [x] Add failing Vitest client tests for scan review/confirm and secret stripping; implement the review/confirm client surface.
+- [x] Publish Cloud revision `2026.07.14.3` and run Go/Web/YAML/security gates.
 
 ### Task 5: Governance and closure
 
 **Files:** update Contract Map/release matrix/verifier, CHG evidence/checkpoint, then active delivery.
 
-- [ ] Change governance data first and observe the old verifier reject the new revisions.
-- [ ] Update verifier and run all Workspace tests.
-- [ ] Record provider conflict repair, red/green evidence, no-live-BitBrowser limitation, and commits.
+- [x] Change governance data first and observe the old verifier reject the new revisions.
+- [x] Update verifier and run all Workspace tests.
+- [x] Record provider conflict repair, red/green evidence, no-live-BitBrowser limitation, and commits.
 - [ ] Close only with all ACs PASS and activate C4 under the user's continuous-execution authorization.

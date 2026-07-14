@@ -1,5 +1,5 @@
 schema_version: 1
-contract_state: m2_media_accounts
+contract_state: m2_bitbrowser_profile_binding
 formal_definitions_active: true
 
 contracts:
@@ -9,7 +9,7 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.07.14.2"
+    contract_revision: "2026.07.14.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -29,7 +29,7 @@ contracts:
     path: ../wt-media-cloud/contracts/business-schemas
     state: active
     formal_definition: active
-    schema_revision: "2026.07.14.2"
+    schema_revision: "2026.07.14.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -47,7 +47,7 @@ contracts:
     path: ../wt-media-cloud/contracts/business-enums
     state: active
     formal_definition: active
-    enum_revision: "2026.07.14.2"
+    enum_revision: "2026.07.14.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -57,7 +57,7 @@ contracts:
     path: ../wt-media-cloud/contracts/cloud-error-codes
     state: active
     formal_definition: active
-    error_revision: "2026.07.14.2"
+    error_revision: "2026.07.14.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -68,7 +68,7 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.07.14.5"
+    contract_revision: "2026.07.14.6"
     consumers:
       - wt-media-desktop
   local_event_schemas:
@@ -76,20 +76,22 @@ contracts:
     path: ../wt-media-agent/contracts/local-event-schemas
     state: active
     formal_definition: active
-    event_revision: "2026.07.14.5"
+    event_revision: "2026.07.14.6"
     consumers:
       - wt-media-desktop
   local_status_enums:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-status-enums
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    enum_revision: "2026.07.14.6"
     consumers:
       - wt-media-desktop
   local_error_codes:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-error-codes
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    error_revision: "2026.07.14.6"
     consumers:
       - wt-media-desktop

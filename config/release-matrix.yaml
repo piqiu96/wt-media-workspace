@@ -376,3 +376,32 @@ releases:
         - "not affected in M2-C2"
       desktop:
         - "not affected in M2-C2"
+  - release: "0.2.2-m2-bitbrowser-profile-binding"
+    status: verified
+    date: "2026-07-14"
+    scope: m2_bitbrowser_user_profile_binding
+    components:
+      cloud: "0.2.2"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.2.0"
+    contract_state: m2_bitbrowser_profile_binding
+    formal_contract_versions_active: true
+    contracts:
+      cloud_api: "v1@2026.07.14.3"
+      cloud_agent_api: "v1@2026.07.14.4"
+      business_schemas: "browser-profile@2026.07.14.3"
+      task_schemas: m0-placeholder
+      business_enums: "browser-profile@2026.07.14.3"
+      cloud_error_codes: "browser-profile@2026.07.14.3"
+      local_agent_api: "v1@2026.07.14.6"
+      local_event_schemas: "status@2026.07.14.6"
+      local_status_enums: "status@2026.07.14.6"
+      local_error_codes: "bitbrowser@2026.07.14.6"
+      revision: "m2-bitbrowser-profile-binding-20260714.3"
+    verification:
+      workspace: ["python3 scripts/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify_skills.py"]
+      cloud: ["go test ./...", "go vet ./...", "scripts/verify-health.sh", "contract YAML parse"]
+      web: ["npm test", "npm run build", "npm audit --audit-level=high"]
+      agent: ["python3.12 -m unittest discover -s tests", "scripts/verify-health.sh", "contract YAML parse"]
+      desktop: ["not affected in M2-C3"]

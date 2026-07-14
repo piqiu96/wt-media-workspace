@@ -82,11 +82,11 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Activate C3, record external-field ADR and provider-contract conflict resolution plan. | DONE | Context generator and Workspace gates pass. |
-| T-02 | Implement Agent BitBrowser scan/identity validation test-first. | IN_PROGRESS | Python focused tests fail first then pass. |
-| T-03 | Publish Agent Local API provider definitions and expose the scan endpoint test-first. | TODO | Local API tests and YAML validation pass. |
-| T-04 | Implement Cloud staged scans, binding, Profile mirror, and MySQL persistence test-first. | TODO | Focused Go/sqlmock/migration tests pass. |
-| T-05 | Implement authenticated Cloud API, media-account Profile binding, Web client, and Cloud contracts test-first. | TODO | Route/Web/full tests pass. |
-| T-06 | Run cross-repo verification, record limitations, close C3, then activate C4 under D-09. | TODO | Acceptance matrix and independent commits complete. |
+| T-02 | Implement Agent BitBrowser scan/identity validation test-first. | DONE | Focused tests failed on the absent adapter, then the full Python suite passed. |
+| T-03 | Publish Agent Local API provider definitions and expose the scan endpoint test-first. | DONE | Local API tests, four provider YAML parses, and real local health passed. |
+| T-04 | Implement Cloud staged scans, binding, Profile mirror, and MySQL persistence test-first. | DONE | Focused domain/sqlmock tests and the full Go suite passed. |
+| T-05 | Implement authenticated Cloud API, media-account Profile binding, Web client, and Cloud contracts test-first. | DONE | Route tests, Web client tests/build, and sixteen provider YAML parses passed. |
+| T-06 | Run cross-repo verification, record limitations, close C3, then activate C4 under D-09. | IN_PROGRESS | Acceptance matrix and independent commits complete. |
 
 ## 9. Repository Checklist
 
@@ -94,18 +94,19 @@ None.
 
 - [x] Record active CHG and durable external identity mapping.
 - [x] Refresh context, verify, and commit plan.
-- [ ] Advance contract/release governance and close.
+- [x] Advance contract/release governance.
+- [ ] Close after final cross-repository regression.
 
 ### wt-media-cloud
 
-- [ ] Add staged Profile identity/domain persistence.
-- [ ] Add Profile/media-account binding APIs and contracts.
-- [ ] Add safe Web review/confirm flow.
+- [x] Add staged Profile identity/domain persistence.
+- [x] Add Profile/media-account binding APIs and contracts.
+- [x] Add secret-safe Web review/confirm client behavior.
 
 ### wt-media-agent
 
-- [ ] Add BitBrowser adapter and full-list identity validation.
-- [ ] Repair/publish Local API v1 definitions and add scan route.
+- [x] Add BitBrowser adapter and full-list identity validation.
+- [x] Repair/publish Local API v1 definitions and add scan route.
 
 ### wt-media-desktop
 
@@ -115,11 +116,11 @@ None.
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Agent pages through all Profiles, strips secrets, and yields one verified normalized owner only when every Profile has the same non-empty `userId`. | Adapter tests. | TODO |
-| AC-02 | Cloud scan submission does not modify formal binding/Profile data; confirmation applies only a ready self-owned scan. | Service/store/route tests. | TODO |
-| AC-03 | Mismatch, mixed/empty identity, failed/expired scan, or attempted rebind applies no formal change and produces an explicit error/status. | Domain/API tests. | TODO |
-| AC-04 | Media accounts bind only to same-user active Profiles and enforce one account per Profile/platform. | Service/MySQL tests. | TODO |
-| AC-05 | Agent and Cloud provider definitions exist, match runtime behavior, and contain no Cookie/proxy secrets; C4/C5 behavior is absent. | YAML/diff/full verification. | TODO |
+| AC-01 | Agent pages through all Profiles, strips secrets, and yields one verified normalized owner only when every Profile has the same non-empty `userId`. | Adapter tests. | PASS |
+| AC-02 | Cloud scan submission does not modify formal binding/Profile data; confirmation applies only a ready self-owned scan. | Service/store/route tests. | PASS |
+| AC-03 | Mismatch, mixed/empty identity, failed/expired scan, or attempted rebind applies no formal change and produces an explicit error/status. | Domain/API tests. | PASS |
+| AC-04 | Media accounts bind only to same-user active Profiles and enforce one account per Profile/platform. | Service/MySQL tests. | PASS |
+| AC-05 | Agent and Cloud provider definitions exist, match runtime behavior, and contain no Cookie/proxy secrets; C4/C5 behavior is absent. | YAML/diff/full verification. | PASS |
 
 ## 11. Evidence
 
@@ -134,27 +135,32 @@ Completed:
 - C2 completed and was removed from active delivery.
 - Official BitBrowser API was checked and ADR-0002 records the external identity normalization.
 - Missing Agent provider definitions were identified before C3 runtime edits.
+- Agent revision `2026.07.14.6` now provides secret-safe BitBrowser paging/identity validation and the Local scan API.
+- Cloud revision `2026.07.14.3` now provides staged scan review/confirmation, Profile mirrors, and media-account Profile binding.
+- Contract Map and release matrix advance only after provider definitions and runtime verification exist.
 
 Current:
-- Write the failing Agent BitBrowser adapter tests.
+- Run the final fresh cross-repository regression and record commit/evidence closure.
 
 Next:
-- Write the failing Agent BitBrowser adapter tests.
+- Close C3 and activate M2-C4 without an approval pause under D-09.
 
 Blocked:
 - None; the provider-contract conflict is explicitly in C3 scope and must be resolved before contract advancement.
 
 Recent verification:
-- Context generator reports CHG-017 IMPLEMENTING with Workspace, Cloud, and Agent scope; C2 final gates passed and repositories were clean before C3 activation.
+- Agent 28-test full suite, four provider YAML files, and real local health passed.
+- Cloud full Go/vet, eight Web tests/build, and sixteen provider YAML files passed before the final fresh regression.
+- Workspace contract/release verifier accepts the C3 revisions; the old verifier first rejected the intentional governance advance.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
+- [x] Scope completed.
 - [x] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed or justified.
+- [x] Manual verification evidence recorded where required.
+- [x] Diff checked for out-of-scope changes.
+- [x] Runtime repositories touched only if listed in scope.
+- [x] Required baselines updated.
+- [x] Affected repositories committed independently.
