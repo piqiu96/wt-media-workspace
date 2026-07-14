@@ -6,4 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260714-006 | M0-C4 tests CI contract map and release matrix | DONE | wt-media-workspace |
