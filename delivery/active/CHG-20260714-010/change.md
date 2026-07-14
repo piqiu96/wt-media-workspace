@@ -77,10 +77,10 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create Active CHG and refresh context. | DONE | `prepare_ai_workspace.py --change CHG-20260714-010` |
-| T-02 | Add Cloud task contract/store/endpoints. | TODO | Cloud tests and curl |
-| T-03 | Add Agent task claim client. | TODO | Agent tests |
-| T-04 | Update Workspace config/evidence and run integrated verification. | TODO | Workspace/Cloud/Agent/Desktop checks |
-| T-05 | Commit, push, cleanup active record. | TODO | Git/CI status |
+| T-02 | Add Cloud task contract/store/endpoints. | DONE | `evidence/cloud-task-store.md` |
+| T-03 | Add Agent task claim client. | DONE | `evidence/agent-task-client.md` |
+| T-04 | Update Workspace config/evidence and run integrated verification. | DONE | `evidence/integration-and-diff.md` |
+| T-05 | Commit, push, cleanup active record. | IN_PROGRESS | Git/CI status |
 
 ## 9. Repository Checklist
 
@@ -95,16 +95,16 @@ None.
 
 ### wt-media-cloud
 
-- [ ] Add task contract artifact.
-- [ ] Add in-memory task store.
-- [ ] Add create and claim endpoints.
-- [ ] Add tests.
+- [x] Add task contract artifact.
+- [x] Add in-memory task store.
+- [x] Add create and claim endpoints.
+- [x] Add tests.
 - [ ] Commit independently.
 
 ### wt-media-agent
 
-- [ ] Add task claim client method.
-- [ ] Add tests.
+- [x] Add task claim client method.
+- [x] Add tests.
 - [ ] Commit independently.
 
 ### wt-media-desktop
@@ -116,11 +116,11 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | PASS |
-| AC-02 | Cloud can create `noop_task` idempotently. | Cloud tests/curl | TODO |
-| AC-03 | Only one Agent can claim a valid task lease. | Cloud tests | TODO |
-| AC-04 | Same Agent can retry claim idempotently while lease is valid. | Cloud tests | TODO |
-| AC-05 | Agent can build claim request. | Agent tests | TODO |
-| AC-06 | No executor/progress/SSE/Desktop/account behavior is introduced. | Diff scan | TODO |
+| AC-02 | Cloud can create `noop_task` idempotently. | Cloud tests/curl | PASS |
+| AC-03 | Only one Agent can claim a valid task lease. | Cloud tests | PASS |
+| AC-04 | Same Agent can retry claim idempotently while lease is valid. | Cloud tests | PASS |
+| AC-05 | Agent can build claim request. | Agent tests | PASS |
+| AC-06 | No executor/progress/SSE/Desktop/account behavior is introduced. | Diff scan | PASS |
 | AC-07 | Affected repositories are committed independently and pushed. | Git log/status | TODO |
 
 ## 11. Evidence
@@ -141,13 +141,23 @@ Completed:
 - Updated M1 Active CHG in `delivery/MASTER_IMPLEMENTATION_PLAN.md`.
 - Refreshed root `.ai/CURRENT_CONTEXT.md`.
 - Recorded T-01 evidence.
+- Added Cloud-owned task lease contract artifact.
+- Added Cloud in-memory task store and create/claim/get endpoints.
+- Updated Cloud-Agent contract revision to `2026.07.14.3`.
+- Verified Cloud tests and HTTP create/claim behavior.
+- Updated Agent consumed contract revision to `2026.07.14.3`.
+- Added Agent task claim client method.
+- Verified Agent tests.
+- Updated Workspace Contract Map and Release Matrix for M1-C3.
+- Ran integrated verification across Workspace, Cloud, Agent, and Desktop.
+- Confirmed diff scan has no out-of-scope implementation.
 
 Current:
-- T-02 Cloud task contract/store/endpoints.
+- T-05 commit, push, and active-record cleanup.
 
 Next:
 - Run `prepare_ai_workspace.py --change CHG-20260714-010`.
-- Commit Workspace start record.
+- Commit Workspace evidence/config snapshot, push affected repositories, then remove completed active record.
 
 Blocked:
 - None.
@@ -155,6 +165,14 @@ Blocked:
 Recent verification:
 - `git status --short --branch` in four repositories
 - `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-010`
+- `go test ./...` with Go 1.26 toolchain
+- `curl` create noop task and claim task requests
+- `PYTHONPATH=src python3 -m unittest discover -s tests`
+- `python3 -m unittest discover -s tests`
+- `python3 scripts/verify_skills.py`
+- `python3 scripts/verify_m0_config.py`
+- `npm run verify`
+- out-of-scope `rg` scans over changed runtime files
 
 ## 13. DONE Gate
 
