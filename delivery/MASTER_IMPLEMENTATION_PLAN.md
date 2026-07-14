@@ -118,7 +118,7 @@ DONE
 | Active CHG | None |
 | Evidence | CHG-002 执行控制提交；CHG-003 Master Plan 固化提交；CHG-004 工程骨架审计 evidence 与三端 M0 骨架提交；CHG-005 最小启动和健康检查 evidence；CHG-006 测试、CI、Contract Map 和版本矩阵 evidence；CHG-007 M0 综合验收 evidence。 |
 | 完成日期 | 2026-07-14 |
-| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit pending。 |
+| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit `716c143`。 |
 
 候选 CHG：
 
