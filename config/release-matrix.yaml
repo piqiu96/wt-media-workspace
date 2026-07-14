@@ -1,4 +1,5 @@
 schema_version: 1
+planning_note: "Verified releases are historical scope evidence; revised milestone completion is determined by the current Master Plan and latest comprehensive acceptance."
 
 toolchains:
   cloud:
@@ -16,7 +17,7 @@ toolchains:
     ci_node_version: "25"
     local_observed_node: "25.9.0"
     local_observed_npm: "11.12.1"
-    rust_status: "cargo not required for M0 health verification; Tauri Rust build remains later M0/M10 work."
+    rust_status: "Historical m0_scaffold_health did not require cargo; revised M0 requires a real Tauri Rust build and M1 requires a mock-free Desktop/Local Agent integration."
 
 releases:
   - release: "0.1.0-m0-health"

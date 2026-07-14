@@ -35,7 +35,7 @@
   - `docs/product/prd/详细文档/第六章_发布管理.md`
   - `docs/product/prd/详细文档/第七章_互动管理.md`
   - `docs/product/prd/详细文档/第八章_数据统计.md`
-- 工程基线：`docs/engineering/architecture/模块化自媒体运营平台_系统架构设计说明书_V1.md`
+- 工程基线：`docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md`
 - 契约治理：`docs/contracts/contract-map.md`、`config/contract-map.yaml`
 - 发布治理：`config/release-matrix.yaml`
 - 决策记录：`docs/decisions/0002-bitbrowser-profile-identity-normalization.md`
@@ -122,7 +122,7 @@
 |---|---|---|---|
 | T-01 | 激活独立对齐 CHG，并记录已经确认的核查结论与决策。 | 已完成 | 扫描唯一 Active CHG；检查 `evidence/baseline-audit-20260715.md`。 |
 | T-02 | 统一产品术语、对象归属和跨章节状态规则。 | 已完成 | 扫描旧对象残留，并进行产品交叉引用检查。 |
-| T-03 | 修正真实 Desktop、持久化任务基础设施和正式 Schema 门禁的工程/契约治理说明。 | 待执行 | 检查架构与 Contract Map 一致性。 |
+| T-03 | 修正真实 Desktop、持久化任务基础设施和正式 Schema 门禁的工程/契约治理说明。 | 已完成 | 检查架构与 Contract Map 一致性。 |
 | T-04 | 将 M0/M1 重写为真实组件和端到端环境里程碑，并重置其状态与证据语义。 | 待执行 | 根据当前代码事实核对退出门禁。 |
 | T-05 | 用重新编号的完整产品执行路线替换 M2。 | 待执行 | 第三章能力映射中不得存在未覆盖 P0/P1 项。 |
 | T-06 | 修正 M3-M10 的流程、对象、依赖、缺失 CHG 和验收门禁。 | 待执行 | 交叉核对第四章至第八章与架构，并扫描禁用对象。 |
@@ -183,14 +183,15 @@ Evidence 只记录事实和验证结果；正式需求仍保存在稳定基线�
 - 已完成基线核查并创建独立对齐 CHG。
 - 已创建与 `change.md` 逐项对应的中文审阅版 `change.zh-CN.md`。
 - T-02 已在产品基线中统一 `source_content`、发布取消统计、账号组语义、`tracked_object` 归属以及共享 BitBrowser 主账号树的授权规则。
+- T-03 已对齐工程架构、人类可读 Contract Map 和 Release Matrix 规划说明，明确真实 Desktop、任务/Agent 持久化、Scheduler/Object Storage 顺序和正式任务 Schema 门禁。
 
 当前：
 
-- 正在执行 T-03：工程架构与契约治理对齐。
+- 正在执行 T-04：重建 M0/M1 Master Plan。
 
 下一步：
 
-- 明确真实 Desktop/任务基础设施的就绪门禁，并同步人类可读 Contract Map。
+- 重置 M0/M1 状态语义，并定义真实组件和端到端退出门禁。
 
 阻塞项：
 
@@ -202,6 +203,7 @@ Evidence 只记录事实和验证结果；正式需求仍保存在稳定基线�
 - Active CHG 扫描和生成的 AI 上下文均唯一指向 CHG-20260715-001，没有阻塞问题。
 - 中文审阅版的 D/T/AC 编号与 `change.md` 保持一一对应。
 - 产品旧术语扫描后，废弃对象只保留在明确排除、迁移说明或历史引用语境中。
+- `python3 scripts/verify_m0_config.py` 已通过，混合的 active/placeholder 契约状态已得到一致说明。
 
 ## 13. 完成门禁
 

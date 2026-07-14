@@ -59,7 +59,7 @@
 ### Task 2: Align Engineering and Contract Governance
 
 **Files:**
-- Modify: `docs/engineering/architecture/模块化自媒体运营平台_系统架构设计说明书_V1.md`
+- Modify: `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md`
 - Modify: `docs/contracts/contract-map.md`
 - Modify if factual wording requires it: `config/contract-map.yaml`
 - Modify if historical release descriptions require clarification: `config/release-matrix.yaml`

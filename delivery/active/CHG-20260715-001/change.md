@@ -27,7 +27,7 @@
   - `docs/product/prd/详细文档/第六章_发布管理.md`
   - `docs/product/prd/详细文档/第七章_互动管理.md`
   - `docs/product/prd/详细文档/第八章_数据统计.md`
-- Engineering baseline: `docs/engineering/architecture/模块化自媒体运营平台_系统架构设计说明书_V1.md`
+- Engineering baseline: `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md`
 - Contract governance: `docs/contracts/contract-map.md`, `config/contract-map.yaml`
 - Release governance: `config/release-matrix.yaml`
 - Decisions: `docs/decisions/0002-bitbrowser-profile-identity-normalization.md`
@@ -114,7 +114,7 @@ failing verification
 |---|---|---|---|
 | T-01 | Activate the independent alignment CHG and record the approved audit/decisions. | DONE | Single Active CHG scan; `evidence/baseline-audit-20260715.md`. |
 | T-02 | Normalize product terminology, object ownership and cross-chapter status rules. | DONE | Stale-object contextual scan plus product cross-reference review. |
-| T-03 | Correct engineering/contract governance descriptions for real Desktop, persistent task infrastructure and formal schema gates. | TODO | Architecture/contract-map consistency scan. |
+| T-03 | Correct engineering/contract governance descriptions for real Desktop, persistent task infrastructure and formal schema gates. | DONE | Architecture/contract-map consistency scan. |
 | T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | TODO | Exit-gate checklist against current code facts. |
 | T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | TODO | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
 | T-06 | Correct M3-M10 flows, objects, dependencies, missing CHGs and acceptance gates. | TODO | Chapters 4-8 and architecture crosswalk; forbidden-object scan. |
@@ -174,12 +174,13 @@ Completed:
 - Baseline audit and the independent alignment CHG were created.
 - A section-for-section Chinese review companion was created at `change.zh-CN.md`; `change.md` remains the execution authority.
 - T-02 normalized `source_content`, publication cancellation metrics, account-group semantics, tracked-object ownership, and shared BitBrowser main-tree authorization language across the product baseline.
+- T-03 aligned the engineering architecture, human contract map and release-matrix planning note with real Desktop, persistent task/Agent state, scheduler/object-storage ordering and formal task-schema gates.
 
 Current:
-- T-03 engineering and contract governance alignment.
+- T-04 M0/M1 Master Plan reconstruction.
 
 Next:
-- Clarify real Desktop/task readiness gates and synchronize the human-readable contract map.
+- Reset M0/M1 status semantics and define real component plus end-to-end exit gates.
 
 Blocked:
 - None.
@@ -189,6 +190,7 @@ Recent verification:
 - Active CHG discovery and generated AI context both resolve uniquely to CHG-20260715-001; no blocking question exists.
 - Chinese review companion D/T/AC identifiers match the authoritative change record one-for-one.
 - Product stale-term scan now leaves removed objects only in explicit exclusion, migration, or historical-reference contexts.
+- `python3 scripts/verify_m0_config.py` passes with the mixed active/placeholder contract state documented consistently.
 
 ## 13. DONE Gate
 
