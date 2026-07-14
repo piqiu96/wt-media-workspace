@@ -1,0 +1,108 @@
+from __future__ import annotations
+
+import importlib.util
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "prepare_ai_workspace.py"
+
+
+def load_module():
+    spec = importlib.util.spec_from_file_location("prepare_ai_workspace", SCRIPT_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load prepare_ai_workspace.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+class PrepareAiWorkspaceTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.outer = Path(self.tmp.name) / "wt-media"
+        self.workspace = self.outer / "wt-media-workspace"
+        for name in (
+            "wt-media-workspace",
+            "wt-media-cloud",
+            "wt-media-agent",
+            "wt-media-desktop",
+        ):
+            (self.outer / name).mkdir(parents=True, exist_ok=True)
+
+        skill = self.workspace / "skills" / "workspace" / "executing-wt-media-change" / "SKILL.md"
+        skill.parent.mkdir(parents=True, exist_ok=True)
+        skill.write_text(
+            "---\n"
+            "name: executing-wt-media-change\n"
+            "description: test skill\n"
+            "---\n\n"
+            "# Test Skill\n",
+            encoding="utf-8",
+        )
+        self.module = load_module()
+
+    def write_change(self, change_id: str, status: str = "IMPLEMENTING") -> Path:
+        path = self.workspace / "delivery" / "active" / change_id / "change.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            f"# {change_id}: Test Change\n\n"
+            "## 1. Basic Information\n\n"
+            "- Level: M\n"
+            f"- Status: {status}\n"
+            "- Affected repositories:\n"
+            "  - `wt-media-workspace`\n"
+            "  - `outer execution root rule files`\n",
+            encoding="utf-8",
+        )
+        return path
+
+    def test_prepare_change_writes_context_and_execution_skill(self) -> None:
+        self.write_change("CHG-20260714-002")
+
+        summary = self.module.prepare_workspace(
+            workspace_repo=self.workspace,
+            change_id="CHG-20260714-002",
+            write_context=True,
+        )
+
+        context = self.outer / ".ai" / "CURRENT_CONTEXT.md"
+        generated_skill = (
+            self.outer
+            / ".agents"
+            / "skills"
+            / "executing-wt-media-change"
+            / "SKILL.md"
+        )
+        self.assertEqual(summary["active_change"], "CHG-20260714-002")
+        self.assertTrue(context.is_file())
+        self.assertTrue(generated_skill.is_file())
+        self.assertIn("Active CHG: `CHG-20260714-002`", context.read_text(encoding="utf-8"))
+        self.assertIn("GENERATED FILE", generated_skill.read_text(encoding="utf-8"))
+
+    def test_missing_change_fails(self) -> None:
+        with self.assertRaises(FileNotFoundError):
+            self.module.prepare_workspace(
+                workspace_repo=self.workspace,
+                change_id="CHG-20260714-999",
+                write_context=False,
+            )
+
+    def test_multiple_active_changes_fail(self) -> None:
+        self.write_change("CHG-20260714-002")
+        self.write_change("CHG-20260714-003")
+
+        with self.assertRaises(ValueError):
+            self.module.prepare_workspace(
+                workspace_repo=self.workspace,
+                change_id="CHG-20260714-002",
+                write_context=False,
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()

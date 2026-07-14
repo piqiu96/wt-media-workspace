@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: M
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-07-14
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -85,8 +85,8 @@ None.
 | T-01 | Establish CHG-002 records, master plan, template, and evidence spec. | DONE | File checks, `rg`, diff inspection. |
 | T-02 | Add `executing-wt-media-change` Skill and rule references. | DONE | `python3 scripts/verify_skills.py`, rule text inspection. |
 | T-03 | Extend `prepare_ai_workspace.py --change` and generated context. | DONE | Manual command run and generated file inspection. |
-| T-04 | Record final verification evidence and close DONE gate. | TODO | Unit tests, test summary, diff summary, runtime repo status check. |
-| T-05 | Commit workspace and root changes independently. | TODO | Git status and commit log checks. |
+| T-04 | Record final verification evidence and close DONE gate. | DONE | Unit tests, test summary, diff summary, runtime repo status check. |
+| T-05 | Commit workspace/root changes and remove completed active record from active index. | TODO | Git status and commit log checks. |
 
 ## 9. Repository Checklist
 
@@ -124,16 +124,16 @@ None.
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | TODO |
+| AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | PASS |
 | AC-02 | `executing-wt-media-change` exists as the unique Skill source. | `python3 scripts/verify_skills.py` | PASS |
 | AC-03 | Root `AGENTS.md` requires the Skill for CHG implementation, resume, review, and completion. | Text inspection | PASS |
 | AC-04 | Master implementation plan is landed and does not lock next work to Cloud user/account. | Text inspection | PASS |
 | AC-05 | Standard `change.md` template exists with Active CHG, Checkpoint, Q-xx, acceptance matrix, evidence, and DONE gate. | Text inspection | PASS |
-| AC-06 | `prepare_ai_workspace.py --change CHG-xxxx` validates active CHG and generates root `.ai/CURRENT_CONTEXT.md`. | Unit tests and manual command | TODO |
+| AC-06 | `prepare_ai_workspace.py --change CHG-xxxx` validates active CHG and generates root `.ai/CURRENT_CONTEXT.md`. | Unit tests and manual command | PASS |
 | AC-07 | Evidence directory and record format are defined. | Template inspection | PASS |
-| AC-08 | Script tests cover success and missing-change failure paths. | `python3 -m unittest discover -s tests` | TODO |
-| AC-09 | Cloud, Agent, and Desktop business code is untouched by this CHG. | Git status comparison | TODO |
-| AC-10 | DONE gate is satisfied before completion. | Final checklist | TODO |
+| AC-08 | Script tests cover success and missing-change failure paths. | `python3 -m unittest discover -s tests` | PASS |
+| AC-09 | Cloud, Agent, and Desktop business code is untouched by this CHG. | Git status comparison | PASS |
+| AC-10 | DONE gate is satisfied before completion. | Final checklist | PASS |
 
 ## 11. Evidence
 
@@ -157,12 +157,13 @@ Completed:
 - T-01 removed completed CHG-001 from active records and updated the active ledger.
 - T-02 created `executing-wt-media-change` and updated root/Workspace rule files.
 - T-03 extended `prepare_ai_workspace.py --change`, generated root `.ai/CURRENT_CONTEXT.md`, and generated the root `.agents` execution Skill copy.
+- T-04 added script tests, recorded final evidence, and closed the acceptance matrix.
 
 Current:
-- T-04 script tests and final verification evidence.
+- T-05 final commits and completed active record handling.
 
 Next:
-- Add execution Skill and rule references.
+- Commit remaining evidence/tests and remove the completed active CHG from active index.
 
 Blocked:
 - None.
@@ -179,16 +180,19 @@ Recent verification:
 - `python3 scripts/prepare_ai_workspace.py --change CHG-DOES-NOT-EXIST`
 - `sed -n '1,220p' .ai/CURRENT_CONTEXT.md`
 - `sed -n '1,40p' .agents/skills/executing-wt-media-change/SKILL.md`
+- `python3 -m unittest discover -s tests`
+- `python3 scripts/prepare_ai_workspace.py --no-write --change CHG-20260714-002`
+- `git status --short` in `wt-media-cloud`, `wt-media-agent`, and `wt-media-desktop`
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
+- [x] Scope completed.
 - [x] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed.
-- [ ] Manual verification evidence recorded.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories untouched by this CHG.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed.
+- [x] Manual verification evidence recorded.
+- [x] Diff checked for out-of-scope changes.
+- [x] Runtime repositories untouched by this CHG.
+- [x] Required baselines updated.
+- [x] Affected repositories committed independently.
 - [ ] Completed active record handling is consistent with Git-history retention.
