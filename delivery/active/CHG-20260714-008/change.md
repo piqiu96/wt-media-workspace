@@ -85,9 +85,9 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create Active CHG, update M1 plan state, and refresh context. | DONE | `prepare_ai_workspace.py --change CHG-20260714-008` |
-| T-02 | Add Cloud-owned Cloud-Agent `v1` compatibility contract and runtime endpoint. | TODO | Cloud Go tests and health/compatibility curl |
-| T-03 | Add Agent consumer compatibility version checks. | TODO | Agent unit tests |
-| T-04 | Update Workspace Contract Map, Release Matrix, verification script, and evidence. | TODO | Workspace tests/config verification |
+| T-02 | Add Cloud-owned Cloud-Agent `v1` compatibility contract and runtime endpoint. | DONE | `evidence/cloud-contract-and-endpoint.md` |
+| T-03 | Add Agent consumer compatibility version checks. | DONE | `evidence/agent-compatibility.md` |
+| T-04 | Update Workspace Contract Map, Release Matrix, verification script, and evidence. | DONE | `evidence/workspace-config.md` |
 | T-05 | Run integrated acceptance, commit affected repos, push, and close CHG. | TODO | Git status, CI status, final evidence |
 
 ## 9. Repository Checklist
@@ -98,22 +98,22 @@ None.
 - [x] Update active ledger.
 - [x] Set M1 Active CHG to CHG-008.
 - [x] Refresh root AI context.
-- [ ] Update Contract Map and Release Matrix.
-- [ ] Update verification script/tests for M1 Cloud-Agent contract state.
+- [x] Update Contract Map and Release Matrix.
+- [x] Update verification script/tests for M1 Cloud-Agent contract state.
 - [ ] Record evidence and cleanup completed active record.
 
 ### wt-media-cloud
 
-- [ ] Add provider-owned Cloud-Agent `v1` compatibility contract artifact.
-- [ ] Add runtime compatibility contract constants.
-- [ ] Add compatibility endpoint.
-- [ ] Add/extend tests.
+- [x] Add provider-owned Cloud-Agent `v1` compatibility contract artifact.
+- [x] Add runtime compatibility contract constants.
+- [x] Add compatibility endpoint.
+- [x] Add/extend tests.
 - [ ] Commit independently.
 
 ### wt-media-agent
 
-- [ ] Add Cloud-Agent consumer compatibility module.
-- [ ] Add/extend tests.
+- [x] Add Cloud-Agent consumer compatibility module.
+- [x] Add/extend tests.
 - [ ] Commit independently.
 
 ### wt-media-desktop
@@ -125,11 +125,11 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | PASS |
-| AC-02 | Cloud owns the formal Cloud-Agent `v1` compatibility contract. | File inspection and contract map | TODO |
-| AC-03 | Cloud exposes a runtime compatibility endpoint. | Cloud tests and curl | TODO |
-| AC-04 | Agent can determine whether Cloud-Agent contract metadata is compatible. | Agent unit tests | TODO |
-| AC-05 | Workspace machine-readable config records active `cloud_agent_api` without duplicating full definitions. | `scripts/verify_m0_config.py` or successor validation | TODO |
-| AC-06 | Release Matrix records a verified M1-C1 combination. | File inspection and config verification | TODO |
+| AC-02 | Cloud owns the formal Cloud-Agent `v1` compatibility contract. | File inspection and contract map | PASS |
+| AC-03 | Cloud exposes a runtime compatibility endpoint. | Cloud tests and curl | PASS |
+| AC-04 | Agent can determine whether Cloud-Agent contract metadata is compatible. | Agent unit tests | PASS |
+| AC-05 | Workspace machine-readable config records active `cloud_agent_api` without duplicating full definitions. | `scripts/verify_m0_config.py` or successor validation | PASS |
+| AC-06 | Release Matrix records a verified M1-C1 combination. | File inspection and config verification | PASS |
 | AC-07 | No registration, heartbeat, task execution, Desktop page, or account/Profile behavior is introduced. | Diff scan | TODO |
 | AC-08 | Affected repositories are committed independently and pushed. | Git log/status | TODO |
 
@@ -158,12 +158,20 @@ Completed:
 - Updated M1 Active CHG in `delivery/MASTER_IMPLEMENTATION_PLAN.md`.
 - Refreshed root `.ai/CURRENT_CONTEXT.md`.
 - Recorded T-01 evidence.
+- Added Cloud-owned Cloud-Agent `v1` compatibility OpenAPI artifact.
+- Added Cloud compatibility module and endpoint.
+- Verified Cloud tests and endpoint response.
+- Added Agent consumer compatibility checker.
+- Verified Agent unit tests.
+- Updated Workspace Contract Map and Release Matrix.
+- Updated Workspace config verification tests.
+- Verified Workspace tests, Skill source checks, and config validation.
 
 Current:
-- T-02 Cloud provider contract and compatibility endpoint.
+- T-05 integrated acceptance, commit/push, and close CHG.
 
 Next:
-- Commit Workspace start record, then implement Cloud provider slice.
+- Commit Workspace config slice, then run integrated acceptance and diff scan.
 
 Blocked:
 - None.
@@ -173,6 +181,12 @@ Recent verification:
 - `git status --short --branch` in four repositories
 - Contract governance and existing placeholder contract inspection
 - `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-008`
+- `go test ./...` with Go 1.26 toolchain
+- `curl http://127.0.0.1:18080/api/v1/cloud-agent/compatibility`
+- `PYTHONPATH=src python3 -m unittest discover -s tests`
+- `python3 -m unittest discover -s tests`
+- `python3 scripts/verify_skills.py`
+- `python3 scripts/verify_m0_config.py`
 
 ## 13. DONE Gate
 

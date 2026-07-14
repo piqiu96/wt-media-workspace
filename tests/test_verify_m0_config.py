@@ -23,7 +23,7 @@ class VerifyM0ConfigTests(unittest.TestCase):
     def setUp(self) -> None:
         self.module = load_module()
 
-    def test_contract_map_is_m0_placeholder_only(self) -> None:
+    def test_contract_map_matches_m1_cloud_agent_compatibility(self) -> None:
         errors = self.module.validate_contract_map(allow_missing_repos=True)
         self.assertEqual(errors, [])
 
@@ -36,7 +36,7 @@ class VerifyM0ConfigTests(unittest.TestCase):
             self.skipTest("runtime sibling repositories are not present in this checkout")
         self.assertEqual(errors, [])
 
-    def test_release_matrix_matches_m0_health_release(self) -> None:
+    def test_release_matrix_matches_m0_and_m1_c1_releases(self) -> None:
         errors = self.module.validate_release_matrix()
         self.assertEqual(errors, [])
 

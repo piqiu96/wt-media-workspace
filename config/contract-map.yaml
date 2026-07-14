@@ -1,6 +1,6 @@
 schema_version: 1
-contract_state: placeholder_only
-formal_definitions_active: false
+contract_state: m1_cloud_agent_compatibility
+formal_definitions_active: true
 
 contracts:
   cloud_api:
@@ -14,8 +14,12 @@ contracts:
   cloud_agent_api:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/cloud-agent-api
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    api_major_version: v1
+    contract_revision: "2026.07.14.1"
+    minimum_agent_contract_revision: "2026.07.14.1"
+    compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:
       - wt-media-agent
   business_schemas:
