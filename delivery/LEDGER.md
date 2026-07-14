@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260714-007 | M0 comprehensive acceptance | IMPLEMENTING | wt-media-workspace |
+| CHG-20260714-007 | M0 comprehensive acceptance | DONE | wt-media-workspace |

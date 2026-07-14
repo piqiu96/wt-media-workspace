@@ -28,6 +28,27 @@ wt-media-desktop health ok
 WT Media M0 local verification ok
 ```
 
+## Final Rerun
+
+Command:
+
+```text
+scripts/verify_m0_local.sh
+```
+
+Result:
+
+```text
+Ran 6 tests in 0.024s
+OK
+verified 8 skill source files
+M0 config verification ok
+wt-media-cloud health ok
+wt-media-agent health ok
+wt-media-desktop health ok
+WT Media M0 local verification ok
+```
+
 ## Notes
 
 - `scripts/verify_m0_local.sh` binds local Cloud and Agent health ports, so elevated execution was required in the Codex sandbox.
