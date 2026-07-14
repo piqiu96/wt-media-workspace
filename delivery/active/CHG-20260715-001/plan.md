@@ -36,23 +36,23 @@
 - Consumes: D-04 through D-09 in `change.md`.
 - Produces: canonical object/status/ownership facts consumed by Tasks 2-4.
 
-- [ ] **Step 1: Capture the failing stale-term and ownership scan**
+- [x] **Step 1: Capture the failing stale-term and ownership scan**
 
   Run contextual `rg -n` scans for the five excluded objects, `waiting_manual_submit`, publication discard wording, undefined account-group wording, and delayed `tracked_object` creation. Record only operational conflicts in the crosswalk evidence.
 
-- [ ] **Step 2: Correct the product baseline minimally**
+- [x] **Step 2: Correct the product baseline minimally**
 
   Replace operational `content_lead` usage with `source_content`; remove independent result/batch/item/signal objects; normalize publication state to `pending_manual_submit` and `cancelled`; define first-version account groups as saved tag/filter snapshots unless a later decision creates a formal object; make M6/M8 the creation providers for `tracked_object`.
 
-- [ ] **Step 3: Verify chapter authority and full capability coverage**
+- [x] **Step 3: Verify chapter authority and full capability coverage**
 
   Compare Chapter 3 account capabilities and Chapters 4-8 business flows to the consolidated PRD. Expected result: every P0/P1 capability has exactly one owning chapter and no contradictory lifecycle.
 
-- [ ] **Step 4: Record evidence and checkpoint**
+- [x] **Step 4: Record evidence and checkpoint**
 
   Update `evidence/product-milestone-crosswalk.md` with source path, capability, owner, milestone and resolution; update `change.md` T-02/checkpoint.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   Commit only product baseline, crosswalk evidence and checkpoint changes with message `docs: normalize product facts for milestone planning`.
 
@@ -69,19 +69,19 @@
 - Consumes: Task 1 canonical facts.
 - Produces: explicit delivery prerequisites for Master Plan tasks.
 
-- [ ] **Step 1: Capture current infrastructure gaps**
+- [x] **Step 1: Capture current infrastructure gaps**
 
   Verify Desktop dev/build/package commands, Tauri entry, Local Agent service source, Cloud task/registry persistence, scheduler/object-store state and `task_schemas` status against the architecture.
 
-- [ ] **Step 2: Correct ownership and readiness descriptions**
+- [x] **Step 2: Correct ownership and readiness descriptions**
 
   State that M0/M1 must provide real build/run paths, persistent task and Agent facts, offline result recovery, real Tauri/Local Agent control and formal task schemas before business executors. Keep `task_schemas` inactive until the provider publishes the definition.
 
-- [ ] **Step 3: Synchronize human and machine governance wording**
+- [x] **Step 3: Synchronize human and machine governance wording**
 
   Update the human-readable contract map from its stale M0-only statement to the actual mixed active/placeholder state. Preserve machine revisions unless a factual description field requires change.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
   Run `python3 scripts/verify_m0_config.py`; inspect diff for provider-owned contract edits. Expected result: PASS and no runtime repository change. Commit with message `docs: align engineering readiness and contract governance`.
 
@@ -96,19 +96,19 @@
 - Consumes: Task 2 readiness prerequisites.
 - Produces: a real end-to-end environment gate required by M2.
 
-- [ ] **Step 1: Reset milestone status semantics**
+- [x] **Step 1: Reset milestone status semantics**
 
   Set M0 to `IN_PROGRESS` and M1 to `NOT_STARTED` until their revised gates pass. Preserve former CHG/commit lists as inherited scaffold evidence, remove completion dates as current completion claims, and state explicitly that historical evidence is reusable but insufficient.
 
-- [ ] **Step 2: Define M0 real component gates**
+- [x] **Step 2: Define M0 real component gates**
 
   Require real Cloud, Agent and Desktop dependency installation, build, test, start/stop, health checks, configuration, MySQL migration path and CI verification. Echo scripts, unavailable Cargo checks and mock-only entry points fail the gate.
 
-- [ ] **Step 3: Define M1 persistent end-to-end gates**
+- [x] **Step 3: Define M1 persistent end-to-end gates**
 
   Require MySQL-backed task/Agent state, formal task schemas, Agent lease/recovery/offline result persistence, real Local Agent API/SSE, real Tauri bridge/process control, Cloud Web loading, login, task creation, execution, progress and restart recovery in one manual demonstration.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
   Cross-check every gate against current code facts and mark missing items as candidate CHGs, never PASS. Commit with message `docs: reopen m0 m1 for real end-to-end acceptance`.
 
@@ -123,11 +123,11 @@
 - Consumes: Chapter 3 capabilities and completed M1 gate.
 - Produces: newly numbered M2-C1 through M2-C11 route.
 
-- [ ] **Step 1: Reset M2 to `NOT_STARTED`**
+- [x] **Step 1: Reset M2 to `NOT_STARTED`**
 
   Record C1-C6 as inherited implementation/evidence only. Require each new CHG to audit and reuse valid code instead of assuming historical PASS or rewriting blindly.
 
-- [ ] **Step 2: Define the new M2 route**
+- [x] **Step 2: Define the new M2 route**
 
   Use these bounded deliverables:
 
@@ -143,11 +143,11 @@
   10. M2-C10 integrated Web/Desktop account-environment workbench and role-specific UX.
   11. M2-C11 real MySQL, BitBrowser, proxy, Cookie, Desktop and three-role product acceptance.
 
-- [ ] **Step 3: Define complete exit gates**
+- [x] **Step 3: Define complete exit gates**
 
   Require automated contracts/tests, real dependency evidence, role-based UI acceptance, batch partial-failure behavior, secret safety, audit logs, recovery and independent commits.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
   Map every Chapter 3 P0/P1 row to one new M2 CHG. Expected result: no uncovered row and no duplicate owner. Commit with message `docs: replan complete m2 account environment milestone`.
 
@@ -162,23 +162,23 @@
 - Consumes: Tasks 1-4 canonical facts and infrastructure gates.
 - Produces: executable downstream candidate CHGs.
 
-- [ ] **Step 1: Correct M3 and M4**
+- [x] **Step 1: Correct M3 and M4**
 
   Split instant query from scheduled crawl; use only `source_content -> material`; add external API spike, scheduler/idempotency, material lifecycle, public/private review, download/hash validation, usage abandon/recover, local file index and real FFmpeg/Agent acceptance.
 
-- [ ] **Step 2: Correct M5 through M7**
+- [x] **Step 2: Correct M5 through M7**
 
   Restore `compose_pool_item -> task` to cloud production; add risk review, object integrity, claim release and stuck recovery; normalize publication states; create `tracked_object` on valid publication; include publication workbench, manual backfill/link validation and Bilibili/Baijiahao regression.
 
-- [ ] **Step 3: Correct M8 and M9**
+- [x] **Step 3: Correct M8 and M9**
 
   Use one `interaction_task` per `tracked_object` and an actual task per account; add external targets, risk, pause/cancel, captcha takeover and precise retry. Keep M9 to immutable `platform_metric_snapshot`, collection, aggregation, dashboard, environment statistics, export and reconciliation.
 
-- [ ] **Step 4: Correct M10**
+- [x] **Step 4: Correct M10**
 
   Keep first real Desktop integration in M0/M1. Define M10 as Cloud deployment/TLS, migrations/backups/restore, object-storage recovery, dependency locking, installers, macOS signing/notarization, compatibility/update/rollback, logging/diagnostics, status/alerts and full recovery drills.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
   Run canonical-object and dependency-order scans. Expected result: no operational forbidden object and every infrastructure capability precedes its first consumer. Commit with message `docs: correct downstream milestone decomposition`.
 
@@ -197,19 +197,19 @@
 - Consumes: all corrected baselines and Master Plan.
 - Produces: repeatable proof that future edits cannot silently restore the reviewed contradictions.
 
-- [ ] **Step 1: Write failing verifier tests**
+- [x] **Step 1: Write failing verifier tests**
 
   Test exactly-one Active CHG, revised M0/M1/M2 statuses and gates, required M2 capability labels, canonical object exclusions in operational plan sections, `tracked_object` ordering, M10 packaging coverage and contract-map human/machine state wording.
 
-- [ ] **Step 2: Run tests and confirm failure before verifier implementation**
+- [x] **Step 2: Run tests and confirm failure before verifier implementation**
 
   Run `python3 -m unittest tests.test_verify_product_master_alignment -v`. Expected result: FAIL because the verifier module or checks do not yet exist.
 
-- [ ] **Step 3: Implement the minimal verifier**
+- [x] **Step 3: Implement the minimal verifier**
 
   Add deterministic file reads and explicit error messages without parsing legacy root `docs/` or runtime code as requirements.
 
-- [ ] **Step 4: Run the full verification matrix**
+- [x] **Step 4: Run the full verification matrix**
 
   Run:
 
@@ -223,11 +223,11 @@
 
   Expected result: all commands exit 0 and only Workspace files appear in the CHG diff.
 
-- [ ] **Step 5: Record evidence and checkpoint**
+- [x] **Step 5: Record evidence and checkpoint**
 
   Record command, expected result, actual result and status in `verification-summary.md`; record every changed file and scope reason in `diff-summary.md`; update every AC and DONE gate from evidence only.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   Commit verifier, tests, evidence and checkpoint with message `test: verify product and master plan alignment`.
 

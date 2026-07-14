@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: L
-- Status: IMPLEMENTING
+- Status: VERIFYING
 - Created: 2026-07-15
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -118,20 +118,20 @@ failing verification
 | T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | DONE | Exit-gate checklist against current code facts. |
 | T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | DONE | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
 | T-06 | Correct M3-M10 flows, objects, dependencies, missing CHGs and acceptance gates. | DONE | Chapters 4-8 and architecture crosswalk; forbidden-object scan. |
-| T-07 | Align Ledger, human/machine contract governance, release wording and generated AI context. | TODO | Workspace governance scripts and single Active CHG verification. |
-| T-08 | Run full Workspace regression, record diff/coverage evidence, and prepare the CHG for user review/closure. | TODO | `verify_m0_config.py`, Workspace tests, new alignment verifier, `git diff --check`. |
+| T-07 | Align Ledger, human/machine contract governance, release wording and generated AI context. | DONE | Workspace governance scripts and single Active CHG verification. |
+| T-08 | Run full Workspace regression, record diff/coverage evidence, and prepare the CHG for user review/closure. | DONE | `verify_m0_config.py`, Workspace tests, new alignment verifier, `git diff --check`. |
 
 ## 9. Repository Checklist
 
 ### wt-media-workspace
 
-- [ ] Product baseline terminology and ownership corrected.
-- [ ] Engineering and contract governance boundaries corrected.
-- [ ] M0/M1 reset to real end-to-end gates.
-- [ ] M2 replanned and renumbered completely.
-- [ ] M3-M10 corrected and cross-checked.
-- [ ] Static verifier and evidence added.
-- [ ] Ledger, generated context and checkpoint aligned.
+- [x] Product baseline terminology and ownership corrected.
+- [x] Engineering and contract governance boundaries corrected.
+- [x] M0/M1 reset to real end-to-end gates.
+- [x] M2 replanned and renumbered completely.
+- [x] M3-M10 corrected and cross-checked.
+- [x] Static verifier and evidence added.
+- [x] Ledger, generated context and checkpoint aligned.
 
 ### wt-media-cloud
 
@@ -150,19 +150,19 @@ failing verification
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | Only CHG-20260715-001 is Active and all approved decisions are recorded without an open blocking question. | Active directory/Ledger/context scan. | PASS |
-| AC-02 | M0/M1 completion requires independently real builds plus a persistent, mock-free Cloud-Agent-Desktop-Web end-to-end manual acceptance environment. | Master exit-gate review against architecture. | TODO |
-| AC-03 | M2 contains user management, media accounts, Profile/window management, proxy management, Cookie/account checks, onboarding, runtime binding, sensitive-task guard, UI and real acceptance. | Chapter 3 capability crosswalk. | TODO |
-| AC-04 | M3-M10 use only canonical objects and place `tracked_object`, task schemas, scheduler, object storage and Desktop dependencies before their first consumer. | Cross-milestone dependency and forbidden-object scan. | TODO |
-| AC-05 | Product, engineering, contract governance and Master Plan agree on BitBrowser main/sub-account identity and Cloud authorization. | D-07 reference scan and terminology verifier. | TODO |
-| AC-06 | Every milestone has automated, real dependency, UI/manual, recovery/security and independent-commit gates where applicable. | Milestone acceptance crosswalk. | TODO |
-| AC-07 | Workspace automated verification passes and diff contains no runtime-repository edits. | Full Workspace regression and repository status check. | TODO |
+| AC-02 | M0/M1 completion requires independently real builds plus a persistent, mock-free Cloud-Agent-Desktop-Web end-to-end manual acceptance environment. | Master exit-gate review against architecture. | PASS |
+| AC-03 | M2 contains user management, media accounts, Profile/window management, proxy management, Cookie/account checks, onboarding, runtime binding, sensitive-task guard, UI and real acceptance. | Chapter 3 capability crosswalk. | PASS |
+| AC-04 | M3-M10 use only canonical objects and place `tracked_object`, task schemas, scheduler, object storage and Desktop dependencies before their first consumer. | Cross-milestone dependency and forbidden-object scan. | PASS |
+| AC-05 | Product, engineering, contract governance and Master Plan agree on BitBrowser main/sub-account identity and Cloud authorization. | D-07 reference scan and terminology verifier. | PASS |
+| AC-06 | Every milestone has automated, real dependency, UI/manual, recovery/security and independent-commit gates where applicable. | Milestone acceptance crosswalk. | PASS |
+| AC-07 | Workspace automated verification passes and diff contains no runtime-repository edits. | Full Workspace regression and repository status check. | PASS |
 
 ## 11. Evidence
 
 - `evidence/baseline-audit-20260715.md`
-- Planned: `evidence/product-milestone-crosswalk.md`
-- Planned: `evidence/verification-summary.md`
-- Planned: `evidence/diff-summary.md`
+- `evidence/product-milestone-crosswalk.md`
+- `evidence/verification-summary.md`
+- `evidence/diff-summary.md`
 
 Evidence records facts and verification results; requirements remain in stable baselines and this change record.
 
@@ -178,12 +178,14 @@ Completed:
 - T-04 reopened M0 as `IN_PROGRESS`, reset M1 to `NOT_STARTED`, retained historical scaffold/noop evidence, and defined M0-R1..R6 plus M1-R1..R8 real component and mock-free end-to-end gates.
 - T-05 reset M2 to `NOT_STARTED` and mapped the complete Chapter 3 account/environment domain to M2-C1..C11, with historical C1-C6 code and evidence retained only as reusable inputs.
 - T-06 corrected M3-M10 canonical flows, restored missing task/infrastructure dependencies, expanded candidate CHGs and added automated/real/UI/recovery/security acceptance gates.
+- T-07 synchronized the Ledger, mixed contract/release wording and generated root AI context with the unique Active CHG.
+- T-08 added a test-first alignment verifier, passed the full 12-test Workspace regression and recorded scope/verification evidence.
 
 Current:
-- T-07 governance alignment and T-08 automated verification/evidence.
+- Final user review before closing and removing the completed Active record.
 
 Next:
-- Add a test-first alignment verifier, run the full Workspace matrix and prepare final evidence/checkpoint.
+- After review confirmation, mark the CHG `DONE`, remove it from `delivery/active` and clear the Active Ledger row according to governance.
 
 Blocked:
 - None.
@@ -197,15 +199,18 @@ Recent verification:
 - M0/M1 exit-gate review now rejects echo builds, Mock-only Desktop entry points, in-memory production task state and placeholder task schemas.
 - Chapter 3 crosswalk maps every user/account/Profile/proxy/Cookie/onboarding/runtime/UI cluster to exactly one new M2 delivery group.
 - Product/milestone crosswalk is PASS: M3-M10 now use canonical objects and each infrastructure dependency precedes its first consumer.
+- The alignment verifier was introduced test-first: 5 tests first failed because the verifier did not exist, then all 5 passed after implementation.
+- Final matrix passes: alignment verifier, M0 config verifier, 12 Workspace tests, Active CHG no-write preparation, 8 skill sources and `git diff --check`.
+- Cloud, Agent and Desktop repository status checks are clean; this CHG changed only `wt-media-workspace` tracked files.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
+- [x] Scope completed.
 - [x] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual review evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed or justified.
+- [x] Manual review evidence recorded where required.
+- [x] Diff checked for out-of-scope changes.
 - [x] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repository committed independently.
+- [x] Required baselines updated.
+- [x] Affected repository committed independently.
