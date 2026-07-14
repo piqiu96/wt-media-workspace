@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260714-001 | Workspace document and delivery governance migration | DONE | wt-media-workspace |
+| CHG-20260714-002 | Project CHG execution control system | IMPLEMENTING | wt-media-workspace |
