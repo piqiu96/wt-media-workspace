@@ -172,6 +172,7 @@ Completed:
 - CHG-020 was closed under its original C1-C6 foundation scope with independent repository commits.
 - User confirmed D-01 through D-10: reopen M0/M1, replan/re-execute M2, normalize canonical objects, and retain the M0-M10 top-level route.
 - Baseline audit and the independent alignment CHG were created.
+- A section-for-section Chinese review companion was created at `change.zh-CN.md`; `change.md` remains the execution authority.
 
 Current:
 - CHG package is ready for user review before T-02 begins.
@@ -185,6 +186,7 @@ Blocked:
 Recent verification:
 - CHG-020 final closure matrix passed on 2026-07-15 before this CHG was activated.
 - Active CHG discovery and generated AI context both resolve uniquely to CHG-20260715-001; no blocking question exists.
+- Chinese review companion D/T/AC identifiers match the authoritative change record one-for-one.
 
 ## 13. DONE Gate
 
