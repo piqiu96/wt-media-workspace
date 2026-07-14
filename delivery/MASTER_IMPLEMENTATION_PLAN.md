@@ -202,10 +202,10 @@ M1-C7 三端真实跨端集成验证
 | 状态 | `IN_PROGRESS` |
 | 目标 | 建立发布、互动、任务分配和本地执行依赖的账号与运行环境基础。 |
 | 依赖 | M1 `DONE` |
-| Active CHG | `CHG-20260714-015` |
-| Evidence | CHG-015 M2-C1 用户认证、单活会话和三角色权限 evidence 进行中。 |
+| Active CHG | None |
+| Evidence | CHG-015 M2-C1 用户认证、单活会话和三角色权限已完成；Cloud Go 全量测试、Web 测试与构建、依赖审计、Contract 校验和 Workspace 治理校验均通过。M2-C6 需补充真实 MySQL 集成验收。 |
 | 完成日期 | None |
-| Commit/Tag | None |
+| Commit/Tag | CHG-015 commits: Cloud `50b5c8d`, `03b0dcc`; Workspace `f3e7d1a`, `51ab7de`, `e79db94`, `6576c44`。 |
 
 候选 CHG：
 
