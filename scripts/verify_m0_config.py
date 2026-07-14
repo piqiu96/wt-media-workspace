@@ -82,8 +82,8 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
         if name == "cloud_agent_api":
             for key, value in (
                 ("api_major_version", "v1"),
-                ("contract_revision", "2026.07.14.6"),
-                ("minimum_agent_contract_revision", "2026.07.14.6"),
+                ("contract_revision", "2026.07.14.7"),
+                ("minimum_agent_contract_revision", "2026.07.14.7"),
                 ("compatibility_endpoint", "/api/v1/cloud-agent/compatibility"),
             ):
                 if actual.get(key) != value:
@@ -91,10 +91,10 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
         if name == "cloud_api":
             if actual.get("api_major_version") != "v1":
                 errors.append("cloud_api: expected api_major_version 'v1'")
-            if actual.get("contract_revision") != "2026.07.14.3":
-                errors.append("cloud_api: expected contract_revision '2026.07.14.3'")
-        if name == "business_schemas" and actual.get("schema_revision") != "2026.07.14.3":
-            errors.append("business_schemas: expected schema_revision '2026.07.14.3'")
+            if actual.get("contract_revision") != "2026.07.14.4":
+                errors.append("cloud_api: expected contract_revision '2026.07.14.4'")
+        if name == "business_schemas" and actual.get("schema_revision") != "2026.07.14.4":
+            errors.append("business_schemas: expected schema_revision '2026.07.14.4'")
         if name == "business_enums" and actual.get("enum_revision") != "2026.07.14.3":
             errors.append("business_enums: expected enum_revision '2026.07.14.3'")
         if name == "cloud_error_codes" and actual.get("error_revision") != "2026.07.14.5":
@@ -102,11 +102,11 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
         if name == "local_agent_api":
             if actual.get("api_major_version") != "v1":
                 errors.append("local_agent_api: expected api_major_version 'v1'")
-            if actual.get("contract_revision") != "2026.07.14.6":
-                errors.append("local_agent_api: expected contract_revision '2026.07.14.6'")
+            if actual.get("contract_revision") != "2026.07.14.7":
+                errors.append("local_agent_api: expected contract_revision '2026.07.14.7'")
         if name == "local_event_schemas":
-            if actual.get("event_revision") != "2026.07.14.8":
-                errors.append("local_event_schemas: expected event_revision '2026.07.14.8'")
+            if actual.get("event_revision") != "2026.07.14.9":
+                errors.append("local_event_schemas: expected event_revision '2026.07.14.9'")
         if name == "local_status_enums" and actual.get("enum_revision") != "2026.07.14.8":
             errors.append("local_status_enums: expected enum_revision '2026.07.14.8'")
         if name == "local_error_codes" and actual.get("error_revision") != "2026.07.14.6":
@@ -181,19 +181,19 @@ def validate_release_matrix() -> list[str]:
         'business_schemas: "media-account@2026.07.14.2"',
         'business_enums: "media-account@2026.07.14.2"',
         'cloud_error_codes: "media-account@2026.07.14.2"',
-        'cloud_api: "v1@2026.07.14.3"',
-        'business_schemas: "browser-profile@2026.07.14.3"',
+        'cloud_api: "v1@2026.07.14.4"',
+        'business_schemas: "browser-profile@2026.07.14.4"',
         'business_enums: "browser-profile@2026.07.14.3"',
         'cloud_error_codes: "browser-profile@2026.07.14.3"',
-        'local_agent_api: "v1@2026.07.14.6"',
+        'local_agent_api: "v1@2026.07.14.7"',
         'local_event_schemas: "status@2026.07.14.6"',
         'local_status_enums: "status@2026.07.14.6"',
         'local_error_codes: "bitbrowser@2026.07.14.6"',
-        'cloud_agent_api: "v1@2026.07.14.5"',
+        'cloud_agent_api: "v1@2026.07.14.7"',
         'cloud_error_codes: "agent-runtime@2026.07.14.4"',
-        'local_event_schemas: "runtime-environment@2026.07.14.7"',
+        'local_event_schemas: "runtime-environment@2026.07.14.9"',
         'local_status_enums: "status@2026.07.14.7"',
-        'cloud_agent_api: "v1@2026.07.14.6"',
+        'cloud_agent_api: "v1@2026.07.14.7"',
         'cloud_error_codes: "profile-guard@2026.07.14.5"',
         'local_event_schemas: "profile-guard@2026.07.14.8"',
         'local_status_enums: "status@2026.07.14.8"',
@@ -206,8 +206,8 @@ def validate_release_matrix() -> list[str]:
             errors.append(f"release-matrix.yaml missing {needle!r}")
 
     active_revisions = {
-        "cloud_agent_api": 'cloud_agent_api: "v1@2026.07.14.6"',
-        "local_agent_api": 'local_agent_api: "v1@2026.07.14.6"',
+        "cloud_agent_api": 'cloud_agent_api: "v1@2026.07.14.7"',
+        "local_agent_api": 'local_agent_api: "v1@2026.07.14.7"',
         "local_event_schemas": 'local_event_schemas: "profile-guard@2026.07.14.8"',
         "local_status_enums": 'local_status_enums: "status@2026.07.14.8"',
         "local_error_codes": 'local_error_codes: "bitbrowser@2026.07.14.6"',

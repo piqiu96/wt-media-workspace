@@ -46,9 +46,9 @@ def validate_static_matrix() -> list[str]:
         (
             "contract_state: m2_sensitive_profile_guard",
             'cloud_agent_api:',
-            'contract_revision: "2026.07.14.6"',
+            'contract_revision: "2026.07.14.7"',
             'error_revision: "2026.07.14.5"',
-            'event_revision: "2026.07.14.8"',
+            'event_revision: "2026.07.14.9"',
             'enum_revision: "2026.07.14.8"',
         ),
     )
@@ -69,7 +69,7 @@ def validate_static_matrix() -> list[str]:
     require_contains(
         errors,
         CLOUD / "internal" / "modules" / "cloudagent" / "compatibility.go",
-        ('ContractRevision             = "2026.07.14.6"', 'MinimumAgentContractRevision = "2026.07.14.6"'),
+        ('ContractRevision             = "2026.07.14.7"', 'MinimumAgentContractRevision = "2026.07.14.7"'),
     )
     for migration in range(1, 6):
         matches = list((CLOUD / "migrations").glob(f"20260714_00{migration}_*.sql"))
@@ -83,7 +83,7 @@ def validate_static_matrix() -> list[str]:
     require_contains(
         errors,
         AGENT / "src" / "wt_media_agent" / "cloud_agent_contract.py",
-        ('REQUIRED_CONTRACT_REVISION = "2026.07.14.6"',),
+        ('REQUIRED_CONTRACT_REVISION = "2026.07.14.7"',),
     )
     require_contains(errors, AGENT / "pyproject.toml", ('version = "0.2.2"',))
     require_contains(
@@ -99,8 +99,8 @@ def validate_static_matrix() -> list[str]:
         errors.append(f"could not parse {lock_path}: {error}")
     else:
         expected = {
-            "cloud_agent_api": "v1@2026.07.14.6",
-            "local_agent_api": "v1@2026.07.14.6",
+            "cloud_agent_api": "v1@2026.07.14.7",
+            "local_agent_api": "v1@2026.07.14.7",
             "local_event_schemas": "profile-guard@2026.07.14.8",
             "local_status_enums": "status@2026.07.14.8",
         }
