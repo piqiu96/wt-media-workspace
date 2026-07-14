@@ -53,7 +53,7 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
 
     for required in (
         "schema_version: 1",
-        "contract_state: m1_task_claim_lease",
+        "contract_state: m1_noop_status_reporting",
         "formal_definitions_active: true",
     ):
         if required not in text:
@@ -82,8 +82,8 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
         if name == "cloud_agent_api":
             for key, value in (
                 ("api_major_version", "v1"),
-                ("contract_revision", "2026.07.14.3"),
-                ("minimum_agent_contract_revision", "2026.07.14.3"),
+                ("contract_revision", "2026.07.14.4"),
+                ("minimum_agent_contract_revision", "2026.07.14.4"),
                 ("compatibility_endpoint", "/api/v1/cloud-agent/compatibility"),
             ):
                 if actual.get(key) != value:
@@ -106,20 +106,24 @@ def validate_release_matrix() -> list[str]:
         'release: "0.1.0-m1-cloud-agent-compatibility"',
         'release: "0.1.0-m1-agent-heartbeat"',
         'release: "0.1.0-m1-task-lease"',
+        'release: "0.1.0-m1-noop-status"',
         "status: verified",
         "scope: m0_scaffold_health",
         "scope: m1_cloud_agent_contract_compatibility",
         "scope: m1_agent_registration_heartbeat",
         "scope: m1_task_creation_claim_lease",
+        "scope: m1_noop_executor_status_reporting",
         "contract_state: placeholder_only",
         "contract_state: m1_cloud_agent_compatibility",
         "contract_state: m1_agent_registration_heartbeat",
         "contract_state: m1_task_claim_lease",
+        "contract_state: m1_noop_status_reporting",
         "formal_contract_versions_active: false",
         "formal_contract_versions_active: true",
         'cloud_agent_api: "v1@2026.07.14.1"',
         'cloud_agent_api: "v1@2026.07.14.2"',
         'cloud_agent_api: "v1@2026.07.14.3"',
+        'cloud_agent_api: "v1@2026.07.14.4"',
         "ci_go_version: \"1.26.5\"",
         "ci_python_version: \"3.12\"",
         "ci_node_version: \"25\"",
@@ -130,8 +134,8 @@ def validate_release_matrix() -> list[str]:
 
     for name in EXPECTED_CONTRACTS:
         if name == "cloud_agent_api":
-            if 'cloud_agent_api: "v1@2026.07.14.3"' not in text:
-                errors.append("release-matrix.yaml must mark cloud_agent_api as v1@2026.07.14.3")
+            if 'cloud_agent_api: "v1@2026.07.14.4"' not in text:
+                errors.append("release-matrix.yaml must mark cloud_agent_api as v1@2026.07.14.4")
             continue
         if f"{name}: m0-placeholder" not in text:
             errors.append(f"release-matrix.yaml must keep {name} as m0-placeholder")

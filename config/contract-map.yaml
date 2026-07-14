@@ -1,5 +1,5 @@
 schema_version: 1
-contract_state: m1_task_claim_lease
+contract_state: m1_noop_status_reporting
 formal_definitions_active: true
 
 contracts:
@@ -17,8 +17,8 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.07.14.3"
-    minimum_agent_contract_revision: "2026.07.14.3"
+    contract_revision: "2026.07.14.4"
+    minimum_agent_contract_revision: "2026.07.14.4"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:
       - wt-media-agent

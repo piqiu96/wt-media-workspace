@@ -71,10 +71,10 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create Active CHG and refresh context. | DONE | `prepare_ai_workspace.py --change CHG-20260714-011` |
-| T-02 | Add Cloud status report contract and state transitions. | TODO | Cloud tests |
-| T-03 | Add Agent report client and noop executor. | TODO | Agent tests |
-| T-04 | Update Workspace config/evidence and run integrated verification. | TODO | Workspace/Cloud/Agent/Desktop checks |
-| T-05 | Commit, push, cleanup active record. | TODO | Git/CI status |
+| T-02 | Add Cloud status report contract and state transitions. | DONE | `evidence/cloud-status-report.md` |
+| T-03 | Add Agent report client and noop executor. | DONE | `evidence/agent-noop-executor.md` |
+| T-04 | Update Workspace config/evidence and run integrated verification. | DONE | `evidence/integration-and-diff.md` |
+| T-05 | Commit, push, cleanup active record. | IN_PROGRESS | Git/CI status |
 
 ## 9. Repository Checklist
 
@@ -84,21 +84,21 @@ None.
 - [x] Update active ledger.
 - [x] Set M1 Active CHG to CHG-011.
 - [x] Refresh root AI context.
-- [ ] Update Contract Map and Release Matrix.
+- [x] Update Contract Map and Release Matrix.
 - [ ] Record evidence and cleanup completed active record.
 
 ### wt-media-cloud
 
-- [ ] Add status report contract artifact.
-- [ ] Add report endpoint and task state transitions.
-- [ ] Add tests.
+- [x] Add status report contract artifact.
+- [x] Add report endpoint and task state transitions.
+- [x] Add tests.
 - [ ] Commit independently.
 
 ### wt-media-agent
 
-- [ ] Add task status report client method.
-- [ ] Add noop executor.
-- [ ] Add tests.
+- [x] Add task status report client method.
+- [x] Add noop executor.
+- [x] Add tests.
 - [ ] Commit independently.
 
 ### wt-media-desktop
@@ -110,10 +110,10 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | PASS |
-| AC-02 | Cloud accepts status reports only from the leased Agent. | Cloud tests | TODO |
-| AC-03 | Cloud can move task to `running` and `succeeded`. | Cloud tests/curl | TODO |
-| AC-04 | Agent noop executor reports started/progress/succeeded. | Agent tests | TODO |
-| AC-05 | No Local Agent SSE, Desktop, offline queue, or business executor behavior is introduced. | Diff scan | TODO |
+| AC-02 | Cloud accepts status reports only from the leased Agent. | Cloud tests | PASS |
+| AC-03 | Cloud can move task to `running` and `succeeded`. | Cloud tests/curl | PASS |
+| AC-04 | Agent noop executor reports started/progress/succeeded. | Agent tests | PASS |
+| AC-05 | No Local Agent SSE, Desktop, offline queue, or business executor behavior is introduced. | Diff scan | PASS |
 | AC-06 | Affected repositories are committed independently and pushed. | Git log/status | TODO |
 
 ## 11. Evidence
@@ -134,13 +134,17 @@ Completed:
 - Updated M1 Active CHG in `delivery/MASTER_IMPLEMENTATION_PLAN.md`.
 - Refreshed root `.ai/CURRENT_CONTEXT.md`.
 - Recorded T-01 evidence.
+- Added Cloud task status report contract and endpoint.
+- Added Agent report client and noop executor.
+- Updated Cloud-Agent contract revision to `2026.07.14.4`.
+- Updated Workspace Contract Map and Release Matrix.
+- Verified Workspace, Cloud, Agent, and Desktop checks.
 
 Current:
-- T-02 Cloud status report contract and state transitions.
+- T-05 commit, push, and active-record cleanup.
 
 Next:
-- Run `prepare_ai_workspace.py --change CHG-20260714-011`.
-- Commit Workspace start record.
+- Commit Workspace evidence/config snapshot, push affected repositories, then remove completed active record.
 
 Blocked:
 - None.
@@ -148,6 +152,12 @@ Blocked:
 Recent verification:
 - `git status --short --branch` in four repositories
 - `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-011`
+- `go test ./...`
+- `PYTHONPATH=src python3 -m unittest discover -s tests`
+- `python3 -m unittest discover -s tests`
+- `python3 scripts/verify_skills.py`
+- `python3 scripts/verify_m0_config.py`
+- `npm run verify`
 
 ## 13. DONE Gate
 
