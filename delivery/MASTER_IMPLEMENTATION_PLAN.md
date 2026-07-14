@@ -13,20 +13,20 @@
 采用纵向闭环路线：
 
 ```text
-工程骨架
-→ 最小跨端任务闭环
-→ 用户、账号与运行环境
-→ 内容发现与素材
-→ 本地合成
-→ 云端生产与成片池
-→ B站辅助发布
-→ 百家号辅助发布
-→ 互动
-→ 数据统计
-→ 打包、更新与稳定性收口
+M0 项目治理与工程基线
+→ M1 Cloud-Agent-Desktop 最小任务闭环
+→ M2 用户、角色、媒体账号与运行环境
+→ M3 抖音内容发现到素材入库
+→ M4 素材使用与本地合成闭环
+→ M5 云端自动生产与云端成片池
+→ M6 发布通用底座与 B站辅助发布
+→ M7 百家号辅助发布
+→ M8 互动管理闭环
+→ M9 效果采集与数据统计
+→ M10 打包、升级、诊断与稳定性验收
 ```
 
-每个阶段都必须产生可以运行、可以测试、可以演示的闭环。M1 最小跨端任务闭环完成前，不进入大规模业务模块开发。
+每个阶段都必须产生可以运行、可以测试、可以演示的闭环。M1 Cloud-Agent-Desktop 最小任务闭环完成前，不进入大规模业务模块开发。
 
 ## 2. 文档和事实源
 
@@ -82,116 +82,518 @@ wt-media-workspace/
 
 ## 3. 里程碑路线
 
-### M0：工程工作区与质量门禁
+每个里程碑只允许以下状态：
 
-目标：让四个仓库具备可重复构建、测试和 AI 执行的基本条件。
+```text
+NOT_STARTED
+IN_PROGRESS
+BLOCKED
+VERIFYING
+DONE
+```
 
-范围：
+里程碑不能因为代码目录已经存在而标记为 `DONE`。必须逐项核验代码、自动测试、Contract、Evidence、人工验证、跨仓库集成、Git 提交和退出条件。
 
-- 四仓库目录和规则文件；
-- Workspace Skills 唯一源码、同步和校验；
-- 根 `.ai/CURRENT_CONTEXT.md` 生成；
-- Cloud、Agent、Desktop 最小启动入口；
-- 基础日志、配置、错误结构；
-- 测试命令和 CI；
-- Contract 目录、版本文件和锁定机制。
+每个里程碑必须记录：
 
-验收：
+| 字段 | 内容 |
+|---|---|
+| 状态 | 当前里程碑状态 |
+| 目标 | 完成后新增的可验证能力 |
+| 依赖 | 必须完成的前置里程碑 |
+| 候选 CHG | 规划中的变更单元，只记录，不自动激活 |
+| Active CHG | 当前激活变更，没有则为 `None` |
+| 退出条件 | 进入下一里程碑前必须满足的条件 |
+| Evidence | 里程碑综合验证索引 |
+| 完成日期 | `DONE` 后记录 |
+| Commit/Tag | 相关提交和版本标签 |
 
-- 三个运行仓库能独立构建和测试；
-- 从最外层 `wt-media/` 启动 Codex 能识别四仓库边界；
-- 运行仓库不依赖 Workspace 才能启动。
+### M0：项目治理与工程基线
 
-### M1：最小跨端任务闭环
+| 字段 | 内容 |
+|---|---|
+| 状态 | `IN_PROGRESS` |
+| 目标 | 建立四仓库协作、Codex 执行控制、基础构建、测试和质量门禁，为后续长期实施提供稳定环境。 |
+| 依赖 | None |
+| Active CHG | `CHG-20260714-003` |
+| Evidence | CHG-002 执行控制提交；CHG-003 evidence；后续 M0 综合验收 evidence。 |
+| 完成日期 | None |
+| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 pending。 |
 
-目标：先证明 Cloud、Agent、Desktop 三端主链路可运行。
+候选 CHG：
 
-最小演示：
+```text
+M0-C1 项目 CHG 执行控制体系
+M0-C1b M0-M10 Master Plan 固化
+M0-C2 四仓库工程结构与规则基线
+M0-C3 Cloud、Agent、Desktop 最小启动和健康检查
+M0-C4 测试、CI、Contract Map 和版本矩阵
+M0-C5 M0 综合验收
+```
+
+退出条件：
+
+- Skill、Active CHG、Checkpoint、Q-xx、Evidence 和 DONE 门禁能实际使用；
+- 从最外层 `wt-media/` 启动 Codex 能识别四仓库；
+- Cloud、Agent、Desktop 能独立构建和测试；
+- Workspace 不成为运行时依赖；
+- Git 工作区、提交和交付历史可追踪；
+- `contract-map.yaml` 和 `release-matrix.yaml` 符合当前已验证状态；
+- M0 综合验收通过。
+
+本阶段不做：
+
+- 正式业务模型；
+- 正式用户认证；
+- 任务执行协议；
+- FFmpeg 合成；
+- 平台自动化；
+- 正式安装包。
+
+### M1：Cloud-Agent-Desktop 最小任务闭环
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 证明 Cloud、Agent、Desktop 三端技术主干能够真实运行。 |
+| 依赖 | M0 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+目标闭环：
 
 ```text
 Cloud 创建 noop_task
-→ Agent 注册节点并领取任务
+→ Agent 注册并领取
 → Agent 上报 started / progress / succeeded
-→ Cloud 保存任务状态
-→ Desktop 启动 Agent
-→ Desktop 通过 Rust 代理读取 Agent 状态和 SSE
-→ 页面展示任务进度
+→ Cloud 保存正式状态
+→ Desktop 启动和观测 Local Agent
+→ Desktop 页面显示任务进度
 ```
 
-M1 拆分建议：
+候选 CHG：
 
 ```text
-三仓库最小工程骨架
-→ Cloud-Agent Contract 与版本
-→ Agent 注册、心跳、任务领取
-→ Agent noop Executor 与结果回传
-→ Local Agent HTTP + SSE
-→ Desktop 启停 Agent 和状态展示
-→ 三端跨端集成验证
+M1-C1 Cloud-Agent Contract 与版本兼容
+M1-C2 Agent 节点注册和心跳
+M1-C3 task 创建、领取、租约与幂等
+M1-C4 noop Executor 和状态回传
+M1-C5 Local Agent HTTP、SSE 与离线待回传
+M1-C6 Desktop 启停 Agent 和状态展示
+M1-C7 三端真实跨端集成验证
 ```
 
-验收：
+退出条件：
 
-- 同一任务不会被两个 Agent 同时执行；
-- Agent 中断后任务可以超时释放或恢复；
-- Agent 无法连接 Cloud 时，结果进入本地待回传；
-- Desktop 不直接访问 Agent SQLite；
-- Desktop Vue 不直接持有 Local Token；
-- 三端分别有自动测试；
-- 完成一次真实跨端演示。
+- 同一个任务不会被两个 Agent 同时执行；
+- Agent 中断后任务可恢复或释放；
+- Cloud 暂时不可达时结果不会丢失；
+- Desktop 不直接读取 Agent SQLite；
+- Desktop Vue 不持有 Local Token；
+- 三端有自动测试；
+- 有真实跨端演示和 Evidence。
 
 ### M2：用户、角色、媒体账号与运行环境
 
-目标：建立后续发布、互动和任务分配依赖的账号基础。
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 建立发布、互动、任务分配和本地执行依赖的账号与运行环境基础。 |
+| 依赖 | M1 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+候选 CHG：
+
+```text
+M2-C1 用户认证、单活会话和三角色权限
+M2-C2 媒体账号模型和分配
+M2-C3 比特浏览器用户与 Profile 绑定
+M2-C4 Agent 节点、Profile 属主和运行环境上报
+M2-C5 Profile 并发控制与敏感任务校验
+M2-C6 用户账号运行环境综合验收
+```
+
+退出条件：
+
+- 可以创建和分配媒体账号；
+- Agent 能确认 Profile 和账号归属；
+- 非属主不能执行敏感任务；
+- 同一 Profile 的敏感任务被拒绝或串行；
+- Cloud 是正式账号事实来源；
+- Desktop 不复制账号业务规则。
+
+### M3：抖音内容发现到素材入库
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 打通链接导入、关键词搜索、作者监控到素材入库的首条业务数据闭环。 |
+| 依赖 | M2 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+目标闭环：
+
+```text
+链接导入 / 关键词搜索 / 作者监控
+→ 抓取任务
+→ crawl_result
+→ source_content
+→ content_lead
+→ material
+```
+
+候选 CHG：
+
+```text
+M3-C1 抓取任务 Contract 和基础模型
+M3-C2 抖音多链接导入
+M3-C3 抖音关键词搜索
+M3-C4 抖音作者监控和定时任务
+M3-C5 crawl_result 与 source_content 去重
+M3-C6 content_lead 查看、筛选和领取
+M3-C7 精准词规则与 material 转化
+M3-C8 内容发现真实业务闭环验收
+```
+
+明确不做：
+
+- B站搜索；
+- 小红书搜索；
+- 百度搜索；
+- Excel 导入；
+- 竞品账号监控；
+- 动态抓取工作流平台。
+
+退出条件：
+
+- 重复作品不会重复创建 `source_content`；
+- 抓取失败不会产生正式素材；
+- 精准词和泛化词行为明确不同；
+- 原始抓取数据可追溯；
+- 一次真实关键词或作者任务能够生成可用 `material`。
+
+### M4：素材使用与本地合成闭环
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 打通素材领取、合成任务、本地 Agent FFmpeg 执行和成片元数据闭环。 |
+| 依赖 | M3 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+目标闭环：
+
+```text
+material
+→ material_usage
+→ compose_pool_item
+→ task
+→ Local Agent + FFmpeg
+→ composite_output
+```
+
+候选 CHG：
+
+```text
+M4-C1 material_usage 与素材领取
+M4-C2 合成模板、版本与参数 Schema
+M4-C3 合成策略、版本和快照
+M4-C4 compose_pool_item 与合成任务台
+M4-C5 Agent FFmpeg 环境和能力检查
+M4-C6 本地视频合成 Executor
+M4-C7 composite_output、失败重试和强制中断
+M4-C8 本地合成真实视频闭环验收
+```
 
 关键约束：
 
-- 单用户只允许一个活跃系统会话；
-- `owner_user_id` 必须硬校验；
-- 同一 Profile 不允许并发执行敏感任务；
-- Cloud 保存正式账号事实；
-- Agent 只上报 Profile 和运行环境事实；
-- Desktop 不复制账号业务规则。
+- 正式运行不依赖系统 Python；
+- FFmpeg 不依赖系统 PATH；
+- Agent 不自行创建正式业务任务；
+- 失败任务不进入成片列表；
+- 成片默认保存在本地；
+- Cloud 保存正式元数据和必要引用。
 
-进入条件：M1 技术主干真实完成并通过验收。
+退出条件：
 
-### M3：内容发现与素材入库
-
-目标：打通关键词、链接、作者监控到素材入库的首条业务数据闭环。
-
-首版不做 B站、小红书、百度搜索和 Excel 导入。
-
-### M4：本地视频合成闭环
-
-目标：打通 `material → task → Agent + FFmpeg → composite_output`。
-
-关键约束：正式运行不依赖系统 Python，不依赖系统 PATH 中的 FFmpeg。
+- 能从一个真实素材生成可播放视频；
+- 来源素材、模板版本、策略版本和参数快照可追溯；
+- FFmpeg 不兼容时禁止执行；
+- 失败和重试状态明确；
+- 成功成片能够进入发布流程。
 
 ### M5：云端自动生产与云端成片池
 
-目标：复用 M4 合成核心，支持 Cloud Agent 生产、对象存储、成片池、领取和下载。
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 复用本地合成核心，打通 Cloud Agent 生产、云端成片池、领取、下载和清理。 |
+| 依赖 | M4 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
 
-### M6：B站辅助发布闭环
+目标闭环：
 
-目标：打通 `composite_output → publication → Agent 辅助填写 → waiting_manual_submit → 人工最终提交`。
+```text
+production_rule
+→ Cloud Agent
+→ composite_output
+→ composite_output_pool
+→ composite_output_claim
+→ 下载到本地
+```
 
-关键约束：Agent 不点击最终发布按钮，同一 Profile 一次只执行一个敏感任务。
+候选 CHG：
+
+```text
+M5-C1 production_rule 与调度
+M5-C2 Cloud Agent 合成模式和对象存储
+M5-C3 composite_output_pool 和范围策略
+M5-C4 自动分配、人工分配与独占领取
+M5-C5 云端下载和本地成片记录
+M5-C6 7 天清理与重复风险提示
+M5-C7 云端生产和成片池综合验收
+```
+
+明确不做：
+
+- 独立生产规则管理平台；
+- 动态工作流引擎；
+- 独立策略组表；
+- `composite_output_download_task`；
+- 独立 `pool_policy` 表。
+
+退出条件：
+
+- Local Agent 和 Cloud Agent 复用同一合成核心；
+- 同一成片不会被多人重复领取；
+- 领取失败不会永久锁死；
+- 下载后能进入本地成片管理；
+- 清理任务和重复风险提示可验证。
+
+### M6：发布通用底座与 B站辅助发布
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 先建立发布通用模型，再完成第一个真实平台发布闭环。 |
+| 依赖 | M5 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+目标闭环：
+
+```text
+composite_output
+→ publication
+→ 发布任务
+→ Agent 打开指定 Profile
+→ 上传和填写
+→ waiting_manual_submit
+→ 运营人工提交
+→ 链接补录和结果回写
+```
+
+候选 CHG：
+
+```text
+M6-C1 publication 模型和正式状态
+M6-C2 发布任务 Contract 和串行队列
+M6-C3 平台 Adapter 通用接口
+M6-C4 B站固定流程与元素 JSON
+M6-C5 单条发布
+M6-C6 批量配置和串行执行
+M6-C7 人工提交、链接补录和手工补录
+M6-C8 失败、丢弃、重试和 result_uncertain
+M6-C9 B站真实辅助发布验收
+```
+
+关键约束：
+
+- Agent 不点击最终发布按钮；
+- 同一 Profile 一次只执行一个敏感任务；
+- 结果不明确时不得盲目重试；
+- 不建设运营可视化流程编排器。
+
+退出条件：
+
+- 完成一条真实 B站辅助发布；
+- 批量任务严格串行；
+- 异常状态和重试行为明确；
+- 人工提交后可以补录链接；
+- Agent 重启后可以识别未完成任务。
 
 ### M7：百家号辅助发布
 
-目标：验证平台 Adapter 边界，复用 publication、task、队列和人工提交逻辑。
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 通过第二个平台验证 Adapter 边界，而不是复制一套发布系统。 |
+| 依赖 | M6 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+候选 CHG：
+
+```text
+M7-C1 百家号字段和元素配置
+M7-C2 百家号 Adapter
+M7-C3 百家号单条和批量辅助发布
+M7-C4 百家号真实发布与 B站回归验收
+```
+
+退出条件：
+
+- 没有复制 B站通用发布逻辑；
+- Cloud 不包含页面元素操作细节；
+- Adapter 不直接修改 Cloud 正式状态；
+- 百家号真实辅助发布完成；
+- B站功能回归通过。
 
 ### M8：互动管理闭环
 
-目标：完成点赞、收藏、评论，不建设关注、转发、私信和主动搜索互动作品。
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 完成点赞、收藏和评论任务闭环。 |
+| 依赖 | M7 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+核心对象：
+
+```text
+interaction_batch
+→ tracked_object
+→ interaction_task
+→ interaction_item
+→ task
+```
+
+候选 CHG：
+
+```text
+M8-C1 互动核心模型
+M8-C2 目标圈定和 interaction_item 生成
+M8-C3 公共模板和个人模板
+M8-C4 DeepSeek 评论生成
+M8-C5 点赞和收藏 Executor
+M8-C6 评论 Executor
+M8-C7 窗口粒度、风控和异常处理
+M8-C8 互动真实业务闭环验收
+```
+
+明确不建设：
+
+- 关注；
+- 转发；
+- 私信；
+- 主动搜索互动作品。
+
+这些不是暂缓功能，不允许创建占位接口或未来状态。
+
+退出条件：
+
+- 一个 `tracked_object` 对应一个 `interaction_task`；
+- 每个账号生成一个 `interaction_item`；
+- 每次真实执行和重试产生新的 `task`；
+- 个人模板仅本人可见；
+- 高风险结果不确定时停止自动重试；
+- 不存在明确排除能力的残留实现。
 
 ### M9：效果采集与数据统计
 
-目标：发布和互动结果形成可追踪数据闭环。Analytics 只读正式业务事实。
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 让发布、互动、素材和策略形成可追踪的数据闭环。 |
+| 依赖 | M8 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
 
-### M10：交付、更新、诊断与稳定性收口
+候选 CHG：
 
-目标：让“开发环境能运行”升级为“运营人员可安装和长期使用”。
+```text
+M9-C1 跟踪对象和 metric_snapshot
+M9-C2 B站效果采集
+M9-C3 百家号效果采集
+M9-C4 素材、策略、账号和平台聚合
+M9-C5 基础运营看板
+M9-C6 生产信号与重复风险数据
+M9-C7 统计闭环验收
+```
+
+关键约束：
+
+- Analytics 只读取正式业务事实；
+- 统计异常不能修改原始业务数据；
+- 原始快照和聚合结果分离；
+- 首版不建设复杂实时数仓。
+
+退出条件：
+
+- 发布链接可以建立跟踪对象；
+- 定时采集生成不可变快照；
+- 可以按主要业务维度查询效果；
+- 采集失败不影响发布业务；
+- 可以形成最小再生产信号。
+
+### M10：打包、升级、诊断与稳定性验收
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | `NOT_STARTED` |
+| 目标 | 将开发环境可运行升级为运营人员可安装、可升级、可诊断、可恢复。 |
+| 依赖 | M9 `DONE` |
+| Active CHG | None |
+| Evidence | None，未进入里程碑验证。 |
+| 完成日期 | None |
+| Commit/Tag | None |
+
+候选 CHG：
+
+```text
+M10-C1 Agent 正式打包和受控依赖
+M10-C2 FFmpeg 分发、校验和许可证
+M10-C3 Desktop 三平台安装包
+M10-C4 版本兼容和更新机制
+M10-C5 日志脱敏和诊断包
+M10-C6 中断恢复、安全和故障演练
+M10-C7 全系统发布验收
+```
+
+退出条件：
+
+- 用户不需要安装系统 Python；
+- 不依赖系统 FFmpeg；
+- 三种桌面目标可以构建；
+- 不兼容版本禁止执行敏感任务；
+- 普通日志不存在敏感信息；
+- 可以导出诊断信息；
+- 关键中断恢复场景通过；
+- `release-matrix.yaml` 存在正式可用版本组合；
+- 全系统最终验收通过。
 
 ## 4. CHG 粒度
 
@@ -292,4 +694,3 @@ Codex 每次必须按顺序读取：
 ```
 
 若工程骨架或最小跨端任务闭环未真实完成并通过验收，不得跳到用户与账号模块。
-
