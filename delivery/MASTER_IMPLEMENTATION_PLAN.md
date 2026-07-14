@@ -202,10 +202,10 @@ M1-C7 三端真实跨端集成验证
 | 状态 | `IN_PROGRESS` |
 | 目标 | 建立发布、互动、任务分配和本地执行依赖的账号与运行环境基础。 |
 | 依赖 | M1 `DONE` |
-| Active CHG | `CHG-20260714-018` |
-| Evidence | CHG-015 M2-C1、CHG-016 M2-C2、CHG-017 M2-C3 已完成；CHG-018 M2-C4 Agent 节点、Profile 属主和运行环境上报进行中。M2-C6 需补充真实 MySQL/比特浏览器集成验收。 |
+| Active CHG | None |
+| Evidence | CHG-015 M2-C1、CHG-016 M2-C2、CHG-017 M2-C3、CHG-018 M2-C4 已完成；C4 的会话绑定节点、运行环境上报和 Profile 运行属主门禁通过。M2-C6 需补充真实 MySQL/比特浏览器集成验收。 |
 | 完成日期 | None |
-| Commit/Tag | CHG-015 commits: Cloud `50b5c8d`, `03b0dcc`; Workspace `f3e7d1a`, `51ab7de`, `e79db94`, `6576c44`, `a1f12d7`。CHG-016 commits: Cloud `18f687a`, `8eb70ba`; Workspace `266595f`, `3c65f6e`, `92c4565`。CHG-017 commits: Agent `14e51be`, `f0257b5`; Cloud `bba30ef`, `727ad9e`; Workspace `0bb7ba8`, `b67d493`。 |
+| Commit/Tag | CHG-015 commits: Cloud `50b5c8d`, `03b0dcc`; Workspace `f3e7d1a`, `51ab7de`, `e79db94`, `6576c44`, `a1f12d7`。CHG-016 commits: Cloud `18f687a`, `8eb70ba`; Workspace `266595f`, `3c65f6e`, `92c4565`。CHG-017 commits: Agent `14e51be`, `f0257b5`; Cloud `bba30ef`, `727ad9e`; Workspace `0bb7ba8`, `b67d493`, `5123ab8`。CHG-018 commits: Agent `8652a90`, `d5a9e4d`; Cloud `6ef0308`, `866364e`, `9770e1b`; Workspace `f54c08c`, `955f8ab`。 |
 
 候选 CHG：
 
