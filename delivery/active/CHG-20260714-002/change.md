@@ -84,8 +84,8 @@ None.
 |---|---|---|---|
 | T-01 | Establish CHG-002 records, master plan, template, and evidence spec. | DONE | File checks, `rg`, diff inspection. |
 | T-02 | Add `executing-wt-media-change` Skill and rule references. | DONE | `python3 scripts/verify_skills.py`, rule text inspection. |
-| T-03 | Extend `prepare_ai_workspace.py --change` and generated context. | TODO | Script unit tests and manual command run. |
-| T-04 | Record final verification evidence and close DONE gate. | TODO | Test summary, diff summary, runtime repo status check. |
+| T-03 | Extend `prepare_ai_workspace.py --change` and generated context. | DONE | Manual command run and generated file inspection. |
+| T-04 | Record final verification evidence and close DONE gate. | TODO | Unit tests, test summary, diff summary, runtime repo status check. |
 | T-05 | Commit workspace and root changes independently. | TODO | Git status and commit log checks. |
 
 ## 9. Repository Checklist
@@ -156,9 +156,10 @@ Completed:
 - T-01 created CHG-002, the master implementation plan, the standard change template, and the evidence record template.
 - T-01 removed completed CHG-001 from active records and updated the active ledger.
 - T-02 created `executing-wt-media-change` and updated root/Workspace rule files.
+- T-03 extended `prepare_ai_workspace.py --change`, generated root `.ai/CURRENT_CONTEXT.md`, and generated the root `.agents` execution Skill copy.
 
 Current:
-- T-03 `prepare_ai_workspace.py --change` and generated context.
+- T-04 script tests and final verification evidence.
 
 Next:
 - Add execution Skill and rule references.
@@ -174,6 +175,10 @@ Recent verification:
 - `rg -n "Cloud user|Cloud 用户|用户账号|用户与账号|下一步" wt-media-workspace/delivery/MASTER_IMPLEMENTATION_PLAN.md wt-media-workspace/delivery/active/CHG-20260714-002/change.md wt-media-workspace/delivery/LEDGER.md`
 - `python3 scripts/verify_skills.py`
 - `rg -n "executing-wt-media-change" AGENTS.md wt-media-workspace/AGENTS.md wt-media-workspace/skills/workspace/executing-wt-media-change/SKILL.md wt-media-workspace/delivery/MASTER_IMPLEMENTATION_PLAN.md`
+- `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-002`
+- `python3 scripts/prepare_ai_workspace.py --change CHG-DOES-NOT-EXIST`
+- `sed -n '1,220p' .ai/CURRENT_CONTEXT.md`
+- `sed -n '1,40p' .agents/skills/executing-wt-media-change/SKILL.md`
 
 ## 13. DONE Gate
 
