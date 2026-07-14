@@ -147,16 +147,16 @@ Completed:
 - Created CHG-015 active record and marked M2 as in progress for C1.
 
 Current:
-- C1 test-first identity persistence and API implementation.
+- C1 MySQL identity persistence, migrations, and public HTTP contract implementation.
 
 Next:
-- Add a focused failing identity-service test before production code.
+- Add a focused failing MySQL-store test before production persistence code.
 
 Blocked:
 - None.
 
 Recent verification:
-- M1 completion is recorded in `delivery/MASTER_IMPLEMENTATION_PLAN.md`; Cloud baseline `go test ./...` completed with the configured Go toolchain before C1 implementation.
+- M1 completion is recorded in `delivery/MASTER_IMPLEMENTATION_PLAN.md`; C1 identity focused tests and the full Cloud `go test ./...` suite passed after commit `50b5c8d`.
 
 ## 13. DONE Gate
 
