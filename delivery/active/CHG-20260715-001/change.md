@@ -1,0 +1,199 @@
+# CHG-20260715-001: 产品基线与 Master Plan 端到端对齐
+
+## 1. Basic Information
+
+- Level: L
+- Status: IMPLEMENTING
+- Created: 2026-07-15
+- Current repository: `wt-media-workspace`
+- Affected repositories:
+  - `wt-media-workspace`
+
+## 2. Change Goal
+
+重新对齐当前产品事实、工程事实和 M0-M10 实施路线：把 M0/M1 重新定义为完成后能够通过真实 Cloud、MySQL、Agent、Desktop 和 Web 端到端人工验收的工程环境；把 M2 按完整用户、账号、窗口、代理、Cookie、开户、运行环境和权限范围重新规划并重新执行；修正 M3-M10 的对象、依赖、状态和漏项，使后续每个 CHG 都能从唯一产品事实推导并独立验收。
+
+本 CHG 只修订稳定基线、治理映射和实施计划，不实现任何运行时业务功能。
+
+## 3. Baseline References
+
+- Product baseline:
+  - `docs/product/prd/社媒运营平台_产品需求说明书_V1.md`
+  - `docs/product/prd/详细文档/第一章_项目概述.md`
+  - `docs/product/prd/详细文档/第二章_系统架构.md`
+  - `docs/product/prd/详细文档/第三章_用户与账号管理.md`
+  - `docs/product/prd/详细文档/第四章_内容发现.md`
+  - `docs/product/prd/详细文档/第五章_素材生产.md`
+  - `docs/product/prd/详细文档/第六章_发布管理.md`
+  - `docs/product/prd/详细文档/第七章_互动管理.md`
+  - `docs/product/prd/详细文档/第八章_数据统计.md`
+- Engineering baseline: `docs/engineering/architecture/模块化自媒体运营平台_系统架构设计说明书_V1.md`
+- Contract governance: `docs/contracts/contract-map.md`, `config/contract-map.yaml`
+- Release governance: `config/release-matrix.yaml`
+- Decisions: `docs/decisions/0002-bitbrowser-profile-identity-normalization.md`
+- Master route: `delivery/MASTER_IMPLEMENTATION_PLAN.md`
+- Audit evidence: `evidence/baseline-audit-20260715.md`
+
+## 4. Current Facts
+
+- CHG-20260714-020 closed the M2 C1-C6 foundation acceptance with real MySQL and BitBrowser evidence; it did not deliver the complete user/account product domain.
+- M0 and M1 are marked `DONE`, but Desktop build/package remain scaffold commands, the Desktop entry still uses a mock Local Agent service, and Cloud task/Agent registries remain in memory.
+- The current M2 plan does not include complete user management UI, browser window/Profile management, proxy management, Cookie operations, account checks, or the three onboarding paths required by Chapter 3.
+- The current M3 plan still uses `crawl_result` and `content_lead`, although the product baseline defines `source_content` as canonical and explicitly excludes an independent `crawl_result`.
+- The current M8 plan still uses `interaction_batch` and `interaction_item`, although the product baseline explicitly excludes both as core objects.
+- `tracked_object` must be created when publication succeeds or an external interaction target is recorded; it cannot first appear in M9.
+- `task_schemas` are still `placeholder_only` and must become formal before real business executors depend on them.
+- Human-readable contract governance and generated AI context have drifted from the current machine-readable facts.
+
+## 5. Scope
+
+### Add
+
+- A product-to-milestone capability crosswalk covering all P0/P1 requirements and explicit exclusions.
+- Corrected M0/M1 remediation CHGs and end-to-end acceptance gates.
+- A newly numbered M2 execution route that reuses valid existing code only after re-verification and closes the complete product/UI/runtime scope.
+- Corrected M3-M10 candidate CHGs, dependency gates, canonical objects, real-integration gates, and manual acceptance requirements.
+- Automated static checks for forbidden stale object usage and milestone/contract governance consistency.
+
+### Modify
+
+- Consolidated PRD and detailed Chapters 2-8 where stale terminology or cross-chapter ownership conflicts remain.
+- Engineering architecture where the real Desktop/Agent/task persistence delivery point is ambiguous.
+- `delivery/MASTER_IMPLEMENTATION_PLAN.md` in full, including current statuses, inherited evidence, candidate CHGs, dependencies and exit conditions.
+- Human-readable contract map, machine-readable governance descriptions, release evidence wording, and generated AI context.
+
+### Delete
+
+- Operational use of `content_lead`, independent `crawl_result`, `interaction_batch`, `interaction_item`, and `production_signal` from current product and implementation plans.
+- Any statement that treats scaffold-only Desktop checks or in-memory task infrastructure as production-complete end-to-end evidence.
+
+Historical Git evidence and migration/replacement tables are retained; deletion applies only to current operational design.
+
+### Explicitly Not Doing
+
+- Implementing or modifying Cloud, Agent, Desktop, Web, MySQL schema, scheduler, object storage, proxy, Cookie, publication, interaction, or packaging runtime behavior.
+- Marking M0, M1, M2, or any later milestone `DONE` in this alignment CHG.
+- Activating placeholder task schemas before a provider-owned formal contract exists.
+- Deleting historical commits, completed CHG evidence from Git history, or valid C1-C6 runtime code.
+- Creating a new top-level M11 business milestone.
+
+## 6. Confirmed Decisions
+
+| ID | Decision | Status |
+|---|---|---|
+| D-01 | M0/M1 are reopened in the Master Plan. M0 establishes independently buildable/runnable real components; M1 completes a persistent Cloud-Agent-Desktop-Web end-to-end environment that can be manually accepted without mocks. | CONFIRMED |
+| D-02 | Historical M0/M1 commits remain inherited evidence, but scaffold checks, echo build/package commands, mock Desktop services, and in-memory registries cannot satisfy the revised exit gates. | CONFIRMED |
+| D-03 | M2 is replanned and re-executed from a newly numbered complete route. Existing C1-C6 code may be reused after audit, but their historical PASS status does not automatically close any new product-level CHG. | CONFIRMED |
+| D-04 | Canonical content discovery flow is `crawl_strategy -> crawl_task` for scheduled work and direct query for instant work; selected results become `source_content -> material`. No independent `crawl_result` or `content_lead` is built. | CONFIRMED |
+| D-05 | Interaction uses `tracked_object -> interaction_task -> account-level task`; batch selection is an operation, not an `interaction_batch` object, and no `interaction_item` is built. | CONFIRMED |
+| D-06 | `production_signal` is not built. Production hints and repeat-risk views are derived from formal business facts and `platform_metric_snapshot`. | CONFIRMED |
+| D-07 | One Cloud user binds at most one BitBrowser main account tree; the same `main_user_id` may be shared by multiple Cloud users/operators; authorization is enforced by Cloud Profile assignment, while `profile_user_id` remains audit metadata. | CONFIRMED |
+| D-08 | `tracked_object` is created or reused by M6 after a valid published result and by M8 for external targets; M9 only collects and aggregates metrics. | CONFIRMED |
+| D-09 | Real Desktop/Tauri/Local Agent integration is an M0/M1 prerequisite and an earlier business acceptance dependency; M10 owns final installers, signing, update, diagnostics and recovery rather than the first real Desktop integration. | CONFIRMED |
+| D-10 | The M0-M10 top-level route is retained; completeness is achieved by correcting CHG decomposition and gates rather than adding M11. | CONFIRMED |
+
+## 7. Pending Questions
+
+None.
+
+## 8. Implementation Tasks
+
+Each task follows:
+
+```text
+failing verification
+→ minimal baseline/plan correction
+→ verification
+→ diff check
+→ evidence
+→ checkpoint
+→ independent Workspace commit
+```
+
+| Task | Goal | Status | Verification |
+|---|---|---|---|
+| T-01 | Activate the independent alignment CHG and record the approved audit/decisions. | DONE | Single Active CHG scan; `evidence/baseline-audit-20260715.md`. |
+| T-02 | Normalize product terminology, object ownership and cross-chapter status rules. | TODO | Stale-object contextual scan plus product cross-reference review. |
+| T-03 | Correct engineering/contract governance descriptions for real Desktop, persistent task infrastructure and formal schema gates. | TODO | Architecture/contract-map consistency scan. |
+| T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | TODO | Exit-gate checklist against current code facts. |
+| T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | TODO | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
+| T-06 | Correct M3-M10 flows, objects, dependencies, missing CHGs and acceptance gates. | TODO | Chapters 4-8 and architecture crosswalk; forbidden-object scan. |
+| T-07 | Align Ledger, human/machine contract governance, release wording and generated AI context. | TODO | Workspace governance scripts and single Active CHG verification. |
+| T-08 | Run full Workspace regression, record diff/coverage evidence, and prepare the CHG for user review/closure. | TODO | `verify_m0_config.py`, Workspace tests, new alignment verifier, `git diff --check`. |
+
+## 9. Repository Checklist
+
+### wt-media-workspace
+
+- [ ] Product baseline terminology and ownership corrected.
+- [ ] Engineering and contract governance boundaries corrected.
+- [ ] M0/M1 reset to real end-to-end gates.
+- [ ] M2 replanned and renumbered completely.
+- [ ] M3-M10 corrected and cross-checked.
+- [ ] Static verifier and evidence added.
+- [ ] Ledger, generated context and checkpoint aligned.
+
+### wt-media-cloud
+
+- [x] Not affected; runtime implementation is explicitly deferred to later CHGs.
+
+### wt-media-agent
+
+- [x] Not affected; runtime implementation is explicitly deferred to later CHGs.
+
+### wt-media-desktop
+
+- [x] Not affected; runtime implementation is explicitly deferred to later CHGs.
+
+## 10. Acceptance Matrix
+
+| AC | Requirement | Verification | Status |
+|---|---|---|---|
+| AC-01 | Only CHG-20260715-001 is Active and all approved decisions are recorded without an open blocking question. | Active directory/Ledger/context scan. | PASS |
+| AC-02 | M0/M1 completion requires independently real builds plus a persistent, mock-free Cloud-Agent-Desktop-Web end-to-end manual acceptance environment. | Master exit-gate review against architecture. | TODO |
+| AC-03 | M2 contains user management, media accounts, Profile/window management, proxy management, Cookie/account checks, onboarding, runtime binding, sensitive-task guard, UI and real acceptance. | Chapter 3 capability crosswalk. | TODO |
+| AC-04 | M3-M10 use only canonical objects and place `tracked_object`, task schemas, scheduler, object storage and Desktop dependencies before their first consumer. | Cross-milestone dependency and forbidden-object scan. | TODO |
+| AC-05 | Product, engineering, contract governance and Master Plan agree on BitBrowser main/sub-account identity and Cloud authorization. | D-07 reference scan and terminology verifier. | TODO |
+| AC-06 | Every milestone has automated, real dependency, UI/manual, recovery/security and independent-commit gates where applicable. | Milestone acceptance crosswalk. | TODO |
+| AC-07 | Workspace automated verification passes and diff contains no runtime-repository edits. | Full Workspace regression and repository status check. | TODO |
+
+## 11. Evidence
+
+- `evidence/baseline-audit-20260715.md`
+- Planned: `evidence/product-milestone-crosswalk.md`
+- Planned: `evidence/verification-summary.md`
+- Planned: `evidence/diff-summary.md`
+
+Evidence records facts and verification results; requirements remain in stable baselines and this change record.
+
+## 12. Current Checkpoint
+
+Completed:
+- CHG-020 was closed under its original C1-C6 foundation scope with independent repository commits.
+- User confirmed D-01 through D-10: reopen M0/M1, replan/re-execute M2, normalize canonical objects, and retain the M0-M10 top-level route.
+- Baseline audit and the independent alignment CHG were created.
+
+Current:
+- CHG package is ready for user review before T-02 begins.
+
+Next:
+- After review, execute T-02 product terminology and ownership normalization.
+
+Blocked:
+- None.
+
+Recent verification:
+- CHG-020 final closure matrix passed on 2026-07-15 before this CHG was activated.
+- Active CHG discovery and generated AI context both resolve uniquely to CHG-20260715-001; no blocking question exists.
+
+## 13. DONE Gate
+
+- [ ] Scope completed.
+- [x] No blocking `Q-xx`.
+- [ ] Acceptance matrix all PASS.
+- [ ] Automated tests passed or justified.
+- [ ] Manual review evidence recorded where required.
+- [ ] Diff checked for out-of-scope changes.
+- [x] Runtime repositories touched only if listed in scope.
+- [ ] Required baselines updated.
+- [ ] Affected repository committed independently.
