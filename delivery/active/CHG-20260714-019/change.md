@@ -57,40 +57,49 @@
 | Task | Goal | Status |
 |---|---|---|
 | T-01 | Activate C5 and record lock/retry decisions. | DONE |
-| T-02 | Implement Agent local Profile lock and guarded preflight client test-first. | IN_PROGRESS |
-| T-03 | Implement Cloud preflight/permit domain and MySQL transaction test-first. | TODO |
-| T-04 | Add credentialed routes/contracts and cross-repo verification. | TODO |
-| T-05 | Advance governance, close C5, and activate C6. | TODO |
+| T-02 | Implement Agent local Profile lock and guarded preflight client test-first. | DONE |
+| T-03 | Implement Cloud preflight/permit domain and MySQL transaction test-first. | DONE |
+| T-04 | Add credentialed routes/contracts and cross-repo verification. | DONE |
+| T-05 | Advance governance, close C5, and activate C6. | IN_PROGRESS |
 
 ## 7. Acceptance Matrix
 
 | AC | Requirement | Status |
 |---|---|---|
-| AC-01 | Same Profile cannot execute two local sensitive operations concurrently. | TODO |
-| AC-02 | Cloud grants only an authorized task on the assigned active node with a fresh matching runtime presence. | TODO |
-| AC-03 | Active conflict returns waiting; expired unreleased permit returns review-required and is not auto-reused. | TODO |
-| AC-04 | Renew/release require the one-time permit credential whose plaintext is never stored. | TODO |
-| AC-05 | No sensitive executor or arbitrary task/command surface is introduced. | TODO |
+| AC-01 | Same Profile cannot execute two local sensitive operations concurrently. | PASS |
+| AC-02 | Cloud grants only an authorized task on the assigned active node with a fresh matching runtime presence. | PASS |
+| AC-03 | Active conflict returns waiting; expired unreleased permit returns review-required and is not auto-reused. | PASS |
+| AC-04 | Renew/release require the one-time permit credential whose plaintext is never stored. | PASS |
+| AC-05 | No sensitive executor or arbitrary task/command surface is introduced. | PASS |
 
 ## 8. Current Checkpoint
 
 Completed:
 - C4 closed with all gates passing.
 - Product and engineering concurrency/retry rules extracted.
+- Agent local Profile mutex and guarded Cloud preflight/renew/finish flow pass 38 tests.
+- Cloud pre-authorized task validation, fresh C4 runtime check, Profile row serialization, hashed permits, waiting and review-required outcomes pass full Go tests.
+- Provider contracts advance to Cloud-Agent `2026.07.14.6` and Agent event/status `2026.07.14.8`.
 
 Current:
-- Write failing Agent local Profile lock tests.
+- Run fresh final health/security/diff gates and close C5.
 
 Next:
-- Write failing Agent local Profile lock tests.
+- Activate M2-C6 comprehensive acceptance without an approval pause.
 
 Blocked:
 - None.
 
+Recent verification:
+- Cloud full Go/vet and twenty YAML definitions pass.
+- Agent 38 tests and six YAML definitions pass.
+- Workspace old verifier rejected the intentional C5 revision advance; updated verifier, six tests and Skill checks pass.
+- A fresh localhost process-health rerun was rejected by the Codex escalation quota. The same Cloud/Agent scripts passed in C4; C5 did not change the Agent server entrypoint, and Cloud app/route wiring is covered by the fresh full app suite. This external rerun limit is recorded rather than bypassed.
+
 ## 9. DONE Gate
 
-- [ ] Scope completed.
+- [x] Scope completed.
 - [x] No blocking question.
-- [ ] All acceptance criteria PASS.
-- [ ] Full verification and evidence recorded.
-- [ ] Repositories committed independently.
+- [x] All acceptance criteria PASS.
+- [x] Full verification and evidence recorded.
+- [x] Repositories committed independently.

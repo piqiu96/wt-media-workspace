@@ -1,5 +1,5 @@
 schema_version: 1
-contract_state: m2_agent_runtime_binding
+contract_state: m2_sensitive_profile_guard
 formal_definitions_active: true
 
 contracts:
@@ -19,8 +19,8 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.07.14.5"
-    minimum_agent_contract_revision: "2026.07.14.5"
+    contract_revision: "2026.07.14.6"
+    minimum_agent_contract_revision: "2026.07.14.6"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:
       - wt-media-agent
@@ -57,7 +57,7 @@ contracts:
     path: ../wt-media-cloud/contracts/cloud-error-codes
     state: active
     formal_definition: active
-    error_revision: "2026.07.14.4"
+    error_revision: "2026.07.14.5"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -76,7 +76,7 @@ contracts:
     path: ../wt-media-agent/contracts/local-event-schemas
     state: active
     formal_definition: active
-    event_revision: "2026.07.14.7"
+    event_revision: "2026.07.14.8"
     consumers:
       - wt-media-desktop
   local_status_enums:
@@ -84,7 +84,7 @@ contracts:
     path: ../wt-media-agent/contracts/local-status-enums
     state: active
     formal_definition: active
-    enum_revision: "2026.07.14.7"
+    enum_revision: "2026.07.14.8"
     consumers:
       - wt-media-desktop
   local_error_codes:
