@@ -211,33 +211,52 @@ M1-R8 无 Mock 三端端到端人工验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS` |
-| 目标 | 建立发布、互动、任务分配和本地执行依赖的账号与运行环境基础。 |
+| 状态 | `NOT_STARTED` |
+| 目标 | 在 M1 真实端到端环境上，完整交付用户、媒体账号、BitBrowser 窗口、代理、Cookie、开户、运行环境、敏感任务权限以及对应 Web/Desktop 产品体验。 |
 | 依赖 | M1 `DONE` |
-| Active CHG | `CHG-20260714-020` |
-| Evidence | CHG-015 至 CHG-019（M2-C1 至 C5）已完成；CHG-020 的四仓自动矩阵和 Desktop 一次性票据边界已通过，真实 MySQL/比特浏览器强制证据因外部依赖不可用而阻塞。 |
+| Active CHG | None |
+| Evidence | 继承证据：CHG-015 至 CHG-020 已验证认证、媒体账号基础模型、BitBrowser 主账号树/Profile 扫描、运行环境上报、敏感任务并发和真实 MySQL/BitBrowser 基础链路。窗口管理、代理、Cookie、开户、完整用户管理 UI、真实 Desktop 产品体验尚未交付，历史 PASS 不自动关闭新的 M2-C1 至 C11。 |
 | 完成日期 | None |
 | Commit/Tag | CHG-015 commits: Cloud `50b5c8d`, `03b0dcc`; Workspace `f3e7d1a`, `51ab7de`, `e79db94`, `6576c44`, `a1f12d7`。CHG-016 commits: Cloud `18f687a`, `8eb70ba`; Workspace `266595f`, `3c65f6e`, `92c4565`。CHG-017 commits: Agent `14e51be`, `f0257b5`; Cloud `bba30ef`, `727ad9e`; Workspace `0bb7ba8`, `b67d493`, `5123ab8`。CHG-018 commits: Agent `8652a90`, `d5a9e4d`; Cloud `6ef0308`, `866364e`, `9770e1b`; Workspace `f54c08c`, `955f8ab`, `1bc1de9`。CHG-019 commits: Agent `5cd9212`, `3d4081a`; Cloud `d1d0ddc`, `2753715`; Workspace `5c59c5a`, `019d4a6`。 |
 
 候选 CHG：
 
 ```text
-M2-C1 用户认证、单活会话和三角色权限
-M2-C2 媒体账号模型和分配
-M2-C3 比特浏览器用户与 Profile 绑定
-M2-C4 Agent 节点、Profile 属主和运行环境上报
-M2-C5 Profile 并发控制与敏感任务校验
-M2-C6 用户账号运行环境综合验收
+M2-C1 用户认证、单活会话、三角色、游戏范围与用户管理台
+M2-C2 媒体账号生命周期、标签、分配与账号工作台
+M2-C3 BitBrowser 主账号树、Profile 扫描 Diff 与 Cloud 分配
+M2-C4 窗口/Profile 创建、修改、打开、检测、归档与恢复
+M2-C5 代理导入、解析、检测、配额、分配与回读
+M2-C6 Cookie 导入导出读写、active Cookie 与账号检测
+M2-C7 批量 Cookie、短信链接、人工验证码开户与部分成功重试
+M2-C8 Agent 节点绑定、运行环境上报与健康页面
+M2-C9 Profile 并发、敏感任务预检、结果不确定审核与审计
+M2-C10 Web/Desktop 账号环境综合工作台与三角色 UX
+M2-C11 真实 MySQL、BitBrowser、代理、Cookie、Desktop 综合验收
 ```
+
+重新执行规则：
+
+- 每个新 CHG 先审计历史实现和 Contract，再决定复用、修正或补齐；
+- 历史 C1-C6 的自动测试和真实证据可以复用，但必须满足新 CHG 的完整范围和 UI/人工验收后才能标记 PASS；
+- 不为重新编号而盲目重写已经正确的代码；
+- 任何代理、Cookie、Profile 修改都必须写入 BitBrowser 后读回验证；
+- 批量操作必须支持部分成功、失败项重试和明确错误反馈。
 
 退出条件：
 
-- 可以创建和分配媒体账号；
-- Agent 能确认 Profile 和账号归属；
-- 非属主不能执行敏感任务；
-- 同一 Profile 的敏感任务被拒绝或串行；
+- 技术角色可以创建、启停、修改用户、分配角色和游戏范围、重置密码并查看审计；普通/高级运营只能访问授权范围；
+- 可以完成媒体账号创建、识别、标签、分配、状态维护和批量账号检查；
+- 一个 Cloud 用户最多绑定一棵 `main_user_id` 主账号树；同一主账号树可服务多个运营，但 Profile 访问严格按 Cloud 分配隔离；
+- 窗口/Profile 的同步、Diff、创建、修改、打开、检测、归档和恢复均有 UI 与读回验证；
+- 代理支持批量导入、智能解析、检测、平台配额、分配、停用和 BitBrowser 回读；
+- Cookie 支持导入、导出、读取、写入、original/active 分离以及实际登录状态检查；
+- 批量 Cookie、短信链接和人工验证码三种开户路径均可完成，支持部分成功和失败重试；
+- Agent 能确认 Profile 的 `main_user_id`、`profile_user_id` 审计信息和 Cloud 授权范围；
+- 未授权用户不能执行敏感任务；同一 Profile 的敏感任务被拒绝或串行；结果不确定时进入人工审核；
 - Cloud 是正式账号事实来源；
-- Desktop 不复制账号业务规则。
+- Desktop 不复制账号业务规则，但能承载 Cloud Web 并提供真实本地环境、Agent、文件和任务状态页面；
+- M2-C11 通过自动 Contract/测试、真实 MySQL/BitBrowser/代理/Cookie、三角色 UI、Desktop 人工、恢复、安全和独立提交验收。
 
 ### M3：抖音内容发现到素材入库
 

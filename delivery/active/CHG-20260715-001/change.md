@@ -116,7 +116,7 @@ failing verification
 | T-02 | Normalize product terminology, object ownership and cross-chapter status rules. | DONE | Stale-object contextual scan plus product cross-reference review. |
 | T-03 | Correct engineering/contract governance descriptions for real Desktop, persistent task infrastructure and formal schema gates. | DONE | Architecture/contract-map consistency scan. |
 | T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | DONE | Exit-gate checklist against current code facts. |
-| T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | TODO | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
+| T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | DONE | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
 | T-06 | Correct M3-M10 flows, objects, dependencies, missing CHGs and acceptance gates. | TODO | Chapters 4-8 and architecture crosswalk; forbidden-object scan. |
 | T-07 | Align Ledger, human/machine contract governance, release wording and generated AI context. | TODO | Workspace governance scripts and single Active CHG verification. |
 | T-08 | Run full Workspace regression, record diff/coverage evidence, and prepare the CHG for user review/closure. | TODO | `verify_m0_config.py`, Workspace tests, new alignment verifier, `git diff --check`. |
@@ -176,12 +176,13 @@ Completed:
 - T-02 normalized `source_content`, publication cancellation metrics, account-group semantics, tracked-object ownership, and shared BitBrowser main-tree authorization language across the product baseline.
 - T-03 aligned the engineering architecture, human contract map and release-matrix planning note with real Desktop, persistent task/Agent state, scheduler/object-storage ordering and formal task-schema gates.
 - T-04 reopened M0 as `IN_PROGRESS`, reset M1 to `NOT_STARTED`, retained historical scaffold/noop evidence, and defined M0-R1..R6 plus M1-R1..R8 real component and mock-free end-to-end gates.
+- T-05 reset M2 to `NOT_STARTED` and mapped the complete Chapter 3 account/environment domain to M2-C1..C11, with historical C1-C6 code and evidence retained only as reusable inputs.
 
 Current:
-- T-05 complete M2 replanning.
+- T-06 M3-M10 correction.
 
 Next:
-- Reset M2 to `NOT_STARTED` and replace the historical narrow C1-C6 route with product-complete M2-C1..C11.
+- Replace downstream stale objects, restore missing task/dependency links and add product-complete acceptance gates for M3-M10.
 
 Blocked:
 - None.
@@ -193,6 +194,7 @@ Recent verification:
 - Product stale-term scan now leaves removed objects only in explicit exclusion, migration, or historical-reference contexts.
 - `python3 scripts/verify_m0_config.py` passes with the mixed active/placeholder contract state documented consistently.
 - M0/M1 exit-gate review now rejects echo builds, Mock-only Desktop entry points, in-memory production task state and placeholder task schemas.
+- Chapter 3 crosswalk maps every user/account/Profile/proxy/Cookie/onboarding/runtime/UI cluster to exactly one new M2 delivery group.
 
 ## 13. DONE Gate
 

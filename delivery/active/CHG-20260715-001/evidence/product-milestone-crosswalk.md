@@ -26,11 +26,11 @@
 | Product capability cluster | Source | Milestone | Resolution status |
 |---|---|---|---|
 | Real component build/run/test and cross-end task environment | Chapters 1-2 | M0-M1 | M0-R1 through R6 and M1-R1 through R8 now define real component and mock-free persistent end-to-end gates. |
-| Users, roles, game scope and user administration | Chapter 3 | M2 | To be mapped to new M2-C1. |
-| Media accounts, tags, assignment and account workbench | Chapter 3 | M2 | To be mapped to new M2-C2. |
-| BitBrowser binding, Profile synchronization and Cloud assignment | Chapter 3 | M2 | To be mapped to M2-C3/C4. |
-| Proxy, Cookie, account health and onboarding | Chapter 3 | M2 | To be mapped to M2-C5/C6/C7. |
-| Agent runtime, environment, Profile concurrency and product UI acceptance | Chapters 2-3 | M2 | To be mapped to M2-C8 through C11. |
+| Users, roles, game scope and user administration | Chapter 3 | M2 | M2-C1. |
+| Media accounts, tags, assignment and account workbench | Chapter 3 | M2 | M2-C2. |
+| BitBrowser binding, Profile synchronization and Cloud assignment | Chapter 3 | M2 | M2-C3/C4. |
+| Proxy, Cookie, account health and onboarding | Chapter 3 | M2 | M2-C5/C6/C7. |
+| Agent runtime, environment, Profile concurrency and product UI acceptance | Chapters 2-3 | M2 | M2-C8 through C11. |
 | Douyin instant query, monitoring, `source_content` and material conversion | Chapter 4 | M3 | To be rewritten in T-06. |
 | Material lifecycle and local composition | Chapter 5 | M4 | To be rewritten in T-06. |
 | Cloud composition and output pool | Chapter 5 | M5 | To be rewritten in T-06. |
