@@ -1,8 +1,8 @@
-# Cloud Identity Foundation Verification
+# Cloud Identity Verification
 
 - CHG: `CHG-20260714-015`
-- Scope: C1 identity-service foundation only; MySQL persistence and HTTP routes are not yet implemented.
-- Related Cloud commit: `50b5c8d feat: add identity service foundation`
+- Scope: C1 identity service, MySQL persistence, public API/contracts, audit redaction, and Cloud Web session shell.
+- Related Cloud commits: `50b5c8d feat: add identity service foundation`; `03b0dcc feat: complete cloud identity access foundation`.
 - Status: PASS
 
 ## Test-first evidence
@@ -21,8 +21,8 @@ The identity unit tests and pre-existing Cloud tests complete without failures.
 
 ## Actual result
 
-The identity package passed its focused session, disabled-user, and role/game-scope tests. The full Cloud suite passed: `cloudagent`, `identity`, and `infra/config` all reported `ok`; remaining packages reported no test files.
+The identity package passed focused session, disabled-user, role/game-scope, password, MySQL-store, route, bootstrap, and audit-redaction tests. The full Cloud suite passed, the real HTTP health process reported `wt-media-cloud health ok`, Web reported 2 passing tests and a successful Vite production build, and npm audit reported 0 vulnerabilities.
 
 ## Limit
 
-This result does not claim MySQL migration, public API, Cloud Web, or M2 completion. Those remain in the active change checkpoint.
+No local MySQL daemon was available, so SQL behavior was verified with deterministic SQL expectations and the migration was contract-reviewed rather than executed against a live database. This limit must remain explicit in C1 evidence and be covered by M2-C6 integration acceptance.

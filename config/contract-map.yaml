@@ -1,13 +1,15 @@
 schema_version: 1
-contract_state: m1_local_agent_observability
+contract_state: m2_identity_access
 formal_definitions_active: true
 
 contracts:
   cloud_api:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/cloud-api
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    api_major_version: v1
+    contract_revision: "2026.07.14.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -25,9 +27,11 @@ contracts:
   business_schemas:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/business-schemas
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    schema_revision: "2026.07.14.1"
     consumers:
+      - wt-media-cloud/web
       - wt-media-agent
       - wt-media-desktop
   task_schemas:
@@ -41,8 +45,9 @@ contracts:
   business_enums:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/business-enums
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    enum_revision: "2026.07.14.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -50,8 +55,9 @@ contracts:
   cloud_error_codes:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/cloud-error-codes
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    error_revision: "2026.07.14.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent

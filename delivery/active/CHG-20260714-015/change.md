@@ -94,10 +94,10 @@ failing verification or test
 |---|---|---|---|
 | T-01 | Create active CHG, update M2 delivery state, and refresh AI context. | DONE | `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-015` |
 | T-02 | Map Cloud identity/API files and record the C1 implementation plan, contracts, and test matrix. | DONE | `plan.md` maps every acceptance criterion to an owned provider contract and test command. |
-| T-03 | Implement password authentication, user lifecycle, and single-active-session behavior test-first. | TODO | Focused Cloud tests fail before implementation and pass after it. |
-| T-04 | Implement fixed roles, game-scope authorization, audit-safe operations, and Cloud Web session handling test-first. | TODO | Focused authorization and Web tests pass. |
-| T-05 | Publish C1 Cloud-owned contracts, run full verification, and record evidence. | TODO | Contract checks plus Cloud test/build verification pass. |
-| T-06 | Close C1 only when its acceptance matrix is PASS; then prepare the next CHG according to D-05. | TODO | Active record and delivery checkpoint are complete. |
+| T-03 | Implement password authentication, user lifecycle, and single-active-session behavior test-first. | DONE | Focused Cloud tests failed before implementation and pass after it. |
+| T-04 | Implement fixed roles, game-scope authorization, audit-safe operations, and Cloud Web session handling test-first. | DONE | Focused authorization and Web tests pass. |
+| T-05 | Publish C1 Cloud-owned contracts, run full verification, and record evidence. | DONE | Contract checks plus Cloud test/build verification pass. |
+| T-06 | Close C1 only when its acceptance matrix is PASS; then prepare the next CHG according to D-05. | IN_PROGRESS | Active record and delivery checkpoint are complete. |
 
 ## 9. Repository Checklist
 
@@ -105,14 +105,14 @@ failing verification or test
 
 - [x] Create active CHG and refresh AI context.
 - [x] Record C1 implementation plan and durable decisions.
-- [ ] Update contract map and release matrix for validated C1 contracts.
+- [x] Update contract map and release matrix for validated C1 contracts.
 - [ ] Remove active record only after the C1 completion gate passes.
 
 ### wt-media-cloud
 
-- [ ] Define Cloud-owned identity/API contracts.
-- [ ] Implement and test identity, authorization, session, and Web behavior.
-- [ ] Add migration validation and audit-safe verification.
+- [x] Define Cloud-owned identity/API contracts.
+- [x] Implement and test identity, authorization, session, and Web behavior.
+- [x] Add migration validation and audit-safe verification.
 
 ### wt-media-agent
 
@@ -126,11 +126,11 @@ failing verification or test
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Technical users can create users; enabled users authenticate with username/password, disabled users cannot authenticate, and secrets never appear in responses or audit logs. | Focused Cloud identity tests and API contract tests. | TODO |
-| AC-02 | A new login invalidates the former session, while multiple tabs sharing the same current session remain valid. | Focused Cloud session tests. | TODO |
-| AC-03 | Only the three fixed roles exist; ordinary/senior users are constrained by their game scopes and technicians have global Cloud authorization. | Focused Cloud authorization tests. | TODO |
-| AC-04 | Authorization is enforced by Cloud APIs and Web session handling; no Agent or Desktop authorization duplicate is introduced. | Cloud route tests, Web tests, and diff review. | TODO |
-| AC-05 | Identity/API contracts are owned by Cloud and compatible consumers are documented before publishing. | Contract validation, `go test ./...`, and Web verification. | TODO |
+| AC-01 | Technical users can create users; enabled users authenticate with username/password, disabled users cannot authenticate, and secrets never appear in responses or audit logs. | Focused Cloud identity tests and API contract tests. | PASS |
+| AC-02 | A new login invalidates the former session, while multiple tabs sharing the same current session remain valid. | Focused Cloud session tests. | PASS |
+| AC-03 | Only the three fixed roles exist; ordinary/senior users are constrained by their game scopes and technicians have global Cloud authorization. | Focused Cloud authorization tests. | PASS |
+| AC-04 | Authorization is enforced by Cloud APIs and Web session handling; no Agent or Desktop authorization duplicate is introduced. | Cloud route tests, Web tests, and diff review. | PASS |
+| AC-05 | Identity/API contracts are owned by Cloud and compatible consumers are documented before publishing. | Contract validation, `go test ./...`, and Web verification. | PASS |
 
 ## 11. Evidence
 
@@ -147,25 +147,25 @@ Completed:
 - Created CHG-015 active record and marked M2 as in progress for C1.
 
 Current:
-- C1 MySQL identity persistence, migrations, and public HTTP contract implementation.
+- C1 active-record closure.
 
 Next:
-- Add a focused failing MySQL-store test before production persistence code.
+- Commit Workspace evidence and governance, remove the completed active record, then create the authorized M2-C2 CHG.
 
 Blocked:
 - None.
 
 Recent verification:
-- M1 completion is recorded in `delivery/MASTER_IMPLEMENTATION_PLAN.md`; C1 identity focused tests and the full Cloud `go test ./...` suite passed after commit `50b5c8d`.
+- Cloud provider commit `03b0dcc`; Cloud `go test ./...`, real-process `scripts/verify-health.sh`, Web tests/build, npm audit, contract YAML parsing, Workspace unit tests, skill verification, and config verification all passed.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
+- [x] Scope completed.
+- [x] No blocking `Q-xx`.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed or justified.
+- [x] Manual verification evidence recorded where required.
+- [x] Diff checked for out-of-scope changes.
+- [x] Runtime repositories touched only if listed in scope.
+- [x] Required baselines updated.
 - [ ] Affected repositories committed independently.

@@ -12,12 +12,12 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTER_ROOT = ROOT.parent
 
 EXPECTED_CONTRACTS = {
-    "cloud_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-api", "placeholder_only", "inactive"),
+    "cloud_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-api", "active", "active"),
     "cloud_agent_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-agent-api", "active", "active"),
-    "business_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/business-schemas", "placeholder_only", "inactive"),
+    "business_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/business-schemas", "active", "active"),
     "task_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/task-schemas", "placeholder_only", "inactive"),
-    "business_enums": ("wt-media-cloud", "../wt-media-cloud/contracts/business-enums", "placeholder_only", "inactive"),
-    "cloud_error_codes": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-error-codes", "placeholder_only", "inactive"),
+    "business_enums": ("wt-media-cloud", "../wt-media-cloud/contracts/business-enums", "active", "active"),
+    "cloud_error_codes": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-error-codes", "active", "active"),
     "local_agent_api": ("wt-media-agent", "../wt-media-agent/contracts/local-agent-api", "active", "active"),
     "local_event_schemas": ("wt-media-agent", "../wt-media-agent/contracts/local-event-schemas", "active", "active"),
     "local_status_enums": ("wt-media-agent", "../wt-media-agent/contracts/local-status-enums", "placeholder_only", "inactive"),
@@ -53,7 +53,7 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
 
     for required in (
         "schema_version: 1",
-        "contract_state: m1_local_agent_observability",
+        "contract_state: m2_identity_access",
         "formal_definitions_active: true",
     ):
         if required not in text:
@@ -88,6 +88,17 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
             ):
                 if actual.get(key) != value:
                     errors.append(f"{name}: expected {key} {value!r}, got {actual.get(key)!r}")
+        if name == "cloud_api":
+            if actual.get("api_major_version") != "v1":
+                errors.append("cloud_api: expected api_major_version 'v1'")
+            if actual.get("contract_revision") != "2026.07.14.1":
+                errors.append("cloud_api: expected contract_revision '2026.07.14.1'")
+        if name == "business_schemas" and actual.get("schema_revision") != "2026.07.14.1":
+            errors.append("business_schemas: expected schema_revision '2026.07.14.1'")
+        if name == "business_enums" and actual.get("enum_revision") != "2026.07.14.1":
+            errors.append("business_enums: expected enum_revision '2026.07.14.1'")
+        if name == "cloud_error_codes" and actual.get("error_revision") != "2026.07.14.1":
+            errors.append("cloud_error_codes: expected error_revision '2026.07.14.1'")
         if name == "local_agent_api":
             if actual.get("api_major_version") != "v1":
                 errors.append("local_agent_api: expected api_major_version 'v1'")
@@ -118,6 +129,7 @@ def validate_release_matrix() -> list[str]:
         'release: "0.1.0-m1-local-agent-observability"',
         'release: "0.1.0-m1-desktop-local-agent-controls"',
         'release: "0.1.0-m1-three-end-integration"',
+        'release: "0.2.0-m2-identity-access"',
         "status: verified",
         "scope: m0_scaffold_health",
         "scope: m1_cloud_agent_contract_compatibility",
@@ -127,6 +139,7 @@ def validate_release_matrix() -> list[str]:
         "scope: m1_local_agent_http_sse_offline_queue",
         "scope: m1_desktop_local_agent_controls",
         "scope: m1_three_end_integration",
+        "scope: m2_user_auth_single_session_fixed_roles",
         "contract_state: placeholder_only",
         "contract_state: m1_cloud_agent_compatibility",
         "contract_state: m1_agent_registration_heartbeat",
@@ -135,6 +148,7 @@ def validate_release_matrix() -> list[str]:
         "contract_state: m1_local_agent_observability",
         "contract_state: m1_desktop_local_agent_controls",
         "contract_state: m1_three_end_integration",
+        "contract_state: m2_identity_access",
         "formal_contract_versions_active: false",
         "formal_contract_versions_active: true",
         'cloud_agent_api: "v1@2026.07.14.1"',
@@ -143,6 +157,10 @@ def validate_release_matrix() -> list[str]:
         'cloud_agent_api: "v1@2026.07.14.4"',
         'local_agent_api: "v1@2026.07.14.5"',
         'local_event_schemas: "status@2026.07.14.5"',
+        'cloud_api: "v1@2026.07.14.1"',
+        'business_schemas: "identity@2026.07.14.1"',
+        'business_enums: "identity@2026.07.14.1"',
+        'cloud_error_codes: "identity@2026.07.14.1"',
         "ci_go_version: \"1.26.5\"",
         "ci_python_version: \"3.12\"",
         "ci_node_version: \"25\"",
