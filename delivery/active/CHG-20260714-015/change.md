@@ -30,6 +30,7 @@
 - Cloud currently contains only the M1 `cloudagent` module; no identity, Cloud API, business-schema, or business-enum formal contract is active.
 - Cloud is the formal source for users, permissions, and business objects; Agent and Desktop do not own identity decisions.
 - M2-C2 through M2-C6 are not started.
+- The baseline requires a first technical user and game-scope assignments, but it does not prescribe first-user provisioning or a game-catalog module.
 
 ## 5. Scope
 
@@ -40,6 +41,7 @@
 - Cloud-owned v1 identity/authentication API contract and error/enum definitions needed by C1.
 - Cloud Web login/session integration and authorization coverage needed to exercise C1.
 - M2-C1 evidence and release-matrix entry after verification.
+- A durable identity bootstrap and game-scope decision record.
 
 ### Modify
 
@@ -66,6 +68,9 @@
 | D-03 | The role set is fixed to ordinary operator, senior operator, and technician; no custom role system is introduced. | CONFIRMED |
 | D-04 | Ordinary and senior operators are constrained by assigned game scopes; technicians have global business and data permission but cannot bypass Local Agent, Bit Browser, or other local-resource boundaries. | CONFIRMED |
 | D-05 | M2 candidate changes proceed in C1-to-C6 order after each change satisfies its own active-CHG completion gate; the user has authorized this sequence without per-C confirmation. | CONFIRMED |
+| D-06 | An empty MySQL database provisions exactly one initial technical user only when both `WT_MEDIA_INITIAL_TECHNICIAN_USERNAME` and `WT_MEDIA_INITIAL_TECHNICIAN_PASSWORD` are supplied. There is no default credential and later starts never reset this user. | CONFIRMED |
+| D-07 | C1 stores assigned `game_id` values as opaque stable identifiers and does not introduce a game catalog or game-management API; later modules consume the same values. | CONFIRMED |
+| D-08 | The Cloud Web session is an opaque server-side session represented in the browser by an HttpOnly, SameSite=Lax cookie. Tokens and password material never appear in JSON responses, logs, or audit records. | CONFIRMED |
 
 ## 7. Pending Questions
 
@@ -88,7 +93,7 @@ failing verification or test
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create active CHG, update M2 delivery state, and refresh AI context. | DONE | `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-015` |
-| T-02 | Map Cloud identity/API files and record the C1 implementation plan, contracts, and test matrix. | TODO | Plan maps every acceptance criterion to an owned provider contract and test command. |
+| T-02 | Map Cloud identity/API files and record the C1 implementation plan, contracts, and test matrix. | DONE | `plan.md` maps every acceptance criterion to an owned provider contract and test command. |
 | T-03 | Implement password authentication, user lifecycle, and single-active-session behavior test-first. | TODO | Focused Cloud tests fail before implementation and pass after it. |
 | T-04 | Implement fixed roles, game-scope authorization, audit-safe operations, and Cloud Web session handling test-first. | TODO | Focused authorization and Web tests pass. |
 | T-05 | Publish C1 Cloud-owned contracts, run full verification, and record evidence. | TODO | Contract checks plus Cloud test/build verification pass. |
@@ -99,7 +104,7 @@ failing verification or test
 ### wt-media-workspace
 
 - [x] Create active CHG and refresh AI context.
-- [ ] Record C1 implementation plan and evidence.
+- [x] Record C1 implementation plan and durable decisions.
 - [ ] Update contract map and release matrix for validated C1 contracts.
 - [ ] Remove active record only after the C1 completion gate passes.
 
@@ -142,16 +147,16 @@ Completed:
 - Created CHG-015 active record and marked M2 as in progress for C1.
 
 Current:
-- C1 file mapping, formal contract ownership, and test-plan preparation.
+- C1 test-first identity persistence and API implementation.
 
 Next:
-- Record the detailed C1 implementation plan before creating any runtime code.
+- Add a focused failing identity-service test before production code.
 
 Blocked:
 - None.
 
 Recent verification:
-- M1 completion is recorded in `delivery/MASTER_IMPLEMENTATION_PLAN.md`; all four repositories were clean before CHG-015 creation.
+- M1 completion is recorded in `delivery/MASTER_IMPLEMENTATION_PLAN.md`; Cloud baseline `go test ./...` completed with the configured Go toolchain before C1 implementation.
 
 ## 13. DONE Gate
 
