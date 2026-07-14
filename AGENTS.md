@@ -18,6 +18,7 @@ This repository owns product, engineering, contract, decision, delivery, skill, 
 ## Change Governance
 
 - No M/L feature implementation without an active `delivery/active/<change-id>/change.md`.
+- CHG implementation, resume, review, and completion must use the `executing-wt-media-change` Skill.
 - Discussion, review comments, and questions do not become requirements until recorded as confirmed decisions.
 - Only confirmed decisions may drive code changes.
 - Do not implement anything listed under "Explicitly Not Doing" in the active change record.

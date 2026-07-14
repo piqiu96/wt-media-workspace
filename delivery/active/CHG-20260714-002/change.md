@@ -83,7 +83,7 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Establish CHG-002 records, master plan, template, and evidence spec. | DONE | File checks, `rg`, diff inspection. |
-| T-02 | Add `executing-wt-media-change` Skill and rule references. | TODO | `python3 scripts/verify_skills.py`, rule text inspection. |
+| T-02 | Add `executing-wt-media-change` Skill and rule references. | DONE | `python3 scripts/verify_skills.py`, rule text inspection. |
 | T-03 | Extend `prepare_ai_workspace.py --change` and generated context. | TODO | Script unit tests and manual command run. |
 | T-04 | Record final verification evidence and close DONE gate. | TODO | Test summary, diff summary, runtime repo status check. |
 | T-05 | Commit workspace and root changes independently. | TODO | Git status and commit log checks. |
@@ -125,8 +125,8 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | TODO |
-| AC-02 | `executing-wt-media-change` exists as the unique Skill source. | `python3 scripts/verify_skills.py` | TODO |
-| AC-03 | Root `AGENTS.md` requires the Skill for CHG implementation, resume, review, and completion. | Text inspection | TODO |
+| AC-02 | `executing-wt-media-change` exists as the unique Skill source. | `python3 scripts/verify_skills.py` | PASS |
+| AC-03 | Root `AGENTS.md` requires the Skill for CHG implementation, resume, review, and completion. | Text inspection | PASS |
 | AC-04 | Master implementation plan is landed and does not lock next work to Cloud user/account. | Text inspection | PASS |
 | AC-05 | Standard `change.md` template exists with Active CHG, Checkpoint, Q-xx, acceptance matrix, evidence, and DONE gate. | Text inspection | PASS |
 | AC-06 | `prepare_ai_workspace.py --change CHG-xxxx` validates active CHG and generates root `.ai/CURRENT_CONTEXT.md`. | Unit tests and manual command | TODO |
@@ -155,9 +155,10 @@ Completed:
 - Confirmed runtime repositories have pre-existing out-of-scope scaffold changes.
 - T-01 created CHG-002, the master implementation plan, the standard change template, and the evidence record template.
 - T-01 removed completed CHG-001 from active records and updated the active ledger.
+- T-02 created `executing-wt-media-change` and updated root/Workspace rule files.
 
 Current:
-- T-02 Skill and rule references.
+- T-03 `prepare_ai_workspace.py --change` and generated context.
 
 Next:
 - Add execution Skill and rule references.
@@ -171,6 +172,8 @@ Recent verification:
 - `test -f wt-media-workspace/delivery/active/CHG-20260714-002/change.md` failed before implementation.
 - `find wt-media-workspace/delivery/active -maxdepth 2 -name change.md`
 - `rg -n "Cloud user|Cloud 用户|用户账号|用户与账号|下一步" wt-media-workspace/delivery/MASTER_IMPLEMENTATION_PLAN.md wt-media-workspace/delivery/active/CHG-20260714-002/change.md wt-media-workspace/delivery/LEDGER.md`
+- `python3 scripts/verify_skills.py`
+- `rg -n "executing-wt-media-change" AGENTS.md wt-media-workspace/AGENTS.md wt-media-workspace/skills/workspace/executing-wt-media-change/SKILL.md wt-media-workspace/delivery/MASTER_IMPLEMENTATION_PLAN.md`
 
 ## 13. DONE Gate
 
