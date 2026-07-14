@@ -6,4 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260714-011 | M1-C4 noop executor and status reporting | IMPLEMENTING | wt-media-workspace |
