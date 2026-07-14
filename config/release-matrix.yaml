@@ -405,3 +405,32 @@ releases:
       web: ["npm test", "npm run build", "npm audit --audit-level=high"]
       agent: ["python3.12 -m unittest discover -s tests", "scripts/verify-health.sh", "contract YAML parse"]
       desktop: ["not affected in M2-C3"]
+  - release: "0.2.3-m2-agent-runtime-binding"
+    status: verified
+    date: "2026-07-14"
+    scope: m2_agent_node_profile_runtime_environment
+    components:
+      cloud: "0.2.3"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.2.1"
+    contract_state: m2_agent_runtime_binding
+    formal_contract_versions_active: true
+    contracts:
+      cloud_api: "v1@2026.07.14.3"
+      cloud_agent_api: "v1@2026.07.14.5"
+      business_schemas: "browser-profile@2026.07.14.3"
+      task_schemas: m0-placeholder
+      business_enums: "browser-profile@2026.07.14.3"
+      cloud_error_codes: "agent-runtime@2026.07.14.4"
+      local_agent_api: "v1@2026.07.14.6"
+      local_event_schemas: "runtime-environment@2026.07.14.7"
+      local_status_enums: "status@2026.07.14.7"
+      local_error_codes: "bitbrowser@2026.07.14.6"
+      revision: "m2-agent-runtime-binding-20260714.4"
+    verification:
+      workspace: ["python3 scripts/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify_skills.py"]
+      cloud: ["go test ./...", "go vet ./...", "scripts/verify-health.sh", "contract YAML parse"]
+      agent: ["python3.12 -m unittest discover -s tests", "scripts/verify-health.sh", "contract YAML parse"]
+      web: ["not affected in M2-C4"]
+      desktop: ["binding-ticket bridge deferred to M2-C6 integration"]

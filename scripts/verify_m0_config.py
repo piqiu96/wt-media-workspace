@@ -53,7 +53,7 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
 
     for required in (
         "schema_version: 1",
-        "contract_state: m2_bitbrowser_profile_binding",
+        "contract_state: m2_agent_runtime_binding",
         "formal_definitions_active: true",
     ):
         if required not in text:
@@ -82,8 +82,8 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
         if name == "cloud_agent_api":
             for key, value in (
                 ("api_major_version", "v1"),
-                ("contract_revision", "2026.07.14.4"),
-                ("minimum_agent_contract_revision", "2026.07.14.4"),
+                ("contract_revision", "2026.07.14.5"),
+                ("minimum_agent_contract_revision", "2026.07.14.5"),
                 ("compatibility_endpoint", "/api/v1/cloud-agent/compatibility"),
             ):
                 if actual.get(key) != value:
@@ -97,18 +97,18 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
             errors.append("business_schemas: expected schema_revision '2026.07.14.3'")
         if name == "business_enums" and actual.get("enum_revision") != "2026.07.14.3":
             errors.append("business_enums: expected enum_revision '2026.07.14.3'")
-        if name == "cloud_error_codes" and actual.get("error_revision") != "2026.07.14.3":
-            errors.append("cloud_error_codes: expected error_revision '2026.07.14.3'")
+        if name == "cloud_error_codes" and actual.get("error_revision") != "2026.07.14.4":
+            errors.append("cloud_error_codes: expected error_revision '2026.07.14.4'")
         if name == "local_agent_api":
             if actual.get("api_major_version") != "v1":
                 errors.append("local_agent_api: expected api_major_version 'v1'")
             if actual.get("contract_revision") != "2026.07.14.6":
                 errors.append("local_agent_api: expected contract_revision '2026.07.14.6'")
         if name == "local_event_schemas":
-            if actual.get("event_revision") != "2026.07.14.6":
-                errors.append("local_event_schemas: expected event_revision '2026.07.14.6'")
-        if name == "local_status_enums" and actual.get("enum_revision") != "2026.07.14.6":
-            errors.append("local_status_enums: expected enum_revision '2026.07.14.6'")
+            if actual.get("event_revision") != "2026.07.14.7":
+                errors.append("local_event_schemas: expected event_revision '2026.07.14.7'")
+        if name == "local_status_enums" and actual.get("enum_revision") != "2026.07.14.7":
+            errors.append("local_status_enums: expected enum_revision '2026.07.14.7'")
         if name == "local_error_codes" and actual.get("error_revision") != "2026.07.14.6":
             errors.append("local_error_codes: expected error_revision '2026.07.14.6'")
 
@@ -136,6 +136,7 @@ def validate_release_matrix() -> list[str]:
         'release: "0.2.0-m2-identity-access"',
         'release: "0.2.1-m2-media-accounts"',
         'release: "0.2.2-m2-bitbrowser-profile-binding"',
+        'release: "0.2.3-m2-agent-runtime-binding"',
         "status: verified",
         "scope: m0_scaffold_health",
         "scope: m1_cloud_agent_contract_compatibility",
@@ -148,6 +149,7 @@ def validate_release_matrix() -> list[str]:
         "scope: m2_user_auth_single_session_fixed_roles",
         "scope: m2_media_account_model_assignment_tags",
         "scope: m2_bitbrowser_user_profile_binding",
+        "scope: m2_agent_node_profile_runtime_environment",
         "contract_state: placeholder_only",
         "contract_state: m1_cloud_agent_compatibility",
         "contract_state: m1_agent_registration_heartbeat",
@@ -159,6 +161,7 @@ def validate_release_matrix() -> list[str]:
         "contract_state: m2_identity_access",
         "contract_state: m2_media_accounts",
         "contract_state: m2_bitbrowser_profile_binding",
+        "contract_state: m2_agent_runtime_binding",
         "formal_contract_versions_active: false",
         "formal_contract_versions_active: true",
         'cloud_agent_api: "v1@2026.07.14.1"',
@@ -183,6 +186,10 @@ def validate_release_matrix() -> list[str]:
         'local_event_schemas: "status@2026.07.14.6"',
         'local_status_enums: "status@2026.07.14.6"',
         'local_error_codes: "bitbrowser@2026.07.14.6"',
+        'cloud_agent_api: "v1@2026.07.14.5"',
+        'cloud_error_codes: "agent-runtime@2026.07.14.4"',
+        'local_event_schemas: "runtime-environment@2026.07.14.7"',
+        'local_status_enums: "status@2026.07.14.7"',
         "ci_go_version: \"1.26.5\"",
         "ci_python_version: \"3.12\"",
         "ci_node_version: \"25\"",
@@ -192,10 +199,10 @@ def validate_release_matrix() -> list[str]:
             errors.append(f"release-matrix.yaml missing {needle!r}")
 
     active_revisions = {
-        "cloud_agent_api": 'cloud_agent_api: "v1@2026.07.14.4"',
+        "cloud_agent_api": 'cloud_agent_api: "v1@2026.07.14.5"',
         "local_agent_api": 'local_agent_api: "v1@2026.07.14.6"',
-        "local_event_schemas": 'local_event_schemas: "status@2026.07.14.6"',
-        "local_status_enums": 'local_status_enums: "status@2026.07.14.6"',
+        "local_event_schemas": 'local_event_schemas: "runtime-environment@2026.07.14.7"',
+        "local_status_enums": 'local_status_enums: "status@2026.07.14.7"',
         "local_error_codes": 'local_error_codes: "bitbrowser@2026.07.14.6"',
     }
     for name in EXPECTED_CONTRACTS:

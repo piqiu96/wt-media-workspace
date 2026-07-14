@@ -80,46 +80,50 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Activate C4 and record binding/security decisions. | DONE | Context and Workspace gates pass. |
-| T-02 | Implement Agent allow-listed environment/Profile runtime report test-first. | IN_PROGRESS | Focused and full Python tests pass. |
-| T-03 | Implement Cloud ticket/node/runtime domain and MySQL persistence test-first. | TODO | Focused service/sqlmock/migration tests pass. |
-| T-04 | Implement authenticated/credentialed routes, Agent client, and provider contracts test-first. | TODO | Route/client/full contract tests pass. |
-| T-05 | Advance governance, run cross-repo gates, close C4, and activate C5. | TODO | Acceptance/evidence/independent commits complete. |
+| T-02 | Implement Agent allow-listed environment/Profile runtime report test-first. | DONE | Focused red/green and 33-test full Python suite pass. |
+| T-03 | Implement Cloud ticket/node/runtime domain and MySQL persistence test-first. | DONE | Service, sqlmock, migration, full Go and vet gates pass. |
+| T-04 | Implement authenticated/credentialed routes, Agent client, and provider contracts test-first. | DONE | Route/client and 18 Cloud/5 Agent YAML parses pass. |
+| T-05 | Advance governance, run cross-repo gates, close C4, and activate C5. | IN_PROGRESS | Acceptance/evidence/independent commits complete. |
 
 ## 9. Acceptance Matrix
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Only a current authenticated session can mint a short-lived one-use local Agent binding ticket. | Identity/domain/route tests. | TODO |
-| AC-02 | Local registration consumes the ticket, stores only credential hashes, and replacement login prevents later reports. | Service/MySQL/route tests. | TODO |
-| AC-03 | Agent reports only allow-listed environment facts and verified Bit owner/Profile IDs without local paths or secrets. | Python tests/contracts/diff. | TODO |
-| AC-04 | Cloud records Profile runtime presence only for the node's user and matching bound Bit owner/active Profile mirror. | Service/MySQL tests. | TODO |
-| AC-05 | Runtime presence remains separate from formal Profile ownership and grants no sensitive task permission or lock. | Migration/domain/diff review. | TODO |
+| AC-01 | Only a current authenticated session can mint a short-lived one-use local Agent binding ticket. | Identity/domain/route tests. | PASS |
+| AC-02 | Local registration consumes the ticket, stores only credential hashes, and replacement login prevents later reports. | Service/MySQL/route tests. | PASS |
+| AC-03 | Agent reports only allow-listed environment facts and verified Bit owner/Profile IDs without local paths or secrets. | Python tests/contracts/diff. | PASS |
+| AC-04 | Cloud records Profile runtime presence only for the node's user and matching bound Bit owner/active Profile mirror. | Service/MySQL tests. | PASS |
+| AC-05 | Runtime presence remains separate from formal Profile ownership and grants no sensitive task permission or lock. | Migration/domain/diff review. | PASS |
 
 ## 10. Current Checkpoint
 
 Completed:
 - C3 closed after all Agent/Cloud/Web/Contract/Workspace gates passed.
 - Product/security constraints and the C5 boundary were extracted from stable baselines.
+- Agent collects normalized secret-safe environment/Profile facts and uses a one-use binding token plus bearer node credential.
+- Cloud persists binding tickets, nodes, structured environment facts and Profile runtime presence while storing only token/credential hashes.
+- Provider contracts advanced to Cloud-Agent `2026.07.14.5` and Agent runtime event/status `2026.07.14.7`.
 
 Current:
-- Write failing Agent environment-report tests.
+- Run fresh final cross-repository gates and record closure evidence.
 
 Next:
-- Write failing Agent environment-report tests.
+- Close C4 and activate M2-C5 without an approval pause.
 
 Blocked:
 - None.
 
 Recent verification:
-- Context generator reports CHG-018 IMPLEMENTING with Workspace, Cloud, and Agent scope.
-- Workspace config verifier, six unit tests, eight Skill-source checks, and diff check pass.
+- Agent 33-test full suite and five YAML provider definitions pass.
+- Cloud full Go/vet and eighteen YAML provider definitions pass.
+- Workspace deliberately observed the prior verifier reject the C4 state/revisions, then the updated verifier and all six tests passed.
 
 ## 11. DONE Gate
 
-- [ ] Scope completed.
+- [x] Scope completed.
 - [x] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Evidence and limitations recorded.
-- [ ] Diff checked for out-of-scope behavior.
-- [ ] Affected repositories committed independently.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed or justified.
+- [x] Evidence and limitations recorded.
+- [x] Diff checked for out-of-scope behavior.
+- [x] Affected repositories committed independently.
