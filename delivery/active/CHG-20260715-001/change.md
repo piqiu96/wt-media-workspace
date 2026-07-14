@@ -115,7 +115,7 @@ failing verification
 | T-01 | Activate the independent alignment CHG and record the approved audit/decisions. | DONE | Single Active CHG scan; `evidence/baseline-audit-20260715.md`. |
 | T-02 | Normalize product terminology, object ownership and cross-chapter status rules. | DONE | Stale-object contextual scan plus product cross-reference review. |
 | T-03 | Correct engineering/contract governance descriptions for real Desktop, persistent task infrastructure and formal schema gates. | DONE | Architecture/contract-map consistency scan. |
-| T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | TODO | Exit-gate checklist against current code facts. |
+| T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | DONE | Exit-gate checklist against current code facts. |
 | T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | TODO | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
 | T-06 | Correct M3-M10 flows, objects, dependencies, missing CHGs and acceptance gates. | TODO | Chapters 4-8 and architecture crosswalk; forbidden-object scan. |
 | T-07 | Align Ledger, human/machine contract governance, release wording and generated AI context. | TODO | Workspace governance scripts and single Active CHG verification. |
@@ -175,12 +175,13 @@ Completed:
 - A section-for-section Chinese review companion was created at `change.zh-CN.md`; `change.md` remains the execution authority.
 - T-02 normalized `source_content`, publication cancellation metrics, account-group semantics, tracked-object ownership, and shared BitBrowser main-tree authorization language across the product baseline.
 - T-03 aligned the engineering architecture, human contract map and release-matrix planning note with real Desktop, persistent task/Agent state, scheduler/object-storage ordering and formal task-schema gates.
+- T-04 reopened M0 as `IN_PROGRESS`, reset M1 to `NOT_STARTED`, retained historical scaffold/noop evidence, and defined M0-R1..R6 plus M1-R1..R8 real component and mock-free end-to-end gates.
 
 Current:
-- T-04 M0/M1 Master Plan reconstruction.
+- T-05 complete M2 replanning.
 
 Next:
-- Reset M0/M1 status semantics and define real component plus end-to-end exit gates.
+- Reset M2 to `NOT_STARTED` and replace the historical narrow C1-C6 route with product-complete M2-C1..C11.
 
 Blocked:
 - None.
@@ -191,6 +192,7 @@ Recent verification:
 - Chinese review companion D/T/AC identifiers match the authoritative change record one-for-one.
 - Product stale-term scan now leaves removed objects only in explicit exclusion, migration, or historical-reference contexts.
 - `python3 scripts/verify_m0_config.py` passes with the mixed active/placeholder contract state documented consistently.
+- M0/M1 exit-gate review now rejects echo builds, Mock-only Desktop entry points, in-memory production task state and placeholder task schemas.
 
 ## 13. DONE Gate
 

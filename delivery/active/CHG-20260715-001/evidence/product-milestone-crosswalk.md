@@ -25,7 +25,7 @@
 
 | Product capability cluster | Source | Milestone | Resolution status |
 |---|---|---|---|
-| Real component build/run/test and cross-end task environment | Chapters 1-2 | M0-M1 | To be rewritten in T-04. |
+| Real component build/run/test and cross-end task environment | Chapters 1-2 | M0-M1 | M0-R1 through R6 and M1-R1 through R8 now define real component and mock-free persistent end-to-end gates. |
 | Users, roles, game scope and user administration | Chapter 3 | M2 | To be mapped to new M2-C1. |
 | Media accounts, tags, assignment and account workbench | Chapter 3 | M2 | To be mapped to new M2-C2. |
 | BitBrowser binding, Profile synchronization and Cloud assignment | Chapter 3 | M2 | To be mapped to M2-C3/C4. |

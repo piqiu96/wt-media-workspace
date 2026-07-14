@@ -1,6 +1,6 @@
 # 模块化自媒体运营平台：代码实施总计划
 
-> 日期：2026-07-14  
+> 日期：2026-07-15
 > 适用项目：WT Media 模块化自媒体运营平台  
 > 执行方式：一个总路线、一个当前变更、一次只完成一个可验证闭环  
 > 运行仓库：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop`  
@@ -94,6 +94,8 @@ DONE
 
 里程碑不能因为代码目录已经存在而标记为 `DONE`。必须逐项核验代码、自动测试、Contract、Evidence、人工验证、跨仓库集成、Git 提交和退出条件。
 
+历史 `DONE` 可以在退出条件被证明过宽或证据只覆盖脚手架时重新打开。重新打开不会删除历史提交和局部验证结果；这些结果标记为“继承证据”，只有重新满足当前退出条件后才能再次标记为 `DONE`。
+
 每个里程碑必须记录：
 
 | 字段 | 内容 |
@@ -112,34 +114,38 @@ DONE
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `DONE` |
-| 目标 | 建立四仓库协作、Codex 执行控制、基础构建、测试和质量门禁，为后续长期实施提供稳定环境。 |
+| 状态 | `IN_PROGRESS` |
+| 目标 | 在治理体系可用的基础上，使 Cloud、Web、Agent、Desktop 成为可安装依赖、可真实构建、可启动停止、可测试的独立工程组件。 |
 | 依赖 | None |
 | Active CHG | None |
-| Evidence | CHG-002 执行控制提交；CHG-003 Master Plan 固化提交；CHG-004 工程骨架审计 evidence 与三端 M0 骨架提交；CHG-005 最小启动和健康检查 evidence；CHG-006 测试、CI、Contract Map 和版本矩阵 evidence；CHG-007 M0 综合验收 evidence。 |
-| 完成日期 | 2026-07-14 |
+| Evidence | 继承证据：CHG-002 执行控制；CHG-003 Master Plan；CHG-004 工程骨架；CHG-005 脚手架健康检查；CHG-006 测试、CI、Contract Map 和版本矩阵；CHG-007 历史综合验收。以上证据不包含真实 Desktop/Tauri 构建，不能满足修订后的 M0 退出条件。 |
+| 完成日期 | None |
 | Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit `716c143`。 |
 
 候选 CHG：
 
 ```text
-M0-C1 项目 CHG 执行控制体系
-M0-C1b M0-M10 Master Plan 固化
-M0-C2 四仓库工程结构与规则基线
-M0-C3 Cloud、Agent、Desktop 最小启动和健康检查
-M0-C4 测试、CI、Contract Map 和版本矩阵
-M0-C5 M0 综合验收
+M0-R1 真实工具链、依赖安装和当前脚手架差距核查
+M0-R2 Cloud/Web 真实 bootstrap、build、test、MySQL Migration 和启动停止
+M0-R3 Agent 正式包入口、依赖锁、SQLite Migration、build 和启动停止
+M0-R4 Desktop Vue/Tauri Rust 正式依赖、build、dev、启动停止和本地页面
+M0-R5 CI、Contract Map、Release Matrix 和跨平台工程门禁
+M0-R6 三端独立构建、启动、健康检查和综合工程验收
 ```
 
 退出条件：
 
 - Skill、Active CHG、Checkpoint、Q-xx、Evidence 和 DONE 门禁能实际使用；
 - 从最外层 `wt-media/` 启动 Codex 能识别四仓库；
-- Cloud、Agent、Desktop 能独立构建和测试；
+- Cloud 和 Web 使用真实依赖完成 bootstrap、test、build、启动、健康检查和停止；
+- Agent 使用正式包入口和独立环境完成 bootstrap、test、build、启动、健康检查和停止；
+- Desktop 使用真实 Vue/Tauri Rust 完成 bootstrap、test、build、dev、启动和停止；echo 脚本、Mock-only 入口或未执行 Cargo 不通过；
+- Cloud Migration 能在空 MySQL 数据库执行并重复验证；Agent SQLite Migration 能在独立用户目录执行；
+- CI 覆盖 Go、Web、Python、Rust/Tauri、Migration 和 Contract 的真实构建/测试门禁；
 - Workspace 不成为运行时依赖；
 - Git 工作区、提交和交付历史可追踪；
 - `contract-map.yaml` 和 `release-matrix.yaml` 符合当前已验证状态；
-- M0 综合验收通过。
+- M0-R6 在三个运行仓库分别形成自动 Evidence 和人工启动 Evidence。
 
 本阶段不做：
 
@@ -154,46 +160,52 @@ M0-C5 M0 综合验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `DONE` |
-| 目标 | 证明 Cloud、Agent、Desktop 三端技术主干能够真实运行。 |
+| 状态 | `NOT_STARTED` |
+| 目标 | 在 M0 的真实组件上建立持久化、无 Mock、可重启恢复的 Cloud-Agent-Desktop-Web 最小任务环境，供后续所有业务里程碑复用。 |
 | 依赖 | M0 `DONE` |
 | Active CHG | None |
-| Evidence | CHG-008 M1-C1 Cloud-Agent Contract 与版本兼容 evidence；CHG-009 M1-C2 Agent 注册和心跳 evidence；CHG-010 M1-C3 task 创建、领取、租约与幂等 evidence；CHG-011 M1-C4 noop Executor 和状态回传 evidence；CHG-012 M1-C5 Local Agent HTTP、SSE 与离线待回传 evidence；CHG-013 M1-C6 Desktop 启停 Agent 和状态展示 evidence；CHG-014 M1-C7 三端真实跨端集成验证 evidence。 |
-| 完成日期 | 2026-07-14 |
+| Evidence | 继承证据：CHG-008 至 CHG-014 已验证 Contract 兼容、Agent 注册心跳、noop task、Local API/SSE 和脚手架集成。Cloud task/Agent Registry 仍为内存实现，Desktop 仍使用 Mock 入口，`task_schemas` 仍为占位，因此不能满足修订后的 M1 退出条件。 |
+| 完成日期 | None |
 | Commit/Tag | CHG-008 commits: Cloud `d2acf2a`; Agent `9a97b2d`; Workspace `fab15d3`, `1cac21f`, `559f907`; CHG-009 commits: Cloud `047d006`, `8cb351a`; Agent `eb5183d`, `482d1f8`; Workspace `e607c98`, `98220b3`; CHG-010 commits: Cloud `89d776b`; Agent `356aa3f`; Workspace `9a4ccf3`, `6e3d216`; CHG-011 commits: Cloud `90daf2e`; Agent `598e0eb`; Workspace `cdeb63c`, `100c09c`; CHG-012 commits: Agent `aaeabdb`; Workspace `edc5e14`, `c2aa5f8`; CHG-013 commits: Desktop `a8f8eef`; Workspace `cf0a49c`, `cd626c2`; CHG-014 commits: Workspace `8859162`, `b86e34c`。 |
 
 目标闭环：
 
 ```text
-Cloud 创建 noop_task
-→ Agent 注册并领取
+用户在 Cloud Web 登录并创建 noop_task
+→ MySQL 持久化 task、幂等键、租约和 Agent Registry
+→ Desktop 通过真实 Tauri 启动 Local Agent
+→ Agent 注册、领取并把检查点写入 SQLite
 → Agent 上报 started / progress / succeeded
-→ Cloud 保存正式状态
-→ Desktop 启动和观测 Local Agent
-→ Desktop 页面显示任务进度
+→ Desktop 通过真实 HTTP/SSE 展示进度
+→ Cloud、Agent 或 Desktop 重启后状态和待回传结果可恢复
 ```
 
 候选 CHG：
 
 ```text
-M1-C1 Cloud-Agent Contract 与版本兼容
-M1-C2 Agent 节点注册和心跳
-M1-C3 task 创建、领取、租约与幂等
-M1-C4 noop Executor 和状态回传
-M1-C5 Local Agent HTTP、SSE 与离线待回传
-M1-C6 Desktop 启停 Agent 和状态展示
-M1-C7 三端真实跨端集成验证
+M1-R1 正式通用 task 模型、状态、错误和 task_schemas
+M1-R2 MySQL task、幂等、租约和 Agent Registry 持久化
+M1-R3 Agent Runner、SQLite 检查点、离线待回传和重启恢复
+M1-R4 Local Agent HTTP/SSE、节点绑定、Token 和安全边界
+M1-R5 Desktop Tauri 进程生命周期、HTTP/SSE 代理和安全存储
+M1-R6 Cloud Web 登录、任务创建和 Desktop WebView 任务进度页
+M1-R7 Cloud/Agent/Desktop 中断、租约、幂等和恢复矩阵
+M1-R8 无 Mock 三端端到端人工验收
 ```
 
 退出条件：
 
 - 同一个任务不会被两个 Agent 同时执行；
-- Agent 中断后任务可恢复或释放；
-- Cloud 暂时不可达时结果不会丢失；
+- task、租约、幂等键和 Agent Registry 持久化到 MySQL，Cloud 重启后不丢失；
+- `task_schemas` 已由 Cloud 正式发布，Agent 和 Desktop 锁定兼容版本；
+- Agent 中断后从 SQLite 检查点恢复或安全释放租约；
+- Cloud 暂时不可达时结果保存在 SQLite，恢复连接后幂等回传；
 - Desktop 不直接读取 Agent SQLite；
 - Desktop Vue 不持有 Local Token；
-- 三端有自动测试；
-- 有真实跨端演示和 Evidence。
+- Desktop 使用真实 Tauri/Rust 管理 Local Agent，不使用 Mock Service 作为验收入口；
+- Cloud Web 能在浏览器和 Desktop WebView 中登录、创建任务并显示同一正式状态；
+- 三端有自动单元、Contract、集成和重启恢复测试；
+- M1-R8 完成从登录、创建、领取、进度、成功回写到重启恢复的真实人工演示和 Evidence。
 
 ### M2：用户、角色、媒体账号与运行环境
 
