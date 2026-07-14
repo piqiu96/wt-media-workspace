@@ -6,4 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260714-009 | M1-C2 Agent registration and heartbeat | IMPLEMENTING | wt-media-workspace |
