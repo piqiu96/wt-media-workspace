@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260714-010 | M1-C3 task creation claim lease idempotency | IMPLEMENTING | wt-media-workspace |
