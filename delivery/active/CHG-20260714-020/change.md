@@ -75,21 +75,22 @@
 
 Completed:
 - C1-C5 implemented and closed.
-- Docker CLI exists; MySQL CLI/server are absent. A follow-up application search found BitBrowser installed, but its Local API is not running.
+- Docker CLI exists; Docker Desktop daemon can be reached with host permission, but no MySQL 8-compatible local image exists and MySQL CLI/server remain absent.
+- BitBrowser is installed and its Local API is now reachable, but the real Profile list is identity-unverifiable for C6 because 37 Profiles contain 2 distinct non-empty `userId` owners.
 - Desktop contract locks and ephemeral `local_agent_bind_session` boundary pass `npm run verify`; node/permit credentials are excluded from Vue response/state.
 - Rust native boundary moves the ticket once into `BindingTransport`; its return type contains only non-secret node facts.
-- Static cross-repository C1-C5 contract/security matrix, seven Workspace tests, Cloud Go/vet plus 20 YAML contracts, Agent 38 tests plus six YAML contracts, and Desktop verification pass.
+- Fresh 2026-07-14T11:28:40Z execution: Workspace config, M2 static verifier, seven Workspace tests, Cloud Go/vet, Agent 38 tests with repo `.venv`, and Desktop verification pass.
 
 Current:
-- Automated C6 work is complete. CHG remains active solely for mandatory real dependency evidence.
+- Automated C6 work is complete. CHG remains active for mandatory real dependency evidence and for correcting the real BitBrowser owner-uniformity failure.
 
 Next:
-- When Docker/MySQL and the installed BitBrowser Local API are available, execute AC-03 through AC-05 exactly as described in `evidence/real-integration-runbook.md`, then close M2 only on PASS.
+- Provide or permit a real MySQL 8-compatible database/DSN or local image, then execute AC-03 and AC-05 exactly as described in `evidence/real-integration-runbook.md`.
+- In BitBrowser, use a Profile set with one non-empty owner `userId` for this acceptance user, then rerun AC-04 through the Agent adapter.
 
 Blocked:
-- Docker CLI is installed but its daemon is not running; MySQL binaries/DSN are absent.
-- BitBrowser is installed at `/Applications/比特浏览器.app` but its Local API is not listening on `127.0.0.1:54345`.
-- Codex escalation quota currently rejects GUI/process launch approvals, so these external dependencies cannot be started from this task at present.
+- No local MySQL image, MySQL binaries, or `WT_MEDIA_MYSQL_DSN` are available for real database migration/bootstrap/concurrency evidence.
+- Real BitBrowser Local API data currently contains mixed owner `userId` values, so AC-04 cannot pass without changing the local BitBrowser Profile/account state.
 - A fresh M1 localhost integration rerun is also denied socket bind permission in this sandbox; its previously closed CHG evidence is retained and is not relabeled as a fresh C6 run.
 
 ## 9. DONE Gate
