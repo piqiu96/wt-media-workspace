@@ -75,7 +75,7 @@
 - Modify: `wt-media-cloud/internal/app/identity_test.go`
 
 **Interfaces:**
-- Expose `POST/GET /api/v1/media-accounts`, `GET/PATCH /api/v1/media-accounts/:id`, `POST /:id/identify`, `POST /tags:add`, and `POST /tags:remove`.
+- Expose `POST/GET /api/v1/media-accounts`, `GET/PATCH /api/v1/media-accounts/:id`, `POST /:id/identify`, `POST /tags/add`, and `POST /tags/remove`.
 - Reuse identity Cookie authentication through an exported authenticator; do not accept actor IDs from request bodies.
 
 - [ ] Write failing route tests for authentication, ownership/game scope, status update, duplicate conflict, tag filters, and secret-free responses.

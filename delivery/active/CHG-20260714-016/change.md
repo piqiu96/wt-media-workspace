@@ -79,11 +79,11 @@ Each task follows failing test → minimal implementation → test → diff chec
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Activate CHG-016, map scope, and refresh AI context. | DONE | Workspace validation and generated context reference CHG-016. |
-| T-02 | Implement media-account domain authorization, lifecycle, duplicate handling, and tags test-first. | IN_PROGRESS | Focused Go service tests fail first and pass after implementation. |
-| T-03 | Implement MySQL persistence/migration test-first. | TODO | SQL mock tests plus migration review pass. |
-| T-04 | Implement authenticated Cloud API and Cloud Web account interaction test-first. | TODO | Route tests and Web tests/build pass. |
-| T-05 | Publish Cloud-owned contracts and run full verification. | TODO | Go/Web/contract/Workspace gates pass. |
-| T-06 | Close C2 only when the acceptance matrix is PASS, then activate C3 per D-07. | TODO | Independent commits and delivery checkpoint complete. |
+| T-02 | Implement media-account domain authorization, lifecycle, duplicate handling, and tags test-first. | DONE | Focused Go service tests failed for missing implementation, then passed. |
+| T-03 | Implement MySQL persistence/migration test-first. | DONE | SQL mock tests failed for missing store, then passed; migration invariants are tested. |
+| T-04 | Implement authenticated Cloud API and Cloud Web account interaction test-first. | DONE | Route/client tests failed for missing modules, then passed; Web build passes. |
+| T-05 | Publish Cloud-owned contracts and run full verification. | DONE | Go/Web/contract/Workspace gates and npm audit pass. |
+| T-06 | Close C2 only when the acceptance matrix is PASS, then activate C3 per D-07. | IN_PROGRESS | Independent commits and delivery checkpoint complete. |
 
 ## 9. Repository Checklist
 
@@ -91,13 +91,14 @@ Each task follows failing test → minimal implementation → test → diff chec
 
 - [x] Create active CHG and record the approved design boundary.
 - [x] Refresh AI context and commit plan.
-- [ ] Update contract map/release matrix and close the active record.
+- [x] Update contract map/release matrix.
+- [ ] Close the active record only after the final Workspace commit.
 
 ### wt-media-cloud
 
-- [ ] Add domain/service tests and implementation.
-- [ ] Add migration/store tests and implementation.
-- [ ] Add authenticated API, Web client, and provider contracts.
+- [x] Add domain/service tests and implementation.
+- [x] Add migration/store tests and implementation.
+- [x] Add authenticated API, Web client, and provider contracts.
 
 ### wt-media-agent
 
@@ -111,11 +112,11 @@ Each task follows failing test → minimal implementation → test → diff chec
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Operators/senior operators create and manage only their own accounts within game scope; technicians manage global accounts. | Service and route authorization tests. | TODO |
-| AC-02 | Each account belongs to one user and one game, starts pending identification, and exposes no Cookie secret. | Domain, route, contract, and redaction tests. | TODO |
-| AC-03 | Identified accounts are unique only by user/platform/platform account ID; duplicates do not overwrite existing account/Profile/Cookie facts. | Service and MySQL duplicate tests. | TODO |
-| AC-04 | Business/login statuses are validated independently and tags support add/remove plus any/all/exclude filters. | Service/store/API tests. | TODO |
-| AC-05 | Cloud MySQL and Cloud-owned contracts are authoritative; no Agent/Desktop rule copy or C3-C5 behavior is introduced. | Diff review, contract checks, and repository status. | TODO |
+| AC-01 | Operators/senior operators create and manage only their own accounts within game scope; technicians manage global accounts. | Service and route authorization tests. | PASS |
+| AC-02 | Each account belongs to one user and one game, starts pending identification, and exposes no Cookie secret. | Domain, route, contract, and redaction tests. | PASS |
+| AC-03 | Identified accounts are unique only by user/platform/platform account ID; duplicates do not overwrite existing account/Profile/Cookie facts. | Service and MySQL duplicate tests. | PASS |
+| AC-04 | Business/login statuses are validated independently and tags support add/remove plus any/all/exclude filters. | Service/store/API tests. | PASS |
+| AC-05 | Cloud MySQL and Cloud-owned contracts are authoritative; no Agent/Desktop rule copy or C3-C5 behavior is introduced. | Diff review, contract checks, and repository status. | PASS |
 
 ## 11. Evidence
 
@@ -129,27 +130,28 @@ Each task follows failing test → minimal implementation → test → diff chec
 Completed:
 - CHG-015 was verified, committed independently, and removed from active delivery.
 - C2 design options were reviewed against the product baseline; the separate domain module was selected over identity coupling or direct SQL route handlers.
+- Cloud domain/persistence commit `18f687a` and API/Web/contracts commit `8eb70ba` are clean and independently committed.
 
 Current:
-- Add the first failing media-account domain tests.
+- Commit C2 Workspace governance/evidence and close CHG-016.
 
 Next:
-- Implement the minimal domain service required by the focused tests.
+- Remove the completed active record and activate C3 under D-07.
 
 Blocked:
 - None.
 
 Recent verification:
-- `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-016` generated an IMPLEMENTING context with Workspace and Cloud scope.
+- Fresh Cloud `go test ./... -count=1`, `go vet ./...`, Web 5/5 tests/build, 12 YAML parses, real-process health, npm audit (0 vulnerabilities), and Workspace gates passed.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
+- [x] Scope completed.
 - [x] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed or justified.
+- [x] Manual verification evidence recorded where required.
+- [x] Diff checked for out-of-scope changes.
+- [x] Runtime repositories touched only if listed in scope.
+- [x] Required baselines updated.
 - [ ] Affected repositories committed independently.

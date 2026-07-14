@@ -336,3 +336,43 @@ releases:
         - "not affected in M2-C1"
       desktop:
         - "not affected in M2-C1"
+  - release: "0.2.1-m2-media-accounts"
+    status: verified
+    date: "2026-07-14"
+    scope: m2_media_account_model_assignment_tags
+    components:
+      cloud: "0.2.1"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.1.0"
+    contract_state: m2_media_accounts
+    formal_contract_versions_active: true
+    contracts:
+      cloud_api: "v1@2026.07.14.2"
+      cloud_agent_api: "v1@2026.07.14.4"
+      business_schemas: "media-account@2026.07.14.2"
+      task_schemas: m0-placeholder
+      business_enums: "media-account@2026.07.14.2"
+      cloud_error_codes: "media-account@2026.07.14.2"
+      local_agent_api: "v1@2026.07.14.5"
+      local_event_schemas: "status@2026.07.14.5"
+      local_status_enums: m0-placeholder
+      local_error_codes: m0-placeholder
+      revision: "m2-media-accounts-20260714.2"
+    verification:
+      workspace:
+        - "python3 -m unittest discover -s tests"
+        - "python3 scripts/verify_skills.py"
+        - "python3 scripts/verify_m0_config.py"
+      cloud:
+        - "go test ./..."
+        - "GO_BIN=../../devenv/go26/go/bin/go scripts/verify-health.sh"
+        - "ruby YAML parse for contracts/**/*.yaml"
+      web:
+        - "npm test"
+        - "npm run build"
+        - "npm audit --audit-level=high"
+      agent:
+        - "not affected in M2-C2"
+      desktop:
+        - "not affected in M2-C2"

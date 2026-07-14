@@ -1,5 +1,5 @@
 schema_version: 1
-contract_state: m2_identity_access
+contract_state: m2_media_accounts
 formal_definitions_active: true
 
 contracts:
@@ -9,7 +9,7 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.07.14.1"
+    contract_revision: "2026.07.14.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -29,7 +29,7 @@ contracts:
     path: ../wt-media-cloud/contracts/business-schemas
     state: active
     formal_definition: active
-    schema_revision: "2026.07.14.1"
+    schema_revision: "2026.07.14.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -47,7 +47,7 @@ contracts:
     path: ../wt-media-cloud/contracts/business-enums
     state: active
     formal_definition: active
-    enum_revision: "2026.07.14.1"
+    enum_revision: "2026.07.14.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -57,7 +57,7 @@ contracts:
     path: ../wt-media-cloud/contracts/cloud-error-codes
     state: active
     formal_definition: active
-    error_revision: "2026.07.14.1"
+    error_revision: "2026.07.14.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
