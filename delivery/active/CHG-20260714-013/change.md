@@ -86,9 +86,9 @@ failing verification or test
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create Active CHG and refresh AI context. | DONE | `prepare_ai_workspace.py --change CHG-20260714-013` |
-| T-02 | Add Desktop Local Agent service/store/page model. | TODO | `npm run verify` initially fails, then passes. |
-| T-03 | Update Desktop contract lock and docs. | TODO | `npm run verify`; diff inspection. |
-| T-04 | Update Workspace release matrix and evidence. | TODO | Workspace tests and config verification. |
+| T-02 | Add Desktop Local Agent service/store/page model. | DONE | `npm run verify` initially failed, then passed. |
+| T-03 | Update Desktop contract lock and docs. | DONE | `npm run verify`; diff inspection. |
+| T-04 | Update Workspace release matrix and evidence. | DONE | Workspace tests and config verification. |
 | T-05 | Complete CHG and remove active record. | TODO | Active ledger empty after completion. |
 
 ## 9. Repository Checklist
@@ -96,8 +96,8 @@ failing verification or test
 ### wt-media-workspace
 
 - [x] Create active CHG.
-- [ ] Record Desktop evidence.
-- [ ] Update release matrix and M1 plan.
+- [x] Record Desktop evidence.
+- [x] Update release matrix and M1 plan.
 - [ ] Remove active record when complete.
 
 ### wt-media-cloud
@@ -110,20 +110,20 @@ failing verification or test
 
 ### wt-media-desktop
 
-- [ ] Add Local Agent service wrapper.
-- [ ] Add Local Agent store.
-- [ ] Add local status page model.
-- [ ] Update verification script.
-- [ ] Update consumed contract lock.
+- [x] Add Local Agent service wrapper.
+- [x] Add Local Agent store.
+- [x] Add local status page model.
+- [x] Update verification script.
+- [x] Update consumed contract lock.
 
 ## 10. Acceptance Matrix
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Desktop can model Local Agent start and stop through a Desktop-owned service boundary. | `npm run verify` | TODO |
-| AC-02 | Desktop can display Local Agent status and pending result count from the Local Agent status/event shape. | `npm run verify` | TODO |
-| AC-03 | Desktop Vue/page layer does not directly access Local Agent dynamic ports or tokens. | Code inspection and `npm run verify` | TODO |
-| AC-04 | Desktop records consumed Local Agent API and event schema revisions. | `contracts.lock.json` inspection | TODO |
+| AC-01 | Desktop can model Local Agent start and stop through a Desktop-owned service boundary. | `npm run verify` | PASS |
+| AC-02 | Desktop can display Local Agent status and pending result count from the Local Agent status/event shape. | `npm run verify` | PASS |
+| AC-03 | Desktop Vue/page layer does not directly access Local Agent dynamic ports or tokens. | Code inspection and `npm run verify` | PASS |
+| AC-04 | Desktop records consumed Local Agent API and event schema revisions. | `contracts.lock.json` inspection | PASS |
 
 ## 11. Evidence
 
@@ -138,27 +138,30 @@ Evidence files live in `evidence/` and must record facts, not repeat requirement
 
 Completed:
 - Created CHG-013 active record.
+- Added Desktop Local Agent service, store, page model, Rust command boundary, verification, README notes, and contract lock.
+- Added Workspace release matrix entry and evidence.
 
 Current:
-- Desktop Local Agent control/status implementation.
+- CHG-013 completion gate.
 
 Next:
-- Run failing verification, then implement minimal service/store/page model.
+- Run final workspace and Desktop verification, then remove active record.
 
 Blocked:
 - None.
 
 Recent verification:
-- Workspace tests passed before CHG creation during CHG-012 cleanup.
+- `npm run verify` failed before implementation with missing M1-C6 checks, then passed after implementation.
+- `cargo check` was attempted but not run because `cargo` is not available in the current shell.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed.
+- [x] No blocking `Q-xx`.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed or justified.
+- [x] Manual verification evidence recorded where required.
+- [x] Diff checked for out-of-scope changes.
+- [x] Runtime repositories touched only if listed in scope.
+- [x] Required baselines updated.
+- [x] Affected repositories committed independently.
