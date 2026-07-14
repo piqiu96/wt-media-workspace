@@ -113,7 +113,7 @@ failing verification
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Activate the independent alignment CHG and record the approved audit/decisions. | DONE | Single Active CHG scan; `evidence/baseline-audit-20260715.md`. |
-| T-02 | Normalize product terminology, object ownership and cross-chapter status rules. | TODO | Stale-object contextual scan plus product cross-reference review. |
+| T-02 | Normalize product terminology, object ownership and cross-chapter status rules. | DONE | Stale-object contextual scan plus product cross-reference review. |
 | T-03 | Correct engineering/contract governance descriptions for real Desktop, persistent task infrastructure and formal schema gates. | TODO | Architecture/contract-map consistency scan. |
 | T-04 | Rewrite M0/M1 as real component and end-to-end environment milestones and reset their status/evidence semantics. | TODO | Exit-gate checklist against current code facts. |
 | T-05 | Replace M2 with the complete newly numbered product execution route and product-level acceptance. | TODO | Chapter 3 capability crosswalk with no uncovered P0/P1 row. |
@@ -173,12 +173,13 @@ Completed:
 - User confirmed D-01 through D-10: reopen M0/M1, replan/re-execute M2, normalize canonical objects, and retain the M0-M10 top-level route.
 - Baseline audit and the independent alignment CHG were created.
 - A section-for-section Chinese review companion was created at `change.zh-CN.md`; `change.md` remains the execution authority.
+- T-02 normalized `source_content`, publication cancellation metrics, account-group semantics, tracked-object ownership, and shared BitBrowser main-tree authorization language across the product baseline.
 
 Current:
-- CHG package is ready for user review before T-02 begins.
+- T-03 engineering and contract governance alignment.
 
 Next:
-- After review, execute T-02 product terminology and ownership normalization.
+- Clarify real Desktop/task readiness gates and synchronize the human-readable contract map.
 
 Blocked:
 - None.
@@ -187,6 +188,7 @@ Recent verification:
 - CHG-020 final closure matrix passed on 2026-07-15 before this CHG was activated.
 - Active CHG discovery and generated AI context both resolve uniquely to CHG-20260715-001; no blocking question exists.
 - Chinese review companion D/T/AC identifiers match the authoritative change record one-for-one.
+- Product stale-term scan now leaves removed objects only in explicit exclusion, migration, or historical-reference contexts.
 
 ## 13. DONE Gate
 
