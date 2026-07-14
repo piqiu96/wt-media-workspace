@@ -18,8 +18,8 @@ EXPECTED_CONTRACTS = {
     "task_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/task-schemas", "placeholder_only", "inactive"),
     "business_enums": ("wt-media-cloud", "../wt-media-cloud/contracts/business-enums", "placeholder_only", "inactive"),
     "cloud_error_codes": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-error-codes", "placeholder_only", "inactive"),
-    "local_agent_api": ("wt-media-agent", "../wt-media-agent/contracts/local-agent-api", "placeholder_only", "inactive"),
-    "local_event_schemas": ("wt-media-agent", "../wt-media-agent/contracts/local-event-schemas", "placeholder_only", "inactive"),
+    "local_agent_api": ("wt-media-agent", "../wt-media-agent/contracts/local-agent-api", "active", "active"),
+    "local_event_schemas": ("wt-media-agent", "../wt-media-agent/contracts/local-event-schemas", "active", "active"),
     "local_status_enums": ("wt-media-agent", "../wt-media-agent/contracts/local-status-enums", "placeholder_only", "inactive"),
     "local_error_codes": ("wt-media-agent", "../wt-media-agent/contracts/local-error-codes", "placeholder_only", "inactive"),
 }
@@ -53,7 +53,7 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
 
     for required in (
         "schema_version: 1",
-        "contract_state: m1_noop_status_reporting",
+        "contract_state: m1_local_agent_observability",
         "formal_definitions_active: true",
     ):
         if required not in text:
@@ -88,6 +88,14 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
             ):
                 if actual.get(key) != value:
                     errors.append(f"{name}: expected {key} {value!r}, got {actual.get(key)!r}")
+        if name == "local_agent_api":
+            if actual.get("api_major_version") != "v1":
+                errors.append("local_agent_api: expected api_major_version 'v1'")
+            if actual.get("contract_revision") != "2026.07.14.5":
+                errors.append("local_agent_api: expected contract_revision '2026.07.14.5'")
+        if name == "local_event_schemas":
+            if actual.get("event_revision") != "2026.07.14.5":
+                errors.append("local_event_schemas: expected event_revision '2026.07.14.5'")
 
         provider_path = (ROOT / rel_path).resolve()
         if not provider_path.is_dir() and not allow_missing_repos:
@@ -107,23 +115,28 @@ def validate_release_matrix() -> list[str]:
         'release: "0.1.0-m1-agent-heartbeat"',
         'release: "0.1.0-m1-task-lease"',
         'release: "0.1.0-m1-noop-status"',
+        'release: "0.1.0-m1-local-agent-observability"',
         "status: verified",
         "scope: m0_scaffold_health",
         "scope: m1_cloud_agent_contract_compatibility",
         "scope: m1_agent_registration_heartbeat",
         "scope: m1_task_creation_claim_lease",
         "scope: m1_noop_executor_status_reporting",
+        "scope: m1_local_agent_http_sse_offline_queue",
         "contract_state: placeholder_only",
         "contract_state: m1_cloud_agent_compatibility",
         "contract_state: m1_agent_registration_heartbeat",
         "contract_state: m1_task_claim_lease",
         "contract_state: m1_noop_status_reporting",
+        "contract_state: m1_local_agent_observability",
         "formal_contract_versions_active: false",
         "formal_contract_versions_active: true",
         'cloud_agent_api: "v1@2026.07.14.1"',
         'cloud_agent_api: "v1@2026.07.14.2"',
         'cloud_agent_api: "v1@2026.07.14.3"',
         'cloud_agent_api: "v1@2026.07.14.4"',
+        'local_agent_api: "v1@2026.07.14.5"',
+        'local_event_schemas: "status@2026.07.14.5"',
         "ci_go_version: \"1.26.5\"",
         "ci_python_version: \"3.12\"",
         "ci_node_version: \"25\"",
@@ -133,9 +146,13 @@ def validate_release_matrix() -> list[str]:
             errors.append(f"release-matrix.yaml missing {needle!r}")
 
     for name in EXPECTED_CONTRACTS:
-        if name == "cloud_agent_api":
+        if name in {"cloud_agent_api", "local_agent_api", "local_event_schemas"}:
             if 'cloud_agent_api: "v1@2026.07.14.4"' not in text:
                 errors.append("release-matrix.yaml must mark cloud_agent_api as v1@2026.07.14.4")
+            if 'local_agent_api: "v1@2026.07.14.5"' not in text:
+                errors.append("release-matrix.yaml must mark local_agent_api as v1@2026.07.14.5")
+            if 'local_event_schemas: "status@2026.07.14.5"' not in text:
+                errors.append("release-matrix.yaml must mark local_event_schemas as status@2026.07.14.5")
             continue
         if f"{name}: m0-placeholder" not in text:
             errors.append(f"release-matrix.yaml must keep {name} as m0-placeholder")

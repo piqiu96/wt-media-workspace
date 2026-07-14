@@ -59,9 +59,9 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create Active CHG and refresh context. | DONE | `prepare_ai_workspace.py --change CHG-20260714-012` |
-| T-02 | Add Local Agent status/SSE/offline queue. | TODO | Agent tests |
-| T-03 | Update Workspace evidence and release matrix. | TODO | Workspace/Agent/Desktop checks |
-| T-04 | Commit, push, cleanup active record. | TODO | Git/CI status |
+| T-02 | Add Local Agent status/SSE/offline queue. | DONE | `evidence/agent-local-api.md` |
+| T-03 | Update Workspace evidence and release matrix. | DONE | `evidence/integration-and-diff.md` |
+| T-04 | Commit, push, cleanup active record. | IN_PROGRESS | Git/CI status |
 
 ## 9. Repository Checklist
 
@@ -74,10 +74,10 @@ None.
 
 ### wt-media-agent
 
-- [ ] Add Local Agent status endpoint.
-- [ ] Add SSE endpoint.
-- [ ] Add pending result queue.
-- [ ] Add tests.
+- [x] Add Local Agent status endpoint.
+- [x] Add SSE endpoint.
+- [x] Add pending result queue.
+- [x] Add tests.
 
 ### wt-media-cloud
 
@@ -92,10 +92,10 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | PASS |
-| AC-02 | Local Agent exposes status. | Agent tests/curl | TODO |
-| AC-03 | Local Agent exposes SSE event snapshot. | Agent tests | TODO |
-| AC-04 | Offline pending result queue stores and drains results. | Agent tests | TODO |
-| AC-05 | No Desktop UI/process control or Cloud persistence is introduced. | Diff scan | TODO |
+| AC-02 | Local Agent exposes status. | Agent tests/curl | PASS |
+| AC-03 | Local Agent exposes SSE event snapshot. | Agent tests | PASS |
+| AC-04 | Offline pending result queue stores and drains results. | Agent tests | PASS |
+| AC-05 | No Desktop UI/process control or Cloud persistence is introduced. | Diff scan | PASS |
 | AC-06 | Affected repositories are committed independently and pushed. | Git log/status | TODO |
 
 ## 11. Evidence
@@ -113,13 +113,16 @@ Completed:
 - Updated M1 Active CHG.
 - Refreshed root `.ai/CURRENT_CONTEXT.md`.
 - Recorded T-01 evidence.
+- Added Local Agent status and SSE endpoints.
+- Added in-memory pending result queue.
+- Updated Workspace Contract Map and Release Matrix for Local Agent API/SSE.
+- Verified Workspace, Agent, and Desktop checks.
 
 Current:
-- T-02 Local Agent status/SSE/offline queue.
+- T-04 commit, push, and active-record cleanup.
 
 Next:
-- Run `prepare_ai_workspace.py --change CHG-20260714-012`.
-- Commit Workspace start record.
+- Commit Agent and Workspace snapshots, push, then remove completed active record.
 
 Blocked:
 - None.
@@ -127,6 +130,13 @@ Blocked:
 Recent verification:
 - `git status --short --branch` in four repositories.
 - `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-012`
+- `PYTHONPATH=src python3 -m unittest discover -s tests`
+- `curl /api/v1/status`
+- `curl /api/v1/events`
+- `python3 -m unittest discover -s tests`
+- `python3 scripts/verify_skills.py`
+- `python3 scripts/verify_m0_config.py`
+- `npm run verify`
 
 ## 13. DONE Gate
 

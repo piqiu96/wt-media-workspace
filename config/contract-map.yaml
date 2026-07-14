@@ -1,5 +1,5 @@
 schema_version: 1
-contract_state: m1_noop_status_reporting
+contract_state: m1_local_agent_observability
 formal_definitions_active: true
 
 contracts:
@@ -59,15 +59,18 @@ contracts:
   local_agent_api:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-agent-api
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    api_major_version: v1
+    contract_revision: "2026.07.14.5"
     consumers:
       - wt-media-desktop
   local_event_schemas:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-event-schemas
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    event_revision: "2026.07.14.5"
     consumers:
       - wt-media-desktop
   local_status_enums:
