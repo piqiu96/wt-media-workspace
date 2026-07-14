@@ -111,6 +111,15 @@ def validate_static_matrix() -> list[str]:
         DESKTOP / "src" / "services" / "local-agent.js",
         ('bindSession: "local_agent_bind_session"', "async bindSession(bindingTicket)"),
     )
+    require_contains(
+        errors,
+        DESKTOP / "src-tauri" / "src" / "local_agent" / "mod.rs",
+        (
+            "pub struct BoundNodeFacts",
+            "fn consume_binding_ticket(",
+            "pub fn bind_session<T: BindingTransport>(",
+        ),
+    )
 
     sensitive_files = [
         CLOUD / "migrations" / "20260714_004_agent_runtime.sql",

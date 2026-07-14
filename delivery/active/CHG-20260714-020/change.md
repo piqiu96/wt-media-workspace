@@ -56,20 +56,20 @@
 |---|---|---|
 | T-01 | Activate C6, inventory real dependencies and current repo state. | DONE |
 | T-02 | Implement/test Desktop one-use binding bridge and contract locks. | DONE |
-| T-03 | Add deterministic cross-repo C6 verifier and execute full automated matrix. | IN_PROGRESS |
-| T-04 | Execute real MySQL and BitBrowser integration matrix where dependencies exist. | TODO |
-| T-05 | Resolve findings, record evidence, close M2 only if all mandatory real gates pass. | TODO |
+| T-03 | Add deterministic cross-repo C6 verifier and execute full automated matrix. | DONE |
+| T-04 | Execute real MySQL and BitBrowser integration matrix where dependencies exist. | BLOCKED |
+| T-05 | Resolve findings, record evidence, close M2 only if all mandatory real gates pass. | BLOCKED |
 
 ## 7. Acceptance Matrix
 
 | AC | Requirement | Status |
 |---|---|---|
-| AC-01 | C1-C5 automated/full contract/security gates pass from clean independent repositories. | TODO |
+| AC-01 | C1-C5 automated/full contract/security gates pass from clean independent repositories. | PASS |
 | AC-02 | Desktop passes one-use binding ticket through native boundary without session/secret persistence. | PASS |
-| AC-03 | Real MySQL migrations and end-to-end Cloud state transitions pass. | TODO |
-| AC-04 | Real BitBrowser scan proves full-list uniform owner and secret-free payload. | TODO |
-| AC-05 | Real concurrency shows one grant/one waiting and expired uncertain permit becomes review-required. | TODO |
-| AC-06 | Final M2 baselines/contracts/releases agree and no blocking limitation remains. | TODO |
+| AC-03 | Real MySQL migrations and end-to-end Cloud state transitions pass. | BLOCKED |
+| AC-04 | Real BitBrowser scan proves full-list uniform owner and secret-free payload. | BLOCKED |
+| AC-05 | Real concurrency shows one grant/one waiting and expired uncertain permit becomes review-required. | BLOCKED |
+| AC-06 | Final M2 baselines/contracts/releases agree and no blocking limitation remains. | BLOCKED |
 
 ## 8. Current Checkpoint
 
@@ -77,18 +77,20 @@ Completed:
 - C1-C5 implemented and closed.
 - Docker CLI exists; MySQL CLI/server are absent. A follow-up application search found BitBrowser installed, but its Local API is not running.
 - Desktop contract locks and ephemeral `local_agent_bind_session` boundary pass `npm run verify`; node/permit credentials are excluded from Vue response/state.
-- Static cross-repository C1-C5 contract/security matrix and seven Workspace tests pass.
+- Rust native boundary moves the ticket once into `BindingTransport`; its return type contains only non-secret node facts.
+- Static cross-repository C1-C5 contract/security matrix, seven Workspace tests, Cloud Go/vet plus 20 YAML contracts, Agent 38 tests plus six YAML contracts, and Desktop verification pass.
 
 Current:
-- Run the full four-repository automated matrix and attempt real dependencies only where available.
+- Automated C6 work is complete. CHG remains active solely for mandatory real dependency evidence.
 
 Next:
-- Establish whether local Docker/BitBrowser can supply the mandatory real evidence without external setup.
+- When Docker/MySQL and the installed BitBrowser Local API are available, execute AC-03 through AC-05 exactly as described in `evidence/real-integration-runbook.md`, then close M2 only on PASS.
 
 Blocked:
 - Docker CLI is installed but its daemon is not running; MySQL binaries/DSN are absent.
 - BitBrowser is installed at `/Applications/比特浏览器.app` but its Local API is not listening on `127.0.0.1:54345`.
 - Codex escalation quota currently rejects GUI/process launch approvals, so these external dependencies cannot be started from this task at present.
+- A fresh M1 localhost integration rerun is also denied socket bind permission in this sandbox; its previously closed CHG evidence is retained and is not relabeled as a fresh C6 run.
 
 ## 9. DONE Gate
 
