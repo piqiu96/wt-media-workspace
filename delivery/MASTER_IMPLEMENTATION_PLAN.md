@@ -154,11 +154,11 @@ M0-C5 M0 综合验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `NOT_STARTED` |
+| 状态 | `IN_PROGRESS` |
 | 目标 | 证明 Cloud、Agent、Desktop 三端技术主干能够真实运行。 |
 | 依赖 | M0 `DONE` |
-| Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
+| Active CHG | `CHG-20260714-008` |
+| Evidence | CHG-008 M1-C1 Cloud-Agent Contract 与版本兼容 evidence 进行中。 |
 | 完成日期 | None |
 | Commit/Tag | None |
 
