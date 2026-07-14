@@ -1,23 +1,55 @@
 schema_version: 1
 
+toolchains:
+  cloud:
+    ci_go_version: "1.26.5"
+    local_outer_go_bin: "../devenv/go26/go/bin/go"
+    local_outer_goroot: "../devenv/go26/go"
+    local_outer_gopath: "../devenv/go19/gopath"
+    bare_go_status: "Codex shell currently resolves bare go to devenv/go19; use local_outer_go_bin for M0 verification."
+  agent:
+    ci_python_version: "3.12"
+    local_observed_python: "3.9.6"
+    package_requires_python: ">=3.12"
+    local_note: "M0 direct unittest passes on system Python 3.9.6; CI is the formal Python 3.12 check."
+  desktop:
+    ci_node_version: "25"
+    local_observed_node: "25.9.0"
+    local_observed_npm: "11.12.1"
+    rust_status: "cargo not required for M0 health verification; Tauri Rust build remains later M0/M10 work."
+
 releases:
-  - release: "0.1.0-bootstrap"
-    status: scaffold
+  - release: "0.1.0-m0-health"
+    status: verified
     date: "2026-07-14"
+    scope: m0_scaffold_health
     components:
       cloud: "0.1.0"
       cloud_agent: "0.1.0"
       desktop: "0.1.0"
       local_agent: "0.1.0"
+    contract_state: placeholder_only
+    formal_contract_versions_active: false
     contracts:
-      cloud_api: v1
-      cloud_agent_api: v1
-      business_schemas: v1
-      task_schemas: v1
-      business_enums: v1
-      cloud_error_codes: v1
-      local_agent_api: v1
-      local_event_schemas: v1
-      local_status_enums: v1
-      local_error_codes: v1
-      revision: "2026.07.14.1"
+      cloud_api: m0-placeholder
+      cloud_agent_api: m0-placeholder
+      business_schemas: m0-placeholder
+      task_schemas: m0-placeholder
+      business_enums: m0-placeholder
+      cloud_error_codes: m0-placeholder
+      local_agent_api: m0-placeholder
+      local_event_schemas: m0-placeholder
+      local_status_enums: m0-placeholder
+      local_error_codes: m0-placeholder
+      revision: "m0-placeholder-20260714"
+    verification:
+      workspace:
+        - "python3 -m unittest discover -s tests"
+        - "python3 scripts/verify_skills.py"
+        - "python3 scripts/verify_m0_config.py"
+      cloud:
+        - "GO_BIN=../../devenv/go26/go/bin/go scripts/verify-health.sh"
+      agent:
+        - "scripts/verify-health.sh"
+      desktop:
+        - "npm run verify"

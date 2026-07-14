@@ -39,3 +39,17 @@ Runtime code lives in `../wt-media-cloud`, `../wt-media-agent`, and `../wt-media
 - Do not store OpenAPI, schema, DTO, or event definitions here when a provider repository owns them.
 - Do not create `changes/active`; use `delivery/active/<change-id>/change.md`.
 - Remove completed delivery records after final outcomes are reflected in stable baselines and Git.
+
+## M0 Verification
+
+From `wt-media-workspace`:
+
+```text
+python3 scripts/verify_m0_config.py
+```
+
+From the same directory, with sibling runtime repositories present:
+
+```text
+scripts/verify_m0_local.sh
+```

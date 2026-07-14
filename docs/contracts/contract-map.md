@@ -4,6 +4,9 @@ This is a human-readable index for cross-repo contract ownership and consumers.
 Machine-readable ownership and consumer facts live in `../../config/contract-map.yaml`.
 Formal OpenAPI, schema, DTO, and event definitions live only in the provider repositories.
 
+M0 status: all listed contract areas are `placeholder_only`. They record ownership and
+expected consumers, but no formal `v1` OpenAPI, schema, DTO, or event definition is active yet.
+
 ## Cloud-Owned Contracts
 
 - `../wt-media-cloud/contracts/cloud-api`

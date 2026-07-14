@@ -1,32 +1,44 @@
 schema_version: 1
+contract_state: placeholder_only
+formal_definitions_active: false
 
 contracts:
   cloud_api:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/cloud-api
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
   cloud_agent_api:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/cloud-agent-api
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-agent
   business_schemas:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/business-schemas
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-agent
       - wt-media-desktop
   task_schemas:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/task-schemas
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-agent
       - wt-media-desktop
   business_enums:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/business-enums
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -34,6 +46,8 @@ contracts:
   cloud_error_codes:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/cloud-error-codes
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -41,20 +55,28 @@ contracts:
   local_agent_api:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-agent-api
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-desktop
   local_event_schemas:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-event-schemas
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-desktop
   local_status_enums:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-status-enums
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-desktop
   local_error_codes:
     owner: wt-media-agent
     path: ../wt-media-agent/contracts/local-error-codes
+    state: placeholder_only
+    formal_definition: inactive
     consumers:
       - wt-media-desktop
