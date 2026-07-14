@@ -80,10 +80,10 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create Active CHG and refresh context. | DONE | `prepare_ai_workspace.py --change CHG-20260714-009` |
-| T-02 | Add Cloud registration/heartbeat contract and runtime endpoints. | TODO | Cloud tests |
-| T-03 | Add Agent registration/heartbeat client. | TODO | Agent tests |
-| T-04 | Run integrated verification and record evidence. | TODO | Workspace, Cloud, Agent, Desktop checks |
-| T-05 | Commit, push, cleanup active record. | TODO | Git/CI status |
+| T-02 | Add Cloud registration/heartbeat contract and runtime endpoints. | DONE | `evidence/cloud-registration-heartbeat.md` |
+| T-03 | Add Agent registration/heartbeat client. | DONE | `evidence/agent-client.md` |
+| T-04 | Run integrated verification and record evidence. | DONE | `evidence/integration-and-diff.md` |
+| T-05 | Commit, push, cleanup active record. | IN_PROGRESS | Git/CI status |
 
 ## 9. Repository Checklist
 
@@ -97,16 +97,16 @@ None.
 
 ### wt-media-cloud
 
-- [ ] Add Cloud-owned registration/heartbeat contract artifact.
-- [ ] Add in-memory Agent registry.
-- [ ] Add registration and heartbeat endpoints.
-- [ ] Add tests.
+- [x] Add Cloud-owned registration/heartbeat contract artifact.
+- [x] Add in-memory Agent registry.
+- [x] Add registration and heartbeat endpoints.
+- [x] Add tests.
 - [ ] Commit independently.
 
 ### wt-media-agent
 
-- [ ] Add Cloud client registration and heartbeat methods.
-- [ ] Add tests.
+- [x] Add Cloud client registration and heartbeat methods.
+- [x] Add tests.
 - [ ] Commit independently.
 
 ### wt-media-desktop
@@ -118,10 +118,10 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | Exactly one active CHG exists during implementation. | `find delivery/active -maxdepth 2 -name change.md` | PASS |
-| AC-02 | Cloud owns formal registration/heartbeat contract artifact. | File inspection | TODO |
-| AC-03 | Cloud can register an Agent and update heartbeat state. | Cloud tests | TODO |
-| AC-04 | Agent can build and send registration/heartbeat requests. | Agent tests | TODO |
-| AC-05 | No task creation, polling, lease, executor, SSE, Desktop, or account/Profile behavior is introduced. | Diff scan | TODO |
+| AC-02 | Cloud owns formal registration/heartbeat contract artifact. | File inspection | PASS |
+| AC-03 | Cloud can register an Agent and update heartbeat state. | Cloud tests | PASS |
+| AC-04 | Agent can build and send registration/heartbeat requests. | Agent tests | PASS |
+| AC-05 | No task creation, polling, lease, executor, SSE, Desktop, or account/Profile behavior is introduced. | Diff scan | PASS |
 | AC-06 | Affected repositories are committed independently and pushed. | Git log/status | TODO |
 
 ## 11. Evidence
@@ -144,12 +144,22 @@ Completed:
 - Updated M1 Active CHG in `delivery/MASTER_IMPLEMENTATION_PLAN.md`.
 - Refreshed root `.ai/CURRENT_CONTEXT.md`.
 - Recorded T-01 evidence.
+- Added Cloud-owned registration/heartbeat contract artifact.
+- Added Cloud in-memory Agent registry and endpoints.
+- Verified Cloud tests and HTTP register/heartbeat/get requests.
+- Added Agent Cloud client registration and heartbeat methods.
+- Verified Agent unit tests.
+- Updated Cloud-Agent contract revision to `2026.07.14.2`.
+- Updated Workspace Contract Map and Release Matrix for M1-C2.
+- Ran integrated verification across Workspace, Cloud, Agent, and Desktop.
+- Verified Cloud HTTP registration, heartbeat, and get Agent node requests.
+- Confirmed diff scan has no out-of-scope implementation.
 
 Current:
-- T-02 Cloud registration/heartbeat contract and endpoints.
+- T-05 commit, push, and active-record cleanup.
 
 Next:
-- Commit Workspace start record, then implement Cloud provider slice.
+- Commit Workspace evidence/config snapshot, push affected repositories, then remove completed active record.
 
 Blocked:
 - None.
@@ -158,6 +168,14 @@ Recent verification:
 - `find wt-media-workspace/delivery/active -maxdepth 2 -name change.md -print`
 - `git status --short --branch` in four repositories
 - `python3 scripts/prepare_ai_workspace.py --change CHG-20260714-009`
+- `go test ./...` with Go 1.26 toolchain
+- `curl` registration, heartbeat, and get Agent node requests
+- `PYTHONPATH=src python3 -m unittest discover -s tests`
+- `python3 -m unittest discover -s tests`
+- `python3 scripts/verify_skills.py`
+- `python3 scripts/verify_m0_config.py`
+- `npm run verify`
+- out-of-scope `rg` scans over changed runtime files
 
 ## 13. DONE Gate
 

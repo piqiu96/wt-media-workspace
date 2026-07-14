@@ -1,5 +1,5 @@
 schema_version: 1
-contract_state: m1_cloud_agent_compatibility
+contract_state: m1_agent_registration_heartbeat
 formal_definitions_active: true
 
 contracts:
@@ -17,8 +17,8 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.07.14.1"
-    minimum_agent_contract_revision: "2026.07.14.1"
+    contract_revision: "2026.07.14.2"
+    minimum_agent_contract_revision: "2026.07.14.2"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:
       - wt-media-agent
