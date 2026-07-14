@@ -83,9 +83,9 @@ failing verification or test
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | Create Active CHG and refresh AI context. | DONE | `prepare_ai_workspace.py --change CHG-20260714-014` |
-| T-02 | Add repeatable M1 integration verification script. | TODO | Script initially absent, then passes. |
-| T-03 | Run full M1 integration verification and record evidence. | TODO | `python3 scripts/verify_m1_integration.py` |
-| T-04 | Mark M1 DONE and update release matrix. | TODO | Workspace config verification. |
+| T-02 | Add repeatable M1 integration verification script. | DONE | Script initially absent, then passed. |
+| T-03 | Run full M1 integration verification and record evidence. | DONE | `python3 scripts/verify_m1_integration.py` |
+| T-04 | Mark M1 DONE and update release matrix. | DONE | Workspace config verification. |
 | T-05 | Complete CHG and remove active record. | TODO | Active ledger empty after completion. |
 
 ## 9. Repository Checklist
@@ -93,33 +93,33 @@ failing verification or test
 ### wt-media-workspace
 
 - [x] Create active CHG.
-- [ ] Add integration script.
-- [ ] Record integration evidence.
-- [ ] Mark M1 DONE.
+- [x] Add integration script.
+- [x] Record integration evidence.
+- [x] Mark M1 DONE.
 - [ ] Remove active record when complete.
 
 ### wt-media-cloud
 
-- [ ] Verified via real HTTP server.
+- [x] Verified via real HTTP server.
 
 ### wt-media-agent
 
-- [ ] Verified via real CloudAgentClient and NoopExecutor.
-- [ ] Verified via Local Agent status/SSE server.
+- [x] Verified via real CloudAgentClient and NoopExecutor.
+- [x] Verified via Local Agent status/SSE server.
 
 ### wt-media-desktop
 
-- [ ] Verified via `npm run verify`.
+- [x] Verified via `npm run verify`.
 
 ## 10. Acceptance Matrix
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Cloud compatibility and health endpoints are reachable in a real process. | `python3 scripts/verify_m1_integration.py` | TODO |
-| AC-02 | Agent registers, claims a noop task, and reports succeeded over Cloud HTTP. | `python3 scripts/verify_m1_integration.py` | TODO |
-| AC-03 | Cloud stores final task status `succeeded` with progress `100`. | `python3 scripts/verify_m1_integration.py` | TODO |
-| AC-04 | Local Agent status and SSE endpoints return M1 status event data. | `python3 scripts/verify_m1_integration.py` | TODO |
-| AC-05 | Desktop M1 control/status verification passes. | `python3 scripts/verify_m1_integration.py` | TODO |
+| AC-01 | Cloud compatibility and health endpoints are reachable in a real process. | `python3 scripts/verify_m1_integration.py` | PASS |
+| AC-02 | Agent registers, claims a noop task, and reports succeeded over Cloud HTTP. | `python3 scripts/verify_m1_integration.py` | PASS |
+| AC-03 | Cloud stores final task status `succeeded` with progress `100`. | `python3 scripts/verify_m1_integration.py` | PASS |
+| AC-04 | Local Agent status and SSE endpoints return M1 status event data. | `python3 scripts/verify_m1_integration.py` | PASS |
+| AC-05 | Desktop M1 control/status verification passes. | `python3 scripts/verify_m1_integration.py` | PASS |
 
 ## 11. Evidence
 
@@ -134,27 +134,30 @@ Evidence files live in `evidence/` and must record facts, not repeat requirement
 
 Completed:
 - Created CHG-014 active record.
+- Added and ran M1 integration verification script.
+- Recorded M1 final release matrix entry and evidence.
 
 Current:
-- M1 integration verification script.
+- CHG-014 completion gate.
 
 Next:
-- Add failing verification for missing script, then implement script.
+- Run final verification and remove active record.
 
 Blocked:
 - None.
 
 Recent verification:
-- CHG-013 workspace and Desktop verification passed before CHG-014 creation.
+- Missing integration script failed before implementation.
+- `python3 scripts/verify_m1_integration.py` passed with real Cloud, Agent, Local Agent, and Desktop verification.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed.
+- [x] No blocking `Q-xx`.
+- [x] Acceptance matrix all PASS.
+- [x] Automated tests passed or justified.
+- [x] Manual verification evidence recorded where required.
+- [x] Diff checked for out-of-scope changes.
+- [x] Runtime repositories touched only if listed in scope.
+- [x] Required baselines updated.
+- [x] Affected repositories committed independently.

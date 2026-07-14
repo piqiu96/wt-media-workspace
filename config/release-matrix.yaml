@@ -259,3 +259,40 @@ releases:
       desktop:
         - "npm run verify"
         - "cargo check not run locally: cargo command not found"
+  - release: "0.1.0-m1-three-end-integration"
+    status: verified
+    date: "2026-07-14"
+    scope: m1_three_end_integration
+    components:
+      cloud: "0.1.0"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.1.0"
+    contract_state: m1_three_end_integration
+    formal_contract_versions_active: true
+    contracts:
+      cloud_api: m0-placeholder
+      cloud_agent_api: "v1@2026.07.14.4"
+      business_schemas: m0-placeholder
+      task_schemas: m0-placeholder
+      business_enums: m0-placeholder
+      cloud_error_codes: m0-placeholder
+      local_agent_api: "v1@2026.07.14.5"
+      local_event_schemas: "status@2026.07.14.5"
+      local_status_enums: m0-placeholder
+      local_error_codes: m0-placeholder
+      revision: "m1-three-end-integration-20260714.7"
+    verification:
+      workspace:
+        - "python3 scripts/verify_m1_integration.py"
+        - "python3 -m unittest discover -s tests"
+        - "python3 scripts/verify_skills.py"
+        - "python3 scripts/verify_m0_config.py"
+      cloud:
+        - "real Cloud process health and compatibility"
+        - "real Cloud noop task creation, claim, report, and lookup"
+      agent:
+        - "real CloudAgentClient registration, heartbeat, claim, and NoopExecutor status reporting"
+        - "real Local Agent status and SSE HTTP process"
+      desktop:
+        - "npm run verify"
