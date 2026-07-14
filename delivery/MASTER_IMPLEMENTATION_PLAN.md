@@ -199,11 +199,11 @@ M1-C7 三端真实跨端集成验证
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `NOT_STARTED` |
+| 状态 | `IN_PROGRESS` |
 | 目标 | 建立发布、互动、任务分配和本地执行依赖的账号与运行环境基础。 |
 | 依赖 | M1 `DONE` |
-| Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
+| Active CHG | `CHG-20260714-015` |
+| Evidence | CHG-015 M2-C1 用户认证、单活会话和三角色权限 evidence 进行中。 |
 | 完成日期 | None |
 | Commit/Tag | None |
 

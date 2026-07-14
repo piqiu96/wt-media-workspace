@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260714-015 | M2-C1 用户认证、单活会话和三角色权限 | IMPLEMENTING | wt-media-workspace |
