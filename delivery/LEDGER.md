@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260715-008 | M1-R1 正式通用 task 模型、状态、错误和 task_schemas | IN_PROGRESS | wt-media-workspace |
+| CHG-20260715-010 | M2-R0 UI 重构：TDesign 迁移 + 统一页面模板 | IN_PROGRESS | wt-media-cloud |

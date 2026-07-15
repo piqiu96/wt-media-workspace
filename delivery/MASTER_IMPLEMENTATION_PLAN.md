@@ -115,8 +115,8 @@ DONE
 | 里程碑 | 当前状态 | 已完成或可复用事实 | 当前结论 |
 |---|---|---|---|
 | M0 | `DONE` | M0-R1～R6 已完成真实工具链、三端构建、迁移、启动停止、CI/config 门禁、综合工程验收和人工验收 | 三端独立工程组件就绪，可进入 M1 |
-| M1 | `VERIFYING` | M1-R1～R7 已完成正式 task 模型、MySQL 持久化、SQLite 检查点、Agent Runner、Local API HTTP/SSE、Desktop Tauri 真实桥接、Cloud Web 任务 UI、中断恢复矩阵 | 等待人工端到端验收确认 |
-| M2 | `NOT_STARTED` | 认证、媒体账号基础、Profile 扫描、运行环境和并发保护的历史实现 | 按新 M2-C1～C11 审计复用并补齐完整产品域 |
+| M1 | `DONE` | M1-R1～R7 已完成正式 task 模型、MySQL 持久化、SQLite 检查点、Agent Runner、Local API HTTP/SSE、Desktop Tauri 真实桥接、Cloud Web 任务 UI、中断恢复矩阵；R8 人工验收通过 | 三端最小任务闭环就绪，可进入 M2 |
+| M2 | `IN_PROGRESS` | 认证、媒体账号基础、Profile 扫描、运行环境和并发保护的历史实现；视觉基线决策 0007 已通过 | M2-R0 前置 UI 重构后，按 R1～R11 实施业务模块 |
 | M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
 每个里程碑的最终综合验收至少包含：
@@ -177,13 +177,13 @@ M0-R6 三端独立构建、启动、健康检查和综合工程验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS` |
+| 状态 | `DONE` |
 | 目标 | 在 M0 的真实组件上建立持久化、无 Mock、可重启恢复的 Cloud-Agent-Desktop-Web 最小任务环境，供后续所有业务里程碑复用。 |
 | 依赖 | M0 `DONE` |
-| Active CHG | `CHG-20260715-008` |
-| Evidence | 继承证据：CHG-008 至 CHG-014 已验证 Contract 兼容、Agent 注册心跳、noop task、Local API/SSE 和脚手架集成。Cloud task/Agent Registry 仍为内存实现，Desktop 仍使用 Mock 入口，`task_schemas` 仍为占位，因此不能满足修订后的 M1 退出条件。 |
-| 完成日期 | None |
-| Commit/Tag | CHG-008 commits: Cloud `d2acf2a`; Agent `9a97b2d`; Workspace `fab15d3`, `1cac21f`, `559f907`; CHG-009 commits: Cloud `047d006`, `8cb351a`; Agent `eb5183d`, `482d1f8`; Workspace `e607c98`, `98220b3`; CHG-010 commits: Cloud `89d776b`; Agent `356aa3f`; Workspace `9a4ccf3`, `6e3d216`; CHG-011 commits: Cloud `90daf2e`; Agent `598e0eb`; Workspace `cdeb63c`, `100c09c`; CHG-012 commits: Agent `aaeabdb`; Workspace `edc5e14`, `c2aa5f8`; CHG-013 commits: Desktop `a8f8eef`; Workspace `cf0a49c`, `cd626c2`; CHG-014 commits: Workspace `8859162`, `b86e34c`。 |
+| Active CHG | None |
+| Evidence | M1-R1 正式 task 模型 + task_schemas 合同；M1-R2 MySQL 持久化；M1-R3 Agent Runner + SQLite 检查点 + 离线队列；M1-R4 Local Agent HTTP/SSE + CORS；M1-R5 Desktop Tauri HTTP 桥接；M1-R6 Cloud Web 任务 UI；M1-R7 中断恢复矩阵；M1-R8 人工验收通过。决策 0006。 |
+| 完成日期 | 2026-07-15 |
+| Commit/Tag | M1-R1: Cloud `e2f7687`, Agent `7739264`, Desktop `81bd9f0`, Workspace `667fc5b`; M1-R2: Cloud `c7a4ca4`, Workspace `5f11c3e`; M1-R3: Agent `d01f65b`; M1-R4: Agent `53f38a1`; M1-R5: Desktop `e3882e0`; M1-R6: Cloud `9a278e4`; M1-R7: Workspace `d1e4f6f`; 继承证据: CHG-008 至 CHG-014。 |
 
 目标闭环：
 
@@ -228,17 +228,18 @@ M1-R8 无 Mock 三端端到端人工验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `NOT_STARTED` |
-| 目标 | 在 M1 真实端到端环境上，完整交付用户、媒体账号、BitBrowser 窗口、代理、Cookie、开户、运行环境、敏感任务权限以及对应 Web/Desktop 产品体验。 |
+| 状态 | `IN_PROGRESS` |
+| 目标 | 在 M1 真实端到端环境上，先完成 UI 重构（TDesign + 统一模板），再完整交付用户、媒体账号、BitBrowser 窗口、代理、Cookie、开户、运行环境、敏感任务权限以及对应 Web/Desktop 产品体验。 |
 | 依赖 | M1 `DONE` |
-| Active CHG | None |
-| Evidence | 继承证据：CHG-015 至 CHG-020 已验证认证、媒体账号基础模型、BitBrowser 主账号树/Profile 扫描、运行环境上报、敏感任务并发和真实 MySQL/BitBrowser 基础链路。窗口管理、代理、Cookie、开户、完整用户管理 UI、真实 Desktop 产品体验尚未交付，历史 PASS 不自动关闭新的 M2-C1 至 C11。 |
+| Active CHG | `CHG-20260715-010` |
+| Evidence | 继承证据：CHG-015 至 CHG-020 已验证认证、媒体账号基础模型、BitBrowser 主账号树/Profile 扫描、运行环境上报、敏感任务并发和真实 MySQL/BitBrowser 基础链路。决策 0007（视觉工程基线）。窗口管理、代理、Cookie、开户、完整用户管理 UI、真实 Desktop 产品体验尚未交付，历史 PASS 不自动关闭新的 M2-C1 至 C11。 |
 | 完成日期 | None |
-| Commit/Tag | CHG-015 commits: Cloud `50b5c8d`, `03b0dcc`; Workspace `f3e7d1a`, `51ab7de`, `e79db94`, `6576c44`, `a1f12d7`。CHG-016 commits: Cloud `18f687a`, `8eb70ba`; Workspace `266595f`, `3c65f6e`, `92c4565`。CHG-017 commits: Agent `14e51be`, `f0257b5`; Cloud `bba30ef`, `727ad9e`; Workspace `0bb7ba8`, `b67d493`, `5123ab8`。CHG-018 commits: Agent `8652a90`, `d5a9e4d`; Cloud `6ef0308`, `866364e`, `9770e1b`; Workspace `f54c08c`, `955f8ab`, `1bc1de9`。CHG-019 commits: Agent `5cd9212`, `3d4081a`; Cloud `d1d0ddc`, `2753715`; Workspace `5c59c5a`, `019d4a6`。 |
+| Commit/Tag | CHG-015～CHG-019 commits（历史继承）。决策 0007: Workspace commit pending。 |
 
 候选 CHG：
 
 ```text
+M2-R0 UI 重构：TDesign 迁移 + 统一页面模板 + 状态色彩规范 + Desktop 本地控制台改进
 M2-C1 用户认证、单活会话、三角色、游戏范围与用户管理台
 M2-C2 媒体账号生命周期、标签、分配与账号工作台
 M2-C3 BitBrowser 主账号树、Profile 扫描 Diff 与 Cloud 分配
