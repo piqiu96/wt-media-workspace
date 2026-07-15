@@ -34,7 +34,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
 
     def test_rejects_reopened_milestone_status_regression(self) -> None:
         changed = self.master.replace(
-            "| 状态 | `VERIFYING` |", "| 状态 | `DONE` |", 1
+            "| 状态 | `DONE` |", "| 状态 | `VERIFYING` |", 1
         )
 
         errors = self.module.validate_master_text(changed)

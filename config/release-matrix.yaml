@@ -23,6 +23,51 @@ toolchains:
     rust_status: "M0-R4 verified real Vue/Vite/Tauri Rust test/build/start/health/stop loop; M1 still requires mock-free Desktop/Local Agent integration."
 
 releases:
+  - release: "0.1.0-m0-accepted"
+    status: accepted
+    date: "2026-07-15"
+    scope: m0_full_engineering_and_manual_acceptance
+    components:
+      cloud: "0.1.0"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.1.0"
+    contract_state: placeholder_only
+    formal_contract_versions_active: false
+    contracts:
+      cloud_api: m0-placeholder
+      cloud_agent_api: m0-placeholder
+      business_schemas: m0-placeholder
+      task_schemas: m0-placeholder
+      business_enums: m0-placeholder
+      cloud_error_codes: m0-placeholder
+      local_agent_api: m0-placeholder
+      local_event_schemas: m0-placeholder
+      local_status_enums: m0-placeholder
+      local_error_codes: m0-placeholder
+      revision: "m0-accepted-20260715"
+    verification:
+      workspace:
+        - "python3 -m unittest discover -s tests"
+        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify_product_master_alignment.py"
+      cloud:
+        - "GO_BIN=../../devenv/go26/go/bin/go scripts/verify-health.sh"
+        - "WT_MEDIA_MYSQL_DSN=... scripts/migrate.sh"
+        - "WT_MEDIA_CLOUD_HTTP_ADDR=127.0.0.1:18080 scripts/health.sh"
+      agent:
+        - "scripts/bootstrap.sh && scripts/test.sh && scripts/build.sh"
+        - "scripts/start-health.sh && scripts/health.sh && scripts/stop-health.sh"
+      desktop:
+        - "npm run verify"
+        - "scripts/start.sh && scripts/health.sh && scripts/stop.sh"
+    manual_acceptance:
+      - "Cloud API health endpoint verified: healthz ok"
+      - "Agent health endpoint verified: health ok"
+      - "Desktop page renders at http://127.0.0.1:5174/"
+      - "Desktop .dmg installer built successfully"
+      - "main.ts blank-page fix verified"
+
   - release: "0.1.0-m0-health"
     status: verified
     date: "2026-07-14"

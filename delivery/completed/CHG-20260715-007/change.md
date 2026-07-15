@@ -145,4 +145,4 @@ Recent verification:
 - [x] Diff checked for out-of-scope changes.
 - [x] Runtime repositories touched only if listed in scope.
 - [x] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Affected repositories committed independently.

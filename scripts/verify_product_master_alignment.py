@@ -40,7 +40,7 @@ def validate_master_text(text: str) -> list[str]:
         )
         return errors
 
-    expected_statuses = {0: "VERIFYING", **{number: "NOT_STARTED" for number in range(1, 11)}}
+    expected_statuses = {0: "DONE", 1: "IN_PROGRESS", **{number: "NOT_STARTED" for number in range(2, 11)}}
     for number, expected in expected_statuses.items():
         status_match = re.search(r"\| 状态 \| `([^`]+)` \|", sections[number])
         actual = status_match.group(1) if status_match else None

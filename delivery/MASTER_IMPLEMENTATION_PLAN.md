@@ -114,8 +114,8 @@ DONE
 
 | 里程碑 | 当前状态 | 已完成或可复用事实 | 当前结论 |
 |---|---|---|---|
-| M0 | `VERIFYING` | M0-R1～R6 已完成真实工具链、三端构建、迁移、启动停止、CI/config 门禁和综合工程验收 | 等待人工基础环境和端到端闭环验收确认 |
-| M1 | `NOT_STARTED` | Contract 兼容、注册心跳、noop task、Local API/SSE 的历史基础实现 | 需完成持久化、正式 task schema、真实 Desktop 和恢复闭环 |
+| M0 | `DONE` | M0-R1～R6 已完成真实工具链、三端构建、迁移、启动停止、CI/config 门禁、综合工程验收和人工验收 | 三端独立工程组件就绪，可进入 M1 |
+| M1 | `IN_PROGRESS` | Contract 兼容、注册心跳、noop task、Local API/SSE 的历史基础实现 | 需完成持久化、正式 task schema、真实 Desktop 和恢复闭环 |
 | M2 | `NOT_STARTED` | 认证、媒体账号基础、Profile 扫描、运行环境和并发保护的历史实现 | 按新 M2-C1～C11 审计复用并补齐完整产品域 |
 | M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
@@ -131,13 +131,13 @@ DONE
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `VERIFYING` |
+| 状态 | `DONE` |
 | 目标 | 在治理体系可用的基础上，使 Cloud、Web、Agent、Desktop 成为可安装依赖、可真实构建、可启动停止、可测试的独立工程组件。 |
 | 依赖 | None |
-| Active CHG | `CHG-20260715-007` |
-| Evidence | 继承证据：CHG-002 执行控制；CHG-003 Master Plan；CHG-004 工程骨架；CHG-005 脚手架健康检查；CHG-006 测试、CI、Contract Map 和版本矩阵；CHG-007 历史综合验收。以上证据不包含真实 Desktop/Tauri 构建，不能满足修订后的 M0 退出条件。 |
-| 完成日期 | None |
-| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit `716c143`。 |
+| Active CHG | None |
+| Evidence | R1-R6 全链路证据；决策 0005；人工验收确认；CHG-002～CHG-007 继承证据；CHG-20260715-007 R6 自动/工程门禁证据。 |
+| 完成日期 | 2026-07-15 |
+| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit `716c143`; CHG-20260715-007 Workspace evidence commit pending; R6 Agent script fix `0e07b4e`。 |
 
 候选 CHG：
 
@@ -177,10 +177,10 @@ M0-R6 三端独立构建、启动、健康检查和综合工程验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `NOT_STARTED` |
+| 状态 | `IN_PROGRESS` |
 | 目标 | 在 M0 的真实组件上建立持久化、无 Mock、可重启恢复的 Cloud-Agent-Desktop-Web 最小任务环境，供后续所有业务里程碑复用。 |
 | 依赖 | M0 `DONE` |
-| Active CHG | None |
+| Active CHG | `CHG-20260715-008` |
 | Evidence | 继承证据：CHG-008 至 CHG-014 已验证 Contract 兼容、Agent 注册心跳、noop task、Local API/SSE 和脚手架集成。Cloud task/Agent Registry 仍为内存实现，Desktop 仍使用 Mock 入口，`task_schemas` 仍为占位，因此不能满足修订后的 M1 退出条件。 |
 | 完成日期 | None |
 | Commit/Tag | CHG-008 commits: Cloud `d2acf2a`; Agent `9a97b2d`; Workspace `fab15d3`, `1cac21f`, `559f907`; CHG-009 commits: Cloud `047d006`, `8cb351a`; Agent `eb5183d`, `482d1f8`; Workspace `e607c98`, `98220b3`; CHG-010 commits: Cloud `89d776b`; Agent `356aa3f`; Workspace `9a4ccf3`, `6e3d216`; CHG-011 commits: Cloud `90daf2e`; Agent `598e0eb`; Workspace `cdeb63c`, `100c09c`; CHG-012 commits: Agent `aaeabdb`; Workspace `edc5e14`, `c2aa5f8`; CHG-013 commits: Desktop `a8f8eef`; Workspace `cf0a49c`, `cd626c2`; CHG-014 commits: Workspace `8859162`, `b86e34c`。 |

@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260715-007 | M0-R6 三端独立构建、启动、健康检查和综合工程验收 | VERIFYING | wt-media-workspace |
+| CHG-20260715-008 | M1-R1 正式通用 task 模型、状态、错误和 task_schemas | IN_PROGRESS | wt-media-workspace |
