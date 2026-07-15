@@ -199,7 +199,13 @@ def validate_release_matrix() -> list[str]:
         'local_status_enums: "status@2026.07.14.8"',
         "ci_go_version: \"1.26.5\"",
         "ci_python_version: \"3.12\"",
-        "ci_node_version: \"25\"",
+        "ci_node_version: \"26\"",
+        "local_observed_node: \"26.5.0\"",
+        "local_observed_npm: \"11.17.0\"",
+        "ci_rust_toolchain: stable",
+        "local_observed_rustc: \"1.97.0\"",
+        "local_observed_cargo: \"1.97.0\"",
+        "M0-R4 verified real Vue/Vite/Tauri Rust test/build/start/health/stop loop",
     )
     for needle in required:
         if needle not in text:
@@ -230,6 +236,56 @@ def validate_release_matrix() -> list[str]:
     return errors
 
 
+def validate_ci_workflows(allow_missing_repos: bool) -> list[str]:
+    errors: list[str] = []
+    expected = {
+        "wt-media-cloud/.github/workflows/m0-cloud.yml": (
+            "services:",
+            "mysql:8.4",
+            "node-version: \"26\"",
+            "scripts/bootstrap.sh",
+            "scripts/test.sh",
+            "scripts/migrate.sh",
+            "scripts/build.sh",
+        ),
+        "wt-media-agent/.github/workflows/m0-agent.yml": (
+            "astral-sh/setup-uv@v5",
+            "scripts/bootstrap.sh",
+            "scripts/test.sh",
+            "scripts/migrate-storage.sh",
+            "scripts/build.sh",
+        ),
+        "wt-media-desktop/.github/workflows/m0-desktop.yml": (
+            "runs-on: macos-latest",
+            "node-version: \"26\"",
+            "dtolnay/rust-toolchain@stable",
+            "scripts/bootstrap.sh",
+            "npm run lint",
+            "scripts/test.sh",
+            "scripts/build.sh",
+        ),
+        "wt-media-workspace/.github/workflows/m0-workspace.yml": (
+            "python -m unittest discover -s tests",
+            "python scripts/verify_skills.py",
+            "python scripts/verify_m0_config.py --allow-missing-repos",
+            "python scripts/verify_product_master_alignment.py",
+            "python scripts/prepare_ai_workspace.py --change \"$ACTIVE_CHANGE\" --no-write",
+        ),
+    }
+    for rel_path, needles in expected.items():
+        path = OUTER_ROOT / rel_path
+        if not path.is_file():
+            if not allow_missing_repos:
+                errors.append(f"missing CI workflow: {rel_path}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        for needle in needles:
+            if needle not in text:
+                errors.append(f"{rel_path} missing {needle!r}")
+
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -242,6 +298,7 @@ def main() -> int:
     errors = []
     errors.extend(validate_contract_map(allow_missing_repos=args.allow_missing_repos))
     errors.extend(validate_release_matrix())
+    errors.extend(validate_ci_workflows(allow_missing_repos=args.allow_missing_repos))
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)

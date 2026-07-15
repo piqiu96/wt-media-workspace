@@ -26,3 +26,18 @@ jobs:
 
       - name: Verify M0 config
         run: python scripts/verify_m0_config.py --allow-missing-repos
+
+      - name: Verify product and Master Plan alignment
+        run: python scripts/verify_product_master_alignment.py
+
+      - name: Validate active AI workspace context
+        run: |
+          ACTIVE_CHANGE="$(python - <<'PY'
+          from pathlib import Path
+          changes = sorted(path.parent.name for path in Path("delivery/active").glob("*/change.md"))
+          if len(changes) != 1:
+              raise SystemExit(f"expected exactly one active CHG, found {changes}")
+          print(changes[0])
+          PY
+          )"
+          python scripts/prepare_ai_workspace.py --change "$ACTIVE_CHANGE" --no-write

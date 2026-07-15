@@ -14,10 +14,13 @@ toolchains:
     package_requires_python: ">=3.12"
     local_note: "M0 direct unittest passes on system Python 3.9.6; CI is the formal Python 3.12 check."
   desktop:
-    ci_node_version: "25"
-    local_observed_node: "25.9.0"
-    local_observed_npm: "11.12.1"
-    rust_status: "Historical m0_scaffold_health did not require cargo; revised M0 requires a real Tauri Rust build and M1 requires a mock-free Desktop/Local Agent integration."
+    ci_node_version: "26"
+    local_observed_node: "26.5.0"
+    local_observed_npm: "11.17.0"
+    ci_rust_toolchain: stable
+    local_observed_rustc: "1.97.0"
+    local_observed_cargo: "1.97.0"
+    rust_status: "M0-R4 verified real Vue/Vite/Tauri Rust test/build/start/health/stop loop; M1 still requires mock-free Desktop/Local Agent integration."
 
 releases:
   - release: "0.1.0-m0-health"

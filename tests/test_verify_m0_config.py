@@ -40,6 +40,10 @@ class VerifyM0ConfigTests(unittest.TestCase):
         errors = self.module.validate_release_matrix()
         self.assertEqual(errors, [])
 
+    def test_ci_workflows_cover_revised_m0_gates(self) -> None:
+        errors = self.module.validate_ci_workflows(allow_missing_repos=True)
+        self.assertEqual(errors, [])
+
 
 if __name__ == "__main__":
     unittest.main()

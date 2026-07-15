@@ -311,7 +311,7 @@ def validate_alignment(root: Path = ROOT) -> list[str]:
             (
                 "Verified releases are historical scope evidence",
                 "revised milestone completion is determined by the current Master Plan",
-                "revised M0 requires a real Tauri Rust build",
+                "M0-R4 verified real Vue/Vite/Tauri Rust",
             ),
             "release matrix planning state",
         )
