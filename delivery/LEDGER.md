@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260715-004 | M0-R3 Agent 正式包入口、依赖锁、SQLite Migration、build 和启动停止 | VERIFYING | wt-media-agent |
+| CHG-20260715-005 | M0-R4 Desktop Vue/Tauri Rust 正式依赖、build、dev、启动停止和本地页面 | VERIFYING | wt-media-desktop |

@@ -134,7 +134,7 @@ DONE
 | 状态 | `IN_PROGRESS` |
 | 目标 | 在治理体系可用的基础上，使 Cloud、Web、Agent、Desktop 成为可安装依赖、可真实构建、可启动停止、可测试的独立工程组件。 |
 | 依赖 | None |
-| Active CHG | `CHG-20260715-004` |
+| Active CHG | `CHG-20260715-005` |
 | Evidence | 继承证据：CHG-002 执行控制；CHG-003 Master Plan；CHG-004 工程骨架；CHG-005 脚手架健康检查；CHG-006 测试、CI、Contract Map 和版本矩阵；CHG-007 历史综合验收。以上证据不包含真实 Desktop/Tauri 构建，不能满足修订后的 M0 退出条件。 |
 | 完成日期 | None |
 | Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit `716c143`。 |
