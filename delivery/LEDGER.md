@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260715-006 | M0-R5 CI、Contract Map、Release Matrix 和跨平台工程门禁 | VERIFYING | wt-media-workspace |
+| CHG-20260715-007 | M0-R6 三端独立构建、启动、健康检查和综合工程验收 | VERIFYING | wt-media-workspace |

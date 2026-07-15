@@ -114,7 +114,7 @@ DONE
 
 | 里程碑 | 当前状态 | 已完成或可复用事实 | 当前结论 |
 |---|---|---|---|
-| M0 | `IN_PROGRESS` | 治理、仓库骨架、基础健康检查和历史 CI/Contract Map | 需完成 M0-R1～R6 的真实构建和启动门禁 |
+| M0 | `VERIFYING` | M0-R1～R6 已完成真实工具链、三端构建、迁移、启动停止、CI/config 门禁和综合工程验收 | 等待人工基础环境和端到端闭环验收确认 |
 | M1 | `NOT_STARTED` | Contract 兼容、注册心跳、noop task、Local API/SSE 的历史基础实现 | 需完成持久化、正式 task schema、真实 Desktop 和恢复闭环 |
 | M2 | `NOT_STARTED` | 认证、媒体账号基础、Profile 扫描、运行环境和并发保护的历史实现 | 按新 M2-C1～C11 审计复用并补齐完整产品域 |
 | M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
@@ -131,10 +131,10 @@ DONE
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS` |
+| 状态 | `VERIFYING` |
 | 目标 | 在治理体系可用的基础上，使 Cloud、Web、Agent、Desktop 成为可安装依赖、可真实构建、可启动停止、可测试的独立工程组件。 |
 | 依赖 | None |
-| Active CHG | `CHG-20260715-006` |
+| Active CHG | `CHG-20260715-007` |
 | Evidence | 继承证据：CHG-002 执行控制；CHG-003 Master Plan；CHG-004 工程骨架；CHG-005 脚手架健康检查；CHG-006 测试、CI、Contract Map 和版本矩阵；CHG-007 历史综合验收。以上证据不包含真实 Desktop/Tauri 构建，不能满足修订后的 M0 退出条件。 |
 | 完成日期 | None |
 | Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit `716c143`。 |
