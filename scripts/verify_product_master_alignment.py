@@ -9,7 +9,6 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ACTIVE_CHANGE = "CHG-20260715-001"
 
 
 def milestone_sections(text: str) -> dict[int, str]:
@@ -229,24 +228,32 @@ def validate_active_change(root: Path) -> list[str]:
     errors: list[str] = []
     active_paths = sorted((root / "delivery" / "active").glob("*/change.md"))
     active_ids = [path.parent.name for path in active_paths]
-    if active_ids != [ACTIVE_CHANGE]:
-        errors.append(
-            f"active CHG set expected [{ACTIVE_CHANGE!r}], got {active_ids!r}"
-        )
+    if len(active_ids) != 1:
+        errors.append(f"expected exactly one active CHG, got {active_ids!r}")
         return errors
 
+    active_change = active_ids[0]
     change_text = active_paths[0].read_text(encoding="utf-8")
+    title_match = re.search(rf"^# {re.escape(active_change)}: (.+)$", change_text, flags=re.MULTILINE)
+    title = title_match.group(1) if title_match else None
     status_match = re.search(r"^- Status: (\S+)$", change_text, flags=re.MULTILINE)
     status = status_match.group(1) if status_match else None
-    if status not in {"IMPLEMENTING", "VERIFYING"}:
-        errors.append(f"active CHG status must be IMPLEMENTING or VERIFYING, got {status!r}")
+    if status not in {"IN_PROGRESS", "IMPLEMENTING", "VERIFYING"}:
+        errors.append(
+            "active CHG status must be IN_PROGRESS, IMPLEMENTING or VERIFYING, "
+            f"got {status!r}"
+        )
+    if not title:
+        errors.append(f"active CHG title is missing or does not match {active_change}")
     if "## 7. Pending Questions\n\nNone." not in change_text:
         errors.append("active CHG must have no pending questions")
 
     ledger = (root / "delivery" / "LEDGER.md").read_text(encoding="utf-8")
-    expected_row = f"| {ACTIVE_CHANGE} | 产品基线与 Master Plan 端到端对齐 | {status} | wt-media-workspace |"
-    if expected_row not in ledger:
-        errors.append(f"Ledger is not aligned with active CHG status {status!r}")
+    expected_row = f"| {active_change} | {title} | {status} | wt-media-workspace |"
+    if title and status and expected_row not in ledger:
+        errors.append(
+            f"Ledger is not aligned with active CHG {active_change} status {status!r}"
+        )
     return errors
 
 

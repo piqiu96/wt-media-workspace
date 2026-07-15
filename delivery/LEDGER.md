@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260715-001 | 产品基线与 Master Plan 端到端对齐 | VERIFYING | wt-media-workspace |
+| CHG-20260715-002 | M0-R1 真实工具链、依赖安装和脚手架差距核查 | VERIFYING | wt-media-workspace |
