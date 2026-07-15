@@ -23,6 +23,63 @@ toolchains:
     rust_status: "M0-R4 verified real Vue/Vite/Tauri Rust test/build/start/health/stop loop; M1 still requires mock-free Desktop/Local Agent integration."
 
 releases:
+  - release: "0.1.0-m1-r1-task-schema"
+    status: verified
+    date: "2026-07-15"
+    scope: m1_r1_formal_task_model_and_task_schemas
+    components:
+      cloud: "0.1.0"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.1.0"
+    contract_state: m1_r1_task_schema_active
+    formal_contract_versions_active: true
+    contracts:
+      cloud_api: m0-placeholder
+      cloud_agent_api: "v1@2026.07.15.1"
+      business_schemas: m0-placeholder
+      task_schemas: "v1@2026.07.15.1"
+      business_enums: m0-placeholder
+      cloud_error_codes: m0-placeholder
+      local_agent_api: "v1@2026.07.14.7"
+      local_event_schemas: "profile-guard@2026.07.14.8"
+      local_status_enums: "status@2026.07.14.8"
+      local_error_codes: m0-placeholder
+      revision: "m1-r1-task-schema-20260715.1"
+    verification:
+      workspace:
+        - "python3 -m unittest discover -s tests"
+        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify_m2_acceptance.py"
+      cloud:
+        - "go test ./internal/modules/cloudagent/..."
+        - "curl POST /api/v1/tasks"
+        - "curl POST /api/v1/cloud-agent/tasks/claim"
+        - "curl POST /api/v1/cloud-agent/tasks/:task_id/cancel"
+      agent:
+        - "python3.12 -m unittest discover -s tests"
+        - "scripts/verify-health.sh"
+      desktop:
+        - "npm run verify"
+    evidence:
+      cloud:
+        - "Typed TaskStatus enum (iota-based) with pending/leased/running/succeeded/failed/cancelled"
+        - "TaskType enum with noop_task"
+        - "task_schemas contract published: v1/task-schema.openapi.yaml rev 2026.07.15.1"
+        - "Generic POST /api/v1/tasks route added (CreateTaskRequest with task_type)"
+        - "POST /api/v1/cloud-agent/tasks/:task_id/cancel route added"
+        - "New error types: ErrTaskAlreadyTerminal, ErrInvalidStatus, ErrInvalidTaskType"
+        - "Bootstrap migration 000_bootstrap_existing.sql for existing DB compatibility"
+      agent:
+        - "REQUIRED_CONTRACT_REVISION updated to 2026.07.15.1"
+        - "task_schemas version locked"
+      desktop:
+        - "contracts.lock.json updated: task_schemas: v1@2026.07.15.1"
+        - "cloud_agent_api: v1@2026.07.15.1"
+      workspace:
+        - "contract-map.yaml: task_schemas active with schema_revision 2026.07.15.1"
+        - "Decision 0005: M0 acceptance carried forward"
+
   - release: "0.1.0-m0-accepted"
     status: accepted
     date: "2026-07-15"

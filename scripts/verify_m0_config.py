@@ -15,7 +15,7 @@ EXPECTED_CONTRACTS = {
     "cloud_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-api", "active", "active"),
     "cloud_agent_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-agent-api", "active", "active"),
     "business_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/business-schemas", "active", "active"),
-    "task_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/task-schemas", "placeholder_only", "inactive"),
+    "task_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/task-schemas", "active", "active"),
     "business_enums": ("wt-media-cloud", "../wt-media-cloud/contracts/business-enums", "active", "active"),
     "cloud_error_codes": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-error-codes", "active", "active"),
     "local_agent_api": ("wt-media-agent", "../wt-media-agent/contracts/local-agent-api", "active", "active"),
@@ -228,7 +228,7 @@ def validate_release_matrix() -> list[str]:
         if f"{name}: m0-placeholder" not in text:
             errors.append(f"release-matrix.yaml must retain the historical {name} m0 placeholder")
 
-    forbidden = ("cloud_api: v1", "local_agent_api: v1", "task_schemas: v1")
+    forbidden = ("cloud_api: v1", "local_agent_api: v1")
     for needle in forbidden:
         if needle in text:
             errors.append(f"release-matrix.yaml must not claim active formal version {needle!r}")

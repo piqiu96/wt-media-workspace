@@ -8,7 +8,7 @@ Current state is mixed. The machine-readable map is authoritative for exact revi
 
 - Cloud API, Cloud-Agent API, business schemas, business enums and Cloud error codes are active formal definitions.
 - Local Agent API, local event schemas, local status enums and local error codes are active formal definitions.
-- `task_schemas` remains `placeholder_only` and inactive. It must be published by `wt-media-cloud` before non-noop business executors treat task payloads and results as formal contracts.
+- `task_schemas` is active (M1-R1). Revision `2026.07.15.1` defines the universal task model, status state machine, task types, and error codes.
 
 Historical M0/M1 release entries remain valid evidence for their recorded scaffold/noop scope. They do not imply that the revised M0/M1 end-to-end milestone gates are complete.
 

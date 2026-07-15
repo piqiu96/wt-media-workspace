@@ -58,7 +58,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
 
         self.assertTrue(any("M2 capability" in error for error in errors), errors)
 
-    def test_contract_governance_requires_mixed_state_and_placeholder_task_schema(
+    def test_contract_governance_requires_mixed_state_and_active_task_schema(
         self,
     ) -> None:
         human = (ROOT / "docs" / "contracts" / "contract-map.md").read_text(

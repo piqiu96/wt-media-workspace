@@ -197,7 +197,7 @@ def validate_contract_texts(human: str, machine: str) -> list[str]:
     errors.extend(
         require_all(
             human,
-            ("Current state is mixed.", "`task_schemas` remains `placeholder_only` and inactive"),
+            ("Current state is mixed.", "`task_schemas` is active"),
             "mixed contract state",
         )
     )
@@ -217,7 +217,7 @@ def validate_contract_texts(human: str, machine: str) -> list[str]:
     errors.extend(
         require_all(
             task_block,
-            ("state: placeholder_only", "formal_definition: inactive"),
+            ("state: active", "formal_definition: active"),
             "task_schemas machine state",
         )
     )

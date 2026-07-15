@@ -37,8 +37,9 @@ contracts:
   task_schemas:
     owner: wt-media-cloud
     path: ../wt-media-cloud/contracts/task-schemas
-    state: placeholder_only
-    formal_definition: inactive
+    state: active
+    formal_definition: active
+    schema_revision: "2026.07.15.1"
     consumers:
       - wt-media-agent
       - wt-media-desktop
