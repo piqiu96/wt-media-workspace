@@ -238,6 +238,8 @@ def validate_active_change(root: Path) -> list[str]:
     title = title_match.group(1) if title_match else None
     status_match = re.search(r"^- Status: (\S+)$", change_text, flags=re.MULTILINE)
     status = status_match.group(1) if status_match else None
+    repo_match = re.search(r"^- Current repository: `([^`]+)`$", change_text, flags=re.MULTILINE)
+    current_repository = repo_match.group(1) if repo_match else None
     if status not in {"IN_PROGRESS", "IMPLEMENTING", "VERIFYING"}:
         errors.append(
             "active CHG status must be IN_PROGRESS, IMPLEMENTING or VERIFYING, "
@@ -245,12 +247,14 @@ def validate_active_change(root: Path) -> list[str]:
         )
     if not title:
         errors.append(f"active CHG title is missing or does not match {active_change}")
+    if not current_repository:
+        errors.append("active CHG current repository is missing")
     if "## 7. Pending Questions\n\nNone." not in change_text:
         errors.append("active CHG must have no pending questions")
 
     ledger = (root / "delivery" / "LEDGER.md").read_text(encoding="utf-8")
-    expected_row = f"| {active_change} | {title} | {status} | wt-media-workspace |"
-    if title and status and expected_row not in ledger:
+    expected_row = f"| {active_change} | {title} | {status} | {current_repository} |"
+    if title and status and current_repository and expected_row not in ledger:
         errors.append(
             f"Ledger is not aligned with active CHG {active_change} status {status!r}"
         )
