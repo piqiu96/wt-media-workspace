@@ -115,7 +115,7 @@ DONE
 | 里程碑 | 当前状态 | 已完成或可复用事实 | 当前结论 |
 |---|---|---|---|
 | M0 | `DONE` | M0-R1～R6 已完成真实工具链、三端构建、迁移、启动停止、CI/config 门禁、综合工程验收和人工验收 | 三端独立工程组件就绪，可进入 M1 |
-| M1 | `IN_PROGRESS` | Contract 兼容、注册心跳、noop task、Local API/SSE 的历史基础实现 | 需完成持久化、正式 task schema、真实 Desktop 和恢复闭环 |
+| M1 | `VERIFYING` | M1-R1～R7 已完成正式 task 模型、MySQL 持久化、SQLite 检查点、Agent Runner、Local API HTTP/SSE、Desktop Tauri 真实桥接、Cloud Web 任务 UI、中断恢复矩阵 | 等待人工端到端验收确认 |
 | M2 | `NOT_STARTED` | 认证、媒体账号基础、Profile 扫描、运行环境和并发保护的历史实现 | 按新 M2-C1～C11 审计复用并补齐完整产品域 |
 | M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
