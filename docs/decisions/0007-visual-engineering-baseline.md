@@ -14,9 +14,12 @@ The following decisions are needed before M2 business module development begins,
 
 ### 1. Frontend Architecture
 
-- **One frontend, two runtimes.** Web and Desktop share a single Vue 3 codebase. Desktop does not maintain a separate set of business pages. The Tauri WebView loads the same frontend served by Cloud (in dev) or bundled as static assets (in production).
-- **Source location remains `wt-media-cloud/web/`.** The proposed rename to `wt-media-cloud/frontend/` is deferred. If refactored later, it must not delay business module delivery.
-- **No two complete frontends.** Desktop never duplicates Cloud Web pages. Desktop-specific UI (Agent status, local diagnostics, system settings) is added as supplemental pages/modules, not as a parallel business application.
+> **Updated 2026-07-16:** The frontend architecture has been refined in the separate architecture document at `docs/engineering/architecture/社媒运营平台模块分界分层和通信规约.md`. That document supersedes the frontend architecture section below for module boundaries, directory structure, routing, build pipeline, and communication models. Decision 0007 remains authoritative for **visual conventions** (component library, templates, status colors, interaction rules).
+
+- **Single Vue source repository.** All Cloud and Desktop Vue source code lives in `wt-media-cloud/web/`.
+- **Two independent applications.** Cloud and Desktop are independent frontend applications with separate entry points, separate routers, separate menus, and separate build outputs — but they share the same source tree via `apps/modules/shared` layering.
+- **`wt-media-desktop` does not hold Vue pages.** Desktop only keeps the Tauri Rust shell, native capabilities, packaging, and update infrastructure. Vue code moves to `wt-media-cloud/web/src/apps/desktop/`.
+- For detailed directory structure, dependency direction, routing rules, communication models (Cloud API direct / Tauri Runtime / Mixed), and build pipeline, see the architecture document above.
 
 ### 2. UI Component Library
 
@@ -91,3 +94,4 @@ UI refactoring begins as **M2-R0**, before any M2 business module (R1–R11). Es
 - Positive: all M2+ pages follow a consistent visual system from the start; no retroactive UI cleanup needed after business modules are built.
 - Negative: M2-R0 adds ~3–5 days before business feature development begins.
 - Follow-up: dark mode is deferred past first version. TDesign Starter skeleton is adopted and customized, not periodically re-fetched from upstream.
+- **2026-07-16 follow-up:** Architecture doc `docs/engineering/architecture/社媒运营平台模块分界分层和通信规约.md` created. Decision 0007's visual decisions remain authoritative; frontend architecture layout is superseded by the new doc.

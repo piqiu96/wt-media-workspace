@@ -87,10 +87,28 @@ wt-media-workspace/
 ```text
 NOT_STARTED
 IN_PROGRESS
-BLOCKED
 VERIFYING
 DONE
 ```
+
+CHG 只允许以下状态：
+
+```text
+TODO → IMPLEMENTED → VERIFIED → CLOSED
+```
+
+状态定义：
+
+| 级别 | 状态 | 含义 |
+|---|---|---|
+| CHG | TODO | 已规划，未开始 |
+| CHG | IMPLEMENTED | 代码完成，待自测 |
+| CHG | VERIFIED | 自测/集成/回归通过 |
+| CHG | CLOSED | 验证通过，evidence 就绪 |
+| 里程碑 | NOT_STARTED | 未进入该里程碑 |
+| 里程碑 | IN_PROGRESS | 开发中 |
+| 里程碑 | VERIFYING | Codex 完成自动综合验收，等待你人工整体验收 |
+| 里程碑 | DONE | 人工整体验收通过 |
 
 里程碑不能因为代码目录已经存在而标记为 `DONE`。必须逐项核验代码、自动测试、Contract、Evidence、人工验证、跨仓库集成、Git 提交和退出条件。
 
@@ -114,9 +132,9 @@ DONE
 
 | 里程碑 | 当前状态 | 已完成或可复用事实 | 当前结论 |
 |---|---|---|---|
-| M0 | `DONE` | M0-R1～R6 已完成真实工具链、三端构建、迁移、启动停止、CI/config 门禁、综合工程验收和人工验收 | 三端独立工程组件就绪，可进入 M1 |
-| M1 | `DONE` | M1-R1～R7 已完成正式 task 模型、MySQL 持久化、SQLite 检查点、Agent Runner、Local API HTTP/SSE、Desktop Tauri 真实桥接、Cloud Web 任务 UI、中断恢复矩阵；R8 人工验收通过 | 三端最小任务闭环就绪，可进入 M2 |
-| M2 | `IN_PROGRESS` | 认证、媒体账号基础、Profile 扫描、运行环境和并发保护的历史实现；视觉基线决策 0007 已通过 | M2-R0 前置 UI 重构后，按 R1～R11 实施业务模块 |
+| M0 | `DONE` | M0 工程基线复验通过。Cloud/Web/Agent/Desktop 真实构建、测试、启动验证完成。MySQL 真实连接。修复 2 个测试问题。 | M0 冻结。不继续扩建。 |
+| M1 | `VERIFYING` | M1-R1～R7 历史代码和提交存在。已验证的最小任务闭环需重新复验：创建任务→Cloud 持久化→Agent 领取→SQLite 检查点→执行上报→Desktop 展示→中断恢复→幂等回传。 | Codex 完成真实任务闭环复验，你看演示后恢复 DONE 并冻结。后续不扩建通用任务系统。 |
+| M2 | `IN_PROGRESS` | M2 完成状态已撤销。历史代码、提交和测试保留为继承证据。PRD 第三章功能逐条审查已完成：47% PASS，其余为 BROKEN 或 NOT_IMPLEMENTED。实施方式已重新制定为五条业务闭环。 | M2 按 A→B→C→D→E 顺序补齐。Codex 自测集成回归，你最终人工验收。 |
 | M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
 每个里程碑的最终综合验收至少包含：
@@ -135,9 +153,9 @@ DONE
 | 目标 | 在治理体系可用的基础上，使 Cloud、Web、Agent、Desktop 成为可安装依赖、可真实构建、可启动停止、可测试的独立工程组件。 |
 | 依赖 | None |
 | Active CHG | None |
-| Evidence | R1-R6 全链路证据；决策 0005；人工验收确认；CHG-002～CHG-007 继承证据；CHG-20260715-007 R6 自动/工程门禁证据。 |
-| 完成日期 | 2026-07-15 |
-| Commit/Tag | CHG-002 commits: `63092e8`, `1504355`, `e20f672`, `681d9c9`, `6e800a0`, `b439038`; CHG-003 commits: `a7d49fe`, `784b3b8`; CHG-004 runtime commits: Cloud `c28bd3d`, Agent `4ef0dfe`, Desktop `0774635`; Workspace evidence commit `67245d2`; CHG-005 runtime commits: Cloud `3bb6028`, Agent `2c2562f`, Desktop `54e6e70`; Workspace evidence commit `2442ba0`; CHG-006 runtime commits: Cloud `f00ae41`, Agent `1351f5f`, Desktop `54d7b6f`; Workspace evidence commit `a4d141e`; CHG-007 Workspace evidence commit `716c143`; CHG-20260715-007 Workspace evidence commit pending; R6 Agent script fix `0e07b4e`。 |
+| Evidence | 继承证据 + M0-VERIFICATION-20260716 复验通过。Cloud/Web/Agent/Desktop 真实构建、测试、启动验证通过；MySQL 真实连接；2 个测试修复。 |
+| 完成日期 | 2026-07-16 |
+| Commit/Tag | 继承历史提交 + M0-VERIFICATION-20260716 修复提交 |
 
 候选 CHG：
 
@@ -177,13 +195,13 @@ M0-R6 三端独立构建、启动、健康检查和综合工程验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `DONE` |
+| 状态 | `VERIFYING` |
 | 目标 | 在 M0 的真实组件上建立持久化、无 Mock、可重启恢复的 Cloud-Agent-Desktop-Web 最小任务环境，供后续所有业务里程碑复用。 |
-| 依赖 | M0 `DONE` |
+| 依赖 | M0 `VERIFYING`（M0 复验通过后自动解除） |
 | Active CHG | None |
-| Evidence | M1-R1 正式 task 模型 + task_schemas 合同；M1-R2 MySQL 持久化；M1-R3 Agent Runner + SQLite 检查点 + 离线队列；M1-R4 Local Agent HTTP/SSE + CORS；M1-R5 Desktop Tauri HTTP 桥接；M1-R6 Cloud Web 任务 UI；M1-R7 中断恢复矩阵；M1-R8 人工验收通过。决策 0006。 |
-| 完成日期 | 2026-07-15 |
-| Commit/Tag | M1-R1: Cloud `e2f7687`, Agent `7739264`, Desktop `81bd9f0`, Workspace `667fc5b`; M1-R2: Cloud `c7a4ca4`, Workspace `5f11c3e`; M1-R3: Agent `d01f65b`; M1-R4: Agent `53f38a1`; M1-R5: Desktop `e3882e0`; M1-R6: Cloud `9a278e4`; M1-R7: Workspace `d1e4f6f`; 继承证据: CHG-008 至 CHG-014。 |
+| Evidence | 历史 evidence 保留为继承证据（CHG-008 至 CHG-014、决策 0006）。需 Codex 使用当前代码重新跑通完整链路后产生新证据。 |
+| 完成日期 | 待复验通过后恢复 |
+| Commit/Tag | 历史提交保留（Cloud `e2f7687`, Agent `7739264`, Desktop `81bd9f0` 等）。待复验通过后确认。 |
 
 目标闭环：
 
@@ -228,35 +246,69 @@ M1-R8 无 Mock 三端端到端人工验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS` |
-| 目标 | 在 M1 真实端到端环境上，先完成 UI 重构（TDesign + 统一模板），再完整交付用户、媒体账号、BitBrowser 窗口、代理、Cookie、开户、运行环境、敏感任务权限以及对应 Web/Desktop 产品体验。 |
-| 依赖 | M1 `DONE` |
-| Active CHG | `CHG-20260715-010` |
-| Evidence | 继承证据：CHG-015 至 CHG-020 已验证认证、媒体账号基础模型、BitBrowser 主账号树/Profile 扫描、运行环境上报、敏感任务并发和真实 MySQL/BitBrowser 基础链路。决策 0007（视觉工程基线）。窗口管理、代理、Cookie、开户、完整用户管理 UI、真实 Desktop 产品体验尚未交付，历史 PASS 不自动关闭新的 M2-C1 至 C11。 |
+| 状态 | `IN_PROGRESS`（完成状态已撤销，恢复为开发中） |
+| 目标 | 在 M1 真实端到端环境上，完整交付用户、媒体账号、BitBrowser 窗口、代理、Cookie、开户、运行环境、敏感任务权限以及对应 Web/Desktop 产品体验。 |
+| 依赖 | M1 `DONE`（M1 复验通过后自动解除） |
+| Active CHG | None |
+| Evidence | 所有历史代码、提交和测试保留为继承证据（CHG-015 至 CHG-020、决策 0007、CHG-20260715-010 至 CHG-20260716-013）。PRD 第三章功能逐条审查已完成，结果记录于 `delivery/reports/M2-prd-chapter3-gap-matrix.md`。当前真实完成率约 47%。 |
 | 完成日期 | None |
-| Commit/Tag | CHG-015～CHG-019 commits（历史继承）。决策 0007: Workspace commit pending。 |
+| Commit/Tag | 历史提交保留。新增提交待五条闭环完成后汇总。 |
 
-候选 CHG：
+已完成 CHG 降级为继承证据：
 
 ```text
-M2-R0 UI 重构：TDesign 迁移 + 统一页面模板 + 状态色彩规范 + Desktop 本地控制台改进
-M2-C1 用户认证、单活会话、三角色、游戏范围与用户管理台
-M2-C2 媒体账号生命周期、标签、分配与账号工作台
-M2-C3 BitBrowser 主账号树、Profile 扫描 Diff 与 Cloud 分配
-M2-C4 窗口/Profile 创建、修改、打开、检测、归档与恢复
-M2-C5 代理导入、解析、检测、配额、分配与回读
-M2-C6 Cookie 导入导出读写、active Cookie 与账号检测
-M2-C7 批量 Cookie、短信链接、人工验证码开户与部分成功重试
-M2-C8 Agent 节点绑定、运行环境上报与健康页面
-M2-C9 Profile 并发、敏感任务预检、结果不确定审核与审计
-M2-C10 Web/Desktop 账号环境综合工作台与三角色 UX
-M2-C11 真实 MySQL、BitBrowser、代理、Cookie、Desktop 综合验收
+CHG-20260715-010 M2-R0 UI 重构：TDesign 迁移 + 统一页面模板（继承证据）
+CHG-20260715-011 M2-C1 用户管理追认（继承证据）
+CHG-20260716-012 架构迁移阶段四（继承证据）
+CHG-20260716-013 架构迁移阶段五+六（继承证据）
 ```
+
+实施方式：按五条业务闭环顺序补齐。每条闭环必须满足"用户可完成完整业务操作"方可标记 CLOSED。
+
+### M2-A：用户与权限闭环
+
+```text
+技术创建用户 → 分配角色和游戏范围 → 用户登录 → 数据权限正确 → 修改和停用生效 → 审计记录可查看
+```
+
+目标：打通用户管理与数据权限的完整链路。已实现 8/12 功能点，需修复 A5（权限校验穿透各模块）、A10（前端 401 自动跳转）、补齐 A11（Agent 被踢行为）、A12（比特绑定审计日志）。
+
+### M2-B：媒体账号与 Profile 闭环
+
+```text
+绑定 BitBrowser 主账号 → 扫描 Profile → 展示差异 → 人工确认同步 → 创建媒体账号 → 绑定 Profile → 打开并检查真实账号
+```
+
+目标：打通 BitBrowser 主账号绑定到 Profile 操作的全链路。已实现 10/20 功能点，需修复 B3/B11/B13/B15/B16，补齐 B12/B14/B17/B18/B19/B20。
+
+### M2-C：代理与 Profile 闭环
+
+```text
+导入代理 → 解析预览 → 检测可用性 → 分配给 Profile → 写入 BitBrowser → 回读确认 → Profile 可以正常打开
+```
+
+目标：代理从导入到绑定 Profile 并验证的全链路。已实现 3/11 功能点，需修复 C5/C6，补齐 C4/C7/C8/C9/C10/C11。
+
+### M2-D：Cookie 与开户闭环
+
+```text
+导入 Cookie → 写入 Profile → 打开平台 → 判断真实登录身份 → 回填媒体账号 → 批量部分成功 → 失败项单独重试
+```
+
+目标：三种开户方式（批量 CK/接码链接/人工验证码）全部可工作。已实现 2/11 功能点，需补齐 D3-D11。
+
+### M2-E：Desktop 与安全闭环
+
+```text
+Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状态 → 执行账号和 Profile 操作 → 查看进度与错误 → 未授权操作被阻止 → 同一 Profile 敏感任务不能并发
+```
+
+目标：Desktop 端可完成本地管理操作。已实现 7/10 功能点，需修复 E2/E6。
 
 重新执行规则：
 
 - 每个新 CHG 先审计历史实现和 Contract，再决定复用、修正或补齐；
-- 历史 C1-C6 的自动测试和真实证据可以复用，但必须满足新 CHG 的完整范围和 UI/人工验收后才能标记 PASS；
+- 历史 C1-C6 的自动测试和真实证据可以复用，但必须满足新 CHG 的完整范围和 UI/人工验收后才能标记 CLOSED；
 - 不为重新编号而盲目重写已经正确的代码；
 - 任何代理、Cookie、Profile 修改都必须写入 BitBrowser 后读回验证；
 - 批量操作必须支持部分成功、失败项重试和明确错误反馈。
@@ -766,9 +818,11 @@ Codex 每次必须按顺序读取：
 - 需求和现有代码无法兼容；
 - 测试只能通过修改验收标准通过。
 
-## 6. DONE 门禁
+## 6. 完成门禁
 
-一个 CHG 只有满足以下条件才能标记为 `DONE`：
+### CHG 门禁 — CLOSED
+
+一个 CHG 只有满足以下条件才能标记为 `CLOSED`：
 
 - 范围内实现完成；
 - 自动测试通过；
@@ -778,8 +832,29 @@ Codex 每次必须按顺序读取：
 - Git Diff 无越界修改；
 - 旧路径、旧状态和旧方案残留扫描完成；
 - 必要产品、工程、协议和决策基线已回写；
+- PRD 功能完整性：本 CHG 涉及的全部 PRD 功能点已逐条对照，且已实现或已记录暂缓（含原因和影响分析）；
 - 受影响仓库独立 Commit；
+- `delivery/active/<CHG>/evidence/` 目录存在非空证据文件；
 - `delivery/active` 和 `delivery/LEDGER.md` 不保留已完成 CHG 作为长期归档。
+
+### 里程碑门禁 — DONE
+
+一个里程碑进入 `DONE` 必须同时满足：
+
+- 所有 P0 功能已经实现；
+- 所有 CHG 自动验证通过；
+- 完整跨端回归通过；
+- 真实依赖验证通过；
+- 没有关键 NOT_TESTED（来自功能事实矩阵）；
+- 人工整体验收通过（你按真实用户流程操作确认）。
+
+以下情况都不能单独作为完成依据：
+
+- 页面存在、路由存在、按钮能够点击；
+- 数据表存在、API 返回 200、单元测试通过；
+- Mock 测试通过、构建成功；
+- 历史代码存在、CHG 已提交；
+- Codex 报告执行结束。
 
 ## 7. 下一步选择规则
 
