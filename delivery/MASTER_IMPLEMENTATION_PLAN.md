@@ -133,7 +133,7 @@ TODO → IMPLEMENTED → VERIFIED → CLOSED
 | 里程碑 | 当前状态 | 已完成或可复用事实 | 当前结论 |
 |---|---|---|---|
 | M0 | `DONE` | M0 工程基线复验通过。Cloud/Web/Agent/Desktop 真实构建、测试、启动验证完成。MySQL 真实连接。修复 2 个测试问题。 | M0 冻结。不继续扩建。 |
-| M1 | `VERIFYING` | M1-R1～R7 历史代码和提交存在。已验证的最小任务闭环需重新复验：创建任务→Cloud 持久化→Agent 领取→SQLite 检查点→执行上报→Desktop 展示→中断恢复→幂等回传。 | Codex 完成真实任务闭环复验，你看演示后恢复 DONE 并冻结。后续不扩建通用任务系统。 |
+| M1 | `DONE` | M1 任务链路闭环复验通过。创建→领取→执行→上报→查询完整链路跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：router 连接、mysql_registry 时间格式。 | M1 冻结。不扩建通用任务系统。 |
 | M2 | `IN_PROGRESS` | M2 完成状态已撤销。历史代码、提交和测试保留为继承证据。PRD 第三章功能逐条审查已完成：47% PASS，其余为 BROKEN 或 NOT_IMPLEMENTED。实施方式已重新制定为五条业务闭环。 | M2 按 A→B→C→D→E 顺序补齐。Codex 自测集成回归，你最终人工验收。 |
 | M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
@@ -195,13 +195,13 @@ M0-R6 三端独立构建、启动、健康检查和综合工程验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `VERIFYING` |
+| 状态 | `DONE` |
 | 目标 | 在 M0 的真实组件上建立持久化、无 Mock、可重启恢复的 Cloud-Agent-Desktop-Web 最小任务环境，供后续所有业务里程碑复用。 |
-| 依赖 | M0 `VERIFYING`（M0 复验通过后自动解除） |
+| 依赖 | M0 `DONE` |
 | Active CHG | None |
-| Evidence | 历史 evidence 保留为继承证据（CHG-008 至 CHG-014、决策 0006）。需 Codex 使用当前代码重新跑通完整链路后产生新证据。 |
-| 完成日期 | 待复验通过后恢复 |
-| Commit/Tag | 历史提交保留（Cloud `e2f7687`, Agent `7739264`, Desktop `81bd9f0` 等）。待复验通过后确认。 |
+| Evidence | 继承证据 + M1 复验通过。创建→领取→执行→上报→查询闭环完整跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：mysql_registry 时间格式。 |
+| 完成日期 | 2026-07-16 |
+| Commit/Tag | 继承历史提交 + M1 修复提交 |
 
 目标闭环：
 
