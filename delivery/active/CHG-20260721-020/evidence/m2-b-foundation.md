@@ -7,6 +7,7 @@
 - Agent runner registers BitBrowser Profile create/open/close/update executors.
 - Profile mutation executors perform BitBrowser list read-back and fail when the target identity cannot be verified.
 - Media account check now creates an authenticated `account_check_task` carrying the authorized Profile and platform payload.
+- Web Profile actions now display asynchronous task state instead of implying immediate business completion.
 - MySQL acceptance schema now includes Profile proxy fields required by the Cloud Profile read model.
 
 ## Verification
