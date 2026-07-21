@@ -8,7 +8,7 @@
 - Affected repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-workspace`
 - Current repository: `wt-media-workspace`
 - Design: `docs/superpowers/specs/2026-07-21-m2-completion-design.md`
-- Plan: `docs/superpowers/plans/2026-07-21-m2-a-implementation-plan.md`
+- Plan: `docs/superpowers/plans/2026-07-21-m2-b-e-execution-plan.md`
 
 ## 2. Change Goal
 
@@ -79,17 +79,14 @@ Restore trustworthy M2 acceptance gates and complete the remaining M2-B～M2-E c
 
 ## 4. Explicitly Not Doing
 
-- No M2-B Profile create/open/close/update implementation.
-- No M2-C proxy write/read-back or real proxy executor.
-- No M2-D Cookie/SMS/manual account-opening implementation.
-- No M2-E Desktop Sidecar completion or final M2 status change.
 - No M3+ business models, tasks, or placeholder endpoints.
+- No production external-account mutation beyond the user-authorized acceptance environment.
 
 ## 5. Checkpoint
 
 - Completed: Tasks 1–6; Web/gov gates are green, authorization is covered, invalidated sessions drain Cloud/Agent safely, and binding/rebinding emits explicit secret-safe audit actions. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, `evidence/task-5-session-invalidation.md`, and `evidence/task-6-binding-audit.md`.
-- Current: M2-B foundation is implemented: Profile mutation routes create typed tasks with payloads, Agent has Profile mutation executors, and the acceptance schema includes task payloads and Profile proxy fields.
-- Next: complete Profile-specific uncertain-result review, then finish proxy protocol/read-back, Profile assignment, Cookie write/read sensitive permits, and account-opening paths.
+- Current: M2-B/C/D foundations are implemented: Profile/proxy/account tasks have typed payloads, Agent executors report structured results, Cloud projects verified results, retry and redaction are in place, and Cookie read/write summaries update account state without returning secrets.
+- Next: finish remaining M2-E Desktop sidecar hardening, add integrated route/e2e evidence for the taskized flows, and run the final full M2 acceptance gate.
 - Blockers: None for implementation; final human acceptance is intentionally deferred until M2-B～M2-E are complete.
 - Recent verification: Cloud all tests passed; Agent 46/46 passed; Web 8/8 and both workspace validators remain green.
 
