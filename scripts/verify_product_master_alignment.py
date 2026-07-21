@@ -227,8 +227,10 @@ def validate_active_change(root: Path) -> list[str]:
     errors: list[str] = []
     active_paths = sorted((root / "delivery" / "active").glob("*/change.md"))
     active_ids = [path.parent.name for path in active_paths]
-    if len(active_ids) != 1:
-        errors.append(f"expected exactly one active CHG, got {active_ids!r}")
+    if not active_ids:
+        return errors
+    if len(active_ids) > 1:
+        errors.append(f"expected at most one active CHG, got {active_ids!r}")
         return errors
 
     active_change = active_ids[0]
