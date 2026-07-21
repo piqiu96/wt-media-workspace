@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: L
-- Status: VERIFYING
+- Status: IN_PROGRESS
 - Created: 2026-07-21
 - Affected repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-workspace`
 - Current repository: `wt-media-workspace`
@@ -12,7 +12,7 @@
 
 ## 2. Change Goal
 
-Restore trustworthy M2 acceptance gates and complete M2-A permissions, invalidated-session handling, and BitBrowser binding/rebinding audit behavior. This CHG does not implement Profile mutation, proxy assignment, Cookie opening, SMS workflows, or Desktop Sidecar completion; those belong to later M2 CHGs.
+Restore trustworthy M2 acceptance gates and complete the remaining M2-B～M2-E closures before one final human acceptance. The user explicitly approved postponing manual acceptance until the full M2 implementation is ready. External effects remain subject to staged task creation, read-back, audit, and redaction rules.
 
 ## 3. Start Gate
 
@@ -88,9 +88,9 @@ Restore trustworthy M2 acceptance gates and complete M2-A permissions, invalidat
 ## 5. Checkpoint
 
 - Completed: Tasks 1–6; Web/gov gates are green, authorization is covered, invalidated sessions drain Cloud/Agent safely, and binding/rebinding emits explicit secret-safe audit actions. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, `evidence/task-5-session-invalidation.md`, and `evidence/task-6-binding-audit.md`.
-- Current: Task 7 automated verification is green; manual acceptance handoff is pending.
-- Next: execute the manual acceptance matrix with non-secret test users and record evidence before closing M2-A.
-- Blockers: Manual acceptance environment/evidence is pending; no code or credential blocker.
+- Current: Full M2 implementation program approved; start M2-B media-account/Profile closure.
+- Next: replace Profile mutation placeholders with typed tasks, Agent execution, read-back, and formal Cloud updates.
+- Blockers: None for implementation; final human acceptance is intentionally deferred until M2-B～M2-E are complete.
 - Recent verification: Cloud all tests passed; Agent 46/46 passed; Web 8/8 and both workspace validators remain green.
 
 ## 6. Evidence Index
