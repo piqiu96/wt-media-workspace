@@ -88,8 +88,8 @@ Restore trustworthy M2 acceptance gates and complete the remaining M2-B～M2-E c
 ## 5. Checkpoint
 
 - Completed: Tasks 1–6; Web/gov gates are green, authorization is covered, invalidated sessions drain Cloud/Agent safely, and binding/rebinding emits explicit secret-safe audit actions. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, `evidence/task-5-session-invalidation.md`, and `evidence/task-6-binding-audit.md`.
-- Current: Full M2 implementation program approved; start M2-B media-account/Profile closure.
-- Next: replace Profile mutation placeholders with typed tasks, Agent execution, read-back, and formal Cloud updates.
+- Current: M2-B foundation is implemented: Profile mutation routes create typed tasks with payloads, Agent has Profile mutation executors, and the acceptance schema includes task payloads and Profile proxy fields.
+- Next: add mutation read-back/formal Cloud updates, uncertain-result handling, Profile UI actions, and account-check batch closure.
 - Blockers: None for implementation; final human acceptance is intentionally deferred until M2-B～M2-E are complete.
 - Recent verification: Cloud all tests passed; Agent 46/46 passed; Web 8/8 and both workspace validators remain green.
 
