@@ -86,7 +86,7 @@ Restore trustworthy M2 acceptance gates and complete the remaining M2-B～M2-E c
 
 - Completed: Tasks 1–6; Web/gov gates are green, authorization is covered, invalidated sessions drain Cloud/Agent safely, and binding/rebinding emits explicit secret-safe audit actions. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, `evidence/task-5-session-invalidation.md`, and `evidence/task-6-binding-audit.md`.
 - Current: M2-B/C/D foundations are implemented: Profile/proxy/account tasks have typed payloads, Agent executors report structured results, Cloud projects verified results, retry and redaction are in place, and Cookie read/write summaries update account state without returning secrets. M2-E Desktop now owns and stops both sidecar and development Agent processes deterministically.
-- Next: run the final full M2 acceptance gate against the already-started local environment; all static, module, Agent, Desktop, Web, and health gates are green.
+- Next: run the final full M2 acceptance gate against the already-started local environment; all static, module, Agent, Desktop, Web, health, and empty-proxy-page gates are green.
 - Blockers: None for implementation; final human acceptance is intentionally deferred until M2-B～M2-E are complete.
 - Recent verification: Cloud all tests passed; Agent 46/46 passed; Web 8/8 and both workspace validators remain green.
 
