@@ -250,7 +250,11 @@ def validate_active_change(root: Path) -> list[str]:
         errors.append(f"active CHG title is missing or does not match {active_change}")
     if not current_repository:
         errors.append("active CHG current repository is missing")
-    if "## 7. Pending Questions\n\nNone." not in change_text:
+    if not re.search(
+        r"^## \d+\. Pending Questions\s+None\.\s*$",
+        change_text,
+        flags=re.MULTILINE,
+    ):
         errors.append("active CHG must have no pending questions")
 
     ledger = (root / "delivery" / "LEDGER.md").read_text(encoding="utf-8")

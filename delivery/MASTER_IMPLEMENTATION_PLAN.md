@@ -152,7 +152,7 @@ TODO → IMPLEMENTED → VERIFIED → CLOSED
 | 状态 | `DONE` |
 | 目标 | 在治理体系可用的基础上，使 Cloud、Web、Agent、Desktop 成为可安装依赖、可真实构建、可启动停止、可测试的独立工程组件。 |
 | 依赖 | None |
-| Active CHG | None |
+| Active CHG | `CHG-20260722-021`（仅 M2-A 验收收口） |
 | Evidence | 继承证据 + M0-VERIFICATION-20260716 复验通过。Cloud/Web/Agent/Desktop 真实构建、测试、启动验证通过；MySQL 真实连接；2 个测试修复。 |
 | 完成日期 | 2026-07-16 |
 | Commit/Tag | 继承历史提交 + M0-VERIFICATION-20260716 修复提交 |
