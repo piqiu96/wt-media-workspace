@@ -14,7 +14,19 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE_ROOT = ROOT.parent
+
+
+def execution_root(workspace: Path) -> Path:
+    """Resolve the shared cross-repo root from a normal checkout or worktree."""
+    for candidate in (workspace.parent, *workspace.parents):
+        if (candidate / ".ai").is_dir() and (
+            candidate / "wt-media-workspace"
+        ).is_dir():
+            return candidate
+    return workspace.parent
+
+
+WORKSPACE_ROOT = execution_root(ROOT)
 SKILLS_ROOT = ROOT / "skills"
 TOOLS = ("codex", "claude")
 

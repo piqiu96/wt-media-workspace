@@ -1,0 +1,4 @@
+interface:
+  display_name: "WT Media Delivery Planning"
+  short_description: "Plan and correct WT Media milestones and CHGs"
+  default_prompt: "Analyze the WT Media delivery request, update the milestone baseline when needed, and propose one bounded CHG without implementing runtime code."
