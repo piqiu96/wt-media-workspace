@@ -87,15 +87,16 @@ Restore trustworthy M2 acceptance gates and complete M2-A permissions, invalidat
 
 ## 5. Checkpoint
 
-- Completed: Tasks 1–5; Web/gov gates are green, authorization is covered, and invalidated sessions now drain Cloud/Agent safely. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, and `evidence/task-5-session-invalidation.md`.
-- Current: Task 6 add explicit BitBrowser binding/rebinding audit events.
-- Next: add binding, same-identity, mismatch, and secret-redaction audit tests.
+- Completed: Tasks 1–6; Web/gov gates are green, authorization is covered, invalidated sessions drain Cloud/Agent safely, and binding/rebinding emits explicit secret-safe audit actions. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, `evidence/task-5-session-invalidation.md`, and `evidence/task-6-binding-audit.md`.
+- Current: Task 7 integrated M2-A verification and handoff.
+- Next: run the cross-repository verification matrix, record remaining manual acceptance gaps, and hand off without marking M2-A complete until manual gates pass.
 - Blockers: None.
 - Recent verification: Cloud all tests passed; Agent 46/46 passed; Web 8/8 and both workspace validators remain green.
 
 ## 6. Evidence Index
 
 - `evidence/start-gate.md` — baseline commands, dirty-tree facts, and start-gate decision.
+- `evidence/task-6-binding-audit.md` — binding/rebinding audit behavior and verification.
 
 ## 7. Pending Questions
 
