@@ -85,16 +85,17 @@ Restore trustworthy M2 acceptance gates and complete the remaining M2-B～M2-E c
 ## 5. Checkpoint
 
 - Completed: Tasks 1–6; Web/gov gates are green, authorization is covered, invalidated sessions drain Cloud/Agent safely, and binding/rebinding emits explicit secret-safe audit actions. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, `evidence/task-5-session-invalidation.md`, and `evidence/task-6-binding-audit.md`.
-- Current: M2-B/C/D foundations are implemented: Profile/proxy/account tasks have typed payloads, Agent executors report structured results, Cloud projects verified results, retry and redaction are in place, and Cookie read/write summaries update account state without returning secrets. M2-E Desktop now owns and stops both sidecar and development Agent processes deterministically.
-- Next: run the final full M2 acceptance gate against the already-started local environment; all static, module, Agent, Desktop, Web, health, and empty-proxy-page gates are green.
+- Current: M2-B/C/D foundations are implemented: Profile/proxy/account tasks have typed payloads, Agent executors report structured results, Cloud projects verified results, retry and redaction are in place, and Cookie read/write summaries update account state without returning secrets. M2-E Desktop now owns and stops both sidecar and development Agent processes deterministically. The proxy check boundary now uses a synchronous Agent fast path, with explicit background retry only for operator-requested fallback.
+- Next: run the final full M2 acceptance gate against the already-started local environment, including the new sync proxy-check and task-detail navigation; all static, module, Agent, Desktop, Web, health, and empty-proxy-page gates must remain green.
 - Blockers: None for implementation; final human acceptance is intentionally deferred until M2-B～M2-E are complete.
-- Recent verification: Cloud all tests passed; Agent 46/46 passed; Web 8/8 and both workspace validators remain green.
+- Recent verification: Cloud proxy/app tests passed; Agent 48/48 passed; Web 8/8 passed. The full M2 gate remains pending after this boundary change.
 
 ## 6. Evidence Index
 
 - `evidence/start-gate.md` — baseline commands, dirty-tree facts, and start-gate decision.
 - `evidence/task-6-binding-audit.md` — binding/rebinding audit behavior and verification.
 - `evidence/m2-a-automated-verification.md` — integrated automated verification and manual handoff boundary.
+- `evidence/sync-fast-path.md` — synchronous Agent proxy check and explicit background-task fallback boundary.
 
 ## 7. Pending Questions
 
