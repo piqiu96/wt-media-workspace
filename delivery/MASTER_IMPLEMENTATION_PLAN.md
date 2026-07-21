@@ -251,6 +251,7 @@ M1-R8 无 Mock 三端端到端人工验收
 | 依赖 | M1 `DONE`（M1 复验通过后自动解除） |
 | Active CHG | None |
 | Evidence | 所有历史代码、提交和测试保留为继承证据（CHG-015 至 CHG-020、决策 0007、CHG-20260715-010 至 CHG-20260716-013）。PRD 第三章功能逐条审查已完成，结果记录于 `delivery/reports/M2-prd-chapter3-gap-matrix.md`。当前真实完成率约 47%。 |
+| 业务闭环基线 | `delivery/milestones/M2-account-runtime.md`。M2-A～E 的用户操作、真实副作用、假成功禁止项和业务验收以该文件为准。 |
 | 完成日期 | None |
 | Commit/Tag | 历史提交保留。新增提交待五条闭环完成后汇总。 |
 
