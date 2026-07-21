@@ -109,8 +109,8 @@ def validate_static_matrix() -> list[str]:
             errors.append(f"Desktop contract lock mismatch: {lock.get('consumes')!r}")
     require_contains(
         errors,
-        DESKTOP / "src" / "services" / "local-agent.js",
-        ('bindSession: "local_agent_bind_session"', "async bindSession(bindingTicket)"),
+        DESKTOP / "src-tauri" / "src" / "main.rs",
+        ("local_agent_start", "local_agent_status", '"wt-media-agent"'),
     )
     require_contains(
         errors,
@@ -125,7 +125,7 @@ def validate_static_matrix() -> list[str]:
     sensitive_files = [
         CLOUD / "migrations" / "20260714_004_agent_runtime.sql",
         CLOUD / "migrations" / "20260714_005_sensitive_profile_locks.sql",
-        DESKTOP / "src" / "services" / "local-agent.js",
+        DESKTOP / "src-tauri" / "src" / "local_agent" / "mod.rs",
     ]
     forbidden = ("binding_token varchar", "node_credential varchar", "permit_credential varchar", "localstorage", "sessionstorage")
     for path in sensitive_files:

@@ -40,9 +40,9 @@ def validate_master_text(text: str) -> list[str]:
         )
         return errors
 
-    expected_statuses = {0: "DONE", 1: "IN_PROGRESS", **{number: "NOT_STARTED" for number in range(2, 11)}}
+    expected_statuses = {0: "DONE", 1: "DONE", 2: "IN_PROGRESS", **{number: "NOT_STARTED" for number in range(3, 11)}}
     for number, expected in expected_statuses.items():
-        status_match = re.search(r"\| 状态 \| `([^`]+)` \|", sections[number])
+        status_match = re.search(r"\| 状态 \| `([^`]+)`", sections[number])
         actual = status_match.group(1) if status_match else None
         if actual != expected:
             errors.append(f"M{number} status expected {expected!r}, got {actual!r}")
@@ -79,11 +79,11 @@ def validate_master_text(text: str) -> list[str]:
         )
     )
 
-    m2_candidates = candidate_block(sections[2])
+    m2_candidates = candidate_block(sections[2]) or sections[2]
     errors.extend(
         require_all(
             m2_candidates,
-            tuple(f"M2-C{number} " for number in range(1, 12)),
+            ("M2-A：", "M2-B：", "M2-C：", "M2-D：", "M2-E："),
             "M2 candidate",
         )
     )
@@ -91,17 +91,16 @@ def validate_master_text(text: str) -> list[str]:
         require_all(
             m2_candidates,
             (
-                "用户管理台",
-                "媒体账号生命周期",
-                "Profile 扫描 Diff",
-                "窗口/Profile 创建",
-                "代理导入、解析、检测、配额、分配与回读",
-                "Cookie 导入导出读写",
-                "短信链接",
-                "运行环境上报",
-                "敏感任务预检",
-                "Web/Desktop",
-                "真实 MySQL、BitBrowser、代理、Cookie、Desktop 综合验收",
+                "按五条业务闭环顺序补齐",
+                "M2-A：用户与权限闭环",
+                "M2-B：媒体账号与 Profile 闭环",
+                "M2-C：代理与 Profile 闭环",
+                "M2-D：Cookie 与开户闭环",
+                "M2-E：Desktop 与安全闭环",
+                "真实 MySQL",
+                "BitBrowser",
+                "Cookie",
+                "Desktop",
             ),
             "M2 capability",
         )
