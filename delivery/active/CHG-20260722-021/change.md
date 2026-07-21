@@ -110,11 +110,11 @@
 
 ## 8. Checkpoint
 
-- Completed: CHG 已按 Milestone M2-A 和 CHG-020 范围审计建立；治理上下文待最终同步验证。
-- Current: 尚未开始运行时代码修改或人工验收。
+- Completed: 治理纠偏、CHG-020 审计归档、M2 闭环基线、规划/执行 Skill、唯一 Active CHG 和治理 start gate 已完成；所有治理校验通过。
+- Current: 尚未开始运行时代码修改或人工验收，CHG 停在 Task 1 前。
 - Next: 执行 Task 1，建立脱敏验收环境和三角色测试数据。
 - Blockers: 真实验收需要用户授权的测试身份与 BitBrowser 绑定操作；开始 Task 1 时确认可用性。
-- Recent verification: CHG-020 审计确认自动化基础可复验，但 M2-A 人工验收尚未证明。
+- Recent verification: Workspace 26 项测试通过、2 项因隔离 worktree 缺少兄弟仓库而跳过；交付治理、产品计划、Skill 与同步校验全部通过；CHG-020 的 Cloud、Agent、Web、Desktop 自动化已复验。
 
 ## 9. Evidence Requirements
 
