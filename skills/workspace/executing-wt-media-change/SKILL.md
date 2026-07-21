@@ -14,13 +14,14 @@ When facts conflict, resolve them in this order:
 1. Root `AGENTS.md`.
 2. Root `.ai/CURRENT_CONTEXT.md`.
 3. Active `wt-media-workspace/delivery/active/<CHG>/change.md`.
-4. Stable baselines referenced by the CHG:
+4. The exact Milestone closure referenced by an M/L CHG, or the stable requirement referenced by a small Bug CHG.
+5. Stable baselines referenced by the CHG:
    - `wt-media-workspace/docs/product`;
    - `wt-media-workspace/docs/engineering`;
    - `wt-media-workspace/docs/contracts`;
    - `wt-media-workspace/docs/decisions`.
-5. Affected repository `AGENTS.md` files.
-6. Current code and tests.
+6. Affected repository `AGENTS.md` files.
+7. Current code and tests.
 
 Do not treat chat history, generated summaries, or legacy root `docs/` files as stronger than the active CHG and stable Workspace baselines.
 
@@ -29,6 +30,10 @@ Do not treat chat history, generated summaries, or legacy root `docs/` files as 
 Before coding, verify and report:
 
 - active CHG ID and status;
+- `CURRENT_CONTEXT`, `delivery/LEDGER.md`, and `delivery/active` all identify the same single CHG;
+- Milestone file and closure anchor for M/L work, or stable requirement reference for a planning-classified small Bug;
+- the user-visible vertical result delivered by this CHG;
+- required database change, external side effect, read-back, business projection, and page result inherited from the closure;
 - current facts;
 - gap to this CHG;
 - real file mapping;
@@ -45,7 +50,11 @@ Do not implement if:
 - the requested work changes "Explicitly Not Doing";
 - contract ownership is unclear;
 - product, engineering, contract, code, or tests conflict;
+- the CHG spans multiple independent closures;
+- the referenced closure requires a real effect or read-back that the CHG does not verify;
 - unexplained dirty worktree changes affect the planned files.
+
+If implementation reveals a missing business step, false-success acceptance, architecture conflict, or scope spanning multiple independent closures, stop and return to `planning-wt-media-delivery`. Do not infer the decision or hide the gap with a code patch.
 
 ## Task Protocol
 
@@ -109,5 +118,7 @@ Only mark a CHG `DONE` when all apply:
 - required baselines are updated;
 - affected repositories are committed independently;
 - completed active records are removed from `delivery/active` and `delivery/LEDGER.md` unless the user explicitly asks to keep an in-progress handoff.
+
+Code presence, an HTTP success response, task creation, mock-only evidence, or a passing unit test cannot replace a required external side effect, read-back, business-state projection, and user-visible final result.
 
 After completion, suggest the next CHG only from `delivery/MASTER_IMPLEMENTATION_PLAN.md` and current real code state. Do not automatically implement the next CHG.
