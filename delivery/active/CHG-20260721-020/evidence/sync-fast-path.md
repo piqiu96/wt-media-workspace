@@ -18,3 +18,4 @@
 - Agent: `PYTHONPATH=src python3 -m unittest discover -s tests -q` — 48 tests passed.
 - Cloud: `GOCACHE=/private/tmp/wt-media-go-cache go test ./internal/modules/proxy ./internal/app` — passed.
 - Web: `npm test -- --run` — 8 tests passed.
+- HTTP smoke: temporary Agent on `127.0.0.1:18766` returned `{"data":{"connectivity":"unreachable: ConnectionRefusedError","proxy_id":"proxy-smoke"}}`; no credentials were present in the response.
