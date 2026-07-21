@@ -87,11 +87,11 @@ Restore trustworthy M2 acceptance gates and complete M2-A permissions, invalidat
 
 ## 5. Checkpoint
 
-- Completed: Task 1 start gate and Task 2 Web API-client injection/sanitization; evidence is in `evidence/start-gate.md` and `evidence/task-2-web.md`.
-- Current: Task 3 make governance validators current and deterministic.
-- Next: update validator paths and current M2/Master Plan assertions.
+- Completed: Tasks 1–3; Web API-client gates and both governance validators are green. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, and `evidence/task-3-governance.md`.
+- Current: Task 4 enforce game-scope authorization at M2 business entry points.
+- Next: add cross-game negative route tests before changing authorization logic.
 - Blockers: None.
-- Recent verification: Cloud baseline passed; Agent baseline 44/44 passed; Web 8/8 passed after commit `daf423d`.
+- Recent verification: Web 8/8 passed; M2 static acceptance and product/Master alignment validators passed after commit `9773ea7`.
 
 ## 6. Evidence Index
 
