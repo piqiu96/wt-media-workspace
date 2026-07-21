@@ -5,6 +5,8 @@
 - Cloud Profile create/open/close/update routes no longer return placeholder success responses; they create typed tasks with a structured payload.
 - Cloud task model accepts Profile mutation task types and persists `payload_json` in MySQL.
 - Agent runner registers BitBrowser Profile create/open/close/update executors.
+- Profile mutation executors perform BitBrowser list read-back and fail when the target identity cannot be verified.
+- Media account check now creates an authenticated `account_check_task` carrying the authorized Profile and platform payload.
 - MySQL acceptance schema now includes Profile proxy fields required by the Cloud Profile read model.
 
 ## Verification
@@ -17,4 +19,4 @@
 
 ## Remaining M2-B work
 
-Read-back/formal Cloud updates, uncertain-result handling, Profile UI actions, and single/batch account-check closure remain in progress. No real BitBrowser Profile was mutated by this probe.
+Formal Cloud updates from Agent result reports, uncertain-result handling, Profile UI actions, and single/batch account-check closure remain in progress. No real BitBrowser Profile was mutated by this probe.
