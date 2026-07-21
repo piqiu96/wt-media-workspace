@@ -6,5 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-
-No active changes.
+| CHG-20260721-020 | M2-A 权限与可信验收基础 | IN_PROGRESS | wt-media-workspace |
