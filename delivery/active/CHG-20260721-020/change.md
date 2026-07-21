@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: L
-- Status: IN_PROGRESS
+- Status: VERIFYING
 - Created: 2026-07-21
 - Affected repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-workspace`
 - Current repository: `wt-media-workspace`
@@ -88,15 +88,16 @@ Restore trustworthy M2 acceptance gates and complete M2-A permissions, invalidat
 ## 5. Checkpoint
 
 - Completed: Tasks 1–6; Web/gov gates are green, authorization is covered, invalidated sessions drain Cloud/Agent safely, and binding/rebinding emits explicit secret-safe audit actions. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, `evidence/task-4-authorization.md`, `evidence/task-5-session-invalidation.md`, and `evidence/task-6-binding-audit.md`.
-- Current: Task 7 integrated M2-A verification and handoff.
-- Next: run the cross-repository verification matrix, record remaining manual acceptance gaps, and hand off without marking M2-A complete until manual gates pass.
-- Blockers: None.
+- Current: Task 7 automated verification is green; manual acceptance handoff is pending.
+- Next: execute the manual acceptance matrix with non-secret test users and record evidence before closing M2-A.
+- Blockers: Manual acceptance environment/evidence is pending; no code or credential blocker.
 - Recent verification: Cloud all tests passed; Agent 46/46 passed; Web 8/8 and both workspace validators remain green.
 
 ## 6. Evidence Index
 
 - `evidence/start-gate.md` — baseline commands, dirty-tree facts, and start-gate decision.
 - `evidence/task-6-binding-audit.md` — binding/rebinding audit behavior and verification.
+- `evidence/m2-a-automated-verification.md` — integrated automated verification and manual handoff boundary.
 
 ## 7. Pending Questions
 
