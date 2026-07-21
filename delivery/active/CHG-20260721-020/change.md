@@ -87,11 +87,11 @@ Restore trustworthy M2 acceptance gates and complete M2-A permissions, invalidat
 
 ## 5. Checkpoint
 
-- Completed: start-gate facts, baseline commands, and dirty-tree boundaries recorded in `evidence/start-gate.md`.
-- Current: Task 2 repair Web API-client test base URL injection.
-- Next: make governance validators current and deterministic after Web tests pass.
+- Completed: Task 1 start gate and Task 2 Web API-client injection/sanitization; evidence is in `evidence/start-gate.md` and `evidence/task-2-web.md`.
+- Current: Task 3 make governance validators current and deterministic.
+- Next: update validator paths and current M2/Master Plan assertions.
 - Blockers: None.
-- Recent verification: Cloud  all tests pass; Agent 44 tests pass; Web 8 tests fail with reproducible relative URL errors; both governance validators fail as documented.
+- Recent verification: Cloud baseline passed; Agent baseline 44/44 passed; Web 8/8 passed after commit `daf423d`.
 
 ## 6. Evidence Index
 
