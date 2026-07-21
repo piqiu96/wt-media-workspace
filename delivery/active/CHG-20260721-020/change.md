@@ -87,11 +87,11 @@ Restore trustworthy M2 acceptance gates and complete M2-A permissions, invalidat
 
 ## 5. Checkpoint
 
-- Completed: Tasks 1–3; Web API-client gates and both governance validators are green. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, and `evidence/task-3-governance.md`.
-- Current: Task 4 enforce game-scope authorization at M2 business entry points.
-- Next: add cross-game negative route tests before changing authorization logic.
+- Completed: Tasks 1–4; Web/gov gates are green and current media-account/profile authorization is covered at service and route boundaries. Evidence is in `evidence/start-gate.md`, `evidence/task-2-web.md`, `evidence/task-3-governance.md`, and `evidence/task-4-authorization.md`.
+- Current: Task 5 stop invalidated Local Agent sessions safely.
+- Next: add failing Cloud and Agent invalidation/drain tests.
 - Blockers: None.
-- Recent verification: Web 8/8 passed; M2 static acceptance and product/Master alignment validators passed after commit `9773ea7`.
+- Recent verification: focused Cloud authorization suite passed after commit `b419244`; Web 8/8 and both workspace validators remain green.
 
 ## 6. Evidence Index
 
