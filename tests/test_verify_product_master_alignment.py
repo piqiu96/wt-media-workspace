@@ -52,7 +52,9 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         self.assertTrue(any("M3 candidate" in error for error in errors), errors)
 
     def test_rejects_missing_m2_product_capability(self) -> None:
-        changed = self.master.replace("代理导入、解析、检测、配额、分配与回读", "网络配置")
+        changed = self.master.replace(
+            "### M2-C：代理与 Profile 闭环", "### 代理网络配置"
+        )
 
         errors = self.module.validate_master_text(changed)
 
