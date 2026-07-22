@@ -152,7 +152,8 @@ Desktop扫描窗口
 - Completed：CHG-20260723-025 已完成 diff review、验证和归档；本 CHG 已从 planned 激活为 active。
 - Completed：Task 1 Start Gate 与 B1 继承审计已完成，见 `evidence/start-gate.md`。
 - Completed：Task 2 接受本地变化应用 Cloud 镜像已完成，见 `evidence/diff-apply-cloud-mirror.md`。
-- Current：ACTIVE，已实现 Desktop 确认接受本地变化、Cloud confirm 前可信节点校验、Cloud 镜像允许字段应用和备注保护。
-- Next：执行 Task 3：恢复 Cloud 配置写回 BitBrowser 并读回验证。
+- Completed：Task 3 恢复 Cloud 配置写回 BitBrowser 并读回验证已完成，见 `evidence/restore-cloud-config-readback.md`。
+- Current：ACTIVE，已实现 Desktop 恢复入口、Tauri/Rust 写回 Local Agent、写回后扫描读回验证、成功后重新提交 Cloud Diff。
+- Next：执行 Task 4：窗口授权与只读摘要展示。
 - Blockers：无。
-- Recent verification：`go test ./internal/modules/profilebinding ./internal/modules/runtimebinding` PASS；`npm test -- profileBindings localAgentService localAgentStatus` PASS；`npm run build:desktop` PASS；`npm run build:cloud` PASS。
+- Recent verification：`cargo test --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`cargo check --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`npm --prefix wt-media-cloud/web test -- --run localAgentService` PASS；`npm run build:desktop --prefix wt-media-cloud/web` PASS；`npm run build:cloud --prefix wt-media-cloud/web` PASS；`git diff --check` PASS。
