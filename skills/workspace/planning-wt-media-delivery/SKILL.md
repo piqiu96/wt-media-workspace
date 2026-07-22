@@ -25,12 +25,25 @@ AI Specs are analysis material. Product and Engineering remain stable facts; Mil
 | Observed change | Update |
 |---|---|
 | Implementation defect that preserves the business closure | Create or adjust one small CHG |
-| User goal, operation order, success effect, or false-success rule changes | Update the Milestone, then create or adjust CHGs |
-| Product capability or rule changes | Update Product, then Milestone and CHGs |
+| Current-M execution detail, acceptance wording, page wording, button semantics, operation boundary, or exception handling | Update the current Milestone and current CHG checkpoint/evidence; do not update Product immediately |
+| User goal, operation order, success effect, or false-success rule changes inside the current M | Update the Milestone, then create or adjust CHGs |
+| Stable Product capability, role model, product scope, or long-term business rule changes | Update Product, then Milestone and CHGs |
 | Cloud/Agent/Desktop ownership or engineering principle changes | Record a Decision and update Engineering before Milestone/CHGs |
 | Existing M is incomplete or implemented incorrectly | Audit code and Evidence against the Milestone; correct the Milestone only when the business truth itself changes |
 
 Do not rewrite a Milestone for a field display Bug. Do not patch code when the business closure is missing.
+
+## Product / Milestone Write-back Rule
+
+Use Milestone-first during active M execution:
+
+- Small changes discovered during acceptance, including wording, page behavior, operation labels, recovery details, and exception handling, should be written to the current `delivery/milestones/M*.md` and the current CHG checkpoint/evidence.
+- Do not update PRD for every small change while an M is still being implemented.
+- After the whole Milestone is accepted, summarize only stable product rules back into PRD as needed.
+- Update PRD immediately only when the product goal, user role model, long-term capability, or global product scope changes.
+- Update Engineering/Decision immediately when Cloud/Desktop/Agent ownership, communication, security, or execution principles change.
+
+Milestone is the current execution baseline. PRD is the long-term product baseline. CHG is the execution contract and must not become a second PRD.
 
 ## Planning Protocol
 

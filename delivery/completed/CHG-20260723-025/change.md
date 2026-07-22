@@ -1,7 +1,7 @@
 # CHG-20260723-025：M2-B1 浏览器窗口扫描与 Diff 只读闭环
 
 > 日期：2026-07-23  
-> 状态：IMPLEMENTED  
+> 状态：DONE  
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环  
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`  
 > 当前仓库：`wt-media-workspace`  
@@ -218,6 +218,27 @@ Desktop登录后扫描Profile
 - 下一步：进入 Task 5，收口 Cloud Web / Desktop 浏览器窗口页面展示边界，隐藏或禁用本 CHG 不包含的 Diff应用类动作。
 - 最近验证：`cargo check` PASS；`npm test -- profileBindings localAgentService` PASS；`npm run build:cloud` PASS；`npm run build:desktop` PASS。
 
+### 2026-07-23 Desktop Trust Status Acceptance Repair
+
+- 已完成：修复人工验收发现的状态不一致问题。Desktop Agent 状态页不再仅凭 Cloud 登录、Local Agent、BitBrowser 和主账号 ID 显示“本机环境可信”；必须存在 Cloud 可信 `node_id` 才显示“本机节点可信”。
+- 已完成：Agent 状态页新增“重新检测”和“重新检测并绑定”入口；未绑定时显示“本机节点未绑定”和运营可理解提示。
+- 已完成：新增 Cloud `POST /api/v1/bit-browser/main-identity`，用于确认当前用户 BitBrowser 主账号，不创建 scan、不应用 Profile Diff、不写入正式 Profile 镜像；Runtime report 允许只上报主账号身份，避免 M2-A 主账号确认与 M2-B Profile Diff 形成循环依赖。
+- 已完成：Desktop Rust 新增 `local_agent_bind_session`，由 Rust 消费 Cloud 一次性绑定票据、注册本机节点、写入 Local Agent `node_id` 并上报运行状态；`node_credential` 不返回 Vue。
+- 已完成：修复 Desktop 登录页旧会话替换按钮事件。登录表单不再通过 submit 触发登录；“登录”“替换旧会话并登录”“取消”全部使用显式 click 事件，确保替换按钮稳定发送 `replace_existing=true`。
+- 已完成：确认登录后仍未进入系统的根因是本地 Cloud 以 `WT_MEDIA_SESSION_COOKIE_SECURE=true` 启动，HTTP Desktop WebView 无法稳定保存 secure cookie；已用 `WT_MEDIA_SESSION_COOKIE_SECURE=false` 重启本地 Cloud API。
+- 当前阻断：需要用户在当前 Desktop 窗口重新点击“替换旧会话并登录”进行人工验收。若点击“重新检测并绑定”后 Cloud 返回身份不匹配，则说明当前 BitBrowser 主账号与 operator01 已绑定主账号不一致，需要先按 M2-A 重新确认主账号。
+- 下一步：用户重新登录 operator01；如出现旧会话提示，点击“替换旧会话并登录”应进入系统，再到 Desktop 环境状态页点击“重新检测并绑定”。
+- 最近验证：`go test ./internal/modules/profilebinding ./internal/modules/runtimebinding` PASS；`npm test -- profileBindings localAgentService` PASS；`npm test -- session desktopRoleGuard` PASS；`npm run build:desktop` PASS；`cargo check` PASS（仅 existing unused/dead_code warnings）；`curl -i http://127.0.0.1:5174/api/v1/auth/login` 确认本地 Set-Cookie 不再包含 `secure`；`curl -b ... /auth/me` PASS。
+
+### 2026-07-23 Desktop Runtime Report Repair
+
+- 已完成：定位“重新检测并绑定”失败原因。Cloud 节点注册成功，但 Desktop 上报 runtime-report 返回 400，导致 `local_agent_nodes.reported_main_user_id` 与 `bitbrowser_status` 未落库，后续浏览器窗口扫描被 `CheckLocalTrust` 正确阻断。
+- 已完成：修复 Desktop Rust `local_agent_bind_session`。runtime-report 改为使用 Local Agent `/api/v1/status` 的真实运行环境字段，上报 `python_version`、`ffmpeg`、`workdir_status`、`disk`、`bitbrowser_status` 和 `main_user_id`；本机可信绑定不再上报 `bit_profile_ids`，避免把 M2-B Profile Diff 归属验证提前塞进主账号绑定。
+- 当前结论：当前修复符合用户确认的 A2-only 口径：可信绑定只验证系统用户、Desktop节点、Local Agent、BitBrowser主账号一致；Profile 列表扫描和 Diff 归属仍留在 M2-B 当前 CHG。
+- 当前阻断：等待用户在新启动的 Desktop 窗口点击“重新检测并绑定”进行人工验证。
+- 下一步：用户点击后检查 Cloud 日志和 `local_agent_nodes`，确认 runtime-report 成功落库；随后返回浏览器窗口页重新扫描。
+- 最近验证：`curl http://127.0.0.1:8765/api/v1/status` PASS，返回 `ffmpeg.version=8.1.2`、`bitbrowser_status=normal`、`main_user_id=2c9bc06191effa4e0191f9589996619f`；`cargo check` PASS；已用 `cargo run` 启动新的 Desktop 壳。
+
 ### 2026-07-23 Task 5 Page Boundary
 
 - 已完成：浏览器窗口页面按 Cloud Web / Desktop 边界展示。Cloud Web 只展示 Cloud 已保存列表、详情和刷新，不展示新建、扫描、打开、关闭、删除等本机操作入口；Desktop 才展示本机操作入口。
@@ -235,3 +256,40 @@ Desktop登录后扫描Profile
 - 当前阻断：真实 Desktop 页面人工验收尚未执行，因此本 CHG 不进入 `CLOSED`。
 - 下一步：启动 Cloud / Agent / Desktop 环境，由用户按 `manual-acceptance.md` 验收 Cloud Web 只读边界、Desktop 扫描 Diff/无差异结果、扫描不修改正式镜像和异常提示。
 - 最近验证：`python3 -m unittest tests/test_local_profile_scan.py` PASS；`go test ./internal/modules/profilebinding/...` PASS；`npm test -- profileBindings localAgentService` PASS；`cargo check` PASS；`npm run build:cloud` PASS；`npm run build:desktop` PASS；关键词检查 PASS。
+
+### 2026-07-23 Final Trust Binding Semantics
+
+- 已完成：按用户最终确认收口本机环境语义。「重新检测本机环境」只做只读检查，不写 Cloud、不重启 Agent、不扫描窗口；首次绑定与已绑定后的刷新分开表达；已绑定账号不允许静默从比特账号 A 改绑到账号 B。
+- 已完成：新增管理员解除用户比特浏览器绑定能力。该操作只清空用户主账号绑定并失效本地节点，不删除 Cloud 已保存浏览器窗口、媒体账号或历史记录；用于系统写错绑定关系后的低成本修复路径。
+- 已完成：Cloud Web / Desktop 边界再次确认。Cloud Web 对所有角色只展示 Cloud 已保存数据；Desktop 才展示本机 Agent / BitBrowser 依赖能力。
+- 已完成：用户可见文案去内部化。源码和构建产物中已清理「M2」「敏感操作」「可信节点」「可执行结论」「当前Desktop身份不可信」等运营不理解或内部工程表达。
+- 已完成：同步正式事实源。PRD 第三章和 `delivery/milestones/M2-account-runtime.md` 已更新为 A2-only 口径：主账号绑定只验证 `main_user_id`；完整 Profile 扫描、Diff 和授权同步归 M2-B；管理员解除错误绑定后由运营在 Desktop 重新绑定。
+- 当前阻断：无代码阻断；仍需用户重新打开最新 Desktop 壳进行人工验收。
+- 下一步：用户验证 Desktop 环境状态页：重新检测只刷新本地读取状态；账号一致时刷新本机状态成功；账号不一致时阻断；管理员可在 Cloud 用户管理解除错误绑定后再由运营重新绑定。
+- 最近验证：`go test ./internal/modules/profilebinding ./internal/modules/runtimebinding` PASS；`npm test -- localAgentStatus usersApi UsersPage profileBindings localAgentService session desktopRoleGuard` PASS；`cargo check` PASS（仅既有 unused/dead_code warnings）；`npm run build:desktop` PASS；`npm run build:cloud` PASS；源码、PRD 和 Milestone 关键词检查无旧口径匹配。
+
+### 2026-07-23 Milestone-first Governance Rule
+
+- 已完成：沉淀 Milestone-first 回写规范。后续执行中发现的小变更、验收细节、页面口径、操作边界和异常处理，优先写当前 Milestone 和当前 CHG checkpoint/evidence；不再每次立即回写 PRD。
+- 已完成：更新 `delivery/milestones/README.md`，明确 PRD 是长期产品事实，Milestone 是当前阶段业务闭环基线。
+- 已完成：更新 `planning-wt-media-delivery` Skill 源文件，并同步到根工作区 `.codex/skills` 生成副本。
+- 当前阻断：无。
+- 下一步：后续 M2-B/C/D/E 按该规则执行；M2 完整验收后，再按需统一整理 PRD。
+- 最近验证：`python3 scripts/sync_skills.py check --repo root --tool codex` PASS，输出 `skill outputs are up to date`。
+
+### 2026-07-23 Next CHG Planning
+
+- 已完成：按用户确认将“比特账号绑定信息需要让管理员知道什么、是否表格列和查看弹窗展示”归入 M2-B 窗口同步/详情后续设计，不在当前本机状态修复中继续追加页面。
+- 已完成：更新 `delivery/milestones/M2-account-runtime.md`，明确比特账号绑定摘要可只读展示给有权限的管理员和当前用户；展示字段限于绑定状态、绑定时间、最近验证时间和脱敏主账号标识，不展示 Agent 凭据、本地端口、Token 或完整本机诊断信息。
+- 已完成：创建 planned CHG `delivery/planned/CHG-20260723-026`，范围为 B2 窗口同步应用、恢复 Cloud 配置与授权闭环。
+- 当前阻断：CHG-20260723-025 仍需 diff review、提交和正式收口后，才能激活 026。
+- 下一步：对 025 做 diff review 和提交；随后将 026 从 planned 激活为 active 并执行 Task 1。
+- 最近验证：本步骤为治理和计划更新，未修改 runtime 代码。
+
+### 2026-07-23 Completion Review
+
+- 已完成：补充 `evidence/completion-review.md`，记录最终 diff check、Go测试、前端测试、Cloud/Desktop构建、Desktop Rust检查和用户验收反馈。
+- 已完成：确认 `CHG-20260723-025` 的用户可见结果、Cloud Web/Desktop边界、本机主账号确认语义、只读扫描Diff和后续B2规划均已收口。
+- 当前阻断：无。
+- 下一步：将本 CHG 移入 `delivery/completed`，从 `delivery/LEDGER.md` 移除；随后激活 `CHG-20260723-026`。
+- 最近验证：`git diff --check` PASS；`go test ./internal/modules/profilebinding ./internal/modules/runtimebinding` PASS；`npm test -- localAgentStatus usersApi UsersPage profileBindings localAgentService session desktopRoleGuard` PASS；`npm run build:desktop` PASS；`npm run build:cloud` PASS；`cargo check` PASS（仅既有 warning）。
