@@ -51,7 +51,7 @@ Desktop登录后扫描Profile
 
 - 审计当前 Cloud / Web / Agent / Desktop 中已有 Profile 扫描、快照提交和 Diff 代码；
 - 明确 Desktop 发起扫描的安全路径，不能让 Cloud Web 直接承担本机 BitBrowser 操作入口；
-- 明确 Cloud Web 与 Desktop 的页面能力边界：Cloud Web只看Cloud基本信息，Desktop展示BitBrowser扫描Diff；
+- 明确 Cloud Web 与 Desktop 的页面能力边界：Cloud Web只看Cloud基本信息和已保存历史摘要，Desktop展示和处理BitBrowser扫描Diff；
 - 普通运营触发本机 BitBrowser Profile 扫描；
 - Local Agent 同步调用 BitBrowser 读取当前窗口列表；
 - Cloud 接收扫描快照并生成只读 Diff；
@@ -109,10 +109,11 @@ Desktop登录后扫描Profile
 
 ### Task 3：Cloud 只读 Diff
 
-- Cloud 接收扫描结果；
-- 生成只读 Diff；
+- Cloud 接收 Desktop 提交的 Local Agent / BitBrowser 扫描快照；
+- Cloud 基于扫描快照与Cloud已保存 `browser_profiles` 镜像计算只读 Diff；
 - 不应用到正式 Profile 镜像；
 - 不改变 Profile 授权、账号绑定和业务对象；
+- 不调用 Local Agent，不连接 BitBrowser，不读取本机环境；
 - 必要时复用或修正已有扫描历史/差异模型。
 
 ### Task 4：Desktop / Agent 同步扫描路径
@@ -126,7 +127,8 @@ Desktop登录后扫描Profile
 
 - Desktop浏览器窗口页面展示扫描入口；
 - Desktop展示本次扫描时间、扫描状态和 Diff 列表；
-- Cloud Web浏览器窗口页面只展示Cloud已保存的基本信息，不展示也不触发扫描、Diff处理或其他本机执行能力；
+- Cloud Web浏览器窗口页面只展示Cloud已保存的基本信息、授权关系、绑定账号摘要和历史同步摘要；
+- Cloud Web不展示也不触发扫描、Diff处理、读回、打开、关闭、创建、更新、账号检查等依赖本机Agent或BitBrowser的能力；
 - Diff 分类清晰表达新增、缺失、变化和受影响账号；
 - “接受本地变化”“恢复Cloud配置”等后续操作可以隐藏、禁用或标记为后续 CHG，不得假装已经完成。
 
@@ -189,3 +191,11 @@ Desktop登录后扫描Profile
 - 当前阻断：无。
 - 下一步：进入 Task 3，补 Cloud 只读 Diff 的业务对象边界与正式镜像不变证据。
 - 最近验证：`go test ./internal/modules/profilebinding/...` PASS；`npm test -- profileBindings` PASS；`python3 -m unittest tests/test_local_profile_scan.py` PASS。
+
+### 2026-07-23 Task 3 Boundary Correction
+
+- 已完成：根据用户确认修正 Task 3 边界。Cloud 不读取本机 BitBrowser，也不调用 Local Agent；Cloud 只接收 Desktop 提交的扫描快照，并与 Cloud 已保存 `browser_profiles` 镜像计算只读 Diff。
+- 已完成：补充 Cloud Web / Desktop 功能展示边界。Cloud Web 只能展示 Cloud 已保存基本信息和历史摘要；Desktop 才展示扫描入口、本机读回、Diff处理、打开/关闭/创建/更新、账号检查等依赖 Local Agent / BitBrowser 的能力。
+- 当前阻断：无。
+- 下一步：按修正后的 Task 3 口径实现 Cloud 只读 Diff 的正式镜像不变验证。
+- 最近验证：本步骤为 CHG/Milestone 边界矫正，未修改 runtime 代码。

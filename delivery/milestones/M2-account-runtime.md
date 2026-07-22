@@ -182,6 +182,18 @@ Desktop登录后扫描Profile
 - 页面使用“浏览器窗口”，代码和数据库使用`browser_profile`；
 - Cloud Web没有本机Agent执行环境，只展示Cloud已保存的浏览器窗口和媒体账号基本信息，不提供扫描、Diff、读回、打开、关闭、创建、更新等依赖BitBrowser或Local Agent的操作入口；
 - Desktop是所有依赖BitBrowser和Local Agent能力的用户入口；Desktop Vue必须通过Tauri/Rust调用Local Agent，不得直接访问Local Agent动态端口或持有动态凭据；
+- Cloud Web与Desktop展示功能必须分层：
+
+| 功能 | Cloud Web | Desktop |
+|---|---|---|
+| 浏览器窗口列表 | 展示Cloud已保存镜像、授权用户、绑定账号摘要、最近同步时间 | 展示Cloud镜像，并额外展示本机环境状态、扫描状态和本机读回结果 |
+| 浏览器窗口详情 | 展示Cloud基本信息、授权关系、绑定账号摘要、历史同步/检查记录 | 展示Cloud基本信息，并提供打开窗口、读回、扫描、检查等本机操作入口 |
+| BitBrowser扫描 | 不展示入口，不触发扫描 | 展示入口，通过Tauri/Rust调用Local Agent同步读取BitBrowser |
+| Diff结果 | 不展示依赖本机实时读回的Diff处理入口；可查看已保存的历史同步摘要 | 展示本次扫描Diff、无差异结果、失败原因和后续处理入口 |
+| 打开/关闭/创建/更新窗口 | 不展示入口，不调用Agent，不创建本机副作用 | 可操作，但必须同步调用Agent并读回验证 |
+| 接受本地变化/恢复Cloud配置 | 不在Cloud Web处理 | 在Desktop处理；接受本地变化更新Cloud镜像，恢复Cloud配置必须写BitBrowser并读回 |
+| 媒体账号绑定与检查 | 可查看Cloud台账和历史结果；不触发本机检查 | 可触发绑定、换绑和账号检查，并通过Agent读回真实结果 |
+
 - 单Profile创建、编辑、打开、关闭、检查和扫描同步调用Agent；批量创建使用专用批次逐项执行；
 - 扫描只生成新增、名称、分组、代理、缺失、运行状态和已绑账号影响Diff；
 - 接受本地变化更新Cloud镜像；恢复Cloud配置必须写BitBrowser并读回；
