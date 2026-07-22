@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: M
-- Status: IN_PROGRESS
+- Status: CLOSED
 - Created: 2026-07-22
 - Affected repositories: `wt-media-cloud`, `wt-media-workspace`
 - Current repository: `wt-media-workspace`
@@ -105,11 +105,11 @@
 
 ## 8. Checkpoint
 
-- Completed: Cloud提交`d623bcb`、`089936c`、`98a35d1`、`cbd60a0`、`d16e37d`和`9fc4c8a`已完成A1迁移、三角色/分组、权限交集、API/Web用户管理及审查纠偏；真实MySQL新库13/13、无Ledger的001～011旧库2/13接管并最终13条、危险遗留数据前置阻断均通过；运行中隔离Cloud的三角色API矩阵通过；Cloud全量Go、Web 14项、Cloud构建及Workspace 26项治理测试通过。
-- Current: A1代码、自动验证、真实MySQL、运行中Cloud API和Evidence已完成；用户管理Web页面人工走查尚未执行。
-- Next: 在真实Web中由管理员完成创建、筛选、修改、重置密码和禁用走查；通过后关闭本CHG，再规划M2-A2。
-- Blockers: 无代码或产品阻塞；仅剩用户可见Web页面的人工验收。
-- Recent verification: `go test ./... -count=1` PASS；`npm test --prefix web` 14/14 PASS；`npm run build:cloud --prefix web` PASS（仅既有chunk提示）；Workspace治理测试26/26 PASS；真实MySQL三类迁移场景PASS；隔离Cloud三角色API矩阵PASS。
+- Completed: Cloud提交`d623bcb`、`089936c`、`98a35d1`、`cbd60a0`、`d16e37d`和`9fc4c8a`已完成A1迁移、三角色/分组、权限交集、API/Web用户管理及审查纠偏；真实MySQL新库13/13、无Ledger的001～011旧库2/13接管并最终13条、危险遗留数据前置阻断均通过；运行中隔离Cloud的三角色API矩阵通过；Cloud全量Go、Web 14项、Cloud构建及Workspace 26项治理测试通过；2026-07-23用户管理Web真实页面走查通过，覆盖管理员登录、分组创建、用户创建、筛选、编辑角色、重置密码、停用和重新启用，并通过隔离库核对持久化与审计。
+- Current: M2-A1所有代码、自动验证、真实MySQL、运行中Cloud API、真实Web页面和Evidence均已完成，状态进入`VERIFIED`。
+- Next: 关闭本CHG后，按`delivery/milestones/M2-account-runtime.md`和实施计划进入M2-A2。
+- Blockers: None.
+- Recent verification: `go test ./... -count=1` PASS；`npm test --prefix web` 14/14 PASS；`npm run build:cloud --prefix web` PASS（仅既有chunk提示）；Workspace治理测试26/26 PASS；真实MySQL三类迁移场景PASS；隔离Cloud三角色API矩阵PASS；真实Web页面走查PASS。
 
 ## 9. Evidence Requirements
 
