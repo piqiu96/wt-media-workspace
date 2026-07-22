@@ -1,7 +1,7 @@
 # CHG-20260723-025：M2-B1 浏览器窗口扫描与 Diff 只读闭环
 
 > 日期：2026-07-23  
-> 状态：TODO  
+> 状态：IMPLEMENTED  
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环  
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`  
 > 当前仓库：`wt-media-workspace`  
@@ -226,3 +226,12 @@ Desktop登录后扫描Profile
 - 当前阻断：无。
 - 下一步：进入 Task 6，汇总自动测试、构建、扫描只读、Desktop路径和页面边界 evidence；如需真实人工验收，再启动环境验证。
 - 最近验证：`npm test -- profileBindings localAgentService` PASS；`npm run build:cloud` PASS；`npm run build:desktop` PASS；关键词检查确认业务页无直连 Local Agent 端口、无可点击 Diff 应用动作。
+
+### 2026-07-23 Task 6 Verification Evidence
+
+- 已完成：补充 `evidence/tests.md`，记录 Agent、Cloud、Web、Desktop、双端构建、页面边界关键词和工作区差异检查结果。
+- 已完成：补充 `evidence/manual-acceptance.md`，明确真实页面人工验收步骤和待补记录项。
+- 当前结论：本 CHG 的代码实现和自动化验证已收口；Cloud 只读 Diff、Desktop/Rust/Local Agent 调用路径、Cloud Web/Desktop 页面边界均通过自动验证。
+- 当前阻断：真实 Desktop 页面人工验收尚未执行，因此本 CHG 不进入 `CLOSED`。
+- 下一步：启动 Cloud / Agent / Desktop 环境，由用户按 `manual-acceptance.md` 验收 Cloud Web 只读边界、Desktop 扫描 Diff/无差异结果、扫描不修改正式镜像和异常提示。
+- 最近验证：`python3 -m unittest tests/test_local_profile_scan.py` PASS；`go test ./internal/modules/profilebinding/...` PASS；`npm test -- profileBindings localAgentService` PASS；`cargo check` PASS；`npm run build:cloud` PASS；`npm run build:desktop` PASS；关键词检查 PASS。
