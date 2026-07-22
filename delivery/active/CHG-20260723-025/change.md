@@ -199,3 +199,12 @@ Desktop登录后扫描Profile
 - 当前阻断：无。
 - 下一步：按修正后的 Task 3 口径实现 Cloud 只读 Diff 的正式镜像不变验证。
 - 最近验证：本步骤为 CHG/Milestone 边界矫正，未修改 runtime 代码。
+
+### 2026-07-23 Task 3 Cloud Readonly Diff
+
+- 已完成：Cloud `POST /api/v1/bit-browser/profile-scans` 接收扫描快照前要求 `node_id` 并校验 M2-A 本地信任；缺少 `node_id` 或本地信任不可用时拒绝请求，且不创建 scan。
+- 已完成：Cloud Service 继续只基于 Desktop 提交的快照与 Cloud 已保存 `browser_profiles` 镜像计算只读 Diff，不调用 Local Agent，不连接 BitBrowser，不应用 Diff。
+- 已完成：Web profile binding client 支持 `submit(snapshot, { nodeId })`，为后续 Desktop Tauri/Rust 路径提交可信 node 做准备。
+- 当前阻断：无。
+- 下一步：进入 Task 4，新增 Desktop / Rust / Local Agent 同步扫描路径，替换页面直连 `127.0.0.1:8765` 的实现。
+- 最近验证：`go test ./internal/modules/profilebinding/...` PASS；`npm test -- profileBindings` PASS。
