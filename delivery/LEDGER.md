@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260723-025 | M2-B1 浏览器窗口扫描与 Diff 只读闭环 | TODO | wt-media-workspace |

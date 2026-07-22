@@ -180,6 +180,8 @@ Desktop登录后扫描Profile
 ### 系统要求
 
 - 页面使用“浏览器窗口”，代码和数据库使用`browser_profile`；
+- Cloud Web没有本机Agent执行环境，只展示Cloud已保存的浏览器窗口和媒体账号基本信息，不提供扫描、Diff、读回、打开、关闭、创建、更新等依赖BitBrowser或Local Agent的操作入口；
+- Desktop是所有依赖BitBrowser和Local Agent能力的用户入口；Desktop Vue必须通过Tauri/Rust调用Local Agent，不得直接访问Local Agent动态端口或持有动态凭据；
 - 单Profile创建、编辑、打开、关闭、检查和扫描同步调用Agent；批量创建使用专用批次逐项执行；
 - 扫描只生成新增、名称、分组、代理、缺失、运行状态和已绑账号影响Diff；
 - 接受本地变化更新Cloud镜像；恢复Cloud配置必须写BitBrowser并读回；
@@ -201,6 +203,7 @@ Desktop登录后扫描Profile
 - 账号台账页面支持列表、详情、搜索、平台/游戏/标签/业务状态/登录状态筛选和备注维护；
 - 单个/批量账号检查真实回填平台身份、头像、登录状态和最近检查时间；
 - 页面、Cloud镜像、Agent读回和BitBrowser实际状态一致。
+- Cloud Web与Desktop页面边界清晰：Cloud Web只能查看Cloud基本信息，Desktop才能展示和处理依赖本机BitBrowser读回的扫描Diff和执行结果。
 
 ### 异常与恢复
 
@@ -215,6 +218,7 @@ Desktop登录后扫描Profile
 - 不远程删除BitBrowser本地窗口；
 - 不用“已创建任务”代替Profile真实结果；
 - 不让高级运营或管理员绕过目标用户Desktop操作本地资源；
+- 不在Cloud Web提供依赖BitBrowser或Local Agent的扫描、Diff处理和本机执行入口；
 - M2-B只完成“只换绑”，不清理原窗口Cookie。
 
 ### 依据与候选CHG

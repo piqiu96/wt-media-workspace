@@ -249,7 +249,7 @@ M1-R8 无 Mock 三端端到端人工验收
 | 状态 | `IN_PROGRESS`（完成状态已撤销，恢复为开发中） |
 | 目标 | 在 M1 真实端到端环境上，完整交付用户、媒体账号、BitBrowser 窗口、代理、Cookie、开户、运行环境、敏感任务权限以及对应 Web/Desktop 产品体验。 |
 | 依赖 | M1 `DONE`（M1 复验通过后自动解除） |
-| Active CHG | None（M2-A 已通过人工验收，等待激活 M2-B） |
+| Active CHG | `CHG-20260723-025`（M2-B1 浏览器窗口扫描与 Diff 只读闭环） |
 | Evidence | 所有历史代码、提交和测试保留为继承证据（CHG-015 至 CHG-020、决策 0007、CHG-20260715-010 至 CHG-20260716-013）。历史 PRD 差距记录见 `delivery/reports/M2-prd-chapter3-gap-matrix.md`；按 2026-07-22 人工确认基线重新审计后的事实见 `delivery/reports/2026-07-22-m2-a-e-code-gap-audit.md`。历史 47% 仅代表旧口径，不再作为当前完成率。 |
 | 业务闭环基线 | `delivery/milestones/M2-account-runtime.md`。M2-A～E 的用户操作、真实副作用、假成功禁止项和业务验收以该文件为准。 |
 | 完成日期 | None |
