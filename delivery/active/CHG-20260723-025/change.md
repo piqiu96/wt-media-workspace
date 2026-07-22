@@ -208,3 +208,12 @@ Desktop登录后扫描Profile
 - 当前阻断：无。
 - 下一步：进入 Task 4，新增 Desktop / Rust / Local Agent 同步扫描路径，替换页面直连 `127.0.0.1:8765` 的实现。
 - 最近验证：`go test ./internal/modules/profilebinding/...` PASS；`npm test -- profileBindings` PASS。
+
+### 2026-07-23 Task 4 Desktop Agent Scan Path
+
+- 已完成：Desktop Rust 新增 `local_agent_profile_scan` Tauri command，由 Rust 同步调用 Local Agent `/api/v1/bit-browser/profile-scans` 并透传安全快照。
+- 已完成：Web Local Agent service 增加 `profileScan()`；浏览器窗口页扫描流程改为通过 Tauri/Rust 获取 `node_id` 和 BitBrowser 快照，再提交 Cloud 计算只读 Diff。
+- 已完成：浏览器窗口页已移除对 `127.0.0.1:8765` 的直接扫描访问；非 Tauri Desktop 客户端环境阻断扫描。
+- 当前阻断：无。
+- 下一步：进入 Task 5，收口 Cloud Web / Desktop 浏览器窗口页面展示边界，隐藏或禁用本 CHG 不包含的 Diff应用类动作。
+- 最近验证：`cargo check` PASS；`npm test -- profileBindings localAgentService` PASS；`npm run build:cloud` PASS；`npm run build:desktop` PASS。
