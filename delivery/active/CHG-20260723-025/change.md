@@ -217,3 +217,12 @@ Desktop登录后扫描Profile
 - 当前阻断：无。
 - 下一步：进入 Task 5，收口 Cloud Web / Desktop 浏览器窗口页面展示边界，隐藏或禁用本 CHG 不包含的 Diff应用类动作。
 - 最近验证：`cargo check` PASS；`npm test -- profileBindings localAgentService` PASS；`npm run build:cloud` PASS；`npm run build:desktop` PASS。
+
+### 2026-07-23 Task 5 Page Boundary
+
+- 已完成：浏览器窗口页面按 Cloud Web / Desktop 边界展示。Cloud Web 只展示 Cloud 已保存列表、详情和刷新，不展示新建、扫描、打开、关闭、删除等本机操作入口；Desktop 才展示本机操作入口。
+- 已完成：扫描结果抽屉移除“仅确认主账号”和“确认同步窗口”可点击动作，改为禁用的“接受本地变化（后续）”“恢复Cloud配置（后续）”，避免把 B2 能力伪装成本 CHG 完成项。
+- 已完成：页面文案从“Profile”面向用户改为“浏览器窗口”，Cloud Web 增加只读提示。
+- 当前阻断：无。
+- 下一步：进入 Task 6，汇总自动测试、构建、扫描只读、Desktop路径和页面边界 evidence；如需真实人工验收，再启动环境验证。
+- 最近验证：`npm test -- profileBindings localAgentService` PASS；`npm run build:cloud` PASS；`npm run build:desktop` PASS；关键词检查确认业务页无直连 Local Agent 端口、无可点击 Diff 应用动作。
