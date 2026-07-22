@@ -1,105 +1,100 @@
-# CHG-20260722-021: M2-A 用户权限与可信验收收口
+# CHG-20260722-021: M2-A1 用户领域模型迁移
 
 ## 1. Basic Information
 
 - Level: M
 - Status: IN_PROGRESS
 - Created: 2026-07-22
-- Affected repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-workspace`
+- Affected repositories: `wt-media-cloud`, `wt-media-workspace`
 - Current repository: `wt-media-workspace`
-- Milestone: `delivery/milestones/M2-account-runtime.md#m2-a`
+- Milestone: `delivery/milestones/M2-account-runtime.md#m2-a-用户权限会话与运行环境可信闭环`
 - Inherited evidence: `delivery/completed/CHG-20260721-020/evidence/governance-scope-audit.md`
 
 ## 2. Change Goal
 
-证明管理员、运营人员和技术人员能够通过真实 Web/API 完成 M2-A 权限与会话链路，旧 Agent 会话失效后不能继续领取任务，BitBrowser 首次绑定与重绑产生正确脱敏审计，并将 M2-A 从“自动化基础已存在”收口为可人工验收的业务闭环。
+将Cloud用户领域从旧的字符串ID、`technician`角色和仅游戏范围模型，迁移为人工确认的自增UID、管理员/高级运营/普通运营、单层运营分组与游戏交集权限模型，并在真实MySQL、API和Web用户管理中形成可独立验收的A1闭环。
 
-本 CHG 的用户可见纵向结果是：不同角色登录后只看到并操作授权范围，权限变更与停用即时生效，越权被明确拒绝，管理员能查看关键审计结果。
+本 CHG 的用户可见纵向结果是：管理员可以管理分组和用户；高级运营只访问同组与授权游戏交集；普通运营只访问本人和授权游戏交集；管理员不受分组限制。
 
 ## 3. Current Proven Facts
 
-- Cloud、Agent、Web、Desktop 与 Workspace 自动化门禁可复验；
-- 媒体账号跨游戏读取已有 403 回归测试；
-- 失效 Agent 会话进入 draining/replaced 并停止继续 claim；
-- BitBrowser 首次绑定和同身份重绑已有脱敏审计动作；
-- 以上均为自动化或局部技术事实，尚未完成三角色真实 UI/API 和绑定人工验收。
+- Cloud已有用户、密码、游戏范围、会话、审计和部分跨游戏403基础；
+- Web已有用户列表和基础用户管理入口；
+- 当前迁移、服务、测试和页面仍以字符串ID与`technician`为事实；
+- 运营分组及“同组/本人∩授权游戏”尚不存在。
 
 ## 4. Remaining Gap
 
-- 缺少管理员、运营人员和技术人员在真实 MySQL/Cloud Web 下的完整权限矩阵；
-- 缺少 401 登录失效跳转、403 越权反馈、角色/游戏范围变更和停用即时生效的页面验收；
-- 缺少真实 Local Agent 会话替换后停止领取新任务的集成证据；
-- 缺少 BitBrowser 主账号首次绑定/重绑及审计可见性的人工证据；
-- 若验收暴露 M2-A 范围内缺陷，需要最小修复和回归；不得借机实现 M2-B～E。
+- `users.id`及关联外键不是自增数值ID；
+- 角色仍为`operator/senior_operator/technician`；
+- 没有运营分组表、用户分组关系、转组历史归属规则；
+- 现有模块授权没有统一表达管理员全部、高级运营同组、普通运营本人，再与游戏范围求交集；
+- Web用户管理缺少分组和新角色语义；
+- 会话确认和BitBrowser身份可信属于A2，不在本CHG实现。
 
 ## 5. Ordered Tasks
 
-### Task 1：验收环境与角色数据
+### Task 1：迁移与领域类型
 
-- 启动真实 MySQL、Cloud、Web 和 Local Agent；
-- 创建非敏感的管理员、运营人员、技术人员及至少两个游戏范围；
-- 记录脱敏 ID、运行端口、健康状态和清理方法；
-- 验证任何失败的环境前置不会产生业务修改。
+- 先为自增UID、三角色和分组约束编写失败测试；
+- 设计并实现不丢失现有用户与关联数据的MySQL迁移；
+- 更新Cloud身份领域类型、角色校验和契约；
+- 验证管理员无分组，普通/高级运营必须且仅属于一个分组。
 
-### Task 2：三角色 Web/API 权限矩阵
+### Task 2：运营分组生命周期
 
-- 验证登录、页面菜单、用户管理、媒体账号、Profile 和代理入口的角色边界；
-- 验证同角色跨游戏范围查询与操作返回 403 且无数据泄漏；
-- 验证未登录或会话失效返回 401，Web 跳转登录并清除失效状态；
-- 对发现的 M2-A 缺陷先写失败测试，再做最小修复。
+- 实现分组创建、列表、重命名和受约束删除；
+- 已有用户或历史业务引用时禁止物理删除；
+- 用户转组后只影响新业务归属，历史记录保留旧分组事实；
+- 记录脱敏审计。
 
-### Task 3：权限变更、密码与停用
+### Task 3：权限交集
 
-- 管理员修改角色和游戏范围，验证下一次请求即时使用新权限；
-- 验证管理员重置密码、用户修改密码和旧会话失效；
-- 停用用户后验证 Web/API 和 Agent 都不能继续使用旧会话；
-- 记录正向与反向结果。
+- 建立统一授权判定：管理员全部、高级运营同组、普通运营本人；
+- 将上述范围与授权游戏求交集；
+- 接入M2现有账号和Profile Cloud查询/修改入口，并保存创建时分组快照；
+- 代理不设置个人或分组归属，代理权限在M2-C基于真实Profile/账号关系接入，本CHG不虚构归属字段；
+- 用正向、跨组、跨用户和跨游戏测试证明零数据泄漏和零副作用。
 
-### Task 4：Local Agent 会话替换
+### Task 4：用户管理API与Web
 
-- 使用受控测试节点建立 Local Agent 会话并领取可安全执行的测试任务；
-- 触发同用户新登录或会话替换；
-- 验证旧节点停止领取新任务，在途敏感任务按状态完成、失败或进入结果不确定，而不是盲目重试；
-- 验证 Cloud 节点状态和 Agent 本地行为一致。
+- 更新用户创建、列表、筛选、修改角色/分组/游戏、密码重置和禁用；
+- 新密码只在创建或重置响应中显示一次；
+- 页面统一显示UID、用户名、角色、分组和授权游戏；
+- 移除`technician`与`retired`无关的旧角色文案。
 
-### Task 5：BitBrowser 绑定与审计
+### Task 5：A1真实验收与迁移证据
 
-- 使用用户授权的测试 BitBrowser 主账号执行首次绑定和同身份重绑；
-- 验证身份不匹配被阻止且不更新 Cloud 正式事实；
-- 验证审计记录区分 bind/rebind，只包含允许的脱敏摘要；
-- 不修改任何非测试 Profile。
-
-### Task 6：M2-A 综合回归与收口
-
-- 运行 Cloud、Agent、Web、Workspace 自动化与治理校验；
-- 汇总三角色、会话替换、绑定审计的人工 Evidence；
-- 对照 Milestone M2-A 的每个成功事实逐项判定；
-- 仅在全部通过后关闭本 CHG，并建议创建 M2-B CHG；不自动执行 M2-B。
+- 使用真实MySQL执行迁移和回滚前检查；
+- 运行Cloud与Web自动测试及治理校验；
+- 人工验证管理员、高级运营和普通运营的用户/分组/游戏权限矩阵；
+- 仅判定A1完成，不宣称整个M2-A完成。
 
 ## 6. Acceptance
 
 ### 用户验收
 
-- 三类角色登录后看到并操作各自授权内容；
-- 越权和失效会话有明确且真实的 401/403 页面结果；
-- 管理员修改权限、密码或停用用户后立即生效；
-- 管理员能查看 BitBrowser 绑定/重绑审计结果。
+- 管理员可以管理分组和三类用户且不需要分组；
+- 高级运营只看到同组且在授权游戏内的数据；
+- 普通运营只看到本人且在授权游戏内的数据；
+- 用户列表、筛选、修改、重置密码、禁用和审计符合新模型。
 
 ### 系统验收
 
-- API 与 UI 权限一致，跨游戏访问无数据泄漏；
-- 旧 Local Agent 会话不再领取新任务；
-- 在途敏感任务不产生重复副作用或假成功；
-- 审计事件、节点状态、用户状态和会话状态正确持久化到真实 MySQL。
+- 自增UID和关联外键迁移不丢失已有数据；
+- API与UI使用一致角色、分组和游戏交集权限；
+- 跨组、跨用户和跨游戏访问无数据泄漏、无外部副作用；
+- 用户、分组、权限变更和密码操作正确持久化并审计。
 
 ### 真实依赖验收
 
-- 使用真实 MySQL、运行中的 Cloud/Web/Agent 和用户授权的 BitBrowser 测试身份；
+- 使用真实MySQL和运行中的Cloud/Web；
 - Evidence 只记录脱敏标识、命令、期望、实际结果、PASS/FAIL 和提交引用；
-- 自动测试不能代替三角色与真实绑定人工验收。
+- 自动测试不能代替三角色与真实MySQL/Web人工验收。
 
 ## 7. Explicitly Not Doing
 
+- 不实现M2-A2确认式会话替换、Desktop环境、BitBrowser首次绑定或重绑；
 - 不实现 M2-B Profile 生命周期、Diff 双向处理或账号检查；
 - 不实现 M2-C 代理导入、配额、分配和真实写入；
 - 不实现 M2-D Cookie 写入、读取或开户；
@@ -110,21 +105,20 @@
 
 ## 8. Checkpoint
 
-- Completed: 治理纠偏、CHG-020 审计归档、M2 闭环基线、规划/执行 Skill、唯一 Active CHG 和治理 start gate 已完成；所有治理校验通过。
-- Current: 尚未开始运行时代码修改或人工验收，CHG 停在 Task 1 前。
-- Next: 执行 Task 1，建立脱敏验收环境和三角色测试数据。
-- Blockers: 真实验收需要用户授权的测试身份与 BitBrowser 绑定操作；开始 Task 1 时确认可用性。
-- Recent verification: Workspace 26 项测试通过、2 项因隔离 worktree 缺少兄弟仓库而跳过；交付治理、产品计划、Skill 与同步校验全部通过；CHG-020 的 Cloud、Agent、Web、Desktop 自动化已复验。
+- Completed: Cloud提交`d623bcb`、`089936c`、`98a35d1`、`cbd60a0`、`d16e37d`和`9fc4c8a`已完成A1迁移、三角色/分组、权限交集、API/Web用户管理及审查纠偏；真实MySQL新库13/13、无Ledger的001～011旧库2/13接管并最终13条、危险遗留数据前置阻断均通过；Cloud全量Go、Web 14项、Cloud构建及Workspace 26项治理测试通过。
+- Current: A1代码、自动验证、真实MySQL和Evidence已完成；运行中的Cloud/Web三角色与用户管理页面人工验收尚未执行。
+- Next: 启动隔离Cloud/Web，人工验证管理员、高级运营、普通运营的正向、跨组、跨用户、跨游戏、密码重置和停用矩阵；通过后关闭本CHG，再规划M2-A2。
+- Blockers: 当前Codex本机进程启动审批因工具额度限制被拒绝，不能绕过权限启动验收Cloud；这不是产品决策或代码阻塞。
+- Recent verification: `go test ./... -count=1` PASS；`npm test --prefix web` 14/14 PASS；`npm run build:cloud --prefix web` PASS（仅既有chunk提示）；Workspace治理测试26/26 PASS；真实MySQL三类迁移场景PASS。
 
 ## 9. Evidence Requirements
 
 - `evidence/governance-start-gate.md`；
-- `evidence/task-1-environment.md`；
-- `evidence/task-2-role-matrix.md`；
-- `evidence/task-3-user-lifecycle.md`；
-- `evidence/task-4-agent-session.md`；
-- `evidence/task-5-binding-audit.md`；
-- `evidence/task-6-m2-a-acceptance.md`。
+- `evidence/task-1-identity-migration.md`；
+- `evidence/task-2-team-lifecycle.md`；
+- `evidence/task-3-scope-matrix.md`；
+- `evidence/task-4-user-management.md`；
+- `evidence/task-5-m2-a1-acceptance.md`。
 
 ## 10. Pending Questions
 
