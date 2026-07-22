@@ -153,7 +153,8 @@ Desktop扫描窗口
 - Completed：Task 1 Start Gate 与 B1 继承审计已完成，见 `evidence/start-gate.md`。
 - Completed：Task 2 接受本地变化应用 Cloud 镜像已完成，见 `evidence/diff-apply-cloud-mirror.md`。
 - Completed：Task 3 恢复 Cloud 配置写回 BitBrowser 并读回验证已完成，见 `evidence/restore-cloud-config-readback.md`。
-- Current：ACTIVE，已实现 Desktop 恢复入口、Tauri/Rust 写回 Local Agent、写回后扫描读回验证、成功后重新提交 Cloud Diff。
-- Next：执行 Task 4：窗口授权与只读摘要展示。
+- Completed：Task 4 窗口授权与只读摘要展示已完成，见 `evidence/authorization-and-binding-summary.md`。
+- Current：ACTIVE，已实现管理员分配 Cloud 窗口授权、已引用窗口阻断、浏览器窗口列表授权用户列、窗口详情只读绑定摘要。
+- Next：执行 Task 5：验证与 Evidence 汇总。
 - Blockers：无。
-- Recent verification：`cargo test --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`cargo check --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`npm --prefix wt-media-cloud/web test -- --run localAgentService` PASS；`npm run build:desktop --prefix wt-media-cloud/web` PASS；`npm run build:cloud --prefix wt-media-cloud/web` PASS；`git diff --check` PASS。
+- Recent verification：`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/profilebinding ./internal/modules/identity` PASS；`npm --prefix wt-media-cloud/web test -- --run profileBindings usersApi` PASS；`npm run build:desktop --prefix wt-media-cloud/web` PASS；`npm run build:cloud --prefix wt-media-cloud/web` PASS；`git diff --check` PASS。
