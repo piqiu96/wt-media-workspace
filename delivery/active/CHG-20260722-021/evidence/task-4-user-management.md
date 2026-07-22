@@ -20,6 +20,10 @@
 | `TestUpdateUserRejectsInvalidStatusWithoutChangingAccess` | 非法状态不会修改已持久化权限 | PASS |
 | `TestUpdateUserCommitsAccessAndStatusTogetherAndInvalidatesSession` | 完整修改原子提交且旧会话失效 | PASS |
 
+## 运行中 API 验证
+
+隔离 Cloud 实例已完成管理员登录、创建分组、创建高级运营/普通运营用户和角色会话验证；响应返回的用户均使用数值 UID、角色、分组与授权游戏。测试数据仅存在于临时验收数据库，未写入项目业务库。
+
 ## 尚需人工验证
 
-管理员在真实 Web 中完成创建、筛选、修改、重置密码和禁用的页面走查尚未执行，不能以构建成功替代。
+管理员在真实 Web 中完成创建、筛选、修改、重置密码和禁用的页面走查尚未执行，不能以构建成功或 API 验证替代。
