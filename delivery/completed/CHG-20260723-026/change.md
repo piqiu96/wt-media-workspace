@@ -1,7 +1,7 @@
 # CHG-20260723-026：M2-B2 窗口同步应用、恢复与授权闭环
 
 > 日期：2026-07-23  
-> 状态：ACTIVE  
+> 状态：DONE  
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环  
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`  
 > 当前仓库：`wt-media-workspace`  
@@ -156,7 +156,7 @@ Desktop扫描窗口
 - Completed：Task 4 窗口授权与只读摘要展示已完成，见 `evidence/authorization-and-binding-summary.md`。
 - Completed：Task 5 自动验证汇总已完成，见 `evidence/tests.md`；人工验收清单已生成，见 `evidence/manual-acceptance.md`。
 - Completed：本地验收环境已固定并验证，见 `evidence/local-acceptance-environment.md`；Cloud 本地默认使用 `wt_media_cloud`、`127.0.0.1:18080`，本地验收账号登录接口已通过。
-- Current：ACTIVE，继续推进 M2-B；用户已要求等 M2-B 整体执行完后再统一人工验收。
-- Next：在不改变 M2-B 业务闭环的前提下，继续补齐后续媒体账号与 Profile 真实绑定、账号检查与身份回填闭环。
+- Current：DONE，B2 实现、自动验证和本地验收环境修复已完成；用户已要求等 M2-B 整体执行完后再统一人工验收。
+- Next：继续补齐 B3 媒体账号台账与 Profile 真实绑定、B4 账号检查与身份回填闭环。
 - Blockers：无。
 - Recent verification：`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/profilebinding ./internal/modules/identity` PASS；`npm --prefix wt-media-cloud/web test -- --run profileBindings usersApi localAgentService` PASS；`cargo test --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`cargo check --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`npm run build:desktop --prefix wt-media-cloud/web` PASS；`npm run build:cloud --prefix wt-media-cloud/web` PASS；`git diff --check` PASS；`GET /healthz` PASS；`POST /api/v1/auth/login` for `admin`、`senior01`、`operator01` PASS。

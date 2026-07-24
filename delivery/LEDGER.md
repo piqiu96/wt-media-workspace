@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260723-026 | M2-B2 窗口同步应用、恢复与授权闭环 | ACTIVE | wt-media-workspace |
+| CHG-20260724-027 | M2-B3 媒体账号台账与 Profile 真实绑定闭环 | ACTIVE | wt-media-workspace |
