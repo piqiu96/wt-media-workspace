@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260724-027 | M2-B3 媒体账号台账与 Profile 真实绑定闭环 | ACTIVE | wt-media-workspace |
+| CHG-20260724-028 | M2-B4-1 单个媒体账号检查与身份回填闭环 | ACTIVE | wt-media-workspace |
