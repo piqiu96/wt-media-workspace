@@ -158,9 +158,9 @@
 
 ## 9. Checkpoint
 
-- Completed：B6 active CHG 已创建；B5 已完成运行仓库提交并归档到 completed。
-- Current：准备执行 Task 1 Start Gate 与现状审计。
-- Next：审计媒体账号 Cloud/Web/Desktop/Agent/Tauri 现状并记录 `evidence/start-gate.md`。
+- Completed：B6 active CHG 已创建；B5 已完成运行仓库提交并归档到 completed；Task 1 Start Gate 与现状审计已完成，见 `evidence/start-gate.md`。
+- Current：准备执行 Task 2 媒体账号台账字段、筛选和状态规则收口。
+- Next：修正媒体账号页面命名、字段展示、绑定窗口标签、可执行原因和检查/同步入口文案，并评估状态枚举兼容方案。
 - Blockers：无。
 - Recent verification：
   - 继承 B5 提交前复验：Agent unittest、Desktop `cargo test`、Web `npm test`、Web `npm run build`、Cloud profilebinding `go test` 均 PASS。
