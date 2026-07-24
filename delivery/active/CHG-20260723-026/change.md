@@ -155,7 +155,8 @@ Desktop扫描窗口
 - Completed：Task 3 恢复 Cloud 配置写回 BitBrowser 并读回验证已完成，见 `evidence/restore-cloud-config-readback.md`。
 - Completed：Task 4 窗口授权与只读摘要展示已完成，见 `evidence/authorization-and-binding-summary.md`。
 - Completed：Task 5 自动验证汇总已完成，见 `evidence/tests.md`；人工验收清单已生成，见 `evidence/manual-acceptance.md`。
-- Current：ACTIVE，等待用户按人工验收清单确认 CHG-20260723-026 是否可以关闭。
-- Next：人工验收通过后执行 Completion Gate，提交 Task 5 evidence 并关闭本 CHG。
+- Completed：本地验收环境已固定并验证，见 `evidence/local-acceptance-environment.md`；Cloud 本地默认使用 `wt_media_cloud`、`127.0.0.1:18080`，本地验收账号登录接口已通过。
+- Current：ACTIVE，继续推进 M2-B；用户已要求等 M2-B 整体执行完后再统一人工验收。
+- Next：在不改变 M2-B 业务闭环的前提下，继续补齐后续媒体账号与 Profile 真实绑定、账号检查与身份回填闭环。
 - Blockers：无。
-- Recent verification：`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/profilebinding ./internal/modules/identity` PASS；`npm --prefix wt-media-cloud/web test -- --run profileBindings usersApi localAgentService` PASS；`cargo test --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`cargo check --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`npm run build:desktop --prefix wt-media-cloud/web` PASS；`npm run build:cloud --prefix wt-media-cloud/web` PASS；`git diff --check` PASS。
+- Recent verification：`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/profilebinding ./internal/modules/identity` PASS；`npm --prefix wt-media-cloud/web test -- --run profileBindings usersApi localAgentService` PASS；`cargo test --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`cargo check --manifest-path wt-media-desktop/src-tauri/Cargo.toml` PASS；`npm run build:desktop --prefix wt-media-cloud/web` PASS；`npm run build:cloud --prefix wt-media-cloud/web` PASS；`git diff --check` PASS；`GET /healthz` PASS；`POST /api/v1/auth/login` for `admin`、`senior01`、`operator01` PASS。
