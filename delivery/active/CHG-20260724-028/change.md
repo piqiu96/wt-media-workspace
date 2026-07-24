@@ -141,6 +141,7 @@
 - `desktop-agent-check.md`：Desktop → Rust → Local Agent同步调用验证；
 - `account-projection.md`：账号身份回填与页面结论验证；
 - `tests.md`：自动测试、构建和已知真实环境限制。
+- `manual-acceptance-checklist.md`：人工验收步骤、通过条件和失败场景。
 
 ## 8. 交付边界
 
@@ -153,11 +154,11 @@
 
 ## 9. Checkpoint
 
-- Completed：CHG 已创建并关联 M2-B 闭环；B3 账号台账与 Profile 绑定闭环已完成。
-- Current：Task 1 Start Gate 与现状审计待执行。
-- Next：审计 Cloud、Desktop、Agent 的现有账号检查链路，确认同步边界后再改代码。
-- Blockers：无。
-- Recent verification：继承 CHG-20260724-027 的测试与构建通过结论。
+- Completed：Task 1～Task 5 已完成代码实现与自动验证。Cloud 已改为本地账号检查预检/结果回写；Agent 已新增同步账号检查入口；Desktop 已新增 Tauri/Rust 账号检查命令；账号详情已提供 Desktop 检查入口和结果投影；Evidence 已补齐；已修复 Desktop Profile Diff 中“接受本地变化/恢复Cloud配置”依赖原生 confirm 导致点击无反应的问题，改为页面内确认弹窗。
+- Current：Cloud、Local Agent、Cloud Web、Desktop Web 与真实 Tauri Desktop 壳已启动；已修复 Desktop dev `/api` 代理旧端口导致的登录“服务器返回格式错误”；已修复本机可信绑定被 Cloud 未同步 BitBrowser 窗口阻断的问题；已记录M2本地验收启动与绑定防踩坑规则；已补充人工验收清单；人工验收继续暴露本机可信绑定不稳定、浏览器窗口字段/同步操作/停用语义、媒体账号新增/绑定/状态/手动登录同步等M2-B闭环缺口，已记录到`manual-acceptance-issues-20260724.md`并同步补充Milestone；已修复本机可信绑定因Cloud心跳过期导致的误失效问题，Desktop新增`local_agent_refresh_runtime`并在环境状态、Profile扫描/Diff处理、账号检查前刷新Cloud运行状态；已追加修复本机可信刷新过于频繁导致的高延迟/误掉线体感，前端增加60秒刷新缓存，Cloud刷新短暂失败但本地节点仍存在时不立即误判掉线；已修复浏览器窗口扫描无Diff时仍要求保存的问题，无差异时只提示无需处理并隐藏保存类操作；已修复环境状态页显示已绑定但刷新失败的问题，刷新失败时会在BitBrowser主账号一致的前提下自动重新申请绑定票据并绑定当前Desktop执行凭证；用户已确认该本机可信刷新/重绑路径验收成功。
+- Next：按M2-B已记录缺口拆分浏览器窗口同步操作和媒体账号台账/检查返修CHG，继续推进浏览器窗口与媒体账号真实闭环。
+- Blockers：无自动验证阻塞；人工验收尚未完成。
+- Recent verification：Cloud Go tests PASS；Agent unittest discover PASS（53 tests）；Desktop cargo test PASS（5 tests）；Web mediaAccounts/localAgentService tests PASS（9 tests）；runtimebinding/profileguard/profilebinding Go tests PASS；localAgentStatus/profileBindings Web tests PASS；Cloud API、Local Agent、Cloud Web、Desktop Web 与 Tauri Desktop 启动检查 PASS；Desktop `5174/api/v1/auth/login` 返回统一 JSON 且本地 cookie 不带 Secure；真实 runtime report 接受含 Cloud 未同步 Profile 的 BitBrowser 上报；`npm --prefix web test -- --run profileBindings localAgentStatus` PASS；`npm --prefix web run build:desktop` PASS；`cargo test` PASS；`npm --prefix web test -- --run localAgentService localAgentStatus profileBindings mediaAccounts` PASS；`npm --prefix web run build:desktop` PASS；追加修复后`npm --prefix web test -- --run localAgentService localAgentStatus profileBindings mediaAccounts` PASS；追加修复后`npm --prefix web run build:desktop` PASS；刷新失败自动重新绑定修复后`npm --prefix web test -- --run localAgentStatus localAgentService profileBindings mediaAccounts` PASS；刷新失败自动重新绑定修复后`npm --prefix web run build:desktop` PASS；2026-07-24 23:37 +0800用户人工验收 PASS。
 
 ## 10. Pending Questions
 
