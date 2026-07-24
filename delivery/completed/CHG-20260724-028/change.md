@@ -1,7 +1,7 @@
 # CHG-20260724-028：M2-B4-1 单个媒体账号检查与身份回填闭环
 
 > 日期：2026-07-24  
-> 状态：ACTIVE  
+> 状态：DONE  
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环  
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`  
 > 当前仓库：`wt-media-workspace`  
