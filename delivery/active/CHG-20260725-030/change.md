@@ -158,12 +158,20 @@
 
 ## 9. Checkpoint
 
-- Completed：B6 active CHG 已创建；B5 已完成运行仓库提交并归档到 completed；Task 1 Start Gate 与现状审计已完成，见 `evidence/start-gate.md`。
-- Current：准备执行 Task 2 媒体账号台账字段、筛选和状态规则收口。
-- Next：修正媒体账号页面命名、字段展示、绑定窗口标签、可执行原因和检查/同步入口文案，并评估状态枚举兼容方案。
+- Completed：
+  - B6 active CHG 已创建；
+  - B5 已完成运行仓库提交并归档到 completed；
+  - Task 1 Start Gate 与现状审计已完成，见 `evidence/start-gate.md`；
+  - Task 2 媒体账号台账字段、筛选和状态规则已部分收口，见 `evidence/account-ledger.md`；
+  - Task 3 绑定/换绑窗口选择与唯一性验收已完成，见 `evidence/account-profile-binding.md`；
+  - Task 4 账号行打开/关闭窗口入口已接入 Desktop 本机操作路径，见 `evidence/account-window-operations.md`；
+  - Task 5 检查/同步账号信息体验已收口，见 `evidence/account-check-sync.md`。
+- Current：Task 6 验证与 Evidence 汇总已完成，准备 diff review 与分仓库提交。
+- Next：提交 Cloud 媒体账号收口改动和 Workspace evidence/checkpoint；随后继续评估 B6 是否还需单独补批量账号检查 CHG，或进入 M2-C。
 - Blockers：无。
 - Recent verification：
   - 继承 B5 提交前复验：Agent unittest、Desktop `cargo test`、Web `npm test`、Web `npm run build`、Cloud profilebinding `go test` 均 PASS。
+  - 2026-07-25 B6 Task 2/4 复验：`npm test` PASS，9 files / 32 tests；`npm run build` PASS；`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/mediaaccount ./internal/modules/profilebinding ./internal/modules/profileguard` PASS。
 
 ## 10. Pending Questions
 
