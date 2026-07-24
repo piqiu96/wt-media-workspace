@@ -1,7 +1,7 @@
 # CHG-20260724-029：M2-B5 浏览器窗口真实操作与台账收口
 
 > 日期：2026-07-24  
-> 状态：ACTIVE  
+> 状态：DONE  
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环  
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`  
 > 当前仓库：`wt-media-workspace`  
@@ -163,11 +163,22 @@
 
 ## 9. Checkpoint
 
-- Completed：已创建CHG，等待Start Gate。
-- Current：准备执行Task 1。
-- Next：审计Cloud/Web/Desktop/Agent现状，确定实现文件映射。
+- Completed：
+  - Task 1 Start Gate 已完成，见 `evidence/start-gate.md`；
+  - Task 2 Cloud窗口查询与只读边界已收口，见 `evidence/cloud-window-query.md`；
+  - Task 3 Desktop打开/关闭窗口同步链路已实现并自动验证，见 `evidence/desktop-open-close.md`；
+  - Task 4 Desktop新建窗口真实创建链路已实现并自动验证，见 `evidence/desktop-create-profile.md`；
+  - Task 5 停用/归档和Diff交互语义已收口，见 `evidence/diff-and-archive.md`。
+- Current：已完成并分仓库提交。
+- Next：继续 M2-B 后续媒体账号闭环 CHG，完成后进入 M2-C。
 - Blockers：无。
-- Recent verification：继承`CHG-20260724-028`，用户已人工验收本机可信刷新/重绑路径。
+- Recent verification：
+  - `python3 -m unittest tests/test_local_profile_operations.py tests/test_local_account_check.py` PASS；
+  - `cargo test` PASS；
+  - `npm test` PASS；
+  - `npm run build` PASS；
+  - `go test ./internal/modules/profilebinding` 使用仓库本地 `GOCACHE` PASS。
+  - 2026-07-25 提交前复验：`python3 -m unittest tests/test_local_profile_operations.py tests/test_local_account_check.py` PASS；`cargo test` PASS；`npm test` PASS；`npm run build` PASS；`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/profilebinding` PASS。
 
 ## 10. Pending Questions
 

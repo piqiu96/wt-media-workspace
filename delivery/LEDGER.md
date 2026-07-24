@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260724-029 | M2-B5 浏览器窗口真实操作与台账收口 | ACTIVE | wt-media-workspace |
+| CHG-20260725-030 | M2-B6 媒体账号操作与检查收口 | ACTIVE | wt-media-workspace |
