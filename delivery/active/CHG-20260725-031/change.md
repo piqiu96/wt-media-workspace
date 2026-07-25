@@ -145,10 +145,10 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：社媒账号页“打开窗口/关闭窗口”已同步 BrowserUsers 页修复，去除打开/关闭前置状态刷新并补齐 loading、错误展示和缺 ID 防护，见 `evidence/manual-acceptance-account-window-actions.md`。
-- Next：用户在最新 Agent session `46283` 与 Desktop session `81281` 中复验社媒账号页打开/关闭窗口；若仍失败，直接读取 Agent 日志中的 `profile_id`、duration 和 error 继续定位 BitBrowser 侧原因。
+- Current：BrowserUsers 新建窗口 404 已定位为 BitBrowser `/browser/create` 路径不存在并改用 `/browser/update`；停用按钮已修复 Web 204 NoContent 解析与 loading/错误反馈；代理绑定/更换按 M2-C 处理，见 `evidence/manual-acceptance-profile-create-archive.md`。
+- Next：用户在最新 Agent session `17057` 与 Desktop session `69344` 中复验 BrowserUsers 新建窗口和停用；代理绑定/更换进入 M2-C 验收/实施清单。
 - Blockers：无。
-- Recent verification：`npm test` PASS，9 files / 33 tests；`npm run build` PASS；Desktop shell session `81281` 已启动；Agent session `46283` 仍在记录 profile open/close 日志。
+- Recent verification：BitBrowser `/browser/create` 真实返回 Not Found，`/browser/update` 真实返回结构化业务错误；Agent profile/runtime tests PASS，12 tests；Web `npm test` PASS，10 files / 34 tests；`npm run build` PASS。
 
 ## 9. Pending Questions
 
