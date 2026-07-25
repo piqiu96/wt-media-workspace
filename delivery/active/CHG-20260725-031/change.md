@@ -137,11 +137,17 @@
 
 ## 8. Checkpoint
 
-- Completed：B7 active CHG 已创建；B6 收口判断确认批量账号检查需要独立 CHG。
-- Current：准备执行 Task 1 Start Gate 与批量模型审计。
-- Next：审计现有账号检查链路和可复用批量模型。
+- Completed：
+  - B7 active CHG 已创建；
+  - B6 收口判断确认批量账号检查需要独立 CHG；
+  - Task 1 Start Gate 与批量模型审计已完成，见 `evidence/start-gate.md`；
+  - Task 2 批量检查入口与预检已完成，见 `evidence/batch-account-check.md`；
+  - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
+  - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
+- Current：Task 5 M2-B 综合收口判断已完成，见 `evidence/m2-b-closure.md`。
+- Next：执行 diff review 与分仓库提交；提交后关闭 B7，并在用户完成人工验收通过后进入 M2-C。
 - Blockers：无。
-- Recent verification：继承 B6 `npm test`、`npm run build`、Cloud mediaaccount/profilebinding/profileguard `go test` PASS。
+- Recent verification：`npm test` PASS，9 files / 32 tests；`npm run build` PASS；`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/mediaaccount ./internal/modules/profilebinding ./internal/modules/profileguard` PASS。
 
 ## 9. Pending Questions
 
