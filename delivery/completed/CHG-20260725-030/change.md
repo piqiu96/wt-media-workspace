@@ -1,7 +1,7 @@
 # CHG-20260725-030：M2-B6 媒体账号操作与检查收口
 
 > 日期：2026-07-25  
-> 状态：ACTIVE  
+> 状态：DONE  
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环  
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`  
 > 当前仓库：`wt-media-workspace`  
@@ -167,7 +167,7 @@
   - Task 4 账号行打开/关闭窗口入口已接入 Desktop 本机操作路径，见 `evidence/account-window-operations.md`；
   - Task 5 检查/同步账号信息体验已收口，见 `evidence/account-check-sync.md`。
 - Current：Task 6 验证与 Evidence 汇总已完成，准备 diff review 与分仓库提交。
-- Next：提交 Cloud 媒体账号收口改动和 Workspace evidence/checkpoint；随后继续评估 B6 是否还需单独补批量账号检查 CHG，或进入 M2-C。
+- Next：B6 已关闭；M2-B 仍缺批量账号检查，已激活 B7 后再判断是否进入 M2-C。见 `evidence/closure-assessment.md`。
 - Blockers：无。
 - Recent verification：
   - 继承 B5 提交前复验：Agent unittest、Desktop `cargo test`、Web `npm test`、Web `npm run build`、Cloud profilebinding `go test` 均 PASS。
