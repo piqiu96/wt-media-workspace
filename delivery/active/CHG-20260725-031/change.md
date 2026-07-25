@@ -145,10 +145,10 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：针对“打开窗口只显示正在打开但不收口”已去除 Desktop open/close 后非必要 profile scan 等待；最新 Desktop shell 已重启，见 `evidence/manual-acceptance-open-hang.md`。
-- Next：用户在最新 Desktop shell 中复验打开/关闭窗口；若通过，按 `evidence/m2-b-closure.md` 关闭 B7 并进入 M2-C；若仍不打开，继续以 Local Agent open/close 返回和 BitBrowser UI 实际状态定位。
+- Current：针对“仍停留在正在打开且缺少失败原因”已确认真实原因是 BitBrowser Local API open 首次超时，并补充 Agent 日志、前端错误展示和打开/关闭前置刷新移除，见 `evidence/manual-acceptance-agent-logging.md`。
+- Next：用户在最新 Agent session `46283` 与 Desktop session `58261` 中复验打开/关闭窗口；若仍失败，直接读取 Agent 日志中的 `profile_id`、duration 和 error 继续定位 BitBrowser 侧原因。
 - Blockers：无。
-- Recent verification：截图对应 profile `0b2ed362e88141f38894ba221483030d` 的 Local Agent `/profile-open` PASS；`cargo test` PASS，10 tests；`cargo build` PASS；最新 Desktop shell session `3117` 已启动。
+- Recent verification：截图对应 profile `0ab85cc0373f42eb9e804c3db20be30a` 首次 Local Agent `/profile-open` 返回 timeout 并被 Agent 日志记录，重试成功；`npm test` PASS，9 files / 33 tests；`npm run build` PASS；Agent profile operation unittest PASS，4 tests。
 
 ## 9. Pending Questions
 
