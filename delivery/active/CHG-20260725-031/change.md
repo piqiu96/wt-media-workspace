@@ -144,7 +144,8 @@
   - Task 2 批量检查入口与预检已完成，见 `evidence/batch-account-check.md`；
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
-- Current：人工验收环境已启动，见 `evidence/manual-acceptance-runtime.md`；等待用户执行真实 Desktop / Local Agent / BitBrowser 人工验收。
+  - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
+- Current：人工验收环境已重启并加载修复；等待用户继续执行真实 Desktop / Local Agent / BitBrowser 人工验收。
 - Next：用户按 `evidence/m2-b-closure.md` 的验收链路确认通过后，关闭 B7 并进入 M2-C；若发现真实读回或页面结果不一致，创建 M2-B 修复 CHG。
 - Blockers：无。
 - Recent verification：`npm test` PASS，9 files / 32 tests；`npm run build` PASS；`env GOCACHE=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build go test ./internal/modules/mediaaccount ./internal/modules/profilebinding ./internal/modules/profileguard` PASS。
