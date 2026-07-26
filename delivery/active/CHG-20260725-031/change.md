@@ -145,10 +145,10 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：BrowserUsers 新建窗口 404 已定位为 BitBrowser `/browser/create` 路径不存在并改用 `/browser/update`；停用按钮已修复 Web 204 NoContent 解析与 loading/错误反馈；代理绑定/更换按 M2-C 处理，见 `evidence/manual-acceptance-profile-create-archive.md`。
-- Next：用户在最新 Agent session `17057` 与 Desktop session `69344` 中复验 BrowserUsers 新建窗口和停用；代理绑定/更换进入 M2-C 验收/实施清单。
+- Current：BrowserUsers 新建窗口已补齐 BitBrowser 必需的 `browserFingerPrint`、直连代理字段和创建专用长超时，并已通过真实 Local Agent / BitBrowser 创建与扫描读回验证；停用后端 route 和 Web 客户端均已自动测试，见 `evidence/manual-acceptance-profile-create-tested.md`。
+- Next：用户在最新 Agent PID `39991` 中复验 BrowserUsers 新建窗口和停用；代理绑定/更换进入 M2-C 验收/实施清单。
 - Blockers：无。
-- Recent verification：BitBrowser `/browser/create` 真实返回 Not Found，`/browser/update` 真实返回结构化业务错误；Agent profile/runtime tests PASS，12 tests；Web `npm test` PASS，10 files / 34 tests；`npm run build` PASS。
+- Recent verification：Agent `/healthz` PASS；真实 Local Agent 创建 `wt-media-acceptance-20260726-1220` PASS，返回并读回 `e25a849033e242d4ae4a9685d6b036c1`；Agent tests PASS，14 tests；Cloud profilebinding tests PASS；Web `npm test` PASS，10 files / 34 tests；`npm run build` PASS。
 
 ## 9. Pending Questions
 
