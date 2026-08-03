@@ -20,11 +20,15 @@ npm run build:desktop
 
 echo "=== 3. 复制构建产物到 Desktop ==="
 cp -r "$CLOUD_WEB_DIR/dist-desktop/"* "$GENERATED_DIR/"
+if [[ -f "$GENERATED_DIR/index.desktop.html" ]]; then
+  cp "$GENERATED_DIR/index.desktop.html" "$GENERATED_DIR/index.html"
+fi
 rm -rf "$CLOUD_WEB_DIR/dist-desktop"
 
 echo "=== 4. 验证 ==="
 echo "  Desktop 前端文件数: $(find "$GENERATED_DIR" -type f | wc -l)"
-echo "  index.html: $(wc -c < "$GENERATED_DIR/index.desktop.html") bytes"
+test -s "$GENERATED_DIR/index.html"
+echo "  index.html: $(wc -c < "$GENERATED_DIR/index.html") bytes"
 
 echo ""
 echo "=== Desktop 前端构建完成 ==="

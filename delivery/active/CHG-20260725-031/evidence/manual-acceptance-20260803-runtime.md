@@ -41,7 +41,9 @@ Confirmed user inputs:
 
 - Desktop frontend build:
   - Command: `bash ../wt-media-workspace/scripts/build-desktop.sh` through Tauri `beforeBuildCommand`.
-  - Actual: PASS, 29 frontend files copied to Desktop `.generated/frontend`.
+  - Initial finding: FAIL, generated Desktop assets only included `index.desktop.html`; packaged Tauri runtime looked for `index.html` and showed `asset not found: index.html`.
+  - Fix applied: `build-desktop.sh` now copies `index.desktop.html` to `index.html` and fails the build if `index.html` is absent or empty.
+  - Retest: PASS, 30 frontend files copied to Desktop `.generated/frontend`; `index.html` is 410 bytes.
 - Tauri config fix:
   - `beforeBuildCommand` changed from a brittle relative path to `bash ../wt-media-workspace/scripts/build-desktop.sh`.
 - Packaged dmg:
@@ -51,9 +53,11 @@ Confirmed user inputs:
 - DMG mount:
   - Command: `hdiutil attach target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg`.
   - Actual: PASS, mounted at `/Volumes/WT Media`.
+  - Environment cleanup: duplicate old mounts `/Volumes/WT Media` and `/Volumes/WT Media 1` were detached before final launch.
 - App launch:
   - Command: `open "/Volumes/WT Media/WT Media.app"`.
-  - Actual: PASS.
+  - Actual: PASS, process source verified as `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`.
+  - Log check: PASS, `log show` narrow search found no `asset not found` or `index.html` errors after final launch.
 
 ## Real BitBrowser Profile Verification
 
@@ -127,4 +131,4 @@ Required manual checks:
 
 ## Status
 
-Current-day M2-B runtime environment is usable. Automated real BitBrowser window create/read/open/close passed after the Agent timeout fix. Full M2-B closure still requires the user to complete packaged Desktop UI and platform-login manual checks.
+Current-day M2-B runtime environment is usable after the packaged Desktop entrypoint fix. Automated real BitBrowser window create/read/open/close passed after the Agent timeout fix. The final launched app process is from the newly mounted DMG, not an old build. Full M2-B closure still requires the user to complete packaged Desktop UI and platform-login manual checks.
