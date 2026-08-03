@@ -145,10 +145,10 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：2026-08-03 当前环境复验已重新收口：Cloud、Local Agent、BitBrowser 和打包 Desktop dmg 均已准备；真实 BitBrowser 新建窗口、扫描读回、Agent 打开/关闭已通过，且修复了 open/close 5 秒超时导致的假失败；用户反馈的 packaged App `asset not found: index.html` 已定位为 Desktop 打包入口缺失并修复，最终 DMG 已重新生成、清理旧进程和重复挂载后从 `/Volumes/WT Media/WT Media.app` 启动，日志未再出现 `asset not found`/`index.html` 错误，见 `evidence/manual-acceptance-20260803-runtime.md`。
+- Current：2026-08-03 当前环境复验已再次收口：Cloud、Local Agent、BitBrowser 和打包 Desktop dmg 均已准备；真实 BitBrowser 新建窗口、扫描读回、Agent 打开/关闭已通过，且修复了 open/close 5 秒超时导致的假失败；用户反馈的 packaged App `asset not found: index.html` 已定位为 Desktop 打包入口缺失并修复；用户反馈的 packaged Desktop 登录 `服务器返回格式错误` 已定位为 `/api/v1` 相对路径落到 Tauri 静态资源协议，已改为 packaged Desktop 使用本地 Cloud API 绝对地址，并补齐 Cloud 本地 Desktop CORS；最终 DMG 已重新生成、清理旧进程和重复挂载后从 `/Volumes/WT Media/WT Media.app` 启动，见 `evidence/manual-acceptance-20260803-runtime.md`。
 - Next：用户在挂载的 `/Volumes/WT Media/WT Media.app` 中用 `operator01` 完成 packaged Desktop 页面人工验收；平台身份真实回填仍需用户在新建 BitBrowser 窗口内登录 B站或百家号后再同步。
 - Blockers：无。
-- Recent verification：Cloud `/api/v1/health` PASS；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；final DMG launch from `/Volumes/WT Media/WT Media.app` PASS；Desktop launch log contains no `asset not found`/`index.html` errors PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 34 tests；`cargo tauri build --bundles dmg --no-sign` PASS。
+- Recent verification：Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop launched from `/Volumes/WT Media/WT Media.app` and reached Cloud `/api/v1/auth/me` PASS；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 
 ## 9. Pending Questions
 

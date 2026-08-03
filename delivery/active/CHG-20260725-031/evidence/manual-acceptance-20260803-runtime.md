@@ -58,6 +58,12 @@ Confirmed user inputs:
   - Command: `open "/Volumes/WT Media/WT Media.app"`.
   - Actual: PASS, process source verified as `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`.
   - Log check: PASS, `log show` narrow search found no `asset not found` or `index.html` errors after final launch.
+- Packaged Desktop login regression:
+  - Initial finding: FAIL, packaged Desktop login showed `服务器返回格式错误`.
+  - Root cause: packaged Desktop used relative Cloud API base `/api/v1`; outside the Vite dev proxy this resolved against the Tauri asset protocol and returned non-JSON static-resource output.
+  - Fix applied: Desktop packaged runtime resolves the default Cloud API base to `http://127.0.0.1:18080/api/v1`, while Desktop dev server `5174` keeps the relative `/api/v1` proxy path.
+  - Cloud compatibility fix: local Desktop/dev CORS middleware now allows credentialed requests from `http://tauri.localhost`, `https://tauri.localhost`, `tauri://localhost`, and local Vite dev origins.
+  - Retest: PASS, direct `POST /api/v1/auth/login` with Origin `http://tauri.localhost` returned unified JSON and `Set-Cookie`; newly launched packaged Desktop reached Cloud `/api/v1/auth/me` instead of Tauri static assets.
 
 ## Real BitBrowser Profile Verification
 
@@ -102,7 +108,14 @@ Confirmed user inputs:
   - Note: existing chunk size warning remains.
 - Web tests:
   - Command: `npm test`.
-  - Actual: PASS, 10 files / 34 tests.
+  - Actual: PASS, 10 files / 36 tests.
+- Cloud app tests:
+  - Command: `go test ./internal/app`.
+  - Actual: PASS.
+- Local environment script:
+  - Script: `wt-media-workspace/scripts/m2b-local-acceptance.sh`.
+  - Verification command: `m2b-local-acceptance.sh verify`.
+  - Actual: PASS, verified Cloud, Agent, BitBrowser through Agent, Desktop generated assets, and DMG.
 
 ## Manual Acceptance Still Required
 
@@ -131,4 +144,4 @@ Required manual checks:
 
 ## Status
 
-Current-day M2-B runtime environment is usable after the packaged Desktop entrypoint fix. Automated real BitBrowser window create/read/open/close passed after the Agent timeout fix. The final launched app process is from the newly mounted DMG, not an old build. Full M2-B closure still requires the user to complete packaged Desktop UI and platform-login manual checks.
+Current-day M2-B runtime environment is usable after the packaged Desktop entrypoint and login API base fixes. Automated real BitBrowser window create/read/open/close passed after the Agent timeout fix. The final launched app process is from the newly mounted DMG, not an old build. A stable local acceptance script now exists for repeatable startup/build/launch/verify flows. Full M2-B closure still requires the user to complete packaged Desktop UI and platform-login manual checks.
