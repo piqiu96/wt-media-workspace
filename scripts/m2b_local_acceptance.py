@@ -227,7 +227,7 @@ def clean_artifacts() -> None:
 def build_dmg() -> None:
     clean_artifacts()
     log("Building Desktop DMG")
-    run([str(SCRIPT_DIR / "build-desktop.sh")])
+    run(["bash", str(SCRIPT_DIR / "build-desktop.sh")])
     run(["cargo", "tauri", "build", "--bundles", "dmg", "--no-sign"], cwd=DESKTOP_DIR)
 
 

@@ -114,8 +114,20 @@ Confirmed user inputs:
   - Actual: PASS.
 - Local environment script:
   - Script: `wt-media-workspace/scripts/m2b-local-acceptance.sh`.
+  - Full rebuild command: `m2b-local-acceptance.sh all`.
+  - Initial script finding: FAIL, Python executed `build-desktop.sh` directly and depended on executable file mode.
+  - Fix applied: Python now invokes `bash build-desktop.sh`, so the workflow is stable even when the shell script is not chmod executable.
+  - Full rebuild retest: PASS, cleaned old Desktop artifacts, rebuilt frontend, rebuilt Tauri dmg, mounted dmg, launched `/Volumes/WT Media/WT Media.app`, and reverified the local environment.
   - Verification command: `m2b-local-acceptance.sh verify`.
   - Actual: PASS, verified Cloud, Agent, BitBrowser through Agent, Desktop generated assets, and DMG.
+- Packaged Desktop login:
+  - CORS preflight: PASS, `OPTIONS /api/v1/auth/login` from `http://tauri.localhost` returned 204 and credentialed CORS headers.
+  - Login API: PASS, `POST /api/v1/auth/login` with `operator01` returned HTTP 200 unified JSON and `Set-Cookie`.
+- Skill:
+  - Path: `.codex/skills/m2b-local-acceptance`.
+  - Purpose: reuse this exact M2-B local acceptance startup/build/launch/verify workflow before user validation.
+  - Manual structure check: PASS.
+  - Official `quick_validate.py`: DEFER, current local Python lacks `yaml` module.
 
 ## Manual Acceptance Still Required
 
@@ -144,4 +156,4 @@ Required manual checks:
 
 ## Status
 
-Current-day M2-B runtime environment is usable after the packaged Desktop entrypoint and login API base fixes. Automated real BitBrowser window create/read/open/close passed after the Agent timeout fix. The final launched app process is from the newly mounted DMG, not an old build. A stable local acceptance script now exists for repeatable startup/build/launch/verify flows. Full M2-B closure still requires the user to complete packaged Desktop UI and platform-login manual checks.
+Current-day M2-B runtime environment is usable after the packaged Desktop entrypoint and login API base fixes. Automated real BitBrowser window create/read/open/close passed after the Agent timeout fix. The final launched app process is from the newly mounted DMG, not an old build. A stable local acceptance script now exists and the full `all` workflow passed after cleaning old artifacts and rebuilding the dmg. Full M2-B closure still requires the user to complete packaged Desktop UI and platform-login manual checks.
