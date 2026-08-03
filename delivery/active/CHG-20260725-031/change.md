@@ -145,10 +145,10 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：BrowserUsers 新建窗口已补齐 BitBrowser 必需的 `browserFingerPrint`、直连代理字段和创建专用长超时，并已通过真实 Local Agent / BitBrowser 创建与扫描读回验证；停用后端 route 和 Web 客户端均已自动测试，见 `evidence/manual-acceptance-profile-create-tested.md`。
-- Next：用户在最新 Agent PID `39991` 中复验 BrowserUsers 新建窗口和停用；代理绑定/更换进入 M2-C 验收/实施清单。
+- Current：2026-08-03 当前环境复验已启动：Cloud、Local Agent、BitBrowser 和打包 Desktop dmg 均已准备；真实 BitBrowser 新建窗口、扫描读回、Agent 打开/关闭已通过，且修复了 open/close 5 秒超时导致的假失败，见 `evidence/manual-acceptance-20260803-runtime.md`。
+- Next：用户在挂载的 `/Volumes/WT Media/WT Media.app` 中用 `operator01` 完成 packaged Desktop 页面人工验收；平台身份真实回填仍需用户在新建 BitBrowser 窗口内登录 B站或百家号后再同步。
 - Blockers：无。
-- Recent verification：Agent `/healthz` PASS；真实 Local Agent 创建 `wt-media-acceptance-20260726-1220` PASS，返回并读回 `e25a849033e242d4ae4a9685d6b036c1`；Agent tests PASS，14 tests；Cloud profilebinding tests PASS；Web `npm test` PASS，10 files / 34 tests；`npm run build` PASS。
+- Recent verification：Cloud `/api/v1/health` PASS；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 34 tests；`cargo tauri build --bundles dmg --no-sign` PASS。
 
 ## 9. Pending Questions
 
