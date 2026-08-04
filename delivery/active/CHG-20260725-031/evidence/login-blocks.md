@@ -87,6 +87,26 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 
 待用户复验 Agent 状态页与绑定入口。
 
+## 11. 打包 Desktop 双根因修复与绑定成功（2026-08-04）
+
+通过临时 Rust 诊断钩子（`log_js_error` + webview 控制台转发）捕获到实际错误，定位并修复两个根因：
+
+**根因 A：Vite external 导致裸模块导入**
+- `vite.config.desktop.js` 曾有 `rollupOptions.external: ["@tauri-apps/api/core"]`，Vite 跳过打包该模块，产物残留裸导入 `from"@tauri-apps/api/core"`，打包 webview 无法解析（"Module name ... does not resolve to a valid URL"），导致点击页面无反应/挂起。
+- 修复：移除该 external（与 cloud 构建一致）。产物现打包为 `core-myWptFl7.js`，页面 chunk 经相对路径导入。**这解释了为何改静态导入仍失败**——external 使静态导入也未被打包。
+
+**根因 B：cloudBaseUrl() 误返回页面源**
+- `init.js`/`AccountsPage.vue`/`ProfilesPage.vue` 的 `cloudBaseUrl()` 在打包 App 返回 `window.location.origin`（`http://tauri.localhost`），导致 Rust 节点注册打到 `http://tauri.localhost/api/v1/...` 失败。
+- 修复：origin 非 `127.0.0.1:18080` 时一律返回 Cloud 地址 `http://127.0.0.1:18080`。
+
+**验证（打包 App，operator01）**：
+- 页面导航恢复正常（社媒账号/浏览器用户/Agent 状态均可进入）。
+- Agent 状态页环境检测正常（Agent 空闲、BitBrowser 可用、主账号已读取）。
+- **绑定当前比特浏览器账号成功**：Cloud 链路 `main-identity 200 → binding-tickets 201 → nodes/register 201`（此前 nodes/register 缺失）。
+- 诊断日志无 JS 错误。
+
+提交待补充：cloud `vite.config.desktop.js` + `cloudBaseUrl` 三处 + dist 产物；desktop `.generated/frontend`；workspace evidence/checkpoint。
+
 ## 8. 根治：Desktop 会话 token 走请求头（X-Session-Token）
 
 SameSite=None 仍未解决：日志显示登录 200 → `/auth/me` 401 持续出现，确认为 **WKWebView 跨站第三方 cookie 不回传**（开发模式 `devUrl: http://127.0.0.1:5174` 与 API 同站可登录；打包模式页面在 `http://tauri.localhost` 与 API 跨站则失败）。

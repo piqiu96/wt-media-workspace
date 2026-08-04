@@ -145,9 +145,9 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：2026-08-04 打包 Desktop 登录验收通过（token 请求头认证）。**Agent 状态页模块解析修复完成**：根因是打包 WebView 无法解析裸说明符动态导入 `import("@tauri-apps/api/core")`；3 处（init.js/AccountsPage/ProfilesPage）改静态导入，双端架构审查确认 Cloud Web 不受影响；npm test 36 PASS、dist-desktop/dist-cloud 构建通过；`cargo clean` 后重建 DMG 并确认新 chunk 内嵌。见 `evidence/login-blocks.md`。
-- Next：用户复验打包 Desktop Agent 状态页（应显示 Agent 空闲/BitBrowser 可用/主账号已读取，可绑定可信节点）；随后进入 M2-B 验收（扫描→Diff→新建→开/关→增删账号→绑定→单项/批量检查→失败重试）；真实平台身份回填需在 BitBrowser 登录 B站/百家号。
-- Blockers：无（待用户复验 Agent 状态页）。
+- Current：2026-08-04 打包 Desktop 核心链路全部打通：登录（token 请求头）、页面导航（Vite external 移除）、**Agent 状态页 + 可信节点绑定**（cloudBaseUrl 修复，`nodes/register 201` 成功）。临时 Rust 诊断钩子捕获真实错误辅助定位。见 `evidence/login-blocks.md`。
+- Next：进入 M2-B 页面人工验收（扫描窗口→处理Diff→新建窗口→打开/关闭→增删账号→绑定→单项/批量检查→失败项重试）；真实平台身份回填需在 BitBrowser 登录 B站/百家号。
+- Blockers：无。
 - Recent verification：`wt-media-workspace/scripts/m2b-local-acceptance.sh all` PASS，已清理旧产物、重建并启动 DMG；Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop process verified from `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 
 ## 9. Pending Questions
