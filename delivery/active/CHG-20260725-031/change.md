@@ -113,10 +113,12 @@
   - B7 active CHG 已创建；
   - 窗口实现与自动/API 验证全部完成：Diff 闭环（字段级展示、操作态不入 diff、缺失窗口清理、备注接受生效、友好提示、分页、布局）用户已 GUI 确认；真实 BitBrowser 创建/读回/开/关、停用 PASS；自增主键迁移 PASS；打包 Desktop 登录链路可用。
   - 2026-08-05 拆分：本 CHG 收窄为浏览器窗口收口；社媒账号收口拆至后续新 CHG（待窗口验收完成后创建）；
-  - 2026-08-05 新建 `evidence/window-closure.md` 窗口收口矩阵。
-- Current：2026-08-05 窗口收口记录完成，进入**用户 GUI 验收阶段**。窗口功能代码已实现且自动验证全绿，验收由用户在打包 Desktop 界面执行。
-- Next：用户 GUI 验收 A3 新建窗口、A4 批量开/关、A2 恢复 Cloud 配置端到端、Agent 状态页；确认后回填 `evidence/window-closure.md` 待确认项为 PASS → 窗口收口 DONE → 提供依赖环境；社媒账号收口 CHG 经 planning-wt-media-delivery 规划后执行。
-- Blockers：无硬阻塞；窗口 GUI 验收待用户执行（非阻塞，属必需人工动作）。社媒账号真实回填阻塞随账号 CHG 迁移。
+  - 2026-08-05 新建 `evidence/window-closure.md` 窗口收口矩阵；
+  - 2026-08-05 GUI 验收：A3 新建窗口 PASS、A4 批量开/关 PASS；「取消变更」按钮已移除（与关闭抽屉行为重复，属误导性 UX），后端 `/reject` 空操作路由保留待清理；
+  - 2026-08-05 A2 首验失败（502，BitBrowser 要求 browserFingerPrint），根因与修复见 `evidence/a2-restore-fix.md`；Agent `update_profile` 改为读回当前指纹并原样传回（指纹不出本地运行时），66 tests PASS；Agent 状态页可用但重启需重绑，记优化项。
+- Current：2026-08-05 窗口收口进入**收尾阶段**：A3/A4 已 PASS；A2 已修复待重验；Agent 状态页可用（重绑定为优化项）。
+- Next：用户重建打包 Desktop（内嵌新 Agent）后**重验 A2 恢复 Cloud 配置**（确认不再 502、写回读回一致、指纹未重置）；A2 PASS 后回填 `evidence/window-closure.md` → 窗口收口 DONE → 提供依赖环境；社媒账号收口 CHG 经 planning-wt-media-delivery 规划后执行。
+- Blockers：A2 重验待用户执行（非阻塞，属必需人工动作）；社媒账号真实回填阻塞随账号 CHG 迁移。
 - Recent verification：`wt-media-workspace/scripts/m2b-local-acceptance.sh all` PASS，已清理旧产物、重建并启动 DMG；Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop process verified from `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 
 ## 9. Pending Questions
