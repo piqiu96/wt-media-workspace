@@ -43,7 +43,18 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 
 ## 5. 后续修复动作（待确认）
 
-- [ ] 获取/reset operator01 密码，API 层验证 operator01 登录成功；
-- [ ] 重启 Cloud/Agent 到最新构建，重建 DMG 前确认新鲜度门；
+- [x] 获取/reset operator01 密码，API 层验证 operator01 登录成功；
+- [x] 重启 Cloud/Agent 到最新构建，确认新鲜度门；
 - [ ] 在最新环境 + 打包 App 上复现登录，采集用户侧报错，确认根因并修复；
-- [ ] 将全部结论并入 `environment-bring-up` skill 与登录冒烟门。
+- [x] 将全部结论并入 `environment-bring-up` skill 与登录冒烟门。
+
+## 6. 修复与复验结果（2026-08-04）
+
+- **operator01 密码**：经 admin `POST /api/v1/users/3/reset-password` 重置为 `operator01`（账号密码一致），API 登录 `errcode 0` 返回 operator01/team1/game1。
+- **环境确定性硬化**（`scripts/m2b_local_acceptance.py`）：
+  - 新增 `--force-restart`：按端口杀死陈旧 Cloud/Agent（含手工启动、无 PID 文件的进程），并等待端口释放；
+  - 构建新鲜度门：`verify_assets`/`verify_dmg` 按喂给产物的源码路径（cloud `web/`、desktop `src-tauri/`）比较 mtime，避免无关提交造成误判；
+  - 登录冒烟门：`verify`/`all` 增加 `verify_login`（默认 admin/admin123，可用 `WT_MEDIA_LOGIN_USER/PASSWORD` 覆盖）。
+- **确定性重建**：`up --force-restart` 将 Cloud 重启为最新代码（PID 28303，含 login API base/CORS 修复）、Agent 最新（PID 28323）；`verify` 全门禁 PASS（Cloud/Agent/BitBrowser/assets fresh/DMG fresh/login smoke）；最新 DMG 已重新挂载并启动（shell PID 28361）。
+- **复验**：fresh Cloud 上 operator01/operator01 登录 `errcode 0`；CORS preflight from `http://tauri.localhost` 返回 204。
+- **待用户**：在已打开的打包 Desktop 中，以 `operator01` / `operator01` 登录，确认端到端登录成功并进入 M2-B 验收流程。

@@ -256,25 +256,37 @@ def verify_all() -> None:
     verify_dmg()
 
 
+def lsof_listener_pids(port: str) -> list[str]:
+    # `-tiTCP:<port>` and `-sTCP:LISTEN` must each stay a single argv element;
+    # lsof otherwise treats `:port` as a file path and exits nonzero.
+    result = subprocess.run(
+        ["lsof", f"-tiTCP:{port}", "-sTCP:LISTEN"],
+        capture_output=True,
+        text=True,
+    )
+    return [line.strip() for line in result.stdout.split() if line.strip().isdigit()]
+
+
 def stop_listener(port: str, label: str) -> None:
     """Kill whatever currently listens on the given port, PID-file or not.
 
     A stale Cloud/Agent started manually (no PID file) would otherwise survive
     `--force-restart` and keep serving old code.
     """
-    result = subprocess.run(
-        ["lsof", "-tiTCP", f":{port}", "-sTCP:LISTEN"],
-        capture_output=True,
-        text=True,
-    )
-    for line in result.stdout.split():
-        line = line.strip()
-        if line.isdigit():
-            try:
-                os.kill(int(line), signal.SIGTERM)
-                print(f"{label}: stopped pid {line} on :{port}")
-            except OSError:
-                pass
+    for pid in lsof_listener_pids(port):
+        try:
+            os.kill(int(pid), signal.SIGTERM)
+            print(f"{label}: stopped pid {pid} on :{port}")
+        except OSError:
+            pass
+
+
+def wait_port_free(port: str, timeout_seconds: float = 10.0) -> None:
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        if not lsof_listener_pids(port):
+            return
+        time.sleep(0.3)
 
 
 def stop_started() -> None:
@@ -287,7 +299,9 @@ def stop_started() -> None:
             print(f"{name}: stopped pid {pid} from pid file")
         pid_file.unlink(missing_ok=True)
     stop_listener(CLOUD_PORT, "cloud")
+    wait_port_free(CLOUD_PORT)
     stop_listener(AGENT_PORT, "agent")
+    wait_port_free(AGENT_PORT)
 
 
 def source_commit_epoch(repo_dir: Path, paths: tuple[str, ...] = ()) -> float:
