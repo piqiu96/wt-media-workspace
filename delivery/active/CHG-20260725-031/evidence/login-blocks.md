@@ -58,3 +58,17 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 - **确定性重建**：`up --force-restart` 将 Cloud 重启为最新代码（PID 28303，含 login API base/CORS 修复）、Agent 最新（PID 28323）；`verify` 全门禁 PASS（Cloud/Agent/BitBrowser/assets fresh/DMG fresh/login smoke）；最新 DMG 已重新挂载并启动（shell PID 28361）。
 - **复验**：fresh Cloud 上 operator01/operator01 登录 `errcode 0`；CORS preflight from `http://tauri.localhost` 返回 204。
 - **待用户**：在已打开的打包 Desktop 中，以 `operator01` / `operator01` 登录，确认端到端登录成功并进入 M2-B 验收流程。
+
+## 7. 打包 Desktop 登录根因与修复（SameSite 跨站 cookie）
+
+用户反馈"点击登录后无法进入下一步"。Cloud 日志显示登录链路：
+`POST /auth/login 200（成功，设 cookie）→ GET /auth/me 401（会话未建立）`。
+
+根因：打包 App 页面运行在 `http://tauri.localhost`，与本地 Cloud API（`http://127.0.0.1:18080`）**跨站**；服务端会话 cookie 原为 `SameSite=Lax`（无 Secure），**跨站 fetch 不发送 Lax cookie** → 会话无法回传 → `/auth/me` 401 → 登录后卡住。
+
+修复（`wt-media-cloud/internal/modules/identity/routes.go`）：新增 `sessionCookieMode(origin, defaultSecure)`，当 `Origin` 含 `tauri.localhost` 时 cookie 用 `SameSite=None; Secure`，否则保持 `SameSite=Lax`。login/logout 三处 SetCookie 均应用。新增单测 `TestDesktopOriginLoginUsesSameSiteNoneSecureCookie`。验证：
+- 带 tauri Origin：`Set-Cookie: ...; SameSite=None; secure`（跨站可回传）；
+- 不带 Origin（Cloud Web 同源）：`SameSite=Lax`（不变）。
+- `go test ./internal/modules/identity/...` PASS，`./internal/app` PASS。
+
+待用户重测打包 App 登录。
