@@ -201,6 +201,7 @@ def verify_assets() -> None:
     assets_dir = DESKTOP_DIR / ".generated" / "frontend" / "assets"
     if not any("127.0.0.1:18080/api/v1" in path.read_text(encoding="utf-8", errors="ignore") for path in assets_dir.glob("http-*.js")):
         raise RuntimeError("Desktop assets: packaged API base not found in http chunk")
+    check_fresh(index, [(CLOUD_DIR, ("web",))], "Desktop assets")
     print("Desktop assets: PASS")
 
 
@@ -208,6 +209,7 @@ def verify_dmg() -> None:
     log("Verifying DMG")
     if not DMG_PATH.is_file() or DMG_PATH.stat().st_size == 0:
         raise RuntimeError(f"DMG: missing {DMG_PATH}")
+    check_fresh(DMG_PATH, [(CLOUD_DIR, ("web",)), (DESKTOP_DIR, ("src-tauri",))], "DMG")
     print(f"DMG: PASS {DMG_PATH}")
 
 
@@ -254,15 +256,87 @@ def verify_all() -> None:
     verify_dmg()
 
 
+def stop_listener(port: str, label: str) -> None:
+    """Kill whatever currently listens on the given port, PID-file or not.
+
+    A stale Cloud/Agent started manually (no PID file) would otherwise survive
+    `--force-restart` and keep serving old code.
+    """
+    result = subprocess.run(
+        ["lsof", "-tiTCP", f":{port}", "-sTCP:LISTEN"],
+        capture_output=True,
+        text=True,
+    )
+    for line in result.stdout.split():
+        line = line.strip()
+        if line.isdigit():
+            try:
+                os.kill(int(line), signal.SIGTERM)
+                print(f"{label}: stopped pid {line} on :{port}")
+            except OSError:
+                pass
+
+
 def stop_started() -> None:
-    log("Stopping processes started by this script")
+    log("Stopping stale Cloud/Agent processes")
     for name in ["cloud", "agent"]:
         pid_file = PID_DIR / f"{name}.pid"
         if pid_alive(pid_file):
             pid = int(pid_file.read_text(encoding="utf-8").strip())
             os.kill(pid, signal.SIGTERM)
-            print(f"{name}: stopped {pid}")
+            print(f"{name}: stopped pid {pid} from pid file")
         pid_file.unlink(missing_ok=True)
+    stop_listener(CLOUD_PORT, "cloud")
+    stop_listener(AGENT_PORT, "agent")
+
+
+def source_commit_epoch(repo_dir: Path, paths: tuple[str, ...] = ()) -> float:
+    """Epoch of the newest commit in repo_dir touching `paths` (or the repo HEAD).
+
+    Scoping to the paths that feed a build artifact avoids false staleness from
+    unrelated commits (e.g. a skill-sync commit invalidating a DMG).
+    """
+    cmd = ["git", "-C", str(repo_dir), "log", "-1", "--format=%ct"]
+    if paths:
+        cmd.append("--")
+        cmd.extend(paths)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    out = result.stdout.strip()
+    return float(out) if out else 0.0
+
+
+def check_fresh(path: Path, sources: list[tuple[Path, tuple[str, ...]]], label: str) -> None:
+    if not path.exists() or path.stat().st_size == 0:
+        raise RuntimeError(f"{label}: missing or empty {path}")
+    newest_source = max(source_commit_epoch(repo, paths) for repo, paths in sources)
+    if path.stat().st_mtime < newest_source:
+        raise RuntimeError(
+            f"{label}: stale build (mtime {path.stat().st_mtime:.0f} "
+            f"< newest source commit {newest_source:.0f})"
+        )
+    print(f"{label}: fresh")
+
+
+def verify_login() -> None:
+    log("Verifying login smoke")
+    username = os.environ.get("WT_MEDIA_LOGIN_USER", "admin")
+    password = os.environ.get("WT_MEDIA_LOGIN_PASSWORD", "admin123")
+    req = json.dumps(
+        {"username": username, "password": password, "replace_existing": True}
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        f"{CLOUD_BASE_URL}/api/v1/auth/login",
+        data=req,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        body = json.loads(response.read().decode("utf-8"))
+    if body.get("errcode") != 0:
+        raise RuntimeError(
+            f"Login smoke: FAIL errcode={body.get('errcode')} message={body.get('message')!r}"
+        )
+    print(f"Login smoke: PASS user={username}")
 
 
 def parse_args() -> argparse.Namespace:
@@ -272,12 +346,19 @@ def parse_args() -> argparse.Namespace:
         choices=["up", "verify", "build-dmg", "launch-dmg", "all", "stop"],
         help="workflow command to execute",
     )
+    parser.add_argument(
+        "--force-restart",
+        action="store_true",
+        help="stop stale Cloud/Agent processes before starting",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     try:
+        if args.force_restart:
+            stop_started()
         if args.command == "up":
             run_migrations()
             start_cloud()
@@ -285,6 +366,7 @@ def main() -> int:
             verify_bitbrowser()
         elif args.command == "verify":
             verify_all()
+            verify_login()
         elif args.command == "build-dmg":
             build_dmg()
             rebuild_cloud_dist()
@@ -299,6 +381,7 @@ def main() -> int:
             launch_dmg()
             rebuild_cloud_dist()
             verify_all()
+            verify_login()
         elif args.command == "stop":
             stop_started()
     except (subprocess.CalledProcessError, RuntimeError, urllib.error.URLError) as exc:
