@@ -145,8 +145,8 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：2026-08-04 浏览器窗口页产品优化完成（用户验收反馈 5 点）：菜单/路由改名"浏览器窗口"；列表系统ID倒序+比特ID可排序；搜索拆分独立字段；**停用/归档废弃→窗口业务状态（启用/停用）**（仅账号匹配筛选、不被扫描覆盖、停用打开/关闭禁用、账号绑定排除；停用+本机已删→同步删除）；编辑（Cloud 备注）、状态分列、详情补充；里程碑 L229 语义修正。后端迁移+排序+PATCH+同步删除，前端 ProfilesPage/AccountsPage，`go test`/`npm test` 全绿，DMG 重建并内嵌新前端。见 `evidence/browser-window-product-optimization.md`。
-- Next：用户 GUI 复验浏览器窗口页新功能（菜单改名/排序/搜索/停用→启用/编辑/状态分列/同步删除）；随后继续 M2-B 验收（扫描→Diff→新建→开/关→增删账号→绑定→检查→重试）与真实平台身份回填（B站/百家号）。
+- Current：2026-08-05 浏览器窗口页第二轮产品优化完成（用户 10 点）：**browser_profiles.id 全量迁移为自增主键**（4 FK 表+数据迁移+索引重建，首次失败已恢复重试）；confirm 500 占位符修复 + 停用+本机缺失**同步自动清理**（移除缺失 tab 同步删除）；备注拆两字段（remark + cloud_remark）；运行状态本地跟踪 + 批量开/关；自增ID/seq 列排序、默认 seq；用户名、配色、详情抽屉、分页总数。`go test`/`npm test` 全绿，DMG 重建。见 `evidence/browser-window-product-optimization.md`。
+- Next：用户 GUI 复验第二轮（自增ID/seq 排序、批量开/关、运行状态、备注双标记、confirm 不报错、停用+本机已删自动清理）；随后继续 M2-B 验收与真实平台身份回填（B站/百家号）。
 - Blockers：无。
 - Recent verification：`wt-media-workspace/scripts/m2b-local-acceptance.sh all` PASS，已清理旧产物、重建并启动 DMG；Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop process verified from `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 

@@ -38,3 +38,32 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 - BitBrowser 侧窗口编辑（Agent update_profile 写回名称/分组/代理）——后续 CHG。
 - 标签展示/搜索（需扩 browser_profiles 表）——后续 CHG。
 - 详情"历史同步/检查记录"独立查询——后续评估。
+
+# 第二轮产品优化（2026-08-05）
+
+## 用户 10 点反馈与决策
+1. confirm 500（ApplyScan INSERT 占位符 bug，21 列 20 `?`）→ 修复；停用+本机缺失窗口**同步自动清理**（接受本地变化时删除 Cloud 记录），移除缺失 tab 逐项同步删除按钮。
+2. **browser_profiles.id 从字符串全量迁移为自增主键**（违反里程碑 L206）；默认按比特序号排序；第一列自增ID、第二列比特序号。标识符语义确认：`profile_id`/`browser_profile_id`（FK 列）= 记录 ID，`bit_profile_id` = BitBrowser ID。
+3. 授权用户列显示用户名。
+4. 运行状态**本地跟踪**（打开/关闭后记录）；已打开只显示关闭、已关闭只显示打开。
+5. 操作按钮加配色。
+6. 详情抽屉放大（560px）+ 只留关闭样式。
+7. 备注**拆分两字段**：`remark`=BitBrowser备注（扫描写入不可改）+ `cloud_remark`=桌面端可编辑追加，一列双标记。
+8. 分页总数修复（v-model 与 :pagination 冲突 → watcher 设 total）。
+9. 批量打开/关闭（表格多选 + 顶部按钮）。
+10. seq/自增ID 列可点击排序。
+
+## 实现
+- **迁移 `20260804_017_browser_profiles_auto_increment_pk.sql`**：id varchar→BIGINT AUTO_INCREMENT；4 张 FK 表（media_accounts/runtime_presence/sensitive_tasks/permits）对应列→bigint + 数据映射 + 索引先删后建（首次尝试因 `uq_media_accounts_profile_platform` 保留在 platform 上失败，从备份恢复后修正重试）；加 `cloud_remark`。`uq_browser_profiles_user_bit_profile` 保留。
+- 后端：ApplyScan INSERT 改 `id=NULL`（自增）+ 21 占位符 + 新增 cloud_remark；upsert 靠已有 `uq(user_id, bit_profile_id)`；同步自动清理"停用+本机缺失"（事务删 runtime_presence + browser_profiles）；PATCH 改更新 `cloud_remark`（remark 保持 BitBrowser 来源）。
+- 前端 ProfilesPage：自增ID/seq 列排序、默认 seq 倒序、运行状态列（本地跟踪）、批量打开/关闭（多选）、操作按钮配色、详情抽屉 560px 无 footer、备注双标记 `[B]`/`[C]`、用户名标签、分页 total watcher、移除缺失 tab 同步删除。
+- 测试：ApplyScan 占位符/自动清理/cloud_remark、UpdateProfile、索引 mock 更新。
+
+## 验证
+- `go test ./internal/...` 全绿；`npm test` 36 PASS；双端构建通过。
+- 迁移应用并验证：id 自增数字、FK 引用完整、索引重建、cloud_remark 列存在。
+- API 实测：列表数字 id、PATCH cloud_remark 生效且比特备注保留。
+- DMG 重建（cargo clean）内嵌新前端，无 JS 错误。
+
+## 待用户 GUI 复验
+自增ID 第一列/seq 第二列排序、批量开/关、运行状态、备注双标记、用户名、配色、详情抽屉、分页总数、confirm 不再报错、停用+本机已删扫描确认后自动删除。
