@@ -235,13 +235,15 @@ def validate_active_change(root: Path) -> list[str]:
 
     active_change = active_ids[0]
     change_text = active_paths[0].read_text(encoding="utf-8")
-    title_match = re.search(rf"^# {re.escape(active_change)}: (.+)$", change_text, flags=re.MULTILINE)
+    # Canonical change.md records use a blockquote header (`# CHG-xxx：标题`,
+    # `> 状态：ACTIVE`, `> 当前仓库：`); accept both that form and the dash form.
+    title_match = re.search(rf"^# {re.escape(active_change)}[：:] ?(.+)$", change_text, flags=re.MULTILINE)
     title = title_match.group(1) if title_match else None
-    status_match = re.search(r"^- Status: (\S+)$", change_text, flags=re.MULTILINE)
+    status_match = re.search(r"^(?:- Status:|> 状态[：:])\s*(\S+)\s*$", change_text, flags=re.MULTILINE)
     status = status_match.group(1) if status_match else None
-    repo_match = re.search(r"^- Current repository: `([^`]+)`$", change_text, flags=re.MULTILINE)
+    repo_match = re.search(r"^(?:- Current repository:|> 当前仓库[：:])\s*`([^`]+)`\s*$", change_text, flags=re.MULTILINE)
     current_repository = repo_match.group(1) if repo_match else None
-    if status not in {"IN_PROGRESS", "IMPLEMENTING", "VERIFYING"}:
+    if status not in {"IN_PROGRESS", "IMPLEMENTING", "VERIFYING", "ACTIVE"}:
         errors.append(
             "active CHG status must be IN_PROGRESS, IMPLEMENTING or VERIFYING, "
             f"got {status!r}"

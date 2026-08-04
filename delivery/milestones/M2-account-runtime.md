@@ -150,7 +150,7 @@ HTTP成功、请求已接受、任务已创建或Agent已调用接口都不等�
 ### 依据与关联CHG
 
 - Product：第三章3.2、3.4.2～3.4.4、3.7；
-- Decisions：ADR-0003、0004、0006；
+- Decisions：ADR-0003、0004、0009；
 - Completed：`CHG-20260723-024`，M2-A 已人工验收通过。
 
 ## M2-B 浏览器窗口与媒体账号真实闭环
@@ -254,7 +254,7 @@ Desktop登录后扫描Profile
 ### 依据与候选CHG
 
 - Product：第三章3.3、3.4；
-- Decisions：ADR-0002、0003、0004、0005、0006；
+- Decisions：ADR-0002、0003、0004、0008、0009；
 - 候选：B1窗口扫描与Diff只读、B2接受本地变化/恢复Cloud配置/窗口生命周期与授权、B3账号台账与绑定、B4账号检查。
 
 ## M2-C 代理资源与窗口真实绑定闭环
@@ -321,7 +321,7 @@ Desktop登录后扫描Profile
 ### 依据与候选CHG
 
 - Product：第三章3.5；
-- Decisions：ADR-0004、0005、0006；
+- Decisions：ADR-0004、0008、0009；
 - 候选：C1代理台账与无副作用导入、C2真实检测与配额、C3推荐与Profile写入读回、C4外部变化与生命周期。
 
 ## M2-D 账号上号与Cookie闭环
@@ -408,7 +408,7 @@ Desktop登录后扫描Profile
 ### 依据与候选CHG
 
 - Product：第三章3.3.7～3.3.10、3.6、3.7；
-- Decisions：ADR-0004、0005、0006；
+- Decisions：ADR-0004、0008、0009；
 - 候选：D1凭据与Cookie台账、D2批量CK、D3接码、D4人工验证码与人工接管、D5导出和换绑清理、D6批次恢复。
 
 ## M2-E Desktop本地执行投影与安全收口闭环
@@ -490,7 +490,7 @@ Desktop登录后扫描Profile
 ### 依据与候选CHG
 
 - Engineering：Desktop、Agent、通信、测试和发布章节；
-- Decisions：ADR-0003、0004、0005；
+- Decisions：ADR-0003、0004、0008；
 - 候选：E1 Sidecar、环境状态与同步安全桥，E2本机执行抽屉与本地恢复，E3互斥、安全退出与综合真实验收。
 
 ## 4. M2完整纵向业务流程
@@ -524,7 +524,7 @@ Desktop登录后扫描Profile
 ### 技术验收
 
 - Cloud正式事实、Desktop安全桥、Agent执行与BitBrowser读回一致；
-- 单项同步、批次/item和长流程异步task边界符合ADR-0005；
+- 单项同步、批次/item和长流程异步task边界符合ADR-0008；
 - 权限、互斥、幂等、取消、重试和结果待确认行为通过。
 
 ### 真实依赖验收

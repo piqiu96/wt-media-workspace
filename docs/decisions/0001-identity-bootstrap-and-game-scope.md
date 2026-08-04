@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted（部分被 ADR-0009 替代：角色命名与用户标识实现假设以 ADR-0009 为准；游戏范围稳定字符串规则继续有效）
 
 ## Context
 

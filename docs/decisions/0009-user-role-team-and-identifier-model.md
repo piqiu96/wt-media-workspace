@@ -1,4 +1,4 @@
-# ADR-0006: User Role, Team, and Identifier Model
+# ADR-0009: User Role, Team, and Identifier Model
 
 - Status: Accepted
 - Date: 2026-07-22

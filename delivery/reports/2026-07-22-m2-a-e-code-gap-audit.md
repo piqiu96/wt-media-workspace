@@ -1,7 +1,7 @@
 # M2-A～E 当前代码差距审计
 
 > 日期：2026-07-22  
-> 基线：`delivery/milestones/M2-account-runtime.md`、产品第三章、工程架构、ADR-0005/0006  
+> 基线：`delivery/milestones/M2-account-runtime.md`、产品第三章、工程架构、ADR-0008/0009  
 > 范围：Cloud/Web、Local Agent、Desktop 当前代码；本报告不修改运行时代码。
 
 ## 1. 结论

@@ -1,4 +1,4 @@
-# ADR-0005: Local BitBrowser Operation Execution Model
+# ADR-0008: Local BitBrowser Operation Execution Model
 
 - Status: Accepted
 - Date: 2026-07-22
