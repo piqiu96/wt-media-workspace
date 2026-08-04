@@ -88,3 +88,6 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 
 ## 验证
 `npm test` 36 PASS、双端构建通过、DMG 重建内嵌新前端无 JS 错误。待用户 GUI 复验。
+
+## 布局修复（AppLayout 菜单消失）
+第三轮 `app-root-layout{overflow:hidden}` + `app-aside{position:sticky;height:100vh}` 导致菜单栏消失、整页滑动。修复：去掉 `overflow:hidden` 与 `position:sticky`，保留 `根 height:100vh` + `aside height:100vh;overflow-y:auto` + `content-area height:calc(100vh-48px);overflow:auto`。菜单固定可见、仅内容区独立滚动；表格横向滚动由 t-table `:scroll="{x:'max-content'}"` 承担。DMG 重建内嵌新 AppLayout chunk，无 JS 错误。待用户 GUI 复验。
