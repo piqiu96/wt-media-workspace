@@ -89,6 +89,20 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 ## 验证
 `npm test` 36 PASS、双端构建通过、DMG 重建内嵌新前端无 JS 错误。待用户 GUI 复验。
 
+# Diff 闭环修复批（2026-08-05）
+
+## 修复项（均已 GUI 确认）
+1. **Diff 字段级展示**：变更栏新增"变更字段"列显示 `字段: 旧值 → 新值`（名称/分组/代理/备注）；缺失/新增栏从 Cloud 窗口列表回查字段值，不再显示 "-"。
+2. **操作态不入 diff**：`bit_status`（打开/关闭）与 `bit_updated_at`（更新时间）从 changedFields 移除——打开/关闭窗口不再误判为窗口变更。仅配置字段（name/seq/group/proxy/remark/身份）算 diff。
+3. **缺失窗口接受后清理**：ApplyScan 接受本地变化时，删除"已从 BitBrowser 删除且无媒体账号引用"的 Cloud 记录；有引用的保留为 local_missing。修复多表 DELETE 关联子查询导致的 FK 错误（用一次性库验证：无引用删、有引用保留）。
+4. **备注接受生效**：ON DUPLICATE KEY UPDATE 增加 `remark = VALUES(remark)`——接受本地变化时 BitBrowser 备注更新到 Cloud；`cloud_remark`（桌面可编辑）保持不动。接受文案更新。
+5. **未可信扫描友好提示**：`refreshRuntimeWithCooldown` 刷新失败时返回本地状态，由 triggerScan 的 node_id 检查给出"请先绑定可信环境"提示（不再无提示/抛原始错误）。
+6. **窗口缩小自适应**：内容区子元素 `min-width:0; max-width:100%`；表格横向滚动由包装层承担。
+7. **分页修复**：手动分页（pagedProfiles 切片 + 独立 t-pagination，10/20/50/100 默认20）；操作按钮顺序：详情→打开/关闭→编辑→停用。
+
+## 已确认
+用户确认以上修复全部正常。
+
 ## 布局修复（标准管理后台 Shell，彻底）
 TDesign `.t-layout__content { flex: auto }` 默认撑大页面导致整页滚动。最终方案：
 - 全局 `web/src/shared/styles/layout.css`：`html,body,#app{height:100%;margin:0}` + `body{overflow:hidden}`（body 不滚动）。

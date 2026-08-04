@@ -145,9 +145,9 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：2026-08-05 浏览器窗口页第三轮展示优化完成（用户 10 点，纯前端）：列调整（ID/seq/名称/分组/代理窄/备注/状态/运行/同步时间/操作，Bit ID/授权用户/Cloud状态 移详情）；备注双色双行；同步完整时间；运行筛选 + 授权用户筛选；菜单固定 + 列表横向滚动；业务→状态。`npm test`/双端构建全绿，DMG 重建。见 `evidence/browser-window-product-optimization.md`。
-- Next：用户 GUI 复验第三轮（列布局/备注/筛选/同步时间/菜单固定）；随后继续 M2-B 验收与真实平台身份回填（B站/百家号）。
-- Blockers：无。
+- Current：2026-08-05 M2-B Diff 闭环已确认通过：字段级变更展示（旧→新）、操作态（bit_status/bit_updated_at）不入 diff、缺失窗口接受后清理（无账号引用删、有引用 local_missing，修复 FK 错误）、备注接受生效（cloud_remark 保持）、未可信扫描友好提示、窗口缩小自适应、手动分页、标准管理后台布局（固定菜单+顶栏）。见 `evidence/browser-window-product-optimization.md`。
+- Next：按整体确认清单继续 M2-B 验收：A2 恢复Cloud配置/取消变更、A3 新建窗口、A4 批量开/关、A5 停用；B 账号台账与绑定（需平台匹配）；C 单项/批量检查与真实平台身份回填（需 B站/百家号 真实账号）；D 边界一致性；E 收口（更新矩阵+关闭 CHG-031）。
+- Blockers：真实平台账号（B站/百家号）用于真实回填；现有 bilibili 账号↔百家号窗口不匹配需处理。
 - Recent verification：`wt-media-workspace/scripts/m2b-local-acceptance.sh all` PASS，已清理旧产物、重建并启动 DMG；Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop process verified from `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 
 ## 9. Pending Questions
