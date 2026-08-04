@@ -72,3 +72,29 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 - `go test ./internal/modules/identity/...` PASS，`./internal/app` PASS。
 
 待用户重测打包 App 登录。
+
+## 8. 根治：Desktop 会话 token 走请求头（X-Session-Token）
+
+SameSite=None 仍未解决：日志显示登录 200 → `/auth/me` 401 持续出现，确认为 **WKWebView 跨站第三方 cookie 不回传**（开发模式 `devUrl: http://127.0.0.1:5174` 与 API 同站可登录；打包模式页面在 `http://tauri.localhost` 与 API 跨站则失败）。
+
+修复方案：**Desktop 会话 token 经请求头传输**（header 不受 SameSite/第三方 cookie 策略限制）。改动：
+- `wt-media-cloud` 服务端：
+  - `internal/app/app.go`：CORS `Access-Control-Allow-Headers` 增加 `X-Session-Token`；
+  - `internal/modules/identity/routes.go`：
+    - 登录成功且 Origin 为 `tauri.localhost` 时，响应体带 `token`（Cloud Web 同源保持 HttpOnly cookie，响应仍为 user 对象，安全模型不变）；
+    - 新增 `sessionToken(c)`：cookie 优先，无 cookie 时回退 `X-Session-Token` 请求头；`AuthenticateRequestContext` 与登录幂等分支统一使用。
+  - 新增单测 `TestDesktopSessionTokenHeaderRoundTrip`：Desktop 登录响应含 token → `/auth/me` 带 header 返回 200。
+- `wt-media-cloud/web` 前端：
+  - `shared/api/http.js`：模块级 token 存储 + 请求注入 `X-Session-Token` header；
+  - `shared/api/session.js`：登录响应含 token 时存储并返回 `data.user`（兼容两种响应形状）。
+- 已重建 DMG（`http-DDmrQpqP.js` 含 X-Session-Token 逻辑）并重挂。
+
+验证（curl，重启后 Cloud）：
+- Desktop Origin 登录响应含 `token`（64 位）；
+- `/auth/me` 带 `X-Session-Token` 返回 200（operator01）；
+- CORS preflight 允许 `X-Session-Token`；
+- `go test` identity/app PASS；前端 36 测试 PASS；`verify` 全门禁 PASS。
+
+提交：cloud `aaf5e17`、desktop `c45bb5b`。
+
+待用户重测打包 App 登录。
