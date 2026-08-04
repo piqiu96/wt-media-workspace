@@ -73,6 +73,20 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 
 待用户重测打包 App 登录。
 
+## 10. 打包 Desktop Agent 状态页模块解析修复（2026-08-04）
+
+用户反馈 Agent 状态页报 `Module name, '@tauri-apps/api/core' does not resolve to a valid file`，为绑定窗口的前置依赖。
+
+**根因**：打包 Desktop WebView 无法解析**裸说明符动态导入** `import("@tauri-apps/api/core")`。全前端唯一 3 处（init.js、AccountsPage.vue、ProfilesPage.vue）；相对路径动态导入（路由懒加载）Vite 已改写、打包正常。
+
+**架构审查**（Desktop vs Cloud Web）：单一源码树、双 Vite 构建（dist-cloud/dist-desktop）；Desktop 才有 Agent 执行，Cloud Web 纯查看，门控靠 `__TAURI_INTERNALS__` + `desktopLocalAgentService()` 抛"只能在 Desktop 客户端执行"。`@tauri-apps/api/core.js` 加载无副作用（`invoke` 仅调用时访问 `__TAURI_INTERNALS__`），静态导入两端安全。
+
+**修复**：3 处动态导入改**静态导入**（`import { invoke } from "@tauri-apps/api/core"`）。init.js 已改；AccountsPage/ProfilesPage 同步改。未动 Vite 配置/路由/Cloud Web 逻辑。验证：无残留裸说明符动态导入；npm test 36 PASS；dist-desktop 构建通过且无动态导入；dist-cloud 构建通过。
+
+**打包**：`cargo clean` 后重建 DMG（防缓存旧资产），新 chunk（AgentStatusPage-BPDQMjF3.js 等）确认内嵌。提交：cloud `4688e74`+`331e3fa`、desktop `f0317df`。
+
+待用户复验 Agent 状态页与绑定入口。
+
 ## 8. 根治：Desktop 会话 token 走请求头（X-Session-Token）
 
 SameSite=None 仍未解决：日志显示登录 200 → `/auth/me` 401 持续出现，确认为 **WKWebView 跨站第三方 cookie 不回传**（开发模式 `devUrl: http://127.0.0.1:5174` 与 API 同站可登录；打包模式页面在 `http://tauri.localhost` 与 API 跨站则失败）。
@@ -97,4 +111,9 @@ SameSite=None 仍未解决：日志显示登录 200 → `/auth/me` 401 持续出
 
 提交：cloud `aaf5e17`、desktop `c45bb5b`。
 
-待用户重测打包 App 登录。
+## 9. 打包 Desktop 登录验收通过（2026-08-04）
+
+- 用户在打包 Desktop 用 `operator01` / `operator01` 登录**成功**。
+- 过程中发现额外问题：① 20:03 DMG 构建内嵌旧前端（cargo 缓存未重新嵌入变更资产），`cargo clean` 后 20:08 重建解决；② Origin 判断加固为与 CORS 白名单一致（`http/https://tauri.localhost`、`tauri://localhost`），提交 cloud `3efd118`。
+- **Agent 状态页存在显示问题（用户反馈，待修复）**：登录后进入的 Agent 状态页有异常，用户选择先继续批量验收，状态页问题列入 M2-B 收口待办。
+- 验收环境现状：Cloud/Agent/BitBrowser 健康，`main_user_id` 与 operator01 一致；`browser_profiles` 37 个，`media_accounts` 2 个（1 个已绑定窗口：bilibili 账号绑定到 `百家号_小帅游戏解说` 窗口——平台不匹配，批量检查将暴露真实不一致；1 个未绑定，可测跳过路径）。
