@@ -145,9 +145,11 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：2026-08-05 M2-B Diff 闭环已确认通过：字段级变更展示（旧→新）、操作态（bit_status/bit_updated_at）不入 diff、缺失窗口接受后清理（无账号引用删、有引用 local_missing，修复 FK 错误）、备注接受生效（cloud_remark 保持）、未可信扫描友好提示、窗口缩小自适应、手动分页、标准管理后台布局（固定菜单+顶栏）。见 `evidence/browser-window-product-optimization.md`。
-- Next：按整体确认清单继续 M2-B 验收：A2 恢复Cloud配置/取消变更、A3 新建窗口、A4 批量开/关、A5 停用；B 账号台账与绑定（需平台匹配）；C 单项/批量检查与真实平台身份回填（需 B站/百家号 真实账号）；D 边界一致性；E 收口（更新矩阵+关闭 CHG-031）。
-- Blockers：真实平台账号（B站/百家号）用于真实回填；现有 bilibili 账号↔百家号窗口不匹配需处理。
+  - 2026-08-05 收口矩阵已更新：`evidence/m2-b-closure.md` 纳入 8/3–8/5 全部后期变更（打包登录链路、Diff 闭环、停用、自增主键迁移、批量开/关），逐项标注 PASS/DEFER。
+  - 2026-08-05 新增真实回填验收清单：`evidence/real-account-readback-acceptance.md`（C1-C6 步骤 + 预期结果 + 回传格式）。
+- Current：2026-08-05 M2-B 工程实现与自动/API 验证已全部完成：Diff 闭环（字段级展示、操作态不入 diff、缺失窗口接受后清理、备注接受生效、友好提示、分页、标准管理后台布局）用户已 GUI 确认；真实 BitBrowser 窗口创建/读回/开/关、停用、批量检查控制流均 PASS；`m2b-local-acceptance.sh all` + `verify` PASS。打包 Desktop 登录链路可用（base URL/CORS/X-Session-Token/登录冒烟门）。
+- Next：M2-B 收口进入**用户真实环境验收阶段**，按 `evidence/real-account-readback-acceptance.md` 执行：C1 修正 bilibili↔百家号平台不匹配并新建正确平台窗口；C2 登录前检查失败路径；C3 真实登录后单项检查回填平台身份（核心出口事实）；C4 批量检查部分成功；C5 失败项精确重试；C6 GUI 复验新建窗口/批量开/关 + Agent 状态页。全部 PASS 后更新矩阵 DEFER 项为 PASS，执行 E 收口关闭 CHG-031。
+- Blockers：真实平台账号（B站/百家号）用于真实回填——环境性阻塞，需用户提供测试账号；现有 bilibili 账号↔百家号窗口不匹配需修正。
 - Recent verification：`wt-media-workspace/scripts/m2b-local-acceptance.sh all` PASS，已清理旧产物、重建并启动 DMG；Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop process verified from `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 
 ## 9. Pending Questions
