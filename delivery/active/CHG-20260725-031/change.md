@@ -145,9 +145,9 @@
   - Task 3 逐项串行执行与回填已完成，见 `evidence/batch-account-check.md`；
   - Task 4 批量结果、失败项重试和 Evidence 已完成，见 `evidence/batch-retry.md` 和 `evidence/tests.md`。
   - 人工验收暴露的分组读取、创建提示、比特序号和打开/关闭问题已修复，见 `evidence/manual-acceptance-fixes.md`。
-- Current：2026-08-04 当前环境复验已再次收口：Cloud、Local Agent、BitBrowser 和打包 Desktop dmg 均已准备；真实 BitBrowser 新建窗口、扫描读回、Agent 打开/关闭已通过，且修复了 open/close 5 秒超时导致的假失败；用户反馈的 packaged App `asset not found: index.html` 已定位为 Desktop 打包入口缺失并修复；用户反馈的 packaged Desktop 登录 `服务器返回格式错误` 已定位为 `/api/v1` 相对路径落到 Tauri 静态资源协议，已改为 packaged Desktop 使用本地 Cloud API 绝对地址，并补齐 Cloud 本地 Desktop CORS；M2-B 本地验收脚本已固化并跑通 `all`：清理旧产物、重建 frontend、重建 dmg、挂载并启动 `/Volumes/WT Media/WT Media.app`、验证 Cloud/Agent/BitBrowser/Desktop assets/DMG，见 `evidence/manual-acceptance-20260803-runtime.md`。
-- Next：用户在挂载的 `/Volumes/WT Media/WT Media.app` 中用 `operator01` 完成 packaged Desktop 页面人工验收；平台身份真实回填仍需用户在新建 BitBrowser 窗口内登录 B站或百家号后再同步。
-- Blockers：无。
+- Current：2026-08-04 登录与环境阻塞复现：环境在跑但 Cloud(启动 08-03 23:45)/Agent(启动 08-03 23:01) 均为**陈旧构建**（早于各自最新提交），系统存在 12 个历史数据库 → 环境非确定性，与"每次登录报错不同"一致；API 层实测 admin/admin123 + `replace_existing:true` 登录成功、CORS for `http://tauri.localhost` 正常、`operator01` 密码未知（错误密码映射 11001「请先登录或凭证已过期」）；打包 App 登录"不进去"的直接原因待用户提供 operator01 密码或经 admin 重置密码后，在最新环境 + 最新 DMG 上端到端复验，见 `evidence/login-blocks.md`。
+- Next：① 获取/重置 operator01 密码并验证 API 登录；② 固化 `environment-bring-up` skill（强制停旧进程、最新源码重建、固定唯一 DSN、登录冒烟门），重启 Cloud/Agent 到最新；③ 在打包 App 上完成登录与 M2-B 页面人工验收；④ 治理不一致修复。
+- Blockers：operator01 密码未知（需用户提供或授权 admin 重置）。
 - Recent verification：`wt-media-workspace/scripts/m2b-local-acceptance.sh all` PASS，已清理旧产物、重建并启动 DMG；Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop process verified from `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 
 ## 9. Pending Questions
