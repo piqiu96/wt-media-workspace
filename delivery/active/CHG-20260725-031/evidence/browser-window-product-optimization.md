@@ -89,5 +89,9 @@ CHG：CHG-20260725-031（M2-B7 批量账号检查与 M2-B 综合收口）
 ## 验证
 `npm test` 36 PASS、双端构建通过、DMG 重建内嵌新前端无 JS 错误。待用户 GUI 复验。
 
-## 布局修复（AppLayout 菜单消失）
-第三轮 `app-root-layout{overflow:hidden}` + `app-aside{position:sticky;height:100vh}` 导致菜单栏消失、整页滑动。修复：去掉 `overflow:hidden` 与 `position:sticky`，保留 `根 height:100vh` + `aside height:100vh;overflow-y:auto` + `content-area height:calc(100vh-48px);overflow:auto`。菜单固定可见、仅内容区独立滚动；表格横向滚动由 t-table `:scroll="{x:'max-content'}"` 承担。DMG 重建内嵌新 AppLayout chunk，无 JS 错误。待用户 GUI 复验。
+## 布局修复（标准管理后台 Shell，彻底）
+TDesign `.t-layout__content { flex: auto }` 默认撑大页面导致整页滚动。最终方案：
+- 全局 `web/src/shared/styles/layout.css`：`html,body,#app{height:100%;margin:0}` + `body{overflow:hidden}`（body 不滚动）。
+- AppLayout：根 `.app-shell{height:100%}`、侧栏 `.app-aside{height:100%;overflow-y:auto;flex-shrink:0}`、内层 `.app-main{height:100%;min-width:0;overflow:hidden}`、顶栏 `.topbar{flex-shrink:0}`、内容区 `.content-area{flex:1;overflow:auto;min-width:0;min-height:0}`（唯一滚动区）。
+- 关键：`min-height:0`+`overflow:auto` 使 flex 子项可收缩滚动；`overflow:hidden` 只在内层 `.app-main`；表格横向滚动由 `.table-scroll-wrap{overflow-x:auto}` 承担。
+- 前两次失败根因规避：`overflow:hidden` 不放根、内容区设 `min-height:0`、html/body 约束。desktop+cloud 双入口均 import layout.css。待用户 GUI 复验菜单/顶栏固定、内容区独立滚动。
