@@ -30,18 +30,18 @@
 ### 包含
 
 - **共享互斥（E1/M2-E 切片）**：同一 Profile 同时仅一个本地敏感操作（Cloud acquire/release + Agent 守卫），账号检查接入；供 CHG-C 继承
-- 账号台账收尾：账号详情 Cookie 操作入口（查看/导出）；`business_status` 枚举对齐 milestone（draft/enabled/disabled/abnormal/retired）
+- 账号台账收尾：`business_status` 补 draft=待识别/abnormal=异常（DB CHECK + 服务校验 + 页面统计筛选）；账号详情 Cookie 操作入口（**查看/导出当前 Cookie + 从 Profile 读真实 Cookie**，读回走 Agent 同步）
 - 平台身份真实识别：抖音/百家号 Cookie→UID；Bilibili/抖音/百家号昵称与头像真实回填
-- 检查结果体验：8 项检查明细在结果中逐项展示
-- 端到端验收：真实平台账号（Bilibili 单项 → 抖音/百家号 → 批量真实回填）
+- 账号检查 8 项完整化：**7/8（验证码/账号限制）本次实现**（需真实受限账号样本）；检查结果 8 项明细逐项展示
+- **账号组（可保存筛选，PRD 3.3.6）**：account_groups 模型 + CRUD + 保存/应用筛选；发布/互动（M6/M8）依赖它筛目标账号
+- 端到端验收：真实平台账号（Bilibili 单项 → 抖音/百家号 → 批量真实回填）+ 受限账号验证 7/8
 
 ### 不包含（延后/后续）
 
 - 检查项 3/4（代理正常/到期）→ 延后 M2-C（CHG-C 完成后接入）
-- 检查项 7/8（验证码/账号限制）→ 可延后（需真实受限账号样本）
-- 上号（CK/接码/人工验证码）、CK 全链路 → M2-D
+- CK **写入**/上号（CK 导入/接码/人工验证码）→ M2-D；本 CHG 只做查看/导出/读回
 - 代理管理、配额、分配 → M2-C（CHG-C）
-- 账号组（可保存筛选）→ 后续评估
+- 标签归属用户（前端传 user_id）→ 随标签交互补正（PRD 3.3.6）
 
 ## 4. 关键规则
 
@@ -57,19 +57,25 @@
 - 账号检查接入互斥
 - 交付互斥契约，CHG-C 继承复用
 
-### Task 2：账号台账收尾（零耦合）
-- B3-1 账号详情 Cookie 操作入口（查看/导出，后端 API 已有前端未接）
-- B3-2 `business_status` 枚举对齐 milestone（draft/enabled/disabled/abnormal/retired，DB CHECK + 服务校验 + 页面统计）
+### Task 2：账号台账收尾
+- B3-2 `business_status` 补 draft=待识别/abnormal=异常（DB CHECK + 服务校验 + 页面统计/筛选）
+- B3-1 Cookie 操作入口：账号详情「查看/导出当前 Cookie」+「从 Profile 读真实 Cookie」（Agent 同步读回）；写入/上号归 M2-D
 
 ### Task 3：平台身份真实识别
 - B4-2 抖音/百家号 Cookie→UID（`_identify_platform_account` 补齐，需各平台 Cookie 样本）
-- B4-3 昵称/头像真实回填（按平台读昵称/头像）
+- B4-3 昵称/头像真实回填（Bilibili/抖音/百家号）
 
-### Task 4：检查结果 8 项明细 UI
-- B4-6 检查结果中逐项展示 8 项明细
+### Task 4：账号检查 8 项完整化
+- 已实现 1/2/5/6（身份/Profile存在/登录/匹配）
+- 7/8 验证码/账号限制（跨平台，需真实受限账号样本）——本次实现
+- 3/4 代理项 → 延后 M2-C（接代理收口后回接）
+- B4-6 检查结果 8 项明细 UI（逐项展示，未实现/延后项标注状态）
 
-### Task 5：端到端验收与收口
-- 真实平台账号：Bilibili 单项 → 抖音/百家号 → 批量真实回填
+### Task 5：账号组（可保存筛选，PRD 3.3.6）
+- `account_groups` 模型 + CRUD + 保存/应用筛选条件；发布/互动（M6/M8）依赖
+
+### Task 6：端到端验收与收口
+- 真实平台账号：Bilibili 单项 → 抖音/百家号 → 批量真实回填；受限账号验证 7/8
 - 更新 M2-B 账号收口矩阵，判定收口 DONE 或创建修复 CHG
 
 ## 6. 验收标准
