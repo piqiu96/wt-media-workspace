@@ -41,8 +41,12 @@ CHG：CHG-20260725-031（M2-B 浏览器窗口收口）
 - 适配 `test_profile_mutations_use_long_timeout`（update 现在先本地扫指纹）。
 - `python -m unittest discover -s tests`：66 tests PASS。
 
-## 验证状态
+## 验证状态（2026-08-05 最终）
 
-- 代码修复 + 单测 PASS。
-- **待用户 GUI 重验 A2**：重建打包 Desktop（内嵌新 Agent）后，对产生 Diff 的窗口执行「恢复Cloud配置并读回验证」，确认不再 502、BitBrowser 被写回 Cloud 配置、重扫读回一致、且窗口指纹未被重置（重新打开窗口确认浏览器身份未变）。
-- 若重验发现代理配置（proxyMethod 等）相关问题，另行处理。
+- 三轮修复均单测 PASS（66 tests）：
+  1. 补 `browserFingerPrint`（原缺失 → 502「请传入 browserFingerPrint」），从 `/browser/detail` 读当前指纹原样传回；
+  2. 补 `proxyMethod`（原缺失 → 502「请选择代理方式」），从 `/browser/detail` 读当前值传回，读不到回退 2（环境实测 noproxy/socks5 均为 2）；
+  3. `_read_profile_runtime_fields` 一次 detail 调用同时返回指纹 + proxyMethod。
+- **用户 GUI 重验通过**：A2 恢复 Cloud 配置写回功能验证无问题（noproxy 场景）；指纹/代理方式均保留。
+- **延后项**：有代理窗口的恢复字段对齐（BitBrowser `host/port` vs payload `proxyHost/proxyPort`）→ 待 M2-C 代理管理完善后处理。
+- Agent 提交：`fbf9576`（browserFingerPrint）、`cba6970`（/browser/detail 来源）、`9c170b9`（proxyMethod）。

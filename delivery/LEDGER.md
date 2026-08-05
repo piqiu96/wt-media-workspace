@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260725-031 | M2-B7 批量账号检查与 M2-B 综合收口 | ACTIVE | wt-media-workspace |
+| _（无活跃记录）_ | 窗口收口 CHG-031 已完成（2026-08-05）；社媒账号收口 CHG 待规划 | — | wt-media-workspace |

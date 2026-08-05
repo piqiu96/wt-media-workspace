@@ -1,7 +1,7 @@
 # CHG-20260725-031：M2-B 浏览器窗口收口
 
 > 日期：2026-07-25（创建时标题"M2-B7 批量账号检查与 M2-B 综合收口"；2026-08-05 拆分收窄）
-> 状态：ACTIVE
+> 状态：DONE（2026-08-05 窗口收口完成）
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`
 > 当前仓库：`wt-media-workspace`
@@ -115,10 +115,12 @@
   - 2026-08-05 拆分：本 CHG 收窄为浏览器窗口收口；社媒账号收口拆至后续新 CHG（待窗口验收完成后创建）；
   - 2026-08-05 新建 `evidence/window-closure.md` 窗口收口矩阵；
   - 2026-08-05 GUI 验收：A3 新建窗口 PASS、A4 批量开/关 PASS；「取消变更」按钮已移除（与关闭抽屉行为重复，属误导性 UX），后端 `/reject` 空操作路由保留待清理；
-  - 2026-08-05 A2 首验失败（502，BitBrowser 要求 browserFingerPrint），根因与修复见 `evidence/a2-restore-fix.md`；Agent `update_profile` 改为读回当前指纹并原样传回（指纹不出本地运行时），66 tests PASS；Agent 状态页可用但重启需重绑，记优化项。
-- Current：2026-08-05 窗口收口进入**收尾阶段**：A3/A4 已 PASS；A2 已修复待重验；Agent 状态页可用（重绑定为优化项）。
-- Next：用户重建打包 Desktop（内嵌新 Agent）后**重验 A2 恢复 Cloud 配置**（确认不再 502、写回读回一致、指纹未重置）；A2 PASS 后回填 `evidence/window-closure.md` → 窗口收口 DONE → 提供依赖环境；社媒账号收口 CHG 经 planning-wt-media-delivery 规划后执行。
-- Blockers：A2 重验待用户执行（非阻塞，属必需人工动作）；社媒账号真实回填阻塞随账号 CHG 迁移。
+  - 2026-08-05 A2 恢复 Cloud 配置修复并**验证通过**：缺 browserFingerPrint、缺 proxyMethod 两个 502 均修复（Agent `update_profile` 从 `/browser/detail` 读回当前指纹与代理方式原样传回，指纹/代理方式不出本地运行时），66 tests PASS，用户 GUI 重验写回无问题，见 `evidence/a2-restore-fix.md`；
+  - Agent 状态页可用但重启需重绑，记优化项；
+  - **2026-08-05 窗口收口判定 DONE**：A3 新建窗口、A4 批量开/关、A2 恢复写回、A5 停用、边界一致性全部 PASS。
+- Current：2026-08-05 **窗口收口完成**，CHG-031 判定 DONE，交付"必须依赖的窗口环境"。
+- Next：CHG-031 关闭归档；社媒账号收口 CHG（含批量检查真实回填 + 账号功能缺口）经 planning-wt-media-delivery 规划后执行；M2-C 代理管理完善后处理"有代理窗口恢复字段对齐"延后项。
+- Blockers：无。延后项：有代理窗口的恢复字段对齐 → M2-C；Agent 状态页重启重绑定 → M2-E 优化。
 - Recent verification：`wt-media-workspace/scripts/m2b-local-acceptance.sh all` PASS，已清理旧产物、重建并启动 DMG；Cloud `/api/v1/health` PASS；Cloud CORS preflight from `http://tauri.localhost` PASS；Cloud `POST /api/v1/auth/login` with `operator01` returned unified JSON and `Set-Cookie` PASS；packaged Desktop process verified from `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell`；Agent `/healthz` 和 `/api/v1/status` PASS；BitBrowser `54345` 可用且主账号匹配；真实创建并读回 `m2b-acceptance-20260803-2257` / `9e6c697c69fc467fa5e0829ca4fbebee` PASS；Agent open/close retest PASS；Desktop `.generated/frontend/index.html` present PASS；Agent tests PASS，16 tests；Web `npm test` PASS，10 files / 36 tests；Cloud `go test ./internal/app` PASS；`cargo tauri build --bundles dmg --no-sign` PASS；`wt-media-workspace/scripts/m2b-local-acceptance.sh verify` PASS。
 
 ## 9. Pending Questions
