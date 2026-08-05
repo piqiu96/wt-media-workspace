@@ -96,9 +96,10 @@
 - Completed：
   - CHG 已创建；Start Gate 完成（继承窗口收口 + B7 检查控制流）；
   - **Task 1 共享互斥——验证通过，机制已存在**：Profile 级互斥由 M2-A profileguard 完整实现并在账号检查路径生效（Cloud AcquirePermit 行锁 + OutcomeWaiting 互斥 + Tauri preflight→check→finish 闭环）。Task 1 为验证 + 固化契约，见 `evidence/task1-profile-mutex.md`。CHG-C 需将代理写回接入同一 permit 路径。
-- Current：Task 2 账号台账收尾（Cookie 操作入口 + business_status 枚举对齐）待实施。
-- Next：Task 2 台账收尾 → Task 3 平台识别 → Task 4 明细 UI → Task 5 端到端验收。
-- Blockers：平台识别需真实 Cookie 样本（Bilibili 已可，抖音/百家号待对齐）。
+  - **Task 2 账号台账收尾——完成**：B3-2 business_status 补 draft/abnormal（语义 draft=待识别、abnormal=异常，迁移 018 + 服务状态流转 + 前端）；B3-1 Cookie 操作（查看/导出 + 从 Profile 同步读回，走 Profile 级互斥，写入/上号归 M2-D）。见 `evidence/task2-ledger-cookie.md`。
+- Current：Task 3 平台身份识别（抖音/百家号 Cookie→UID + 昵称/头像）待实施。
+- Next：Task 3 平台识别 → Task 4 检查 8 项（7/8 + 明细 UI）→ Task 5 账号组 → Task 6 端到端验收。
+- Blockers：平台识别需真实 Cookie 样本——用户已确认提供百家号（登录 BitBrowser 待提取）与 B站 登录链接。
 - Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
 
 ## 9. Pending Questions
