@@ -1,0 +1,98 @@
+# CHG-20260805-033：M2-C 代理收口
+
+> 日期：2026-08-05
+> 状态：PLANNED（待 CHG-20260805-032 账号收口验收完成后激活）
+> 所属 Milestone：M2-C 代理资源与窗口真实绑定闭环
+> 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-C-代理资源与窗口真实绑定闭环`
+> 当前仓库：`wt-media-workspace`
+> 预计影响仓库：`wt-media-cloud`、`wt-media-agent`
+
+## 0. 继承与关联
+
+- 前置：M2-A、M2-B 窗口收口（CHG-031 DONE）、M2-B 账号收口（CHG-20260805-032，先行）、共享互斥（CHG-A Task 1 实现，本 CHG 继承复用）
+- 本 CHG 与账号收口串行推进，激活时间在账号收口验收完成后
+
+## 1. 用户可见目标
+
+普通运营管理代理台账（新增/批量导入/检测），将代理真实写入授权 Profile（分配/更换/解绑），写回 BitBrowser 后读回验证一致，并按统一配额（`max_profile_count`）获得推荐分配方案。
+
+## 2. 当前背景（继承已完成）
+
+- proxy_configs CRUD 后端、文本导入解析、TCP 连通性检测（同步 Cloud/同步 Agent/后台 Agent）：已实现
+- `POST /proxies/:id/assign` 创建 `proxy_mutation_task`：已实现（校验归属/活跃/配额）
+- Agent `ProxyMutationExecutor`：写入 BitBrowser + 扫描读回（已带 browserFingerPrint/proxyMethod 保留）：已实现
+- ProxyPage：列表/筛选/详情/导入对话框/检测/状态/删除：已实现
+
+## 3. 本 CHG 范围
+
+### 包含
+
+- 台账收尾：单个代理创建前端表单；导入预览**零副作用**（拆分 Parse/Import 端点）
+- 配额模型：`proxy_platform_quotas` 迁移为统一 `max_profile_count`（DB 迁移 + CheckQuota 重构），页面展示已用/剩余
+- 分配写回：ProxyPage 分配入口；Agent 同步写回端点（`/proxy-mutation`）；Cloud 同步 mutation 调用（复用互斥）
+- 写回一致性：Cloud 写回 broker（mutation 结果更新 `browser_profiles`）、解绑、更换（先验新后释放旧）
+- 推荐方案：推荐引擎（仅已启用/检测正常/未到期/有剩余配额）+ 推荐/人工调整/确认 UI
+- 外部代理变化：扫描 Diff 中代理变化的处理（未知代理→待补充记录）——可延后
+- 端到端验收：真实代理——分配写入→读回→更换→解绑全链路
+
+### 不包含
+
+- 账号检查的代理项（B4-4）→ 本 CHG 完成后回接账号
+- Cookie/上号/接码 → M2-D
+- 代理刷新 URL（供应商 API）→ 待定
+
+## 4. 关键规则
+
+- 代理写入/更换/解绑后必须**读回验证一致**才更新正式关系与配额；失败不更新、不占配额
+- 单代理检测/写入/更换/解绑为**同步调用 Agent**（非纯异步任务）
+- 同一 Profile 同时只能一个本地敏感操作（复用共享互斥）
+- 代理密码为敏感数据，遵守 `secret_policy`；预览阶段零副作用
+
+## 5. 执行任务
+
+### Task 1：台账收尾（零耦合）
+- C1.1 单个代理创建前端表单
+- C1.2 导入预览零副作用（拆分 Parse/Import 端点）
+
+### Task 2：配额模型迁移
+- C2.2 `proxy_platform_quotas` → 统一 `max_profile_count`（DB 迁移 + CheckQuota 重构）
+- C2.3 页面展示已用/剩余配额
+
+### Task 3：分配写回链路
+- C3.3 ProxyPage 分配入口
+- C3.4 Agent 同步写回端点（`/proxy-mutation`）
+- C3.5 Cloud 同步 mutation 调用（复用互斥）
+
+### Task 4：写回一致性与生命周期
+- C3.6 Cloud 写回 broker（mutation 结果更新 `browser_profiles`）
+- C3.8 解绑、C3.9 更换（先验新后释放旧）
+
+### Task 5：推荐方案
+- C3.7 推荐引擎 + 推荐/人工调整/确认 UI
+
+### Task 6：外部代理变化与收口
+- C4 外部代理变化 Diff 处理（可延后）
+- 端到端验收（真实代理）→ 更新 M2-C 收口矩阵，判定 DONE 或修复
+
+## 6. 验收标准
+
+- 单个新增/批量导入/预览零副作用；配额统一 max_profile_count 且校验正确
+- 分配/更换/解绑在 BitBrowser 读回一致后更新 Cloud 关系与配额；失败不更新不占配额
+- 推荐仅选已启用/检测正常/未到期/有剩余配额代理
+- 页面、Cloud 镜像、Agent 读回、BitBrowser 实际状态一致
+
+## 7. Evidence 要求
+
+`evidence/` 提供：台账收尾、配额迁移、同步写回端点、写回 broker、推荐引擎、端到端验收（真实代理）、测试与构建记录。
+
+## 8. Checkpoint
+
+- Completed：CHG 已创建（PLANNED）。
+- Current：等待 CHG-20260805-032 账号收口验收完成后激活。
+- Next：激活后按 Task 1-6 执行。
+- Blockers：需真实代理资源（用户已确认可提供）。
+- Recent verification：—。
+
+## 9. Pending Questions
+
+None.

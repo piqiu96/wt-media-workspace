@@ -6,4 +6,5 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| _（无活跃记录）_ | 窗口收口 CHG-031 已完成（2026-08-05）；社媒账号收口 CHG 待规划 | — | wt-media-workspace |
+| CHG-20260805-032 | M2-B 社媒账号收口 | ACTIVE | wt-media-workspace |
+| CHG-20260805-033 | M2-C 代理收口 | PLANNED | wt-media-workspace |
