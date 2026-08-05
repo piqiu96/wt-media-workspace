@@ -97,10 +97,14 @@
   - CHG 已创建；Start Gate 完成（继承窗口收口 + B7 检查控制流）；
   - **Task 1 共享互斥——验证通过，机制已存在**：Profile 级互斥由 M2-A profileguard 完整实现并在账号检查路径生效（Cloud AcquirePermit 行锁 + OutcomeWaiting 互斥 + Tauri preflight→check→finish 闭环）。Task 1 为验证 + 固化契约，见 `evidence/task1-profile-mutex.md`。CHG-C 需将代理写回接入同一 permit 路径。
   - **Task 2 账号台账收尾——完成**：B3-2 business_status 补 draft/abnormal（语义 draft=待识别、abnormal=异常，迁移 018 + 服务状态流转 + 前端）；B3-1 Cookie 操作（查看/导出 + 从 Profile 同步读回，走 Profile 级互斥，写入/上号归 M2-D）。见 `evidence/task2-ledger-cookie.md`。
-  - **Task 3 前置发现**：见 `evidence/task3-resources-and-cdp-finding.md`——本版 BitBrowser 无 `/browser/cookie` API（需 CDP 读 Cookie）；百家号 UID 在页面 `window.user_id`（BDUSS 加密）。资源：百家号 seq46 窗口已登录；B站 接码链接（4208560/217api）已记录。
-- Current：Task 3 平台识别待实施，需先为 Agent 新增 **CDP 能力**（读 Cookie + 页面求值）。
-- Next：Agent CDP 能力 → 平台识别（Bilibili/百家号/抖音 UID+昵称/头像）→ Task 4 → Task 5 → Task 6。
-- Blockers：无硬阻塞；百家号 seq46 已登录可验证；B站 接码链接可用。
+  - **Task 3 前置发现 + 实施**：
+    - 发现：本版 BitBrowser 无 `/browser/cookie` API；**`/browser/detail` 对已登录窗口返回 `cookie` JSON 字段**（正确读取途径，无需 CDP）
+    - 资源：百家号 seq46 窗口已登录；B站 接码链接（4208560/217api）已记录，见 `evidence/task3-resources-and-cdp-finding.md`
+    - **实施（Agent `bff592c`）**：`read_cookies` 改从 detail cookie 字段解析（修复 B3-1 与账号检查的 Cookie 读取）；`_identify_baijiahao` 服务端调 `image.baidu.com/user/logininfo` 读 UID/昵称/头像
+    - **百家号端到端验证通过**：真实 seq46 窗口 → UID `6572476037`、昵称"你阿邱爷"、头像 portrait URL、login_status=normal；73 tests PASS
+- Current：Task 3 平台识别——**百家号已完成并端到端验证**；Bilibili/抖音识别待接（Bilibili 用接码链接登录后验证；抖音需 Cookie 样本）。
+- Next：Bilibili 昵称/头像（card API）+ 抖音 Cookie→UID → Task 4 检查 8 项 → Task 5 账号组 → Task 6。
+- Blockers：Bilibili 需用接码链接登录验证；抖音需 Cookie 样本。
 - Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
 
 ## 9. Pending Questions
