@@ -102,9 +102,9 @@
     - 资源：百家号 seq46 窗口已登录；B站 接码链接（4208560/217api）已记录，见 `evidence/task3-resources-and-cdp-finding.md`
     - **实施（Agent `bff592c`）**：`read_cookies` 改从 detail cookie 字段解析（修复 B3-1 与账号检查的 Cookie 读取）；`_identify_baijiahao` 服务端调 `image.baidu.com/user/logininfo` 读 UID/昵称/头像
     - **百家号端到端验证通过**：真实 seq46 窗口 → UID `6572476037`、昵称"你阿邱爷"、头像 portrait URL、login_status=normal；73 tests PASS
-- Current：Task 3 平台识别——**百家号已完成并端到端验证**；Bilibili/抖音识别待接（Bilibili 用接码链接登录后验证；抖音需 Cookie 样本）。
-- Next：Bilibili 昵称/头像（card API）+ 抖音 Cookie→UID → Task 4 检查 8 项 → Task 5 账号组 → Task 6。
-- Blockers：Bilibili 需用接码链接登录验证；抖音需 Cookie 样本。
+- Current：Task 3 平台识别——**百家号已完成并端到端验证**；**Bilibili 识别逻辑已集成（nav API，`_identify_bilibili`，73 tests PASS）**，待用户手动登录 B站 后端到端验证；抖音 Cookie→UID 待样本。
+- Next：B站 手动登录后 nav API 端到端验证 → 抖音 Cookie→UID → Task 4 → Task 5 → Task 6。
+- Blockers：自动化接码登录暂停（Geetest 点选验证码 + 接码平台未收到码 `0|0`）——用户改手动登录一个 B站 号（专用窗口 `a24f40d959c146a0a40835d89d2da23e` 已建并打开在登录页）；抖音需 Cookie 样本。
 - Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
 
 ## 9. Pending Questions
