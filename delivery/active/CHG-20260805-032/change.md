@@ -97,9 +97,10 @@
   - CHG 已创建；Start Gate 完成（继承窗口收口 + B7 检查控制流）；
   - **Task 1 共享互斥——验证通过，机制已存在**：Profile 级互斥由 M2-A profileguard 完整实现并在账号检查路径生效（Cloud AcquirePermit 行锁 + OutcomeWaiting 互斥 + Tauri preflight→check→finish 闭环）。Task 1 为验证 + 固化契约，见 `evidence/task1-profile-mutex.md`。CHG-C 需将代理写回接入同一 permit 路径。
   - **Task 2 账号台账收尾——完成**：B3-2 business_status 补 draft/abnormal（语义 draft=待识别、abnormal=异常，迁移 018 + 服务状态流转 + 前端）；B3-1 Cookie 操作（查看/导出 + 从 Profile 同步读回，走 Profile 级互斥，写入/上号归 M2-D）。见 `evidence/task2-ledger-cookie.md`。
-- Current：Task 3 平台身份识别（抖音/百家号 Cookie→UID + 昵称/头像）待实施。
-- Next：Task 3 平台识别 → Task 4 检查 8 项（7/8 + 明细 UI）→ Task 5 账号组 → Task 6 端到端验收。
-- Blockers：平台识别需真实 Cookie 样本——用户已确认提供百家号（登录 BitBrowser 待提取）与 B站 登录链接。
+  - **Task 3 前置发现**：见 `evidence/task3-resources-and-cdp-finding.md`——本版 BitBrowser 无 `/browser/cookie` API（需 CDP 读 Cookie）；百家号 UID 在页面 `window.user_id`（BDUSS 加密）。资源：百家号 seq46 窗口已登录；B站 接码链接（4208560/217api）已记录。
+- Current：Task 3 平台识别待实施，需先为 Agent 新增 **CDP 能力**（读 Cookie + 页面求值）。
+- Next：Agent CDP 能力 → 平台识别（Bilibili/百家号/抖音 UID+昵称/头像）→ Task 4 → Task 5 → Task 6。
+- Blockers：无硬阻塞；百家号 seq46 已登录可验证；B站 接码链接可用。
 - Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
 
 ## 9. Pending Questions
