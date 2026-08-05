@@ -102,12 +102,14 @@
     - 资源：百家号 seq46 窗口已登录；B站 接码链接（4208560/217api）已记录，见 `evidence/task3-resources-and-cdp-finding.md`
     - **实施（Agent `bff592c`）**：`read_cookies` 改从 detail cookie 字段解析（修复 B3-1 与账号检查的 Cookie 读取）；`_identify_baijiahao` 服务端调 `image.baidu.com/user/logininfo` 读 UID/昵称/头像
     - **百家号端到端验证通过**：真实 seq46 窗口 → UID `6572476037`、昵称"你阿邱爷"、头像 portrait URL、login_status=normal；73 tests PASS
-- Current：Task 3 平台识别——**百家号 ✅ 端到端验证通过**；**Bilibili ✅ UID 识别（DedeUserID 可靠）端到端验证通过**（UID 3706971620379308/normal）；**抖音移除**（用户确认不支持管理）。
-- Next：Bilibili 昵称/头像（需决策：页面内 nav CDP 或延后）→ Task 4 → Task 5 → Task 6。
-- Blockers/决策点：
-  1. **Bilibili 昵称/头像**：服务端 nav/space 被 B站 风控（bili_ticket/指纹）拒绝（-101/-799），页面内 fetch 可靠——需 Agent 加 CDP 页面内 nav 能力，或接受 UID-only 延后昵称/头像
-  2. **Cookie 读取设计**：`/browser/detail` cookie 字段是**已保存** Cookie（窗口关闭时写入），对**当前打开且刚登录**的窗口为空——账号检查读 Cookie 需 CDP 实时读取或先关再开窗口
-  3. 自动化接码登录暂停（Geetest + 接码无码）；B站 手动登录已完成（专用窗口 `a24f40d959c146a0a40835d89d2da23e`）
+  - **Task 3 平台识别——完成**：
+    - 百家号 ✅（logininfo API，UID 6572476037/你阿邱爷）
+    - Bilibili ✅（DedeUserID UID + CDP 页面内 nav 昵称/头像：UID 3706971620379308/游戏魔王嘟嘟/头像/正常）
+    - 抖音移除（用户确认不支持管理）
+    - **Agent 新增 CDP 能力**（`92fe666`）：实时 Cookie 读取（`/browser/detail` 只含已保存 cookie）+ 页面内 fetch（绕开 B站 bili_ticket/指纹风控）；74 tests PASS
+- Current：Task 3 完成，进入 Task 4（账号检查 8 项完整化：7/8 验证码/限制 + 明细 UI）。
+- Next：Task 4 检查 8 项 → Task 5 账号组 → Task 6 端到端验收。
+- Blockers/已知：检查项 7/8（验证码/账号限制）需真实受限账号样本（用户可提供）；自动化接码登录（上号）属 M2-D，暂停待后续。
 - Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
 
 ## 9. Pending Questions
