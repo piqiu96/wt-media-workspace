@@ -107,9 +107,10 @@
     - Bilibili ✅（DedeUserID UID + CDP 页面内 nav 昵称/头像：UID 3706971620379308/游戏魔王嘟嘟/头像/正常）
     - 抖音移除（用户确认不支持管理）
     - **Agent 新增 CDP 能力**（`92fe666`）：实时 Cookie 读取（`/browser/detail` 只含已保存 cookie）+ 页面内 fetch（绕开 B站 bili_ticket/指纹风控）；74 tests PASS
-- Current：Task 3 完成，进入 Task 4（账号检查 8 项完整化：7/8 验证码/限制 + 明细 UI）。
-- Next：Task 4 检查 8 项 → Task 5 账号组 → Task 6 端到端验收。
-- Blockers/已知：检查项 7/8（验证码/账号限制）需真实受限账号样本（用户可提供）；自动化接码登录（上号）属 M2-D，暂停待后续。
+  - **Task 5 账号组——完成**：filters JSON + 应用复用 ListAccounts；主键 BIGINT 自增；CRUD/应用/前端下拉；测试全绿，见 `evidence/task5-account-groups.md`。
+- Current：Task 4（账号检查 8 项完整化）待实施。
+- Next：Task 4 检查 8 项明细 UI + 7/8 判定逻辑骨架（7/8 语义已澄清：7=临时验证门禁 verification_needed、8=受限/封号/限流 restricted；真实受限样本用户暂时无法提供，判定对齐留待样本到位）→ Task 6 端到端验收。
+- Blockers/已知：检查项 7/8 需真实受限账号样本；自动化接码登录（上号）属 M2-D，暂停待后续。
 - Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
 
 ## 9. Pending Questions
