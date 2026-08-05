@@ -109,9 +109,10 @@
     - **Agent 新增 CDP 能力**（`92fe666`）：实时 Cookie 读取（`/browser/detail` 只含已保存 cookie）+ 页面内 fetch（绕开 B站 bili_ticket/指纹风控）；74 tests PASS
   - **Task 5 账号组——完成**：filters JSON + 应用复用 ListAccounts；主键 BIGINT 自增；CRUD/应用/前端下拉；测试全绿，见 `evidence/task5-account-groups.md`。
   - **Task 4 检查 8 项明细——完成（骨架）**：check_items 持久化 + 前端 8 项展示；7/8 判定为骨架（na，需真实受限样本对齐）。见 `evidence/task4-check-items.md`。
-- Current：Task 6（端到端验收）待实施；7/8 真实样本对齐待用户提供。
-- Next：重建环境（force-restart，内嵌全部 Task1-5 代码）→ 端到端验收（真实平台账号跑完整检查链路，验证 8 项明细）→ 7/8 受限样本对齐。
-- Blockers/已知：检查项 7/8 需真实受限账号样本（用户暂时无法提供）；自动化接码登录（上号）属 M2-D，暂停待后续。
+  - **Task 6 端到端验收——通过**：重建环境（内嵌全部代码），真实 B站 窗口 Agent 检查返回 check_items 5-8；Cloud 应用合并 1-4 并持久化 8 项；business_status draft→enabled。见 `evidence/task6-e2e-acceptance.md`。
+- Current：CHG-A 全部 Task（1-6）完成，检查链路 + 8 项明细端到端验证通过。
+- Next：**CHG-A 收口判定**——待用户打包 Desktop GUI 人工验收（点击检查按钮看 8 项明细）+ 7/8 受限样本对齐；随后更新账号收口矩阵判定 DONE。
+- Blockers/已知：7/8 判定需真实受限账号样本；代理项 3/4 na 待 M2-C 回接；自动化接码登录（上号）属 M2-D。
 - Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
 
 ## 9. Pending Questions
