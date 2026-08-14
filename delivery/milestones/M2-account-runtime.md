@@ -216,7 +216,7 @@ Desktop登录后扫描Profile
 - P0平台为哔哩哔哩和百家号；新增账号入口命名为“新增账号”，绑定窗口选择项必须能让用户识别系统记录ID、窗口名称和BitBrowser Profile ID；
 - 新增账号时可以先不绑定游戏；账号启用、上号完成进入可执行状态、发布或互动预检前必须至少绑定一个游戏；一个账号可以绑定多个游戏；
 - 媒体账号业务状态为两态 `enabled`（启用）/ `disabled`（停用）；健康度由派生「账号状态」承载，不写入业务状态（迁移 021，见 Decision 0010）；
-- 媒体账号登录状态包括`unchecked`、`logged_in`、`not_logged_in`、`expired`、`mismatch`、`check_failed`；
+- 媒体账号登录状态包括`unknown`、`normal`、`not_logged_in`、`verification_needed`、`expired`、`restricted`、`account_mismatch`、`environment_error`；
 - 媒体账号操作栏至少包含详情、编辑、绑定/更换窗口、打开窗口、关闭窗口、检查/同步账号信息、启用/停用；打开窗口默认跳转到平台对应主页或创作入口，平台URL由平台配置提供；
 - 自动登录或Cookie上号失败后，允许用户在BitBrowser窗口中人工登录，再回到Desktop点击“检查/同步账号信息”，由Agent读取当前窗口真实平台身份并回填平台UID、昵称、头像、登录状态和最近检查时间；
 - P0不保存平台密码以外的第二套账号事实；

@@ -118,6 +118,7 @@
   - **Task 4 检查 8 项明细——完成（骨架）**：check_items 持久化 + 前端 8 项展示；7/8 判定为骨架（na，需真实受限样本对齐）。见 `evidence/task4-check-items.md`。
   - **Task 6 端到端验收——通过**：重建环境（内嵌全部代码），真实 B站 窗口 Agent 检查返回 check_items 5-8；Cloud 应用合并 1-4 并持久化 8 项；business_status draft→enabled。见 `evidence/task6-e2e-acceptance.md`。
   - **Task 7 社媒账号页 v3 页面收口——完成（代码 + 自动化验证）**：Cookie 列 + 任意行弹窗/从 Profile 读真实 Cookie；账号信息/窗口弹窗去多余按钮；查看抽屉转 view-only；编辑/新增加「账号名称」+ 编辑加「绑定窗口」；标签多选 allow-create；删标签管理；「窗口绑定」模糊筛选。**布局重排**：统计一行分两组、主操作 [新增账号][批量检查][刷新]、筛选两行、移除批量工具栏、操作列「检查」、错误反馈重构、修复分页总条数。Cloud mediaaccount go test 全绿（含新增 5 用例）、Web 38 tests、Cloud/Web 构建通过。GUI 人工验收待执行。
+  - **文档口径收口（改口，记录于本变更记录）**：① business_status 收敛两态 `enabled`/`disabled`（迁移 021，健康度由派生「账号状态」承载）；② 账号页 v3 无批量工具栏、标签仅单账号增删（批量标签延后）；③ login_status 对齐 PRD 3.3.9（`unknown`/`normal`/`not_logged_in`/`verification_needed`/`expired`/`restricted`/`account_mismatch`/`environment_error`）。同步回改 milestone 218/219 与 PRD 第三章 3.3.6。
 - Current：CHG-A 全部 Task（1-7）代码完成；检查链路 + 8 项明细端到端验证 + v3 页面收口自动化验证通过。
 - Next：**CHG-A 收口判定**——待用户打包 Desktop GUI 人工验收（点击检查按钮看 8 项明细 + v3 页面收口效果）+ 7/8 受限样本对齐；随后更新账号收口矩阵判定 DONE。
 - Blockers/已知：7/8 判定需真实受限账号样本；代理项 3/4 na 待 M2-C 回接；自动化接码登录（上号）属 M2-D。
