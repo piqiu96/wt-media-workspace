@@ -78,6 +78,13 @@
 - 真实平台账号：Bilibili 单项 → 抖音/百家号 → 批量真实回填；受限账号验证 7/8
 - 更新 M2-B 账号收口矩阵，判定收口 DONE 或创建修复 CHG
 
+### Task 7：社媒账号页 v3 页面收口
+- 前端 AccountsPage.vue：加 **Cookie 列**（任意行打开弹窗 + Desktop 从 Profile 读真实 Cookie）；账号信息/窗口弹窗去多余按钮（只留 X/外部关闭 + 打开/关闭窗口）；查看抽屉转 **view-only**（去底部按钮与可编辑表单，保留 8 项检查明细）；编辑弹窗加「账号名称」+「绑定窗口」（bind/unbindProfile）；新增账号弹窗加「账号名称」；标签控件改 **多选 allow-create**（候选=已用标签，回车新建）；删除标签管理（openTagManage/deleteTagFromAll/tagManageVisible）；筛选栏加「窗口绑定」文本模糊匹配
+- **信息架构与布局重排（用户最新规格确认）**：统计区一行六项分两组（业务状态：总/启用/停用｜账号健康：正常/异常/待检查，点卡片应用筛选）；主操作区固定 `[新增账号][批量检查][刷新]`（唯一批量入口，批量检查=列表多选勾选账号，无勾选提示）；筛选区两行重排（第一行 搜索+查询+重置，第二行 六个筛选）；**移除批量工具栏**（批量启用/批量停用/取消选择/已选N项 全部删除，行级启用/停用保留）；操作列「检查同步」→「检查」；列宽保证 业务状态/账号状态/最近检查 独立可见；**错误反馈重构**（顶部横幅仅页面级加载失败，单账号检查失败→行状态置「检查失败」+ 打开详情展示失败原因，批量→批量结果面板，其余操作错误就近 MessagePlugin 提示）；**修复分页总条数**（前端 pagination total 绑定，后端全量返回）
+- 前端 mediaAccounts.js：list 透传 profile→profile_search；create/update 支持 name
+- 后端 mediaaccount：Create/Update 支持 name（Update 已支持 GameID）；ApplyLocalAccountCheckResult 的 name **空才回填**；AccountFilter 加 ProfileSearch（store List 对 browser_profiles.name/seq/bit_profile_id/id 模糊匹配）；routes 透传 name/profile_search
+- 测试：service_test +3（Create/Update name、name 空才回填）、store_mysql_test +1（ProfileSearch）、routes_test +1（create/update name）；web mediaAccounts.test 更新边界断言（检查→检查按钮、主操作批量检查、无勾选提示）+ 补 name/profile_search 用例
+
 ## 6. 验收标准
 
 - 单项/批量检查对真实已登录平台账号真实回填 UID/昵称/头像/登录状态/最近检查时间
@@ -110,10 +117,11 @@
   - **Task 5 账号组——完成**：filters JSON + 应用复用 ListAccounts；主键 BIGINT 自增；CRUD/应用/前端下拉；测试全绿，见 `evidence/task5-account-groups.md`。
   - **Task 4 检查 8 项明细——完成（骨架）**：check_items 持久化 + 前端 8 项展示；7/8 判定为骨架（na，需真实受限样本对齐）。见 `evidence/task4-check-items.md`。
   - **Task 6 端到端验收——通过**：重建环境（内嵌全部代码），真实 B站 窗口 Agent 检查返回 check_items 5-8；Cloud 应用合并 1-4 并持久化 8 项；business_status draft→enabled。见 `evidence/task6-e2e-acceptance.md`。
-- Current：CHG-A 全部 Task（1-6）完成，检查链路 + 8 项明细端到端验证通过。
-- Next：**CHG-A 收口判定**——待用户打包 Desktop GUI 人工验收（点击检查按钮看 8 项明细）+ 7/8 受限样本对齐；随后更新账号收口矩阵判定 DONE。
+  - **Task 7 社媒账号页 v3 页面收口——完成（代码 + 自动化验证）**：Cookie 列 + 任意行弹窗/从 Profile 读真实 Cookie；账号信息/窗口弹窗去多余按钮；查看抽屉转 view-only；编辑/新增加「账号名称」+ 编辑加「绑定窗口」；标签多选 allow-create；删标签管理；「窗口绑定」模糊筛选。**布局重排**：统计一行分两组、主操作 [新增账号][批量检查][刷新]、筛选两行、移除批量工具栏、操作列「检查」、错误反馈重构、修复分页总条数。Cloud mediaaccount go test 全绿（含新增 5 用例）、Web 38 tests、Cloud/Web 构建通过。GUI 人工验收待执行。
+- Current：CHG-A 全部 Task（1-7）代码完成；检查链路 + 8 项明细端到端验证 + v3 页面收口自动化验证通过。
+- Next：**CHG-A 收口判定**——待用户打包 Desktop GUI 人工验收（点击检查按钮看 8 项明细 + v3 页面收口效果）+ 7/8 受限样本对齐；随后更新账号收口矩阵判定 DONE。
 - Blockers/已知：7/8 判定需真实受限账号样本；代理项 3/4 na 待 M2-C 回接；自动化接码登录（上号）属 M2-D。
-- Recent verification：窗口收口 DONE（CHG-031）；Agent 66 tests、Web 36 tests 保持；互斥已覆盖（profileguard tests）。
+- Recent verification：窗口收口 DONE（CHG-031）；Web 38 tests（Task 7 后）；Cloud mediaaccount go test 全绿（含 Task 7 新增 5 用例）；Cloud/Web 构建通过。
 
 ## 9. Pending Questions
 
