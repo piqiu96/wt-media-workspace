@@ -90,7 +90,7 @@
 - 单项/批量检查对真实已登录平台账号真实回填 UID/昵称/头像/登录状态/最近检查时间
 - 同一 Profile 并发两个本地操作 → 第二个被拒绝/排队
 - Cookie 查看/导出入口可用且遵守敏感数据规则
-- `business_status` 枚举与 milestone 对齐
+- `business_status` 收敛为两态 `enabled`/`disabled`（迁移 021；健康度由派生「账号状态」承载，见 Decision 0010）
 - 检查结果展示 8 项明细
 - 页面、Cloud 镜像、Agent 读回、平台实际状态一致
 
@@ -103,7 +103,7 @@
 - Completed：
   - CHG 已创建；Start Gate 完成（继承窗口收口 + B7 检查控制流）；
   - **Task 1 共享互斥——验证通过，机制已存在**：Profile 级互斥由 M2-A profileguard 完整实现并在账号检查路径生效（Cloud AcquirePermit 行锁 + OutcomeWaiting 互斥 + Tauri preflight→check→finish 闭环）。Task 1 为验证 + 固化契约，见 `evidence/task1-profile-mutex.md`。CHG-C 需将代理写回接入同一 permit 路径。
-  - **Task 2 账号台账收尾——完成**：B3-2 business_status 补 draft/abnormal（语义 draft=待识别、abnormal=异常，迁移 018 + 服务状态流转 + 前端）；B3-1 Cookie 操作（查看/导出 + 从 Profile 同步读回，走 Profile 级互斥，写入/上号归 M2-D）。见 `evidence/task2-ledger-cookie.md`。
+  - **Task 2 账号台账收尾——完成**：B3-2 business_status 补 draft/abnormal（语义 draft=待识别、abnormal=异常，迁移 018 + 服务状态流转 + 前端；**后经迁移 021 收敛为 enabled/disabled 两态**，见 Decision 0010）；B3-1 Cookie 操作（查看/导出 + 从 Profile 同步读回，走 Profile 级互斥，写入/上号归 M2-D）。见 `evidence/task2-ledger-cookie.md`。
   - **Task 3 前置发现 + 实施**：
     - 发现：本版 BitBrowser 无 `/browser/cookie` API；**`/browser/detail` 对已登录窗口返回 `cookie` JSON 字段**（正确读取途径，无需 CDP）
     - 资源：百家号 seq46 窗口已登录；B站 接码链接（4208560/217api）已记录，见 `evidence/task3-resources-and-cdp-finding.md`
