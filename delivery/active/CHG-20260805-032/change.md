@@ -5,7 +5,7 @@
 > 所属 Milestone：M2-B 浏览器窗口与媒体账号真实闭环
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-B-浏览器窗口与媒体账号真实闭环`
 > 当前仓库：`wt-media-workspace`
-> 预计影响仓库：`wt-media-cloud`、`wt-media-agent`
+> 预计影响仓库：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop`
 
 ## 0. 继承与关联
 
@@ -31,10 +31,11 @@
 
 - **共享互斥（E1/M2-E 切片）**：同一 Profile 同时仅一个本地敏感操作（Cloud acquire/release + Agent 守卫），账号检查接入；供 CHG-C 继承
 - 账号台账收尾：`business_status` 补 draft=待识别/abnormal=异常（DB CHECK + 服务校验 + 页面统计筛选）；账号详情 Cookie 操作入口（**查看/导出当前 Cookie + 从 Profile 读真实 Cookie**，读回走 Agent 同步）
+- **账号—游戏多关系切换**：新建 `media_account_games`、一次性迁移旧单值关联并删除 `media_accounts.game_id`；Cloud API 与账号页面创建/编辑/展示/筛选均使用 `game_ids`；已启用游戏在媒体账号域默认公开可用（Decision 0011）
 - 平台身份真实识别：抖音/百家号 Cookie→UID；Bilibili/抖音/百家号昵称与头像真实回填
-- 账号检查 8 项完整化：**7/8（验证码/账号限制）本次实现**（需真实受限账号样本）；检查结果 8 项明细逐项展示
+- 账号检查 8 项明细：保留已完成骨架与展示；7/8（验证码/账号限制）的真实样本校准移至 CHG-20260903-034
 - **账号组（可保存筛选，PRD 3.3.6）**：account_groups 模型 + CRUD + 保存/应用筛选；发布/互动（M6/M8）依赖它筛目标账号
-- 端到端验收：真实平台账号（Bilibili 单项 → 抖音/百家号 → 批量真实回填）+ 受限账号验证 7/8
+- 端到端验收：真实平台账号（Bilibili 单项 → 百家号 → 批量真实回填）及多游戏关系迁移/页面验收
 
 ### 不包含（延后/后续）
 
@@ -67,7 +68,7 @@
 
 ### Task 4：账号检查 8 项完整化
 - 已实现 1/2/5/6（身份/Profile存在/登录/匹配）
-- 7/8 验证码/账号限制（跨平台，需真实受限账号样本）——本次实现
+- 7/8 验证码/账号限制（跨平台，需真实受限账号样本）——移至 CHG-20260903-034
 - 3/4 代理项 → 延后 M2-C（接代理收口后回接）
 - B4-6 检查结果 8 项明细 UI（逐项展示，未实现/延后项标注状态）
 
@@ -85,6 +86,11 @@
 - 后端 mediaaccount：Create/Update 支持 name（Update 已支持 GameID）；ApplyLocalAccountCheckResult 的 name **空才回填**；AccountFilter 加 ProfileSearch（store List 对 browser_profiles.name/seq/bit_profile_id/id 模糊匹配）；routes 透传 name/profile_search
 - 测试：service_test +3（Create/Update name、name 空才回填）、store_mysql_test +1（ProfileSearch）、routes_test +1（create/update name）；web mediaAccounts.test 更新边界断言（检查→检查按钮、主操作批量检查、无勾选提示）+ 补 name/profile_search 用例
 
+### Task 8：账号—游戏多关系切换
+- 创建 `media_account_games` 关系表，迁移旧 `media_accounts.game_id`，保留账号、标签、Cookie、检查记录与 Profile 绑定并删除旧列/索引
+- Cloud 服务/Store/路由以 `game_ids` 为正式字段；旧 `game_id` 仅兼容；创建/更新按完整数组写入或删除关系；按任一游戏筛选不产生重复账号
+- Cloud Web 新增、编辑、列表、详情和筛选支持多游戏；已启用游戏默认公开可用，不按 `users.game_ids` 限制本域
+
 ## 6. 验收标准
 
 - 单项/批量检查对真实已登录平台账号真实回填 UID/昵称/头像/登录状态/最近检查时间
@@ -92,6 +98,7 @@
 - Cookie 查看/导出入口可用且遵守敏感数据规则
 - `business_status` 收敛为两态 `enabled`/`disabled`（迁移 021；健康度由派生「账号状态」承载，见 Decision 0010）
 - 检查结果展示 8 项明细
+- 多游戏创建、完整替换、清空、按任一游戏筛选和页面展示与 Cloud 关系表读回一致；迁移不删除账号其他关联事实
 - 页面、Cloud 镜像、Agent 读回、平台实际状态一致
 
 ## 7. Evidence 要求
@@ -122,11 +129,12 @@
   - **Decision 0010 两态残留修复**：2026-09-03 审计发现账号页检查条件仍兼容历史 `draft`；增加失败回归断言后删除该分支，当前仅 `enabled` 可检查。目标文件 9 tests、完整 Web 38 tests PASS。
   - **文档口径收口（改口，记录于本变更记录）**：① business_status 收敛两态 `enabled`/`disabled`（迁移 021，健康度由派生「账号状态」承载）；② 账号页 v3 无批量工具栏、标签仅单账号增删（批量标签延后）；③ login_status 对齐 PRD 3.3.9（`unknown`/`normal`/`not_logged_in`/`verification_needed`/`expired`/`restricted`/`account_mismatch`/`environment_error`）。同步回改 milestone 218/219 与 PRD 第三章 3.3.6。
 - Current：CHG-A 全部 Task（1-7）代码完成；检查链路 + 8 项明细端到端验证 + v3 页面收口自动化验证通过；**v3 页面 GUI 人工验收通过（2026-08-14）**，标签跨账号复用 DB 唯一键修复（迁移 024）已应用并点验。
-- Next：先解决 Q-01/Q-02；随后完成 7/8 真实样本对齐、更新账号收口矩阵并判定 DONE。M2-C 的 CHG-20260805-033 在本 CHG 关闭前不得激活。
-- Blockers/已知：7/8 判定需真实受限账号样本；代理项 3/4 na 待 M2-C 回接；自动化接码登录（上号）属 M2-D；账号—游戏基数在 Milestone 与最终 PRD 间冲突。
+- Current：按 Decision 0011 实施 Task 8 账号—游戏多关系切换。
+- Next：完成关系迁移、Cloud API 与账号页面验证；随后将 CHG-032 的 7/8 样本验收移交 CHG-034，并按门禁关闭 CHG-032。
+- Blockers/已知：7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
 - Recent verification：窗口收口 DONE（CHG-031）；2026-09-03 从当前源代码重新执行 `m2b-local-acceptance.sh all`，Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Web 38 tests PASS；Cloud mediaaccount + migration tests PASS；Agent 13 项目标 unittest PASS；Desktop 10 tests PASS；迁移 024 已记录且唯一键列顺序验证通过。Cloud 修正提交 `56fc86e`，Desktop 生成资产提交 `95db0e8`。见 `evidence/2026-09-03-current-environment-and-regression.md`。
 
 ## 9. Pending Questions
 
-- **Q-01（BLOCKING）账号—游戏基数**：Milestone M2-B 要求“新增时可不绑定、可绑定多个游戏”，最终 PRD 3.3.2 要求“首版只归属一个游戏”，当前代码/表结构为单 `game_id`。决策目录没有覆盖此冲突的 durable decision。按治理规则，未确认前不得修改模型。
-- **Q-02（BLOCKING）检查项 7/8 真实验收**：当前没有验证码/安全验证或账号受限的真实平台样本。是否提供 Bilibili/百家号受限样本，或形成决策把真实样本验收移到有样本的修复 CHG？没有任一结果，本 CHG 不能声明完整 DONE。
+- Q-01（已决）：Decision 0011 已确认多游戏关系和媒体账号域公开游戏规则；Task 8 实施中。
+- Q-02（已决）：真实样本校准移至 CHG-20260903-034；当前 CHG 不把 7/8 的 `na` 骨架作为真实通过。
