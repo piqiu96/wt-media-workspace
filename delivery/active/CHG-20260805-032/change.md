@@ -130,6 +130,7 @@
   - **文档口径收口（改口，记录于本变更记录）**：① business_status 收敛两态 `enabled`/`disabled`（迁移 021，健康度由派生「账号状态」承载）；② 账号页 v3 无批量工具栏、标签仅单账号增删（批量标签延后）；③ login_status 对齐 PRD 3.3.9（`unknown`/`normal`/`not_logged_in`/`verification_needed`/`expired`/`restricted`/`account_mismatch`/`environment_error`）。同步回改 milestone 218/219 与 PRD 第三章 3.3.6。
 - Current：CHG-A 全部 Task（1-7）代码完成；检查链路 + 8 项明细端到端验证 + v3 页面收口自动化验证通过；**v3 页面 GUI 人工验收通过（2026-08-14）**，标签跨账号复用 DB 唯一键修复（迁移 024）已应用并点验。
 - Current：按 Decision 0011 实施 Task 8 账号—游戏多关系切换。
+- Current：Task 8 的领域模型子任务完成并已验证：`GameIDs` 规范化、完整替换/清空、启用游戏公开关联、停用游戏拒绝；下一步为 `media_account_games` 迁移与 MySQL 原子读写。
 - Next：完成关系迁移、Cloud API 与账号页面验证；随后将 CHG-032 的 7/8 样本验收移交 CHG-034，并按门禁关闭 CHG-032。
 - Blockers/已知：7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
 - Recent verification：窗口收口 DONE（CHG-031）；2026-09-03 从当前源代码重新执行 `m2b-local-acceptance.sh all`，Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Web 38 tests PASS；Cloud mediaaccount + migration tests PASS；Agent 13 项目标 unittest PASS；Desktop 10 tests PASS；迁移 024 已记录且唯一键列顺序验证通过。Cloud 修正提交 `56fc86e`，Desktop 生成资产提交 `95db0e8`。见 `evidence/2026-09-03-current-environment-and-regression.md`。
