@@ -117,13 +117,16 @@
   - **Task 5 账号组——完成**：filters JSON + 应用复用 ListAccounts；主键 BIGINT 自增；CRUD/应用/前端下拉；测试全绿，见 `evidence/task5-account-groups.md`。
   - **Task 4 检查 8 项明细——完成（骨架）**：check_items 持久化 + 前端 8 项展示；7/8 判定为骨架（na，需真实受限样本对齐）。见 `evidence/task4-check-items.md`。
   - **Task 6 端到端验收——通过**：重建环境（内嵌全部代码），真实 B站 窗口 Agent 检查返回 check_items 5-8；Cloud 应用合并 1-4 并持久化 8 项；business_status draft→enabled。见 `evidence/task6-e2e-acceptance.md`。
-  - **Task 7 社媒账号页 v3 页面收口——完成（代码 + 自动化验证）**：Cookie 列 + 任意行弹窗/从 Profile 读真实 Cookie；账号信息/窗口弹窗去多余按钮；查看抽屉转 view-only；编辑/新增加「账号名称」+ 编辑加「绑定窗口」；标签多选 allow-create；删标签管理；「窗口绑定」模糊筛选。**布局重排**：统计一行分两组、主操作 [新增账号][批量检查][刷新]、筛选两行、移除批量工具栏、操作列「检查」、错误反馈重构、修复分页总条数。Cloud mediaaccount go test 全绿（含新增 5 用例）、Web 38 tests、Cloud/Web 构建通过。GUI 人工验收待执行。
+  - **Task 7 社媒账号页 v3 页面收口——完成（代码 + 自动化验证）**：Cookie 列 + 任意行弹窗/从 Profile 读真实 Cookie；账号信息/窗口弹窗去多余按钮；查看抽屉转 view-only；编辑/新增加「账号名称」+ 编辑加「绑定窗口」；标签多选 allow-create；删标签管理；「窗口绑定」模糊筛选。**布局重排**：统计一行分两组、主操作 [新增账号][批量检查][刷新]、筛选两行、移除批量工具栏、操作列「检查」、错误反馈重构、修复分页总条数。Cloud mediaaccount go test 全绿（含新增 5 用例）、Web 38 tests、Cloud/Web 构建通过。GUI 人工验收**通过**（2026-08-14，含标签跨账号复用修复后点验）。
+  - **Task 7 GUI 验收修复——标签跨账号复用丢失（根因在 DB 唯一键，非前端）**：GUI 验收发现「新建账号勾选其他记录已创建的标签 → 保存后标签未落库」。根因：迁移 `20260806_022` 在 `DROP COLUMN media_account_id` 时未先删含该列的复合唯一键，MySQL 自动把 `uq_media_account_tags_owner_account_name` 折叠为 `(user_id, tag_name)`（丢失 `media_account_id`），使同一用户跨账号复用同一标签名被 `store.AddTags` 的 `INSERT IGNORE` 静默丢弃（审计日志有 `tags.add`、表里无行）。修复：新增迁移 `20260814_024` 恢复 `(user_id, media_account_id, tag_name)`，应用 + SQL 复现验证通过。前端 `t-select multiple filterable` 与后端 `AddTags` 契约本身正确，未改。GUI 最终复核**通过**（2026-08-14）。
+  - **Decision 0010 两态残留修复**：2026-09-03 审计发现账号页检查条件仍兼容历史 `draft`；增加失败回归断言后删除该分支，当前仅 `enabled` 可检查。目标文件 9 tests、完整 Web 38 tests PASS。
   - **文档口径收口（改口，记录于本变更记录）**：① business_status 收敛两态 `enabled`/`disabled`（迁移 021，健康度由派生「账号状态」承载）；② 账号页 v3 无批量工具栏、标签仅单账号增删（批量标签延后）；③ login_status 对齐 PRD 3.3.9（`unknown`/`normal`/`not_logged_in`/`verification_needed`/`expired`/`restricted`/`account_mismatch`/`environment_error`）。同步回改 milestone 218/219 与 PRD 第三章 3.3.6。
-- Current：CHG-A 全部 Task（1-7）代码完成；检查链路 + 8 项明细端到端验证 + v3 页面收口自动化验证通过。
-- Next：**CHG-A 收口判定**——待用户打包 Desktop GUI 人工验收（点击检查按钮看 8 项明细 + v3 页面收口效果）+ 7/8 受限样本对齐；随后更新账号收口矩阵判定 DONE。
-- Blockers/已知：7/8 判定需真实受限账号样本；代理项 3/4 na 待 M2-C 回接；自动化接码登录（上号）属 M2-D。
-- Recent verification：窗口收口 DONE（CHG-031）；Web 38 tests（Task 7 后）；Cloud mediaaccount go test 全绿（含 Task 7 新增 5 用例）；Cloud/Web 构建通过。
+- Current：CHG-A 全部 Task（1-7）代码完成；检查链路 + 8 项明细端到端验证 + v3 页面收口自动化验证通过；**v3 页面 GUI 人工验收通过（2026-08-14）**，标签跨账号复用 DB 唯一键修复（迁移 024）已应用并点验。
+- Next：先解决 Q-01/Q-02；随后完成 7/8 真实样本对齐、更新账号收口矩阵并判定 DONE。M2-C 的 CHG-20260805-033 在本 CHG 关闭前不得激活。
+- Blockers/已知：7/8 判定需真实受限账号样本；代理项 3/4 na 待 M2-C 回接；自动化接码登录（上号）属 M2-D；账号—游戏基数在 Milestone 与最终 PRD 间冲突。
+- Recent verification：窗口收口 DONE（CHG-031）；2026-09-03 从当前源代码重新执行 `m2b-local-acceptance.sh all`，Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Web 38 tests PASS；Cloud mediaaccount + migration tests PASS；Agent 13 项目标 unittest PASS；Desktop 10 tests PASS；迁移 024 已记录且唯一键列顺序验证通过。Cloud 修正提交 `56fc86e`，Desktop 生成资产提交 `95db0e8`。见 `evidence/2026-09-03-current-environment-and-regression.md`。
 
 ## 9. Pending Questions
 
-None.
+- **Q-01（BLOCKING）账号—游戏基数**：Milestone M2-B 要求“新增时可不绑定、可绑定多个游戏”，最终 PRD 3.3.2 要求“首版只归属一个游戏”，当前代码/表结构为单 `game_id`。决策目录没有覆盖此冲突的 durable decision。按治理规则，未确认前不得修改模型。
+- **Q-02（BLOCKING）检查项 7/8 真实验收**：当前没有验证码/安全验证或账号受限的真实平台样本。是否提供 Bilibili/百家号受限样本，或形成决策把真实样本验收移到有样本的修复 CHG？没有任一结果，本 CHG 不能声明完整 DONE。
