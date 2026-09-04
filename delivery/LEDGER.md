@@ -6,6 +6,5 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260805-032 | M2-B 社媒账号收口 | ACTIVE | wt-media-workspace |
-| CHG-20260805-033 | M2-C 代理收口 | PLANNED | wt-media-workspace |
+| CHG-20260805-033 | M2-C 代理收口 | ACTIVE | wt-media-workspace |
 | CHG-20260903-034 | M2-B 账号检查项 7/8 真实样本校准 | PLANNED | wt-media-workspace |

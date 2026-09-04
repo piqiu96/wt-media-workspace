@@ -1,7 +1,7 @@
 # CHG-20260805-033：M2-C 代理收口
 
 > 日期：2026-08-05
-> 状态：PLANNED（待 CHG-20260805-032 账号收口验收完成后激活）
+> 状态：ACTIVE
 > 所属 Milestone：M2-C 代理资源与窗口真实绑定闭环
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-C-代理资源与窗口真实绑定闭环`
 > 当前仓库：`wt-media-workspace`
@@ -10,7 +10,7 @@
 ## 0. 继承与关联
 
 - 前置：M2-A、M2-B 窗口收口（CHG-031 DONE）、M2-B 账号收口（CHG-20260805-032，先行）、共享互斥（CHG-A Task 1 实现，本 CHG 继承复用）
-- 本 CHG 与账号收口串行推进，激活时间在账号收口验收完成后
+- 本 CHG 与账号收口串行推进；CHG-20260805-032 已于 2026-09-04 验收完成，本 CHG 自该日激活。
 
 ## 1. 用户可见目标
 
@@ -89,11 +89,11 @@
 
 ## 8. Checkpoint
 
-- Completed：CHG 已创建（PLANNED）。
-- Current：等待 CHG-20260805-032 账号收口验收完成后激活。
-- Next：激活后按 Task 1-6 执行。
-- Blockers：需真实代理资源（用户已确认可提供）。
-- Recent verification：—。
+- Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。
+- Current：执行 Task 1：先建立单个代理创建页面和“解析预览零副作用 → 确认导入”边界。
+- Next：完成 Task 1 的 Cloud 契约、Web 页面、测试与人工预览验收后，进入统一 `max_profile_count` 配额迁移。
+- Blockers：Task 1/2 无外部阻塞；Task 3 及端到端验收需要真实代理资源。
+- Recent verification：CHG-032 最新强制重启与人工验收已通过，可作为本 CHG 环境基线。
 
 ## 9. Pending Questions
 
