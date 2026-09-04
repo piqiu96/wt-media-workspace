@@ -90,7 +90,7 @@
 ## 8. Checkpoint
 
 - Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。Task 1/2/3/4 完成；新增代理弹窗已可选择窗口并同步 BitBrowser；可信 Desktop Profile 扫描已提供代理 Diff 预览、集中确认、未知代理待补充和逐项恢复 Cloud 配置。2026-09-05 修复 BitBrowser `/browser/list` 代理字段 `host`/`port` 的读取与写入映射，真实扫描已读回 11 个带地址/端口的 SOCKS5 窗口。
-- Current：Task 6 的本机窗口代理扫描字段映射已通过实机验证；最新 Cloud/Agent/BitBrowser/DMG 已强制重建、挂载并启动。强制重启清除了 Desktop 进程内可信绑定，页面预览前需在“环境状态”页重新绑定当前电脑；Cloud 门禁已正确拒绝未重新绑定的直接扫描请求，未产生正式写入。
+- Current：Task 6 的本机窗口代理扫描字段映射已通过实机验证；最新 Cloud/Agent/BitBrowser/DMG 已强制重建、挂载并启动。实机读取到 11 个有代理配置的窗口，且 11/11 已在 Cloud Browser Profile 台账中。强制重启清除了 Desktop 进程内可信绑定，页面预览前需在“环境状态”页重新绑定当前电脑；Cloud 门禁已正确拒绝未重新绑定的直接扫描请求，未产生正式写入。
 - Next：重新完成 Desktop 可信绑定后，以真实代理完成外部变更扫描、接受与恢复的人工验收；继续推荐引擎及账号检查项 3/4。
 - Blockers：真实代理分配、读回、更换、解绑、扫描恢复及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。当前已有本机窗口真实代理可用于扫描验收。
 - Recent verification：Agent 全量 78 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Web 42 tests、Cloud/Desktop Web build、强制重建本地环境和认证路由烟雾测试均通过；本机 BitBrowser 实际读取到 11 个完整代理窗口。见 `evidence/2026-09-05-bitbrowser-proxy-scan-field-mapping.md`、`evidence/task4-proxy-lifecycle-readback.md`、`evidence/task6-local-proxy-scan-and-create-sync.md`、`evidence/2026-09-05-proxy-sync-acceptance-environment.md`；此前证据见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。

@@ -22,6 +22,7 @@ BitBrowser `POST /browser/list` 对窗口代理使用 `host`、`port` 字段。A
 | Agent 全量测试 | 无回归 | 78 项通过 | PASS |
 | 强制重建环境 | 最新 Cloud、Agent、Desktop DMG 与 BitBrowser 均可用 | 迁移 0/27、健康/资源/DMG/登录门禁全部通过 | PASS |
 | 真实 BitBrowser 扫描 | 配置了代理的窗口应带非空地址和端口 | 读取到 11 个 SOCKS5 窗口，全部具有非空地址和有效端口 | PASS |
+| Cloud 台账范围核对 | 已配置窗口需为 Cloud Profile，才能进入 M2-C Diff | 11/11 个已配置窗口已存在于 Cloud 的 39 个 Browser Profile 中 | PASS |
 
 ## Desktop 预览前置条件
 
