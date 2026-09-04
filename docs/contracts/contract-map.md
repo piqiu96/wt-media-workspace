@@ -32,12 +32,13 @@ relation contract and Desktop consumes the Cloud Web build output only.
 
 ### Proxy synchronous mutation revision (M2-C)
 
-The Agent-owned Local Agent API revision `2026.09.04.1` adds the compatible
-`POST /api/v1/proxy-mutation` write/read-back operation; credentials are
-write-only and never returned. Cloud owns the corresponding compatible
-`POST /api/v1/proxies/{proxy_id}/assign` projection. Cloud records
-`browser_profiles.proxy_id` only after the Agent response confirms read-back;
-Cloud Web and Desktop consume the refreshed Web build output.
+The Agent-owned Local Agent API revision `2026.09.05.1` provides compatible
+`POST /api/v1/proxy-mutation` assign and `unbind` write/read-back operations;
+credentials are write-only and never returned. Cloud owns the corresponding
+compatible `POST /api/v1/proxies/{proxy_id}/assign` and `/unbind` projections.
+Cloud records or clears `browser_profiles.proxy_id` only after the Agent
+response confirms the matching proxy or `noproxy` read-back; Cloud Web and
+Desktop consume the refreshed Web build output.
 
 ## Agent-Owned Contracts
 

@@ -90,10 +90,10 @@
 ## 8. Checkpoint
 
 - Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。
-- Current：Task 1/2/3 完成；最新本地 Cloud/Agent 已重启，Agent `proxy-mutation` 空输入返回预期 400，Cloud/Agent/BitBrowser 健康检查通过。正在执行 Task 4 的解绑和更换生命周期。
-- Next：以 BitBrowser 的正式 `proxyType: noproxy` 语义实现解绑读回；更换只在新代理读回成功后将 `proxy_id` 原子切换。
-- Blockers：真实代理分配、读回、更换、解绑及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。
-- Recent verification：Task 3 Agent 76 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Web 41 tests、Cloud/Desktop Web build 均通过。见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。
+- Current：Task 1/2/3/4 完成；Agent 以 BitBrowser 正式 `proxyType: noproxy` 写入并读回后才允许解绑，Cloud 更换只在新代理读回后切换 `proxy_id`。正在执行 Task 6 的本机代理扫描 Diff、未知代理待补充和恢复 Cloud 配置。
+- Next：复用 Desktop 的可信 Profile 扫描，提供代理扫描预览、集中确认与逐项恢复；新增代理弹窗可直接同步到目标窗口。
+- Blockers：真实代理分配、读回、更换、解绑、扫描恢复及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。
+- Recent verification：Task 4 Agent 77 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1` 均通过。见 `evidence/task4-proxy-lifecycle-readback.md`；此前证据见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。
 
 ## 9. Pending Questions
 
