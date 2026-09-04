@@ -133,9 +133,10 @@
 - Current：Task 8 的领域模型子任务完成并已验证：`GameIDs` 规范化、完整替换/清空、启用游戏公开关联、停用游戏拒绝；下一步为 `media_account_games` 迁移与 MySQL 原子读写。
 - Current：Task 8 的关系表持久化子任务完成并已验证：迁移 025、事务化关系替换、批量关系读回和 `EXISTS` 任一游戏筛选；下一步发布 `game_ids` API 契约与兼容路由。
 - Current：Task 8 的 Cloud API 子任务完成并已验证：`game_ids` 为正式创建/更新/筛选字段，`game_id` 兼容且冲突请求拒绝；下一步更新 Cloud Web 多游戏管理。
-- Current：Task 8 的 Cloud Web 子任务完成并已验证：多选创建/编辑/清空、任一游戏筛选和完整游戏展示均使用 `game_ids`；Cloud/Web 双静态构建通过。下一步执行真实 MySQL 切换与 Desktop 生成资产刷新。
-- Next：完成关系迁移、Cloud API 与账号页面验证；随后将 CHG-032 的 7/8 样本验收移交 CHG-034，并按门禁关闭 CHG-032。
-- Blockers/已知：7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
+- Current：Task 8 的真实 MySQL 切换完成并通过：迁移 025 已记录；6 条关系完整迁移；旧 `media_accounts.game_id` 已移除；标签、Cookie、检查项和 Profile 绑定计数均保持；重复关系被复合主键拒绝。当前源码强制重启后 Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Cloud 关系层回归与 Cloud Web 40 项测试 PASS。Desktop 生成资产已刷新（`849f244`）。见 `evidence/2026-09-03-multi-game-cutover.md`。
+- Current：Task 8 的手工页面业务点验尚未执行：内置浏览器访问本地 Cloud 被 `ERR_BLOCKED_BY_CLIENT` 拦截，未发生登录或账号数据修改；自动化覆盖已通过。待可访问本地页面的交互环境中，以明确的可丢弃账号验证双游戏创建、替换、清空、任一游戏筛选和未绑定游戏执行资格。
+- Next：补齐上述手工页面点验后，审计 CHG-032 全部已转移事项并按门禁关闭；7/8 真实样本验收由 CHG-034 承接，代理检查项 3/4 由 CHG-033 回接。
+- Blockers/已知：Task 8 仅剩本地页面访问受客户端拦截的手工点验；7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
 - Recent verification：窗口收口 DONE（CHG-031）；2026-09-03 从当前源代码重新执行 `m2b-local-acceptance.sh all`，Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Web 38 tests PASS；Cloud mediaaccount + migration tests PASS；Agent 13 项目标 unittest PASS；Desktop 10 tests PASS；迁移 024 已记录且唯一键列顺序验证通过。Cloud 修正提交 `56fc86e`，Desktop 生成资产提交 `95db0e8`。见 `evidence/2026-09-03-current-environment-and-regression.md`。
 
 ## 9. Pending Questions
