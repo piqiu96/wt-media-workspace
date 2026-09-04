@@ -90,10 +90,10 @@
 ## 8. Checkpoint
 
 - Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。
-- Current：执行 Task 1：先建立单个代理创建页面和“解析预览零副作用 → 确认导入”边界。
-- Next：完成 Task 1 的 Cloud 契约、Web 页面、测试与人工预览验收后，进入统一 `max_profile_count` 配额迁移。
+- Current：Task 1 的 Cloud 契约、单个创建页面和零副作用预览已完成并通过自动化/构建验证；待随下一次本地环境重启进行人工预览验收。
+- Next：进入 Task 2，审计现有按平台配额的表、API 和调用点，并迁移到统一 `max_profile_count`；Task 1 人工预览与后续 Task 2 一并在最新环境验收。
 - Blockers：Task 1/2 无外部阻塞；Task 3 及端到端验收需要真实代理资源。
-- Recent verification：CHG-032 最新强制重启与人工验收已通过，可作为本 CHG 环境基线。
+- Recent verification：`go test ./internal/modules/proxy -run TestImportPreviewDoesNotPersistUntilConfirmed -count=1`、Web 41 tests、Cloud/Desktop Web build 均通过。见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`。
 
 ## 9. Pending Questions
 
