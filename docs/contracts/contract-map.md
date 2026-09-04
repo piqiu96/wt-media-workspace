@@ -30,6 +30,15 @@ containing both fields must use the same normalized singleton value or Cloud
 rejects it. Cloud Web is the direct consumer; Agent has no media-account game
 relation contract and Desktop consumes the Cloud Web build output only.
 
+### Proxy synchronous mutation revision (M2-C)
+
+The Agent-owned Local Agent API revision `2026.09.04.1` adds the compatible
+`POST /api/v1/proxy-mutation` write/read-back operation; credentials are
+write-only and never returned. Cloud owns the corresponding compatible
+`POST /api/v1/proxies/{proxy_id}/assign` projection. Cloud records
+`browser_profiles.proxy_id` only after the Agent response confirms read-back;
+Cloud Web and Desktop consume the refreshed Web build output.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`
