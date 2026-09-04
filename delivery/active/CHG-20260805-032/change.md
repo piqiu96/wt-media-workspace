@@ -132,6 +132,7 @@
 - Current：按 Decision 0011 实施 Task 8 账号—游戏多关系切换。
 - Current：Task 8 的领域模型子任务完成并已验证：`GameIDs` 规范化、完整替换/清空、启用游戏公开关联、停用游戏拒绝；下一步为 `media_account_games` 迁移与 MySQL 原子读写。
 - Current：Task 8 的关系表持久化子任务完成并已验证：迁移 025、事务化关系替换、批量关系读回和 `EXISTS` 任一游戏筛选；下一步发布 `game_ids` API 契约与兼容路由。
+- Current：Task 8 的 Cloud API 子任务完成并已验证：`game_ids` 为正式创建/更新/筛选字段，`game_id` 兼容且冲突请求拒绝；下一步更新 Cloud Web 多游戏管理。
 - Next：完成关系迁移、Cloud API 与账号页面验证；随后将 CHG-032 的 7/8 样本验收移交 CHG-034，并按门禁关闭 CHG-032。
 - Blockers/已知：7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
 - Recent verification：窗口收口 DONE（CHG-031）；2026-09-03 从当前源代码重新执行 `m2b-local-acceptance.sh all`，Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Web 38 tests PASS；Cloud mediaaccount + migration tests PASS；Agent 13 项目标 unittest PASS；Desktop 10 tests PASS；迁移 024 已记录且唯一键列顺序验证通过。Cloud 修正提交 `56fc86e`，Desktop 生成资产提交 `95db0e8`。见 `evidence/2026-09-03-current-environment-and-regression.md`。

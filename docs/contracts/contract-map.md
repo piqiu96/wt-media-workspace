@@ -21,6 +21,15 @@ Historical M0/M1 release entries remain valid evidence for their recorded scaffo
 - `../wt-media-cloud/contracts/business-enums`
 - `../wt-media-cloud/contracts/cloud-error-codes`
 
+### Media-account game-set revision (M2-B)
+
+Cloud owns the additive media-account API revision. `game_ids` is the
+canonical request, response and query field for the full account game set;
+`game_id` remains a single-value compatibility input/projection only. A request
+containing both fields must use the same normalized singleton value or Cloud
+rejects it. Cloud Web is the direct consumer; Agent has no media-account game
+relation contract and Desktop consumes the Cloud Web build output only.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`
