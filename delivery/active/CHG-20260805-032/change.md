@@ -137,6 +137,7 @@
 - Current：用户重启 BitBrowser 后已重新执行全量强制重启验收，BitBrowser via Agent 与全部跨端门禁仍为 PASS。人工点验进一步确认：数据库游戏目录仅有 `game1 / 默认游戏`，没有第二个游戏可用于双游戏验收；`18080` 仅为 Cloud API，Cloud Web 已改由 `5173` 启动并在系统浏览器打开；admin 首次登录会因 login smoke 的存量会话返回 `20010`，页面选择“替换旧会话并登录”即可。待补充第二条启用游戏数据后验证双游戏创建、替换、清空、任一游戏筛选和未绑定游戏执行资格。
 - Current：用户确认媒体账号游戏范围以 `user_game_scopes` 为准，并批准以“列表摘要 + 详情接口”治理游戏引用。发现 `GameHasReferences` 仍查询已删除的 `media_accounts.game_id`，导致游戏停用/删除 500；本次修复改查 `media_account_games`，补充摘要、详情、范围缩减保护和前端禁用态。用户已授权清理 `game1` 等测试脏数据：保留媒体账号，仅移除测试游戏关系和游戏记录（账号组筛选器无引用后执行）。
 - Current：范围与引用修复已完成并验证。管理员游戏列表含“用户 N / 账号 M”摘要及按需详情；任一关联存在时页面和 API 均阻止停用/删除。非管理员媒体账号创建、更新、筛选、检查及用户范围缩减已受 `user_game_scopes` 保护。`game1` 已按批准清理：删除 6 条账号—游戏关系和游戏记录，保留 6 条媒体账号。见 `evidence/2026-09-04-game-scope-reference-cleanup.md`。
+- Current：用户已于 2026-09-04 完成并确认本轮 Cloud Web 人工验收。Task 8 的多游戏关系、范围授权、游戏引用治理和测试数据清理均已验收；CHG 仍保持 ACTIVE，待按既有门禁审计其余转移事项，不提前关闭 7/8 真实样本或 M2-C 代理回接。
 - Next：完成范围与引用修复、清理 `game1` 后，补齐多游戏手工页面点验并审计 CHG-032 全部已转移事项；7/8 真实样本验收由 CHG-034 承接，代理检查项 3/4 由 CHG-033 回接。
 - Blockers/已知：Task 8 手工点验尚缺第二条启用游戏数据；Codex 浏览器访问本地页面仍受客户端拦截，但用户可使用已打开的系统浏览器和 Desktop 验收。7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
 - Recent verification：2026-09-04 再次执行 `m2b-local-acceptance.sh all --force-restart`，退出码 0；Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS。随后独立确认 Cloud health、Agent health、`bitbrowser_status=normal`、两个监听端口、DMG 挂载和 WT Media 桌面进程。多游戏 Cloud mediaaccount + migration 测试及 Web 40 tests 已通过。见 `evidence/2026-09-03-multi-game-cutover.md`。
