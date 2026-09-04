@@ -35,10 +35,13 @@ relation contract and Desktop consumes the Cloud Web build output only.
 The Agent-owned Local Agent API revision `2026.09.05.1` provides compatible
 `POST /api/v1/proxy-mutation` assign and `unbind` write/read-back operations;
 credentials are write-only and never returned. Cloud owns the corresponding
-compatible `POST /api/v1/proxies/{proxy_id}/assign` and `/unbind` projections.
-Cloud records or clears `browser_profiles.proxy_id` only after the Agent
-response confirms the matching proxy or `noproxy` read-back; Cloud Web and
-Desktop consume the refreshed Web build output.
+compatible `POST /api/v1/proxies/{proxy_id}/assign`, `/unbind`, and
+`/local-scan/{preview,confirm}` projections. Cloud records or clears
+`browser_profiles.proxy_id` only after an Agent response confirms the matching
+proxy or `noproxy` read-back, or after a trusted Desktop Profile scan is
+explicitly accepted. Unknown scanned proxies become paused, unchecked records;
+ambiguous tuple matches are surfaced as conflicts and are never guessed.
+Cloud Web and Desktop consume the refreshed Web build output.
 
 ## Agent-Owned Contracts
 
