@@ -50,3 +50,12 @@
 复验时内置浏览器与已连接 Chrome 访问 `http://127.0.0.1:18080/` 均仍返回 `ERR_BLOCKED_BY_CLIENT`。该结果证明拦截来自 Codex 浏览器客户端对本机 HTTP 地址的策略，而非业务 BitBrowser 或 Cloud/Agent 故障；未绕过该策略，也未产生账号数据变更。
 
 已交付人工验收环境：Cloud `127.0.0.1:18080`、Agent `127.0.0.1:8765` 均处于监听状态；Agent 报告 `bitbrowser_status=normal`；DMG 挂载在 `/Volumes/WT Media`；进程 `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell` 正在运行。待用户在已打开的 WT Media 应用中完成页面操作验收并反馈结果。
+
+## 2026-09-04 人工验收入口与游戏数据诊断
+
+用户点验发现游戏下拉仅有“默认游戏”，并反馈访问 `http://127.0.0.1:18080` 无法登录管理员后台。只读核验与复现结果：
+
+- `operation_games` 只有一条启用记录：`game1 / 默认游戏`；`user_game_scopes` 也只有 `game1`，不存在未进入游戏目录的历史游戏 ID。6 条 `media_account_games` 关系全部指向该游戏。因此页面只显示一个选项与当前数据库一致，不是多选控件丢数据；但当前数据不足以执行“双游戏”手工验收。
+- `18080` 是 Cloud API 端口，不承载 Cloud Web，直接 `GET /` 返回 404；此前把它作为可登录后台地址交付属于环境入口描述错误。
+- 已启动 Cloud Web Vite 服务 `http://127.0.0.1:5173/`，其 `/api` 代理指向 `18080`；首页和代理健康接口均验证通过，并已在系统浏览器打开。
+- 经 `5173` 代理复现管理员登录返回 HTTP 409 / `errcode=20010`：登录 smoke 已占用 admin 会话。前端已提供“替换旧会话并登录”分支；用户在页面选择替换即可，未在诊断中代替用户提交该操作。
