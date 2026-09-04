@@ -31,7 +31,7 @@
 
 - **共享互斥（E1/M2-E 切片）**：同一 Profile 同时仅一个本地敏感操作（Cloud acquire/release + Agent 守卫），账号检查接入；供 CHG-C 继承
 - 账号台账收尾：`business_status` 补 draft=待识别/abnormal=异常（DB CHECK + 服务校验 + 页面统计筛选）；账号详情 Cookie 操作入口（**查看/导出当前 Cookie + 从 Profile 读真实 Cookie**，读回走 Agent 同步）
-- **账号—游戏多关系切换**：新建 `media_account_games`、一次性迁移旧单值关联并删除 `media_accounts.game_id`；Cloud API 与账号页面创建/编辑/展示/筛选均使用 `game_ids`；已启用游戏在媒体账号域默认公开可用（Decision 0011）
+- **账号—游戏多关系与范围治理**：新建 `media_account_games`、一次性迁移旧单值关联并删除 `media_accounts.game_id`；Cloud API 与账号页面创建/编辑/展示/筛选均使用 `game_ids`；非管理员按 `user_game_scopes` 使用游戏，游戏管理提供引用摘要和详情（Decision 0012）
 - 平台身份真实识别：抖音/百家号 Cookie→UID；Bilibili/抖音/百家号昵称与头像真实回填
 - 账号检查 8 项明细：保留已完成骨架与展示；7/8（验证码/账号限制）的真实样本校准移至 CHG-20260903-034
 - **账号组（可保存筛选，PRD 3.3.6）**：account_groups 模型 + CRUD + 保存/应用筛选；发布/互动（M6/M8）依赖它筛目标账号
@@ -89,7 +89,7 @@
 ### Task 8：账号—游戏多关系切换
 - 创建 `media_account_games` 关系表，迁移旧 `media_accounts.game_id`，保留账号、标签、Cookie、检查记录与 Profile 绑定并删除旧列/索引
 - Cloud 服务/Store/路由以 `game_ids` 为正式字段；旧 `game_id` 仅兼容；创建/更新按完整数组写入或删除关系；按任一游戏筛选不产生重复账号
-- Cloud Web 新增、编辑、列表、详情和筛选支持多游戏；已启用游戏默认公开可用，不按 `users.game_ids` 限制本域
+- Cloud Web 新增、编辑、列表、详情和筛选支持多游戏；非管理员只可使用本人 `user_game_scopes` 内已启用游戏，管理员代管按目标用户范围校验；游戏管理显示用户授权和媒体账号引用并提供详情
 
 ## 6. 验收标准
 
@@ -135,7 +135,8 @@
 - Current：Task 8 的 Cloud API 子任务完成并已验证：`game_ids` 为正式创建/更新/筛选字段，`game_id` 兼容且冲突请求拒绝；下一步更新 Cloud Web 多游戏管理。
 - Current：Task 8 的真实 MySQL 切换完成并通过：迁移 025 已记录；6 条关系完整迁移；旧 `media_accounts.game_id` 已移除；标签、Cookie、检查项和 Profile 绑定计数均保持；重复关系被复合主键拒绝。当前源码强制重启后 Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Cloud 关系层回归与 Cloud Web 40 项测试 PASS。Desktop 生成资产已刷新（`849f244`）。见 `evidence/2026-09-03-multi-game-cutover.md`。
 - Current：用户重启 BitBrowser 后已重新执行全量强制重启验收，BitBrowser via Agent 与全部跨端门禁仍为 PASS。人工点验进一步确认：数据库游戏目录仅有 `game1 / 默认游戏`，没有第二个游戏可用于双游戏验收；`18080` 仅为 Cloud API，Cloud Web 已改由 `5173` 启动并在系统浏览器打开；admin 首次登录会因 login smoke 的存量会话返回 `20010`，页面选择“替换旧会话并登录”即可。待补充第二条启用游戏数据后验证双游戏创建、替换、清空、任一游戏筛选和未绑定游戏执行资格。
-- Next：补齐上述手工页面点验后，审计 CHG-032 全部已转移事项并按门禁关闭；7/8 真实样本验收由 CHG-034 承接，代理检查项 3/4 由 CHG-033 回接。
+- Current：用户确认媒体账号游戏范围以 `user_game_scopes` 为准，并批准以“列表摘要 + 详情接口”治理游戏引用。发现 `GameHasReferences` 仍查询已删除的 `media_accounts.game_id`，导致游戏停用/删除 500；本次修复改查 `media_account_games`，补充摘要、详情、范围缩减保护和前端禁用态。用户已授权清理 `game1` 等测试脏数据：保留媒体账号，仅移除测试游戏关系和游戏记录（账号组筛选器无引用后执行）。
+- Next：完成范围与引用修复、清理 `game1` 后，补齐多游戏手工页面点验并审计 CHG-032 全部已转移事项；7/8 真实样本验收由 CHG-034 承接，代理检查项 3/4 由 CHG-033 回接。
 - Blockers/已知：Task 8 手工点验尚缺第二条启用游戏数据；Codex 浏览器访问本地页面仍受客户端拦截，但用户可使用已打开的系统浏览器和 Desktop 验收。7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
 - Recent verification：2026-09-04 再次执行 `m2b-local-acceptance.sh all --force-restart`，退出码 0；Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS。随后独立确认 Cloud health、Agent health、`bitbrowser_status=normal`、两个监听端口、DMG 挂载和 WT Media 桌面进程。多游戏 Cloud mediaaccount + migration 测试及 Web 40 tests 已通过。见 `evidence/2026-09-03-multi-game-cutover.md`。
 
