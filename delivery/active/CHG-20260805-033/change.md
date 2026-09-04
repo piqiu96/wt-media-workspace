@@ -29,7 +29,7 @@
 
 - 台账收尾：单个代理创建前端表单；导入预览**零副作用**（拆分 Parse/Import 端点）
 - 配额模型：`proxy_platform_quotas` 迁移为统一 `max_profile_count`（DB 迁移 + CheckQuota 重构），页面展示已用/剩余
-- 分配写回：ProxyPage 分配入口；Agent 同步写回端点（`/proxy-mutation`）；Cloud 同步 mutation 调用（复用互斥）
+- 分配写回：浏览器窗口页分配入口；Agent 同步写回端点（`/proxy-mutation`）；Cloud 同步 mutation 调用（复用互斥）
 - 写回一致性：Cloud 写回 broker（mutation 结果更新 `browser_profiles`）、解绑、更换（先验新后释放旧）
 - 推荐方案：推荐引擎（仅已启用/检测正常/未到期/有剩余配额）+ 推荐/人工调整/确认 UI
 - 外部代理变化：扫描 Diff 中代理变化的处理（未知代理→待补充记录）
@@ -59,7 +59,7 @@
 - C2.3 页面展示统一最大配额；已用/剩余仅在 Task 3 读回并写入正式 `proxy_id` 关系后计算，禁止以地址猜测
 
 ### Task 3：分配写回链路
-- C3.3 ProxyPage 分配入口
+- C3.3 浏览器窗口页分配入口
 - C3.4 Agent 同步写回端点（`/proxy-mutation`）
 - C3.5 Cloud 同步 mutation 调用（复用互斥）
 
@@ -71,9 +71,14 @@
 - C3.7 推荐引擎 + 推荐/人工调整/确认 UI
 
 ### Task 6：外部代理变化与收口
-- C4 外部代理变化 Diff 处理
+- C4 浏览器窗口页中的外部代理变化 Diff 处理
 - 回接媒体账号检查项 3/4：基于已读回的 Profile—代理关系、代理检测状态、业务状态和过期时间生成真实结果
 - 端到端验收（真实代理）→ 更新 M2-C 收口矩阵，判定 DONE 或修复
+
+### Task 7：代理操作入口边界调整
+- 从代理管理页移除新增代理时同步、单代理分配/更换/解绑、本机代理扫描 Diff 与恢复入口；代理管理保留台账、新增、导入和检测能力。
+- 在Desktop浏览器窗口页提供单窗口绑定/更换/解绑和多选窗口绑定同一代理；复用现有Cloud预检、Profile互斥、Agent写入与读回，不创建第二套关系或任务模型。
+- 将本机代理变化的预览、接受和恢复入口迁至浏览器窗口页；Cloud Web不展示任何BitBrowser代理操作。
 
 ## 6. 验收标准
 
@@ -89,11 +94,11 @@
 
 ## 8. Checkpoint
 
-- Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。Task 1/2/3/4 完成；新增代理弹窗已可选择窗口并同步 BitBrowser；可信 Desktop Profile 扫描已提供代理 Diff 预览、集中确认、未知代理待补充和逐项恢复 Cloud 配置。2026-09-05 修复 BitBrowser `/browser/list` 代理字段 `host`/`port` 的读取与写入映射，真实扫描已读回 11 个带地址/端口的 SOCKS5 窗口。
-- Current：Task 6 的本机窗口代理扫描字段映射已通过实机验证；最新 Cloud/Agent/BitBrowser/DMG 已强制重建、挂载并启动。实机读取到 11 个有代理配置的窗口，且 11/11 已在 Cloud Browser Profile 台账中。强制重启清除了 Desktop 进程内可信绑定，页面预览前需在“环境状态”页重新绑定当前电脑；Cloud 门禁已正确拒绝未重新绑定的直接扫描请求，未产生正式写入。
-- Next：重新完成 Desktop 可信绑定后，以真实代理完成外部变更扫描、接受与恢复的人工验收；继续推荐引擎及账号检查项 3/4。
+- Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。Task 1/2/3/4 完成；可信 Desktop Profile 扫描已提供代理 Diff 预览、集中确认、未知代理待补充和逐项恢复 Cloud 配置。2026-09-05 修复 BitBrowser `/browser/list` 代理字段 `host`/`port` 的读取与写入映射，真实扫描已读回 11 个带地址/端口的 SOCKS5 窗口。
+- Current：Task 7 第一阶段完成：代理管理已移除绑定/同步/本机扫描入口；浏览器窗口Desktop页已提供单窗口代理绑定、更换、解绑和代理关系Diff展示，均复用既有写后读回链路。最新 Cloud/Agent/BitBrowser/DMG 已强制重建、挂载并启动；实机读取到 11 个有代理配置的窗口，且 11/11 已在 Cloud Browser Profile 台账中。
+- Next：完成多选窗口绑定同一代理、按正式关系恢复Cloud代理绑定与真实Desktop人工验收；重新完成 Desktop 可信绑定后验证外部变化的接受与恢复；继续推荐引擎及账号检查项 3/4。
 - Blockers：真实代理分配、读回、更换、解绑、扫描恢复及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。当前已有本机窗口真实代理可用于扫描验收。
-- Recent verification：Agent 全量 78 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Web 42 tests、Cloud/Desktop Web build、强制重建本地环境和认证路由烟雾测试均通过；本机 BitBrowser 实际读取到 11 个完整代理窗口。见 `evidence/2026-09-05-bitbrowser-proxy-scan-field-mapping.md`、`evidence/task4-proxy-lifecycle-readback.md`、`evidence/task6-local-proxy-scan-and-create-sync.md`、`evidence/2026-09-05-proxy-sync-acceptance-environment.md`；此前证据见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。
+- Recent verification：Agent 全量 78 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Web 44 tests、Desktop Web build、强制重建本地环境和认证路由烟雾测试均通过；本机 BitBrowser 实际读取到 11 个完整代理窗口。见 `evidence/2026-09-05-proxy-operation-boundary.md`、`evidence/2026-09-05-bitbrowser-proxy-scan-field-mapping.md`、`evidence/task4-proxy-lifecycle-readback.md`、`evidence/task6-local-proxy-scan-and-create-sync.md`、`evidence/2026-09-05-proxy-sync-acceptance-environment.md`；此前证据见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。
 
 ## 9. Pending Questions
 
