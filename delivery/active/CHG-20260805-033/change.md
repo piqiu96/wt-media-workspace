@@ -90,7 +90,7 @@
 ## 8. Checkpoint
 
 - Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。
-- Current：Task 1 完成；Task 2 的统一 `max_profile_count` 迁移、API/页面收敛和正式 `browser_profiles.proxy_id` 关系预留已完成，待应用迁移和最新环境人工验收。
+- Current：Task 1/2 完成；统一 `max_profile_count` 和正式 `browser_profiles.proxy_id` 迁移已于 2026-09-04 应用到本地开发库，Cloud、Agent、BitBrowser 健康检查通过。正在执行 Task 3 同步写回链路。
 - Next：进入 Task 3，建立同步 Agent 写入调用、读回后的 `proxy_id` 正式关系更新与配额占用校验；Task 1/2 人工验收与 Task 3 环境验收合并执行。
 - Blockers：Task 1/2 无外部阻塞；Task 3 及端到端验收需要真实代理资源。
 - Recent verification：Task 1 路由测试、Task 2 `go test ./internal/modules/proxy ./internal/modules/migration -count=1`、Web 41 tests、Cloud/Desktop Web build 均通过。见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`。
