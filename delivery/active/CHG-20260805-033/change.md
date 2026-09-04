@@ -90,8 +90,8 @@
 ## 8. Checkpoint
 
 - Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。
-- Current：Task 1/2 完成；Task 3 的 Agent 同步写入端点、Cloud 读回 broker、正式 `proxy_id` 写入、统一容量占用统计和 ProxyPage 分配入口已完成，等待最新进程重启后的无副作用端点验收。
-- Next：重启本地 Cloud/Agent 验证新端点加载；随后进入 Task 4，完成解绑和更换的先验新后释放旧流程。
+- Current：Task 1/2/3 完成；最新本地 Cloud/Agent 已重启，Agent `proxy-mutation` 空输入返回预期 400，Cloud/Agent/BitBrowser 健康检查通过。正在执行 Task 4 的解绑和更换生命周期。
+- Next：以 BitBrowser 的正式 `proxyType: noproxy` 语义实现解绑读回；更换只在新代理读回成功后将 `proxy_id` 原子切换。
 - Blockers：真实代理分配、读回、更换、解绑及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。
 - Recent verification：Task 3 Agent 76 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Web 41 tests、Cloud/Desktop Web build 均通过。见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。
 
