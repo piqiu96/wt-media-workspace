@@ -134,10 +134,10 @@
 - Current：Task 8 的关系表持久化子任务完成并已验证：迁移 025、事务化关系替换、批量关系读回和 `EXISTS` 任一游戏筛选；下一步发布 `game_ids` API 契约与兼容路由。
 - Current：Task 8 的 Cloud API 子任务完成并已验证：`game_ids` 为正式创建/更新/筛选字段，`game_id` 兼容且冲突请求拒绝；下一步更新 Cloud Web 多游戏管理。
 - Current：Task 8 的真实 MySQL 切换完成并通过：迁移 025 已记录；6 条关系完整迁移；旧 `media_accounts.game_id` 已移除；标签、Cookie、检查项和 Profile 绑定计数均保持；重复关系被复合主键拒绝。当前源码强制重启后 Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Cloud 关系层回归与 Cloud Web 40 项测试 PASS。Desktop 生成资产已刷新（`849f244`）。见 `evidence/2026-09-03-multi-game-cutover.md`。
-- Current：Task 8 的手工页面业务点验尚未执行：内置浏览器访问本地 Cloud 被 `ERR_BLOCKED_BY_CLIENT` 拦截，未发生登录或账号数据修改；自动化覆盖已通过。待可访问本地页面的交互环境中，以明确的可丢弃账号验证双游戏创建、替换、清空、任一游戏筛选和未绑定游戏执行资格。
+- Current：用户重启 BitBrowser 后已重新执行全量强制重启验收，BitBrowser via Agent 与全部跨端门禁仍为 PASS；内置浏览器和已连接 Chrome 访问本地 Cloud 均继续被客户端策略以 `ERR_BLOCKED_BY_CLIENT` 拦截，确认与业务 BitBrowser 无关。人工验收环境已交付：Cloud/Agent 监听正常、DMG 已挂载、WT Media 桌面进程正在运行。待用户在桌面应用中验证双游戏创建、替换、清空、任一游戏筛选和未绑定游戏执行资格。
 - Next：补齐上述手工页面点验后，审计 CHG-032 全部已转移事项并按门禁关闭；7/8 真实样本验收由 CHG-034 承接，代理检查项 3/4 由 CHG-033 回接。
 - Blockers/已知：Task 8 仅剩本地页面访问受客户端拦截的手工点验；7/8 真实样本校准由 CHG-034 承接；代理项 3/4 由 CHG-033 回接；自动化接码登录（上号）属 M2-D。
-- Recent verification：窗口收口 DONE（CHG-031）；2026-09-03 从当前源代码重新执行 `m2b-local-acceptance.sh all`，Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS；Web 38 tests PASS；Cloud mediaaccount + migration tests PASS；Agent 13 项目标 unittest PASS；Desktop 10 tests PASS；迁移 024 已记录且唯一键列顺序验证通过。Cloud 修正提交 `56fc86e`，Desktop 生成资产提交 `95db0e8`。见 `evidence/2026-09-03-current-environment-and-regression.md`。
+- Recent verification：2026-09-04 再次执行 `m2b-local-acceptance.sh all --force-restart`，退出码 0；Cloud/Agent/BitBrowser/Desktop assets/DMG/login smoke 全部 PASS。随后独立确认 Cloud health、Agent health、`bitbrowser_status=normal`、两个监听端口、DMG 挂载和 WT Media 桌面进程。多游戏 Cloud mediaaccount + migration 测试及 Web 40 tests 已通过。见 `evidence/2026-09-03-multi-game-cutover.md`。
 
 ## 9. Pending Questions
 

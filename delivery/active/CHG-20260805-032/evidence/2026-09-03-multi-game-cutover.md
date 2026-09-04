@@ -42,3 +42,11 @@
 已尝试在内置浏览器打开固定本地 Cloud URL 进行“创建双游戏 → 替换为单游戏 → 清空 → 任一游戏筛选 → 未绑定游戏不可执行”点验，但客户端返回 `ERR_BLOCKED_BY_CLIENT`，未访问页面、未登录且未修改任何账号数据。该浏览器限制不能通过绕过处理。
 
 这五个行为已有 Cloud 服务/路由、MySQL Store 与 Cloud Web Vitest 覆盖；待在可访问本地 Cloud 的交互环境中对一个明确的可丢弃账号做一次页面补验后，才能把 Task 8 的手工页面项标记为完成。
+
+## 2026-09-04 BitBrowser 重启后复验
+
+用户重启 BitBrowser 后，重新执行 `scripts/m2b-local-acceptance.sh all --force-restart`，退出码为 0：迁移无待应用项（26 total），Cloud/Agent 从当前源码强制重启，BitBrowser via Agent、Desktop assets、DMG、login smoke 全部 PASS。
+
+复验时内置浏览器与已连接 Chrome 访问 `http://127.0.0.1:18080/` 均仍返回 `ERR_BLOCKED_BY_CLIENT`。该结果证明拦截来自 Codex 浏览器客户端对本机 HTTP 地址的策略，而非业务 BitBrowser 或 Cloud/Agent 故障；未绕过该策略，也未产生账号数据变更。
+
+已交付人工验收环境：Cloud `127.0.0.1:18080`、Agent `127.0.0.1:8765` 均处于监听状态；Agent 报告 `bitbrowser_status=normal`；DMG 挂载在 `/Volumes/WT Media`；进程 `/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell` 正在运行。待用户在已打开的 WT Media 应用中完成页面操作验收并反馈结果。
