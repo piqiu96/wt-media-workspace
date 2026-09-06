@@ -86,6 +86,12 @@
 - 有绑定窗口的代理不能删除，页面必须展示关联数量和处理指引。
 - 浏览器窗口候选仅允许检测正常、未过期、有配额的代理，并展示无候选原因；解绑必须显式写入和读回BitBrowser直连配置（`noproxy`、空Host/Port）。
 
+### Task 9：代理录入来源与关联可见性
+- 新增/编辑代理提供静态地址和动态供应商 API 两种最小输入方式；静态地址解析为协议、Host、Port、账号、密码，动态 API 由当前本机 Agent 手动提取并只接受首条可解析的纯文本代理地址。
+- 动态来源的 URL 为敏感写入字段，列表和普通详情只返回脱敏值；提取不支持浏览器自动轮换、供应商预设、JSON 模板或每次打开窗口重新取 IP。
+- 提取或编辑导致连接字段变化时清空检测结果；不自动写入 BitBrowser，已绑定窗口显示待同步并继续仅能由浏览器窗口页写入、读回。
+- 代理列表提供标准多选列和批量检测；绑定窗口显示摘要，详情通过独立接口按现有 Profile 可见性规则查询窗口名称、BitBrowser ID、所属用户和绑定状态。
+
 ## 6. 验收标准
 
 - 单个新增/批量导入/预览零副作用；配额统一 max_profile_count 且校验正确
@@ -101,10 +107,10 @@
 ## 8. Checkpoint
 
 - Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。Task 1/2/3/4 完成；可信 Desktop Profile 扫描已提供代理 Diff 预览、集中确认、未知代理待补充和逐项恢复 Cloud 配置。2026-09-05 修复 BitBrowser `/browser/list` 代理字段 `host`/`port` 的读取与写入映射，真实扫描已读回 11 个带地址/端口的 SOCKS5 窗口。
-- Current：Task 7 第一阶段完成；Task 8 已完成代码、自动验证与最新DMG重建：代理管理已有批量检测、详情/编辑/检测/配额/删除操作，编辑后的检测失效与窗口待同步提示，关联删除保护，以及候选代理和解绑直连读回的Cloud/Agent双重校验。Cloud、Agent、BitBrowser和最新DMG均正常运行。
-- Next：完成真实代理的“修正Host/Port→检测→绑定→更换→解绑直连”人工验收；随后完成多选窗口绑定同一代理、按正式关系恢复Cloud代理绑定与真实Desktop人工验收；重新完成 Desktop 可信绑定后验证外部变化的接受与恢复；继续推荐引擎及账号检查项 3/4。
+- Current：Task 7 第一阶段和 Task 8 完成；Task 9 已完成代码与自动验证：静态地址解析、动态 API 手动提取/刷新、绑定窗口详情和标准多选列已进入 Cloud/Agent/Web 契约。动态来源只更新代理台账并重新检测，已绑定窗口继续必须在浏览器窗口页写入并读回。
+- Next：以真实供应商 API 和代理完成“提取→检测→绑定→更换→解绑直连”人工验收；随后完成多选窗口绑定同一代理、按正式关系恢复Cloud代理绑定与真实Desktop人工验收，并继续推荐引擎及账号检查项 3/4。
 - Blockers：真实代理分配、读回、更换、解绑、扫描恢复及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。当前已有本机窗口真实代理可用于扫描验收。
-- Recent verification：Agent 全量 79 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Web 46 tests、Cloud/Desktop Web build均通过；本机 BitBrowser 实际读取到 11 个完整代理窗口。Task 8的自动验证见 `evidence/2026-09-06-proxy-ledger-sync-safety.md`；边界调整和环境证据见 `evidence/2026-09-05-proxy-operation-boundary-self-test.md`、`evidence/2026-09-05-proxy-operation-boundary.md`、`evidence/2026-09-05-bitbrowser-proxy-scan-field-mapping.md`、`evidence/task4-proxy-lifecycle-readback.md`、`evidence/task6-local-proxy-scan-and-create-sync.md`、`evidence/2026-09-05-proxy-sync-acceptance-environment.md`；此前证据见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。
+- Recent verification：Task 9 的 Cloud `go test ./internal/app ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Agent 83 tests、Web 47 tests、Cloud/Desktop Web build均通过，见 `evidence/2026-09-06-proxy-source-and-binding-visibility.md`；Task 8 的自动验证见 `evidence/2026-09-06-proxy-ledger-sync-safety.md`。
 
 ## 9. Pending Questions
 

@@ -30,7 +30,7 @@ containing both fields must use the same normalized singleton value or Cloud
 rejects it. Cloud Web is the direct consumer; Agent has no media-account game
 relation contract and Desktop consumes the Cloud Web build output only.
 
-### Proxy synchronous mutation revision (M2-C)
+### Proxy ledger extraction and synchronous mutation revision (M2-C)
 
 The Agent-owned Local Agent API revision `2026.09.05.1` provides compatible
 `POST /api/v1/proxy-mutation` assign and `unbind` write/read-back operations;
@@ -42,6 +42,8 @@ proxy or `noproxy` read-back, or after a trusted Desktop Profile scan is
 explicitly accepted. Unknown scanned proxies become paused, unchecked records;
 ambiguous tuple matches are surfaced as conflicts and are never guessed.
 Cloud Web and Desktop consume the refreshed Web build output.
+
+Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extract` operation. Cloud owns the compatible proxy-address parse, dynamic extraction preview, dynamic refresh, and bound-window detail projections. The Agent fetches a manually requested provider URL and returns only the first supported plain-text proxy address to Cloud; it never writes BitBrowser. Cloud stores the source URL as a secret, exposes only a configured/masked indication, clears stale check facts when the extracted connection changes, and requires browser-window-side write/read-back before any bound Profile changes.
 
 ## Agent-Owned Contracts
 
