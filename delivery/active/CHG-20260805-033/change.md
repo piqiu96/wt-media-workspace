@@ -101,8 +101,8 @@
 ## 8. Checkpoint
 
 - Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。Task 1/2/3/4 完成；可信 Desktop Profile 扫描已提供代理 Diff 预览、集中确认、未知代理待补充和逐项恢复 Cloud 配置。2026-09-05 修复 BitBrowser `/browser/list` 代理字段 `host`/`port` 的读取与写入映射，真实扫描已读回 11 个带地址/端口的 SOCKS5 窗口。
-- Current：Task 7 第一阶段完成；Task 8 已完成代码和自动验证：代理管理已有批量检测、详情/编辑/检测/配额/删除操作，编辑后的检测失效与窗口待同步提示，关联删除保护，以及候选代理和解绑直连读回的Cloud/Agent双重校验。最新前端构建产物已生成，待重新打包DMG和人工验证真实代理写入。
-- Next：重新打包Desktop并完成真实代理的“修正Host/Port→检测→绑定→更换→解绑直连”人工验收；随后完成多选窗口绑定同一代理、按正式关系恢复Cloud代理绑定与真实Desktop人工验收；重新完成 Desktop 可信绑定后验证外部变化的接受与恢复；继续推荐引擎及账号检查项 3/4。
+- Current：Task 7 第一阶段完成；Task 8 已完成代码、自动验证与最新DMG重建：代理管理已有批量检测、详情/编辑/检测/配额/删除操作，编辑后的检测失效与窗口待同步提示，关联删除保护，以及候选代理和解绑直连读回的Cloud/Agent双重校验。Cloud、Agent、BitBrowser和最新DMG均正常运行。
+- Next：完成真实代理的“修正Host/Port→检测→绑定→更换→解绑直连”人工验收；随后完成多选窗口绑定同一代理、按正式关系恢复Cloud代理绑定与真实Desktop人工验收；重新完成 Desktop 可信绑定后验证外部变化的接受与恢复；继续推荐引擎及账号检查项 3/4。
 - Blockers：真实代理分配、读回、更换、解绑、扫描恢复及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。当前已有本机窗口真实代理可用于扫描验收。
 - Recent verification：Agent 全量 79 tests、Cloud `go test ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Web 46 tests、Cloud/Desktop Web build均通过；本机 BitBrowser 实际读取到 11 个完整代理窗口。Task 8的自动验证见 `evidence/2026-09-06-proxy-ledger-sync-safety.md`；边界调整和环境证据见 `evidence/2026-09-05-proxy-operation-boundary-self-test.md`、`evidence/2026-09-05-proxy-operation-boundary.md`、`evidence/2026-09-05-bitbrowser-proxy-scan-field-mapping.md`、`evidence/task4-proxy-lifecycle-readback.md`、`evidence/task6-local-proxy-scan-and-create-sync.md`、`evidence/2026-09-05-proxy-sync-acceptance-environment.md`；此前证据见 `evidence/task1-proxy-create-and-zero-side-effect-preview.md`、`evidence/task2-unified-proxy-capacity.md`、`evidence/task3-synchronous-proxy-writeback.md`。
 

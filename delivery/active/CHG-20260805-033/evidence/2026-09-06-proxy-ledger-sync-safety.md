@@ -11,6 +11,7 @@ CHG：CHG-20260805-033
 | Cloud Web `npm test -- --run` | 12 文件、46 测试通过 | PASS |
 | Cloud Web `npm run build:desktop`、`npm run build:cloud` | 两种前端产物构建通过 | PASS |
 | Agent `.venv/bin/python -m unittest discover -s tests` | 79 测试通过；包含直连解绑的显式 `noproxy`/`proxyMethod=2` 写入和残留Host/Port拒绝 | PASS |
+| `scripts/m2b-local-acceptance.sh all` 与运行态检查 | 迁移27条已就绪；最新DMG于2026-09-06 11:01生成、挂载并启动；Cloud health、Agent health与`bitbrowser_status=normal`均通过 | PASS |
 
 ## 覆盖事实
 
@@ -23,4 +24,3 @@ CHG：CHG-20260805-033
 ## 待人工验证
 
 真实代理记录目前仍需由管理员在代理管理页修正为独立Host与Port并检测成功；不得用现有错误格式记录执行真实BitBrowser写入验收。
-
