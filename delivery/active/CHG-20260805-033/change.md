@@ -110,7 +110,7 @@
 - Current：Task 7 第一阶段和 Task 8 完成；Task 9 已完成代码与自动验证：静态地址解析、动态 API 手动提取/刷新、绑定窗口详情和标准多选列已进入 Cloud/Agent/Web 契约。动态来源只更新代理台账并重新检测，已绑定窗口继续必须在浏览器窗口页写入并读回。
 - Next：以真实供应商 API 和代理完成“提取→检测→绑定→更换→解绑直连”人工验收；随后完成多选窗口绑定同一代理、按正式关系恢复Cloud代理绑定与真实Desktop人工验收，并继续推荐引擎及账号检查项 3/4。
 - Blockers：真实代理分配、读回、更换、解绑、扫描恢复及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。当前已有本机窗口真实代理可用于扫描验收。
-- Recent verification：Task 9 的 Cloud `go test ./internal/app ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Agent 83 tests、Web 47 tests、Cloud/Desktop Web build均通过，见 `evidence/2026-09-06-proxy-source-and-binding-visibility.md`；Task 8 的自动验证见 `evidence/2026-09-06-proxy-ledger-sync-safety.md`。
+- Recent verification：Task 9 的 Cloud `go test ./internal/app ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Agent 83 tests、Web 47 tests、Cloud/Desktop Web build均通过，见 `evidence/2026-09-06-proxy-source-and-binding-visibility.md`；最新人工验收环境和固定库迁移见 `evidence/2026-09-06-proxy-source-acceptance-environment.md`。
 
 ## 9. Pending Questions
 
