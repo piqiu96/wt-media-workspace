@@ -1,7 +1,7 @@
 # CHG-20260805-033：M2-C 代理收口
 
 > 日期：2026-08-05
-> 状态：ACTIVE
+> 状态：VERIFIED（等待 M2 综合人工验收）
 > 所属 Milestone：M2-C 代理资源与窗口真实绑定闭环
 > 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-C-代理资源与窗口真实绑定闭环`
 > 当前仓库：`wt-media-workspace`
@@ -106,11 +106,11 @@
 
 ## 8. Checkpoint
 
-- Completed：CHG 已创建；继承 CHG-032 的 Profile 敏感操作互斥和 Cloud/Agent/Desktop 本地验收环境。Task 1/2/3/4 完成；可信 Desktop Profile 扫描已提供代理 Diff 预览、集中确认、未知代理待补充和逐项恢复 Cloud 配置。2026-09-05 修复 BitBrowser `/browser/list` 代理字段 `host`/`port` 的读取与写入映射，真实扫描已读回 11 个带地址/端口的 SOCKS5 窗口。
-- Current：Task 7 第一阶段和 Task 8 完成；Task 9 已完成代码与自动验证：静态地址解析、动态 API 手动提取/刷新、绑定窗口详情和标准多选列已进入 Cloud/Agent/Web 契约。动态来源只更新代理台账并重新检测，已绑定窗口继续必须在浏览器窗口页写入并读回。
-- Next：以真实供应商 API 和代理完成“提取→检测→绑定→更换→解绑直连”人工验收；随后完成多选窗口绑定同一代理、按正式关系恢复Cloud代理绑定与真实Desktop人工验收，并继续推荐引擎及账号检查项 3/4。
-- Blockers：真实代理分配、读回、更换、解绑、扫描恢复及端到端验收需要真实代理资源；无资源时不得把 mock/单元验证写成真实效果。当前已有本机窗口真实代理可用于扫描验收。
-- Recent verification：Task 9 的 Cloud `go test ./internal/app ./internal/modules/proxy ./internal/modules/profilebinding -count=1`、Agent 83 tests、Web 47 tests、Cloud/Desktop Web build均通过，见 `evidence/2026-09-06-proxy-source-and-binding-visibility.md`；最新人工验收环境和固定库迁移见 `evidence/2026-09-06-proxy-source-acceptance-environment.md`。
+- Completed：Task 1～9 完成。2026-09-12/13 完成账户检查代理事实、推荐与多窗口批量绑定；修复代理创建 SQL 占位符以及 BitBrowser 解绑残留连接字段。两条专用验收窗口已在真实 Cloud、Local Agent、BitBrowser 间完成“受信绑定→检测→推荐→批量写入→读回→解绑”，并恢复为无代理状态。
+- Current：自动化、跨端真实读回和临时本机 TCP 连通性夹具验收均通过；本 CHG 不再进行新的实现。
+- Next：与 M2-E 一起进行 Desktop 页面和真实供应商代理的统一人工验收；确认后将本 CHG CLOSED 并归档。
+- Blockers：本轮没有代码阻塞。临时 TCP 夹具只验证当前 Agent 的连通性检测合同，不替代真实供应商代理的出口行为；最终人工验收需使用用户可控的真实代理。
+- Recent verification：Cloud `go test ./internal/modules/mediaaccount ./internal/modules/profilebinding ./internal/modules/proxy -count=1`、Agent 全量 `unittest discover -s tests`（84 tests）、Web 相关代理测试与两个构建已通过；2026-09-13 本机真实链路 7/7 步通过，详情见 `evidence/2026-09-13-m2-c-real-proxy-flow.md`。
 
 ## 9. Pending Questions
 
