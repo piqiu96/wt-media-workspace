@@ -26,7 +26,7 @@
 
 - M2-D 的 Cookie、接码、验证码或上号；
 - 绕过 Gatekeeper/隔离标记/企业安全策略；
-- Windows 发行包。Windows x64 Sidecar 名称和原生构建要求会写入脚本与文档，实际发布由后续 Windows 机器执行；
+- 当前 macOS 主机无法生成的 Windows 发行包；Windows x64 Sidecar 名称和原生构建要求已写入脚本与文档，实际安装包需在 Windows 原生机器执行；
 - 重建 Profile、代理、账号或任务业务页面。
 
 ## 3. 关键规则
