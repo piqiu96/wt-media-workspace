@@ -65,6 +65,7 @@
 - Completed：用户已确认 M2 综合验收完成；新增可重复的 macOS 发布封装，输出包内 App、DMG、最终 Sidecar SHA-256 清单、构建阶段清单、校验和与 ZIP。
 - Completed verification：输出 ZIP 解压、输出 App `codesign --verify --deep --strict`、ZIP/DMG/最终清单 SHA-256、最终签名 Sidecar 与清单 SHA-256、发布脚本预检以及 Desktop Rust 11/11 均通过。证据：`evidence/2026-09-13-m2-e-output-zip.md`。
 - Completed：新增可直接执行的 `scripts/local-control.sh`，统一执行完整端到端启动、复核和停止；本机强制重启、DMG 启动与全部环境门禁通过。两个走查账号登录均验证通过。证据：`evidence/2026-09-14-local-e2e-bringup.md`。
+- Completed：用户确认的走查导航已实现：暂时隐藏账号开户，新增“运营资源”折叠菜单并收纳浏览器窗口、代理管理和社媒账号，其他业务分组同样改为折叠展示。Cloud Web 52/52 测试与新鲜本机端到端启动通过。证据：`evidence/2026-09-14-resource-menu.md`。
 - Current：macOS ARM64 完整交付包位于工作区 `output/WT-Media_0.1.0_macos-aarch64.zip`；包内 Sidecar 为 Agent 0.2.2、`aarch64-apple-darwin`。
 - Next：如需 Windows 包，在 Windows x64 原生机器执行项目发布命令生成 NSIS/MSI，再回填 release matrix。
 - Blockers：当前机器无 Windows target linker、NSIS、WiX、MinGW、zig 或 cargo-xwin，不能诚实生成 Windows 可安装包。本 CHG 不绕过 Gatekeeper；当前无 Apple 公证凭据，macOS 包为 ad-hoc 签名，首次未知开发者放行仍按系统流程执行。
