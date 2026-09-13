@@ -16,6 +16,7 @@
 - 直接运行 DMG 内 Sidecar：`GET http://127.0.0.1:8765/healthz` 返回 `{"status":"ok","service":"wt-media-agent","mode":"m1"}`：通过。
 - 直接启动 DMG 内 `WT Media.app` 后，同一健康接口返回成功，且进程路径为 `/Volumes/WT Media 1/WT Media.app/Contents/MacOS/wt-media-agent`：通过。
 - Cloud `GET /api/v1/health`：通过；BitBrowser `127.0.0.1:54345`：可达。
+- `python3 scripts/m2b_local_acceptance.py verify`：Cloud、Agent、BitBrowser、Desktop 资产、DMG 新鲜度和登录烟测全部通过；Cloud 使用固定 `wt_media_cloud` 数据库，Agent 使用最终 DMG 内 Sidecar。
 
 ## 根因与修复
 

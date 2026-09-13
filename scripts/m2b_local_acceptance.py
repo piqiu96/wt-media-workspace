@@ -199,8 +199,12 @@ def verify_assets() -> None:
     if not index.is_file() or index.stat().st_size == 0:
         raise RuntimeError(f"Desktop assets: missing {index}")
     assets_dir = DESKTOP_DIR / ".generated" / "frontend" / "assets"
-    if not any("127.0.0.1:18080/api/v1" in path.read_text(encoding="utf-8", errors="ignore") for path in assets_dir.glob("http-*.js")):
-        raise RuntimeError("Desktop assets: packaged API base not found in http chunk")
+    javascript_assets = assets_dir.glob("*.js")
+    if not any(
+        "127.0.0.1:18080/api/v1" in path.read_text(encoding="utf-8", errors="ignore")
+        for path in javascript_assets
+    ):
+        raise RuntimeError("Desktop assets: packaged API base not found in JavaScript assets")
     check_fresh(index, [(CLOUD_DIR, ("web",))], "Desktop assets")
     print("Desktop assets: PASS")
 

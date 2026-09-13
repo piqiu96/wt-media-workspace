@@ -61,7 +61,7 @@
 - Completed：Agent frozen sidecar 入口、原生目标构建与版本/SHA-256 清单；Desktop `externalBin`、release 禁止 Python fallback、开发 fallback 显式 opt-in、macOS ad-hoc 签名和 DMG 校验脚本；Cloud Web 已移除直连 `127.0.0.1:8765`，Desktop 统一经 Rust invoke 启动 Agent。
 - Completed verification：Desktop Rust 11/11；Cloud Web local-agent boundary/status/service 10/10；Agent sidecar/解绑定向测试 5/5；Agent frozen sidecar 本机 `/healthz`、停止通过；已构建的 macOS ARM64 DMG 内 App `codesign --verify --deep --strict` 通过。
 - Completed：清理旧的 `dist-*`、`.generated`、Sidecar 和 Desktop `target` 产物；使用 Python 3.12.13 构建 Agent Sidecar；先构建 App、修复 Sidecar 普通 ad-hoc 签名、再制作 DMG，解决 macOS 26 的 `libpython` Team ID 加载冲突。
-- Completed verification：最终 DMG 签名 `codesign --verify --deep --strict` 通过；直接启动最终 DMG 内 Sidecar 的 `/healthz` 通过；直接启动最终 DMG 内 `WT Media.app` 后，包内 Sidecar 自动监听 `8765`；Cloud `18080` 与 BitBrowser `54345` 可达。
+- Completed verification：最终 DMG 签名 `codesign --verify --deep --strict` 通过；直接启动最终 DMG 内 Sidecar 的 `/healthz` 通过；直接启动最终 DMG 内 `WT Media.app` 后，包内 Sidecar 自动监听 `8765`；Cloud `18080` 与 BitBrowser `54345` 可达；`python3 scripts/m2b_local_acceptance.py verify` 全部门禁和登录烟测通过。
 - Current：macOS ARM64 可安装包已生成并保持挂载运行，等待用户执行 M2 综合人工验收；Windows x64 安装包仍受当前 macOS 缺少 Windows 原生/交叉安装器工具链阻塞。
 - Next：用户先验收 macOS DMG；如需 Windows 包，在 Windows x64 原生机器执行项目发布命令生成 NSIS/MSI，再回填 release matrix。
 - Blockers：当前机器无 Windows target linker、NSIS、WiX、MinGW、zig 或 cargo-xwin，不能诚实生成 Windows 可安装包。真实供应商代理的出口、鉴权和区域能力仍需用户人工验收；本 CHG 不绕过 Gatekeeper，也不实现证书认证。
