@@ -569,3 +569,38 @@ releases:
       agent: ["python3.12 -m unittest discover -s tests", "scripts/verify-health.sh", "contract YAML parse"]
       web: ["not affected in M2-C5"]
       desktop: ["not affected in M2-C5"]
+  - release: "0.2.5-m2-c-e-private-distribution"
+    status: verifying
+    date: "2026-09-13"
+    scope: m2_c_proxy_binding_and_m2_e_private_distribution
+    components:
+      cloud: "0.1.0"
+      cloud_agent: "0.1.0"
+      desktop: "0.1.0"
+      local_agent: "0.2.2"
+    contract_state: m2_c_e_source_verified
+    formal_contract_versions_active: true
+    verification:
+      cloud:
+        - "GET /api/v1/health -> errcode 0"
+        - "M2-C proxy/profile real read-back flow 7/7"
+      agent:
+        - "Sidecar target aarch64-apple-darwin"
+        - "Sidecar SHA-256 recorded in target/sidecar-manifest.json"
+        - "Final DMG-launched /healthz -> status ok"
+      desktop:
+        - "macOS ARM64 DMG built and codesign --verify --deep --strict passed"
+        - "Desktop Rust tests 11/11"
+      web:
+        - "Local Agent boundary/status/service tests 10/10"
+    target_status:
+      macos_arm64: "verified_pending_user_install_acceptance"
+      macos_x86_64: "not_built_on_arm64_host"
+      windows_x64: "blocked_until_native_windows_toolchain"
+    manual_acceptance:
+      - "macOS customer-machine install without system Python"
+      - "M2-C real supplier proxy egress/auth/region"
+      - "Windows x64 native build and install"
+    residual_risks:
+      - "ad-hoc signature still requires user Gatekeeper first-run approval"
+      - "Windows package is not present from this macOS host"
