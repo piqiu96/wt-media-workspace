@@ -50,8 +50,8 @@
 - Completed：根据走查反馈，代理和社媒账号的筛选区从嵌套卡片收束为资源内容卡内的轻分隔区；代理行操作收束为详情、检测、更多；社媒账号移除独立 Cookie 列，保留检查、查看、更多，Cookie、窗口、编辑和启停动作均可从更多菜单访问。
 - Completed：顶部栏不再展示英文路由名；根据左侧导航自动生成父级 / 子级面包屑，社媒账号显示为“运营资源 / 社媒账号”。
 - Completed：代理管理与社媒账号改为浏览器窗口同款筛选条、横向滚动资源表格、独立分页和操作按钮层级；全局资源表格补齐白色行底、统一边界、垂直居中和悬浮反馈。
-- Completed verification：Cloud Web 全量 Vitest 18 文件、65 测试通过；Desktop 前端生产构建通过。
-- Completed verification：`scripts/local-control.sh start` 已从 `wt-media-cloud` 提交 `6d877f7` 重建；随后 `scripts/local-control.sh verify` 确认 Cloud、Agent、BitBrowser、Desktop assets、最新 DMG 与管理员登录烟测均 PASS。
-- Current：最新 DMG 已启动，等待用户走查“运营资源 / 社媒账号”面包屑及代理、社媒账号的统一表格样式。
-- Next：根据用户走查结论决定是否关闭本 CHG；在结论前保持 ACTIVE。
+- Completed：运营资源三页筛选区统一为每行最多四项、1400px 以下三项、980px 以下两项；浏览器窗口操作列补为右侧固定。三个页面当前直接行操作均为三项，其余动作已在“更多”菜单中，严于“最多五项”的约束。
+- Completed verification：Cloud Web 全量 Vitest 18 文件、67 测试通过；Desktop 前端生产构建通过。
+- Current：待提交本轮源码并重建最新本地 DMG 供用户走查。
+- Next：执行本机 M2-B 环境验收；在用户确认视觉结果前保持 ACTIVE。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
