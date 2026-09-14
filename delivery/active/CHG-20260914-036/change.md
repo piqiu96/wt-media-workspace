@@ -56,6 +56,7 @@
 - Completed：根据最新走查，浏览器窗口、代理管理和社媒账号的筛选控件均恢复可见字段前缀；操作列统一固定右侧并扩至 420px，可容纳至多六个直接操作，其余动作仍收纳于“更多”。
 - Completed verification：最新 DMG 已使用 `operator01` 登录并逐页截图核验。三页字段前缀、三列自动换行、420px 固定右侧操作列及“运营资源 / 子页面”面包屑均符合预期；详见 `evidence/2026-09-14-resource-filter-and-action-visual-verification.md`。
 - Completed：根据最新走查，三页行操作改为“小于等于 6 个全部直接展示”的规则。TDesign 右侧固定列不支持按内容的 `minWidth` 自动展开，故按真实最大操作数使用精确列宽：浏览器窗口 320px、代理管理 340px、社媒账号 400px；筛选网格最小列宽提高至 220px，控件改为填满可用列宽。
-- Current：正在从上述最新源码重新打包并通过 Desktop 逐页截图核验精确操作列宽与宽筛选区。
-- Next：记录最新核验；根据用户最终结论决定是否关闭本 CHG。
+- Completed verification：从最新源码重新打包后，以 Desktop 中 `operator01` 逐页核验。浏览器窗口五个操作、代理管理五个操作、社媒账号已绑定行六个操作均直出；右侧固定操作列分别为 320px、340px、400px，筛选控件按可用宽度填充并在窄空间自动换行。详见 `evidence/2026-09-14-adaptive-resource-actions-visual-verification.md`。
+- Current：本地环境保持运行，等待用户对最新 Desktop 进行最终走查。
+- Next：根据用户最终结论决定是否关闭本 CHG。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
