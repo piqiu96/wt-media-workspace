@@ -18,7 +18,7 @@
 - 建立并全局引入 WT Media Design Token；
 - 复用资源页 Header、内容卡片和状态 Badge；
 - 统一三页的页面背景、统计卡、筛选区、表格、按钮层级、状态和操作列视觉；
-- 将浏览器窗口的“绑定代理、关闭、编辑、启用/停用”等非主动作收纳到“更多”菜单；
+- 当资源页单行操作总数不超过 6 个时直接展示；超过时才收纳到“更多”菜单，并让操作列按实际内容宽度自适应；
 - 保持已确认的“运营资源”折叠菜单视觉。
 
 ### 明确不做
@@ -40,7 +40,7 @@
 - 三页同时使用 `src/styles/design-token.css` 的 `--wt-*` Token；
 - 页面 Header、内容卡片、按钮、表头 44px、表行 56px、Hover 和状态 Badge 一致；
 - 代理/账号统计从既有数据派生并且筛选、创建、检查、编辑等既有行为不变；
-- 浏览器窗口操作列只有详情、打开和更多；所有原动作仍能从菜单访问；
+- 浏览器窗口、代理管理和社媒账号的单行操作少于等于 6 个时均直接展示，操作列固定右侧且不保留无效大面积空白；
 - Cloud Web/桌面前端构建、现有前端回归和本机 M2-B 环境验收通过。
 
 ## Checkpoint
@@ -55,6 +55,7 @@
 - Completed verification：`scripts/local-control.sh start` 已从 `wt-media-cloud` 提交 `f6b7f24` 重建；随后 `scripts/local-control.sh verify` 确认 Cloud、Agent、BitBrowser、Desktop assets、最新 DMG 与管理员登录烟测均 PASS。
 - Completed：根据最新走查，浏览器窗口、代理管理和社媒账号的筛选控件均恢复可见字段前缀；操作列统一固定右侧并扩至 420px，可容纳至多六个直接操作，其余动作仍收纳于“更多”。
 - Completed verification：最新 DMG 已使用 `operator01` 登录并逐页截图核验。三页字段前缀、三列自动换行、420px 固定右侧操作列及“运营资源 / 子页面”面包屑均符合预期；详见 `evidence/2026-09-14-resource-filter-and-action-visual-verification.md`。
-- Current：最新环境已保持启动，等待用户最终走查结论。
-- Next：根据用户最终结论决定是否关闭本 CHG。
+- Completed：根据最新走查，三页行操作改为“小于等于 6 个全部直接展示”的规则，操作列由固定 420px 改为根据按钮内容计算的最小 260px；筛选网格最小列宽提高至 220px，控件改为填满可用列宽。
+- Current：正在从最新源码重建并通过 Desktop 逐页截图核验直接操作和宽筛选区。
+- Next：记录最新核验；根据用户最终结论决定是否关闭本 CHG。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
