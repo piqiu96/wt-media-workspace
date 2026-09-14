@@ -49,6 +49,7 @@
 - Completed：浏览器窗口、代理管理和社媒账号已接入统一 Header、统计卡、内容卡、表格和状态 Badge。浏览器窗口行操作保留详情、打开和更多；更多菜单仍连接分配、关闭、绑定代理、编辑和启用/停用的原处理函数。
 - Completed：根据走查反馈，代理和社媒账号的筛选区从嵌套卡片收束为资源内容卡内的轻分隔区；代理行操作收束为详情、检测、更多；社媒账号移除独立 Cookie 列，保留检查、查看、更多，Cookie、窗口、编辑和启停动作均可从更多菜单访问。
 - Completed verification：Cloud Web 全量 Vitest 18 文件、62 测试通过；Desktop 前端生产构建通过。
-- Current：准备以本次已构建的最新前端重新启动完整本地验收环境。
-- Next：执行本机 M2-B 环境验收并保留用户视觉走查入口；本 CHG 保持 ACTIVE，直到用户确认三个资源页视觉验收。
+- Completed verification：`scripts/local-control.sh start` 已从 `wt-media-cloud` 提交 `e0f2bef` 重建并启动；随后 `scripts/local-control.sh verify` 确认 Cloud、Agent、BitBrowser、Desktop assets、最新 DMG 与管理员登录烟测均 PASS。
+- Current：最新 DMG 已挂载并启动，等待用户在 Desktop 的“运营资源”中走查代理管理与社媒账号。
+- Next：根据用户走查结论决定是否关闭本 CHG；在结论前保持 ACTIVE。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。

@@ -34,3 +34,18 @@ Login smoke PASS user=admin
 - 代理管理：筛选区不再使用嵌套 Card，表格行操作改为“详情 / 检测 / 更多”；编辑、设置配额和删除仍连接原有处理函数。
 - 社媒账号：筛选区不再使用嵌套 Card，移除独立 Cookie 列；行操作改为“检查 / 查看 / 更多”，Cookie、桌面窗口、编辑和启停仍连接原有处理函数。
 - 验证：`npm test -- --run` 通过（18 files / 62 tests）；`npm run build:desktop` 通过。完整本地环境验收将在本次修订提交后重新执行。
+
+## 本机环境复验
+
+```text
+cd wt-media-workspace && ./scripts/local-control.sh start
+已从 wt-media-cloud e0f2bef 重建并启动最新 DMG
+
+cd wt-media-workspace && ./scripts/local-control.sh verify
+Cloud: PASS
+Agent: PASS
+BitBrowser via Agent: PASS
+Desktop assets: fresh / PASS
+DMG: fresh / PASS
+Login smoke: PASS user=admin
+```
