@@ -47,7 +47,8 @@
 
 - Completed：已新增并在 Cloud/Desktop 入口加载 `design-token.css` 与资源模块样式；`ResourcePageHeader`、`ResourceCard`、`ResourceStatGrid` 和 `ResourceStatusBadge` 均为展示层组件。新增 Token/组件回归测试通过。
 - Completed：浏览器窗口、代理管理和社媒账号已接入统一 Header、统计卡、内容卡、表格和状态 Badge。浏览器窗口行操作保留详情、打开和更多；更多菜单仍连接分配、关闭、绑定代理、编辑和启用/停用的原处理函数。
-- Completed verification：Cloud Web 全量 Vitest 18 文件、60 测试通过；Desktop 前端生产构建通过；`scripts/local-control.sh start` 已重建并启动最新 DMG，Cloud、Agent、BitBrowser、Desktop assets、DMG 和管理员登录烟测均 PASS。
-- Current：验收证据已记录，等待用户在已启动的 Desktop 中完成视觉走查。
-- Next：根据用户走查反馈微调；本 CHG 保持 ACTIVE，直到用户确认三个资源页视觉验收。
+- Completed：根据走查反馈，代理和社媒账号的筛选区从嵌套卡片收束为资源内容卡内的轻分隔区；代理行操作收束为详情、检测、更多；社媒账号移除独立 Cookie 列，保留检查、查看、更多，Cookie、窗口、编辑和启停动作均可从更多菜单访问。
+- Completed verification：Cloud Web 全量 Vitest 18 文件、62 测试通过；Desktop 前端生产构建通过。
+- Current：准备以本次已构建的最新前端重新启动完整本地验收环境。
+- Next：执行本机 M2-B 环境验收并保留用户视觉走查入口；本 CHG 保持 ACTIVE，直到用户确认三个资源页视觉验收。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
