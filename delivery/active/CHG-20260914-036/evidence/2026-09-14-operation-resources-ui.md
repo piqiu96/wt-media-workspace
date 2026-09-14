@@ -57,6 +57,16 @@ Login smoke: PASS user=admin
 - 行操作：三页当前均为最多三项直接按钮，其他操作保留在“更多”菜单，满足最多五项的上限。
 - 验证：`npm test -- --run` 通过（18 files / 67 tests）；`npm run build:desktop` 通过。源码提交后将重新构建本地 DMG。
 
+```text
+cd wt-media-workspace && ./scripts/local-control.sh verify
+Cloud: PASS
+Agent: PASS
+BitBrowser via Agent: PASS
+Desktop assets: fresh / PASS
+DMG: fresh / PASS
+Login smoke: PASS user=admin
+```
+
 ## 表格与顶部栏收束
 
 - 顶部栏：从菜单树派生面包屑，避免展示路由内部名；`/accounts` 显示“运营资源 / 社媒账号”。
