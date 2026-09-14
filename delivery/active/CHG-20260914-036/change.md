@@ -45,6 +45,9 @@
 
 ## Checkpoint
 
-- Current：用户已确认统一设计规范与参考图，并授权直接执行；已完成现状映射。`tokens.css` 尚未被入口引入，三页各自实现页面样式，现有 `BusinessStatus` 为高饱和实色胶囊，不能直接作为本 CHG 的资源页 Badge。
-- Next：提交设计与实施计划，随后按 Token/共享组件、浏览器窗口、代理与账号、端到端验收四个任务执行。
+- Completed：已新增并在 Cloud/Desktop 入口加载 `design-token.css` 与资源模块样式；`ResourcePageHeader`、`ResourceCard`、`ResourceStatGrid` 和 `ResourceStatusBadge` 均为展示层组件。新增 Token/组件回归测试通过。
+- Completed：浏览器窗口、代理管理和社媒账号已接入统一 Header、统计卡、内容卡、表格和状态 Badge。浏览器窗口行操作保留详情、打开和更多；更多菜单仍连接分配、关闭、绑定代理、编辑和启用/停用的原处理函数。
+- Completed verification：Cloud Web 全量 Vitest 18 文件、60 测试通过；Desktop 前端生产构建通过；`scripts/local-control.sh start` 已重建并启动最新 DMG，Cloud、Agent、BitBrowser、Desktop assets、DMG 和管理员登录烟测均 PASS。
+- Current：验收证据已记录，等待用户在已启动的 Desktop 中完成视觉走查。
+- Next：根据用户走查反馈微调；本 CHG 保持 ACTIVE，直到用户确认三个资源页视觉验收。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
