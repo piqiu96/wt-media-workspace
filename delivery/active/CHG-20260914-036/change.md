@@ -55,7 +55,7 @@
 - Completed verification：`scripts/local-control.sh start` 已从 `wt-media-cloud` 提交 `f6b7f24` 重建；随后 `scripts/local-control.sh verify` 确认 Cloud、Agent、BitBrowser、Desktop assets、最新 DMG 与管理员登录烟测均 PASS。
 - Completed：根据最新走查，浏览器窗口、代理管理和社媒账号的筛选控件均恢复可见字段前缀；操作列统一固定右侧并扩至 420px，可容纳至多六个直接操作，其余动作仍收纳于“更多”。
 - Completed verification：最新 DMG 已使用 `operator01` 登录并逐页截图核验。三页字段前缀、三列自动换行、420px 固定右侧操作列及“运营资源 / 子页面”面包屑均符合预期；详见 `evidence/2026-09-14-resource-filter-and-action-visual-verification.md`。
-- Completed：根据最新走查，三页行操作改为“小于等于 6 个全部直接展示”的规则，操作列由固定 420px 改为根据按钮内容计算的最小 260px；筛选网格最小列宽提高至 220px，控件改为填满可用列宽。
-- Current：正在从最新源码重建并通过 Desktop 逐页截图核验直接操作和宽筛选区。
+- Completed：根据最新走查，三页行操作改为“小于等于 6 个全部直接展示”的规则。TDesign 右侧固定列不支持按内容的 `minWidth` 自动展开，故按真实最大操作数使用精确列宽：浏览器窗口 320px、代理管理 340px、社媒账号 400px；筛选网格最小列宽提高至 220px，控件改为填满可用列宽。
+- Current：正在从上述最新源码重新打包并通过 Desktop 逐页截图核验精确操作列宽与宽筛选区。
 - Next：记录最新核验；根据用户最终结论决定是否关闭本 CHG。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
