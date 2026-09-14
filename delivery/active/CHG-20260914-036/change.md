@@ -53,6 +53,7 @@
 - Completed：运营资源三页筛选区统一为每行最多四项、1400px 以下三项、980px 以下两项；浏览器窗口操作列补为右侧固定。三个页面当前直接行操作均为三项，其余动作已在“更多”菜单中，严于“最多五项”的约束。
 - Completed verification：Cloud Web 全量 Vitest 18 文件、67 测试通过；Desktop 前端生产构建通过。
 - Completed verification：`scripts/local-control.sh start` 已从 `wt-media-cloud` 提交 `f6b7f24` 重建；随后 `scripts/local-control.sh verify` 确认 Cloud、Agent、BitBrowser、Desktop assets、最新 DMG 与管理员登录烟测均 PASS。
-- Current：最新 DMG 已启动，等待用户走查筛选自动换行及右侧固定操作栏。
-- Next：根据用户走查结论决定是否关闭本 CHG；在结论前保持 ACTIVE。
+- Completed：根据最新走查，浏览器窗口、代理管理和社媒账号的筛选控件均恢复可见字段前缀；操作列统一固定右侧并扩至 420px，可容纳至多六个直接操作，其余动作仍收纳于“更多”。
+- Current：正在从上述最新 Cloud 源码重新构建并启动本地 Desktop 环境，随后逐页进行截图视觉核验。
+- Next：记录最新环境与人工截图核验结果；在用户最终走查结论前保持 ACTIVE。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
