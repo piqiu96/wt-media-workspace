@@ -1,0 +1,119 @@
+# CHG-20260805-033：M2-C 代理收口
+
+> 日期：2026-08-05
+> 状态：DONE
+> 所属 Milestone：M2-C 代理资源与窗口真实绑定闭环
+> 关联闭环：`delivery/milestones/M2-account-runtime.md#M2-C-代理资源与窗口真实绑定闭环`
+> 当前仓库：`wt-media-workspace`
+> 预计影响仓库：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop`
+
+## 0. 继承与关联
+
+- 前置：M2-A、M2-B 窗口收口（CHG-031 DONE）、M2-B 账号收口（CHG-20260805-032，先行）、共享互斥（CHG-A Task 1 实现，本 CHG 继承复用）
+- 本 CHG 与账号收口串行推进；CHG-20260805-032 已于 2026-09-04 验收完成，本 CHG 自该日激活。
+
+## 1. 用户可见目标
+
+普通运营管理代理台账（新增/批量导入/检测），将代理真实写入授权 Profile（分配/更换/解绑），写回 BitBrowser 后读回验证一致，并按统一配额（`max_profile_count`）获得推荐分配方案。
+
+## 2. 当前背景（继承已完成）
+
+- proxy_configs CRUD 后端、文本导入解析、TCP 连通性检测（同步 Cloud/同步 Agent/后台 Agent）：已实现
+- `POST /proxies/:id/assign` 创建 `proxy_mutation_task`：已实现（校验归属/活跃/配额）
+- Agent `ProxyMutationExecutor`：写入 BitBrowser + 扫描读回（已带 browserFingerPrint/proxyMethod 保留）：已实现
+- ProxyPage：列表/筛选/详情/导入对话框/检测/状态/删除：已实现
+
+## 3. 本 CHG 范围
+
+### 包含
+
+- 台账收尾：单个代理创建前端表单；导入预览**零副作用**（拆分 Parse/Import 端点）
+- 配额模型：`proxy_platform_quotas` 迁移为统一 `max_profile_count`（DB 迁移 + CheckQuota 重构），页面展示已用/剩余
+- 分配写回：浏览器窗口页分配入口；Agent 同步写回端点（`/proxy-mutation`）；Cloud 同步 mutation 调用（复用互斥）
+- 写回一致性：Cloud 写回 broker（mutation 结果更新 `browser_profiles`）、解绑、更换（先验新后释放旧）
+- 推荐方案：推荐引擎（仅已启用/检测正常/未到期/有剩余配额）+ 推荐/人工调整/确认 UI
+- 外部代理变化：扫描 Diff 中代理变化的处理（未知代理→待补充记录）
+- 账号检查代理项：在代理闭环建立后实现检查项 3「窗口代理正常」和 4「代理到期/停用」，回填 M2-B 的 8 项检查明细
+- 端到端验收：真实代理——分配写入→读回→更换→解绑全链路
+
+### 不包含
+
+- Cookie/上号/接码 → M2-D
+- 代理刷新 URL（供应商 API）→ 待定
+
+## 4. 关键规则
+
+- 代理写入/更换/解绑后必须**读回验证一致**才更新正式关系与配额；失败不更新、不占配额
+- 单代理检测/写入/更换/解绑为**同步调用 Agent**（非纯异步任务）
+- 同一 Profile 同时只能一个本地敏感操作（复用共享互斥）
+- 代理密码为敏感数据，遵守 `secret_policy`；预览阶段零副作用
+
+## 5. 执行任务
+
+### Task 1：台账收尾（零耦合）
+- C1.1 单个代理创建前端表单
+- C1.2 导入预览零副作用（拆分 Parse/Import 端点）
+
+### Task 2：配额模型迁移
+- C2.2 `proxy_platform_quotas` → 统一 `max_profile_count`（DB 迁移 + CheckQuota 重构）
+- C2.3 页面展示统一最大配额；已用/剩余仅在 Task 3 读回并写入正式 `proxy_id` 关系后计算，禁止以地址猜测
+
+### Task 3：分配写回链路
+- C3.3 浏览器窗口页分配入口
+- C3.4 Agent 同步写回端点（`/proxy-mutation`）
+- C3.5 Cloud 同步 mutation 调用（复用互斥）
+
+### Task 4：写回一致性与生命周期
+- C3.6 Cloud 写回 broker（mutation 结果更新 `browser_profiles`）
+- C3.8 解绑、C3.9 更换（先验新后释放旧）
+
+### Task 5：推荐方案
+- C3.7 推荐引擎 + 推荐/人工调整/确认 UI
+
+### Task 6：外部代理变化与收口
+- C4 浏览器窗口页中的外部代理变化 Diff 处理
+- 回接媒体账号检查项 3/4：基于已读回的 Profile—代理关系、代理检测状态、业务状态和过期时间生成真实结果
+- 端到端验收（真实代理）→ 更新 M2-C 收口矩阵，判定 DONE 或修复
+
+### Task 7：代理操作入口边界调整
+- 从代理管理页移除新增代理时同步、单代理分配/更换/解绑、本机代理扫描 Diff 与恢复入口；代理管理保留台账、新增、导入和检测能力。
+- 在Desktop浏览器窗口页提供单窗口绑定/更换/解绑和多选窗口绑定同一代理；复用现有Cloud预检、Profile互斥、Agent写入与读回，不创建第二套关系或任务模型。
+- 将本机代理变化的预览、接受和恢复入口迁至浏览器窗口页；Cloud Web不展示任何BitBrowser代理操作。
+
+### Task 8：代理台账操作与待同步安全收口
+- 代理管理提供多选批量检测；操作栏保留详情、编辑、检测、配额、删除，移除状态操作。
+- 编辑连接字段后清空检测结果；若代理已绑定窗口，不写BitBrowser，关联窗口必须显示“代理配置待同步”，仅能由Desktop浏览器窗口页逐项重新写入并读回恢复一致。
+- 有绑定窗口的代理不能删除，页面必须展示关联数量和处理指引。
+- 浏览器窗口候选仅允许检测正常、未过期、有配额的代理，并展示无候选原因；解绑必须显式写入和读回BitBrowser直连配置（`noproxy`、空Host/Port）。
+
+### Task 9：代理录入来源与关联可见性
+- 新增/编辑代理提供静态地址和动态供应商 API 两种最小输入方式；静态地址解析为协议、Host、Port、账号、密码，动态 API 由当前本机 Agent 手动提取并只接受首条可解析的纯文本代理地址。
+- 动态来源的 URL 为敏感写入字段，列表和普通详情只返回脱敏值；提取不支持浏览器自动轮换、供应商预设、JSON 模板或每次打开窗口重新取 IP。
+- 提取或编辑导致连接字段变化时清空检测结果；不自动写入 BitBrowser，已绑定窗口显示待同步并继续仅能由浏览器窗口页写入、读回。
+- 代理列表提供标准多选列和批量检测；绑定窗口显示摘要，详情通过独立接口按现有 Profile 可见性规则查询窗口名称、BitBrowser ID、所属用户和绑定状态。
+
+## 6. 验收标准
+
+- 单个新增/批量导入/预览零副作用；配额统一 max_profile_count 且校验正确
+- 分配/更换/解绑在 BitBrowser 读回一致后更新 Cloud 关系与配额；失败不更新不占配额
+- 推荐仅选已启用/检测正常/未到期/有剩余配额代理
+- 媒体账号检查项 3/4 不再为 `na`，并与该账号绑定 Profile 的真实代理读回事实一致
+- 页面、Cloud 镜像、Agent 读回、BitBrowser 实际状态一致
+
+## 7. Evidence 要求
+
+`evidence/` 提供：台账收尾、配额迁移、同步写回端点、写回 broker、推荐引擎、外部代理 Diff、账号检查项 3/4、端到端验收（真实代理）、测试与构建记录。
+
+## 8. Checkpoint
+
+- Completed：Task 1～9 完成。2026-09-12/13 完成账户检查代理事实、推荐与多窗口批量绑定；修复代理创建 SQL 占位符以及 BitBrowser 解绑残留连接字段。两条专用验收窗口已在真实 Cloud、Local Agent、BitBrowser 间完成“受信绑定→检测→推荐→批量写入→读回→解绑”，并恢复为无代理状态。
+- Current：自动化、跨端真实读回和临时本机 TCP 连通性夹具验收均通过；本 CHG 不再进行新的实现。
+- Completed：用户于 2026-09-14 完成 M2 综合人工走查并确认完整通过；M2-C 的 Desktop 页面与真实代理流程已纳入通过范围。
+- Current：DONE。
+- Next：无；后续代理能力仅在新的独立 CHG 中开展。
+- Blockers：本轮没有代码阻塞。临时 TCP 夹具只验证当前 Agent 的连通性检测合同，不替代真实供应商代理的出口行为；最终人工验收需使用用户可控的真实代理。
+- Recent verification：Cloud `go test ./internal/modules/mediaaccount ./internal/modules/profilebinding ./internal/modules/proxy -count=1`、Agent 全量 `unittest discover -s tests`（84 tests）、Web 相关代理测试与两个构建已通过；2026-09-13 本机真实链路 7/7 步通过，详情见 `evidence/2026-09-13-m2-c-real-proxy-flow.md`。
+
+## 9. Pending Questions
+
+None.

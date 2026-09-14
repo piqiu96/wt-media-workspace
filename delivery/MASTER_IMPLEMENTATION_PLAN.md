@@ -134,7 +134,7 @@ TODO → IMPLEMENTED → VERIFIED → CLOSED
 |---|---|---|---|
 | M0 | `DONE` | M0 工程基线复验通过。Cloud/Web/Agent/Desktop 真实构建、测试、启动验证完成。MySQL 真实连接。修复 2 个测试问题。 | M0 冻结。不继续扩建。 |
 | M1 | `DONE` | M1 任务链路闭环复验通过。创建→领取→执行→上报→查询完整链路跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：router 连接、mysql_registry 时间格式。 | M1 冻结。不扩建通用任务系统。 |
-| M2 | `IN_PROGRESS` | M2 完成状态已撤销。历史代码、提交和测试保留为继承证据。2026-09-12 确认 M2-D 账号上号与Cookie闭环整体暂缓；M2-A/B 为继承验收事实，M2-C 已验证，M2-E 源码与发布链路已验证，均等待本轮综合人工验收。 | M2 按 A→B→C→E 顺序完成本轮闭环；M2-D 保持 `DEFERRED`，未来单独恢复。一次只激活一个可独立验收的 CHG，Codex 自测集成回归，你最终人工验收。 |
+| M2 | `DONE` | 2026-09-14 用户完成本轮综合人工验收并确认完整通过。M2-A/B/C/E 的真实依赖、构建、Desktop 与人工走查证据均已归档；M2-D 保持 `DEFERRED`。 | M2 冻结为当前运行环境与账号管理基线；后续内容发现从 M3 开始，M2-D 或真实受限样本校准须以独立 CHG 恢复。 |
 | M3-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
 每个里程碑的最终综合验收至少包含：
@@ -246,14 +246,14 @@ M1-R8 无 Mock 三端端到端人工验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS`（完成状态已撤销，恢复为开发中） |
+| 状态 | `DONE` |
 | 目标 | 在 M1 真实端到端环境上，完整交付用户、媒体账号、BitBrowser 窗口、代理、运行环境、敏感任务权限以及对应 Web/Desktop 产品体验；Cookie 与开户整体由暂缓的 M2-D 后续单独交付。 |
 | 依赖 | M1 `DONE`（M1 复验通过后自动解除） |
-| Active CHG | `CHG-20260913-035`（M2-E 打包 Local Agent Sidecar 与私有分发收口）；M2-C 已转 VERIFIED，等待 M2 综合人工验收。 |
-| Evidence | 所有历史代码、提交和测试保留为继承证据（CHG-015 至 CHG-020、决策 0007、CHG-20260715-010 至 CHG-20260716-013）。历史 PRD 差距记录见 `delivery/reports/M2-prd-chapter3-gap-matrix.md`；按 2026-07-22 人工确认基线重新审计后的事实见 `delivery/reports/2026-07-22-m2-a-e-code-gap-audit.md`。历史 47% 仅代表旧口径，不再作为当前完成率。 |
+| Active CHG | None。M2-A/B/C/E 的本轮收口变更均已归档。 |
+| Evidence | 最终人工验收见 `delivery/reports/2026-09-14-m2-final-acceptance.md`；各闭环证据位于已归档 CHG。历史 PRD 差距记录和 47% 旧口径不作为当前完成率。 |
 | 业务闭环基线 | `delivery/milestones/M2-account-runtime.md`。本轮以 M2-A、M2-B、M2-C、M2-E 的用户操作、真实副作用、假成功禁止项和业务验收为准；M2-D 为 `DEFERRED`。 |
-| 完成日期 | None |
-| Commit/Tag | 历史提交保留。新增提交待本轮四条闭环完成后汇总。 |
+| 完成日期 | 2026-09-14 |
+| Commit/Tag | 继承历史提交；M2-C `CHG-20260805-033`、M2-E `CHG-20260913-035` 与资源页统一改造 `CHG-20260914-036` 已归档。 |
 
 已完成 CHG 降级为继承证据：
 
