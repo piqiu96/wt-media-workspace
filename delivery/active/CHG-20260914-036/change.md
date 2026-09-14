@@ -54,6 +54,7 @@
 - Completed verification：Cloud Web 全量 Vitest 18 文件、67 测试通过；Desktop 前端生产构建通过。
 - Completed verification：`scripts/local-control.sh start` 已从 `wt-media-cloud` 提交 `f6b7f24` 重建；随后 `scripts/local-control.sh verify` 确认 Cloud、Agent、BitBrowser、Desktop assets、最新 DMG 与管理员登录烟测均 PASS。
 - Completed：根据最新走查，浏览器窗口、代理管理和社媒账号的筛选控件均恢复可见字段前缀；操作列统一固定右侧并扩至 420px，可容纳至多六个直接操作，其余动作仍收纳于“更多”。
-- Current：正在从上述最新 Cloud 源码重新构建并启动本地 Desktop 环境，随后逐页进行截图视觉核验。
-- Next：记录最新环境与人工截图核验结果；在用户最终走查结论前保持 ACTIVE。
+- Completed verification：最新 DMG 已使用 `operator01` 登录并逐页截图核验。三页字段前缀、三列自动换行、420px 固定右侧操作列及“运营资源 / 子页面”面包屑均符合预期；详见 `evidence/2026-09-14-resource-filter-and-action-visual-verification.md`。
+- Current：最新环境已保持启动，等待用户最终走查结论。
+- Next：根据用户最终结论决定是否关闭本 CHG。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。
