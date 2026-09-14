@@ -51,6 +51,7 @@
 - Completed：顶部栏不再展示英文路由名；根据左侧导航自动生成父级 / 子级面包屑，社媒账号显示为“运营资源 / 社媒账号”。
 - Completed：代理管理与社媒账号改为浏览器窗口同款筛选条、横向滚动资源表格、独立分页和操作按钮层级；全局资源表格补齐白色行底、统一边界、垂直居中和悬浮反馈。
 - Completed verification：Cloud Web 全量 Vitest 18 文件、65 测试通过；Desktop 前端生产构建通过。
-- Current：待提交本轮源码并重建最新本地 DMG 供用户走查。
-- Next：执行本机 M2-B 环境验收；在用户确认视觉结果前保持 ACTIVE。
+- Completed verification：`scripts/local-control.sh start` 已从 `wt-media-cloud` 提交 `6d877f7` 重建；随后 `scripts/local-control.sh verify` 确认 Cloud、Agent、BitBrowser、Desktop assets、最新 DMG 与管理员登录烟测均 PASS。
+- Current：最新 DMG 已启动，等待用户走查“运营资源 / 社媒账号”面包屑及代理、社媒账号的统一表格样式。
+- Next：根据用户走查结论决定是否关闭本 CHG；在结论前保持 ACTIVE。
 - Blockers：无。`web/dist-desktop`、Desktop `.generated` 和无关的 Workspace 计划文件为既有或本机构建产物，不纳入提交。

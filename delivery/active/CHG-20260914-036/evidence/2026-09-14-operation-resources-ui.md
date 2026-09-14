@@ -55,3 +55,13 @@ Login smoke: PASS user=admin
 - 顶部栏：从菜单树派生面包屑，避免展示路由内部名；`/accounts` 显示“运营资源 / 社媒账号”。
 - 代理管理与社媒账号：使用与浏览器窗口相同的筛选条、横向可滚动表格和独立分页；详情、主操作、更多按钮统一为同一层级。
 - 验证：`npm test -- --run` 通过（18 files / 65 tests）；`npm run build:desktop` 通过。最新 DMG 将在源码提交后重新构建并启动。
+
+```text
+cd wt-media-workspace && ./scripts/local-control.sh verify
+Cloud: PASS
+Agent: PASS
+BitBrowser via Agent: PASS
+Desktop assets: fresh / PASS
+DMG: fresh / PASS
+Login smoke: PASS user=admin
+```
