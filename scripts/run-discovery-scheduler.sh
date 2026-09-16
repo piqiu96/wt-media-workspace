@@ -13,6 +13,7 @@ Environment:
   WT_MEDIA_CLOUD_BASE_URL       Cloud API base (default: http://127.0.0.1:18080)
   WT_MEDIA_SCHEDULER_USER       Admin username (default: admin)
   WT_MEDIA_SCHEDULER_PASSWORD   Admin password (default: admin123)
+  WT_MEDIA_SCHEDULER_REPLACE_EXISTING  Replace an existing session (default: true)
 EOF
 }
 
@@ -29,6 +30,7 @@ fi
 CLOUD_BASE_URL="${WT_MEDIA_CLOUD_BASE_URL:-http://127.0.0.1:18080}"
 SCHEDULER_USER="${WT_MEDIA_SCHEDULER_USER:-admin}"
 SCHEDULER_PASSWORD="${WT_MEDIA_SCHEDULER_PASSWORD:-admin123}"
+SCHEDULER_REPLACE_EXISTING="${WT_MEDIA_SCHEDULER_REPLACE_EXISTING:-true}"
 
 cookie_file="$(mktemp)"
 login_response="$(mktemp)"
@@ -37,7 +39,8 @@ trap 'rm -f "$cookie_file" "$login_response" "$run_response"' EXIT
 
 login_payload="$(WT_MEDIA_SCHEDULER_USER_VALUE="$SCHEDULER_USER" \
   WT_MEDIA_SCHEDULER_PASSWORD_VALUE="$SCHEDULER_PASSWORD" \
-  python3 -c 'import json, os; print(json.dumps({"username": os.environ["WT_MEDIA_SCHEDULER_USER_VALUE"], "password": os.environ["WT_MEDIA_SCHEDULER_PASSWORD_VALUE"], "replace_existing": True}))')"
+  WT_MEDIA_SCHEDULER_REPLACE_VALUE="$SCHEDULER_REPLACE_EXISTING" \
+  python3 -c 'import json, os; print(json.dumps({"username": os.environ["WT_MEDIA_SCHEDULER_USER_VALUE"], "password": os.environ["WT_MEDIA_SCHEDULER_PASSWORD_VALUE"], "replace_existing": os.environ["WT_MEDIA_SCHEDULER_REPLACE_VALUE"].lower() == "true"}))')"
 
 login_status="$(curl --silent --show-error --output "$login_response" --write-out '%{http_code}' \
   --cookie-jar "$cookie_file" \
