@@ -37,6 +37,9 @@ AGENT_PORT = os.environ.get("WT_MEDIA_AGENT_PORT", "8765")
 AGENT_ADDR = f"{AGENT_HOST}:{AGENT_PORT}"
 AGENT_BASE_URL = f"http://{AGENT_ADDR}"
 BIT_API_URL = os.environ.get("WT_MEDIA_BITBROWSER_API_URL", "http://127.0.0.1:54345")
+DOUYIN_ENV_FILE = Path(
+    os.environ.get("WT_MEDIA_DOUYIN_ENV_FILE", CLOUD_DIR / ".env.local")
+)
 
 GO_BIN = Path(os.environ.get("GO_BIN", "/Users/aqiuye/Develop/workspace/devenv/go26/go/bin/go"))
 GOROOT = os.environ.get("GOROOT", "/Users/aqiuye/Develop/workspace/devenv/go26/go")
@@ -60,6 +63,49 @@ def env_with(base: dict[str, str] | None = None, **kwargs: str) -> dict[str, str
     if base:
         env.update(base)
     env.update({k: v for k, v in kwargs.items() if v is not None})
+    return env
+
+
+def local_douyin_env() -> dict[str, str]:
+    """Load repo-local Douyin credentials without putting them in source or Git.
+
+    Explicit process environment variables always win. The file is intentionally
+    limited to the Cloud crawler settings and must be owner-readable only.
+    """
+    if not DOUYIN_ENV_FILE.is_file():
+        return {}
+    permissions = DOUYIN_ENV_FILE.stat().st_mode & 0o777
+    if permissions & 0o077:
+        raise RuntimeError(
+            f"Douyin env file must be owner-readable only (chmod 600): {DOUYIN_ENV_FILE}"
+        )
+    allowed = {
+        "WT_MEDIA_DOUYIN_API_BASE",
+        "WT_MEDIA_DOUYIN_API_KEY",
+        "WT_MEDIA_DOUYIN_COOKIE",
+        "WT_MEDIA_DOUYIN_AUTHOR_ENDPOINT",
+    }
+    values: dict[str, str] = {}
+    for raw_line in DOUYIN_ENV_FILE.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if key not in allowed:
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+            value = value[1:-1]
+        values[key] = value
+    return values
+
+
+def cloud_runtime_env(**kwargs: str) -> dict[str, str]:
+    """Build Cloud env with explicit shell variables taking precedence."""
+    env = env_with(**kwargs)
+    for key, value in local_douyin_env().items():
+        env.setdefault(key, value)
     return env
 
 
@@ -144,7 +190,7 @@ def start_cloud() -> None:
         "cloud",
         [str(GO_BIN), "run", "./cmd/server"],
         CLOUD_DIR,
-        env_with(
+        cloud_runtime_env(
             GOROOT=GOROOT,
             GOPATH=GOPATH,
             GOCACHE=str(CLOUD_DIR / ".cache" / "go-build"),

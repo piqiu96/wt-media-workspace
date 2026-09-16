@@ -23,3 +23,7 @@ WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899 scripts/m2b-local-acceptance.s
 ## 环境边界
 
 本机未安装真实 BitBrowser，因此本轮使用仓库既有脱敏 mock（`127.0.0.1:8899`）；不代表真实 BitBrowser 验收。按 ADR-0015，M3 discovery 不使用 Agent/BitBrowser；Douyin 真实请求仍需在 Cloud 服务端配置 `WT_MEDIA_DOUYIN_API_BASE`、`WT_MEDIA_DOUYIN_API_KEY`（可选 Cookie）后单独走查。
+
+## 本机凭据配置
+
+为满足本机代码库内可控配置，Cloud 提供 `.env.local.example` 模板。复制为 `wt-media-cloud/.env.local` 并填入真实值即可；该文件已被 `.gitignore` 排除，启动脚本只接受 owner-only（`0600`）权限文件，命令行环境变量优先级更高。真实凭据不写入源码常量，也不进入提交历史。
