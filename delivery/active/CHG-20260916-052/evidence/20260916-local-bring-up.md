@@ -27,3 +27,10 @@ WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899 scripts/m2b-local-acceptance.s
 ## 本机凭据配置
 
 为满足本机代码库内可控配置，Cloud 提供 `.env.local.example` 模板。复制为 `wt-media-cloud/.env.local` 并填入真实值即可；该文件已被 `.gitignore` 排除，启动脚本只接受 owner-only（`0600`）权限文件，命令行环境变量优先级更高。真实凭据不写入源码常量，也不进入提交历史。
+
+## 搜索失败修复回归
+
+- 首次失败根因：Cloud 进程早于 `.env.local` 创建，旧进程没有加载 API Key，任务错误为 `content crawler is not configured`。
+- 重启后第二个根因：参考客户端要求 `/dyRank` 将 Cookie 作为 `ck` 表单字段传入，旧实现只设置了 HTTP `Cookie` Header。
+- 修复提交：Cloud `0548b22`；新增回归测试断言 `ck` 字段。
+- 重启 Cloud 后使用 `operator01` 执行关键词搜索，接口返回 `errcode=0`，任务 `status=success`；本次关键词上游返回 0 条结果，但已不再直接失败。
