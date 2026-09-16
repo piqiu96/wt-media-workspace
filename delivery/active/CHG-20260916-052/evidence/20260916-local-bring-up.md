@@ -41,3 +41,4 @@ WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899 scripts/m2b-local-acceptance.s
 - 行为：登录管理员后调用 Cloud `POST /api/v1/discovery-scheduler/run-due`；策略到期判断、幂等和 `crawl_task` 写入仍由 Cloud 业务服务负责，脚本不直写数据库。
 - 管理员烟测：返回 `scheduler tick ... triggered=0`。
 - 越权烟测：`operator01` 调用返回 `HTTP 403`。
+- 会话保护烟测：设置 `WT_MEDIA_SCHEDULER_REPLACE_EXISTING=false` 时，已有管理员会话返回 `HTTP 409`；默认 `true` 便于无人值守手动调度。
