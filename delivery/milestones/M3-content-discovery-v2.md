@@ -1,7 +1,7 @@
 # M3 Milestone V2：内容挖掘自动化入口建设
 
-> 更新：2026-09-15。产品方向：CONFIRMED，依据用户本轮 Milestone；工程任务拆分：PLANNED / 关键细节待决。
-> 实施状态：IN_PROGRESS（M3-A）；Active CHG：CHG-20260915-044；M2 保持 DONE。
+> 更新：2026-09-16。产品方向：CONFIRMED，依据用户本轮 Milestone；工程任务拆分：IMPLEMENTED（自动化验证完成，真实外部验收待凭据）。
+> 实施状态：IN_PROGRESS（M3-A～E 代码已实现）；Active CHG：CHG-20260916-052；M2 保持 DONE。
 > 有效 Product：[内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)；决策：[ADR-0013](../../docs/decisions/0013-m3-content-mining-entry.md)、[ADR-0014](../../docs/decisions/0014-m3-team-content-scope.md)。
 > 替代 M3-content-discovery.md 及旧 CHG-037～043 的实施资格，不将旧草案视为已完成工作。
 
@@ -28,7 +28,7 @@
 | M3-E2 博主自动挖掘 | CHG-20260915-050 | E1；作者首次/增量范围确定 | 作者周期任务→新作品入池，复用同一记录与执行链路 |
 | M3-E3 综合验收 | CHG-20260915-051 | A～E2 均通过 | 三个人工入口、两种自动策略、只读流转视图与 M2 回归通过 |
 
-所有 CHG 均为 DISCUSSION 执行草案，存放 delivery/planned；最多激活一项。A 不用伪造内容冒充真实入口；D 不用保存成功冒充定时执行；E3 不补建前面遗漏的核心能力。真实接口、权限或行为选择缺失时，只能记录未通过，不能降格为 mock 验收。
+原 A～E 拆分记录保留为范围基线；M3-B～E 的实际实施由 active CHG-20260916-052 统一承载。A 不用伪造内容冒充真实入口；D 不用保存成功冒充定时执行；E3 不补建前面遗漏的核心能力。真实接口、权限或行为选择缺失时，只能记录未通过，不能降格为 mock 验收。
 
 ## M3-A 内容池基础能力
 
@@ -134,4 +134,4 @@ V2-Q02 已由用户确认并记录为 ADR-0014。Q03 已向用户提出单项澄
 
 Cloud 拥有业务、数据库和正式合同；Agent 拥有渠道执行；Desktop 复用 Web；Workspace 拥有需求、决策、交付治理。每仓独立提交，版本组合经联调再记录通过，不扫描代码就不估计实现完成率。
 
-当前只完成 Workspace 文档更新：M2 DONE、M3 NOT_STARTED、无 active CHG。按用户扫描范围不读写根 CURRENT_CONTEXT，下一次获准准备实施时同步根上下文。详细日期在人力和接口条件明确后估算，不虚构工期。
+当前：M3-A～E 代码与自动化验证已完成，真实 Douyin 外部读回仍需配置 Agent 凭据后补证；active CHG-20260916-052 持续跟踪。按用户要求仅更新相关 Workspace 记录，不改写根 CURRENT_CONTEXT。
