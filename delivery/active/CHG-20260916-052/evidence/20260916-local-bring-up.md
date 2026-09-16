@@ -20,4 +20,4 @@ WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899 scripts/m2b-local-acceptance.s
 
 ## 环境边界
 
-本机未安装真实 BitBrowser，因此本轮使用仓库既有脱敏 mock（`127.0.0.1:8899`）；不代表真实 BitBrowser/M3 外部渠道验收。Douyin 真实请求仍需在 Agent 配置 `WT_MEDIA_DOUYIN_API_BASE`、`WT_MEDIA_DOUYIN_API_KEY`（可选 Cookie）后单独走查。
+本机未安装真实 BitBrowser，因此本轮使用仓库既有脱敏 mock（`127.0.0.1:8899`）；不代表真实 BitBrowser 验收。按 ADR-0015，M3 discovery 不使用 Agent/BitBrowser；Douyin 真实请求仍需在 Cloud 服务端配置 `WT_MEDIA_DOUYIN_API_BASE`、`WT_MEDIA_DOUYIN_API_KEY`（可选 Cookie）后单独走查。

@@ -1,6 +1,6 @@
 # CHG-20260915-044：M3-A 内容池基础能力
 
-- Status: ACTIVE
+- Status: HANDOFF
 - Level: M
 - Milestone: `delivery/milestones/M3-content-discovery-v2.md#m3-a-内容池基础能力`
 - 日期：2026-09-15
@@ -52,7 +52,7 @@ Cloud 负责业务 API/数据库/Web 及正式合同；Agent 负责渠道执行�
 ## Checkpoint
 
 - Completed：V2 文档级范围、依赖、任务与验收拆分；用户已确认团队级隔离规则。
-- Current：ACTIVE；Cloud migration、内容池服务/API、团队范围校验、幂等转素材和 Web 内容池/素材库入口已实现，待接入环境做数据库读回与人工 UI 验收。
-- Next：在最新 Cloud 环境执行 migration 和 API/页面读回；收集脱敏证据后再决定是否关闭 M3-A。真实外部链接留给 M3-B。
+- Current：HANDOFF；Cloud migration、内容池服务/API、团队范围校验、幂等转素材和 Web 内容池/素材库入口已实现；本记录的后续 M3-B～E 由 CHG-20260916-052 统一承载。
+- Next：由 CHG-20260916-052 复用并复验内容池基础能力；本记录不再单独推进。
 - Blockers：M3-A 不依赖外部接口；需要避免与其他未提交 Cloud 变更冲突。
 - Verification：启动门已完成；`go test ./...`、Web `npm test`（19 files/74 tests）、`npm run build:cloud`、`npm run build:desktop` 均通过。自动化结果见 `evidence/20260916-implementation.md`。

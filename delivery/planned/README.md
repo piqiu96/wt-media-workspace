@@ -1,6 +1,6 @@
 # Planned delivery index
 
-更新：2026-09-16。当前 active CHG 为 CHG-20260915-044；其余 DISCUSSION 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认。
+更新：2026-09-16。当前 active CHG 为 CHG-20260916-052；其余 DISCUSSION 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler。
 
 ## 当前 M3 V2
 
@@ -8,7 +8,7 @@
 
 | 阶段 | 当前草案 | 状态 |
 | --- | --- | --- |
-| M3-A 内容池基础能力 | [CHG-20260915-044](../active/CHG-20260915-044/change.md) | ACTIVE |
+| M3-A 内容池基础能力 | [CHG-20260915-044](../active/CHG-20260915-044/change.md) | HANDOFF（并入 M3 综合变更） |
 | M3-B 分享链接解析入池 | [CHG-20260915-045](CHG-20260915-045/change.md) | DISCUSSION |
 | M3-C1 关键词主动搜索入池 | [CHG-20260915-046](CHG-20260915-046/change.md) | DISCUSSION |
 | M3-C2 博主主动搜索入池 | [CHG-20260915-047](CHG-20260915-047/change.md) | DISCUSSION |
@@ -17,7 +17,7 @@
 | M3-E2 博主任务与持续入池 | [CHG-20260915-050](CHG-20260915-050/change.md) | DISCUSSION |
 | M3-E3 内容挖掘综合验收 | [CHG-20260915-051](CHG-20260915-051/change.md) | DISCUSSION |
 
-按依赖顺序逐项激活，最多一项 active。M3-A 按团队级隔离实施，不做游戏维度或跨团队共享；B 需要真实链接接口；D/E 需要周期、作者首轮及任务部分失败口径。激活前同步根 CURRENT_CONTEXT。
+按依赖顺序逐项激活，最多一项 active。M3-A 按团队级隔离实施，不做游戏维度或跨团队共享；B～E 按 ADR-0015 由 Cloud Crawler 实施，不依赖 Agent/BitBrowser/Desktop；真实外部接口、周期、作者首轮及任务部分失败口径仍需按阶段验收。
 
 ## 已替代的旧 M3 草案
 

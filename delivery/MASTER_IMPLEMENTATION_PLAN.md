@@ -335,14 +335,14 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `NOT_STARTED` |
+| 状态 | `IN_PROGRESS` |
 | 产品方向 | 用户已明确确认内容挖掘 V2（2026-09-15）；M2 保持 `DONE`。 |
-| 目标 | 三个人工入口与两种自动策略统一入内容池，经人工筛选转为可追踪素材。 |
+| 目标 | 三个人工入口与两种自动策略统一入内容池，经人工筛选转为可追踪素材；M3 自动发现由 Cloud Scheduler + Cloud Crawler 执行，不创建 Agent 任务。 |
 | 依赖 | M2 `DONE`；按阶段解决接口、权限、周期与状态口径。 |
-| 规划状态 | A～E 与八个 CHG 草案已拆分；M3-A 已激活，其他阶段待决。 |
+| 规划状态 | A～E 与八个 CHG 草案已拆分；当前由 CHG-20260916-052 承载纠偏实施，M3-B～E 改为 Cloud Scheduler + Cloud Crawler，不创建 Agent 任务。 |
 | 闭环 | `delivery/milestones/M3-content-discovery-v2.md` |
-| 产品/决策 | `docs/product/M3-content-mining-v2.md`；ADR-0013、ADR-0014（团队级隔离已确认） |
-| Active CHG | CHG-20260915-044 |
+| 产品/决策 | `docs/product/M3-content-mining-v2.md`；ADR-0013、ADR-0014（团队级隔离已确认）、ADR-0015（Cloud-owned 执行） |
+| Active CHG | CHG-20260916-052 |
 | Evidence | None，规划检查不等于运行验收。 |
 | 完成日期 | None |
 | Commit/Tag | None |
@@ -377,7 +377,7 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 
 - 单/批量链接、关键词和博主搜索均有真实接口到入池证据；未选搜索结果不写正式来源。
 - 两种策略均能真实定时触发，创建带快照的 crawl_task，自动入池；保存配置/任务列表不是完成证据。
-- 策略只定义规则，调度负责触发，Cloud Agent 负责外部执行；同周期防重、同策略串行及重启恢复通过。
+- 策略只定义规则，Cloud Scheduler 负责触发，Cloud Crawler 负责外部执行；同周期防重、同策略串行及重启恢复通过。
 - source_content 三态、crawl_task 四态与部分失败口径均明确，统计/错误和业务事实一致。
 - 全局唯一、权限隔离、忽略保护、人工转换事务与素材来源可追踪同时成立。
 - 仅预留渠道/策略扩展抽象；运行视图只读且基于真实记录。
