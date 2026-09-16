@@ -2,6 +2,10 @@
 
 本目录保存每个 M 由人工确认的业务闭环基线。
 
+尚未确认的拆分必须显式标注 DRAFT，不能作为已批准的实现依据。
+
+当前 M3 规划见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：用户方向已确认，A～E 与八个执行草案已拆分，关键细节待决，未激活实施。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
+
 Milestone 不替代 Product、Engineering、MASTER PLAN、AI Spec、CHG 或 Evidence。它只回答：用户按什么顺序操作，以及哪些业务结果和真实外部效果必须同时成立，才能认为该 M 的一段闭环完成。
 
 每张闭环卡只包含：

@@ -61,3 +61,7 @@ Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extrac
 ## Readiness Rule
 
 Contract existence and milestone completion are separate facts. A consumer may use an active contract revision only after its own real build/integration gate passes. Placeholder contracts cannot satisfy a production or end-to-end acceptance row.
+
+## M3 V2 planned contract scope (not a published revision)
+
+ADR-0013 confirms content-pool-first ingestion, `discovery_strategy`, a controlled channel abstraction and four business `crawl_task` statuses. Cloud owns the future business API/enums, source/material relationship and task input/result/error contracts; Agent consumes execution contracts and implements channel adapters. Desktop reuses Cloud Web. Partial-failure mapping and content authorization require confirmed decisions before publication. This planning entry neither changes machine-readable revisions nor claims runtime compatibility, migrations or generated consumers have been updated.

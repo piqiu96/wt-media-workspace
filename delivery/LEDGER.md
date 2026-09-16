@@ -6,4 +6,7 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260903-034 | M2-B 账号检查项 7/8 真实样本校准 | PLANNED | wt-media-workspace |
+
+当前无 active CHG。M2 已由用户验收通过；M3 已按用户新方向更新 V2 基线与 A～E 规划，关键细节待决，未进入实施。
+
+待规划/待决记录见 [Planned index](planned/README.md)，不计为正在执行的变更。
