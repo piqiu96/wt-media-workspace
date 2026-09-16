@@ -34,3 +34,10 @@ WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899 scripts/m2b-local-acceptance.s
 - 重启后第二个根因：参考客户端要求 `/dyRank` 将 Cookie 作为 `ck` 表单字段传入，旧实现只设置了 HTTP `Cookie` Header。
 - 修复提交：Cloud `0548b22`；新增回归测试断言 `ck` 字段。
 - 重启 Cloud 后使用 `operator01` 执行关键词搜索，接口返回 `errcode=0`，任务 `status=success`；本次关键词上游返回 0 条结果，但已不再直接失败。
+
+## 本地手动调度脚本
+
+- 脚本：`scripts/run-discovery-scheduler.sh`。
+- 行为：登录管理员后调用 Cloud `POST /api/v1/discovery-scheduler/run-due`；策略到期判断、幂等和 `crawl_task` 写入仍由 Cloud 业务服务负责，脚本不直写数据库。
+- 管理员烟测：返回 `scheduler tick ... triggered=0`。
+- 越权烟测：`operator01` 调用返回 `HTTP 403`。
