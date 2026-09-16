@@ -9,6 +9,8 @@ WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899 scripts/m2b-local-acceptance.s
 
 ## 门禁结果
 
+本次最新源码重启（`up --force-restart`）及复核（`verify`）均已通过；Cloud 与 Local Agent 进程以脱离终端方式持续运行，供走查使用。
+
 - Cloud migration：PASS；固定数据库 `wt_media_cloud`，20260916_028/029/030 已应用。
 - Cloud：PASS，`http://127.0.0.1:18080/api/v1/health`。
 - Local Agent：PASS，`http://127.0.0.1:8765/healthz`。
