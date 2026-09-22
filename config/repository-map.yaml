@@ -1,0 +1,9 @@
+schema_version: 1
+
+repositories:
+  cloud:
+    path: ../wt-media-cloud
+  agent:
+    path: ../wt-media-agent
+  desktop:
+    path: ../wt-media-desktop

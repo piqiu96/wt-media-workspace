@@ -11,7 +11,7 @@ Maintain the path from stable project facts to one bounded executable CHG. This 
 
 Read in order:
 
-1. root `AGENTS.md` and `.ai/CURRENT_CONTEXT.md`;
+1. root `AGENTS.md` and `wt-media-workspace/.ai/CURRENT_CONTEXT.md`;
 2. `docs/product`, `docs/engineering`, `docs/contracts`, `docs/decisions`;
 3. `delivery/MASTER_IMPLEMENTATION_PLAN.md`;
 4. applicable `delivery/milestones/M*.md`;
@@ -64,7 +64,7 @@ Milestone is the current execution baseline. PRD is the long-term product baseli
    - linked CHGs.
 5. Propose CHGs in dependency order. Activate at most one M/L CHG.
 6. For the next CHG, define one independently verifiable vertical result, explicit exclusions, ordered Tasks, real acceptance, Evidence, and commit boundaries.
-7. Synchronize `delivery/LEDGER.md` and root `.ai/CURRENT_CONTEXT.md` with the actual active directory.
+7. Synchronize `delivery/LEDGER.md` with the actual active directory, then regenerate `wt-media-workspace/.ai/CURRENT_CONTEXT.md` with `python3 scripts/prepare_ai_workspace.py --change <CHG>`. Never edit the snapshot by hand, and never keep a second copy at the execution root.
 8. Stop before runtime implementation and hand off to `executing-wt-media-change`.
 
 ## CHG Boundary

@@ -32,6 +32,8 @@ M0 项目治理与工程基线
 
 ```text
 wt-media-workspace/
+├── .ai/
+│   └── CURRENT_CONTEXT.md          # 唯一执行状态快照，脚本生成，禁止手工编辑
 ├── docs/
 │   ├── product/                    # 当前有效产品事实
 │   ├── engineering/                # 当前有效工程架构
@@ -40,16 +42,29 @@ wt-media-workspace/
 ├── delivery/
 │   ├── MASTER_IMPLEMENTATION_PLAN.md
 │   ├── LEDGER.md                   # 当前 Active CHG 索引，不是历史归档
-│   └── active/
-│       └── CHG-YYYYMMDD-NNN/
-│           ├── change.md           # 当前变更唯一执行依据
-│           └── evidence/           # 测试、Spike、Diff、人工验证事实
+│   ├── active/
+│   │   └── CHG-YYYYMMDD-NNN/
+│   │       ├── change.md           # 当前变更唯一执行依据
+│   │       ├── checkpoint.md       # 已完成 / 未完成 / 阻塞 / 下一步
+│   │       └── evidence/           # 测试、Spike、Diff、人工验证事实
+│   ├── milestones/                 # 人工确认的业务闭环基线
+│   ├── planned/                    # 待规划与待决记录
+│   ├── completed/                  # 已收口记录，默认不加载
+│   ├── reports/                    # 阶段性审计与分析报告
+│   └── verifying/
 ├── config/
 │   ├── contract-map.yaml           # 机器可读协议归属和消费关系
-│   └── release-matrix.yaml         # 已验证版本组合
+│   ├── release-matrix.yaml         # 已验证版本组合
+│   ├── skills-distribution.yaml    # skill 分发目标
+│   └── repository-map.yaml         # 关联工程路径唯一来源
 ├── skills/
 ├── scripts/
-└── templates/
+├── templates/
+│   └── delivery/                   # CHG 与 evidence 记录模板
+├── AGENT-INDEX.md                  # 跨仓库路由与渐进式加载规则
+├── AGENTS.md
+├── CLAUDE.md
+└── README.md
 ```
 
 | 位置 | 保存内容 | 不保存内容 |

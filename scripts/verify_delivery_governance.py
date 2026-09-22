@@ -14,11 +14,14 @@ LEVEL_RE = re.compile(r"^- Level:\s*([A-Z])\s*$", re.MULTILINE)
 MILESTONE_RE = re.compile(r"^- Milestone:\s*`([^`]+)`\s*$", re.MULTILINE)
 
 
-def execution_root(workspace: Path) -> Path:
-    for candidate in (workspace.parent, *workspace.parents):
-        if (candidate / ".ai" / "CURRENT_CONTEXT.md").is_file():
-            return candidate
-    return workspace.parent
+def current_context_path(workspace: Path) -> Path:
+    """Return the single execution snapshot owned by the workspace repository.
+
+    The snapshot lives inside the workspace repository so that a worktree
+    checkout carries it, and so that no second copy can drift in the outer
+    execution root.
+    """
+    return workspace / ".ai" / "CURRENT_CONTEXT.md"
 
 
 def parse_context_change(context: Path) -> str | None:
@@ -31,10 +34,24 @@ def parse_context_change(context: Path) -> str | None:
     return None if value.lower() == "none" else value
 
 
+LEDGER_ROW_RE = re.compile(r"^\|\s*(CHG-\d{8}-\d{3})\s*\|")
+
+
 def parse_ledger_changes(ledger: Path) -> list[str]:
+    """Return the CHG ids listed in the LEDGER table.
+
+    Only table rows count. Prose in the LEDGER body may mention a CHG id
+    (for example to point at where earlier work was folded in), and that
+    mention must not be read as a second active change.
+    """
     if not ledger.is_file():
         return []
-    return CHANGE_ID_RE.findall(ledger.read_text(encoding="utf-8"))
+    changes: list[str] = []
+    for line in ledger.read_text(encoding="utf-8").splitlines():
+        match = LEDGER_ROW_RE.match(line)
+        if match is not None:
+            changes.append(match.group(1))
+    return changes
 
 
 def heading_anchors(markdown: str) -> set[str]:
@@ -69,8 +86,7 @@ def validate_milestone_reference(
 
 def validate_delivery_governance(workspace: Path) -> list[str]:
     workspace = workspace.resolve()
-    root = execution_root(workspace)
-    context = root / ".ai" / "CURRENT_CONTEXT.md"
+    context = current_context_path(workspace)
     ledger = workspace / "delivery" / "LEDGER.md"
     active_root = workspace / "delivery" / "active"
 

@@ -22,6 +22,16 @@ REQUIRED_DIRS = [
 ]
 CHANGE_ID_RE = re.compile(r"^CHG-\d{8}-\d{3}$")
 EXECUTION_SKILL = "executing-wt-media-change"
+MILESTONE_RE = re.compile(r"^-\s*Milestone:\s*`([^`]+)`\s*$")
+AFFECTED_KEY_RE = re.compile(r"^-\s*(?:Affected repositories|当前仓库)\s*[:：]\s*(.*)$")
+REPO_TOKEN_RE = re.compile(r"wt-media-[a-z]+")
+
+OWNERSHIP_BOUNDARIES = (
+    "Cloud owns business state, orchestration, and the Cloud runtime.",
+    "Agent owns local execution and external side effects.",
+    "Desktop owns user interaction and the local bridge.",
+    "Workspace owns governance and never becomes a runtime dependency.",
+)
 
 
 @dataclass(frozen=True)
@@ -30,6 +40,7 @@ class ChangeInfo:
     title: str
     status: str
     path: Path
+    milestone: str | None
     affected_repositories: tuple[str, ...]
 
 
@@ -46,12 +57,14 @@ def read_change_info(change_id: str, workspace_repo: Path) -> ChangeInfo:
     if active_changes != [change_id]:
         raise ValueError(
             "expected exactly one active change "
-            f"{change_id!r}, found: {', '.join(active_changes) or 'none'}"
+            f"{change_id!r}, found: {', '.join(active_changes) or 'none'}; "
+            "move every non-active CHG out of delivery/active first"
         )
 
     text = change_path.read_text(encoding="utf-8")
     title = change_id
     status = "UNKNOWN"
+    milestone: str | None = None
     affected: list[str] = []
     in_affected = False
     for line in text.splitlines():
@@ -59,21 +72,34 @@ def read_change_info(change_id: str, workspace_repo: Path) -> ChangeInfo:
             title = line.removeprefix("# ").strip()
         elif line.startswith("- Status:"):
             status = line.split(":", 1)[1].strip()
-        elif line.strip() == "- Affected repositories:":
-            in_affected = True
+        elif milestone is None and (match := MILESTONE_RE.match(line)):
+            milestone = match.group(1).strip()
         elif in_affected and line.startswith("  - "):
             affected.append(line.removeprefix("  - ").strip().strip("`"))
+        elif match := AFFECTED_KEY_RE.match(line):
+            # Two record shapes are in use: a structured bullet list under
+            # `- Affected repositories:`, and a prose `- 当前仓库：` line that
+            # names the repositories inline before explaining the split.
+            in_affected = not match.group(1).strip()
+            affected.extend(REPO_TOKEN_RE.findall(match.group(1)))
         elif in_affected and line and not line.startswith("  "):
             in_affected = False
 
+    affected = list(dict.fromkeys(affected))
+
     if status == "DONE":
         raise ValueError(f"active change must not be DONE: {change_id}")
+
+    # Record headings usually repeat the id (`# CHG-...052：Title`). Drop that
+    # prefix so the snapshot can render the id once, next to the title.
+    title = re.sub(rf"^{re.escape(change_id)}\s*[:：]\s*", "", title).strip() or change_id
 
     return ChangeInfo(
         change_id=change_id,
         title=title,
         status=status,
         path=change_path,
+        milestone=milestone,
         affected_repositories=tuple(affected),
     )
 
@@ -101,42 +127,52 @@ def write_execution_skill(workspace_root: Path, workspace_repo: Path) -> Path:
     return dest
 
 
-def build_context(change: ChangeInfo, workspace_root: Path, workspace_repo: Path) -> str:
+def build_context(change: ChangeInfo, workspace_repo: Path) -> str:
+    """Render the single execution snapshot.
+
+    Every path is workspace-relative: the snapshot lives inside the workspace
+    repository and must stay readable when that repository is checked out on
+    its own, for example in a worktree.
+    """
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    change_path = change.path.relative_to(workspace_repo)
     affected = "\n".join(f"- `{repo}`" for repo in change.affected_repositories) or "- None"
+    milestone_lines = (
+        f"- Current milestone: `{change.milestone}`\n" if change.milestone else ""
+    )
+    reading_order = [
+        "`AGENTS.md`",
+        "`CLAUDE.md`",
+        "`AGENT-INDEX.md`",
+        "`.ai/CURRENT_CONTEXT.md`",
+        "`delivery/LEDGER.md`",
+    ]
+    if change.milestone:
+        reading_order.append(f"`{change.milestone}`")
+    reading_order.append(f"`{change_path}`")
+    reading_order.append("Affected repository `AGENT-INDEX.md`, `AGENTS.md`, and `CLAUDE.md`")
+    reading_order_text = "\n".join(
+        f"{index}. {entry}" for index, entry in enumerate(reading_order, start=1)
+    )
     return f"""# WT Media Current AI Context
 
 - Generated: {generated_at}
-- Active CHG: `{change.change_id}`
+- Active CHG: `{change.change_id}` — {change.title}
 - Status: `{change.status}`
-- Title: {change.title}
-- Change file: `{change.path.relative_to(workspace_root)}`
-- Workspace governance repo: `{workspace_repo.relative_to(workspace_root)}`
+{milestone_lines}- Change file: `{change_path}`
+
+This is the only execution snapshot. It is generated by
+`scripts/prepare_ai_workspace.py` and must not be edited by hand. No copy of
+this file exists in the outer execution root.
 
 ## Required Skill
 
-Use `executing-wt-media-change` for CHG implementation, resume, review, and completion.
-
-Generated copy:
-
-```text
-.agents/skills/executing-wt-media-change/SKILL.md
-```
-
-Unique source:
-
-```text
-wt-media-workspace/skills/workspace/executing-wt-media-change/SKILL.md
-```
+- Plan the next CHG with `planning-wt-media-delivery`.
+- Implement, resume, review, and complete a CHG with `executing-wt-media-change`.
 
 ## Required Reading Order
 
-1. `AGENTS.md`
-2. `.ai/CURRENT_CONTEXT.md`
-3. `{change.path.relative_to(workspace_root)}`
-4. Baselines referenced by the active CHG
-5. Affected repository `AGENTS.md` files
-6. Current code, tests, and Git status
+{reading_order_text}
 
 ## Affected Repositories
 
@@ -144,11 +180,18 @@ wt-media-workspace/skills/workspace/executing-wt-media-change/SKILL.md
 
 ## Stable Baselines
 
-- Product: `wt-media-workspace/docs/product`
-- Engineering: `wt-media-workspace/docs/engineering`
-- Contracts: `wt-media-workspace/docs/contracts`
-- Decisions: `wt-media-workspace/docs/decisions`
-- Master route: `wt-media-workspace/delivery/MASTER_IMPLEMENTATION_PLAN.md`
+- Product: `docs/product`
+- Engineering: `docs/engineering`
+- Contracts: `docs/contracts`
+- Decisions: `docs/decisions`
+- Master route: `delivery/MASTER_IMPLEMENTATION_PLAN.md`
+
+## Stable Ownership Boundaries
+
+{chr(10).join(f"- {line}" for line in OWNERSHIP_BOUNDARIES)}
+
+Milestone-specific decisions are not copied here. The active CHG names the
+decision records it depends on; read those files instead of this summary.
 
 ## Execution Boundaries
 
@@ -156,13 +199,16 @@ wt-media-workspace/skills/workspace/executing-wt-media-change/SKILL.md
 - Do not start the next CHG.
 - Do not modify Cloud, Agent, or Desktop business code unless listed in the active CHG.
 - Stop and record `Q-xx` if scope, contracts, facts, or responsibilities need a new decision.
+- Multi-repository CHGs record per-repository status under
+  `delivery/active/{change.change_id}/status/<repo>.md`. Never edit this
+  snapshot concurrently from more than one agent.
 """
 
 
-def write_current_context(change: ChangeInfo, workspace_root: Path, workspace_repo: Path) -> Path:
-    context_path = workspace_root / ".ai" / "CURRENT_CONTEXT.md"
+def write_current_context(change: ChangeInfo, workspace_repo: Path) -> Path:
+    context_path = workspace_repo / ".ai" / "CURRENT_CONTEXT.md"
     context_path.parent.mkdir(parents=True, exist_ok=True)
-    context_path.write_text(build_context(change, workspace_root, workspace_repo), encoding="utf-8")
+    context_path.write_text(build_context(change, workspace_repo), encoding="utf-8")
     return context_path
 
 
@@ -193,10 +239,11 @@ def prepare_workspace(
         summary["active_change"] = change.change_id
         summary["active_change_status"] = change.status
         summary["active_change_file"] = str(change.path)
+        summary["active_milestone"] = change.milestone
         summary["affected_repositories"] = list(change.affected_repositories)
         if write_context:
             skill_path = write_execution_skill(workspace_root, workspace_repo)
-            context_path = write_current_context(change, workspace_root, workspace_repo)
+            context_path = write_current_context(change, workspace_repo)
             summary["current_context"] = str(context_path)
             summary["generated_execution_skill"] = str(skill_path)
 

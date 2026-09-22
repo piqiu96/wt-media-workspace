@@ -12,7 +12,7 @@ Use this Skill for any WT Media M/L CHG implementation, resume, review, or compl
 When facts conflict, resolve them in this order:
 
 1. Root `AGENTS.md`.
-2. Root `.ai/CURRENT_CONTEXT.md`.
+2. `wt-media-workspace/.ai/CURRENT_CONTEXT.md` — the only execution snapshot; it never lives at the execution root.
 3. Active `wt-media-workspace/delivery/active/<CHG>/change.md`.
 4. The exact Milestone closure referenced by an M/L CHG, or the stable requirement referenced by a small Bug CHG.
 5. Stable baselines referenced by the CHG:
@@ -30,7 +30,7 @@ Do not treat chat history, generated summaries, or legacy root `docs/` files as 
 Before coding, verify and report:
 
 - active CHG ID and status;
-- `CURRENT_CONTEXT`, `delivery/LEDGER.md`, and `delivery/active` all identify the same single CHG;
+- `wt-media-workspace/.ai/CURRENT_CONTEXT.md`, `delivery/LEDGER.md`, and `delivery/active` all identify the same single CHG;
 - Milestone file and closure anchor for M/L work, or stable requirement reference for a planning-classified small Bug;
 - the user-visible vertical result delivered by this CHG;
 - required database change, external side effect, read-back, business projection, and page result inherited from the closure;

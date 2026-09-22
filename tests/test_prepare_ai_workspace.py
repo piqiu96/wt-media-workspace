@@ -54,6 +54,7 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
             "## 1. Basic Information\n\n"
             "- Level: M\n"
             f"- Status: {status}\n"
+            "- Milestone: `delivery/milestones/M2-account-runtime.md`\n"
             "- Affected repositories:\n"
             "  - `wt-media-workspace`\n"
             "  - `outer execution root rule files`\n",
@@ -70,7 +71,8 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
             write_context=True,
         )
 
-        context = self.outer / ".ai" / "CURRENT_CONTEXT.md"
+        context = self.workspace / ".ai" / "CURRENT_CONTEXT.md"
+        outer_context = self.outer / ".ai" / "CURRENT_CONTEXT.md"
         generated_skill = (
             self.outer
             / ".agents"
@@ -78,11 +80,25 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
             / "executing-wt-media-change"
             / "SKILL.md"
         )
+        text = context.read_text(encoding="utf-8")
         self.assertEqual(summary["active_change"], "CHG-20260714-002")
+        self.assertEqual(
+            summary["active_milestone"], "delivery/milestones/M2-account-runtime.md"
+        )
         self.assertTrue(context.is_file())
         self.assertTrue(generated_skill.is_file())
-        self.assertIn("Active CHG: `CHG-20260714-002`", context.read_text(encoding="utf-8"))
+        # The id appears once, next to a title stripped of its own id prefix.
+        self.assertIn("Active CHG: `CHG-20260714-002` — Test Change", text)
+        self.assertNotIn("— CHG-20260714-002", text)
+        self.assertIn(
+            "- Current milestone: `delivery/milestones/M2-account-runtime.md`", text
+        )
+        self.assertIn("- `outer execution root rule files`", text)
         self.assertIn("GENERATED FILE", generated_skill.read_text(encoding="utf-8"))
+        self.assertFalse(
+            outer_context.exists(),
+            "the execution snapshot must exist only inside the workspace repository",
+        )
 
     def test_missing_change_fails(self) -> None:
         with self.assertRaises(FileNotFoundError):

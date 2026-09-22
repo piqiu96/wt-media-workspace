@@ -4,11 +4,11 @@
 
 ## 当前 M3 V2
 
-有效基线：[Product](../../docs/product/M3-content-mining-v2.md)；[M3-content-discovery-v2.md](../milestones/M3-content-discovery-v2.md)。用户确认的方向为内容挖掘自动化入口，关键细节参见 V2-Q01～06。
+有效基线：[Product](../milestones/M3-content-mining-v2.md)；[M3-content-discovery-v2.md](../milestones/M3-content-discovery-v2.md)。用户确认的方向为内容挖掘自动化入口，关键细节参见 V2-Q01～06。
 
 | 阶段 | 当前草案 | 状态 |
 | --- | --- | --- |
-| M3-A 内容池基础能力 | [CHG-20260915-044](../active/CHG-20260915-044/change.md) | HANDOFF（并入 M3 综合变更） |
+| M3-A 内容池基础能力 | [CHG-20260915-044](../completed/CHG-20260915-044/change.md) | HANDOFF（并入 M3 综合变更，已归档） |
 | M3-B 分享链接解析入池 | [CHG-20260915-045](CHG-20260915-045/change.md) | DISCUSSION |
 | M3-C1 关键词主动搜索入池 | [CHG-20260915-046](CHG-20260915-046/change.md) | DISCUSSION |
 | M3-C2 博主主动搜索入池 | [CHG-20260915-047](CHG-20260915-047/change.md) | DISCUSSION |

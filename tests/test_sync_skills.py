@@ -28,9 +28,25 @@ class SyncSkillsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "wt-media"
             workspace = root / "wt-media-workspace"
-            (root / ".ai").mkdir(parents=True)
-            workspace.mkdir()
+            workspace.mkdir(parents=True)
+            (root / "wt-media-cloud").mkdir()
 
+            self.assertEqual(self.module.execution_root(workspace), root)
+
+    def test_execution_root_ignores_the_execution_snapshot_location(self) -> None:
+        """Root detection is repository-based, not snapshot-based.
+
+        The snapshot directory is not created here on purpose: `.ai/` lives
+        inside the workspace repository and must not be required at the outer
+        root for root detection to succeed.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "wt-media"
+            workspace = root / "wt-media-workspace"
+            workspace.mkdir(parents=True)
+            (root / "wt-media-cloud").mkdir()
+
+            self.assertFalse((root / ".ai").exists())
             self.assertEqual(self.module.execution_root(workspace), root)
 
     def test_execution_root_resolves_linked_worktree_to_shared_root(self) -> None:
@@ -38,8 +54,8 @@ class SyncSkillsTests(unittest.TestCase):
             root = Path(tmp) / "wt-media"
             workspace = root / "wt-media-workspace"
             worktree = workspace / ".worktrees" / "delivery-fix"
-            (root / ".ai").mkdir(parents=True)
             worktree.mkdir(parents=True)
+            (root / "wt-media-cloud").mkdir()
 
             self.assertEqual(self.module.execution_root(worktree), root)
 

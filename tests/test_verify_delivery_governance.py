@@ -26,13 +26,15 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name) / "wt-media"
         self.workspace = self.root / "wt-media-workspace"
-        (self.root / ".ai").mkdir(parents=True)
         (self.workspace / "delivery" / "active").mkdir(parents=True)
         (self.workspace / "delivery" / "milestones").mkdir(parents=True)
         self.module = load_module()
 
     def write_context(self, change_id: str) -> None:
-        (self.root / ".ai" / "CURRENT_CONTEXT.md").write_text(
+        (self.workspace / ".ai" / "CURRENT_CONTEXT.md").parent.mkdir(
+            parents=True, exist_ok=True
+        )
+        (self.workspace / ".ai" / "CURRENT_CONTEXT.md").write_text(
             f"# Context\n\n- Active CHG: `{change_id}`\n",
             encoding="utf-8",
         )
@@ -93,6 +95,28 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
         self.write_context("none")
         (self.workspace / "delivery" / "LEDGER.md").write_text(
             "# Delivery Ledger\n\nNo active M/L CHG.\n",
+            encoding="utf-8",
+        )
+
+        errors = self.module.validate_delivery_governance(self.workspace)
+
+        self.assertEqual(errors, [])
+
+    def test_ledger_prose_mention_is_not_a_second_active_change(self) -> None:
+        change_id = "CHG-20260722-021"
+        milestone = "delivery/milestones/M2-account-runtime.md#m2-b"
+        self.write_context(change_id)
+        (self.workspace / "delivery" / "milestones" / "M2-account-runtime.md").write_text(
+            "# M2\n\n## M2-B\n",
+            encoding="utf-8",
+        )
+        self.write_active_change(change_id, milestone)
+        (self.workspace / "delivery" / "LEDGER.md").write_text(
+            "# Delivery Ledger\n\n"
+            "| Change | Title | Status | Current Repository |\n"
+            "|---|---|---|---|\n"
+            f"| {change_id} | Test | IN_PROGRESS | wt-media-workspace |\n"
+            "\nEarlier scope was folded into CHG-20260715-010, which is no longer active.\n",
             encoding="utf-8",
         )
 

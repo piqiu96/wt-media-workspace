@@ -17,10 +17,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def execution_root(workspace: Path) -> Path:
-    """Resolve the shared cross-repo root from a normal checkout or worktree."""
+    """Resolve the shared cross-repo root from a normal checkout or worktree.
+
+    Detection is repository-based, not snapshot-based: the outer root is the
+    directory that holds the governance repository alongside the runtime
+    repositories. It deliberately does not probe for `.ai/`, which lives
+    inside the workspace repository and is not a property of the outer root.
+    """
     for candidate in (workspace.parent, *workspace.parents):
-        if (candidate / ".ai").is_dir() and (
-            candidate / "wt-media-workspace"
+        if (candidate / "wt-media-workspace").is_dir() and (
+            candidate / "wt-media-cloud"
         ).is_dir():
             return candidate
     return workspace.parent
