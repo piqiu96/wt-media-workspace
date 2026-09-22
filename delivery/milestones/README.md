@@ -4,7 +4,7 @@
 
 尚未确认的拆分必须显式标注 DRAFT，不能作为已批准的实现依据。
 
-当前 M3 规划见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：用户方向已确认，A～E 与八个执行草案已拆分，关键细节待决，未激活实施。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
+当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：用户方向已确认，A～E 与八个执行草案已拆分，实施中——A～E1 有真实证据，C2/E2 因作者侧接口未开放未通过真实验收，E3 未开始；逐阶段状态见该文件第 2.1 节。M3 产品事实源为 [Product M3 内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
 
 Milestone 不替代 Product、Engineering、MASTER PLAN、AI Spec、CHG 或 Evidence。它只回答：用户按什么顺序操作，以及哪些业务结果和真实外部效果必须同时成立，才能认为该 M 的一段闭环完成。
 

@@ -352,15 +352,15 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS` |
+| 状态 | `IN_PROGRESS`（A～E1 有真实证据；C2/E2 未通过真实验收；E3 未开始） |
 | 产品方向 | 用户已明确确认内容挖掘 V2（2026-09-15）；M2 保持 `DONE`。 |
-| 目标 | 三个人工入口与两种自动策略统一入内容池，经人工筛选转为可追踪素材；M3 自动发现由 Cloud Scheduler + Cloud Crawler 执行，不创建 Agent 任务。 |
+| 目标 | 三个人工入口与两种自动策略统一入内容池，经人工筛选或策略规则转为可追踪素材；M3 自动发现由 Cloud Scheduler + Cloud Worker/Crawler 执行，不创建 Agent 任务。 |
 | 依赖 | M2 `DONE`；按阶段解决接口、权限、周期与状态口径。 |
-| 规划状态 | A～E 与八个 CHG 草案已拆分；当前由 CHG-20260916-052 承载纠偏实施，M3-B～E 改为 Cloud Scheduler + Cloud Crawler，不创建 Agent 任务。 |
+| 规划状态 | A～E 与八个 CHG 草案已拆分；当前由 CHG-20260916-052 承载实施，M3-B～E 由 Cloud Scheduler + Cloud Crawler 承担，不创建 Agent 任务。 |
 | 闭环 | `delivery/milestones/M3-content-discovery-v2.md` |
-| 产品/决策 | `docs/product/M3-content-mining-v2.md`；ADR-0013、ADR-0014（团队级隔离已确认）、ADR-0015（Cloud-owned 执行） |
+| 产品/决策 | `docs/product/M3-content-mining-v2.md`；ADR-0013（第 3、7 条已于 2026-09-23 增补）、ADR-0014（团队级隔离已确认）、ADR-0015（Cloud-owned 执行） |
 | Active CHG | CHG-20260916-052 |
-| Evidence | None，规划检查不等于运行验收。 |
+| Evidence | Cloud `docs/superpowers/handoffs/`（2026-09-18、2026-09-21、2026-09-22）与 CHG-052 `checkpoint.md`/`evidence/`；关键词链路经真实凭据取得 `status=success`。C2/E2 无真实外部证据。 |
 | 完成日期 | None |
 | Commit/Tag | None |
 
@@ -386,16 +386,18 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 | M3-E2 | 作者周期任务与真实增量入池 | CHG-20260915-050 |
 | M3-E3 | 综合验收、只读运行视图核验及用户签收 | CHG-20260915-051 |
 
-全部位于 delivery/planned，状态 DISCUSSION；原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。每次最多激活一项。C1/C2 共同完成 C，E1/E2/E3 共同完成 E。
+A、B、C1、D、E1 已实施并有真实证据；C2、E2 因作者侧接口未开放未通过真实验收；E3 仍为 DISCUSSION，其执行草案位于 `delivery/planned`。原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。C1/C2 共同完成 C，E1/E2/E3 共同完成 E。逐阶段状态见 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1 节。
 
-明确不做：自动转素材、视频下载/存储/校验、剪辑、AI 评分、自动生产/发布/互动/数据分析、其他渠道真实采集、工作流引擎、可视化调度器、任意脚本执行、crawl_result、完整历史原始 JSON。
+明确不做：视频下载/存储/校验、剪辑、AI 评分、自动生产/发布/互动/数据分析、其他渠道真实采集、工作流引擎、可视化调度器、任意脚本执行、crawl_result、完整历史原始 JSON。
+
+自动转素材为 M3 范围内正式能力（2026-09-23 用户确认，见 ADR-0013 第 3 条），按 `auto_material` / `material_rule` / 阈值规则生效，不再列入“明确不做”。
 
 退出条件：
 
 - 单/批量链接、关键词和博主搜索均有真实接口到入池证据；未选搜索结果不写正式来源。
 - 两种策略均能真实定时触发，创建带快照的 crawl_task，自动入池；保存配置/任务列表不是完成证据。
 - 策略只定义规则，Cloud Scheduler 负责触发，Cloud Crawler 负责外部执行；同周期防重、同策略串行及重启恢复通过。
-- source_content 三态、crawl_task 四态与部分失败口径均明确，统计/错误和业务事实一致。
+- source_content 三态、crawl_task 五态（含 `partial_success`）与部分失败口径均明确，统计/错误和业务事实一致。
 - 全局唯一、权限隔离、忽略保护、人工转换事务与素材来源可追踪同时成立。
 - 仅预留渠道/策略扩展抽象；运行视图只读且基于真实记录。
 - Cloud Web/Desktop、受控故障、M2 回归及用户最终验收通过后才标 M3 DONE。
