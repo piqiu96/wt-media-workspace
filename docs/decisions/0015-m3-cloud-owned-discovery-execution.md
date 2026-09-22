@@ -16,9 +16,9 @@ M3 的内容挖掘只需要访问公开/已授权的内容数据接口，不涉�
 3. Cloud Scheduler 只扫描到期启用策略并创建 `pending` 的 `crawl_task`，不得在调度调用栈中执行 Crawler。
 4. Cloud Discovery Worker 统一领取 `pending crawl_task`，原子推进为 `running`，调用 Crawler，按统一入池服务写入 `source_content`，最后更新为 `success` 或 `failed`。手动“立即执行”同样只创建任务，不旁路 Worker。
 5. `crawl_task` 是一次策略运行记录，也是 M3 Cloud 内部 Worker 的执行事实；它不是通用 Agent 任务。状态、策略快照、结果和错误均由 Cloud 业务表保存。
-6. 关键词/博主人工搜索复用同一 Cloud Worker/Crawler，结果先保存在 `crawl_task.result_json`，只有用户确认选择后才入池；链接导入和自动策略任务成功结果直接入池。
+6. 关键词/博主人工搜索复用同一 Cloud Worker/Crawler，结果先保存在 `crawl_task.result_json`，只有用户确认选择后才入池；链接导入和自动策略任务成功结果直接入池。（2026-09-23 增补：博主搜索已暂停，本期只有关键词搜索在使用；机制本身不变，恢复时直接复用。）
 7. 渠道通过 `channel_type` 选择适配器；本期仅实现 `douyin`，其他渠道只保留不可执行的扩展位。
-8. M3 默认仍由一个 Cloud 进程承载 API Server、Scheduler 和 Discovery Worker 三个模块；模块以独立 goroutine 和接口隔离，不拆微服务、不引入 MQ。Cloud 仓库同时提供独立 Go CMD 和脚本，便于本地单独触发调度或运行 Worker。
+8. M3 默认仍由一个 Cloud 进程承载 API Server、Scheduler 和 Discovery Worker 三个模块；模块以独立 goroutine 和接口隔离，不拆微服务、不引入 MQ。Cloud 仓库同时提供独立 Go CMD（`cmd/discovery-scheduler`、`cmd/discovery-worker`），便于本地单独运行调度或 Worker。调度与 Worker 的间隔取 `config/scheduler/scheduler.toml`；一次性触发走管理员受控端点 `POST /api/v1/discovery-scheduler/run-due`。（2026-09-23 更正：原 `scripts/run-discovery-*.sh` 已在 Cloud `36a7cfe` 删除，入口以 CMD 为准。）
 
 ## Consequences
 
