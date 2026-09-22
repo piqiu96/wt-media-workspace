@@ -14,7 +14,7 @@ M3 从“内容发现功能开发”调整为“内容挖掘自动化入口建�
 
 1. 三个页面：内容池、挖掘策略、挖掘任务。链接导入、关键词搜索和博主搜索均由内容池进入。（2026-09-23 增补：博主搜索已暂停 —— 本期不交付、不计入 M3 验收，入口、字段与枚举保留，后续版本再评估。）
 2. 链接点击“解析并入池”即为入池意图；解析成功的有效内容进入 source_content。关键词/博主搜索须选择结果才入池。上述行为均不自动创建 material。
-3. 自动挖掘创建或更新 source_content；人工转素材保留 material.source_content_id 唯一关联。策略可配置自动转素材：`auto_material` 开启时，按 `material_rule`（`AND` / `OR`）与各正阈值判定命中并在入池后自动生成 material，未命中项留在内容池等待人工处理。（2026-09-23 增补：本条原为“M3 不提供自动转素材配置”，经用户确认为 M3 范围内正式能力后改写。手工入口本身仍不自动创建 material。）
+3. 自动挖掘创建或更新 source_content；人工转素材保留 material.source_content_id 唯一关联。策略可配置自动转素材：`auto_material` 开启时，按 `material_rule`（`AND` / `OR`）与各正阈值判定命中并在入池后自动生成 material，未命中项留在内容池等待人工处理。（2026-09-23 增补：本条原为“M3 不提供自动转素材配置”，经用户确认为 M3 范围内正式能力后改写。手工入口本身仍不自动创建 material。同日封口条件集合：本期判定条件只有 `auto_material`、`material_rule` 与 `like_threshold` / `favorite_threshold` 两个阈值；新增条件须先有明确产品决策，`material_rule` 的非 `AND`/`OR` 取值必须拒绝。）
 4. 统一 discovery_strategy，通过 strategy_type 区分 keyword / author；保留 crawl_task 表达一次自动挖掘执行。不得按策略类型拆成两套业务模型。（2026-09-23 增补：`author` 已暂停 —— 本期只交付 keyword，`author` 取值保留、字段与共用生命周期约束不变，后续版本再评估。）
 5. 统一 content_channel 抽象并由 channel_type 引用；当前仅实现抖音。预留快手/B站/小红书/热榜等能力接入点，不实现这些渠道，不建设通用插件或工作流引擎。
 6. 策略只存业务规则及关联的触发配置，不自行运行定时器。Cloud Scheduler 负责何时触发，Cloud Crawler 查询外部平台并由 DiscoveryService 写入正式业务事实；M3 不创建 Agent 任务，页面可配置执行周期但不提供可视化调度器。
@@ -37,5 +37,7 @@ M3 从“内容发现功能开发”调整为“内容挖掘自动化入口建�
 2026-09-23：用户确认自动转素材为 M3 范围内正式能力，第 3 条随之改写。同日按实施事实增补第 7 条的 `partial_success`，并关闭任务部分失败的状态映射待决项。第 6 条（Cloud-owned 执行）已由 ADR-0015 收敛为 Scheduler 只入队、Worker 统一领取执行。
 
 2026-09-23（第二次）：用户确认博主搜索与作者策略「现在不做，改成暂停，以后再做」。第 1、4 条随之增补：本期只交付链接导入、关键词搜索与关键词策略；博主搜索入口、`author` 取值、作者字段与枚举全部保留，但移出 M3 验收范围，后续版本再评估。据此 CHG-20260915-047（M3-C2）与 CHG-20260915-050（M3-E2）标记为暂停，不再激活；M3-C 由 C1 完成、M3-E 由 E1 与 E3 完成。
+
+2026-09-23（第三次）：用户重申「挖掘策略根据条件可以自动转素材」。核对实施结果与第 3 条一致（`internal/modules/contentpool/service/discovery.go` 的 `shouldAutoMaterialize` 即按 `material_rule` + 正阈值判定），故本条不改变判定，只把条件集合封口为开关、连接方式与点赞/收藏两个阈值，并在基线 §4 写明「未配置阈值不得解释为全部命中」与「自动转素材失败不得记为成功」。新增条件（发布时间、时长、作者、是否带货等）不属本期范围。
 
 增补依据在 Cloud 仓库：`wt-media-cloud/docs/superpowers/specs/2026-09-21-content-pool-discovery-closure-design.md`（`auto_material` / `material_rule` / 阈值语义）、`wt-media-cloud/docs/superpowers/handoffs/2026-09-21-content-pool-discovery-closure-handoff.md`（真实凭据下的自动转素材实测）、`wt-media-cloud/docs/superpowers/handoffs/2026-09-22-content-pool-discovery-hardening-handoff.md`（`partial_success` 端到端与失败项重试）。
