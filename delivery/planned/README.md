@@ -1,6 +1,6 @@
 # Planned delivery index
 
-更新：2026-09-23。当前 active CHG 为 CHG-20260916-052；本目录其余 DISCUSSION 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler。
+更新：2026-09-23。当前 active CHG 为 CHG-20260916-052；本目录其余 DISCUSSION 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 的分层、依赖方向与配置目录约定已由 ADR-0016 确认。
 
 ## 当前 M3 V2
 
@@ -33,5 +33,6 @@
 
 ## 既有非 M3 记录
 
+- [CHG-20260923-053](CHG-20260923-053/change.md)：Agent 运行时目录、依赖边界与生产运行能力，PLANNED；已由 ADR-0016 确认目标设计，按用户 decision 排在 M3 收尾之后实施，不抢占 active 名额，不作为 M3 前置。不改变任何业务闭环、API contract 语义或已有测试含义。
 - [CHG-20260903-034](CHG-20260903-034/change.md)：账号检查项 7/8 真实样本校准，PLANNED，待授权样本；不重新打开已经验收通过的 M2，不作为 M3 前置。
 - [CHG-20260723-023](CHG-20260723-023/change.md)：既有历史规划文件，位于 planned 但正文保留 IN_PROGRESS 标记；不是当前 active。状态整理不属于本次 M3 拆分范围，保留原文件，不能据此宣布 M2 尚未完成。
