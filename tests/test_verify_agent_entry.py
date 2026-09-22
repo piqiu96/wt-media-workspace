@@ -9,9 +9,9 @@ from pathlib import Path
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify_agent_entry.py"
-GOVERNANCE_SCRIPT = (
-    Path(__file__).resolve().parents[1] / "scripts" / "verify_delivery_governance.py"
-)
+SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+GOVERNANCE_SCRIPT = SCRIPTS_DIR / "verify_delivery_governance.py"
+CONFIG_SCRIPT = SCRIPTS_DIR / "agent_config.py"
 CHANGE_ID = "CHG-20260722-021"
 
 
@@ -44,16 +44,16 @@ class VerifyAgentEntryTests(unittest.TestCase):
         (self.workspace / "config" / "repository-map.yaml").write_text(
             "repositories:\n  cloud:\n    path: ../wt-media-cloud\n", encoding="utf-8"
         )
-        (self.workspace / "config" / "skills-distribution.yaml").write_text(
-            'targets:\n  cloud:\n    path: "../wt-media-cloud"\n', encoding="utf-8"
-        )
+        self.write_distribution('targets:\n  cloud:\n    path: "../wt-media-cloud"\n    groups:\n      - common\n')
+        (self.workspace / "skills" / "common").mkdir(parents=True)
         (self.workspace / "delivery").mkdir()
         self.write_ledger(CHANGE_ID)
         change = self.workspace / "delivery" / "active" / CHANGE_ID / "change.md"
         change.parent.mkdir(parents=True)
         change.write_text(f"# {CHANGE_ID}: Test\n\n- Status: ACTIVE\n", encoding="utf-8")
         (self.workspace / "scripts").mkdir()
-        shutil.copy(GOVERNANCE_SCRIPT, self.workspace / "scripts" / GOVERNANCE_SCRIPT.name)
+        for script in (GOVERNANCE_SCRIPT, CONFIG_SCRIPT):
+            shutil.copy(script, self.workspace / "scripts" / script.name)
 
         self.module = load_module()
         self.module.ROOT = self.workspace
@@ -62,6 +62,11 @@ class VerifyAgentEntryTests(unittest.TestCase):
     def write_context(self, body: str) -> None:
         (self.workspace / ".ai" / "CURRENT_CONTEXT.md").write_text(
             f"# WT Media Current AI Context\n\n{body}", encoding="utf-8"
+        )
+
+    def write_distribution(self, text: str) -> None:
+        (self.workspace / "config" / "skills-distribution.yaml").write_text(
+            text, encoding="utf-8"
         )
 
     def write_ledger(self, change_id: str) -> None:
@@ -127,8 +132,8 @@ class VerifyAgentEntryTests(unittest.TestCase):
         self.assertIn("LEDGER references missing active CHG: CHG-20260722-999", errors)
 
     def test_config_path_disagreement_is_an_error(self) -> None:
-        (self.workspace / "config" / "skills-distribution.yaml").write_text(
-            'targets:\n  cloud:\n    path: "../wt-media-cloud-web"\n', encoding="utf-8"
+        self.write_distribution(
+            'targets:\n  cloud:\n    path: "../wt-media-cloud-web"\n    groups:\n      - common\n'
         )
 
         errors = self.errors()
@@ -140,8 +145,8 @@ class VerifyAgentEntryTests(unittest.TestCase):
         )
 
     def test_config_without_matching_target_is_an_error(self) -> None:
-        (self.workspace / "config" / "skills-distribution.yaml").write_text(
-            "targets:\n  workspace:\n    path: '.'\n", encoding="utf-8"
+        self.write_distribution(
+            'targets:\n  workspace:\n    path: ".."\n    groups:\n      - common\n'
         )
 
         errors = self.errors()
@@ -150,6 +155,74 @@ class VerifyAgentEntryTests(unittest.TestCase):
             "repository 'cloud' is missing from config/skills-distribution.yaml targets",
             errors,
         )
+
+    def test_repository_kind_target_missing_from_map_is_an_error(self) -> None:
+        self.write_distribution(
+            "targets:\n"
+            "  cloud:\n"
+            '    path: "../wt-media-cloud"\n'
+            "    groups:\n"
+            "      - common\n"
+            "  cloud-web:\n"
+            '    path: "../wt-media-cloud-web"\n'
+            "    groups:\n"
+            "      - common\n"
+        )
+
+        errors = self.errors()
+
+        self.assertIn(
+            "target 'cloud-web' is kind: repository but is missing from "
+            "config/repository-map.yaml",
+            errors,
+        )
+
+    def test_distribution_kind_target_is_exempt_from_the_repository_map(self) -> None:
+        self.write_distribution(
+            "targets:\n"
+            '  root:\n'
+            '    path: ".."\n'
+            "    kind: distribution\n"
+            "    groups:\n"
+            "      - common\n"
+            "  cloud:\n"
+            '    path: "../wt-media-cloud"\n'
+            "    groups:\n"
+            "      - common\n"
+        )
+
+        errors = self.errors()
+
+        self.assertEqual([error for error in errors if "root" in error], [])
+
+    def test_unclaimed_skill_group_is_an_error(self) -> None:
+        (self.workspace / "skills" / "desktop").mkdir()
+
+        errors = self.errors()
+
+        self.assertIn(
+            "skill group 'skills/desktop' is not claimed by any distribution target",
+            errors,
+        )
+
+    def test_target_claiming_a_missing_group_is_an_error(self) -> None:
+        self.write_distribution(
+            'targets:\n  cloud:\n    path: "../wt-media-cloud"\n    groups:\n      - desktop\n'
+        )
+
+        errors = self.errors()
+
+        self.assertIn(
+            "distribution targets claim a missing skill group: skills/desktop", errors
+        )
+
+    def test_malformed_config_is_reported_as_an_error(self) -> None:
+        self.write_distribution('targets:\n  cloud: ["../wt-media-cloud"]\n')
+
+        errors = self.errors()
+
+        self.assertEqual(len(errors), 1)
+        self.assertIn("skills-distribution.yaml:2:", errors[0])
 
     def test_forbidden_path_described_in_claude_md_is_warned(self) -> None:
         (self.cloud / "AGENTS.md").write_text(
@@ -188,21 +261,12 @@ class VerifyAgentEntryTests(unittest.TestCase):
             "cloud: no AGENT-INDEX.md (AGENT-INDEX.md Layer 3 is unresolved)", warnings
         )
 
-    def test_parse_path_map_handles_quoted_and_bare_paths(self) -> None:
-        text = (
-            "schema_version: 1\n"
-            "\n"
-            "targets:\n"
-            "  root:\n"
-            '    path: ".."\n'
-            "    commit_generated: false\n"
-            "  cloud:\n"
-            "    path: ../wt-media-cloud\n"
-        )
+    def test_config_reader_is_loaded_from_the_workspace_tree(self) -> None:
+        """The reader must come from the tree under test, not the caller's path."""
+        config = self.module.load_agent_config()
 
         self.assertEqual(
-            self.module.parse_path_map(text, "targets"),
-            {"root": "..", "cloud": "../wt-media-cloud"},
+            Path(config.__file__), self.workspace / "scripts" / "agent_config.py"
         )
 
 

@@ -1,7 +1,33 @@
 schema_version: 1
 skills_revision: "2026.07.14.bootstrap"
 
+# This file is the single declaration of where skill copies are distributed.
+# `scripts/sync_skills.py` reads it and nothing else; it must not hardcode
+# targets again.
+#
+# Each target is a distribution location:
+#   path:   the directory, relative to the workspace repository's parent.
+#           `..` is the execution root itself.
+#   groups: the `skills/<group>` directories to copy from.
+#   kind:   `repository` (default) or `distribution`.
+#           `repository` targets must also appear in repository-map.yaml and are
+#           checked against it by `scripts/verify_agent_entry.py`.
+#           `distribution` targets are locations that are not repositories.
+#
+# Every group in `skills/` must be claimed by at least one target, so a new
+# skill group cannot be added without deciding who receives it.
+
 targets:
+  root:
+    path: ".."
+    kind: distribution
+    commit_generated: false
+    groups:
+      - common
+      - workspace
+      - cloud
+      - agent
+      - desktop
   cloud:
     path: "../wt-media-cloud"
     commit_generated: true

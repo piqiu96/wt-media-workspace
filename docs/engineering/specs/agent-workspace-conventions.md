@@ -69,9 +69,27 @@
 
 ## 7. 配置一致性
 
-`config/repository-map.yaml` 与 `config/skills-distribution.yaml` 重复声明同一批仓库 path，两者必须一致，由 `scripts/verify_agent_entry.py` 强制。
+`scripts/sync_skills.py` 的**唯一**分发依据是 `config/skills-distribution.yaml`，代码中不再保留目标清单副本。目标的四个字段：
 
-`scripts/sync_skills.py` 的 `TARGETS` 仍是第三份硬编码，尚未改为读取 `skills-distribution.yaml`。在校验覆盖范围内，但重构它属于独立工作。
+| 字段 | 含义 |
+|---|---|
+| `path` | 目标目录，相对 workspace 仓库的父目录；`..` 即执行根自身 |
+| `groups` | 从 `skills/<group>` 复制哪些 skill |
+| `kind` | `repository`（默认）或 `distribution` |
+| `commit_generated` | 生成副本是否随该仓提交 |
+
+`kind: repository` 的目标必须同时出现在 `config/repository-map.yaml`；`kind: distribution` 用于非仓库的落点（当前只有 `root`，即执行根——从跨仓工作区启动的 Harness 靠它发现 skill）。
+
+`scripts/verify_agent_entry.py` 强制以下四条，任一不成立即 ERROR：
+
+1. `repository-map.yaml` 的每个仓库都在分发目标中，且 path 完全一致（`../wt-media-cloud` 与 `../wt-media-cloud`）；
+2. 每个 `kind: repository` 的目标都在 `repository-map.yaml` 中——**反方向检查**。此前只有正方向，导致 yaml 里多出的目标永远不会被发现；
+3. `skills/` 下每个分组都至少被一个目标认领。**否则新增的分组会静默地永不分发**：sync 只遍历配置里列出的内容，会照常报成功；
+4. 每个被认领的分组都真实存在。
+
+配置由 `scripts/agent_config.py` 读取（纯标准库，无 PyYAML）。它是**被校验对象之外的独立模块**：校验脚本不得 import 它所校验的工具，否则工具一坏校验也跑不了。该读取器拒绝任何它不理解的写法（行内集合、重复键、Tab 缩进、畸形缩进）并抛出 `ConfigError`，因为此处误读会静默改变哪些仓库收到 skill。
+
+生成副本共 5 处落点：执行根、三个工程仓、以及 **workspace 仓库自身**（`wt-media-workspace/.claude/skills`、`.codex/skills`）。workspace 那份是必要的：Agent 以 workspace 为 cwd 启动时只能从该 cwd 的 `.claude/skills` 发现 skill，父层那份不会被加载。这 5 处副本都随各自仓库提交（`commit_generated: true`），执行根不是 git 仓库，其副本无法提交。
 
 ## 8. 初始化脚本语义
 
@@ -90,9 +108,11 @@
 | 规则 | 落点 | 耦合的实现 | 同步要求 |
 |---|---|---|---|
 | 快照唯一源 | `.ai/CURRENT_CONTEXT.md` | `prepare_ai_workspace.py::write_current_context`、`verify_delivery_governance.py::current_context_path`、`sync_skills.py::execution_root`（根目录探测）、`skills/workspace/executing-wt-media-change/SKILL.md`、`skills/workspace/planning-wt-media-delivery/SKILL.md`、`tests/test_prepare_ai_workspace.py`、`tests/test_verify_delivery_governance.py` | 改位置必须同步改这 7 处；`verify_agent_entry.py` 的单快照检查兜住回归 |
-| 仓库路径 | `config/repository-map.yaml` | `init-agent-entry.sh::map_path`、`sync_skills.py::TARGETS`、`skills-distribution.yaml` | `verify_agent_entry.py` 强制前两者一致 |
+| 仓库路径 | `config/repository-map.yaml` | `init-agent-entry.sh::map_path`、`agent_config.py::read_section` | `verify_agent_entry.py` 双向强制与 `skills-distribution.yaml` 一致 |
+| 分发目标 | `config/skills-distribution.yaml` | `sync_skills.py::load_targets`（唯一消费方）、`verify_agent_entry.py::check_config_agreement` | 改目标只改 yaml；代码里不得再出现目标清单 |
+| 配置文件语法 | `scripts/agent_config.py` | `sync_skills.py`、`verify_agent_entry.py` 均 import 它 | 语法放宽必须同时改 `tests/test_agent_config.py` |
 | 入口文件平级 | 各仓 `AGENTS.md` / `CLAUDE.md` | 无强制 | `verify_agent_entry.py` 的漂移检查产出 WARN 供人工复核 |
-| skill 单一源 | `skills/<group>/<name>/SKILL.md` | `sync_skills.py` 分发到 `skills-distribution.yaml` 的 targets | `sync_skills.py check` / `diff` |
+| skill 单一源 | `skills/<group>/<name>/SKILL.md` | `sync_skills.py` 分发到 `skills-distribution.yaml` 的 targets | `sync_skills.py check` / `diff`；分组认领由 `verify_agent_entry.py::check_group_coverage` 兜住 |
 | 快照由脚本生成 | `prepare_ai_workspace.py` | `planning-wt-media-delivery` skill 第 7 步 | 两者措辞需同时更新 |
 
 ## 10. 校验与已知红项

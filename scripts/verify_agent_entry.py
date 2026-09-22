@@ -55,28 +55,16 @@ def load_governance_module():
     return module
 
 
-def parse_path_map(text: str, section: str) -> dict[str, str]:
-    """Collect `name:` -> `path:` pairs from a two-level YAML section."""
-    result: dict[str, str] = {}
-    current: str | None = None
-    in_section = False
-    for raw_line in text.splitlines():
-        line = raw_line.split("#", 1)[0].rstrip()
-        if not line.strip():
-            continue
-        if not line.startswith(" "):
-            in_section = line.strip() == f"{section}:"
-            current = None
-            continue
-        if not in_section:
-            continue
-        stripped = line.strip()
-        indent = len(line) - len(line.lstrip())
-        if indent == 2 and stripped.endswith(":"):
-            current = stripped.removesuffix(":").strip().strip('"')
-        elif indent == 4 and current and stripped.startswith("path:"):
-            result[current] = stripped.split(":", 1)[1].strip().strip('"')
-    return result
+def load_agent_config():
+    """Load the shared configuration reader."""
+    path = ROOT / "scripts" / "agent_config.py"
+    spec = importlib.util.spec_from_file_location("agent_config", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load agent_config.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 def check_entry_files() -> list[str]:
@@ -148,41 +136,97 @@ def check_delivery_pointers() -> list[str]:
 
 
 def check_config_agreement() -> tuple[list[str], list[str], dict[str, str]]:
-    """repository-map and skills-distribution must agree on repository paths."""
+    """The two configuration files and `skills/` must agree.
+
+    Agreement is required in both directions. A repository missing from the
+    distribution targets would silently never receive its skills, and a target
+    missing from the repository map cannot be recognised as a repository at all
+    unless it declares itself a distribution location.
+    """
     errors: list[str] = []
     warnings: list[str] = []
+    config = load_agent_config()
     repository_map = ROOT / REPOSITORY_MAP_RELATIVE
     skills_distribution = ROOT / SKILLS_DISTRIBUTION_RELATIVE
-    if not repository_map.is_file() or not skills_distribution.is_file():
-        errors.append(
-            f"missing {REPOSITORY_MAP_RELATIVE.as_posix()} "
-            f"or {SKILLS_DISTRIBUTION_RELATIVE.as_posix()}"
-        )
-        return errors, warnings, {}
+    try:
+        repositories = config.read_section(repository_map, "repositories")
+        targets = config.read_section(skills_distribution, "targets")
+    except config.ConfigError as error:
+        return [str(error)], warnings, {}
 
-    repository_paths = parse_path_map(
-        repository_map.read_text(encoding="utf-8"), "repositories"
-    )
-    target_paths = parse_path_map(
-        skills_distribution.read_text(encoding="utf-8"), "targets"
-    )
+    repository_paths: dict[str, str] = {}
+    for name, settings in sorted(repositories.items()):
+        path = settings.get("path")
+        if not isinstance(path, str):
+            errors.append(
+                f"repository '{name}' declares no path in "
+                f"{REPOSITORY_MAP_RELATIVE.as_posix()}"
+            )
+            continue
+        repository_paths[name] = path
     if not repository_paths:
         errors.append("config/repository-map.yaml declares no repositories")
 
     for name, path in sorted(repository_paths.items()):
-        other = target_paths.get(name)
-        if other is None:
+        target = targets.get(name)
+        if target is None:
             errors.append(
                 f"repository '{name}' is missing from config/skills-distribution.yaml targets"
             )
-        elif other != path:
+        elif target.get("path") != path:
             errors.append(
                 f"repository '{name}' path disagrees: "
-                f"repository-map '{path}' != skills-distribution '{other}'"
+                f"repository-map '{path}' != skills-distribution '{target.get('path')}'"
             )
         if not (ROOT / path).is_dir():
             warnings.append(f"repository '{name}' path does not resolve here: {path}")
+
+    for name, settings in sorted(targets.items()):
+        kind = settings.get("kind", "repository")
+        if kind not in {"repository", "distribution"}:
+            errors.append(
+                f"target '{name}' has unknown kind '{kind}' in "
+                f"{SKILLS_DISTRIBUTION_RELATIVE.as_posix()}"
+            )
+        elif kind == "repository" and name not in repository_paths:
+            errors.append(
+                f"target '{name}' is kind: repository but is missing from "
+                f"{REPOSITORY_MAP_RELATIVE.as_posix()}"
+            )
+
+    errors.extend(check_group_coverage(targets))
     return errors, warnings, repository_paths
+
+
+def check_group_coverage(targets: dict[str, dict[str, object]]) -> list[str]:
+    """Every `skills/<group>` must be claimed, and every claim must exist.
+
+    A group that no target claims produces skills that are never distributed,
+    which is invisible: sync reports success because it only walks what the
+    configuration lists.
+    """
+    errors: list[str] = []
+    skills_root = ROOT / "skills"
+    available = (
+        {entry.name for entry in skills_root.iterdir() if entry.is_dir()}
+        if skills_root.is_dir()
+        else set()
+    )
+    claimed: set[str] = set()
+    for name, settings in sorted(targets.items()):
+        groups = settings.get("groups")
+        if groups is None:
+            errors.append(f"target '{name}' declares no groups")
+            continue
+        if not isinstance(groups, list):
+            errors.append(f"target '{name}' has a malformed groups list")
+            continue
+        claimed |= {str(group) for group in groups}
+    for group in sorted(available - claimed):
+        errors.append(f"skill group 'skills/{group}' is not claimed by any distribution target")
+    for group in sorted(claimed - available):
+        errors.append(f"distribution targets claim a missing skill group: skills/{group}")
+    return errors
 
 
 def path_tokens(line: str) -> set[str]:

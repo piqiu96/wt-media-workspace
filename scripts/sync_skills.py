@@ -1,19 +1,39 @@
 #!/usr/bin/env python3
 """Sync WT Media skill source files into generated tool directories.
 
-The implementation is deliberately conservative: unknown files in generated
-directories stop sync instead of being overwritten.
+The distribution targets are declared in `config/skills-distribution.yaml` and
+read from there; this script holds no copy of that list. The implementation is
+deliberately conservative: unknown files in generated directories stop sync
+instead of being overwritten.
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CONFIG_PATH = ROOT / "config" / "skills-distribution.yaml"
+SKILLS_ROOT = ROOT / "skills"
+
+
+def load_sibling(name: str):
+    """Load a sibling script by file path, since scripts are not a package."""
+    path = Path(__file__).resolve().parent / f"{name}.py"
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"could not load {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+agent_config = load_sibling("agent_config")
 
 
 def execution_root(workspace: Path) -> Path:
@@ -33,8 +53,6 @@ def execution_root(workspace: Path) -> Path:
 
 
 WORKSPACE_ROOT = execution_root(ROOT)
-SKILLS_ROOT = ROOT / "skills"
-TOOLS = ("codex", "claude")
 
 
 @dataclass(frozen=True)
@@ -42,14 +60,61 @@ class Target:
     name: str
     path: Path
     groups: tuple[str, ...]
+    kind: str = "repository"
 
 
-TARGETS = {
-    "root": Target("root", WORKSPACE_ROOT, ("common", "workspace", "cloud", "agent", "desktop")),
-    "cloud": Target("cloud", WORKSPACE_ROOT / "wt-media-cloud", ("common", "cloud")),
-    "agent": Target("agent", WORKSPACE_ROOT / "wt-media-agent", ("common", "agent")),
-    "desktop": Target("desktop", WORKSPACE_ROOT / "wt-media-desktop", ("common", "desktop")),
-}
+def resolve_target_path(declared: str, workspace_root: Path) -> Path:
+    """Resolve a declared target path to an absolute directory.
+
+    A declared path is written relative to the workspace repository's parent, so
+    `../wt-media-cloud` names the sibling repository and `..` names the
+    execution root itself. The path is re-anchored to the execution root rather
+    than joined literally, because a linked worktree sits in a different
+    directory than the repository it checks out: joining `../x` to the worktree
+    directory would leave the cross-repo workspace entirely.
+    """
+    declared_path = Path(declared)
+    if declared_path.is_absolute():
+        raise agent_config.ConfigError(
+            f"target path must be relative to the execution root: {declared}"
+        )
+    parts = [part for part in declared_path.parts if part != ".."]
+    if not parts:
+        return workspace_root
+    return workspace_root.joinpath(*parts)
+
+
+def load_targets(
+    config_path: Path, workspace_root: Path
+) -> tuple[dict[str, Target], tuple[str, ...]]:
+    """Build the distribution targets and tools from the configuration file."""
+    targets: dict[str, Target] = {}
+    for name, settings in agent_config.read_section(config_path, "targets").items():
+        declared = settings.get("path")
+        groups = settings.get("groups")
+        kind = settings.get("kind", "repository")
+        if not isinstance(declared, str):
+            raise agent_config.ConfigError(f"{config_path}: target '{name}' has no path")
+        if not isinstance(groups, list) or not groups:
+            raise agent_config.ConfigError(
+                f"{config_path}: target '{name}' declares no groups"
+            )
+        if kind not in {"repository", "distribution"}:
+            raise agent_config.ConfigError(
+                f"{config_path}: target '{name}' has unknown kind: {kind}"
+            )
+        targets[name] = Target(
+            name=name,
+            path=resolve_target_path(declared, workspace_root),
+            groups=tuple(str(group) for group in groups),
+            kind=str(kind),
+        )
+    if not targets:
+        raise agent_config.ConfigError(f"{config_path}: no targets declared")
+    return targets, tuple(agent_config.read_sequence(config_path, "tools"))
+
+
+TARGETS, TOOLS = load_targets(CONFIG_PATH, WORKSPACE_ROOT)
 
 
 def skill_sources(groups: tuple[str, ...]) -> dict[str, Path]:
@@ -144,6 +209,20 @@ def selected_targets(name: str | None) -> list[Target]:
     return list(TARGETS.values())
 
 
+def unresolved_targets(targets: list[Target]) -> list[str]:
+    """Report targets whose directory does not exist.
+
+    Writing would otherwise create a tool directory inside a repository that is
+    not checked out here, which is how a stale list of targets silently produces
+    skill copies nothing can load.
+    """
+    return [
+        f"{target.name}: target directory does not exist: {target.path}"
+        for target in targets
+        if not target.path.is_dir()
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["check", "diff", "sync"])
@@ -153,6 +232,12 @@ def main() -> int:
 
     tools = (args.tool,) if args.tool else TOOLS
     targets = selected_targets(args.repo)
+
+    missing = unresolved_targets(targets)
+    if missing:
+        for line in missing:
+            print(line, file=sys.stderr)
+        return 1
 
     if args.command in {"check", "diff"}:
         errors: list[str] = []

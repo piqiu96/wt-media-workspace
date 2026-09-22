@@ -55,10 +55,12 @@ wt-media-workspace/
 ├── config/
 │   ├── contract-map.yaml           # 机器可读协议归属和消费关系
 │   ├── release-matrix.yaml         # 已验证版本组合
-│   ├── skills-distribution.yaml    # skill 分发目标
+│   ├── skills-distribution.yaml    # skill 分发目标唯一声明
 │   └── repository-map.yaml         # 关联工程路径唯一来源
 ├── skills/
 ├── scripts/
+├── .claude/skills/                 # 自动生成并提交 Git
+├── .codex/skills/                  # 自动生成并提交 Git
 ├── templates/
 │   └── delivery/                   # CHG 与 evidence 记录模板
 ├── AGENT-INDEX.md                  # 跨仓库路由与渐进式加载规则
