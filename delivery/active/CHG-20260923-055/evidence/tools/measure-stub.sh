@@ -86,6 +86,16 @@ for line in sys.stdin:
     tp = d.get("row0Cells") or []
     print("  各 td 宽:", [x["w"] for x in tp])
     print("  行高:", d.get("rows"))
+    # 竖排计数块：定列宽用。列宽下界 = 最宽项 need + 左右内边距。
+    ms = d.get("metricSamples") or []
+    if ms:
+        mf = d.get("metricFont") or {}
+        mc = d.get("metricCell") or {}
+        print("  计数块字体: 标签 %s / 数值 %s, gap=%s" % (mf.get("label"), mf.get("value"), mf.get("gap")))
+        for s in ms:
+            print("    %-6s %-10s 标签%3s + 数值%3s = %3s" % (s["label"], s["value"], s["labelW"], s["valueW"], s["need"]))
+        print("  最宽项 need =", max(s["need"] for s in ms))
+        print("  当前所在 td: w=%s padding=%s/%s listW=%s" % (mc.get("w"), mc.get("padLeft"), mc.get("padRight"), mc.get("listW")))
 '
 echo "---- 日志：$LOG ----"
 exit $rc

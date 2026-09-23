@@ -202,6 +202,63 @@ WALK_JS = """
           contentRect: rect(content)
         };
       }
+      // 竖排计数块（MetricList）：量「一行一项」在真实字体下需要多宽，用来定列宽。
+      // 竖排后列宽由**最宽的那一项**决定，所以量的是单项自然宽，不是整块。
+      // 标签与数值的字重不同，必须分开量再相加，不能拿一个字符串糊过去。
+      var mlItem = document.querySelector('.metric-list__item');
+      if (mlItem) {
+        var labEl = mlItem.querySelector('.metric-list__label');
+        var valEl = mlItem.querySelector('.metric-list__value');
+        var mlCs = getComputedStyle(mlItem);
+        var gap = parseFloat(mlCs.columnGap || mlCs.gap || '0') || 0;
+        var probeEl = document.createElement('div');
+        probeEl.style.cssText = 'position:absolute;left:-99999px;top:0;white-space:nowrap;visibility:hidden';
+        document.body.appendChild(probeEl);
+        function copyFont(from, to) {
+          var cs = getComputedStyle(from);
+          to.style.fontFamily = cs.fontFamily;
+          to.style.fontSize = cs.fontSize;
+          to.style.fontWeight = cs.fontWeight;
+          to.style.fontStyle = cs.fontStyle;
+          to.style.fontVariantNumeric = cs.fontVariantNumeric;
+          to.style.letterSpacing = cs.letterSpacing;
+        }
+        // 覆盖三张表的全部标签，数值取「最坏情况」（千万级带千分位）。
+        var SAMPLES = [
+          ['浏览', '9,999,999'], ['赞', '9,999,999'], ['藏', '9,999,999'],
+          ['发现', '9,999,999'], ['新增', '9,999,999'], ['自动素材', '9,999,999'],
+          ['待审核', '9,999,999'], ['失败', '9,999,999'], ['自动', '9,999,999']
+        ];
+        out.metricSamples = SAMPLES.map(function (s) {
+          probeEl.innerHTML = '';
+          var a = document.createElement('span'); a.textContent = s[0]; copyFont(labEl, a);
+          var b = document.createElement('strong'); b.textContent = s[1]; copyFont(valEl, b);
+          probeEl.appendChild(a); probeEl.appendChild(b);
+          return {
+            label: s[0], value: s[1],
+            labelW: Math.ceil(rect(a).width), valueW: Math.ceil(rect(b).width),
+            need: Math.ceil(rect(a).width + gap + rect(b).width)
+          };
+        });
+        out.metricFont = {
+          label: getComputedStyle(labEl).fontSize + '/' + getComputedStyle(labEl).fontWeight,
+          value: getComputedStyle(valEl).fontSize + '/' + getComputedStyle(valEl).fontWeight,
+          gap: gap
+        };
+        probeEl.remove();
+        // 承载计数块的那个 td：列宽下界 = 最宽项 + 左右内边距
+        var mlTd = null;
+        Array.prototype.some.call(trs[0] ? trs[0].querySelectorAll('td') : [], function (td) {
+          if (td.querySelector('.metric-list')) { mlTd = td; return true; }
+          return false;
+        });
+        out.metricCell = mlTd ? {
+          w: rect(mlTd).width,
+          padLeft: getComputedStyle(mlTd).paddingLeft,
+          padRight: getComputedStyle(mlTd).paddingRight,
+          listW: rect(mlTd.querySelector('.metric-list')).width
+        } : null;
+      }
       out.ok = true;
     } catch (e) {
       out.ok = false;
