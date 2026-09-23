@@ -75,6 +75,7 @@
 | D-06 | T-02 实测得 22 条跨层边，其中**仅两条**越过 ADR-0016 的层级下降序，二者均照此执行并需进 T-05 白名单：①`runtime/environment.py → clients.bitbrowser`（§1 称 runtime 不引用业务层，§4 却把环境探测指派给该模块；它必须区分 `BitBrowserIdentityError` → `identity_unverifiable` 与 `BitBrowserError` → `unreachable`，此行为有测试覆盖。取 §4，并把白名单**收窄到单文件粒度**，不放开整条 `runtime → clients`）；②`clients/bilibili/identity.py → services.browser`（§1 将 `{clients, services, storage}` 列为无序集合，§3 明禁边只有 `clients→executors`、`services→executors`、`utils→业务层`，同级边被允许） | CONFIRMED（2026-09-23，T-02 执行时依 ADR-0016 判定，计划已载明；证据 `task-02-structure-migration.md` §4） |
 | D-07 | Agent 配置中的凭据通路**收窄为仅环境变量**：`config/agent.toml` 与 `config_online/agent.toml` 里出现的任何敏感键（token/password/secret/cookie 等）一律被加载器忽略，并按**键名**告警（绝不输出值）；`runtime_token` 只能来自 `WT_MEDIA_AGENT_RUNTIME_TOKEN`。依据是用户批准的程序总纲 §4「敏感与临时运行上下文不混进部署配置」，与 ADR-0016 §7（允许凭据放在仓库配置中）取**更严**者，**ADR-0016 本身不改**。后果：`config_online/` 的「整目录替换」分发机制不承载凭据，CHG-D(059) 的发布校验不得依赖该通路；`config/README.md` 与 `config_online/README.md` 已声明此收窄 | CONFIRMED（2026-09-23 用户批准的程序总纲 §4；T-03 落地，证据 `task-03-runtime-config.md` §9） |
 | D-08 | T-05 把 D-06 的例外落成机器规则时发现**第三条**越序边：`local_api/server.py → bootstrap.app`（T-04 引入，`server.main` 需要装配组件）。ADR-0016 §1 把 `local_api/` 与 `runner` 并列为平行层，§2 又称 `bootstrap/` 是唯一生产初始化入口——照 §2 取；且这条例外**只对 `local_api/server.py` 这一个文件**成立，不放开整条 `local_api → bootstrap`。与 D-06 同法：白名单收窄到单文件，机器规则的例外收窄测试证明「把例外放宽到整层会被抓住」。**ADR-0016 零修订**，此为实现对既有条款的一处单文件收敛 | CONFIRMED（2026-09-23，T-05 执行时依 ADR-0016 §2 判定；证据 `task-05-boundary-tests.md` §3） |
+| D-09 | Desktop 的 `RELEASE_FAILED`（「释放账号检查本机授权失败」，`preflight.rs:80`）在 **Cookie 读取**流程里也报「账号检查」。这是它**一直**的说法：T-06 合并两处重复 preflight 时实测两条流程各自内联的这行文案**本来就相同**，故合并后保持逐字不变，由 `release_text_still_names_the_account_check_flow` 钉住现状。改成按流程取名（`释放{noun}本机授权失败`）是一词之改，但**刻意不塞进一个承诺「无用户可见文案变更」的 commit**——用户可见文案的变更应单独可见、单独可回滚。登记为待决，不在本 CHG 修 | CONFIRMED（2026-09-24，T-06 执行时实测；证据 `task-06-desktop-split.md` §9.3） |
 
 ## 7. Pending Questions
 
@@ -91,8 +92,8 @@
 | T-03 | Agent runtime/config + paths（吸收 053 Task 5）：强类型 AgentConfig（env>file>default，TOML/`tomllib`，测试目录接缝）；`configs/`→`config/` + `config_online/` 同构镜像；RuntimePaths 三态；统一 `WT_MEDIA_LOG_LEVEL`；删除 config.py/log_setup.py 死代码与目录双实现 | DONE | config loader 测试（默认/文件/env/非法/凭据忽略）全绿；运行时代码零处引用 `config_online`（打包校验除外） |
 | T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | DONE | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试 |
 | T-05 | Agent AST 边界测试（ADR-0016 第 3 条机器校验，含 `test_patch_targets.py`）+ 平台 URL 常量化 | DONE | R1–R10 全绿且每条有控制组证明「能红」（规则放在任务前的树上实跑转红并点名六处）；patch 目标可解析且在别名重构下转红；`executors/`+`local_api/` 无内联 URL 字面量（grep 0 命中 / 对照树 2 命中） |
-| T-06 | Desktop 拆分 main.rs：bootstrap/config/paths/state/commands/agent.rs；17 命令原样迁移；account_check/cookie_read 重复 preflight 提取共用；HttpClient 超时；端口进配置 | TODO | `cargo test` 全绿；`cargo build` 通过 |
-| T-07 | Desktop Cloud 地址链路 + sidecar 传参：`get_public_config` command；`resources/desktop.production.toml`；`local_agent_start` 传环境变量；生产模式忽略地址类 env 覆盖 | TODO | config loader 单测（默认/文件/env/非法/生产忽略） |
+| T-06 | Desktop 拆分 main.rs：config/paths/state/commands；17 命令原样迁移；account_check/cookie_read 重复 preflight 提取共用 | DONE | `cargo test` 全绿（42 passed）；`cargo build` 通过；`main.rs` 1570 → 89 行；`generate_handler!` 17/17 逐字同序；9 条既有测试逐字不变、17 命令的 7 处改动逐条归因 |
+| T-07 | Desktop Cloud 地址链路 + sidecar 传参 + 配置接线：`bootstrap.rs`（把已就位的 `config.rs`/`paths.rs` 接到 `main`）；移除 `Client::new()` 的无超时与 `main.rs:1534` 的 `8765`；CSP 改运行时注入；`uuid` per-launch token；sidecar 两条 path 同一组环境变量；`get_public_config` command（含 `dto/config.rs`、`commands/public_config.rs`）；生产模式忽略整个 `WT_MEDIA_DESKTOP_*` 命名空间 | TODO | config loader 单测（默认/文件/env/非法/生产忽略）；T-06 遗留的 23 条「从未使用」告警（`config.rs` 16 + `paths.rs` 7）归零 |
 | T-08 | Cloud Web 两文件：init.js cloudBaseUrl 改 invoke（带回退）；LocalLogsPage healthz 改走 command | TODO | desktop 前端既有测试全绿 |
 | T-09 | 联调回归 + 证据落盘：dev 模式跑通 sidecar 启动（传参生效、鉴权生效）、bind/account_check/cookie_read/profile 链路、`/healthz` curl、Agent 独立启动 | TODO | evidence/ 各项记录 PASS |
 | T-10 | 模块分工回写 + 收尾：三仓 AGENT-INDEX/DIRECTORY_MAP、workspace 基线核对、LEDGER/CURRENT_CONTEXT 同步、DONE Gate | TODO | `verify_agent_entry.py`+`verify_delivery_governance.py` 通过 |
@@ -147,6 +148,7 @@ Evidence files live in `evidence/`，按 Task 编号记录事实。
 - `evidence/task-03-runtime-config.md`：T-03 配置/路径取证——10 个 commit 的逐 commit 测试矩阵（107→172，单调不减）、`log_setup.py → runtime/logging.py` 的 blob 级纯移动证明（`R100`）、冻结导入 sha256 与 T-02 同值、`src/` 环境变量读取点归零（带阳性对照）、19/19 变异对照（并**作废**本会话早先因变异脚本未分发而不可采信的一组记录）、`factory` 零覆盖缺口的补测、取证中发现的既有连接泄漏（`ResourceWarning` 20→0）与修复、唯一行为变更的记录、以及**已枚举的未覆盖面**。
 - `evidence/task-04-bootstrap-injection.md`：T-04 bootstrap/注入取证——4 个 commit 的逐 commit 测试矩阵（184→204，单调不减；「移动文件」与「改逻辑」分列两个 commit）、冻结导入 sha256 与 T-02/T-03 同值、7/7 变异对照（其中 2 条初跑**不可判别**，各暴露一个真实测试缺口：`_as_bool` 的假值拼写与 `agent_id` 的**空断言**，补测后全部可判别）、AC-09 三模式真实进程输出（cloud 只报告 / local 连到真实 BitBrowser 40 个 profile / sidecar 401-401-200 token 矩阵且 token 不入 `ps`）、冻结入口脚本 ×3、静态扫描含阳性对照、PyInstaller 产物 PYZ 模块集 28→53（`runner`/`executors` 首次进包）、以及**已枚举的未覆盖面**（`bootstrap/local.py` 无单测、打包产物未重签时无法启动这一既存问题归 CHG-D(059)）。
 - `evidence/task-05-boundary-tests.md`：T-05 AST 边界取证——3 个 commit 的逐 commit 测试矩阵（214→249，单调不减）、冻结导入 sha256 与 T-02/T-03/T-04 同值、**规则在任务之前的树上实跑转红**并逐行点名 `a4a43cc` 修掉的六处（R5 两处 `_post` + R9 四处 URL 字面量）、6/6 变异对照（含两处**我自己的脚本缺陷**已修正并披露）、`/tmp/t05patch.py` 的别名重构把 `test_patch_targets.py` 与**既有的** `test_proxy_check.py` 同时转红、AC-02 的 grep 双证据（HEAD 0 命中 / 对照树 2 命中，各带分母）与死 import 扫描的阳性对照、以及 **§9.1 逐条枚举的未覆盖面**（R10 只到层对、`from pkg import mod` 的保守、运行期拼装 URL、`patch.object/dict` 不解析、`clients/` 内硬编码值）。
+- `evidence/task-06-desktop-split.md`：T-06 Desktop 拆分取证——11 个 commit 的逐 commit 测试矩阵（11→42，单调不减，且逐段能对上：+10 config、+8 preflight、−2 删死代码、+6 drain、+7 paths、+2 exit_report）、`main.rs` 1570→89 行（AC-04）、`generate_handler!` 17/17 逐字同序、**逐函数**的搬家核对（9 条既有测试 IDENTICAL / 10 条 BODY-SAME-SIG / 7 条 BODY-CHANGED 逐条归因）、CJK 字面量普查（99 条中 93 条逐字存在，6 条为模板分解，渲染由 16 行 `message_parity` 表钉住）、四份变异矩阵（config 12/12、drain 8/8、paths 7/7、exit_report 4/4）、**变异脚本自身错了五次**的完整披露、死代码删除带来的覆盖缺口（空票据守卫现在无覆盖）、Node 工具链的仓库级发现（CI 在任何分支上都不可能通过），以及 **§9.4 逐条枚举的未覆盖面**。
 
 ## 12. Current Checkpoint
 
@@ -187,14 +189,24 @@ Completed:
   `a4a43cc` 修掉的那六处。测试 214 → 249。侧记：`local_api/server.py → bootstrap.app`
   是本期发现的**第三条**越序边，按 D-08 以单文件粒度收窄（不放开整层）。
 
+- T-06 Desktop 拆分 `main.rs` 完成，desktop `c03d244` → `4b3a7b4` 共 **11** 个 commit：
+  `ec2d34b` DTO 迁出、`d4ab510` HttpClient 拆两型、`3bcf2c7` 17 命令迁出（含 `state.rs`）、
+  `72095b9` `config.rs` + `resources/desktop.production.toml`、`e6842c1` `preflight.rs`（合并两处
+  重复预检与三类守卫）、`30b9ebf` 删 `local_agent/mod.rs` 死代码、`0982fc3` sidecar 启停抽出、
+  `5cddc4e` sidecar 输出环形缓冲、`38b97be` 修 `scripts/test.sh`、`19541b3` `paths.rs`、
+  `4b3a7b4` 退出报告补持有行数。`main.rs` **1570 → 89 行**（AC-04），测试 **11 → 42**，
+  `generate_handler!` 17/17 逐字同序，9 条既有测试逐字不变。
+
 Current:
-- T-06 Desktop 拆分 `main.rs`。
+- T-07 Desktop Config 链路（`bootstrap.rs` 把已就位的 `config.rs`/`paths.rs` 接上、移除
+  `8765`、CSP 运行时注入、http 超时、`uuid` per-launch token、两条 spawn 路径同一组环境变量、
+  `get_public_config`），**与 T-08 同批落地**。
 
 Next:
-- T-06 目标树：`main.rs`（mod、`main()`、配置引导装载、CSP 注入、Builder 装配）＋ `bootstrap.rs`、
-  `config.rs`、`paths.rs`、`state.rs`、`http/`（`LocalAgentClient` 带 token / `CloudClient` 不带）、
-  `sidecar/{mod,drain}.rs`、`preflight.rs`、`dto/`、`commands/`；删除 `local_agent/mod.rs` 死代码；
-  修 `scripts/test.sh`（现跑 `npm test` 而本仓无 `package.json`，应改为 `cargo test --workspace`）。
+- T-07 + T-08（同批）：Desktop 配置接线与 Cloud Web 两文件。T-08 的两处必须在 T-07 的
+  token 强制落地**同批**，否则 Agent 一强制 token，`LocalLogsPage.vue` 的无头 `fetch`
+  立即 401、`init.js` 的地址链路也卡住。
+- 之后 T-09（联调回归 + 证据落盘）、T-10（模块分工回写 + DONE Gate）。
 
 Blocked:
 - None.
@@ -275,6 +287,46 @@ Recent verification:
   `from __future__ import annotations` 都误报，排除后才归零；属扫描器缺陷，已记录）。
 - T-05 冻结脚本：`migrate-storage.sh --data-dir /tmp/t05mig` ×2 → `2 applied`/`0 applied`；
   `verify-health.sh` → `wt-media-agent health ok`。
+- T-06 逐 commit 测试矩阵（`/tmp/t06_matrix.sh`，逐个 checkout 后**强制重编**再量）：
+  11/11/11/11/21/29/27/27/33/33/40/42，全部 `OK`，单调不减。逐段可对：
+  +10（`config.rs`）、+8（`preflight.rs`）、−2（删 `local_agent` 的两条死代码测试）、
+  +6（`drain`）、+7（`paths`）、+2（`exit_report`）。
+- T-06 告警数（同一口径，cargo 自报的 `generated N warnings`）：bin 14 → 29（config 新增 16）
+  → 20（删死代码 −9）→ 21（drain +1）→ 28（paths +7）→ **27**（`4b3a7b4` 让 `drain::len`
+  不再是死函数 −1）；test target 12 → 4。**剩余 23 条**「从未使用」是 `config.rs` 16 +
+  `paths.rs` 7，属 T-07 接线后即消除的中间态（已登记）。
+- T-06 `main.rs` **1570 → 89 行**（`git show c03d244:… | wc -l` / `wc -l`），**< 300，AC-04 达成**。
+- T-06 接线未动：`generate_handler!` 的 17 项在当前树与 `c03d244` 的裸名列表**逐字同序**
+  （取末段比较，diff 为空）。
+- T-06 **逐函数**搬家核对（`/tmp/t06_body_parity.py`，带阳性对照 `python_fallback_allowed`
+  必须判 IDENTICAL，否则拒绝判定）：26 项 = 9 IDENTICAL（9 条既有测试）+ 10 BODY-SAME/SIG
+  （`fn`→`pub fn`、`HttpClient`→`LocalAgentClient` 等机械改名）+ **7 BODY-CHANGED**，
+  7 条逐条 diff 核对后全部对应计划内改动（3 条 sidecar 委托、4 条 preflight 去重）。
+  **脚本第一版结论（13 条 BODY-CHANGED）已作废**：没抵消 `client.local_agent_base` →
+  `client.base` 这类**函数体内**的机械改名，把拆型算成了逻辑改动。
+- T-06 文案不漂的双证据：CJK 字面量普查（baseline `main.rs` 99 条含中文串，93 条在新树中
+  **逐字存在**，6 条不存在的**恰好是**带 `{}` 占位符的模板，由 `{noun}` + 固定后缀拼出）；
+  渲染由 `message_parity` 的 **16 行** `（流程规格, 失败形态, 历史那句话）` 精确相等表钉住。
+- T-06 一处**我自己的判断错误被测试抓住**：`reqwest::StatusCode` 的 `Display` 带 reason
+  phrase（`400 Bad Request`）。我先把测试写成期望 `400`，`message_parity` 报不一致；
+  回查 `git show HEAD:…commands/account.rs` 确认原实现用 `{}`，即**测试错了不是代码错了**，
+  改正期望值并给那条测试改名（原名断言的正是我误以为的那件事）。
+- T-06 变异对照 31 条：`config.rs` 12/12、`drain.rs` 8/8、`paths.rs` 7/7、`exit_report` 4/4，
+  全部 CAUGHT，撤红后 restore 逐字节复原。其中 **`exit_report` 的脚本自己错了五次**才跑对
+  （每次都以「0/4 caught」这个**假结论**呈现，方向是「测试很弱」）；护栏拦下 3 次，
+  另 2 次是**护栏挡不住**的「解析成功但解析错了」，详见 evidence §7。
+- T-06 两处**被变异逼出来的真问题**（`paths.rs`）：M-07「读不出的文件改 panic」最初存活
+  （该分支无测试，补非 UTF-8 用例后被杀）；`locate_takes_the_first_candidate_that_exists`
+  原本只让一个候选存在，「取第一个」与「取最后一个」两种实现对它**都成立**（改为让所有
+  候选都存在）。
+- T-06 范围检查：`git diff --stat c03d244..HEAD` 27 文件（+3142/−1608），删除文件 0；
+  `tauri.conf.json`(+1 `bundle.resources`) 与 `src-tauri/Cargo.toml`(+3 `toml="0.9"`) 均落在
+  `72095b9` 且在计划 T-06 的提交序列文字内（该序列与 T-07 条目都提过 `bundle.resources`，
+  实际落在 T-06 的 config commit，非越界）；`web/dist-desktop/`、`.generated/` 0 命中。
+- T-06 发现并登记（不在本 CHG 修）：本仓 M0 时期的整套 Node 工具链（`.github/workflows/
+  m0-desktop.yml` + 6 个 `npm` shell script + 2 个 mjs）引用的 `package.json` 不存在，
+  **该 CI workflow 在任何分支上都不可能通过**——这也解释了坏掉的 `npm test` 为何一直没被发现
+  （CI 在 `bootstrap.sh` 就失败了，从没走到 test 那一步）。
 
 ## 13. DONE Gate
 

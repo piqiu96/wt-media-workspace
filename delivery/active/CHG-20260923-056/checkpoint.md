@@ -9,15 +9,14 @@ Completed:
 - T-01：四仓 AI 入口文档各自独立提交（desktop `47a6263`、cloud `3b733ff`、workspace `e0444cd`；agent 上一轮 `d3ab02f` 已提交）；配置格式按 D-05 回写为 TOML（`change.md` §6 D-01/§2/§5/§7/§8 + 程序总纲 §2 + planned CHG-059）；测试基线证据按模板规范化。
 
 Current:
-- T-06 Desktop 拆分 `main.rs`。
+- T-07 Desktop Config 链路（与 T-08 同批）。
 
 Next:
-- T-06 目标树：`main.rs`（mod、`main()`、配置引导装载、CSP 注入、Builder 装配）＋
-  `bootstrap.rs`、`config.rs`、`paths.rs`、`state.rs`、`http/`、`sidecar/{mod,drain}.rs`、
-  `preflight.rs`、`dto/`、`commands/`；删除 `local_agent/mod.rs` 死代码；
-  修 `scripts/test.sh`（现跑 `npm test` 而本仓无 `package.json`）。
-  提交序列：DTO 迁出 → HttpClient 拆两型 → 17 命令迁出 → `config.rs`+`resources/*.toml`
-  → `preflight.rs` → `paths.rs`+`state.rs` → 9 测试落位 + 修 `scripts/test.sh`。
+- T-07 + T-08 同批：`bootstrap.rs` 把已就位的 `config.rs`/`paths.rs` 接到 `main`、移除
+  `8765` 与无超时的 `Client::new()`、CSP 改运行时注入、`uuid` per-launch token、
+  sidecar 两条 spawn 路径同一组环境变量、`get_public_config`（含 `dto/config.rs`、
+  `commands/public_config.rs`）；Cloud Web 的 `init.js` 与 `LocalLogsPage.vue`。
+  **两处必须同批**：Agent 一强制 token，`LocalLogsPage.vue` 的无头 `fetch` 立即 401。
 
 Blocked:
 - None.
@@ -195,3 +194,79 @@ Open（未覆盖面，已枚举，不以「测试通过」代替）:
   R9 看不见运行期拼装的 URL，也不覆盖 `runtime/constants.py` 的配置默认地址；
   R5 看不见 `getattr(client, "_post")` 这类动态取用；`patch.object`/`patch.dict` 不解析。
 - `local_api/server.py:340` 的 `check_items` 契约分歧仍在（计划细节 11，只登记不修）。
+
+### T-06 完成（desktop `c03d244` → `4b3a7b4`，11 个 commit）
+
+Completed:
+- `main.rs` **1570 → 89 行**（AC-04，< 300）：拆出 `config.rs`、`paths.rs`、`state.rs`、
+  `http/`（`LocalAgentClient`/`CloudClient`）、`sidecar/{mod,drain}.rs`、`preflight.rs`、
+  `dto/`、`commands/`；17 个命令逐字搬迁，`generate_handler!` **17/17 逐字同序**。
+- `e6842c1` 合并重复的 Cloud 预检：`PreflightSpec{noun, no_cloud_address}` +
+  `PreflightFailure::message(spec)` 纯函数 + 三类守卫（空地址 / 绑定 / 身份）收口；
+  文案不漂由 **16 行 `message_parity`** 精确相等表 + CJK 字面量普查双证据钉住。
+- `30b9ebf` 删除 `local_agent/mod.rs` 的 5 常量 / 3 类型 / `command_names` 与 2 条测试，
+  只留 `BoundNodeFacts`（17 行）。
+- `5cddc4e` sidecar 输出进内存环形缓冲（容量 200 / 尾 20 行），退出报告 + 附到
+  `local_agent_start`/`local_agent_health` 的既有 `Err(String)` 尾部。跨仓先证再发：
+  实测 `wt-media-agent` 的 `auth_token` 不出现在任何日志/日志行/JSON dump 中。
+- `38b97be` 修 `scripts/test.sh`（原 `npm test` 而本仓无 `package.json`，先证 `npm error
+  code ENOENT` 再改 `cargo test --workspace`）。
+- `4b3a7b4` 退出报告补「缓冲共 N 行」：持有数与展示数**在缓冲溢出时必然不等**，这个不等
+  本身就是诊断信息；顺带让 `drain::len` 不再是死函数（`5cddc4e` 引入的那条告警消失）。
+
+Verification（详见 `evidence/task-06-desktop-split.md`）:
+- 逐 commit 测试矩阵（`/tmp/t06_matrix.sh`，逐个 checkout 后**强制重编**再量）：
+  11/11/11/11/21/29/27/27/33/33/40/42，全部 `OK`，单调不减，逐段可对（+10 config、
+  +8 preflight、−2 删死代码、+6 drain、+7 paths、+2 exit_report）。
+- `generate_handler!` 17 项与基线**逐字同序**（diff 为空）。
+- **逐函数**搬家核对（`/tmp/t06_body_parity.py`，带阳性对照）：9 条既有测试 IDENTICAL、
+  10 条 BODY-SAME/SIG（仅 `fn`→`pub fn` 与拆型改名）、7 条 BODY-CHANGED 逐条 diff 后
+  全部归因到计划内改动。
+- 变异对照 31 条：`config.rs` 12/12、`drain.rs` 8/8、`paths.rs` 7/7、`exit_report` 4/4。
+- 范围检查：27 文件、删 0；`tauri.conf.json`(+1) 与 `src-tauri/Cargo.toml`(+3 `toml="0.9"`)
+  均落在 `72095b9` 且在计划 T-06 的提交序列文字内。
+
+Corrections（本轮内我自己的缺陷，均已修正并披露）:
+- **测试断言错了不是代码错了**：`reqwest::StatusCode` 的 `Display` 带 reason phrase
+  （`400 Bad Request`）。我先把 `message_parity` 写成期望 `400`，测试报不一致；回查
+  `git show HEAD:…commands/account.rs` 确认原实现用 `{}`，改正期望值并给该测试改名。
+- **`exit_report` 变异脚本错了五次**才跑对，每次都朝同一方向报出「0/4 caught」这个
+  **假结论**（「测试很弱」）。护栏拦下 3 次（`__file__` 找不到 crate 根、结果正则只认
+  `ok.` 而捕获打印 `FAILED`、编译失败正则把 `error: test failed, to rerun` 当成编译不过）；
+  另 2 次是**护栏挡不住**的「解析成功但解析错了」（失败测试名不在 `name ... FAILED` 行里、
+  裸名 vs 全限定名），只能靠看清「`passing` 在降而 `failed` 是空的」这个矛盾发现。
+- **`paths.rs` 的两处真问题被变异逼出**：M-07「读不出的文件改 panic」最初存活（该分支
+  无测试，补非 UTF-8 用例）；`locate_takes_the_first_candidate_that_exists` 原本只让一个
+  候选存在，两种实现都成立（改为让所有候选都存在）。
+- **搬家核对的脚本第一版结论作废**：未抵消 `client.local_agent_base`→`client.base` 这类
+  **函数体内**的机械改名，把拆型算成逻辑改动，报出 13 条而非 7 条 BODY-CHANGED。
+- **commit 10 的 message 算术错误**：初版写「21 → 28（+8）」，把基线取成两个 commit 前的
+  `30b9ebf`（20）而不是紧邻的 `38b97be`（21），实为 **+7**；已 amend 为 `19541b3` 并附订正
+  说明，内容未变。
+
+Deviations（已披露）:
+- 计划 T-06 的目标树列了 `bootstrap.rs`、`dto/config.rs`、`commands/public_config.rs`
+  三个文件，其内容实际是 T-07 的，故 T-06 收尾时**不存在**；T-06 自己的验收条目
+  （`cargo test` 全绿 + `cargo build` 通过）已达成，故记 DONE，三个文件随 T-07 落地。
+- 用户裁定写「真实 sidecar 生命周期与 Rust HTTP 代理搬进 `local_agent/`」，实际落在
+  `sidecar/{mod,drain}.rs`：依据是计划 T-06 的目标树**逐文件**列了它（目标树是文件级
+  产物，裁定是意图级描述），且 `local_agent/mod.rs` 在本 CHG 里被明确要求删死代码。
+- 计划称那 2 条 `local_agent` 测试「重写」，实际是**删除**——它们测的替身整体不在了。
+- `change.md` 的 T-06 行原写「HttpClient 超时；端口进配置」，按计划那两项属 T-07，
+  已把该行措辞改正并把两项移入 T-07 行（T-01 时的粗分，非本期缩减）。
+- 新增决策 **D-09**：`RELEASE_FAILED` 在 Cookie 读取流程里也报「账号检查」，这是它一直
+  的说法，保持逐字不变并钉住现状；改成按流程取名是一词之改，刻意不塞进一个承诺
+  「无用户可见文案变更」的 commit。
+
+Open（未覆盖面，已枚举，不以「测试通过」代替）:
+- **命令层无测试脚手架**：本仓没有任何测试驱动过 `#[tauri::command]` 函数体，故 7 条
+  BODY-CHANGED 的**新行为**只有逐字 diff + 文案表佐证，没有「调一次命令看返回」这层。
+- `preflight.rs` 的 async 路径（`run`/`sync_runtime_facts`/`finish_permit`）全走 HTTP，
+  本模块测试只覆盖纯文案与守卫；`config.rs`/`paths.rs` 暂无消费者（T-07 才接上）。
+- **空票据守卫无覆盖**：被删的 `empty_binding_ticket_is_rejected_before_transport` 是
+  「空票据在发请求前被拒绝」的**唯一**测试，且它测的是被删的替身。活代码里规则仍在
+  （`commands/bind.rs:48-50`）但从未被覆盖——**规则没丢，验证丢了**。
+- **仓库级发现（登记，不在本 CHG 修）**：M0 时期的整套 Node 工具链
+  （`.github/workflows/m0-desktop.yml` + 6 个 `npm` shell script + 2 个 mjs）引用的
+  `package.json` 不存在，**该 CI workflow 在任何分支上都不可能通过**——这也解释了坏掉的
+  `npm test` 为何一直没被发现。
