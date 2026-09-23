@@ -55,13 +55,38 @@ Before modifying code, enter the affected repository and read:
 1. `AGENT-INDEX.md`
 2. `AGENTS.md`
 3. `CLAUDE.md`
+4. `DIRECTORY_MAP.md`（目录导航，按它定位目标目录）
 
-Then read the relevant code and tests.
+Then read only the relevant code and tests.
 
 When the target repository has no `AGENT-INDEX.md` yet, do not invent one.
 Fall back to this file plus that repository's `AGENTS.md`, and record the gap
 in the active CHG. `scripts/verify_agent_entry.py` reports which repositories
 are still missing the file.
+
+## 跨工程需求定位
+
+不得只根据需求关键词判断工程，必须根据真正发生修改的能力定位：
+
+| 用户需求 | 主要责任工程 |
+| --- | --- |
+| 修改用户权限和数据库规则 | Cloud |
+| 修改正式业务状态和 API | Cloud |
+| 修改内容发现策略与当前 M3 抓取执行 | Cloud |
+| 修改 Cloud Web 页面 | Cloud Web |
+| 修改 Desktop 使用的 Vue 业务页面 | Cloud Web |
+| 修改 Desktop Vue Runtime 适配 | Cloud Web，必要时联动 Desktop |
+| 修改 BitBrowser 实际执行逻辑 | Agent |
+| 修改 Playwright 平台适配 | Agent |
+| 修改本地 FFmpeg 合成执行 | Agent |
+| 修改 Agent Sidecar 启停 | Desktop |
+| 修改 Tauri 安全桥 | Desktop |
+| 修改 Windows/macOS 安装包 | Desktop |
+| 修改 Milestone、Plan、Spec 和 CHG | Workspace |
+| 修改跨工程 API 或通信契约 | Workspace 协调，责任工程分别实施 |
+
+工程定位后，进入对应仓库的 `AGENT-INDEX.md` 与 `DIRECTORY_MAP.md` 定位目录。
+工程可以并行执行，但不得同时修改其他工程拥有的代码和正式治理状态。
 
 ## Default Exclusions
 
