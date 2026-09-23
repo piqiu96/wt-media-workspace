@@ -21,8 +21,19 @@ DMG 里跑的是 WKWebView + Tauri 注入的 CSP，普通浏览器里跑的是�
 用法：
     python3 csp-probe-proxy.py <静态根> --csp-file <tauri.conf.json> [--no-csp]
     WT_MEDIA_M3_SESSION=<cookie 值> 从环境变量读入
+    python3 csp-probe-proxy.py <静态根> --csp-file <tauri.conf.json> --stub <stub.json>
 
-安全：cookie 只从环境变量读入，不写入日志、不落盘。
+--stub（离线数据模式）
+---------------------
+给 `--stub <json>` 后，`/api/` 不再反代到后端，改由该文件直出应答
+（键为去掉查询串的路径，未命中的 `/api/` 一律回 `[]`），**因此不再需要会话 cookie**。
+
+为什么要有它：量「内容列被压没」这类**布局**问题，变量只应该是「被测产物」，
+不该混进「会话是否过期 / 那条数据长什么样」。用固定假数据 + 同一份 stub，
+前后两次跑（旧产物 vs 新产物）的差异就只剩产物本身。
+附带好处是这条通道**完全不接触凭据**，不需要把运营账号密码交给工具。
+
+安全：cookie 只从环境变量读入，不写入日志、不落盘。stub 文件只含编造的假数据。
 """
 import http.server
 import json
@@ -39,6 +50,8 @@ HOP = {"connection", "keep-alive", "transfer-encoding", "upgrade", "proxy-authen
        "proxy-authorization", "te", "trailers", "content-length", "host"}
 
 SANDBOX = "%s:%d/api/v1" % ("http://127.0.0.1", TARGET)
+
+STUB = None          # 非 None 时进入离线数据模式，见模块 docstring
 
 WALK_JS = """
 (function () {
@@ -275,8 +288,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
         }.get(candidate.suffix, "application/octet-stream")
         return self._send(200, payload, ctype)
 
+    def _stub(self, path):
+        """离线数据模式：不碰后端、不需要会话。未命中的 /api/ 回空数组，避免页面挂住。"""
+        hit = path in STUB
+        # 必须套 Cloud 的统一信封 {errcode,message,data,logid}：
+        # http.js 的 parseResponse 见到没有 errcode 的响应体一律抛「服务器响应格式错误」，
+        # 抛在路由守卫里就会被 catch 成「未登录」→ 页面停在登录页（第一次跑就是这么栽的）。
+        payload = {"errcode": 0, "message": "success", "data": STUB.get(path, []), "logid": "stub"}
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        # 打出来是为了诊断「页面为什么停在登录页」——stub 命中与否一眼可见。
+        print("STUB %s %s -> %s" % (self.command, path, "命中" if hit else "未命中(回 [])"), flush=True)
+        return self._send(200, body, "application/json; charset=utf-8")
+
     def _handle(self):
         path = self.path.split("?", 1)[0]
+        if path.startswith("/api/") and STUB is not None:
+            return self._stub(path)
         if path == "/__probe" and self.command == "POST":
             length = int(self.headers.get("Content-Length") or 0)
             raw = self.rfile.read(length)
@@ -311,12 +338,23 @@ if __name__ == "__main__":
         i = args.index("--csp-file")
         csp_file = args[i + 1]
         del args[i:i + 2]
+    stub_file = None
+    if "--stub" in args:
+        i = args.index("--stub")
+        stub_file = args[i + 1]
+        del args[i:i + 2]
     no_csp = "--no-csp" in args
     if no_csp:
         args.remove("--no-csp")
     ROOT = Path(args[0]).resolve() if args else None
     CSP = "" if no_csp else (load_csp(csp_file) if csp_file else "")
-    SESSION = os.environ["WT_MEDIA_M3_SESSION"]
+    if stub_file:
+        STUB = json.loads(Path(stub_file).read_text(encoding="utf-8"))
+        SESSION = ""
+    else:
+        STUB = None
+        SESSION = os.environ["WT_MEDIA_M3_SESSION"]
     print("CSP in effect: %s" % (CSP or "(none)"), flush=True)
     print("static root: %s" % ROOT, flush=True)
+    print("data mode: %s" % ("stub %d 条路由" % len(STUB) if STUB is not None else "反代后端", ), flush=True)
     http.server.ThreadingHTTPServer(("127.0.0.1", LISTEN), Handler).serve_forever()

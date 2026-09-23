@@ -1,0 +1,108 @@
+{
+  "_comment": "离线段造数据：配合 csp-probe-proxy.py --stub 使用，量『内容列被压没』用。全部为编造的假数据，不含任何凭据。",
+  "/api/v1/auth/me": {
+    "id": 1,
+    "username": "operator01",
+    "name": "运营一号",
+    "role": "operator",
+    "team_id": "team-a"
+  },
+  "/api/v1/operation-teams": [
+    {
+      "id": "team-a",
+      "name": "A 组"
+    }
+  ],
+  "/api/v1/games": [
+    {
+      "id": "other",
+      "name": "其他"
+    }
+  ],
+  "/api/v1/content-pool": [
+    {
+      "id": 1001,
+      "title": "三分钟看懂这家新开的川菜馆后厨全流程，老板亲自上手炒底料",
+      "platform_content_id": "7345678901234567890",
+      "cover_url": "/stub-cover.png",
+      "source_url": "https://www.douyin.com/video/7345678901234567890",
+      "platform": "douyin",
+      "game_id": "other",
+      "author_name": "吃货老张",
+      "author_home_url": "https://www.douyin.com/user/stub-sec-uid",
+      "author_sec_uid": "MS4wLjABAAAAstubsecuid",
+      "author_uid": "1234567890",
+      "like_count": 128000,
+      "favorite_count": 45000,
+      "view_count": 3200000,
+      "comment_count": 8900,
+      "share_count": 1200,
+      "source_type": "keyword",
+      "strategy_name": "川菜_20260923164254",
+      "crawl_task_name": "川菜探访_20260923164254",
+      "strategy_id": 11,
+      "crawl_task_id": 22,
+      "status": "pending",
+      "published_at": "2026-09-23T16:42:54+08:00",
+      "created_at": "2026-09-23T17:05:00+08:00",
+      "updated_at": "2026-09-23T17:10:00+08:00",
+      "updated_by_name": "运营一号"
+    },
+    {
+      "id": 1002,
+      "title": "这是一条刻意写得非常非常长的标题，用来逼近最坏情况：标题文本长度远超内容列的可用宽度，如果省略号规则没有覆盖 <a> 分支，这一行就会被撑开并折行，把行高从 56px 顶到一百多像素，并且把右侧固定列压错位",
+      "platform_content_id": "7345678901234567891",
+      "cover_url": "/stub-cover.png",
+      "source_url": "https://www.douyin.com/video/7345678901234567891",
+      "platform": "douyin",
+      "game_id": "other",
+      "author_name": "一个名字很长的自媒体作者账号",
+      "author_home_url": "https://www.douyin.com/user/stub-sec-uid-2",
+      "author_sec_uid": "MS4wLjABAAAAstubsecuid2",
+      "author_uid": "1234567891",
+      "like_count": 999,
+      "favorite_count": 88,
+      "view_count": 12345,
+      "comment_count": 6,
+      "share_count": 1,
+      "source_type": "id",
+      "strategy_name": "长标题_20260923164254",
+      "crawl_task_name": "长标题任务_20260923164254",
+      "strategy_id": 11,
+      "crawl_task_id": 23,
+      "status": "pending",
+      "published_at": "2026-12-31T23:59:59+08:00",
+      "created_at": "2026-01-01T00:00:00+08:00",
+      "updated_at": "2026-09-23T17:10:00+08:00",
+      "updated_by_name": "运营一号"
+    },
+    {
+      "id": 1003,
+      "title": "没有外链的条目走 <span> 分支，用来验证省略号规则两个分支都覆盖到",
+      "platform_content_id": "7345678901234567892",
+      "cover_url": null,
+      "source_url": null,
+      "platform": "douyin",
+      "game_id": "other",
+      "author_name": "无主页作者",
+      "author_home_url": null,
+      "author_sec_uid": "",
+      "author_uid": "",
+      "like_count": 0,
+      "favorite_count": 0,
+      "view_count": 0,
+      "comment_count": 0,
+      "share_count": 0,
+      "source_type": "search",
+      "strategy_name": "无外链_20260923164254",
+      "crawl_task_name": "无外链任务_20260923164254",
+      "strategy_id": 11,
+      "crawl_task_id": 24,
+      "status": "material_created",
+      "published_at": "2026-09-23T16:42:54+08:00",
+      "created_at": "2026-09-23T17:05:00+08:00",
+      "updated_at": "2026-09-23T17:20:00+08:00",
+      "updated_by_name": "运营一号"
+    }
+  ]
+}
