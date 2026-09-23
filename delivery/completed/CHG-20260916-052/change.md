@@ -1,6 +1,6 @@
 # CHG-20260916-052：M3-B～E 内容挖掘自动化入口
 
-- Status: ACTIVE
+- Status: HANDOFF
 - Level: M
 - Milestone: `delivery/milestones/M3-content-discovery-v2.md`
 - 日期：2026-09-16

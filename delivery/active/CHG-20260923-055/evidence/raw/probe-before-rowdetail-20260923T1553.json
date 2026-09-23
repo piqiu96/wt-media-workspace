@@ -1,0 +1,535 @@
+{
+  "label": "rowdetail",
+  "viewport": {
+    "w": 1512,
+    "h": 813
+  },
+  "img": {
+    "total": 20,
+    "loaded": 0,
+    "failed": 20,
+    "pending": 0,
+    "sampleSrc": "https://p11-sign.douyinpic.com/tos-cn-p-0015/ocdlEQgqDEXKK1UqAkArIXIyfvAyEBACeD99sF~tplv-d"
+  },
+  "header": [
+    {
+      "text": "",
+      "r": {
+        "left": 278,
+        "right": 326,
+        "width": 48,
+        "height": 44
+      }
+    },
+    {
+      "text": "ID",
+      "r": {
+        "left": 326,
+        "right": 406,
+        "width": 80,
+        "height": 44
+      }
+    },
+    {
+      "text": "内容",
+      "r": {
+        "left": 406,
+        "right": 746,
+        "width": 340,
+        "height": 44
+      }
+    },
+    {
+      "text": "平台",
+      "r": {
+        "left": 746,
+        "right": 856,
+        "width": 110,
+        "height": 44
+      }
+    },
+    {
+      "text": "游戏",
+      "r": {
+        "left": 856,
+        "right": 966,
+        "width": 110,
+        "height": 44
+      }
+    },
+    {
+      "text": "作者",
+      "r": {
+        "left": 966,
+        "right": 1106,
+        "width": 140,
+        "height": 44
+      }
+    },
+    {
+      "text": "互动",
+      "r": {
+        "left": 1106,
+        "right": 1276,
+        "width": 170,
+        "height": 44
+      }
+    },
+    {
+      "text": "来源方式",
+      "r": {
+        "left": 1276,
+        "right": 1386,
+        "width": 110,
+        "height": 44
+      }
+    },
+    {
+      "text": "来源",
+      "r": {
+        "left": 1386,
+        "right": 1646,
+        "width": 260,
+        "height": 44
+      }
+    },
+    {
+      "text": "发布时间",
+      "r": {
+        "left": 1646,
+        "right": 1816,
+        "width": 170,
+        "height": 44
+      }
+    },
+    {
+      "text": "发现时间",
+      "r": {
+        "left": 1816,
+        "right": 1986,
+        "width": 170,
+        "height": 44
+      }
+    },
+    {
+      "text": "修改时间",
+      "r": {
+        "left": 1986,
+        "right": 2156,
+        "width": 170,
+        "height": 44
+      }
+    },
+    {
+      "text": "修改人",
+      "r": {
+        "left": 2156,
+        "right": 2276,
+        "width": 120,
+        "height": 44
+      }
+    },
+    {
+      "text": "状态",
+      "r": {
+        "left": 2276,
+        "right": 2396,
+        "width": 120,
+        "height": 44
+      }
+    },
+    {
+      "text": "操作",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 44
+      }
+    }
+  ],
+  "fixed": [
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first ",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 44
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 109
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 87
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 131
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 109
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 131
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 87
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 131
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 109
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 109
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 109
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 131
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    },
+    {
+      "cls": "t-table__cell--fixed-right t-table__cell--fixed-right-first",
+      "r": {
+        "left": 1207,
+        "right": 1467,
+        "width": 260,
+        "height": 153
+      }
+    }
+  ],
+  "content": {
+    "rect": {
+      "left": 278,
+      "right": 1467,
+      "width": 1189,
+      "height": 2664
+    },
+    "scrollWidth": 2378,
+    "clientWidth": 1189,
+    "overflowX": "auto"
+  },
+  "innerTable": {
+    "rect": {
+      "left": 278,
+      "right": 2656,
+      "width": 2378,
+      "height": 2664
+    },
+    "styleWidth": null,
+    "minWidth": "0px",
+    "tableLayout": "fixed",
+    "declaredWidth": null
+  },
+  "wrap": {
+    "left": 278,
+    "right": 1467,
+    "width": 1189,
+    "height": 2664
+  },
+  "rows": [
+    109,
+    87,
+    153,
+    153,
+    131,
+    109,
+    131,
+    87
+  ],
+  "fixedBodyHeights": [
+    109,
+    87,
+    153,
+    153,
+    131,
+    109,
+    131,
+    87
+  ],
+  "row0Cells": [
+    {
+      "w": 48,
+      "h": 109,
+      "txt": ""
+    },
+    {
+      "w": 80,
+      "h": 109,
+      "txt": "875"
+    },
+    {
+      "w": 340,
+      "h": 109,
+      "txt": "生活不易，小麦卖艺 #三"
+    },
+    {
+      "w": 110,
+      "h": 109,
+      "txt": "douyin"
+    },
+    {
+      "w": 110,
+      "h": 109,
+      "txt": "三角洲"
+    },
+    {
+      "w": 140,
+      "h": 109,
+      "txt": "小花卷（三角洲行动）"
+    },
+    {
+      "w": 170,
+      "h": 109,
+      "txt": "浏览 0 · 赞 4,3"
+    },
+    {
+      "w": 110,
+      "h": 109,
+      "txt": "挖掘策略"
+    },
+    {
+      "w": 260,
+      "h": 109,
+      "txt": "m3acc0923-ma"
+    },
+    {
+      "w": 170,
+      "h": 109,
+      "txt": "2026/9/22 18"
+    },
+    {
+      "w": 170,
+      "h": 109,
+      "txt": "2026/9/23 14"
+    },
+    {
+      "w": 170,
+      "h": 109,
+      "txt": "2026/9/23 14"
+    },
+    {
+      "w": 120,
+      "h": 109,
+      "txt": "operator01"
+    },
+    {
+      "w": 120,
+      "h": 109,
+      "txt": "待处理"
+    },
+    {
+      "w": 260,
+      "h": 109,
+      "txt": "查看\n转素材\n忽略"
+    }
+  ],
+  "row0TitleParts": {
+    "cell": {
+      "left": 414,
+      "right": 738,
+      "width": 324,
+      "height": 92
+    },
+    "media": {
+      "left": 414,
+      "right": 502,
+      "width": 88,
+      "height": 56
+    },
+    "mediaImg": {
+      "left": 415,
+      "right": 501,
+      "width": 86,
+      "height": 54
+    },
+    "copy": {
+      "left": 514,
+      "right": 738,
+      "width": 224,
+      "height": 92
+    },
+    "first": {
+      "left": 514,
+      "right": 738,
+      "width": 224,
+      "height": 66
+    },
+    "small": {
+      "left": 514,
+      "right": 738,
+      "width": 224,
+      "height": 22
+    },
+    "cellMinHeight": "64px",
+    "tdPadding": "8px",
+    "lineHeight": "22px",
+    "fontSize": "14px"
+  },
+  "titleCell": {
+    "left": 414,
+    "right": 738,
+    "width": 324,
+    "height": 92
+  },
+  "titleMedia": {
+    "rect": {
+      "left": 414,
+      "right": 502,
+      "width": 88,
+      "height": 56
+    },
+    "boxSizing": "border-box"
+  },
+  "titleEl": {
+    "tag": "A",
+    "cls": "wt-primary-link",
+    "textLen": 44,
+    "clientHeight": 66,
+    "whiteSpace": "normal",
+    "textOverflow": "clip",
+    "overflow": "visible"
+  },
+  "ok": true
+}
