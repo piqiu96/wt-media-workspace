@@ -6,9 +6,10 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260923-056 | 联合工程优化 A——结构审计、Config 与 Client 解耦 | IMPLEMENTING | wt-media-agent, wt-media-desktop, wt-media-cloud, wt-media-workspace |
 
-（2026-09-23：CHG-20260923-056 激活，属上线前联合工程优化程序；CHG-20260923-053 同日由用户裁定 SUPERSEDED 并入本程序。）
+No active M/L CHG（2026-09-24：CHG-20260923-056 关闭归档后，active 名额为空；联合工程优化程序的后续阶段 CHG-057/058/059 已在 [planned/](planned/README.md) 登记，待用户裁定后激活）。
+
+[CHG-20260923-056](completed/CHG-20260923-056/change.md)（联合工程优化 A——结构审计、Config 与 Client 解耦）已于 2026-09-24 关闭归档为 `DONE`：按 ADR-0016 与架构基线完成 Agent 的目录迁移与 `runtime/` 配置收口、`bootstrap/` 真实装配链、两端 Client 的构造注入，Desktop 从 1570 行单文件拆为分层模块并以配置驱动启动 sidecar，Cloud Web 的地址链路改由 `get_public_config` 提供。§13 DONE Gate 九项逐项签字；AC-01…AC-11 全 PASS（agent 253 tests / desktop 63 passed / cloud web 21 files-101 tests）。**四项待用户裁定随记录一并归档**（生产 CSP 是否加 `ipc:`、回环 client 是否加 `.no_proxy()`、`modes/`+`generated/` 占位包与基线 §5.2 的冲突、以及 T-09 期间在开发者 Cloud 上被误建的一个惰性 `noop_task` 如何处置），详见该记录 §12。归档**未**阻塞于这四项：它们全部是计划明示的范围外事项或新增发现，不属本 CHG 的未完成范围。
 
 M2 已由用户验收通过。M3-A 的闭环记录已随其并入门槛转出活动目录，归档在 [completed/CHG-20260915-044](completed/CHG-20260915-044/change.md)（`Status: HANDOFF`，未改写为 DONE）；M3-B～E 已在 [CHG-20260916-052](completed/CHG-20260916-052/change.md) 收敛并实施，该记录已于 2026-09-23 以 `Status: HANDOFF` 归档（照 CHG-044 先例，未写 DONE）。
 

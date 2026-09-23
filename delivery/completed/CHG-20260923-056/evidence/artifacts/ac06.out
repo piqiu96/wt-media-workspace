@@ -1,0 +1,69 @@
+agent: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent
+log:   /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/ac06-agent.log
+agent up on 127.0.0.1:58293 (token enforced)
+
+==============================================================================
+CHAIN 1/4: bind
+==============================================================================
+  POST /api/v1/bind                     -> 200 {"node_id": "ac06-node", "session_token": "<redacted-local-session-token>", "status": "bound"}
+  POST /api/v1/bind  (no token)         -> 400 {"error": "binding_token_required"}
+
+==============================================================================
+CHAIN 2/4: profile
+==============================================================================
+  POST /api/v1/bit-browser/profile-scans -> 200, 40 profiles, main_user_id=2c9bc06191effa4e0191f9589996619f
+  POST /api/v1/bit-browser/profile-groups -> 200, 1 groups
+  using 'm2b-bilibili-login' = a24f40d959c146a0a40835d89d2da23e (status=0)
+  POST /api/v1/bit-browser/profile-open  -> 200 {"data": {"status": "opened"}}
+    BitBrowser profile status: 0 -> 1
+  POST /api/v1/bit-browser/profile-close -> 200 {"data": {"status": "closed"}}
+    BitBrowser profile status: 1 -> 0 (after retrying)
+  POST /api/v1/bit-browser/profile-close (no id) -> 400 {"error": {"code": "profile_id_required"}}
+
+==============================================================================
+CHAIN 3/4: account-check
+==============================================================================
+  POST /api/v1/account-check (bilibili)  -> 200
+    login_status='normal' platform_account_id='3706971620379308' check_items=4
+  POST /api/v1/account-check (weibo)     -> 400 'account_check_input_invalid'
+  POST /api/v1/account-check (expected=the real id) -> 200 login_status='normal'
+  POST /api/v1/account-check (expected=a wrong id) -> 200 login_status='account_mismatch' message='当前窗口登录账号与媒体账号台账不一致'
+
+==============================================================================
+CHAIN 4/4: cookie-read
+==============================================================================
+  POST /api/v1/cookie-read              -> 200, 36 cookies
+    names=['DedeUserID', 'DedeUserID', 'DedeUserID', 'DedeUserID', 'DedeUserID__ckMd5', 'DedeUserID__ckMd5', 'DedeUserID__ckMd5', 'DedeUserID__ckMd5', 'SESSDATA', 'SESSDATA', 'SESSDATA', 'SESSDATA', '_uuid', 'b_lsid', 'b_nut', 'bili_jct', 'bili_jct', 'bili_jct', 'bili_jct', 'bili_ticket', 'bili_ticket_expires', 'bmg_af_sc', 'bmg_af_switch', 'bmg_src_def_domain', 'browser_resolution', 'buvid3', 'buvid4', 'buvid_fp', 'home_feed_column', 'sid', 'sid', 'sid', 'sid', 'theme-avatar-tip-show', 'theme-switch-show', 'theme-tip-show']
+    total value bytes=1694 (values deliberately not printed)
+    agent log: searched 31/36 values (>=8 chars); too short to search: ['bmg_af_switch', 'home_feed_column', 'theme-avatar-tip-show', 'theme-switch-show', 'theme-tip-show']
+    control: the profile id is present in the log -> True (scan works)
+    leak: no cookie value found
+  POST /api/v1/cookie-read (no id)      -> 400 {"error": {"code": "cookie_read_input_invalid"}}
+
+  end state: m2b-bilibili-login status=0 (started at 0)
+  agent stopped (exit=-15)
+
+==============================================================================
+COVERAGE (16 exercised, 3 not)
+==============================================================================
+  [x] all chains      401 without the bearer token
+  [x] bind            200 with a node id and a fresh 64-hex session token
+  [x] bind            400 binding_token_required when the token is missing
+  [x] bind            each bind mints a distinct session token
+  [x] profile         scan returns the real profile set (40 profiles with names and groups)
+  [x] profile         group listing (1 groups)
+  [x] profile         open and close move BitBrowser's own status field (0 -> 1 -> 0)
+  [x] profile         400 when the profile id is missing
+  [x] account-check   400 account_check_input_invalid for a platform outside {bilibili, baijiahao, douyin}
+  [x] account-check   identified a real logged-in account ('3706971620379308') with 4 check items
+  [x] account-check   the expected id matching the real one is not flagged
+  [x] account-check   a wrong expected id is flagged account_mismatch with the product's message -- both directions of the rule
+  [x] cookie-read     the real cookie jar came back (36 cookies: DedeUserID, DedeUserID, DedeUserID, DedeUserID, DedeUserID__ckMd5, DedeUserID__ckMd5, DedeUserID__ckMd5, DedeUserID__ckMd5, SESSDATA, SESSDATA, SESSDATA, SESSDATA, _uuid, b_lsid, b_nut, bili_jct, bili_jct, bili_jct, bili_jct, bili_ticket, bili_ticket_expires, bmg_af_sc, bmg_af_switch, bmg_src_def_domain, browser_resolution, buvid3, buvid4, buvid_fp, home_feed_column, sid, sid, sid, sid, theme-avatar-tip-show, theme-switch-show, theme-tip-show)
+  [x] cookie-read     none of the 31 searchable cookie values appear in the agent's log (5 too short to search: ['bmg_af_switch', 'home_feed_column', 'theme-avatar-tip-show', 'theme-switch-show', 'theme-tip-show'])
+  [x] cookie-read     400 cookie_read_input_invalid when the profile id is missing
+  [x] profile         the profile was returned to its starting state (status=0) after account-check and cookie-read opened it
+  [ ] bind            no Cloud round trip: the handler only mints a local session token and sets node_id in memory (local_api/server.py:474-497)
+  [ ] profile         profile-create / -update / -delete were NOT driven: they mutate the real profile inventory, and this CHG has no mandate to add or destroy the user's profiles. Only scan/groups/open/close were exercised.
+  [ ] profile         a close that BitBrowser refuses is reported as success: closing a profile that is still starting up answers {"success":false,"msg":"浏览器正在打开中"}, and close_profile (clients/bitbrowser/client.py:169-174) catches that and passes, so the API returns status=closed either way. BitBrowser's own status field is the only way to tell. Pre-existing, not changed by this CHG.
+
+RESULT: PASS -- every driven chain answered as specified, and nothing was left open

@@ -3,7 +3,7 @@
 - 日期：2026-09-23
 - 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）
 - 性质：上线前工程加固程序，不属 M2/M3 里程碑范围（先例：CHG-20260923-055 里程碑外工程 CHG）
-- 承载 CHG：CHG-20260923-056（A，active）、CHG-20260923-057（B）、CHG-20260923-058（C）、CHG-20260923-059（D，均 planned）
+- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、CHG-20260923-057（B）、CHG-20260923-058（C）、CHG-20260923-059（D，均 planned）
 - 上游基线：ADR-0016（Agent 运行时分层的目录、依赖与配置边界）；架构基线 `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` §5.8
 
 ## 1. 问题与目标
@@ -40,8 +40,8 @@
 - 三仓结构审计（已完成：Desktop `main.rs` 1570 行承载全部 17 命令、其余模块空壳；Agent `config.py`/`log_setup.py` 零引用死代码、5+ 处 `os.getenv` 散落、入口空壳）。
 - Agent：`runtime/`（config/context/paths/environment/logging）+ `bootstrap/{local,cloud}.py` 真实组装 + `clients/`、`services/` 拆分（撤销 `runtimes/`，ADR-0016 第 4 条）+ executors 注入 + `config/`+`config_online/` 落地 + sidecar 受控传参 + AST 边界测试。
 - Desktop：拆分 main.rs（bootstrap/config/paths/state/commands）+ 强类型 DesktopConfig（`resources/desktop.<env>.toml` + env 覆盖 + 生产校验）+ AppPaths + AppState + HttpClient 超时 + Cloud 地址链路（DesktopConfig → 受控 command → Vue）+ sidecar 传参。
-- Cloud Web：desktop app 两文件（init.js 地址改 invoke、LocalLogsPage healthz 改走 command）。
-- 详见 `delivery/active/CHG-20260923-056/change.md`。
+- Cloud Web：desktop app 两个生产文件（init.js 地址改 invoke、LocalLogsPage healthz 改走 command）+ 两个测试文件（把上两条改成常驻断言）。
+- 详见 [CHG-20260923-056 change.md](../../../delivery/completed/CHG-20260923-056/change.md)。
 
 ### CHG-B：Paths、Logger 和运行目录
 

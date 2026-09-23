@@ -3,10 +3,10 @@
 ## 1. Basic Information
 
 - Level: L
-- Status: IMPLEMENTING
+- Status: DONE（2026-09-24 归档；见文末「关闭记录」）
 - Created: 2026-09-23
 - Current repository: wt-media-workspace（治理）；运行时改动分布于 wt-media-agent、wt-media-desktop、wt-media-cloud
-- Affected repositories: wt-media-agent（主）、wt-media-desktop（主）、wt-media-cloud（仅 web/src/apps/desktop 两文件）、wt-media-workspace（治理记录与基线回写）
+- Affected repositories: wt-media-agent（主）、wt-media-desktop（主）、wt-media-cloud（仅 `web/src/apps/desktop` 的两个生产文件 + 两个测试文件）、wt-media-workspace（治理记录与基线回写）
 
 ## 2. Change Goal
 
@@ -61,7 +61,7 @@
 - 不引入 DI 容器、配置中心、日志数据库、第二套 Agent Runtime。
 - 不改 Cloud 业务逻辑、API 契约语义、既有 M2 业务行为。
 - 不动 reqwest native-tls→rustls。
-- 不改 Cloud Web 模块结构与 API 层（仅 desktop app 两文件）。
+- 不改 Cloud Web 模块结构与 API 层（只动 desktop app 的两个生产文件与其两个测试文件，见 §9）。
 
 ## 6. Confirmed Decisions
 
@@ -90,38 +90,38 @@
 | T-01 | 治理工件就绪：本 change.md、checkpoint、status×3、planned 057/058/059、LEDGER、CURRENT_CONTEXT 再生成；CHG-053 标注 SUPERSEDED 并入 | DONE | `verify_agent_entry.py` 通过；CURRENT_CONTEXT 指向本 CHG |
 | T-02 | Agent 结构迁移（吸收 053 Task 1-3）：`constants.py`→`runtime/`（含 `runtime/version.py`）；`clients/bitbrowser/` 包拆分并新增公开 `open_url()`，executor 不再直连私有 `_post`；`clients/cloud/` 迁移；`services/{browser,net}/` 建立；`runtime/environment.py` 委托 services 并撤销 `runtimes/`；`storage/` 整理（checkpoint/sqlite/migration 重导出，`storage.migration` 路径与符号不变）；`runner/` 三拆并重导出 `TaskRunner`/`TaskRunnerConfig`（测试零改动）；`local_api/` 瘦身；`utils/time.py`；既有 85 用例随迁全绿 | DONE | `bash scripts/test.sh`（≥85 OK）；`migrate-storage.sh` 连续两次成功；`verify-health.sh` 通过 |
 | T-03 | Agent runtime/config + paths（吸收 053 Task 5）：强类型 AgentConfig（env>file>default，TOML/`tomllib`，测试目录接缝）；`configs/`→`config/` + `config_online/` 同构镜像；RuntimePaths 三态；统一 `WT_MEDIA_LOG_LEVEL`；删除 config.py/log_setup.py 死代码与目录双实现 | DONE | config loader 测试（默认/文件/env/非法/凭据忽略）全绿；运行时代码零处引用 `config_online`（打包校验除外） |
-| T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | DONE | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试 |
+| T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | DONE | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试。**Goal 里的「pyproject 入口重指」未发生**：T-10 核对时发现 `pyproject.toml` 在本 CHG 全程**未被改动**（最后一次改它是 M2 的 `01fe41e`），四个 console script 早已指向 `local_main:main`/`cloud_main:main`/`local_api.server:main`/`storage.migration:main`——T-04 实际做的是把前两个模块改成真实委托，使既有条目**首次真正可用**，无需改 pyproject |
 | T-05 | Agent AST 边界测试（ADR-0016 第 3 条机器校验，含 `test_patch_targets.py`）+ 平台 URL 常量化 | DONE | R1–R10 全绿且每条有控制组证明「能红」（规则放在任务前的树上实跑转红并点名六处）；patch 目标可解析且在别名重构下转红；`executors/`+`local_api/` 无内联 URL 字面量（grep 0 命中 / 对照树 2 命中） |
 | T-06 | Desktop 拆分 main.rs：config/paths/state/commands；17 命令原样迁移；account_check/cookie_read 重复 preflight 提取共用 | DONE | `cargo test` 全绿（42 passed）；`cargo build` 通过；`main.rs` 1570 → 89 行；`generate_handler!` 17/17 逐字同序；9 条既有测试逐字不变、17 命令的 7 处改动逐条归因 |
 | T-07 | Desktop Cloud 地址链路 + sidecar 传参 + 配置接线：`bootstrap.rs`（把已就位的 `config.rs`/`paths.rs` 接到 `main`）；移除 `Client::new()` 的无超时与 `main.rs:1534` 的 `8765`；CSP 改运行时注入；`uuid` per-launch token；sidecar 两条 path 同一组环境变量；`get_public_config` command（含 `dto/config.rs`、`commands/public_config.rs`）；生产模式忽略整个 `WT_MEDIA_DESKTOP_*` 命名空间 | DONE | config loader 单测（默认/文件/env/非法/生产忽略）；T-06 遗留的 23 条「从未使用」告警（`config.rs` 16 + `paths.rs` 7）归零 |
 | T-08 | Cloud Web 两文件：init.js cloudBaseUrl 改 invoke（带回退）；LocalLogsPage healthz 改走 command | DONE | desktop 前端既有测试全绿 |
-| T-09 | 联调回归 + 证据落盘：dev 模式跑通 sidecar 启动（传参生效、鉴权生效）、bind/account_check/cookie_read/profile 链路、`/healthz` curl、Agent 独立启动 | TODO | evidence/ 各项记录 PASS |
-| T-10 | 模块分工回写 + 收尾：三仓 AGENT-INDEX/DIRECTORY_MAP、workspace 基线核对、LEDGER/CURRENT_CONTEXT 同步、DONE Gate | TODO | `verify_agent_entry.py`+`verify_delivery_governance.py` 通过 |
+| T-09 | 联调回归 + 证据落盘：dev 模式跑通 sidecar 启动（传参生效、鉴权生效）、bind/account_check/cookie_read/profile 链路、`/healthz` curl、Agent 独立启动 | DONE | AC-01…AC-11 逐条 PASS 且各有阳性对照（`evidence/task-09-acceptance.md`）；Desktop 侧四次真实启动见 `evidence/task-09-desktop-launch.md`。**AC-05 方法与计划不同**：计划写「dev 模式断点/日志」，实际改为把探针页经 `TAURI_CONFIG` 嵌进真二进制，因为断点只能证明调用发生了、不能证明**页面拿到的就是配置里的值**，而后者才是这条 AC 要的 |
+| T-10 | 模块分工回写 + 收尾：三仓 AGENT-INDEX/DIRECTORY_MAP、workspace 基线核对、LEDGER/CURRENT_CONTEXT 同步、DONE Gate | DONE | 三仓文档各一 commit（agent `ba179ed`、desktop `5c74ca1`+`2599819`、cloud `f89467f`），判据为退役名扫描带阳性对照；基线核对逐节判据与两处偏离见 `evidence/task-10-baseline-check.md`；`verify_agent_entry.py` + `verify_delivery_governance.py` 均 0 ERROR / exit=0；快照已再生成 |
 
 ## 9. Repository Checklist
 
 ### wt-media-workspace
 
-- [ ] 程序总纲 `docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md`
-- [ ] planned 登记 CHG-20260923-057/058/059
-- [ ] LEDGER 与 CURRENT_CONTEXT 同步
-- [ ] evidence/ 记录齐全
+- [x] 程序总纲 `docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md`
+- [x] planned 登记 CHG-20260923-057/058/059（三目录均存在）
+- [x] LEDGER 与 CURRENT_CONTEXT 同步（本次收尾提交，含快照再生成）
+- [x] evidence/ 记录齐全（task-02…task-10 共 9 份 + `artifacts/` 运行产物 + `tools/`）
 
 ### wt-media-cloud
 
-- [ ] 仅 `web/src/apps/desktop/features/local-agent/init.js` 与 `features/local-logs/LocalLogsPage.vue` 两文件
+- [x] 四个文件：生产 `web/src/apps/desktop/features/local-agent/init.js`、`features/local-logs/LocalLogsPage.vue`；测试 `web/src/localAgentBoundary.test.js`、`web/src/localAgentService.test.js`（后两者是前两者的常驻守护，与改动同批提交 `305d002`）
 
 ### wt-media-agent
 
-- [ ] runtime/、bootstrap/、clients/、services/、config/、config_online/ 落地
-- [ ] runtimes/、config.py、log_setup.py 删除
-- [ ] 全部测试绿
+- [x] runtime/、bootstrap/、clients/、services/、config/、config_online/ 落地
+- [x] runtimes/、config.py、log_setup.py 删除
+- [x] 全部测试绿（`bash scripts/test.sh` → Ran 253 tests OK）
 
 ### wt-media-desktop
 
-- [ ] bootstrap.rs、config/、paths/、state/、commands/ 落地
-- [ ] main.rs 收缩
-- [ ] cargo test / build 绿
+- [x] bootstrap.rs、config/、paths/、state/、commands/ 落地
+- [x] main.rs 收缩（1570 → 115 行，AC-04 上限 300）
+- [x] cargo test / build 绿（63 passed；`cargo build` 成功，4 条告警全部来自本 CHG 明示不动的三个空壳 `filesystem`/`secure_store`/`updater`/`system`）
 
 ## 10. Acceptance Matrix
 
@@ -137,7 +137,7 @@
 | AC-08 | 治理校验通过（verify_agent_entry、verify_delivery_governance） | 脚本输出 | **PASS** `tools/ac08_governance.sh`：两者 0 ERROR，**且同对校验器在故意弄坏的副本上 exit=1**（0 ERROR 只在「校验器会红」被证明后才有意义） |
 | AC-09 | Local / Cloud / sidecar 三种模式各有一次真实启动与健康输出记录（吸收 053 验收 1） | 手动启动 + evidence | **PASS** 三模式各一次（cloud 0.09s 退出 0、对死地址无出站请求；local 连真实 BitBrowser 40 profiles；sidecar 见 AC-03），另加 Desktop 真实拉起的 4 次 |
 | AC-10 | 任务链路 e2e：Cloud Task → runner → executor → client/service → 结果上报 → checkpoint 落库 → 重启恢复，至少跑通一次（吸收 053 验收 2） | 手动回归 + evidence | **PASS** `tools/ac10_task_chain.py` 两 leg：LEG A 全链 `succeeded`/`progress=100` 且 checkpoint 已清；LEG B 中途 SIGKILL → 盘上留 `running` → 重启 `recovering 1 incomplete task(s)` + `resuming task <id>`。隔离 Cloud（独立实例 + 独立 schema，空表起步），**不碰**开发者 :18080 的积压任务表 |
-| AC-11 | 新增一个 executor + 一个 client 的 demo 证明无需改 runtime（吸收 053 验收 3） | demo 代码 + evidence | **PASS** 常驻测试 `tests/test_new_task_type.py`（产品代码零改动，经公开缝 `register_executor` 装入）+ 失败验证 `/tmp/ac11-mutants.py`：**6/6 CAUGHT，0 SURVIVED**，含探测器自检 |
+| AC-11 | 新增一个 executor + 一个 client 的 demo 证明无需改 runtime（吸收 053 验收 3） | demo 代码 + evidence | **PASS** 常驻测试 `tests/test_new_task_type.py`（产品代码零改动，经公开缝 `register_executor` 装入）+ 失败验证 `evidence/artifacts/ac11-mutants.py`：**6/6 CAUGHT，0 SURVIVED**，含探测器自检 |
 
 ## 11. Evidence
 
@@ -154,6 +154,7 @@ Evidence files live in `evidence/`，按 Task 编号记录事实。
 - `evidence/task-08-cloud-web.md`：T-08 Cloud Web 取证——单个 commit `305d002`、**行为性**的红输出（而非导入失败）、5/5 变异矩阵、`npm test` 96→**101**、AC-05 grep 升级为**常驻断言**（两条规则显式限定文件范围并注明理由）、一处**值级哨兵自查删除**（`"true"` 在红跑里从未触发，只为错误的理由匹配），以及**已枚举的未覆盖面**（`health()` 调用无单测、`bindTrustedLocalAgent()` 归 T-09）。
 - `evidence/task-09-desktop-launch.md`：T-09 Desktop 真实启动取证——**四次**真实启动（M1 错 CSP / M2 Python fallback / M3 exe 旁 sidecar / M4 加 `ipc:` 的反事实），逐 leg 的实测输出；探针页如何经 `TAURI_CONFIG` 把 `devUrl` 置 `null` 而被嵌进真二进制（以及「首次构建疑似没生效」的判定过程）；T-07 遗留①②④的运行期闭合；**两向 CSP**（错地址 rejected+违规且 `originalPolicy` 逐字含该地址 / 对地址 resolved 零违规 / 按源精确：`localhost:18080` 四 leg 全拒）；**子进程环境从不读取**（`ps -wwE` 被拒后改为四项行为判据 + argv 的植入阳性对照）；三条实测发现（`development.python_fallback` 是装饰键、`connect-src` 缺 `ipc:`、`reqwest` 默认读 macOS 系统代理导致回环请求被接管）与**已枚举的未覆盖面**。
 - `evidence/task-09-acceptance.md`：T-09 AC-01…AC-11 验收矩阵——逐条命令与实测输出、每条的**阳性对照**、环境事实表（含「为什么另建隔离 Cloud」）、以及 §覆盖边界 **7 条未覆盖项**（真实前端 bundle 未被驱动、只有 macOS、BitBrowser 链路依赖真实账号状态、`profile-create/update/delete` 与 bind 的 Cloud 往返未驱动、`connect_timeout` 不闭合、两处待裁定的产品决定、Cloud 仓 Go 测试不在验收面内）。
+- `evidence/task-10-baseline-check.md`：T-10 入口文档回写 + 架构基线核对——三仓各自的**退役名扫描**（带分母与阳性对照）、`core/` 撤销的登记（代码追上基线，而非基线被违反）、§5.2/§5.4/§5.5/§5.8 与 ADR-0016 层表**逐节**的对照判据、**两处偏离**（§5.2 的 7 项差集，其中 `modes/`/`generated/` 是基线与实现正面冲突故留作待裁定；`runtime/paths.py` 无平台分支，§5.8 的 Windows 路径未实现）、一处 overstated 能力描述（文档与两条代码注释把「HTTP 桥」写成「HTTP/SSE 桥」）的纠正、**一次自查纠正**（zsh 不对未加引号的变量做词分割，导致第一版退役名扫描得到假的「0 命中」）、以及 §覆盖边界 **5 条未覆盖项**。`core/` 与 `runtimes/` 的撤销、根级 `config.py`/`log_setup.py` 的删除在基线侧**无需改动**：§5.2 的 `:1040` 早已明写这三者不保留。
 
 ## 12. Current Checkpoint
 
@@ -217,17 +218,78 @@ Completed:
   AC-01…AC-11 逐条落到可重跑的工具上并附阳性对照，四次 Desktop 真实启动闭合 T-07 的三处
   运行期遗留并完成两向 CSP 检查。矩阵见 `evidence/task-09-acceptance.md`，Desktop 深挖见
   `evidence/task-09-desktop-launch.md`。
+- T-10 三仓入口文档回写完成，一仓一 commit：agent `ba179ed`、desktop `5c74ca1`
+  （另有 `2599819` 单改两处注释）、cloud `f89467f`。判据是**退役名扫描**（各带分母与阳性对照），
+  不是「读了一遍觉得对」。
+  - agent：旧树的 `app.py`/`runner.py`/`core/`/`runtimes/`/两个顶层模块从 `AGENTS.md` 的
+    Structure 消失；`DIRECTORY_MAP.md` 那句「`executors/account_check.py` 尚余 4 处 URL 字面量
+    未迁出」已被 `a4a43cc` 作废，改指 `clients/platform_urls.py` 与 `PROXY_PROBE_URL`，
+    并补上缺失的 `clients/platform_urls.py` 行；`README.md` 的 Key Directories 不再列已删包。
+  - desktop：`DIRECTORY_MAP.md` 补齐 `bootstrap.rs`/`config.rs`/`paths.rs`/`token.rs`/`state.rs`/
+    `http/`/`dto/`/`preflight.rs`/`resources/`，并把 sidecar 启停从 `local_agent/` 改指 `sidecar/`
+    （`local_agent/` 只余契约类型 `BoundNodeFacts`）；`README.md` 原称本仓有 `src/` Vue 页面、
+    用 `npm test` 验证、`binaries` 是 future placeholders——三条全不成立，已改。
+  - cloud：补 T-08 的缺口——Desktop 应用行下补 `features/local-agent/init.js`（地址来源）
+    与仓库根的 `localAgentBoundary.test.js`（常驻边界断言），需求路由补对应一行。
+- T-10 一处**被夸大的能力描述**：四处文字（desktop 的 `AGENT-INDEX.md`、`AGENTS.md`，
+  以及 `main.rs` 头注释与 `commands/agent.rs:89` 的文档注释）写「Rust 代理 Local Agent
+  HTTP 与 **SSE**」。实测：Agent 侧确有 `text/event-stream` 端点
+  （`local_api/server.py:445`），Desktop 侧消费流的地方 **0 处**——`local_agent_task_status`
+  打的是状态端点、返回快照。两份入口文档随各自的 T-10 文档 commit 改掉并注明「不要写成
+  已实现」，产品代码里的两条注释单独一个 commit（`2599819`）改掉——文档 commit 与代码
+  commit 分开走。
+- T-10 **架构基线核对**（逐节给判据，见 `evidence/task-10-baseline-check.md`）：
+  §5.4 与 §5.5 **一致**——§5.4 的依赖方向由 `tests/test_dependency_boundaries.py` 的
+  R2 白名单 + R10 冻结边棘轮机器校验（全绿即满足，不靠约定），§5.5 点名的三个平台目录
+  齐备且 `clients/douyin/` 按 ADR-0015 确实未建；§5.2 与 §5.8 **各有一处偏离**，逐条登记。
+- T-10 **`core/` 撤销的登记**：`core/profile_guard.py` → `services/profile_guard.py`，
+  物理 `core/` 已不存在。基线侧**无需改动**——§5.2 的 `:1040` 早已明写
+  「不保留 `modes/`、`core/`、`communication/`、`runtimes/`、`platforms/`、`generated/`」，
+  ADR-0016 的层表也无 `core/`。这条登记的含义是**代码追上了文档**：撤销之后基线不再被违反，
+  而是被满足。同批消失的 `runtimes/`（拆入 `clients/` + `services/`）与根级
+  `config.py`/`log_setup.py`（内容迁入 `runtime/`）同理。
+- T-10 两处**基线偏离**（只登记未改）：
+  ①§5.2 的树与实际差 7 项（`local_main.py`/`cloud_main.py` 两个入口、两个废弃 shim、
+  `adapters/` 占位包，以及 `modes/`/`generated/` 两个占位包）。前三类与计划一致、
+  照实登记；**后两者是基线与实现正面冲突**（基线明写不保留、计划定为不动），
+  按纪律不擅自回写文档，留作待裁定项（见 Next 第三条）。
+  ②§5.8 另外指定了 Windows 的 `%LOCALAPPDATA%\WTMedia\Agent\`，而 `runtime/paths.py`
+  （124 行）**没有任何 `sys.platform`/`os.name` 分支**，installed 态无条件走 `Path.home()`
+  + `("Library","Application Support",…)`，故在 Windows 上会落到
+  `%USERPROFILE%\Library\Application Support\WTMedia\Agent`。基线 §1.4 把 Windows x64
+  列为桌面首版支持范围之一。本 CHG 无判据（全部取证只在 macOS 上做过，T-09 覆盖边界第 2 条
+  已声明不可外推），故只报静态机制、不报实测失败，也不在本次动手改。
+- T-10 **一次自查纠正**：第一版退役名扫描写成 `for f in $files`（`$files` 来自 `ls`）。
+  zsh **不对未加引号的变量做词分割**，`$f` 成了整个多行字符串，grep 拿到多行文件名报错、
+  又被 `2>/dev/null` 吞掉，于是得到「0 命中」。用 `runtime/constants.py` 做阳性对照才暴露
+  （同一模式手工跑有命中）。换成 glob 重跑后 agent 仓得到 3 条命中、逐条合法。
+  **这次 0 命中是检查坏了，不是仓库干净**——与本 CHG 反复强调的「否定结论必须先证明
+  检查会失败」是同一回事，记在此处作为它的一次真实触发。
+- T-10 一处**数字自查纠正**：基线核对初稿把 `runtime/paths.py` 写成 343 行（那是 desktop 仓
+  `paths.rs` 的行数，串了）。实测 124 行，已改，且平台分支扫描的分母随之写明。
 
 Current:
-- T-10 模块分工回写 + 收尾（三仓 `AGENT-INDEX.md`/`DIRECTORY_MAP.md` 按实际布局回写、
-  workspace 架构基线核对并登记 `core/` 撤销、`change.md` §13 DONE Gate 逐项签字、
-  `LEDGER.md`/`status/*.md`/快照再生成）。
+- **T-10 收尾完成，本 CHG 达到 DONE Gate**：`change.md` §1/§5/§8/§9/§10/§11/§13、`status/*.md`、
+  evidence 齐全；快照经 `prepare_ai_workspace.py` 再生成；§13 九项逐项签字。状态已置 `DONE`。
+- 三仓文档回写与基线逐节核对已完成（见 Completed 末条）。
 
 Next:
-- T-10 完成后本 CHG 走 DONE Gate。
+- **归档决定（待用户裁定）**：按 `executing-wt-media-change` 的 Completion Gate，已完成的记录
+  应从 `delivery/active` 与 `LEDGER.md` 移出。但下面四项待裁定均引用本目录的文件，
+  故**不擅自归档**，等裁定结果一并处理。
 - 两处**待用户裁定的产品决定**（本 CHG 只登记未改，见 `task-09-desktop-launch.md` §Findings）：
   ①生产 CSP 是否把 `ipc:` 加进 `connect-src`（可只改 `config`，`csp_connect_src` 本就允许空格分隔多值）；
   ②回环 client 是否加 `.no_proxy()`（涉及 Cloud client 是否保留系统代理）。
+- 第三处**待用户裁定**由 T-10 的基线核对新增（见 `task-10-baseline-check.md` §偏离 1）：
+  基线 §5.2 `:1040` 明写「不保留 `modes/`、`generated/`」，而两者实际以一行 docstring 的
+  占位包形式保留，本次计划亦定为「不动」。两者零实现、零引用，裁定成本很低：要么删掉，
+  要么把基线那句改成「保留为占位」。
+- 第四处**由我造成、待用户裁定如何处置**：开发者的 Cloud `:18080` 上有一个 T-09 AC-10
+  早期调试时被误建的 `noop_task`（`task_b21340775ace100173202de3`，`pending`，
+  created 2026-09-24T00:49:21）。它是惰性的（`claimTask` 按 `created_at ASC` 领取，被
+  :18080 上更早的 7 月积压排在后面），但它确实是本 CHG 计划外的一次写入。
+  **清除它要动开发者的 Cloud，超出本 CHG 的授权**（§9 的 cloud 清单只含四个源码文件），
+  故只登记不处置。
 
 Blocked:
 - None.（T-07 遗留③ `connect_timeout` 的隔离量测**被②挡住**：`reqwest` 默认走 macOS 系统代理，
@@ -419,7 +481,7 @@ Recent verification:
 - T-08 未覆盖面（已枚举）：`LocalLogsPage` 的 `health()` 调用**没有单元测试**（只断言了它不再
   直连）——断言「用的是 `health()` 而不是 `status()`」属对实现细节过拟合，且两者都经桥、
   都不越界，无可断言的行为差异；运行期由 T-09 覆盖。
-- T-09 四次 Desktop 真实启动（`tools/ac05_desktop_launch.py`，`/tmp/ac05-run5.log` = PASS）：
+- T-09 四次 Desktop 真实启动（`tools/ac05_desktop_launch.py`，`evidence/artifacts/ac05-run5.log` = PASS）：
   M1 错 CSP / M2 Python fallback / M3 exe 旁 sidecar / M4 加 `ipc:` 的反事实。每 leg 独立
   scratch 端口（**四次都未触碰开发者 :8765 的 dev Agent**）、独立配置与数据目录、退出后
   实测**零残留监听**。
@@ -466,7 +528,7 @@ Recent verification:
   改为按前缀分区、只断言被测 URL 自己的 `refusals`，并补 M4 作反事实。
 - T-09 一处**文本与证据不同步**的处置：加完 M4 后 docstring/表头/PASS 串仍写「three」，
   改完措辞后**没有重跑**，故 `/tmp/ac05-run4.log` 里的 PASS 行属于旧文本；证据因此改用
-  **`/tmp/ac05-run5.log`**（与当前工具文本一致的那一次），run1–run4 留在记录里作为调试过程。
+  **`evidence/artifacts/ac05-run5.log`**（原 `/tmp/ac05-run5.log`；与当前工具文本一致的那一次），run1–run4 留在记录里作为调试过程。
 - T-09 AC-01…AC-11 逐条判据与阳性对照见 `evidence/task-09-acceptance.md`：AC-07 = agent
   **253 tests OK** / desktop 63 passed / web 21 files·101 tests；AC-08 = 两个校验器 0 ERROR
   **且同对校验器在弄坏的副本上 exit=1**；AC-10 = 两 leg（全链 `succeeded`+`progress=100` 且
@@ -480,22 +542,91 @@ Recent verification:
   只有 `npm test` 的单元与变异证据；**只测了 macOS**；探针用 `mode:"no-cors"` 故只量策略放行与否、
   不量 HTTP 状态；`profile-create/update/delete` 与 bind 的 Cloud 往返未驱动；
   `connect_timeout` 不闭合（原因如上）。
-- T-09 待收尾的三项（本记录落盘时仍未做）：隔离 Cloud（`:18199`，PID 21224，cwd `/tmp/ac10/root`，
-  日志 `/tmp/ac10/server.log`）与其 scratch schema `wt_media_cloud_ac10` 的停用与清理；
-  `/tmp/wt-ac05/` 等 scratch 目录；以及**开发者的 Cloud `:18080` 上被误建的一个 `noop_task`**
+- T-10 **收尾清理已完成**（T-09 落盘时登记为「待收尾」的三项）：
+  - 隔离 Cloud（PID 21224，cwd `/tmp/ac10/root`）`kill -TERM` 停止 → `18199` 无监听、
+    进程已退出（实测）。**开发者的 `:18080`（PID 55442）与 dev Agent `:8765`（PID 55443）
+    全程未触碰**，停止前后两次 `lsof` 均在。
+  - scratch schema `wt_media_cloud_ac10`：**删前先看**——`information_schema` 显示除
+    `schema_migrations`（39）外唯一有数据的是 `tasks`（2 行），逐行读出为
+    `noop_task` / `agent_id=ac10-agent` / `created_at 2026-09-24 00:55:30`（`succeeded`）与
+    `…00:55:31`（`leased`），正是 AC-10 的 LEG A 与 LEG B，确认为本次自己的产物后才 `DROP`。
+    删后复查：该库名 0 命中，**且同一条查询能看见 `wt_media_cloud`**（阳性对照，证明 0 是真 0）。
+    连接密码从隔离实例自己的 `config/database/primary.toml` 读出后经 `MYSQL_PWD` 传入，
+    **不进转写文本、不进任何输出**。
+  - `/tmp/ac10/`（39M，含 `server`/`migrate` 二进制与 `root/config`）、`/tmp/wt-ac05/`（四次
+    启动的 scratch）等 scratch 目录：随 T-10 清除。
+- T-10 **把证据从 `/tmp` 收回本 CHG**：`/tmp` 重启即清空，而 `task-07`/`task-09` 的证据文件
+  引用的是 `/tmp/…` 路径——那等于把证据寄存在会消失的地方。收回 `evidence/artifacts/`
+  （6 个运行输出，逐字节 `shasum` 两两相等）与 `evidence/tools/`（T-07 的两个脚本，同样逐字节），
+  引用逐处改指，原始 `/tmp` 路径保留在括号里作为出处。清单与**唯一一处脱敏**见
+  `evidence/artifacts/README.md`：`ac06.out` 里 `bind` 响应打出的 64 位会话 token 已按名
+  替换为 `<redacted-local-session-token>`（`diff` 只有那一行），理由是它虽属已退出的一次性
+  scratch 实例、不构成在用凭据，但与约束禁止的形状同类；同一份输出里的 cookie **名称**清单
+  则刻意保留——AC-06 要证的恰是「值没泄漏」。
+- T-09 遗留一项**未收尾、待用户裁定**：**开发者的 Cloud `:18080` 上被误建的一个 `noop_task`**
   （`task_b21340775ace100173202de3`，`pending`，created_at 2026-09-24T00:49:21，AC-10 工具早期
   调试所留）。该行**无害**（`claimTask` 取 `created_at` 最早者，7 月的积压排在其前），
-  但它是本次误写，**登记待用户决定是否撤销**（写开发者的 Cloud 不属本 CHG 授权范围，
-  故不擅自写）。
+  但它是本次误写，且写开发者的 Cloud 不属本 CHG 授权范围，故**不擅自删**，登记待用户决定。
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed. —— T-01…T-10 全部 DONE（§8）。Add/Modify/Delete 三节逐条有落点：
+  Agent 的 `runtime/`+`bootstrap/`+`clients/`+`services/`+`config{,_online}/`、Desktop 的
+  bootstrap/config/paths/state/commands/`get_public_config`、Cloud Web 的四个文件（§9），
+  删除项的 `config.py`/`log_setup.py`/`runtimes/` 均已消失（T-10 退役名扫描，附分母与阳性对照）。
+  超范围的 T-07 遗留③与两处产品决定**未擅自闭合**，登记在 §12 待裁定。
+- [x] No blocking `Q-xx`. —— 唯一的 Q-01（生产真实 Cloud 地址）为 `NO`（不阻塞开发默认值与机制实现），
+  本次未产生新的 `Q-xx`；三仓实现只依赖已定的部署模型「本机 Cloud」。
+- [x] Acceptance matrix all PASS. —— AC-01…AC-11 共 11 条全 PASS，逐条判据见 §10 与
+  `evidence/task-09-acceptance.md`（每条附阳性对照；16 项真实链路 exercised，未覆盖项逐条列在
+  §覆盖边界，未以「测试通过」替代真实副作用证据）。
+- [x] Automated tests passed or justified. —— agent `bash scripts/test.sh` **253 tests OK**（起点 85，
+  单调不降）；desktop `cargo test --workspace` **63 passed**；cloud web `npm test`
+  **21 files / 101 tests passed**。CI 固定 Python 3.12，未用 3.13+ 语法。
+- [x] Manual verification evidence recorded where required. —— T-09 的**四次**真实 Desktop 启动
+  与两向 CSP（`evidence/task-09-desktop-launch.md`）；T-07 的真实副作用（带 token 200 / 无 token 401、
+  数据目录实际落点）；T-09 三模式各一次真实启动；AC-10 的隔离 Cloud 任务链与 SIGKILL 恢复。
+- [x] Diff checked for out-of-scope changes. —— 逐仓枚举了 CHG 区间的完整改动面：agent 的非源码改动
+  全部在 §5 内；desktop 的非 Rust 改动（`Cargo.lock`/`Cargo.toml`/`resources/*.toml`/`tauri.conf.json`/
+  `scripts/test.sh`/四份文档）全部在 §5 内；cloud 实为 **4 个代码文件**（2 生产 + 2 测试），
+  §1/§5/§9 原先写的「两文件」是低估，**本次已按实际改写**（不是改了实现去迁就文档）。
+  无范围外的产品行为变更。
+- [x] Runtime repositories touched only if listed in scope. —— 三个运行仓均在 §1 的受影响仓库内；
+  `wt-media-workspace` 只做治理记录与基线核对，未成为运行时依赖（未新增任何跨仓 import/引用）。
+- [x] Required baselines updated. —— 架构基线已按 ADR-0016 在程序启动时改写完毕，本次**逐节核对**
+  §5.2/§5.4/§5.5/§5.8 与 ADR-0016 层表（`evidence/task-10-baseline-check.md`），
+  其中 §5.4/§5.5 是**机器强制**的一致（R2 白名单 + R10 冻结边棘轮）；**两处偏离如实登记未改**：
+  §5.2 的 7 项差集（其中 `modes/`/`generated/` 是基线与实现正面冲突，按纪律留待裁定）、
+  §5.8 的 Windows 路径在 `runtime/paths.py` 中无平台分支。三仓 AI 入口文档按实际新布局回写完毕。
+- [x] Affected repositories committed independently. —— 一仓一提交：agent `ba179ed`；
+  desktop `5c74ca1`（文档）+ `2599819`（注释，与文档分开提交）；cloud `f89467f`；
+  workspace 本次收尾提交（治理记录、evidence、状态、快照再生成）。
+  全程遵守「移动文件与改逻辑不进同一 commit」。
+
+## 关闭记录（2026-09-24）
+
+- **关闭依据是 DONE Gate，不是用户签收**（如实登记，勿读成后者）：本 CHG 的授权来自用户
+  2026-09-23 对执行计划的批准与「继续完成任务」的指示；执行期间**没有**针对本 CHG 的用户
+  验收轮次。§13 九项由我逐项签字，判据逐条写在签字行里。若需要用户签收口径，请在此追加。
+- **关闭时的验证快照**：agent `bash scripts/test.sh` → **Ran 253 tests OK**（起点 85，全程单调不降）；
+  desktop `cargo test --workspace` → **63 passed; 0 failed**，`cargo build` 成功
+  （4 条告警全部来自本 CHG 明示不动的空壳模块）；cloud `cd web && npm test` →
+  **21 files / 101 tests passed**；`verify_agent_entry.py` → **0 warning**（快照 1668 字符）；
+  `verify_delivery_governance.py` → **ok, Active CHG: none**。
+- **提交**：agent `ba179ed`（入口文档）及其之前的 T-02…T-08 全链；desktop `5c74ca1`（文档）+
+  `2599819`（注释，单独提交）；cloud `f89467f`（入口文档与边界测试登记）；
+  workspace 本次收尾提交（§1/§5/§9/§13 回写、evidence 与运行产物、三仓 status、快照再生成）。
+- **归档动作**：记录由 `delivery/active/CHG-20260923-056/` 移入 `delivery/completed/`，
+  `delivery/LEDGER.md` 的活动行移除并补关闭说明。归档**连带修掉 5 处失效指针**——
+  `planned/README.md`（2 处）、`planned/CHG-20260923-053/change.md`、程序总纲（2 处）原先都指向
+  `delivery/active/CHG-20260923-056/`；这正是本 CHG 反复处理的「文档落后于事实」形态，
+  用带阳性对照的扫描确认 0 残留（模式在别处有命中，故 0 是真 0）。
+  快照用 `prepare_ai_workspace.py --no-active` 再生成（该模式由 CHG-055 关闭时补上，
+  本次无需再补工具缺口），快照现为 `Active CHG: none` / `Status: NONE`。
+- **遗留（四项，随记录归档，不阻塞本次关闭）**：见 §12「Next」——①生产 CSP 是否加 `ipc:`；
+  ②回环 client 是否加 `.no_proxy()`；③`modes/`+`generated/` 占位包与基线 §5.2「不保留」的冲突；
+  ④T-09 期间在开发者 Cloud `:18080` 上被误建的惰性 `noop_task`（`task_b21340775ace100173202de3`）
+  如何处置。四者全是计划明示的范围外事项或新增发现，故不构成未完成的 scope。
+- **明确不在本次关闭内**：本 CHG 未实现日志轮转/清理/脱敏、用户设置 UI、端口就绪通知、
+  打包完整性校验与升级回归——这些按程序总纲分属 CHG-057/058/059，**不得**据本记录的 DONE
+  推断它们已完成。

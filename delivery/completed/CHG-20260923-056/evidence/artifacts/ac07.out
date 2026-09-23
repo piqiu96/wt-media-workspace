@@ -1,0 +1,15 @@
+=== AC-07: three repositories ===
+
+--- wt-media-agent: bash scripts/test.sh ---
+  Ran 253 tests in 3.287s
+  OK
+
+--- wt-media-desktop: cargo test --workspace ---
+  test result: ok. 63 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.22s
+
+--- wt-media-cloud/web: npm test ---
+   Test Files  21 passed (21)
+        Tests  101 passed (101)
+
+=== result ===
+PASS: all three suites green, agent >= 85

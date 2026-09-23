@@ -1,0 +1,48 @@
+python: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/bin/python
+agent HEAD: da6f593
+
+==============================================================================
+PROVENANCE: is config/agent.toml read?  (four trees)
+==============================================================================
+  1. real checkout            exit=0  warnings: 0
+  2. copy, bogus + secret key exit=0  warnings: 2
+       ignoring unknown config key agent.bogus_key
+       ignoring sensitive key agent.runtime_token from the config file; credentials are environment-only
+  3. copy with a value        exit=0  resolved agent_id='ac09-from-file'
+  4. copy with broken TOML    exit=1  reported=True
+     precedence (env > file > default) is pinned by tests/test_runtime_config.py
+
+==============================================================================
+MODE 1: local  (bootstrap.local, config/agent.toml + environment)
+==============================================================================
+  port 54848 (default 8765 is the developer's own Agent -- not used)
+  GET /healthz                -> 200 {"status":"ok","service":"wt-media-agent","mode":"m1"}
+  GET /api/v1/status          -> 200
+    bitbrowser_status='normal' main_user_id='2c9bc06191effa4e0191f9589996619f' profiles=40
+    control: the two failure values, exercised -> exit=0 (OK)
+    data dir /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-ac09-eq83f5p4/local-data -> ['local-agent.sqlite3', 'local-agent.sqlite3-shm', 'local-agent.sqlite3-wal', 'logs', 'versions']
+  after stop: listening=False
+  log tail: 2026-09-24T00:48:59 [INFO] wt_media_agent.local_api.server: local_api.status.success duration_ms=323
+
+==============================================================================
+MODE 2: cloud  (bootstrap.cloud, report posture)
+==============================================================================
+  elapsed 0.09s  exit=0
+  stdout: {"agent_id": "ac09-cloud", "cloud_base_url": "http://127.0.0.1:1", "data_dir": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-ac09-eq83f5p4/cloud-data", "database_path": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-ac09-eq83f5p4/cloud-data/local-agent.sqlite3", "environment": "development", "log_file": "", "mode": "cloud", "run_runner": false, "version": "0.2.2"}
+  verdict: reported facts after 0.09s against a dead Cloud address -> no request was made
+
+==============================================================================
+MODE 3: sidecar  (bootstrap.sidecar, Desktop's four variables)
+==============================================================================
+  the four variables: HOST=127.0.0.1 PORT=54862 TOKEN=<set> DATA_DIR=/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-ac09-eq83f5p4/sidecar-data
+  listened on 127.0.0.1:54862 -- not the default 8765, so PORT was honoured
+  GET /healthz with the token       -> 200 {"status":"ok","service":"wt-media-agent","mode":"m1"}
+  GET /healthz with no token        -> 401 {"error":"unauthorized"}
+  GET /healthz with a wrong token   -> 401 {"error":"unauthorized"}
+  GET /api/v1/status (with token) -> 200 profiles=40
+  argv: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/bin/python -m wt_media_agent.sidecar_main
+  data dir /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-ac09-eq83f5p4/sidecar-data -> ['local-agent.sqlite3', 'local-agent.sqlite3-shm', 'local-agent.sqlite3-wal', 'logs', 'versions']
+  after stop: listening=False
+
+==============================================================================
+RESULT: PASS -- three modes started for real, each judged on its own criteria

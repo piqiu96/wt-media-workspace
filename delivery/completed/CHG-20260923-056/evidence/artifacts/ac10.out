@@ -1,0 +1,33 @@
+agent: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent
+cloud: http://127.0.0.1:18199 (isolated instance, schema wt_media_cloud_ac10)
+isolated cloud task stats before: {'cancelled': 0, 'failed': 0, 'pending': 0, 'running': 0, 'succeeded': 0}
+
+==============================================================================
+LEG A: one task, all the way through
+==============================================================================
+  POST /api/v1/tasks/noop -> 201 task_id=task_05874f7384a561c2f37eb34d reported='pending' persisted='pending'
+  agent ac10-agent started (runner on), local api on 55912
+  GET /api/v1/cloud-agent/tasks/task_05874f7384a561c2f37eb34d -> status=succeeded progress=100 message='noop succeeded'
+    agent_id on the Cloud row: 'ac10-agent'
+  agent log: 'executing task'=True 'task succeeded'=True
+  agent sqlite: file=True (local-agent.sqlite3), rows for this task=0, rows in total=0
+  agent /api/v1/status: pending_result_count=0 bitbrowser_status='normal'
+  agent stopped (exit=-15)
+
+==============================================================================
+LEG B: killed mid-task, then restarted
+==============================================================================
+  stall proxy on 127.0.0.1:55930 -> http://127.0.0.1:18199 (POST .../report is held open)
+  POST /api/v1/tasks/noop -> 201 task_id=task_596b5b85611084d7fa9b2853 reported='pending' persisted='pending'
+    proxy: holding POST /api/v1/cloud-agent/tasks/task_596b5b85611084d7fa9b2853/report open (no response)
+  agent sqlite, mid-flight: {'task_id': 'task_596b5b85611084d7fa9b2853', 'task_type': 'noop_task', 'checkpoint_status': 'running', 'progress': 0}
+  Cloud row while the agent is blocked: status='leased' progress=None
+  agent SIGKILLed (exit=-9); the process got no chance to clean up
+  agent sqlite after the kill: [{'task_id': 'task_596b5b85611084d7fa9b2853', 'task_type': 'noop_task', 'checkpoint_status': 'running', 'progress': 0}]
+  restart log: 'recovering 1 incomplete task(s)'=True
+  restart log: 2026-09-24T00:55:31 [INFO] wt_media_agent.runner.runner: resuming task task_596b5b85611084d7fa9b2853 at progress 0
+  agent sqlite after the restart: [{'task_id': 'task_596b5b85611084d7fa9b2853', 'task_type': 'noop_task', 'checkpoint_status': 'running', 'progress': 0}]
+  restarted agent stopped (exit=-15)
+
+==============================================================================
+RESULT: PASS -- the chain ran end to end, and the crash leg recovered what it must

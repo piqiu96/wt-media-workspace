@@ -6,7 +6,7 @@
 - Type: manual + e2e（真二进制、真 WebView、真 Agent 进程、真配置）
 - Status: PASS（四次真实启动全部通过；含 3 处登记发现、1 处 T-07 遗留未闭合）
 - Tool: `evidence/tools/ac05_desktop_launch.py` + `evidence/tools/ac05_probe/`
-- Run: `/tmp/ac05-run5.log`（本记录引用的是**与当前工具文本一致**的那一次；run1–run4 为调试过程）
+- Run: `evidence/artifacts/ac05-run5.log`（原跑于 `/tmp/ac05-run5.log`；本记录引用的是**与当前工具文本一致**的那一次；run1–run4 为调试过程）
 
 ## Purpose
 
@@ -87,7 +87,7 @@ D-04 的否定面（token 不得经 argv）另有取证：读子进程 argv，�
 
 ## Actual
 
-四次全部 PASS（`/tmp/ac05-run5.log`）。逐 leg 关键行：
+四次全部 PASS（`evidence/artifacts/ac05-run5.log`）。逐 leg 关键行：
 
 ```
 M1 csp_connect_src = http://127.0.0.1:19998   (故意写错)

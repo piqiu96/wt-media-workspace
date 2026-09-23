@@ -89,7 +89,7 @@ sidecar 组明细：
     M-06 fallback 路径不注入环境           -> 无                        SURVIVED（见 §6）
     M-07 sidecar 路径不注入环境            -> 无                        SURVIVED（见 §6）
 
-### 3. 真实副作用验证（D 的前提，`/tmp/ac03-token-check.sh`、`/tmp/ac03-datadir-check.sh`）
+### 3. 真实副作用验证（D 的前提，`evidence/tools/ac03-token-check.sh`、`evidence/tools/ac03-datadir-check.sh`；原跑于 `/tmp/`）
 
 D 的整个论证建立在「这四个变量名就是 Agent 认的那四个」之上。名字漂了不是编译错误，而是
 一个静默 401 或一个没人调用的端口，**故不靠读源码断言，直接启动一次**：

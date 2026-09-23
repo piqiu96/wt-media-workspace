@@ -172,7 +172,8 @@ T-09 是联调回归与证据落盘：把 AC-01…AC-11 逐条钉到**可重跑�
 ### AC-11 — demo executor / client 落成常驻测试
 
 常驻测试 `tests/test_new_task_type.py`（**产品代码零改动**：新任务类型与它的 client 全在测试文件里定义，
-经公开缝 `TaskRunner.register_executor` 装入）。失败验证 `/tmp/ac11-mutants.py`：
+经公开缝 `TaskRunner.register_executor` 装入）。失败验证 `evidence/artifacts/ac11-mutants.py`
+（原跑于 `/tmp/ac11-mutants.py`，副本见 `evidence/artifacts/README.md`）：
 
     DETECTOR SELF-CHECK  故意制造一次失败 -> FAILED（探测器会红）
     M-01 不注册工厂                                    CAUGHT
