@@ -6,8 +6,9 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260923-056 | 联合工程优化 A——结构审计、Config 与 Client 解耦 | IMPLEMENTING | wt-media-agent, wt-media-desktop, wt-media-cloud, wt-media-workspace |
 
-No active M/L CHG（2026-09-23：CHG-20260923-055 关闭归档后，active 名额为空；下一个 CHG 待用户裁定后激活）。
+（2026-09-23：CHG-20260923-056 激活，属上线前联合工程优化程序；CHG-20260923-053 同日由用户裁定 SUPERSEDED 并入本程序。）
 
 M2 已由用户验收通过。M3-A 的闭环记录已随其并入门槛转出活动目录，归档在 [completed/CHG-20260915-044](completed/CHG-20260915-044/change.md)（`Status: HANDOFF`，未改写为 DONE）；M3-B～E 已在 [CHG-20260916-052](completed/CHG-20260916-052/change.md) 收敛并实施，该记录已于 2026-09-23 以 `Status: HANDOFF` 归档（照 CHG-044 先例，未写 DONE）。
 

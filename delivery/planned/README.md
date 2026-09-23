@@ -1,6 +1,17 @@
 # Planned delivery index
 
-更新：2026-09-23。**当前无 active CHG**——M3 已于 2026-09-23 由用户签收转 `DONE`，承载 Desktop 呈现修复的 CHG-20260923-055 已归档到 [completed](../completed/CHG-20260923-055/change.md)；下一个 CHG 需用户裁定后再激活。本目录 DISCUSSION 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 的分层、依赖方向与配置目录约定已由 ADR-0016 确认。
+更新：2026-09-23。**当前 active：[CHG-20260923-056](../active/CHG-20260923-056/change.md)（联合工程优化 A——结构审计、Config 与 Client 解耦）**，属上线前工程加固程序（`docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md`），不属 M2/M3 里程碑。本目录 DISCUSSION/PLANNED 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 的分层、依赖方向与配置目录约定已由 ADR-0016 确认。
+
+## 联合工程优化程序（2026-09-23 立项）
+
+程序总纲：[launch-engineering-optimization-program.md](../../docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md)。按依赖顺序激活，最多一项 active：
+
+| 阶段 | 记录 | 状态 |
+| --- | --- | --- |
+| A 结构审计、Config 与 Client 解耦 | [CHG-20260923-056](../active/CHG-20260923-056/change.md) | **ACTIVE（实施中）** |
+| B Paths、Logger 和运行目录 | [CHG-20260923-057](CHG-20260923-057/change.md) | PLANNED（未激活） |
+| C Desktop 本机设置 | [CHG-20260923-058](CHG-20260923-058/change.md) | PLANNED（未激活） |
+| D Sidecar、打包、升级与回归 | [CHG-20260923-059](CHG-20260923-059/change.md) | PLANNED（未激活） |
 
 ## 当前 M3 V2
 
@@ -48,6 +59,6 @@ E3 综合验收已由 `CHG-20260916-052` 执行并经 2026-09-23 补验收口（
 
 ## 既有非 M3 记录
 
-- [CHG-20260923-053](CHG-20260923-053/change.md)：Agent 运行时目录、依赖边界与生产运行能力，PLANNED；已由 ADR-0016 确认目标设计，按用户 decision 排在 M3 收尾之后实施，不抢占 active 名额，不作为 M3 前置。不改变任何业务闭环、API contract 语义或已有测试含义。
+- [CHG-20260923-053](CHG-20260923-053/change.md)：Agent 运行时目录、依赖边界与生产运行能力，**SUPERSEDED（2026-09-23 用户裁定并入联合工程优化程序：Task 1-5→CHG-056、Task 6→CHG-057、Task 7→CHG-059，唯一偏差 sidecar 受控 env 传参见其归档记录）**。原「不改变任何业务闭环、API contract 语义或已有测试含义」约束随 CHG-056 继续有效（`test_sidecar_entry.py` 断言调整除外）。
 - [CHG-20260903-034](CHG-20260903-034/change.md)：账号检查项 7/8 真实样本校准，PLANNED，待授权样本；不重新打开已经验收通过的 M2，不作为 M3 前置。
 - [CHG-20260723-023](CHG-20260723-023/change.md)：既有历史规划文件，位于 planned 但正文保留 IN_PROGRESS 标记；不是当前 active。状态整理不属于本次 M3 拆分范围，保留原文件，不能据此宣布 M2 尚未完成。

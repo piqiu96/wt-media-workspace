@@ -1,0 +1,69 @@
+# Desktop × Agent 联合上线工程优化程序（Program）
+
+- 日期：2026-09-23
+- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）
+- 性质：上线前工程加固程序，不属 M2/M3 里程碑范围（先例：CHG-20260923-055 里程碑外工程 CHG）
+- 承载 CHG：CHG-20260923-056（A，active）、CHG-20260923-057（B）、CHG-20260923-058（C）、CHG-20260923-059（D，均 planned）
+- 上游基线：ADR-0016（Agent 运行时分层的目录、依赖与配置边界）；架构基线 `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` §5.8
+
+## 1. 问题与目标
+
+`wt-media-desktop` 与 `wt-media-agent` 接近上线，需完成一次联合工程优化，解决六类问题：
+
+1. 服务地址、端口、文件路径和超时等变量写死，修改环境必须改代码。
+2. Client 和业务执行代码耦合，自动化测试容易误连真实外部服务。
+3. Desktop 和 Agent 缺少清晰的配置、日志、运行目录及初始化规范。
+4. 本地开发、自动化测试、Sidecar 和正式安装包缺少可靠隔离。
+5. 正式打包、升级回滚和故障诊断尚未形成可持续维护的工程闭环。
+6. 运营人员缺少本机文件、缓存和运行日志的查看与安全清理能力。
+
+改造原则：**保留现有稳定功能，按职责收口，尽量少增加抽象**。必须实施真实代码改造，不只是补充架构文档。不重做 Cloud 业务逻辑，不创建第二套任务系统，不引入配置中心、日志数据库、复杂 DI 框架或插件体系。
+
+## 2. 基线融合裁定（2026-09-23 用户裁定，方案一）
+
+用户优化方案与 ADR-0016 的分歧按下述融合执行，**ADR-0016 零修订**：
+
+| 分歧点 | 融合结果 |
+|---|---|
+| config/logging 目录归属 | 收口在 `runtime/` 下（`runtime/config.py`、`runtime/logging/`），遵循 ADR-0016 第 2 条 |
+| 配置文件组织 | `config/`（运行时唯一读取）+ `config_online/`（发布整目录替换）1:1 镜像，单文件 `agent.yaml` + environment 字段区分，不按模式选文件 |
+| 配置优先级 | **env > file > default**（ADR-0016 第 8 条）；模式区分靠 bootstrap 入口传 context |
+| 配置格式 | YAML，对齐 Cloud |
+| 开发运行目录 | `.local/{data,logs,versions}`（架构基线 §5.8）；`cache` 子目录出现真实需求时再入基线 |
+
+新方案的内容全部落地：三类配置分离（部署配置/用户设置/敏感与临时运行上下文）、强类型配置模型、Executor 构造注入 Client、日志脱敏与保留策略、Desktop 用户设置 `settings.toml`。
+
+## 3. 分阶段范围
+
+### CHG-A：结构审计、Config 和 Client 解耦
+
+- 三仓结构审计（已完成：Desktop `main.rs` 1570 行承载全部 17 命令、其余模块空壳；Agent `config.py`/`log_setup.py` 零引用死代码、5+ 处 `os.getenv` 散落、入口空壳）。
+- Agent：`runtime/`（config/context/paths/environment/logging）+ `bootstrap/{local,cloud}.py` 真实组装 + `clients/`、`services/` 拆分（撤销 `runtimes/`，ADR-0016 第 4 条）+ executors 注入 + `config/`+`config_online/` 落地 + sidecar 受控传参 + AST 边界测试。
+- Desktop：拆分 main.rs（bootstrap/config/paths/state/commands）+ 强类型 DesktopConfig（`resources/desktop.<env>.toml` + env 覆盖 + 生产校验）+ AppPaths + AppState + HttpClient 超时 + Cloud 地址链路（DesktopConfig → 受控 command → Vue）+ sidecar 传参。
+- Cloud Web：desktop app 两文件（init.js 地址改 invoke、LocalLogsPage healthz 改走 command）。
+- 详见 `delivery/active/CHG-20260923-056/change.md`。
+
+### CHG-B：Paths、Logger 和运行目录
+
+Desktop/Agent 独立运行目录、日志初始化、落盘、轮转、清理及脱敏；`operation_id` 日志关联；测试目录隔离；sidecar stdout 持续消费（不转存全部 INFO）。
+
+### CHG-C：Desktop 本机设置
+
+目录查看与修改、存储空间、日志查看（约 500 行 + 级别筛选）、缓存清理、历史日志清理、诊断导出（脱敏）。
+
+### CHG-D：Sidecar、打包、升级与回归
+
+端口就绪通知与实例身份验证、退出 draining、PyInstaller 产物完整性、`config_online → 产物/config` 打包步骤、版本兼容、正式安装包脱离开发环境验证、M2 业务回归。
+
+## 4. 横切要求（各阶段通用）
+
+- Config 三类分离：部署与运行配置（开发/部署控制）、用户设置（Desktop 页面修改、存用户数据目录）、敏感信息与临时运行上下文（安全存储/启动时生成）。不混进一个文件。
+- 依赖方向：`Bootstrap → Config Loader → Validated Config → Clients/Logger/Runtime → 注入 Services/Executors`。Executor 不读环境变量、不初始化 Logger、不创建底层 HTTP Client。
+- 两端独立运行：Agent 必须可脱离 Desktop 启动；Desktop 只传必要运行参数与凭证，不接管 Agent 内部配置与 Logger。
+- 敏感信息永不进日志：Cookie、Password、Authorization、Bearer/Refresh/Agent Runtime Token、代理密码等。
+- 验收不以编译通过、目录创建、类定义完成为准；每阶段交付实际发现问题、修改文件与职责变化、删除或迁移的硬编码、配置加载与验证结果、日志落盘与清理测试结果、真实运行或打包验证证据、未解决风险。
+- 模块分工回写：每阶段完成时同步更新各仓 `AGENT-INDEX.md`/`DIRECTORY_MAP.md` 与 workspace 职责基线；`.ai/CURRENT_CONTEXT.md` 由脚本生成，禁手改。
+
+## 5. 来源说明
+
+本程序由用户于 2026-09-23 会话内提供完整优化方案并裁定融合与执行顺序；本文件为其治理沉淀，冲突时以用户原始裁定记录与本文件融合表为准，ADR-0016 保持原有效力。

@@ -1,12 +1,13 @@
 # CHG-20260923-053：Agent 运行时目录、依赖边界与生产运行能力
 
-- Status: PLANNED
+- Status: **SUPERSEDED（2026-09-23 并入联合工程优化程序，不再独立激活）**
 - Level: S
 - 锚点：ADR-0016；工程架构基线 §5.2 / §5.4 / §5.5 / §5.6 / §5.8
 - 日期：2026-09-23
 - 基线：`docs/decisions/0016-agent-runtime-layering-and-dependency-boundaries.md`；`docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` §5。
 - 当前仓库：wt-media-agent；文档与治理记录在 wt-media-workspace。
-- 未激活：本草案已获用户确认（2026-09-23），但按用户decision 排在 M3 收尾之后实施，不抢占当前 active 名额。激活前不得开始运行时代码实施。
+- **并入去向（用户 2026-09-23 裁定）**：本草案 Task 1～5 并入 [CHG-20260923-056](../active/CHG-20260923-056/change.md)（联合工程优化 A），Task 6 并入 [CHG-20260923-057](CHG-20260923-057/change.md)（B），Task 7 并入 [CHG-20260923-059](CHG-20260923-059/change.md)（D）。程序总纲见 `docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md`。
+- **并入时的唯一实质偏差**：本草案 Task 4 要求 sidecar shim「保住字面 argv」，联合优化程序（用户后续方案）要求 sidecar 改为受控环境变量传参（端口/token/数据目录由 Desktop 注入）。按后者执行，`test_sidecar_entry.py` 断言相应调整。此偏差为用户 2026-09-23 会话裁定。
 
 ## 独立目标与范围
 
