@@ -1,0 +1,35 @@
+t	id	status	started_at	finished_at
+crawl_tasks	33	pending	NULL	NULL
+crawl_tasks	29	success	2026-09-22 10:43:52.373269	2026-09-22 10:43:55.752657
+crawl_tasks	27	partial_success	2026-09-22 10:37:07.372155	2026-09-22 10:37:08.247372
+id	team_id	username	role	status	LEFT(password_hash,7)
+1	NULL	admin	admin	enabled	$2a$10$
+2	1	senior01	senior_operator	enabled	$2a$10$
+3	1	operator01	operator	enabled	$2a$10$
+Tables_in_wt_media_cloud
+account_groups
+agent_nodes
+audit_logs
+browser_profile_runtime_presence
+browser_profiles
+crawl_tasks
+discovery_strategies
+local_agent_binding_tickets
+local_agent_nodes
+materials
+media_account_games
+media_account_tags
+media_accounts
+operation_games
+operation_teams
+profile_sync_candidates
+profile_sync_scans
+proxy_configs
+schema_migrations
+sensitive_browser_tasks
+sensitive_profile_permits
+source_contents
+tasks
+user_game_scopes
+user_sessions
+users

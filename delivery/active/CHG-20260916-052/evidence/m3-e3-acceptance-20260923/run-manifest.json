@@ -1,0 +1,1355 @@
+[
+  {
+    "step_id": "G0.1",
+    "phase": "G0",
+    "kind": "freeze",
+    "request": "git rev-parse/status",
+    "expected": "Cloud 干净；Workspace 只允许本轮验收产物",
+    "actual": "cloud=aaf66c51bab6 clean=True | workspace=4f44ffd16016 dirty_entries=2 非本轮产物=0",
+    "verdict": "PASS",
+    "ids": {
+      "cloud_head": "aaf66c51bab68c5fddfd0648e347356e37dcb29e",
+      "ws_head": "4f44ffd16016752d53f923614614b2d7dc3afae5"
+    },
+    "note": "Cloud 未提交改动=''；Workspace 越界改动=[]；本轮产物=['?? delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/', '?? scripts/verify_m3_acceptance.py']",
+    "ts": "2026-09-22T21:50:59Z"
+  },
+  {
+    "step_id": "G0.2",
+    "phase": "G0",
+    "kind": "freeze",
+    "request": "toolchain versions",
+    "expected": "记录工具链版本",
+    "actual": "{\"go\": \"go version go1.26.5 darwin/arm64\", \"node\": \"v26.8.1\", \"mysql\": \"mysql  Ver 8.4.10 for macos26.4 on arm64 (Homebrew)\", \"python\": \"Python 3.14.6\"}",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:50:59Z"
+  },
+  {
+    "step_id": "G0.3",
+    "phase": "G0",
+    "kind": "freeze",
+    "request": "lsof -iTCP:18080",
+    "expected": "18080 上只有本轮启动的进程",
+    "actual": "COMMAND     PID   USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME\nwt-media- 27020 aqiuye    8u  IPv4 0xf257ef499c305321      0t0  TCP 127.0.0.1:18080 (LISTEN)\nwt-media- 27020 aqiuye    9u  IPv4 0xf257ef499c305321      0t0  TCP 127.0.0.1:18080 (LISTEN)",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:50:59Z"
+  },
+  {
+    "step_id": "G0.4",
+    "phase": "G0",
+    "kind": "security",
+    "request": "config/credentials/*.toml 元数据",
+    "expected": "只记键名与字节长度，不记值",
+    "actual": "[{\"file\": \"config/credentials/agent.toml\", \"bytes\": 16, \"git_tracked\": true, \"keys\": [[\"auth_token\", 0]]}, {\"file\": \"config/credentials/douyin.toml\", \"bytes\": 7078, \"git_tracked\": true, \"keys\": [[\"api_key\", 35], [\"cookie\", 6975], [\"headers.User-Agent\", 16]]}]",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "安全问题登记项：见 B6/D-安全-1",
+    "ts": "2026-09-22T21:50:59Z"
+  },
+  {
+    "step_id": "G0.5",
+    "phase": "G0",
+    "kind": "freeze",
+    "request": "端口占用表",
+    "expected": "记录 5173/5174/8765/8899 现状",
+    "actual": "node        112 aqiuye   21u  IPv4 0x90fd640854a62a2b      0t0  TCP 127.0.0.1:5173 (LISTEN)\nnode       3121 aqiuye   21u  IPv4 0x50acdda8afe13794      0t0  TCP 127.0.0.1:5174 (LISTEN)\npython3.1 15233 aqiuye    3u  IPv4 0xa558e89d3e4f970b      0t0  TCP 127.0.0.1:8765 (LISTEN)\nwt-media- 27020 aqiuye    8u  IPv4 0xf257ef499c305321      0t0  TCP 127.0.0.1:18080 (LISTEN)\nwt-media- 27020 aqiuye    9u  IPv4 0xf257ef499c305321      0t0  TCP 127.0.0.1:18080 (LISTEN)\nnode      99678 aqiuye   19u  IPv4 0x84caabcf35cb20f8      0t0  TCP 127.0.0.1:8899 (LISTEN)",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:50:59Z"
+  },
+  {
+    "step_id": "G1.1",
+    "phase": "G1",
+    "kind": "precondition",
+    "request": "information_schema + schema_migrations",
+    "expected": "表与迁移齐备",
+    "actual": "tables=26 migrations_total=39 tail=20260922_038_audit_fields@2026-09-22 13:48:19.689398; 20260922_037_user_nickname@2026-09-22 13:30:34.950405; 20260922_036_content_game_default@2026-09-22 12:27:14.521474",
+    "verdict": "PASS",
+    "ids": {
+      "tables": 26
+    },
+    "note": "",
+    "ts": "2026-09-22T21:51:00Z"
+  },
+  {
+    "step_id": "G1.2",
+    "phase": "G1",
+    "kind": "precondition",
+    "request": "users / operation_teams",
+    "expected": "admin 与至少一个运营组存在",
+    "actual": "users=[['1', 'admin', 'admin', 'NULL', 'enabled'], ['2', 'senior01', 'senior_operator', '1', 'enabled'], ['3', 'operator01', 'operator', '1', 'enabled']] teams=[['1', '默认运营组'], ['2', 'M3验收-隔离组-20260923'], ['3', 'm3acc0923-自动转素材探测-158733'], ['4', 'm3acc0923-自动转素材探测-188327'], ['5', 'm3acc0923-转素材-关闭-196427'], ['6', 'm3acc0923-转素材-AND命中与未命中-200496'], ['7', 'm3acc0923-转素材-OR非正阈值被跳过-204573'], ['8', 'm3acc0923-转素材-AND单正阈值-212653'], ['9', 'm3acc0923-转素材-OR不可达阈值-220728'], ['10', 'm3acc0923-转素材-无关条件不参与-228801'], ['11', 'm3acc0923-partial-258428'], ['12', 'm3acc0923-concurrency-344178']]",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "需要 admin 才能登录；不通过则 STOP S3",
+    "ts": "2026-09-22T21:51:00Z"
+  },
+  {
+    "step_id": "G1.3",
+    "phase": "G1",
+    "kind": "precondition",
+    "request": "基线计数",
+    "expected": "冻结既有行数",
+    "actual": "{\"captured_at\": \"2026-09-22T21:51:00Z\", \"tables\": 26, \"discovery_strategies\": {\"count\": 17, \"max_id\": 18}, \"crawl_tasks\": {\"count\": 41, \"max_id\": 63, \"pending\": 0}, \"source_contents\": {\"count\": 319, \"max_id\": 434}, \"materials\": {\"count\": 87, \"max_id\": 87}, \"users\": 3, \"operation_teams\": 12}",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "后续断言一律按「本次新建 id」过滤，不与既有 109 来源混算",
+    "ts": "2026-09-22T21:51:00Z"
+  },
+  {
+    "step_id": "G1.4",
+    "phase": "G1",
+    "kind": "precondition",
+    "request": "TCP api.itfaba.com:443",
+    "expected": "上游可达",
+    "actual": "reachable",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "不可达则 G5 起进入 EXTERNAL-BLOCKED 分支",
+    "ts": "2026-09-22T21:51:00Z"
+  },
+  {
+    "step_id": "G2.1",
+    "phase": "G2",
+    "kind": "bringup",
+    "request": "scripts/start.sh -> cmd/server",
+    "expected": "只有 API Server 在跑",
+    "actual": "pid=27020 lstart=Wed Sep 23 05:50:16 2026",
+    "verdict": "PASS",
+    "ids": {
+      "server_pid": 27020
+    },
+    "note": "",
+    "ts": "2026-09-22T21:51:00Z"
+  },
+  {
+    "step_id": "G2.2",
+    "phase": "G2",
+    "kind": "bringup",
+    "request": "仅 API Server 观察窗口",
+    "expected": "pending/running 不变",
+    "actual": "scheduler/worker 已在运行，跳过（pid=[23308]）",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:51:00Z"
+  },
+  {
+    "step_id": "G2.3",
+    "phase": "G2",
+    "kind": "bringup",
+    "request": "启动 cmd/discovery-scheduler 与 cmd/discovery-worker",
+    "expected": "两个独立进程，无 flag，间隔取 config/scheduler/scheduler.toml",
+    "actual": "{\"discovery-scheduler\": {\"pid\": 27302, \"lstart\": \"Wed Sep 23 05:51:01 2026\"}, \"discovery-worker\": {\"pid\": 23308, \"lstart\": \"Wed Sep 23 05:17:25 2026\"}}",
+    "verdict": "PASS",
+    "ids": {
+      "discovery-scheduler": 27302,
+      "discovery-worker": 23308
+    },
+    "note": "",
+    "ts": "2026-09-22T21:51:02Z"
+  },
+  {
+    "step_id": "G3.1-admin",
+    "phase": "G3",
+    "kind": "auth",
+    "request": "POST /auth/login admin",
+    "expected": "errcode=0 且能读到身份",
+    "actual": "HTTP 200 errcode=0 message=success",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "登录成功即建立会话 cookie",
+    "ts": "2026-09-22T21:51:02Z"
+  },
+  {
+    "step_id": "G3.2-admin",
+    "phase": "G3",
+    "kind": "auth",
+    "request": "GET /auth/me",
+    "expected": "会话可读回身份",
+    "actual": "{\"id\": 1, \"username\": \"admin\", \"role\": \"admin\", \"status\": \"enabled\", \"team_id\": null, \"team_name\": \"\", \"game_ids\": null}",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:51:02Z"
+  },
+  {
+    "step_id": "G3.1-operator",
+    "phase": "G3",
+    "kind": "auth",
+    "request": "POST /auth/login senior01",
+    "expected": "errcode=0 且能读到身份",
+    "actual": "HTTP 200 errcode=0 message=success",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "登录成功即建立会话 cookie",
+    "ts": "2026-09-22T21:51:02Z"
+  },
+  {
+    "step_id": "G3.2-operator",
+    "phase": "G3",
+    "kind": "auth",
+    "request": "GET /auth/me",
+    "expected": "会话可读回身份",
+    "actual": "{\"id\": 2, \"username\": \"senior01\", \"role\": \"senior_operator\", \"status\": \"enabled\", \"team_id\": 1, \"team_name\": \"默认运营组\", \"game_ids\": [\"other\"]}",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:51:02Z"
+  },
+  {
+    "step_id": "G3.4",
+    "phase": "G3",
+    "kind": "seed",
+    "request": "隔离组 id",
+    "expected": "用于跨组权限负例",
+    "actual": "isolated_team_id=2 operator_team_id=1",
+    "verdict": "INFO",
+    "ids": {
+      "isolated_team_id": 2
+    },
+    "note": "复用已建的隔离组",
+    "ts": "2026-09-22T21:51:02Z"
+  },
+  {
+    "step_id": "G4.1",
+    "phase": "G4",
+    "kind": "external",
+    "request": "POST /content-pool/search keyword=王者荣耀 limit=3",
+    "expected": "真实上游可达则 REAL-OK；不可达则 EXTERNAL-BLOCKED（不得用 mock 顶替）",
+    "actual": "branch=REAL-OK items=3 errcode=0 message=success",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "搜索为同步只读，不应写入 source_contents",
+    "ts": "2026-09-22T21:51:04Z"
+  },
+  {
+    "step_id": "G4.2",
+    "phase": "G4",
+    "kind": "external",
+    "request": "搜索前后 source_contents 计数",
+    "expected": "搜索零写入",
+    "actual": "before=319 after=319",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:51:04Z"
+  },
+  {
+    "step_id": "G4.3",
+    "phase": "G4",
+    "kind": "external",
+    "request": "取真实样本（入池与阈值依据）",
+    "expected": "拿到真实 like/favorite 分布",
+    "actual": "[{\"platform_content_id\": \"7688456561111231914\", \"like_count\": 24, \"favorite_count\": 5}, {\"platform_content_id\": \"7688444829000691685\", \"like_count\": 743, \"favorite_count\": 38}, {\"platform_content_id\": \"7688444060881165550\", \"like_count\": 481, \"favorite_count\": 43}]",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:51:04Z"
+  },
+  {
+    "step_id": "5.1",
+    "phase": "5",
+    "kind": "entry",
+    "request": "POST /content-pool/search keyword（同步查询）",
+    "expected": "errcode=0、返回结果、不创建 crawl_task",
+    "actual": "errcode=0 items=5 crawl_tasks 41->41",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:02Z"
+  },
+  {
+    "step_id": "5.2",
+    "phase": "5",
+    "kind": "entry",
+    "request": "POST /content-pool/search query=纯ID+video链接（中英文分隔符）",
+    "expected": "errcode=0 且 ID 与 URL 两种写法都能解析出内容",
+    "actual": "errcode=0 items=2 attempts=1 空返回=0 ids=['7688456561111231914', '7688444829000691685']",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "上游批量按 ID 接口间歇返回空集，见缺陷登记 D9",
+    "ts": "2026-09-22T21:52:03Z"
+  },
+  {
+    "step_id": "5.2b",
+    "phase": "5",
+    "kind": "defect",
+    "request": "同一真实 ID 连续 8 次 ID 发现",
+    "expected": "合法 ID 应稳定返回内置内容",
+    "actual": "空返回 2/8 次（errcode 均为 0）",
+    "verdict": "FAIL",
+    "ids": {},
+    "note": "D9：上游 /batchDyVideo 以 result=1 + 空 data 间歇返回；Cloud 如实透传为「成功但无结果」，用户无任何错误提示",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.3",
+    "phase": "5",
+    "kind": "negative",
+    "request": "POST /content-pool/search 空 query 与空 keyword",
+    "expected": "400 / 14006",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.4",
+    "phase": "5",
+    "kind": "negative",
+    "request": "POST /content-pool/search 101 个目标（上限 100）",
+    "expected": "400 / 14006",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.5",
+    "phase": "5",
+    "kind": "negative",
+    "request": "POST /content-pool/search 非抖音域 URL",
+    "expected": "400 / 14006",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.6",
+    "phase": "5",
+    "kind": "negative",
+    "request": "POST /content-pool/author-search（服务端硬禁用）",
+    "expected": "400 / 14006「博主搜索接口维护中」",
+    "actual": "HTTP 400 errcode=14006 message=博主搜索接口维护中",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.7",
+    "phase": "5",
+    "kind": "negative",
+    "request": "POST /content-pool/import-results source_type=link",
+    "expected": "400 / 14006：只接受 search|author",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.8",
+    "phase": "5",
+    "kind": "negative",
+    "request": "POST /content-pool/import-results 空 items",
+    "expected": "400 / 14006",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.9",
+    "phase": "5",
+    "kind": "negative",
+    "request": "POST /content-pool/import-results 501 条（上限 100）",
+    "expected": "400 / 14006",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.10",
+    "phase": "5",
+    "kind": "entry",
+    "request": "只搜索不提交 import-results",
+    "expected": "未选择结果不写正式来源",
+    "actual": "source_contents 319 -> 319",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.11",
+    "phase": "5",
+    "kind": "entry",
+    "request": "POST /content-pool/import-results（选中 2 条，隔离组）",
+    "expected": "每条都落成 imported 或 duplicate，无一 failed（重复运行时应全为 duplicate）",
+    "actual": "imported=1 duplicate=1 failed=0 source_ids=[436]",
+    "verdict": "PASS",
+    "ids": {
+      "source_ids": [
+        436
+      ]
+    },
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.12",
+    "phase": "5",
+    "kind": "readback",
+    "request": "SQL 读回导入行",
+    "expected": "落库行与请求一致、source_type=search",
+    "actual": "[[\"436\", \"2\", \"douyin\", \"search\", \"pending\", \"24\", \"5\"]]",
+    "verdict": "PASS",
+    "ids": {
+      "source_ids": [
+        436
+      ]
+    },
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.13",
+    "phase": "5",
+    "kind": "idempotency",
+    "request": "POST /content-pool/import-results 重复提交同一批",
+    "expected": "duplicate=2、imported=0",
+    "actual": "imported=0 duplicate=2",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.14",
+    "phase": "5",
+    "kind": "entry",
+    "request": "POST /content-pool/import-url（UI 已不调用的遗留路径）",
+    "expected": "201，创建 manual_discovery_task 且 strategy_id 为空",
+    "actual": "HTTP 201 task_id=64 task_type=manual_discovery_task crawl_tasks 41->42",
+    "verdict": "PASS",
+    "ids": {
+      "task_id": 64
+    },
+    "note": "该路径是 UI 唯一不再调用、却能产出 source_type='link' 的入口（缺陷 D6 背景）",
+    "ts": "2026-09-22T21:52:16Z"
+  },
+  {
+    "step_id": "5.15",
+    "phase": "5",
+    "kind": "readback",
+    "request": "GET /crawl-tasks/<import-url task>（沿用遗留入口）",
+    "expected": "Worker 领取并执行，产出 source_type='link' 的来源行",
+    "actual": "尝试 8 次，task_ids=[64, 65, 66, 67, 68, 69, 70, 71]，最后一次 stats={\"scanned\": 0, \"found\": 0, \"added\": 0, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 0, \"pending\": 0}，link 行=[]",
+    "verdict": "FAIL",
+    "ids": {
+      "task_ids": [
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71
+      ]
+    },
+    "note": "该入口 UI 已不调用；它是唯一能产出 source_type='link' 的真实路径（缺陷 D6）",
+    "ts": "2026-09-22T22:12:20Z"
+  },
+  {
+    "step_id": "5.15b",
+    "phase": "5",
+    "kind": "defect",
+    "request": "统计「零产物却判成功」的任务数",
+    "expected": "链接导入没拿到任何内容时不应显示成功",
+    "actual": "0/8 次任务为 status=success 且 found=0（上游空返回被如实透传成成功）",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "D9 同族：上游空返回既不报错也不重试，任务与界面显示为成功",
+    "ts": "2026-09-22T22:12:20Z"
+  },
+  {
+    "step_id": "5.5.1",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies {\"platform\": \"douyin\", \"strategy_type\": \"keyword\", \"game_id\": \"other\", \"status\": \"disabled\", \"name\": \"m3acc0923-合法-keyword-手动-061323\", \"config\": {\"keyword\": \"王者荣耀\"}, \"schedule\": \"manual\"}",
+    "expected": "201，合法 keyword + manual 策略可创建",
+    "actual": "HTTP 201 errcode=0 message=success",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 24
+    },
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.2",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies {\"platform\": \"douyin\", \"strategy_type\": \"keyword\", \"game_id\": \"other\", \"status\": \"disabled\", \"name\": \"m3acc0923-非正阈值-061323\", \"config\": {\"keyword\": \"王者荣耀\", \"auto_material\": true, \"material_rule\": \"AND",
+    "expected": "400 / 14006：开启自动转素材但两个阈值都非正",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.3",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies {\"platform\": \"douyin\", \"strategy_type\": \"keyword\", \"game_id\": \"other\", \"status\": \"disabled\", \"name\": \"m3acc0923-非法规则-061323\", \"config\": {\"keyword\": \"王者荣耀\", \"auto_material\": true, \"material_rule\": \"XOR",
+    "expected": "400 / 14006：material_rule 非 AND/OR 必须拒绝",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.4",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies {\"platform\": \"douyin\", \"strategy_type\": \"keyword\", \"game_id\": \"other\", \"status\": \"disabled\", \"name\": \"m3acc0923-空关键词-061323\", \"config\": {\"keyword\": \"\"}}",
+    "expected": "400 / 14006：keyword 为空",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.5",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies {\"platform\": \"bilibili\", \"strategy_type\": \"keyword\", \"game_id\": \"other\", \"status\": \"disabled\", \"name\": \"m3acc0923-非抖音-061323\", \"config\": {\"keyword\": \"王者荣耀\"}}",
+    "expected": "400 / 14006：本期只支持 douyin",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.6",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies {\"platform\": \"douyin\", \"strategy_type\": \"author\", \"game_id\": \"other\", \"status\": \"disabled\", \"name\": \"m3acc0923-author枚举保留-061323\", \"config\": {\"author\": \"王者荣耀\"}}",
+    "expected": "201：author 取值保留（实现未删除该枚举）",
+    "actual": "HTTP 201 errcode=0 message=success",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 25
+    },
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.7",
+    "phase": "5.5",
+    "kind": "negative",
+    "request": "POST /discovery-strategies/999999/run",
+    "expected": "404 / 14005：策略不存在",
+    "actual": "HTTP 404 errcode=14005 message=挖掘策略不存在",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.8",
+    "phase": "5.5",
+    "kind": "defect",
+    "request": "POST /discovery-strategies 同名策略（隔离组内）",
+    "expected": "预期 409 / 14007「策略名称已存在」",
+    "actual": "HTTP 500 errcode=50000 message=挖掘服务内部错误",
+    "verdict": "FAIL",
+    "ids": {},
+    "note": "D1：仓储层 errStrategyDuplicate 未翻译为 service.ErrStrategyDuplicate",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.9",
+    "phase": "5.5",
+    "kind": "defect",
+    "request": "POST /discovery-strategies schedule='garbage'",
+    "expected": "预期 400 / 14006：schedule 应有服务端格式校验",
+    "actual": "HTTP 201 errcode=0 schedule=garbage",
+    "verdict": "FAIL",
+    "ids": {},
+    "note": "D2：createStrategy/updateStrategy 只把空值兜底为 manual，不校验格式",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.10",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies {\"platform\": \"douyin\", \"strategy_type\": \"keyword\", \"game_id\": \"other\", \"status\": \"disabled\", \"name\": \"m3acc0923-隔离组策略-061323\", \"config\": {\"keyword\": \"王者荣耀\"}}",
+    "expected": "201：admin 可跨组建策略",
+    "actual": "HTTP 201 errcode=0 message=success",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 28
+    },
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.11",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "POST /discovery-strategies/<id>/status enabled",
+    "expected": "200：启用成功",
+    "actual": "HTTP 200 errcode=0 message=success",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:13:23Z"
+  },
+  {
+    "step_id": "5.5.12",
+    "phase": "5.5",
+    "kind": "strategy",
+    "request": "启用后观察 60s",
+    "expected": "启用不触发立即执行（schedule=manual）",
+    "actual": "crawl_tasks(strategy=24) 0 -> 0",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:14:23Z"
+  },
+  {
+    "step_id": "5.5.13",
+    "phase": "5.5",
+    "kind": "negative",
+    "request": "POST /discovery-strategies/<disabled>/run",
+    "expected": "400 / 14006：停用策略不能创建任务",
+    "actual": "HTTP 400 errcode=14006 message=挖掘参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:14:23Z"
+  },
+  {
+    "step_id": "6.1",
+    "phase": "6",
+    "kind": "schedule",
+    "request": "POST /discovery-strategies schedule=interval:5 且 enabled",
+    "expected": "201，创建即启用",
+    "actual": "HTTP 201 id=29",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 29
+    },
+    "note": "",
+    "ts": "2026-09-22T22:14:51Z"
+  },
+  {
+    "step_id": "6.2",
+    "phase": "6",
+    "kind": "defect",
+    "request": "启动 cmd/discovery-scheduler 并观察 75s",
+    "expected": "调度进程应持续存活并按 discovery_interval 触发",
+    "actual": "存活=False exit=2 panic=panic: douyin: Get called before Initialize",
+    "verdict": "FAIL",
+    "ids": {
+      "scheduler_pid": 29134
+    },
+    "note": "schedulerResourcePlan() 不含 clientsResource()，而 RunDiscoverySchedule→RunDue→newDouyinCrawler()→douyin.Get() 要求已 Initialize，故首次 tick 即 panic 退出",
+    "ts": "2026-09-22T22:16:08Z"
+  },
+  {
+    "step_id": "6.3",
+    "phase": "6",
+    "kind": "schedule",
+    "request": "POST /discovery-scheduler/run-due（管理员受控，同一 runDue 实现）",
+    "expected": "triggered>=1，生成 schedule_key 非空的 discovery_task",
+    "actual": "HTTP 200 triggered=2",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "这一步验证调度语义，不主张等价于周期 tick（tick 执行者已崩溃）",
+    "ts": "2026-09-22T22:16:08Z"
+  },
+  {
+    "step_id": "6.4",
+    "phase": "6",
+    "kind": "readback",
+    "request": "SQL 读回调度窗口键",
+    "expected": "schedule_key 形如 interval:5:<epoch/300> 且 task_type=discovery_task",
+    "actual": "task_id=72 schedule_key=interval:5:5967051 task_type=discovery_task",
+    "verdict": "PASS",
+    "ids": {
+      "task_id": 72
+    },
+    "note": "",
+    "ts": "2026-09-22T22:16:08Z"
+  },
+  {
+    "step_id": "6.5",
+    "phase": "6",
+    "kind": "readback",
+    "request": "SQL 读回周期任务执行结果",
+    "expected": "Worker 写入 started_at/finished_at 并给出终态",
+    "actual": "status=success started=2026-09-23 06:16:12.500834 finished=2026-09-23 06:16:16.485304 stats={\"added\": 11, \"found\": 20, \"failed\": 0, \"pending\": 11, \"scanned\": 20, \"duplicate\": 9, \"auto_materialized\": 0}",
+    "verdict": "PASS",
+    "ids": {
+      "task_id": 72
+    },
+    "note": "",
+    "ts": "2026-09-22T22:16:18Z"
+  },
+  {
+    "step_id": "6.6",
+    "phase": "6",
+    "kind": "idempotency",
+    "request": "同一窗口内再调一次 run-due",
+    "expected": "triggered=0：同策略同计划周期不重复排队",
+    "actual": "HTTP 200 triggered=0",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:16:18Z"
+  },
+  {
+    "step_id": "6.7",
+    "phase": "6",
+    "kind": "idempotency",
+    "request": "SQL 统计同 schedule_key 行数",
+    "expected": "同窗口只有 1 行",
+    "actual": "count=1",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:16:18Z"
+  },
+  {
+    "step_id": "6.8",
+    "phase": "6",
+    "kind": "idempotency",
+    "request": "SHOW INDEX uq_crawl_tasks_strategy_schedule",
+    "expected": "唯一键存在（第二层防重）",
+    "actual": "rows=2 列=['uq_crawl_tasks_strategy_schedule', 'uq_crawl_tasks_strategy_schedule']",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:16:18Z"
+  },
+  {
+    "step_id": "6.9",
+    "phase": "6",
+    "kind": "defect",
+    "request": "POST /discovery-strategies/<id>/run 连调两次",
+    "expected": "基线 §5：同策略已有 pending/running 时不重复排队",
+    "actual": "HTTP 201/201，pending 行 0 -> 2",
+    "verdict": "FAIL",
+    "ids": {},
+    "note": "D3：/run 传空 schedule_key→NULL，唯一索引不拦 NULL，可重复排队",
+    "ts": "2026-09-22T22:16:18Z"
+  },
+  {
+    "step_id": "7.0",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "策略 config={\"auto_material\": false, \"keyword\": \"王者荣耀\"} -> 任务 76",
+    "expected": "落库统计 = 库内素材行数 = 逐条谓词复算；",
+    "actual": "stats={\"scanned\": 20, \"found\": 20, \"added\": 20, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 0, \"pending\": 20} 库内素材行=0 逐条谓词比对=全部一致",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 30,
+      "task_id": 76,
+      "team_id": 13
+    },
+    "note": "",
+    "ts": "2026-09-22T22:16:39Z"
+  },
+  {
+    "step_id": "7.0.1",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "从真实 like_count 选定阈值",
+    "expected": "选一个能同时产生命中与未命中的阈值",
+    "actual": "like 分布=[3, 4, 6, 22, 39, 97, 107, 449, 465, 569, 658, 854, 1099, 2612, 7360, 8620, 9933, 23499, 110192, 186399]，取中位数=658",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:16:39Z"
+  },
+  {
+    "step_id": "7.1",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "策略 config={\"auto_material\": false, \"material_rule\": \"AND\", \"like_threshold\": 0, \"favorite_threshold\": 0, \"keyword\": \"王者荣耀\"} -> 任务 77",
+    "expected": "落库统计 = 库内素材行数 = 逐条谓词复算；",
+    "actual": "stats={\"scanned\": 20, \"found\": 20, \"added\": 20, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 0, \"pending\": 20} 库内素材行=0 逐条谓词比对=全部一致",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 31,
+      "task_id": 77,
+      "team_id": 14
+    },
+    "note": "",
+    "ts": "2026-09-22T22:16:47Z"
+  },
+  {
+    "step_id": "7.2",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "策略 config={\"auto_material\": true, \"material_rule\": \"AND\", \"like_threshold\": 658, \"favorite_threshold\": 0, \"keyword\": \"王者荣耀\"} -> 任务 78",
+    "expected": "落库统计 = 库内素材行数 = 逐条谓词复算；",
+    "actual": "stats={\"scanned\": 20, \"found\": 20, \"added\": 20, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 12, \"pending\": 8} 库内素材行=12 逐条谓词比对=全部一致",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 32,
+      "task_id": 78,
+      "team_id": 15
+    },
+    "note": "",
+    "ts": "2026-09-22T22:16:56Z"
+  },
+  {
+    "step_id": "7.3",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "策略 config={\"auto_material\": true, \"material_rule\": \"OR\", \"like_threshold\": 0, \"favorite_threshold\": 2000000000, \"keyword\": \"王者荣耀\"} -> 任务 79",
+    "expected": "落库统计 = 库内素材行数 = 逐条谓词复算；",
+    "actual": "stats={\"scanned\": 20, \"found\": 20, \"added\": 20, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 0, \"pending\": 20} 库内素材行=0 逐条谓词比对=全部一致",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 33,
+      "task_id": 79,
+      "team_id": 16
+    },
+    "note": "",
+    "ts": "2026-09-22T22:17:04Z"
+  },
+  {
+    "step_id": "7.4",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "策略 config={\"auto_material\": true, \"material_rule\": \"AND\", \"like_threshold\": 0, \"favorite_threshold\": 1, \"keyword\": \"王者荣耀\"} -> 任务 80",
+    "expected": "落库统计 = 库内素材行数 = 逐条谓词复算；",
+    "actual": "stats={\"scanned\": 20, \"found\": 20, \"added\": 20, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 17, \"pending\": 3} 库内素材行=17 逐条谓词比对=全部一致",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 34,
+      "task_id": 80,
+      "team_id": 17
+    },
+    "note": "",
+    "ts": "2026-09-22T22:17:12Z"
+  },
+  {
+    "step_id": "7.5",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "策略 config={\"auto_material\": true, \"material_rule\": \"OR\", \"like_threshold\": 2000000000, \"favorite_threshold\": 1, \"keyword\": \"王者荣耀\"} -> 任务 81",
+    "expected": "落库统计 = 库内素材行数 = 逐条谓词复算；",
+    "actual": "stats={\"scanned\": 20, \"found\": 20, \"added\": 20, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 17, \"pending\": 3} 库内素材行=17 逐条谓词比对=全部一致",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 35,
+      "task_id": 81,
+      "team_id": 18
+    },
+    "note": "",
+    "ts": "2026-09-22T22:17:16Z"
+  },
+  {
+    "step_id": "7.6",
+    "phase": "7",
+    "kind": "auto-material",
+    "request": "策略 config={\"auto_material\": true, \"material_rule\": \"AND\", \"like_threshold\": 658, \"favorite_threshold\": 0, \"published_within_days\": 1, \"min_duration\": 99999, \"keyword\": \"王者荣耀\"} -> 任务 82",
+    "expected": "落库统计 = 库内素材行数 = 逐条谓词复算；",
+    "actual": "stats={\"scanned\": 20, \"found\": 20, \"added\": 20, \"duplicate\": 0, \"failed\": 0, \"auto_materialized\": 12, \"pending\": 8} 库内素材行=12 逐条谓词比对=全部一致",
+    "verdict": "PASS",
+    "ids": {
+      "strategy_id": 36,
+      "task_id": 82,
+      "team_id": 19
+    },
+    "note": "",
+    "ts": "2026-09-22T22:17:24Z"
+  },
+  {
+    "step_id": "8.1",
+    "phase": "8",
+    "kind": "states",
+    "request": "SQL crawl_tasks 状态分布",
+    "expected": "五态枚举在库中真实出现过",
+    "actual": "[[\"success\", \"54\"], [\"partial_success\", \"2\"], [\"failed\", \"4\"]]",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:40Z"
+  },
+  {
+    "step_id": "8.2",
+    "phase": "8",
+    "kind": "states",
+    "request": "POST /content-pool/import-url 真实数字 ID + 必然失败目标",
+    "expected": "status=partial_success：processed>0 且 failed>0",
+    "actual": "尝试 1 次 task_id=83 status=partial_success stats={\"scanned\": 2, \"found\": 1, \"added\": 1, \"duplicate\": 0, \"failed\": 1, \"auto_materialized\": 0, \"pending\": 1}",
+    "verdict": "PASS",
+    "ids": {
+      "task_id": 83
+    },
+    "note": "",
+    "ts": "2026-09-22T22:17:45Z"
+  },
+  {
+    "step_id": "8.3",
+    "phase": "8",
+    "kind": "states",
+    "request": "partial_success 的判定式复核",
+    "expected": "processed = added+duplicate+pending+auto_materialized > 0 且 failed > 0",
+    "actual": "processed=2 failed=1",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:45Z"
+  },
+  {
+    "step_id": "8.4",
+    "phase": "8",
+    "kind": "negative",
+    "request": "POST /crawl-tasks/<success>/retry-failed",
+    "expected": "400 / 14008：非失败/部分成功任务不可重试",
+    "actual": "HTTP 400 errcode=14008 message=请选择可入池的搜索结果",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:45Z"
+  },
+  {
+    "step_id": "8.5",
+    "phase": "8",
+    "kind": "retry",
+    "request": "POST /crawl-tasks/83/retry-failed",
+    "expected": "新建任务 parent_task_id 指向原任务，snapshot.retry_items 仅含失败项",
+    "actual": "HTTP 200 new_task=84 parent_task_id=83 retry_items=[{\"id\": null, \"processing_status\": \"failed\"}]",
+    "verdict": "PASS",
+    "ids": {
+      "task_id": 84
+    },
+    "note": "",
+    "ts": "2026-09-22T22:17:45Z"
+  },
+  {
+    "step_id": "8.6",
+    "phase": "8",
+    "kind": "retry",
+    "request": "SQL 原任务不可变",
+    "expected": "原任务终态与统计不被重试改写",
+    "actual": "status=partial_success stats={\"added\": 1, \"found\": 1, \"failed\": 1, \"pending\": 1, \"scanned\": 2, \"duplicate\": 0, \"auto_materialized\": 0}",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:45Z"
+  },
+  {
+    "step_id": "8.7",
+    "phase": "8",
+    "kind": "retry",
+    "request": "Worker 领取重试任务",
+    "expected": "重试任务只处理失败项：scanned == len(retry_items)",
+    "actual": "status=failed scanned=1 retry_items=1 stats={\"scanned\": 1, \"found\": 1, \"added\": 0, \"duplicate\": 0, \"failed\": 1, \"auto_materialized\": 0, \"pending\": 0}",
+    "verdict": "PASS",
+    "ids": {
+      "task_id": 84
+    },
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "8.8",
+    "phase": "8",
+    "kind": "states",
+    "request": "material_failed 触发路径排查",
+    "expected": "materialize 在 FOR UPDATE 下幂等，公开 API 无法制造失败",
+    "actual": "无法经公开 API 触发，且本轮不注入故障",
+    "verdict": "NOT VERIFIED",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "8.9",
+    "phase": "8",
+    "kind": "negative",
+    "request": "POST /crawl-tasks/<id>/confirm ids=[]",
+    "expected": "400 / 14008：未选择不可确认",
+    "actual": "HTTP 400 errcode=14008 message=请选择可入池的搜索结果",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "8.10",
+    "phase": "8",
+    "kind": "negative",
+    "request": "只搜索不确认",
+    "expected": "未选择结果不写正式来源",
+    "actual": "source_contents 476 -> 476",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.1",
+    "phase": "9",
+    "kind": "permission",
+    "request": "POST /discovery-scheduler/run-due（senior_operator）",
+    "expected": "403 / 11003",
+    "actual": "HTTP 403 errcode=11003 message=没有权限执行调度",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.2",
+    "phase": "9",
+    "kind": "permission",
+    "request": "GET /discovery-strategies（senior_operator）",
+    "expected": "只返回本团队（team_id=1）策略",
+    "actual": "team_ids=['1']",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.3",
+    "phase": "9",
+    "kind": "permission",
+    "request": "POST /discovery-strategies/<隔离组策略>/status（senior_operator）",
+    "expected": "403 / 11003",
+    "actual": "HTTP 403 errcode=11003 message=没有权限访问该团队资源",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.4",
+    "phase": "9",
+    "kind": "permission",
+    "request": "POST /discovery-strategies/<隔离组策略>/run（senior_operator）",
+    "expected": "403 / 11003",
+    "actual": "HTTP 403 errcode=11003 message=没有权限访问该团队资源",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.5",
+    "phase": "9",
+    "kind": "permission",
+    "request": "GET /crawl-tasks（senior_operator）",
+    "expected": "只返回 team_id=1 的任务",
+    "actual": "team_ids=['1']",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.6",
+    "phase": "9",
+    "kind": "permission",
+    "request": "GET /crawl-tasks（admin）",
+    "expected": "admin 可见多团队任务",
+    "actual": "team_ids=['1', '10', '11', '13', '14', '15', '16', '17', '18', '19', '2', '20', '3', '4', '5', '6', '7', '8', '9']",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.7",
+    "phase": "9",
+    "kind": "negative",
+    "request": "POST /content-pool/batch/status 501 个 id",
+    "expected": "400 / 14002：批量上限 500",
+    "actual": "HTTP 400 errcode=14002 message=内容参数无效",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.8",
+    "phase": "9",
+    "kind": "idempotency",
+    "request": "8 线程并发导入同一条目",
+    "expected": "库中只有 1 行，且最多 1 次 imported=1（唯一约束兜底）",
+    "actual": "imported=1 duplicate=7 库中行数=1 状态码=['200']",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.9",
+    "phase": "9",
+    "kind": "idempotency",
+    "request": "8 路并发对同一条目转素材",
+    "expected": "只生成 1 个 material，且全库无重复 source_content_id",
+    "actual": "material 行数=1 全库重复组=[] 并发 errocode=['0']",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.10",
+    "phase": "9",
+    "kind": "negative",
+    "request": "POST /content-pool/<material_created>/status pending",
+    "expected": "409 / 14003：已转素材不能恢复为待处理",
+    "actual": "HTTP 409 errcode=14003 message=已转素材内容不能恢复为待处理",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "9.11",
+    "phase": "9",
+    "kind": "idempotency",
+    "request": "重复导入已忽略条目",
+    "expected": "自动发现不恢复 ignored（只有人工恢复才生效）",
+    "actual": "重复导入 duplicate=1，库中状态=ignored",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:17:50Z"
+  },
+  {
+    "step_id": "10.1",
+    "phase": "10",
+    "kind": "regression",
+    "request": "Cloud scripts/test.sh: go test ./...",
+    "expected": "全部包通过，无 FAIL",
+    "actual": "ok 包数=57，FAIL 行=0",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "10.2",
+    "phase": "10",
+    "kind": "regression",
+    "request": "Cloud scripts/test.sh: npm test --prefix web",
+    "expected": "全部测试文件与用例通过",
+    "actual": "files=Test Files  20 passed (20) tests=Tests  87 passed (87)",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "10.3",
+    "phase": "10",
+    "kind": "regression",
+    "request": "python3 scripts/verify_m2_acceptance.py（原样）",
+    "expected": "0 ERROR",
+    "actual": "命中陈旧路径：ERROR: missing file: /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/internal/modules/cloudagent/compatibility.go",
+    "verdict": "FAIL",
+    "ids": {},
+    "note": "缺陷 D10：compatibility.go 已于 2026-09-18 bf499d9 迁至 service/ 子目录，脚本路径未同步",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "10.4",
+    "phase": "10",
+    "kind": "regression",
+    "request": "python3 <仅改 compatibility.go 路径的临时副本>（用后即删）",
+    "expected": "M2 静态跨仓矩阵 ok",
+    "actual": "M2 static cross-repository acceptance matrix ok",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "用于把「脚本陈旧路径」与「M2 真实回归」两件事分开；原脚本未被修改",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "10.5",
+    "phase": "10",
+    "kind": "regression",
+    "request": "scripts/m2b-local-acceptance.sh verify",
+    "expected": "Cloud 与 Agent 健康检查通过",
+    "actual": "Cloud=PASS Agent=PASS（见 p10-m2-regression.log）",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "10.6",
+    "phase": "10",
+    "kind": "regression",
+    "request": "scripts/m2b-local-acceptance.sh verify: BitBrowser 腿",
+    "expected": "Agent 经真实 BitBrowser 得到 bitbrowser_status=normal",
+    "actual": "脚本对该 dev Agent 报 unreachable；原因为该 Agent 以 WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899（mock，/browser/list 返回 404）启动；改用 Agent 自身代码直连真实 BitBrowser(54345) 得 profiles=40, main_user_id 非空, bitbrowser_status=normal, ffmpeg=normal",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "脚本那条 FAIL 是环境前置（dev Agent 指向 mock），非 M3 回归；未重启用户正在跑的 Agent",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "10.7",
+    "phase": "10",
+    "kind": "walkthrough",
+    "request": "无头 Chrome 经 cookie 注入代理(5190 -> Vite 5180)逐页截图",
+    "expected": "内容池 / 素材库 / 挖掘策略 / 挖掘任务 四页均可读回真实数据",
+    "actual": "截图=01-content-pool.png, 02-material-library.png, 03-discovery-strategies.png, 04-crawl-tasks.png",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "内容池 319 全部/231 待处理/87 已转素材；任务页见「部分成功」徽标与仅失败行可重试；策略页见 赞≥2.3千（AND）/ 赞≥200000万 或 藏≥1（OR）/ 关闭 三种转素材规则，以及 D2 的 schedule=garbage 被 UI 原样显示",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "10.8",
+    "phase": "10",
+    "kind": "adjudicated",
+    "request": "grep 流转/业务流转/工作流视图/全景 于 Cloud internal+web/docs",
+    "expected": "本期不交付独立只读业务流转视图（用户 2026-09-23 裁定「就当没有」）",
+    "actual": "Cloud 侧 0 命中；前端路由仅四个内容挖掘页面（content-pool / discovery-strategies / crawl-tasks / material-library）；原始记录见 raw/p10-flowview-grep.txt",
+    "verdict": "ADJUDICATED",
+    "ids": {},
+    "note": "按裁定移出验收范围，基线 §6 相应改写为「本期交付功能链路而非视图」",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "11.1",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL operation_teams 本轮新建",
+    "expected": "登记（不删除）",
+    "actual": "1 个：[[\"2\", \"M3验收-隔离组-20260923\"]]",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "11.2.discovery_strategies",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL discovery_strategies 相对基线快照的增量",
+    "expected": "既有行逐项未被修改/删除，只登记新增",
+    "actual": "基线 3 行(max_id=3) → 现 29 行，新增 26：4,5,7,8,9,10,11,12,13,14,15,16 …",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:16Z"
+  },
+  {
+    "step_id": "11.2.crawl_tasks",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL crawl_tasks 相对基线快照的增量",
+    "expected": "既有行逐项未被修改/删除，只登记新增",
+    "actual": "基线 11 行(max_id=33) → 现 62 行，新增 51：34,35,36,37,38,39,40,41,42,43,44,45 …",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  },
+  {
+    "step_id": "11.2.source_contents",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL source_contents 相对基线快照的增量",
+    "expected": "既有行逐项未被修改/删除，只登记新增",
+    "actual": "基线 109 行(max_id=165) → 现 478 行，新增 369：166,167,168,169,170,171,172,174,176,177,179,180 …",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  },
+  {
+    "step_id": "11.2.materials",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL materials 相对基线快照的增量",
+    "expected": "既有行逐项未被修改/删除，只登记新增",
+    "actual": "基线 26 行(max_id=26) → 现 146 行，新增 120：27,28,29,30,31,32,33,34,35,36,37,38 …",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  },
+  {
+    "step_id": "11.3.discovery_strategies",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL discovery_strategies 基线区间行数复核",
+    "expected": "基线区间内行数不变（既有 3 策略/11 任务/109 来源/26 素材未被删除）",
+    "actual": "id<=3 的行数=3，基线 count=3",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  },
+  {
+    "step_id": "11.3.crawl_tasks",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL crawl_tasks 基线区间行数复核",
+    "expected": "基线区间内行数不变（既有 3 策略/11 任务/109 来源/26 素材未被删除）",
+    "actual": "id<=33 的行数=11，基线 count=11",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  },
+  {
+    "step_id": "11.3.source_contents",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL source_contents 基线区间行数复核",
+    "expected": "基线区间内行数不变（既有 3 策略/11 任务/109 来源/26 素材未被删除）",
+    "actual": "id<=165 的行数=109，基线 count=109",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  },
+  {
+    "step_id": "11.3.materials",
+    "phase": "11",
+    "kind": "residue",
+    "request": "SQL materials 基线区间行数复核",
+    "expected": "基线区间内行数不变（既有 3 策略/11 任务/109 来源/26 素材未被删除）",
+    "actual": "id<=26 的行数=26，基线 count=26",
+    "verdict": "PASS",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  },
+  {
+    "step_id": "11.4",
+    "phase": "11",
+    "kind": "teardown",
+    "request": "停止 scheduler/worker/Vite/代理 + scripts/stop.sh",
+    "expected": "进程退出、两端工作区干净",
+    "actual": "见 11-teardown 与 shell 收尾结果",
+    "verdict": "INFO",
+    "ids": {},
+    "note": "",
+    "ts": "2026-09-22T22:18:17Z"
+  }
+]

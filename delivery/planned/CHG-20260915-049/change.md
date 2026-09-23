@@ -15,15 +15,20 @@
 
 范围：受控触发、周期防重、crawl_task 四态/快照/统计/日志、Cloud Agent 多词执行、真实入池和恢复。
 
+> 2026-09-23 更正：本条原表述「crawl_task 四态」已失效，业务状态为五态（`pending`/`running`/`success`/`partial_success`/`failed`）；「Cloud Agent 多词执行」亦已由 ADR-0015 纠偏为 Cloud-owned 执行。见 docs/product/M3-content-mining-v2.md 与 evidence/m3-e3-acceptance-20260923/。
+
 ## 明确不做
 
 只建任务列表、用手工调用代替定时验收、自动创建 material、partial 第五业务态、可视化调度与任意脚本。
+
+> 2026-09-23 更正：本条原表述「自动创建 material」与「partial 第五业务态」均已失效——自动转素材是本期已交付能力，`partial_success` 已是正式业务状态（五态之一）；见 docs/product/M3-content-mining-v2.md 与 evidence/m3-e3-acceptance-20260923/。
 
 ## 顺序任务
 
 ### Task 1：定义任务与触发合同
 
 - 工作：四态映射、统计单位、触发身份、计划幂等键、同策略互斥、恢复检查点及日志脱敏。
+  > 2026-09-23 更正：本条原表述「四态映射」已失效，业务状态为五态（含 `partial_success`）；见 docs/product/M3-content-mining-v2.md 与 evidence/m3-e3-acceptance-20260923/。
 - 验收：先解决部分失败口径；技术 task 与 crawl_task 分离，终态不任意回写。
 
 ### Task 2：交付周期到真实内容池
@@ -34,6 +39,7 @@
 ### Task 3：交付任务列表和详情
 
 - 工作：四态、开始/结束、五项主要计数、错误和执行日志，策略页面关联记录；以这些真实记录提供只读业务流转展示，素材尚未转换时如实显示未转素材，后续 E2 复用。
+  > 2026-09-23 更正：本条原表述「四态」与「只读业务流转展示」均已失效——状态为五态；独立的只读业务流转视图本期不交付，已按用户 2026-09-23 裁定移出交付与验收范围（ADR-0013 第 8 条的禁止性约束不变）；见 docs/product/M3-content-mining-v2.md 与 evidence/m3-e3-acceptance-20260923/。
 - 验收：统计单位可解释，接口失败不假装作品计数；无结果成功与接口失败可区分。
 
 ### Task 4：恢复与闭环验收

@@ -15,6 +15,8 @@
 
 范围：单/批量分享链接、渠道识别、真实解析/详情、Cloud Agent 执行、逐条入池与失败反馈。
 
+> 2026-09-23 更正：本条原表述「单/批量分享链接、渠道识别、真实解析/详情、Cloud Agent 执行」与 Cloud 实现不符——内容池 UI 入口名为「ID/链接发现」（另有「关键词发现」），链接入池走 `POST /content-pool/search` 的 `query` 模式，遗留 `POST /content-pool/import-url` 在 UI 零调用；执行边界已由 ADR-0015 纠偏为 Cloud-owned（Cloud Scheduler/Worker/Crawler，不创建 Agent 任务）。见 docs/product/M3-content-mining-v2.md 与 evidence/m3-e3-acceptance-20260923/。
+
 ## 明确不做
 
 选择结果直接建素材、其他平台实现、关键词/博主查询、自动业务 crawl_task、下载。

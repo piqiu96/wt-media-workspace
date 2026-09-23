@@ -1,0 +1,36 @@
+== 流转视图独立实现排查（2026-09-23）==
+
+--- Cloud internal/ 与 web/src/ 搜 业务流转|流转视图|工作流视图|全景 ---
+(0 命中)
+
+--- Cloud 搜 流转 (任意) ---
+(0 命中)
+
+--- Cloud 前端路由清单（web/src/apps/cloud/router.ts）---
+6:    { path: "/login", name: "Login", component: () => import("../../modules/auth/pages/LoginPage.vue") },
+8:      path: "/",
+11:        { path: "", name: "Dashboard", component: () => import("../../modules/dashboard/pages/DashboardPage.vue") },
+12:        { path: "discovery", redirect: "/content-pool" },
+13:        { path: "content-pool", name: "ContentPool", component: () => import("../../modules/contentpool/pages/ContentPoolPage.vue") },
+14:        { path: "discovery-strategies", name: "DiscoveryStrategies", component: () => import("../../modules/contentpool/pages/DiscoveryStrategiesPage.vue") },
+15:        { path: "crawl-tasks", name: "CrawlTasks", component: () => import("../../modules/contentpool/pages/CrawlTasksPage.vue") },
+16:        { path: "material-library", name: "MaterialLibrary", component: () => import("../../modules/contentpool/pages/ContentPoolPage.vue") },
+17:        { path: "my-material", name: "MyMaterial", component: () => import("../../shared/ui/ComingSoon.vue") },
+18:        { path: "compose", name: "Compose", component: () => import("../../shared/ui/ComingSoon.vue") },
+19:        { path: "finished-media", name: "FinishedMedia", component: () => import("../../shared/ui/ComingSoon.vue") },
+20:        { path: "publish", name: "Publish", component: () => import("../../shared/ui/ComingSoon.vue") },
+21:        { path: "interact", name: "Interact", component: () => import("../../shared/ui/ComingSoon.vue") },
+22:        { path: "execute-tasks", name: "ExecuteTasks", component: () => import("../../modules/tasks/pages/TasksPage.vue") },
+23:        { path: "stats", name: "Stats", component: () => import("../../shared/ui/ComingSoon.vue") },
+24:        { path: "accounts", name: "Accounts", component: () => import("../../modules/accounts/pages/AccountsPage.vue") },
+25:        { path: "account-opening", name: "AccountOpening", component: () => import("../../modules/accounts/pages/AccountOpeningPage.vue") },
+26:        { path: "browser-windows", name: "BrowserWindows", component: () => import("../../modules/profiles/pages/ProfilesPage.vue") },
+27:        { path: "compose-strategy", name: "ComposeStrategy", component: () => import("../../shared/ui/ComingSoon.vue") },
+28:        { path: "comment-templates", name: "CommentTemplates", component: () => import("../../shared/ui/ComingSoon.vue") },
+29:        { path: "proxies", name: "Proxies", component: () => import("../../modules/proxy/pages/ProxyPage.vue") },
+30:        { path: "users", name: "Users", component: () => import("./pages/users/UsersPage.vue") },
+31:        { path: "operation-teams", name: "OperationTeams", component: () => import("./pages/users/TeamsPage.vue") },
+32:        { path: "games", name: "Games", component: () => import("./pages/users/GamesPage.vue") },
+
+--- Cloud 侧文档是否提及流转视图 ---
+(0 命中)

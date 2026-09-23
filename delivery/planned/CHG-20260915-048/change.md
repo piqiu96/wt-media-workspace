@@ -15,9 +15,13 @@
 
 范围：discovery_strategy keyword/author、content_channel 引用、策略表单、周期配置、启停、执行记录入口。
 
+> 2026-09-23 更正：本条原表述中的作者侧已随 C2/E2 暂停——本期只交付 keyword，`author` 取值与字段保留但不交付；见 docs/product/M3-content-mining-v2.md 与 evidence/m3-e3-acceptance-20260923/。
+
 ## 明确不做
 
 定时器放入策略类、两套策略表、其他平台接入、自动转素材选项、通用规则或调度引擎。
+
+> 2026-09-23 更正：本条原表述「自动转素材选项」已失效——自动转素材是本期已交付能力（`auto_material` 开关、`material_rule` 的 `AND`/`OR`、`like_threshold`、`favorite_threshold`；阈值 ≤0 不参与判定）；见 docs/product/M3-content-mining-v2.md 与 evidence/m3-e3-acceptance-20260923/。
 
 ## 顺序任务
 
