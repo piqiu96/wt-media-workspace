@@ -74,6 +74,7 @@
 | D-05 | Agent 配置文件格式定为 **TOML**（`config/agent.toml` + `config_online/agent.toml`），用标准库 `tomllib` 解析，不引入 YAML 依赖；D-01 与程序总纲 §2 的「YAML」措辞据此回写 | CONFIRMED（2026-09-23 用户裁定，替代原表述） |
 | D-06 | T-02 实测得 22 条跨层边，其中**仅两条**越过 ADR-0016 的层级下降序，二者均照此执行并需进 T-05 白名单：①`runtime/environment.py → clients.bitbrowser`（§1 称 runtime 不引用业务层，§4 却把环境探测指派给该模块；它必须区分 `BitBrowserIdentityError` → `identity_unverifiable` 与 `BitBrowserError` → `unreachable`，此行为有测试覆盖。取 §4，并把白名单**收窄到单文件粒度**，不放开整条 `runtime → clients`）；②`clients/bilibili/identity.py → services.browser`（§1 将 `{clients, services, storage}` 列为无序集合，§3 明禁边只有 `clients→executors`、`services→executors`、`utils→业务层`，同级边被允许） | CONFIRMED（2026-09-23，T-02 执行时依 ADR-0016 判定，计划已载明；证据 `task-02-structure-migration.md` §4） |
 | D-07 | Agent 配置中的凭据通路**收窄为仅环境变量**：`config/agent.toml` 与 `config_online/agent.toml` 里出现的任何敏感键（token/password/secret/cookie 等）一律被加载器忽略，并按**键名**告警（绝不输出值）；`runtime_token` 只能来自 `WT_MEDIA_AGENT_RUNTIME_TOKEN`。依据是用户批准的程序总纲 §4「敏感与临时运行上下文不混进部署配置」，与 ADR-0016 §7（允许凭据放在仓库配置中）取**更严**者，**ADR-0016 本身不改**。后果：`config_online/` 的「整目录替换」分发机制不承载凭据，CHG-D(059) 的发布校验不得依赖该通路；`config/README.md` 与 `config_online/README.md` 已声明此收窄 | CONFIRMED（2026-09-23 用户批准的程序总纲 §4；T-03 落地，证据 `task-03-runtime-config.md` §9） |
+| D-08 | T-05 把 D-06 的例外落成机器规则时发现**第三条**越序边：`local_api/server.py → bootstrap.app`（T-04 引入，`server.main` 需要装配组件）。ADR-0016 §1 把 `local_api/` 与 `runner` 并列为平行层，§2 又称 `bootstrap/` 是唯一生产初始化入口——照 §2 取；且这条例外**只对 `local_api/server.py` 这一个文件**成立，不放开整条 `local_api → bootstrap`。与 D-06 同法：白名单收窄到单文件，机器规则的例外收窄测试证明「把例外放宽到整层会被抓住」。**ADR-0016 零修订**，此为实现对既有条款的一处单文件收敛 | CONFIRMED（2026-09-23，T-05 执行时依 ADR-0016 §2 判定；证据 `task-05-boundary-tests.md` §3） |
 
 ## 7. Pending Questions
 
@@ -89,7 +90,7 @@
 | T-02 | Agent 结构迁移（吸收 053 Task 1-3）：`constants.py`→`runtime/`（含 `runtime/version.py`）；`clients/bitbrowser/` 包拆分并新增公开 `open_url()`，executor 不再直连私有 `_post`；`clients/cloud/` 迁移；`services/{browser,net}/` 建立；`runtime/environment.py` 委托 services 并撤销 `runtimes/`；`storage/` 整理（checkpoint/sqlite/migration 重导出，`storage.migration` 路径与符号不变）；`runner/` 三拆并重导出 `TaskRunner`/`TaskRunnerConfig`（测试零改动）；`local_api/` 瘦身；`utils/time.py`；既有 85 用例随迁全绿 | DONE | `bash scripts/test.sh`（≥85 OK）；`migrate-storage.sh` 连续两次成功；`verify-health.sh` 通过 |
 | T-03 | Agent runtime/config + paths（吸收 053 Task 5）：强类型 AgentConfig（env>file>default，TOML/`tomllib`，测试目录接缝）；`configs/`→`config/` + `config_online/` 同构镜像；RuntimePaths 三态；统一 `WT_MEDIA_LOG_LEVEL`；删除 config.py/log_setup.py 死代码与目录双实现 | DONE | config loader 测试（默认/文件/env/非法/凭据忽略）全绿；运行时代码零处引用 `config_online`（打包校验除外） |
 | T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | DONE | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试 |
-| T-05 | Agent AST 边界测试（ADR-0016 第 3 条机器校验，含 `test_patch_targets.py`）+ 平台 URL 常量化 | TODO | AST 测试全绿；server.py/account_check.py 无内联 URL 字面量 |
+| T-05 | Agent AST 边界测试（ADR-0016 第 3 条机器校验，含 `test_patch_targets.py`）+ 平台 URL 常量化 | DONE | R1–R10 全绿且每条有控制组证明「能红」（规则放在任务前的树上实跑转红并点名六处）；patch 目标可解析且在别名重构下转红；`executors/`+`local_api/` 无内联 URL 字面量（grep 0 命中 / 对照树 2 命中） |
 | T-06 | Desktop 拆分 main.rs：bootstrap/config/paths/state/commands/agent.rs；17 命令原样迁移；account_check/cookie_read 重复 preflight 提取共用；HttpClient 超时；端口进配置 | TODO | `cargo test` 全绿；`cargo build` 通过 |
 | T-07 | Desktop Cloud 地址链路 + sidecar 传参：`get_public_config` command；`resources/desktop.production.toml`；`local_agent_start` 传环境变量；生产模式忽略地址类 env 覆盖 | TODO | config loader 单测（默认/文件/env/非法/生产忽略） |
 | T-08 | Cloud Web 两文件：init.js cloudBaseUrl 改 invoke（带回退）；LocalLogsPage healthz 改走 command | TODO | desktop 前端既有测试全绿 |
@@ -145,6 +146,7 @@ Evidence files live in `evidence/`，按 Task 编号记录事实。
 - `evidence/task-02-structure-migration.md`：T-02 结构迁移取证——14 个 commit 的逐 commit 测试矩阵（均 ≥85 且 OK）、冻结导入 sha256 恒等、冻结路径与符号清单、22 条跨层边全集与**仅有**的两条 ADR-0016 例外、PyInstaller 产物 PYZ 模块清单。
 - `evidence/task-03-runtime-config.md`：T-03 配置/路径取证——10 个 commit 的逐 commit 测试矩阵（107→172，单调不减）、`log_setup.py → runtime/logging.py` 的 blob 级纯移动证明（`R100`）、冻结导入 sha256 与 T-02 同值、`src/` 环境变量读取点归零（带阳性对照）、19/19 变异对照（并**作废**本会话早先因变异脚本未分发而不可采信的一组记录）、`factory` 零覆盖缺口的补测、取证中发现的既有连接泄漏（`ResourceWarning` 20→0）与修复、唯一行为变更的记录、以及**已枚举的未覆盖面**。
 - `evidence/task-04-bootstrap-injection.md`：T-04 bootstrap/注入取证——4 个 commit 的逐 commit 测试矩阵（184→204，单调不减；「移动文件」与「改逻辑」分列两个 commit）、冻结导入 sha256 与 T-02/T-03 同值、7/7 变异对照（其中 2 条初跑**不可判别**，各暴露一个真实测试缺口：`_as_bool` 的假值拼写与 `agent_id` 的**空断言**，补测后全部可判别）、AC-09 三模式真实进程输出（cloud 只报告 / local 连到真实 BitBrowser 40 个 profile / sidecar 401-401-200 token 矩阵且 token 不入 `ps`）、冻结入口脚本 ×3、静态扫描含阳性对照、PyInstaller 产物 PYZ 模块集 28→53（`runner`/`executors` 首次进包）、以及**已枚举的未覆盖面**（`bootstrap/local.py` 无单测、打包产物未重签时无法启动这一既存问题归 CHG-D(059)）。
+- `evidence/task-05-boundary-tests.md`：T-05 AST 边界取证——3 个 commit 的逐 commit 测试矩阵（214→249，单调不减）、冻结导入 sha256 与 T-02/T-03/T-04 同值、**规则在任务之前的树上实跑转红**并逐行点名 `a4a43cc` 修掉的六处（R5 两处 `_post` + R9 四处 URL 字面量）、6/6 变异对照（含两处**我自己的脚本缺陷**已修正并披露）、`/tmp/t05patch.py` 的别名重构把 `test_patch_targets.py` 与**既有的** `test_proxy_check.py` 同时转红、AC-02 的 grep 双证据（HEAD 0 命中 / 对照树 2 命中，各带分母）与死 import 扫描的阳性对照、以及 **§9.1 逐条枚举的未覆盖面**（R10 只到层对、`from pkg import mod` 的保守、运行期拼装 URL、`patch.object/dict` 不解析、`clients/` 内硬编码值）。
 
 ## 12. Current Checkpoint
 
@@ -177,13 +179,22 @@ Completed:
   5 处自建 client 清零且无新增构造点；未装配的 runner 走既有 `no_executor` 路径（fail-closed）；
   三个模式首次各有真实进程启动；测试 184 → 204。侧记：`sidecar_main.main()` **无参数**，
   这正是 token 不能经 argv 泄漏的机制（AC-03）。
+- T-05 Agent AST 边界测试 + 平台 URL 常量化完成，agent `7e19622` → `87cde92` 共 **3** 个 commit：
+  `a4a43cc` 平台 URL 迁入 `clients/platform_urls.py` + `BitBrowserClient.open_url()` 公开
+  （executor 不再直连私有 `_post`）、`d00147b` `tests/test_dependency_boundaries.py`
+  （R1–R10 + 15 个控制组）、`87cde92` `tests/test_patch_targets.py`（发现 + 解析 + 绑定规则）。
+  十条规则**每条都有控制组**证明它「能红」；把规则放到任务之前的树上实跑，报出的正是
+  `a4a43cc` 修掉的那六处。测试 214 → 249。侧记：`local_api/server.py → bootstrap.app`
+  是本期发现的**第三条**越序边，按 D-08 以单文件粒度收窄（不放开整层）。
 
 Current:
-- T-05 Agent AST 边界测试 + 平台 URL 常量化。
+- T-06 Desktop 拆分 `main.rs`。
 
 Next:
-- T-05 `tests/test_dependency_boundaries.py`（R1–R10，含 D-06 两条例外与 R6 环境变量规则）、
-  `tests/test_patch_targets.py`、`executors/account_check.py` 平台 URL 移入 `clients/**` 并公开 `open_url()`。
+- T-06 目标树：`main.rs`（mod、`main()`、配置引导装载、CSP 注入、Builder 装配）＋ `bootstrap.rs`、
+  `config.rs`、`paths.rs`、`state.rs`、`http/`（`LocalAgentClient` 带 token / `CloudClient` 不带）、
+  `sidecar/{mod,drain}.rs`、`preflight.rs`、`dto/`、`commands/`；删除 `local_agent/mod.rs` 死代码；
+  修 `scripts/test.sh`（现跑 `npm test` 而本仓无 `package.json`，应改为 `cargo test --workspace`）。
 
 Blocked:
 - None.
@@ -241,6 +252,29 @@ Recent verification:
   **28 → 53**（`runner` 0→4、`executors` 0→8、`bootstrap` 3），T-02 遗留的
   「sidecar 够不到 runner/executors」已消除。未重签的产物启动失败（`different Team IDs`）
   属既存打包/签名问题，登记归 CHG-D(059)，不作为 T-04 的通过条件。
+- T-05 逐 commit 测试矩阵（同样以 `git archive` 导出后各自实跑）：`a4a43cc` 为 214，
+  `d00147b` 为 243，`87cde92` 为 249，全部 `OK`，单调不减，无一低于 T-04 收尾的 204。
+- T-05 冻结导入：`tests/test_runner_session.py` sha256 在 3 个 commit 上恒为 `888113ca…`
+  （与 T-02/T-03/T-04 记录同值）；本 CHG 范围（`99f408c^..87cde92`）内
+  `git log -- <该文件>` 计数 **0**。
+- T-05 **规则确能转红**（这是本期最重要的一条，因为「规则全绿」与「规则从不报错」在输出上
+  无法区分）：把 `test_dependency_boundaries.py` 放到 `a4a43cc~1` 的源码树上实跑，
+  R5/R9 两条失败并逐行点名六处——`account_check.py:65`/`:80` 的 `_post` 调用与
+  `:29`/`:30`/`:31`/`:82` 的 URL 字面量；在 `a4a43cc` 的树上全绿。
+- T-05 变异对照 6/6 全部「基线绿 → 转红 → 还原绿」。其中两条初跑的问题**判定为我的脚本
+  缺陷而非测试缺口**并已披露：M-2 把常量替换成了它自己的字面量（等值替换，不构成变异）、
+  M-5 锚点缩进写错（报 ANCHOR MISMATCH 而非静默跳过）。另发现 `open_url` 此前**无任何
+  测试覆盖**，补 `OpenUrlTests` 2 例后 M-1/M-6 才可判别。
+- T-05 patch 面：`/tmp/t05patch.py` 把 `local_api/server.py` 改成模块别名访问后，
+  `test_patch_targets.py` 报 3 条失败、**既有的** `test_proxy_check.py` 报 1 条错误，
+  还原后双双回绿——「凡测试 patch 的名字，源侧一律用 `from X import name`」这句
+  由两个文件同时守着。
+- T-05 AC-02 双证据：grep 在当前树 0 命中（分母 1109 行）、在 `7e19622` 对照树 2 命中
+  （分母 1120 行，即 `account_check.py:65`/`:80`）——**有分母的对照组**，不是空转的 0。
+  死 import 扫描 65 文件 0 条，阳性对照植入的 `import json` 被报出（该扫描器初版把每个
+  `from __future__ import annotations` 都误报，排除后才归零；属扫描器缺陷，已记录）。
+- T-05 冻结脚本：`migrate-storage.sh --data-dir /tmp/t05mig` ×2 → `2 applied`/`0 applied`；
+  `verify-health.sh` → `wt-media-agent health ok`。
 
 ## 13. DONE Gate
 

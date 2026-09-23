@@ -9,13 +9,15 @@ Completed:
 - T-01：四仓 AI 入口文档各自独立提交（desktop `47a6263`、cloud `3b733ff`、workspace `e0444cd`；agent 上一轮 `d3ab02f` 已提交）；配置格式按 D-05 回写为 TOML（`change.md` §6 D-01/§2/§5/§7/§8 + 程序总纲 §2 + planned CHG-059）；测试基线证据按模板规范化。
 
 Current:
-- T-05 Agent AST 边界测试 + 平台 URL 常量化。
+- T-06 Desktop 拆分 `main.rs`。
 
 Next:
-- T-05 `tests/test_dependency_boundaries.py`（R1–R10，含 D-06 两条例外的**单文件粒度**白名单、
-  R6 环境变量规则、R10 冻结边集棘轮）、`tests/test_patch_targets.py`（固化
-  `local_api.server.urlrequest.urlopen` 等三个 patch 目标）、
-  `executors/account_check.py` 的平台 URL 移入 `clients/**` 并公开 `open_url()`。
+- T-06 目标树：`main.rs`（mod、`main()`、配置引导装载、CSP 注入、Builder 装配）＋
+  `bootstrap.rs`、`config.rs`、`paths.rs`、`state.rs`、`http/`、`sidecar/{mod,drain}.rs`、
+  `preflight.rs`、`dto/`、`commands/`；删除 `local_agent/mod.rs` 死代码；
+  修 `scripts/test.sh`（现跑 `npm test` 而本仓无 `package.json`）。
+  提交序列：DTO 迁出 → HttpClient 拆两型 → 17 命令迁出 → `config.rs`+`resources/*.toml`
+  → `preflight.rs` → `paths.rs`+`state.rs` → 9 测试落位 + 修 `scripts/test.sh`。
 
 Blocked:
 - None.
@@ -115,7 +117,10 @@ Completed:
 
 Verification（详见 `evidence/task-04-bootstrap-injection.md`）:
 - 逐 commit 测试矩阵：`f7ed012`/`587496b` 184、`3e47985`/`7e19622` 204，全部 `OK`。
-- 冻结导入 sha256 恒为 `888113ca…`（与 T-02/T-03 同值），`git log` 计数仍为 1。
+- 冻结导入 sha256 恒为 `888113ca…`（与 T-02/T-03 同值）；本 CHG 范围内
+  `git log -- tests/test_runner_session.py` 计数 **0**（与 T-02/T-03 记录一致），
+  全史仅 `1e3e96f` 一次（本 CHG 之前）。先前此处的「计数仍为 1」未标范围，
+  与上一条记录的 0 并列时会被读成矛盾，故补明范围。
 - 变异对照 7/7（另 `f7ed012` 5 条）全部三步俱全；`/tmp/t04mut.py` 要求锚点唯一匹配。
 - 真实进程三模式（AC-09）：cloud 打印事实 JSON 并 `exit=0`；local `/healthz` 200、
   `profile_count=40`（真实 BitBrowser）；sidecar 401/401/200 且 token 不入 `ps`。
@@ -141,3 +146,52 @@ Open（未覆盖面，已枚举）:
 - `bootstrap/local.py` 无单元测试（只有真实进程取证）；`local_api/server.py:main` 的
   「不传 `--host/--port` 时取配置值」分支无测试；`bootstrap/sidecar.py` 的
   `run_runner=true` 守护线程分支未被真实进程走过（AC-10 归 T-09）。
+
+### T-05 完成（agent `7e19622` → `87cde92`，3 个 commit）
+
+Completed:
+- `a4a43cc`：平台 URL 移入新建 `clients/platform_urls.py`（`LOGIN_URLS` + `login_url()`，
+  未知平台抛 `ValueError`），探针常量 `PROXY_PROBE_URL` 放进 `clients/bitbrowser/client.py`；
+  `BitBrowserClient.open_url()` 成为公开面，`executors/account_check.py` 的两处
+  `_post("/browser/open-url", …)` 改走它。`login_url(platform)` 刻意放在 `try` **之外**：
+  放进去会被宽 `except` 变成上报给 Cloud 的 `check_failed`。
+- `d00147b`：`tests/test_dependency_boundaries.py`——R1–R10 十条纯函数规则 +
+  `BoundaryRuleControls` 15 个控制组，每条规则都有一条「故意写坏的源码」证明它**能**红。
+- `87cde92`：`tests/test_patch_targets.py`——AST 收集 `tests/**` 全部 `patch(...)`
+  字面量目标，断言可解析 + 被 patch 的名字绑定在该模块自己的命名空间里。
+- 一并订正 `clients/bitbrowser/__init__.py` docstring 的既存自相矛盾
+  （「clients 之外不得构造」vs「bootstrap 构造一次」，T-03 遗留③）。
+
+Verification（详见 `evidence/task-05-boundary-tests.md`）:
+- 逐 commit 测试矩阵：`a4a43cc` 214、`d00147b` 243、`87cde92` 249，全部 `OK`，单调不减。
+- 冻结导入 sha256 恒为 `888113ca…`（与 T-02/T-03/T-04 同值），本 CHG 范围内 `git log` 计数 0。
+- **规则在任务之前的树上实跑转红**：R5/R9 失败并逐行点名 `account_check.py:65`/`:80`
+  （`_post`）与 `:29`/`:30`/`:31`/`:82`（URL 字面量），在 `a4a43cc` 上全绿。
+  这是「规则全绿」与「规则从不报错」不可区分的唯一破解办法。
+- 变异对照 6/6 三步俱全；patch 面用别名重构把 `test_patch_targets.py`（3 失败）与
+  **既有的** `test_proxy_check.py`（1 错误）同时转红。
+- AC-02 grep 双证据：HEAD 0 命中 / 分母 1109 行；`7e19622` 对照树 2 命中 / 分母 1120 行。
+- 冻结脚本 `migrate-storage.sh` ×2 → `2 applied`/`0 applied`，`verify-health.sh` → `health ok`。
+
+Corrections（本轮内我自己的缺陷，均已修正并披露）:
+- **M-2 不是变异**：初版把 `PROXY_PROBE_URL` 替换成它自己的字面量，等值替换，
+  测试保持绿是**正确**的。改用不同 URL 后才构成变异。
+- **`open_url` 此前无任何测试覆盖**：M-6（改超时）最初报「未判别」是真实的测试缺口，
+  不是脚本问题。补 `OpenUrlTests` 2 例后 M-1/M-6 才可判别。
+- **`test_patch_targets.py` 的控制组写错前提**：断言 `import X as name` 不绑定 `name`，
+  实测相反。判定为**我的控制组有洞**，改为会真正失败的形态，并据实收窄了文件顶部
+  对规则的表述（机器判据只取「名字是否被绑定」这更弱的一半）。
+- **死 import 扫描器的假阳性**：初版把每个 `from __future__ import annotations` 都报成
+  未使用（45 条），属扫描器缺陷；排除后为 0，且阳性对照正常报出。
+
+Deviations（已披露）:
+- 计划 T-05 的行号有偏移（`PLATFORM_URLS` 在 `:28-32` 而非 `:31-33`，探针在 `:82` 而非
+  `:84`）；计划未指定 URL 落在 `clients/` 的哪一处，实际新建 `clients/platform_urls.py`。
+- 新增决策 **D-08**：`local_api/server.py → bootstrap.app`（T-04 引入）是本期发现的
+  **第三条**越序边，按 ADR-0016 §2 取，并收窄到**单文件**粒度（不放开整层）。
+
+Open（未覆盖面，已枚举，不以「测试通过」代替）:
+- R10 只到层对粒度；`from pkg import mod` 在 R2 里只记成父层（保守，不失明）；
+  R9 看不见运行期拼装的 URL，也不覆盖 `runtime/constants.py` 的配置默认地址；
+  R5 看不见 `getattr(client, "_post")` 这类动态取用；`patch.object`/`patch.dict` 不解析。
+- `local_api/server.py:340` 的 `check_items` 契约分歧仍在（计划细节 11，只登记不修）。
