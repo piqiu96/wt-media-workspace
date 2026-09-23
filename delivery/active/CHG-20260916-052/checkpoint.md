@@ -10,7 +10,8 @@
 
 - 验收在 Cloud `aaf66c5` 上完成：`run-manifest.json` 共 106 步，87 PASS / 7 FAIL / 1 NOT VERIFIED / 1 ADJUDICATED。
 - 唯一硬阻断是 D-scheduler：独立 `cmd/discovery-scheduler` 首次 tick 即 panic 退出，**无人值守的真实周期触发本期未交付**（管理员 `run-due` 受控端点与周期 tick 共用实现，但不等于无人值守触发）。
-- **D-scheduler 已于同日修复并复验通过**（用户裁定：scheduler 只扫库调度，不依赖额外 client；修法是让调度路径不再持有 crawler，而非给 `schedulerResourcePlan()` 补 `clientsResource()`）。复验以**无人值守**路径端到端成立：调度进程跨 ≥6 tick 存活、日志 0 字节，未调 `run-due`、未启 HTTP server 即自行按窗口入队 4 个任务，Worker 领取执行后全部 `success`，库内新增 25 行与统计 `added` 合计一致。**验收项 2 由「不通过」改判「复验通过」**。详见 `evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`。
+- **D-scheduler 已于同日修复并复验通过**（用户裁定：scheduler 只扫库调度，不依赖额外 client；修法是让调度路径不再持有 crawler，而非给 `schedulerResourcePlan()` 补 `clientsResource()`）。复验以**无人值守**路径端到端成立，**两种周期触发形态均已覆盖**：`interval:N`——调度进程跨 ≥6 tick 存活、日志 0 字节，未调 `run-due`、未启 HTTP server 即自行按窗口入队 4 个任务（85–88），Worker 领取执行后全部 `success`，库内新增 25 行与统计 `added` 合计一致；`daily HH:MM`——同日追加补验，到期 tick 前 20 秒仍 0 行、到期那一分钟恰好 1 行（`id=91`、`daily:2026-09-23:13:57`）、同日后续 tick 仍 1 行，进程存活 8 分 31 秒跨约 9 tick、日志全程 0 字节，库内 19 行 == `added` 19。**验收项 2 由「不通过」改判「复验通过」**。详见 `evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`（覆盖范围见其第三节）。
 - 其他缺陷仍未修：D1 策略重名返回 500、D2 `schedule` 无服务端校验、D3 `/run` 可重复排队、D9 上游空返回透传为成功、D8 `ErrCrawlerUnavailable` 未映射；`material_failed` 记 NOT VERIFIED（未构造公开 API 触发路径）。
+- **新增登记（2026-09-23 复验时，只登记不修）**：D-scheduler-2 —— `daily HH:MM` 要求 tick 恰好落在那一分钟内且无补偿机制，漏 tick 即丢当天；既有设计、非本次引入，是否补兜底交用户裁定。另：两轮复验新增残留 `crawl_tasks` 9 行（85–93）、`source_contents` 55 行、`discovery_strategies` 1 行（id=37，daily 补验样本），既有行未修改未删除。
 - 独立的只读业务流转视图按用户 2026-09-23 裁定移出验收范围（ADJUDICATED），不作为缺口；ADR-0013 第 8 条的禁止性约束不变。
 - 结论：**未标记 M3 DONE**，M3 保持 `IN_PROGRESS`（修复不构成用户签收，`CHG-20260915-051` 未激活）。详细证据见 `evidence/m3-e3-acceptance-20260923/`（判定见 `14-verdict.md`，缺陷与安全问题见 `12-defects-and-security.md`）。

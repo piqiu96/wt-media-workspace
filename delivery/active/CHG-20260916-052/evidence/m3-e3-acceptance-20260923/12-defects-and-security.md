@@ -164,10 +164,28 @@ panic: douyin: Get called before Initialize
   额外的 client」，**不给 `schedulerResourcePlan()` 补 `clientsResource()`**，而是让调度路径不再持有
   crawler（Cloud 新增 `defaultSchedulerDiscoveryService()`，`RunDue` 改走它；`RunDue` 只用
   `s.store` 与 `s.createRun`，从不解引用 `s.crawler`）。`schedulerResourcePlan()` 与其测试**原样保留**。
-  进程级复验：调度进程跨 ≥6 个 tick 存活、日志 0 字节，并在**未调用 `run-due`、未启动 HTTP server**
-  的情况下自行按窗口入队 4 个任务，Worker 领取执行后全部 `success`、库内新增 25 行与统计一致。
-  详见 `15-dscheduler-fix-reverification.md`。**验收项 2 由「不通过」改判「复验通过」**
-  （`14-verdict.md` 已同步；仍不标记 M3 DONE）。
+  进程级复验（`interval:N` 形态）：调度进程跨 ≥6 个 tick 存活、日志 0 字节，并在**未调用 `run-due`、
+  未启动 HTTP server** 的情况下自行按窗口入队 4 个任务，Worker 领取执行后全部 `success`、
+  库内新增 25 行与统计一致。
+  **同日追加 `daily HH:MM` 形态补验**（首轮只覆盖了 `interval:N`，而全库 `daily:` 前缀任务历史为
+  0 条、在册生产策略 id=2 用的恰是 `daily 09:00`，两者走不同 due 判定）：到期 tick 前 20 秒仍
+  0 行、到期那一分钟恰好 1 行（`id=91`、`daily:2026-09-23:13:57`）、同日后续 tick 仍 1 行；
+  调度进程存活 8 分 31 秒、跨约 9 个 tick、日志全程 0 字节；Worker 执行后 `success`、
+  库内 19 行 == `added` 19。
+  详见 `15-dscheduler-fix-reverification.md`（两种形态的覆盖范围见该文第三节）。**验收项 2 由
+  「不通过」改判「复验通过」**（`14-verdict.md` 已同步；仍不标记 M3 DONE）。
+
+### D-scheduler-2　`daily HH:MM` 漏 tick 即丢当天　【2026-09-23 复验时新登记，未修】
+
+- 位置：`internal/modules/contentpool/service/discovery.go:761-769`（`scheduleDue` 的 daily 分支）。
+- 现象：daily 的到期判定要求 `hour==now.Hour() && minute==now.Minute()`，即 tick 必须**恰好落在
+  那一分钟内**；且 `sameScheduleWindow` 以「同一日历日」为窗口，故一旦当天已过该分钟，
+  后续 tick **不会补触发**。
+- 影响：调度进程若在目标分钟内不在跑（或漏了一次 tick），当天该策略**静默不执行**，
+  无告警、无补偿。与 `interval:N` 不同（后者只要进程在跑，窗口到期即触发，天然容忍漏 tick）。
+- 定性：**既有设计，非本次修复引入**；本轮复验中亦未观察到实际发生（样本按预期触发）。
+- 处置：**本轮只登记，不修**；是否补「当天未跑则补触发」的兜底，交用户裁定
+  （已列入 `14-verdict.md` 建议的下一步第 2 条）。
 
 ### D10　`scripts/verify_m2_acceptance.py` 指向已迁移的文件路径　【实测 FAIL 10.3】
 
@@ -185,7 +203,8 @@ panic: douyin: Get called before Initialize
 
 | 缺陷 | 是否影响基线 §8 验收项 | 说明 |
 | --- | --- | --- |
-| D-scheduler | **曾是**，验收项 2 | 在冻结修订 `aaf66c5` 上真实周期触发未交付；2026-09-23 修复并复验通过，验收项 2 已改判（见 `15-dscheduler-fix-reverification.md`） |
+| D-scheduler | **曾是**，验收项 2 | 在冻结修订 `aaf66c5` 上真实周期触发未交付；2026-09-23 修复并复验通过（`interval:N` 与 `daily HH:MM` 两形态均覆盖），验收项 2 已改判（见 `15-dscheduler-fix-reverification.md`） |
+| D-scheduler-2 | 否（潜在，非本轮实测失败） | daily 漏 tick 即丢当天且无补偿；影响无人值守可靠性，未构成本轮任何验收项失败 |
 | D1 / D2 | 否 | 边界与体验问题，不影响既定验收项成立 |
 | D3 | **是**，基线 §5 的「不重复排队」 | 手工 `/run` 路径不达标 |
 | D6 | 否 | 来源方式标签失真，不影响入池与去重正确性 |

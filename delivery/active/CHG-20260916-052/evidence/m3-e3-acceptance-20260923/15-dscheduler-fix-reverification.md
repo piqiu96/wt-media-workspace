@@ -1,9 +1,9 @@
 # D-scheduler 修复与进程级复验
 
 - 日期：2026-09-23
-- 被验代码：Cloud 工作树修复（`defaultSchedulerDiscoveryService`），基于冻结修订 `aaf66c5` + 本修复
+- 被验代码：Cloud 修复提交 `b7f13c3`（`defaultSchedulerDiscoveryService`），基于冻结修订 `aaf66c5` + 本修复
 - 关联：`12-defects-and-security.md` 的 D-scheduler；`14-verdict.md` 验收项 2
-- 原始证据：`raw/p15-dscheduler-process-observation.txt`、`raw/p15-worker-log-excerpt.txt`
+- 原始证据：`raw/p15-dscheduler-process-observation.txt`（interval 形态）、`raw/p16-daily-schedule-observation.txt`（daily 形态）、`raw/p15-worker-log-excerpt.txt`
 
 ## 一、根因（由 git 历史确认：未收尾的迁移遗留）
 
@@ -65,85 +65,139 @@ Cloud 改动（3 行生产代码 + 测试）：
 - `go build ./...` 通过；`go test ./...` **57 包 ok、0 FAIL**；
   触及包 `contentpool/service`、`bootstrap`、`jobs` 全通过。
 
-## 三、进程级复验（决定性证据）
+## 三、进程级复验
 
-复验期间**未启动 HTTP server**、**未调用管理员 `run-due` 端点** → 下列任务只可能来自
+两次复验**均未启动 HTTP server**、**均未调用管理员 `run-due` 端点** → 下列任务只可能来自
 调度进程自身的 tick，即真正的**无人值守**触发。
+
+### 三.1 `interval:N` 形态（`raw/p15-*.txt`）
 
 | 时刻 | 观测 |
 | --- | --- |
 | 13:20:23 | 启动 `cmd/discovery-scheduler`（PID 50129）；启动前基线 `max_task_id=84 / total=62 / with_key=3` |
 | 13:20:52 | 存活 29 秒；`scheduler.log` **0 字节**（修复前此处 panic 后 exit 2）；首个 tick 即入队 85、86（`interval:5:5967136`，**pending**） |
-| 13:22:44 | 存活 2 分 21 秒，跨 **3 个 tick**（`discovery_interval=1m`）；日志仍 0 字节；tick2/tick3 **未新增任何行** → 同窗口防重成立；`HAVING c>1` 为空 |
-| 13:25:24 | 窗口推进到 `5967137`，无人干预下再各入队 1 行（87、88） |
+| 13:22:44 | 存活 2 分 21 秒，跨 **3 个 tick**（`discovery_interval=1m`）；日志仍 0 字节；tick2/tick3 **未新增任何行**（距上次不足 5 分钟）→ 同窗口防重成立；`HAVING c>1` 为空 |
+| 13:25:24 | 距上次满 5 分钟，无人干预下再各入队 1 行（87、88） |
 | 约 13:25:35 | 由本次复验主动 `pkill` 停止（存活约 5 分 10 秒、跨 ≥6 tick）。背景任务回报的 exit 144 **即此次 pkill**，非进程自身退出；判据是日志全程 0 字节 |
 | 13:27:39 起 | 启动独立 `cmd/discovery-worker`：领取 4 个任务，**写入 `started_at`/`finished_at`**，终态全部 `success` |
 | 13:29:24 | 收尾；两进程已停止，无残留 |
 
-**统计与库内读回一致（接口统计 == 库内真实行）：**
+### 三.2 `daily HH:MM` 形态（`raw/p16-*.txt`，同日追加补验）
 
-| task | strategy | schedule_key | scanned/found | added | duplicate | 库内新增行 |
-| --- | --- | --- | --- | --- | --- | --- |
-| 85 | 29 | `interval:5:5967136` | 20 / 20 | 17 | 3 | 17 |
-| 86 | 10 | `interval:5:5967136` | 20 / 20 | 6 | 14 | 6 |
-| 87 | 29 | `interval:5:5967137` | 20 / 20 | 2 | 18 | 2 |
-| 88 | 10 | `interval:5:5967137` | 20 / 20 | 0 | 20 | 0 |
+**为什么要补**：三.1 只覆盖 `interval:N`。回查发现全库 `schedule_key LIKE 'daily:%'` 历史为
+**0 条**（p15 轮次产生的 3 条也全是 `interval:`），而**在册生产策略 id=2「三角洲热点」用的正是
+`daily 09:00`**。两者走**不同的 due 判定**（`discovery.go:752-783`），interval 的证据覆盖不到 daily：
 
-- `added` 合计 17+6+2+0 = **25**，与按 `crawl_task_id` 聚合的库内行数 **25** 精确一致。
-- task 88 的 `added=0 / duplicate=20` 是上游真实全量去重的自然证据（非构造）。
-- 本轮新增的 4 条任务**全部带非空 `schedule_key`** → 全部来自调度路径，无手工/HTTP 路径掺入。
-- 上游真实性：Worker 日志含真实唯一键冲突（`uq_source_contents_team_platform_content`）与真实
-  `platform_content_id`/标题，非 mock（见 `raw/p15-worker-log-excerpt.txt`）。
+| schedule | `scheduleDue` | `sameScheduleWindow` | 实际生效条件 |
+| --- | --- | --- | --- |
+| `interval:N` | 恒 `true` | `now-created < N min` → 跳过 | 距上次满 N 分钟 |
+| `daily HH:MM` | 仅 `hour==now.Hour() && minute==now.Minute()` 那一分钟为 `true` | 同一日历日 → 跳过 | tick 恰好落进那一分钟，且当天未跑过 |
 
-### 与上一轮 6.2 的对照
+**样本**：镜像既有验收策略 id=10 的字段形状，插入 1 条 `id=37`、`schedule='daily 13:57'`、
+`timezone='Asia/Shanghai'`、`enabled` 的 keyword 策略（本地库仅插入，属授权内）。
+本机本地时区 = CST+0800 = `Asia/Shanghai`，shell 时刻与策略时区同一参照。
+
+tick 网格锚定进程启动秒 `:50` → 到期 tick = **13:57:50**。
+
+| 时刻 | 观测 |
+| --- | --- |
+| 13:52:38 | 基线：`daily:` 前缀任务 **0 条**；`max_id=88 / total=66 / with_key=7` |
+| 13:52:50 | 启动调度进程（PID 52372） |
+| 13:56:47 | 存活 3:57，已跨约 4 tick；**策略 37 行数 = 0**；日志 0 字节 |
+| **13:57:30** | **到期 tick 前 20 秒**：策略 37 **仍为 0 行** → 「没到点不插」成立，且非「先插后回滚」 |
+| 13:58:10 | 到期 tick（13:57:50）之后：**恰好 1 行** —— `id=91`、`schedule_key='daily:2026-09-23:13:57'`、`pending`、`created_at=13:57:51.824909` |
+| 14:01:00 | 同日后续 tick（含跨入下一分钟/下一窗口）：**仍为 1 行** → daily 的「同一日历日」窗口防重成立 |
+| 14:01:21 | 存活 **8 分 31 秒**、跨约 **9 个 tick**、日志全程 **0 字节**；由本次复验主动 `pkill` 冻结现场 |
+| 14:01:29 起 | 启动独立 worker，5 条待执行任务在 29 秒内排空 |
+| 14:02:03 | 任务 91 终态 `success`，`started_at=14:01:39.675`/`finished_at=14:01:46.092` 由 worker 写入；`stats_json.added=19` 与库内 19 行**精确一致** |
+| 14:02:11 | 收尾；两进程已停止，无残留 |
+
+**同一次扫描的旁证**：该 tick 内 `id=91`（daily）的创建时刻 `13:57:51.824909` 夹在
+`id=92`（interval，`.880008`）与 `id=93`（interval，`.916081`）之间 → daily 与 interval 是在
+**同一次 `runDue` 扫描**中被判定的，daily 未走旁路。
+
+**上游真实性**：worker 日志 1021807 字节，含 70 处真实唯一键冲突
+（`uq_source_contents_team_platform_content`，如 `2-douyin-7688444829000691685`）与真实标题
+（如「S44赛季定榜之夜… #王者荣耀」）→ 19 行为真实上游读回，非构造数据。
+
+### 三.3 覆盖范围声明（本轮两种形态各自被什么证据覆盖）
+
+| schedule 形态 | 证据 | 覆盖内容 |
+| --- | --- | --- |
+| `interval:N` | 三.1 / `p15` | 到期 tick 入队、未到期不重复入队、跨窗口再触发、Worker 执行与内容池读回 |
+| `daily HH:MM` | 三.2 / `p16` | 到期前不插、到期那一分钟恰好插 1 行、`schedule_key` 形态正确、同日不再重复入队、Worker 执行与内容池读回 |
+| `manual` | 不在调度范围（`scheduleDue` 恒 false），由人工「立即执行」入口覆盖，非本轮对象 | — |
+| 非法 `schedule`（如 `garbage`） | 不在本轮范围；`scheduleDue` 返回 false，另见缺陷 **D2**（无服务端校验） | — |
+
+即：**两种周期触发形态（`interval:N`、`daily HH:MM`）在无人值守路径上均已端到端成立**。
+
+### 三.4 与上一轮 6.2 的对照
 
 | | 上一轮（`aaf66c5`，未修） | 本轮（修复后） |
 | --- | --- | --- |
-| 6.2 独立调度进程存活 | **存活=False，exit=2**，`panic: douyin: Get called before Initialize` | **存活=True**，跨 ≥6 tick，日志 0 字节 |
+| 6.2 独立调度进程存活 | **存活=False，exit=2**，`panic: douyin: Get called before Initialize` | **存活=True**，跨 ≥6 tick（p15）/ ≥9 tick（p16），日志全程 0 字节 |
 | 周期触发执行者 | 不存在（只能靠管理员 `run-due` 顶替） | **存在**：调度进程自身按窗口入队，Worker 领取执行 |
+| `interval:N` 无人值守触发 | 未交付 | 成立（85–88） |
+| `daily HH:MM` 无人值守触发 | 未交付（历史 0 条） | 成立（91） |
 
 ## 四、本轮**未**做（如实声明）
 
 1. **未复跑管理员 `run-due` 的防重子项**（上一轮 6.6/6.7）。理由：该端点需管理员登录，
    而登录会顶替用户浏览器中的既有会话；且其代码路径（`runDue`/`createRun`）本次**未被修改**
-   （改动只是「谁来构造 service」），无回归面。**替代证据更强**：本轮以**无人值守路径**证明
-   同窗口不重复（tick2/tick3 未新增行、`HAVING c>1` 为空），上一轮用 `run-due` 证明的正是同一条防重逻辑。
+   （改动只是「谁来构造 service」），无回归面。**替代证据更强**：本轮以**无人值守路径**证明了
+   两种形态的防重（interval 同窗口不重复、daily 同日不重复），上一轮用 `run-due` 证明的正是同一条防重逻辑。
 2. **未修 D8**（`ErrCrawlerUnavailable` 未在 `writeDiscoveryError` 映射）：按用户裁定保持最小改动，
    仍登记不修。
 3. **未做 Desktop 视觉走查**；验收项 7 的「部分通过」结论不受本轮影响。
 4. **未修 D1/D2/D3/D6/D9/D10**；未动 `config/credentials/douyin.toml`；未清理 git 历史。
 
+### 本轮新登记（只登记，不修，交用户裁定）
+
+- **daily 漏 tick 即丢当天**：`scheduleDue` 要求 tick 落在 `HH:MM` 那一分钟内，且该形态无补偿机制
+  —— 调度进程若在该分钟不在跑（或漏了一次 tick），当天即无任务，且不会在后续 tick 补触发。
+  这是既有设计、非本次修复引入；是否补一个「当天未跑则补触发」的兜底，另立处置。
+- **样本策略 id=37 是补验用的一次性样本**，未删除（沿用阶段 11「残留不删除」口径），见第六节。
+
 ## 五、安全复查（沿用 S-2 纪律）
 
-用**真实凭据值反查**全部证据文件（110 个）：
+用**真实凭据值反查**全部证据文件：
 
 - `config/credentials/douyin.toml` 的 `api_key`（35 字符）与 `cookie`（6975 字符）：**无任何文件命中**；
 - cookie 的前 120 / 后 120 字符片段：**无命中**（排除截断残留）；
 - 活会话令牌样式（`wt_media_session=<16+ 位>`）：**无命中**；
 - `cookies/` 目录仍不存在。
-- 新增的两个原始证据文件亦无凭据值。**结论：证据中不含凭据值。**
+- 本轮新增的 `p16` 原始证据与 `15`/`12`/`14` 回写同样无凭据值。**结论：证据中不含凭据值。**
 
-## 六、本轮残留登记（不删除，沿用阶段 11 口径）
+## 六、残留登记（不删除，沿用阶段 11 口径）
 
-`11-residue-teardown.md` 是**首轮验收**的渲染产物（基线 3 策略/11 任务/109 来源/26 素材），
-此处单独登记本轮复验新增的残留，两者叠加即为当前全量：
+`11-residue-teardown.md` 是**首轮验收**的渲染产物（基线 3 策略/11 任务/109 来源/26 素材）。
+以下为两轮复验新增的残留，叠加即为当前全量：
 
-| 表 | 本轮新增 |
-| --- | --- |
-| `crawl_tasks` | 4 行：85、86、87、88（全部带非空 `schedule_key`，全部 `success`） |
-| `source_contents` | 25 行：`crawl_task_id ∈ {85,86,87,88}` |
-| `discovery_strategies` | 0（复用既有 in-册策略 10、29，**未新增、未修改**） |
-| `materials` | 0 |
-| `operation_teams` / `users` | 0 |
+| 表 | p15 轮新增 | p16 轮新增 | 合计 |
+| --- | --- | --- | --- |
+| `crawl_tasks` | 4 行：85、86、87、88（带 key，全 `success`） | 5 行：89、90、91、92、93（带 key，全 `success`） | 9 行 |
+| `source_contents` | 25 行（task 85–88） | 30 行（task 89–93） | 55 行 |
+| `discovery_strategies` | 0（复用既有策略 10、29） | **1 行：id=37**（daily 补验样本） | 1 行 |
+| `materials` | 0 | 0 | 0 |
+| `operation_teams` / `users` | 0 | 0 | 0 |
 
-**不变式**：本轮**未修改、未删除任何既有行**。启动前基线 `max_task_id=84 / total=62 /
-with_key=3` 在复验前后一致；既有 62 条任务与 3 条带 key 任务保持原值。
+**不变式**：两轮复验**均未修改、未删除任何既有行**。
+`WHERE id<=88` 的 66 条任务（含 7 条带 key）在 p16 轮前后一致；p15 轮的启动前基线
+`max_task_id=84 / total=62 / with_key=3` 亦保持不变。全库现状：`total=71 max_id=93
+daily_rows=1 interval_rows=11`。
 无残留进程：收尾后仅剩复验前即在运行的 Desktop 外壳与 Agent `local_api:8765`。
 
 ## 七、对验收项 2 的结论
 
 验收项 2（关键词策略真实周期触发 → 任务 → 执行 → 自动入池）的**唯一阻断点已消除**，
-且以**无人值守**路径端到端复现（调度进程入队 → Worker 领取执行 → 内容池真实读回）。
+且以**无人值守**路径端到端复现，**两种周期触发形态均被覆盖**：
+
+| 形态 | 无人值守入队 | Worker 执行 | 内容池真实读回 | 防重 |
+| --- | --- | --- | --- | --- |
+| `interval:N` | 85、86（13:20:23）、87、88（13:25:24） | 全部 `success` | 25 行 == `added` 合计 25 | 同窗口不重复（tick2/3 无新增） |
+| `daily HH:MM` | 91（13:57:51，`daily:2026-09-23:13:57`） | `success` | 19 行 == `added` 19 | 同日不重复（14:01:00 仍 1 行） |
 
 - 判定：**复验通过**（原判定「不通过」基于修复前的 `aaf66c5`，本轮修复后重取证据）。
+- **覆盖范围**：`interval:N` 与 `daily HH:MM` 成立；`manual` 不在调度范围；非法 `schedule`
+  的服务端校验缺失另属缺陷 D2，不影响本项判定。
 - 这是**对已执行验收轮的复验补证**，不是重开签收；**M3 状态保持 `IN_PROGRESS`，未标 DONE**。

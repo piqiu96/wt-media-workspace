@@ -1,0 +1,209 @@
+# D-scheduler 补验：`daily HH:MM` 形态的无人值守触发（按时间顺序的原始观察）
+#
+# 背景：p15 的无人值守复验只覆盖了 `interval:N` 形态。全库 `schedule_key LIKE 'daily:%'` 历史为 0 条，
+#       而在册生产策略 id=2「三角洲热点」用的正是 `daily 09:00`。两者走不同的 due 判定
+#       （internal/modules/contentpool/service/discovery.go:752-783），故单独补验 daily。
+#
+# 被验代码：Cloud b7f13c3（已提交的 D-scheduler 修复）。工作树 clean，二进制从该修订重建。
+# 环境：MySQL 127.0.0.1:3306 wt_media_cloud；discovery_interval=1m；worker_interval=5s
+# 本机本地时区 = CST+0800 = Asia/Shanghai，故 shell 时刻与策略 timezone 同一参照。
+# 复验期间**未启动 HTTP server**、**未调用管理员 run-due 端点**：下列任务只能来自调度进程自身的 tick。
+
+============================================================
+T0  2026-09-23 13:52:38　基线（实测）
+============================================================
+$ ... SELECT COUNT(*) FROM crawl_tasks WHERE schedule_key LIKE 'daily:%';
+daily: 前缀任务数 = 0          <- 历史上从未有 daily 形态任务被触发过
+
+$ ... SELECT MAX(id), COUNT(*), SUM(schedule_key IS NOT NULL AND schedule_key<>'') FROM crawl_tasks;
+max_task_id=88  total=66  with_key=7
+
+在册且启用的周期策略：id=10（interval:5）、id=29（interval:5）、id=37（daily 13:57，本轮新建）。
+另有 id=9（daily 05:33，enabled）与本轮无关（未到点）。
+
+------------------------------------------------------------
+样本构造（授权内：本地库仅插入）
+------------------------------------------------------------
+镜像既有验收策略 id=10 的字段形状，插入 1 条 daily 策略：
+
+  id=37  team=2  name=m3acc0923-周期触发-daily1357  type=keyword  platform=douyin
+  config_json={"keyword": "三角洲行动", "auto_material": false, "material_rule": "AND",
+               "like_threshold": 0, "favorite_threshold": 0}
+  schedule='daily 13:57'   timezone='Asia/Shanghai'   status='enabled'   created_by=1
+
+目标时刻取插入时刻 +约 4 分钟，留出「未到点」的观察窗口。
+
+============================================================
+T1  2026-09-23 13:52:50　启动 /tmp/wtmedia-acc16/discovery-scheduler
+============================================================
+（cwd = wt-media-cloud 仓库根，配置文件按 config/ 加载）
+
+$ nohup /tmp/wtmedia-acc16/discovery-scheduler > /tmp/wtmedia-acc16/scheduler.log 2>&1 &
+$ ps -o pid,lstart,etime -p 52372
+  PID   STARTED                      ELAPSED
+52372  Wed Sep 23 13:52:50 2026       00:02
+
+# tick 网格锚定在进程启动秒 :50（discovery_interval=1m）→ 每分钟 :50 一次 tick。
+# 目标 daily 13:57 的到期 tick = **13:57:50**。
+
+============================================================
+T2  13:54:20 → 13:57:30　未到点：连续观测 3 次均为 0 行
+============================================================
+（观察脚本按墙钟定时取点，下表为各次实取结果，含实际取点时刻）
+
+A  取点 13:56:47（已跨约 2 tick）  ALIVE pid=52372 etime=03:57  scheduler.log=0 bytes
+   策略 37 产生的任务： (无)        策略 37 行数 = 0   全库 daily: 行数 = 0
+
+B  取点 13:56:47（已跨约 4 tick，紧邻到期前）  ALIVE etime=03:57  scheduler.log=0 bytes
+   策略 37 产生的任务： (无)        策略 37 行数 = 0   全库 daily: 行数 = 0
+
+C  取点 13:57:30（**到期 tick 前 20 秒**）  ALIVE pid=52372 etime=04:40  scheduler.log=0 bytes
+   策略 37 产生的任务： (无)        策略 37 行数 = 0   全库 daily: 行数 = 0
+# 结论：距到期 20 秒仍未插入 —— 「没到点不插」成立，且非「插入后回滚」。
+
+============================================================
+T3  13:58:10　到期 tick 13:57:50 之后：恰好 1 行
+============================================================
+D  取点 13:58:10  ALIVE pid=52372 etime=05:20  scheduler.log=0 bytes
+
+$ ... SELECT id,strategy_id,schedule_key,status,created_at FROM crawl_tasks WHERE strategy_id=37;
+id  strategy_id  schedule_key              status   created_at
+91  37           daily:2026-09-23:13:57    pending  2026-09-23 13:57:51.824909
+
+# schedule_key 形态正确（daily:<日期>:<HH:MM>），创建时刻 13:57:51.8 落在到期 tick 13:57:50 上。
+# 策略 37 行数 = 1；全库 daily: 行数 = 1
+
+------------------------------------------------------------
+同一 tick 内三个启用策略同时触发（证明 daily 与 interval 在同一次扫描中被判定）
+------------------------------------------------------------
+$ ... SELECT id,strategy_id,schedule_key,status,created_at FROM crawl_tasks WHERE id>88 ORDER BY id;
+89  29  interval:5:5967142  pending  2026-09-23 13:52:51.766560   <- 首 tick
+90  10  interval:5:5967142  pending  2026-09-23 13:52:51.797619   <- 首 tick
+91  37  daily:2026-09-23:13:57 pending 2026-09-23 13:57:51.824909  <- 本 tick（daily）
+92  29  interval:5:5967143  pending  2026-09-23 13:57:51.880008   <- 本 tick（5 分钟到期）
+93  10  interval:5:5967143  pending  2026-09-23 13:57:51.916081   <- 本 tick（5 分钟到期）
+
+$ ... SELECT strategy_id, COUNT(*), GROUP_CONCAT(DATE_FORMAT(created_at,'%H:%i:%s.%f') ORDER BY id SEPARATOR ' | ')
+      FROM crawl_tasks WHERE id>88 GROUP BY strategy_id;
+10  2  13:52:51.797619 | 13:57:51.916081
+29  2  13:52:51.766560 | 13:57:51.880008
+37  1  13:57:51.824909
+# 任务 91 的创建时刻夹在 92/93 之间（.824909 < .880008 < .916081），说明 daily 策略与两条
+# interval 策略是在**同一次 runDue 扫描**中被判定的，daily 未走旁路。
+
+============================================================
+T4  13:59:40 / 14:01:00　同日防重：仍为 1 行
+============================================================
+E  取点 13:59:40（同日后续 tick 之后）  ALIVE pid=52372 etime=06:50  scheduler.log=0 bytes
+   策略 37 行数 = 1   全库 daily: 行数 = 1    策略 37 任务： 91 (...13:57, pending)
+
+F  取点 14:01:00（跨入下一分钟/下一窗口）  ALIVE pid=52372 etime=08:10  scheduler.log=0 bytes
+   策略 37 行数 = 1   全库 daily: 行数 = 1    策略 37 任务： 91 (...13:57, pending)
+# 结论：daily 的 sameScheduleWindow 以「同一日历日」为窗口，同日不再重复入队 —— 成立。
+# 注意这是与 interval 不同的窗口语义（interval 是「距上次满 N 分钟」），两者各自被本文件与
+# p15-dscheduler-process-observation.txt 覆盖。
+
+============================================================
+T5  2026-09-23 14:01:21　停止调度进程（本轮主动 pkill，冻结待执行集合）
+============================================================
+$ ps -o pid,lstart,etime -p 52372
+  PID   STARTED                      ELAPSED
+52372  Wed Sep 23 13:52:50 2026       08:31
+$ wc -c scheduler.log
+0 scheduler.log
+# 存活 8 分 31 秒，跨约 9 个 tick，日志全程 0 字节（无 panic）。
+# 修复前：首个 tick 即 `panic: douyin: Get called before Initialize` 后 exit 2。
+
+$ pkill -f "wtmedia-acc16/discovery-scheduler"   -> STOPPED
+
+$ ... SELECT id,strategy_id,schedule_key,status FROM crawl_tasks WHERE status='pending' ORDER BY id;
+89  29  interval:5:5967142  pending
+90  10  interval:5:5967142  pending
+91  37  daily:2026-09-23:13:57  pending
+92  29  interval:5:5967143  pending
+93  10  interval:5:5967143  pending
+
+============================================================
+T6  2026-09-23 14:01:29 起　独立 Worker 领取并执行
+============================================================
+$ nohup /tmp/wtmedia-acc16/discovery-worker > /tmp/wtmedia-acc16/worker.log 2>&1 &    （PID 52919）
+
+排空过程（轮询 pending/running 计数）：
+14:01:37 未完成=5
+14:01:42 未完成=3
+14:01:48 未完成=2
+14:01:53 未完成=1
+14:01:58 未完成=0
+
+$ ... SELECT id,strategy_id,schedule_key,status,created_at,started_at,finished_at FROM crawl_tasks WHERE id=91;
+id  strategy_id  schedule_key            status   created_at                  started_at                  finished_at
+91  37           daily:2026-09-23:13:57  success  2026-09-23 13:57:51.824909  2026-09-23 14:01:39.675124  2026-09-23 14:01:46.092597
+# started_at/finished_at 由 Worker 写入（调度进程不写这两个字段）；终态 success。
+
+$ ... SELECT id, stats_json FROM crawl_tasks WHERE id=91;
+{"added": 19, "found": 20, "failed": 0, "pending": 19, "scanned": 20, "duplicate": 1, "auto_materialized": 0}
+
+$ ... SELECT crawl_task_id, COUNT(*) rows_in_pool, SUM(status='pending') pending, SUM(status='material_created') materialized
+      FROM source_contents WHERE crawl_task_id=91 GROUP BY crawl_task_id;
+crawl_task_id  rows_in_pool  pending  materialized
+91             19            19       0
+# 库内 19 行 == stats_json.added 19，精确一致（接口统计 == 库内真实行）。
+
+$ ... 全部 5 条终态与时间戳
+89  29  interval:5:5967142  success  started_set=1 finished_set=1
+90  10  interval:5:5967142  success  started_set=1 finished_set=1
+91  37  daily:2026-09-23:13:57  success  started_set=1 finished_set=1
+92  29  interval:5:5967143  success  started_set=1 finished_set=1
+93  10  interval:5:5967143  success  started_set=1 finished_set=1
+
+$ ... 统计 / 读回对账
+task  strategy  added_stat  rows_in_pool
+89    29        4           4
+90    10        4           4
+91    37        19          19
+92    29        2           2
+93    10        1           1
+# 5 条全部逐条相等。
+
+------------------------------------------------------------
+真实上游证据（非 mock）
+------------------------------------------------------------
+$ wc -c worker.log
+1021807 worker.log
+$ grep -c "Error 1062" worker.log
+70
+$ grep -oE "Error 1062[^\"]{0,120}" worker.log | head -2
+Error 1062 (23000): Duplicate entry '2-douyin-7688444829000691685' for key 'source_contents.uq_source_contents_team_platform_conte
+Error 1062 (23000): Duplicate entry '2-douyin-7688491727686364873' for key 'source_contents.uq_source_contents_team_platform_conte
+$ grep -oE '"title":"[^"]{0,60}"' worker.log | head -3
+"title":"S44赛季定榜之夜，宗师定榜第一，精彩程度堪比S25定榜之夜 #王者荣耀"
+"title":"孙尚香珍品无双来了！#王小贱 #王者荣耀"
+"title":"S45赛季王维上分教学，教你快速上手新英雄 #王者荣耀 #王者荣耀S45赛季 #法师教学 #王维 #出装推荐"
+# 真实唯一键冲突（uq_source_contents_team_platform_content）+ 真实 platform_content_id + 真实标题 →
+# 该任务的 19 行是真实上游读回，不是构造数据。
+
+============================================================
+T7  2026-09-23 14:02:11　收尾
+============================================================
+$ pkill -f "wtmedia-acc16/discovery-worker"    -> STOPPED
+$ pgrep -fl "wtmedia-acc16"
+(无)
+$ ps aux | grep -iE "wt-media|discovery-(scheduler|worker)"
+仅剩复验前即存在的两个无关进程：
+  15233  wt-media-agent local_api :8765
+  11253  /Volumes/WT Media/WT Media.app/.../wt-media-desktop-shell
+
+------------------------------------------------------------
+残留登记（本轮新增，不删除）
+------------------------------------------------------------
+discovery_strategies   1 行：id=37（本轮新建的 daily 样本）
+crawl_tasks            5 行：89、90、91、92、93（全部带非空 schedule_key，全部 success）
+source_contents       30 行：crawl_task_id ∈ {89,90,91,92,93}
+materials              0 行
+users / operation_teams 0 行
+
+不变式（复验前后一致）：
+$ ... SELECT COUNT(*), SUM(schedule_key IS NOT NULL AND schedule_key<>''), MAX(id) FROM crawl_tasks WHERE id<=88;
+66  7  88
+# 既有 66 条任务（含 7 条带 key）**未修改、未删除**；本轮只新增上表所列行。
+# 全库现状： total=71  max_id=93  daily_rows=1  interval_rows=11
