@@ -2,3 +2,7 @@
 
 - 2026-09-23：审计完成（仅涉及 `web/src/apps/desktop` 两文件：init.js 硬编码 18080、LocalLogsPage 直连 8765）。待执行 T-08。不改 Go 后端与模块结构。
 - 2026-09-23 T-01：AI 入口文档独立提交 `3b733ff`（`AGENT-INDEX.md`/`AGENTS.md`/`CLAUDE.md` 改动 + 新增 `DIRECTORY_MAP.md`）。本 CHG 在本仓只有 T-08 的两文件范围；`shared/api/http.js:89` 等三处 18080 登记为残留、本 CHG 不改。
+- 2026-09-24 T-08 完成（`305d002`，1 个 commit）：`init.js::cloudBaseUrl()` 不再返回 `http://127.0.0.1:18080`，改问 `get_public_config`，失败回退**空串**（**永不**回退回环字面量）并缓存最后已知良好值；`LocalLogsPage.vue` 不再 `fetch('http://127.0.0.1:8765/healthz')`，改走 `createLocalAgentService().health()`。**必须与 T-07 D 同批**：Agent 一强制 token，无头 `fetch` 立即 401。红是**行为性**的（先只导出、函数体不动），不是导入失败；变异矩阵 **5/5 杀**；`npm test` → 21 files / **101** tests passed（改动前 96）。详见 `evidence/task-08-cloud-web.md`。
+- 2026-09-24 T-08 把 AC-05 的一次性 grep **升级为常驻断言**：`localAgentBoundary.test.js` 新增 `carries no hard-coded Cloud address`（`not.toMatch(/18080/)`）与「local-logs 页不直接够得着 Agent 端口」两条规则，**显式限定文件范围**并注明理由——全树规则今天就会红，只能靠删规则来通过。
+- 2026-09-24 T-08 一处**自查删除**：值级哨兵 `"true"`（想覆盖 `development.python_fallback`）在红跑里**从未触发**，且布尔只有两种拼写、都不是哨兵——它只为**错误的理由**匹配将来的任何字段。该字段的保证划给键集棘轮。
+- 2026-09-24 T-08 遗留事实（T-09 需接）：`LocalLogsPage` 的 `health()` 调用**无单元测试**（只断言它不再直连，断言用的是 `health()` 而非 `status()` 属对实现细节过拟合）；`bindTrustedLocalAgent()` 本身需真实 Tauri 窗口，归 T-09 的 Desktop 真实启动观察。

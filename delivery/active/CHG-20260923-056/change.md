@@ -93,8 +93,8 @@
 | T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | DONE | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试 |
 | T-05 | Agent AST 边界测试（ADR-0016 第 3 条机器校验，含 `test_patch_targets.py`）+ 平台 URL 常量化 | DONE | R1–R10 全绿且每条有控制组证明「能红」（规则放在任务前的树上实跑转红并点名六处）；patch 目标可解析且在别名重构下转红；`executors/`+`local_api/` 无内联 URL 字面量（grep 0 命中 / 对照树 2 命中） |
 | T-06 | Desktop 拆分 main.rs：config/paths/state/commands；17 命令原样迁移；account_check/cookie_read 重复 preflight 提取共用 | DONE | `cargo test` 全绿（42 passed）；`cargo build` 通过；`main.rs` 1570 → 89 行；`generate_handler!` 17/17 逐字同序；9 条既有测试逐字不变、17 命令的 7 处改动逐条归因 |
-| T-07 | Desktop Cloud 地址链路 + sidecar 传参 + 配置接线：`bootstrap.rs`（把已就位的 `config.rs`/`paths.rs` 接到 `main`）；移除 `Client::new()` 的无超时与 `main.rs:1534` 的 `8765`；CSP 改运行时注入；`uuid` per-launch token；sidecar 两条 path 同一组环境变量；`get_public_config` command（含 `dto/config.rs`、`commands/public_config.rs`）；生产模式忽略整个 `WT_MEDIA_DESKTOP_*` 命名空间 | TODO | config loader 单测（默认/文件/env/非法/生产忽略）；T-06 遗留的 23 条「从未使用」告警（`config.rs` 16 + `paths.rs` 7）归零 |
-| T-08 | Cloud Web 两文件：init.js cloudBaseUrl 改 invoke（带回退）；LocalLogsPage healthz 改走 command | TODO | desktop 前端既有测试全绿 |
+| T-07 | Desktop Cloud 地址链路 + sidecar 传参 + 配置接线：`bootstrap.rs`（把已就位的 `config.rs`/`paths.rs` 接到 `main`）；移除 `Client::new()` 的无超时与 `main.rs:1534` 的 `8765`；CSP 改运行时注入；`uuid` per-launch token；sidecar 两条 path 同一组环境变量；`get_public_config` command（含 `dto/config.rs`、`commands/public_config.rs`）；生产模式忽略整个 `WT_MEDIA_DESKTOP_*` 命名空间 | DONE | config loader 单测（默认/文件/env/非法/生产忽略）；T-06 遗留的 23 条「从未使用」告警（`config.rs` 16 + `paths.rs` 7）归零 |
+| T-08 | Cloud Web 两文件：init.js cloudBaseUrl 改 invoke（带回退）；LocalLogsPage healthz 改走 command | DONE | desktop 前端既有测试全绿 |
 | T-09 | 联调回归 + 证据落盘：dev 模式跑通 sidecar 启动（传参生效、鉴权生效）、bind/account_check/cookie_read/profile 链路、`/healthz` curl、Agent 独立启动 | TODO | evidence/ 各项记录 PASS |
 | T-10 | 模块分工回写 + 收尾：三仓 AGENT-INDEX/DIRECTORY_MAP、workspace 基线核对、LEDGER/CURRENT_CONTEXT 同步、DONE Gate | TODO | `verify_agent_entry.py`+`verify_delivery_governance.py` 通过 |
 
@@ -149,6 +149,9 @@ Evidence files live in `evidence/`，按 Task 编号记录事实。
 - `evidence/task-04-bootstrap-injection.md`：T-04 bootstrap/注入取证——4 个 commit 的逐 commit 测试矩阵（184→204，单调不减；「移动文件」与「改逻辑」分列两个 commit）、冻结导入 sha256 与 T-02/T-03 同值、7/7 变异对照（其中 2 条初跑**不可判别**，各暴露一个真实测试缺口：`_as_bool` 的假值拼写与 `agent_id` 的**空断言**，补测后全部可判别）、AC-09 三模式真实进程输出（cloud 只报告 / local 连到真实 BitBrowser 40 个 profile / sidecar 401-401-200 token 矩阵且 token 不入 `ps`）、冻结入口脚本 ×3、静态扫描含阳性对照、PyInstaller 产物 PYZ 模块集 28→53（`runner`/`executors` 首次进包）、以及**已枚举的未覆盖面**（`bootstrap/local.py` 无单测、打包产物未重签时无法启动这一既存问题归 CHG-D(059)）。
 - `evidence/task-05-boundary-tests.md`：T-05 AST 边界取证——3 个 commit 的逐 commit 测试矩阵（214→249，单调不减）、冻结导入 sha256 与 T-02/T-03/T-04 同值、**规则在任务之前的树上实跑转红**并逐行点名 `a4a43cc` 修掉的六处（R5 两处 `_post` + R9 四处 URL 字面量）、6/6 变异对照（含两处**我自己的脚本缺陷**已修正并披露）、`/tmp/t05patch.py` 的别名重构把 `test_patch_targets.py` 与**既有的** `test_proxy_check.py` 同时转红、AC-02 的 grep 双证据（HEAD 0 命中 / 对照树 2 命中，各带分母）与死 import 扫描的阳性对照、以及 **§9.1 逐条枚举的未覆盖面**（R10 只到层对、`from pkg import mod` 的保守、运行期拼装 URL、`patch.object/dict` 不解析、`clients/` 内硬编码值）。
 - `evidence/task-06-desktop-split.md`：T-06 Desktop 拆分取证——11 个 commit 的逐 commit 测试矩阵（11→42，单调不减，且逐段能对上：+10 config、+8 preflight、−2 删死代码、+6 drain、+7 paths、+2 exit_report）、`main.rs` 1570→89 行（AC-04）、`generate_handler!` 17/17 逐字同序、**逐函数**的搬家核对（9 条既有测试 IDENTICAL / 10 条 BODY-SAME-SIG / 7 条 BODY-CHANGED 逐条归因）、CJK 字面量普查（99 条中 93 条逐字存在，6 条为模板分解，渲染由 16 行 `message_parity` 表钉住）、四份变异矩阵（config 12/12、drain 8/8、paths 7/7、exit_report 4/4）、**变异脚本自身错了五次**的完整披露、死代码删除带来的覆盖缺口（空票据守卫现在无覆盖）、Node 工具链的仓库级发现（CI 在任何分支上都不可能通过），以及 **§9.4 逐条枚举的未覆盖面**。
+
+- `evidence/task-07-desktop-config.md`：T-07 Config 链路取证——7 个 commit 的逐 commit 测试矩阵（42→63 单调不减；告警 27→4 且**余 4 条为空壳**，不虚报为 0）、四份变异矩阵（CSP 6/6、`get_public_config` 6/6、`cloudBaseUrl` 5/5、sidecar 5/7 **+2 存活并登记**）、CSP 退役的三重证据（棘轮 + 金标 + `dev_csp` 保持 `None`）、**真实副作用**验证（真启动一次：`127.0.0.1:18766`、200/401/**401 三态齐备**、`<scratch>` 下三目录齐备且仓库 `.local/` 未被触碰、0 残留监听）、我自己的 data-dir 检查脚本缺陷（override 分支语义）**自查纠正**、一处计划偏差（CSP 注入点写浅了）与计划计数笔误（第 17/18 个命令）、以及**已枚举的未覆盖面**（两条 spawn 路径、`generate_handler!` 注册、`connect_timeout`）。
+- `evidence/task-08-cloud-web.md`：T-08 Cloud Web 取证——单个 commit `305d002`、**行为性**的红输出（而非导入失败）、5/5 变异矩阵、`npm test` 96→**101**、AC-05 grep 升级为**常驻断言**（两条规则显式限定文件范围并注明理由）、一处**值级哨兵自查删除**（`"true"` 在红跑里从未触发，只为错误的理由匹配），以及**已枚举的未覆盖面**（`health()` 调用无单测、`bindTrustedLocalAgent()` 归 T-09）。
 
 ## 12. Current Checkpoint
 
@@ -327,6 +330,76 @@ Recent verification:
   m0-desktop.yml` + 6 个 `npm` shell script + 2 个 mjs）引用的 `package.json` 不存在，
   **该 CI workflow 在任何分支上都不可能通过**——这也解释了坏掉的 `npm test` 为何一直没被发现
   （CI 在 `bootstrap.sh` 就失败了，从没走到 test 那一步）。
+- T-07 逐 commit 实测（`/tmp/t07_matrix.sh`，每个 commit 后**强制重编**再量，非事后补记）：
+
+      commit   | tests | bin warnings
+      4b3a7b4  |  42   |  27     <- T-06 收尾基线
+      1276e98  |  45   |  29
+      b4d4dc4  |  46   |  29
+      2afe1d9  |  52   |   7
+      d838ccd  |  55   |   6
+      14ff67c  |  56   |   6
+      6f94cbb  |  59   |   6
+      35a2ee9  |  63   |   4
+
+  测试 **42 → 63 单调不减**；告警**先升后降**（A/B1 新增的类型尚无消费者故 +2；B2 接线后
+  一次降到 7，D 到 4）。**余下 4 条是 `filesystem/`/`secure_store/`/`system/`/`updater/`
+  四个空壳**——CHG-056 §5 明写本 CHG 不动，故告警收口到此为止，**不虚报为 0**。
+- T-07 变异矩阵四组（每组先跑未变异阳性对照；锚点必须**恰好命中一次**，否则硬停）：
+  CSP 棘轮+金标 6/6 杀、`get_public_config` 6/6 杀、`cloudBaseUrl`+边界 5/5 杀（属 T-08）、
+  sidecar 环境变量 **5/7 杀 + 2 存活（预期内）**。逐条明细见 `evidence/task-07-desktop-config.md`。
+- T-07 的 **2 条存活变异是登记项而非遗漏**：`Command` 需 `AppHandle` 才能构造，
+  「两条 spawn 路径注入同一组变量」是**结构性**性质，`cargo test` 看不见。对策是只有
+  **一处** `with_vars` 绑定、两条路径各用一次；运行期补位归 **T-09**（bundled 路径 +
+  dev Python fallback 路径各一次真实启动）。**不写成「已覆盖」**。
+- T-07 的 D（`35a2ee9`）前提**不是靠读源码断言的**：变量名漂了不是编译错误，而是一个静默
+  401 或一个没人调用的端口，故**真启动一次**（`PYTHONPATH=src` + 四个变量，端口 18766）：
+  监听 `127.0.0.1:18766`（**不是**默认 8765）；`/healthz` 带对 token **200** / 不带 **401** /
+  带错 **401**（三态齐备——缺第三态时「不带得 401」也可能只是「healthz 恰好要求别的什么」）；
+  `<scratch>` 下出现 `local-agent.sqlite3`/`logs`/`versions` 而仓库 `.local/` **未被触碰**。
+  四次启动断言后自行停止，实测 **0 个残留监听**，未动用户既有的 :8765 dev Agent。
+- T-07 一处**自查纠正**：第一版 data-dir 脚本断言 `$SCRATCH/data` 存在，报 `exists=no`。
+  查下去是**脚本的问题**——`RuntimePaths.resolve` 的 override 分支把 `<override>` **本身**
+  当 data_dir（`runtime/paths.py:64-71`），只有 dev/installed 分支才拼 `data/`。改正后如上。
+- T-07 的 AC-04 前置风险**静态闭合**：命令层请求的 6 个 `State<'_, T>` 类型与 `.manage()`
+  的 6 次调用**精确相等**，故不留下一个等 T-09 才炸的 "state not managed" 运行时 panic。
+- T-07 的 CSP 退役**不靠「删掉即通过」**：退役的是文件里那条**字面量**，不是策略本身。三重
+  证据——棘轮 `tauri_conf_carries_no_policy_of_its_own`（禁 `csp` 与 `devCsp` 回归）+
+  金标 `the_policy_is_shape_for_shape_the_literal_it_replaced`（把**原字面量逐字**钉进测试）+
+  `apply_csp_writes_the_field_a_dev_build_would_otherwise_prefer_over`（钉住 `dev_csp`
+  保持 `None`）。即「策略搬家了，它没变」成为一条**永久主张**，改一个指令就必须**故意**改那个字符串。
+- T-07 与计划的偏差（1 处，已披露）：计划写「CSP 改为运行时经 `ctx.config_mut()` 注入」，
+  `ctx` 指对了但**注入点写浅了**。实测 Tauri 源码：`AppManager` 持有 config 的**拷贝**
+  （`manager/mod.rs:39`），`Manager::csp()` 从那份拷贝读（`:369-380`）；`App` 没有
+  `config_mut`；`.setup()` 更晚，在**配置声明的窗口全部建好之后**（`app.rs:2524` 然后
+  `:2531`）。故唯一可行注入点是 `Builder::run` **之前**对 `Context` 施加，调用链逐行写在
+  `bootstrap.rs` 头部。另：计划 T-07 行写「第 17 个命令 `get_public_config`」，实际是**第 18 个**
+  `generate_handler!` 条目（既有 17 个位置不变），属计划计数笔误。
+- T-07 未覆盖面（已枚举，不以「测试通过」代替）：`generate_handler!` 的**注册本身**测试看不到
+  （写了忘注册则 `cargo test` 全绿，只有运行期以「命令不存在」暴露）；`connect_timeout`
+  未单独验证（`reqwest` 不把已建成 `Client` 的超时读回来，单独失效需黑洞地址，CI 不稳定）；
+  `.setup()` 与 `run()` 的先后**链**、以及 `bindTrustedLocalAgent()` 本身，均归 T-09 真实启动。
+- T-08 单个 commit `305d002`（`wt-media-cloud`）：`init.js::cloudBaseUrl()` 不再返回
+  `http://127.0.0.1:18080` 改问 `get_public_config`（AC-05），`LocalLogsPage.vue` 不再
+  `fetch('…:8765/healthz')` 改走 `createLocalAgentService().health()`。
+- T-08 的红是**行为性**的：先只把 `cloudBaseUrl` 导出、函数体一字不改，让失败来自
+  `expected 'http://127.0.0.1:18080' to be ''` 与边界规则的 `not to match /127\.0\.0\.1/`，
+  而不是「函数不存在」导致的导入失败。变异矩阵 **5/5 杀，0 存活，0 无效**。
+- T-08 实测 `cd wt-media-cloud/web && npm test` → **21 files / 101 tests passed（改动前 96）**。
+  缓存语义的三条测试各自 `vi.resetModules()` 后重新 import——`init.js` 的缓存是**模块级**的，
+  共用一个实例会让它们依赖执行顺序。
+- T-08 把 AC-05 的**一次性 grep 升级为常驻断言**：`localAgentBoundary.test.js` 新增
+  `carries no hard-coded Cloud address`（`not.toMatch(/18080/)`）与
+  `does not let the local-logs page reach the Agent port itself`；两条规则**显式限定文件范围**，
+  理由写在测试注释里（全树规则今天就会红，只能靠删规则来通过）——三个残留 18080 站点
+  （`AccountsPage.vue`/`ProfilesPage.vue`/`shared/api/http.js`）按用户裁定登记为遗留、本 CHG 不改。
+- T-08 一处**值级哨兵被我自查删除**：原想用 `"true"` 覆盖 `development.python_fallback`，
+  但它在红跑里**从未触发**（当时的稻草人漏的是 `data_dir` 不是 `python_fallback`），
+  且布尔只有两种拼写、都不是哨兵——`"true"` 会为**错误的理由**匹配到将来的任何字段。
+  已删除，并把该字段的保证明确划给**键集棘轮**（属 T-07 F 的测试）。
+- T-08 未覆盖面（已枚举）：`LocalLogsPage` 的 `health()` 调用**没有单元测试**（只断言了它不再
+  直连）——断言「用的是 `health()` 而不是 `status()`」属对实现细节过拟合，且两者都经桥、
+  都不越界，无可断言的行为差异；运行期由 T-09 覆盖。
 
 ## 13. DONE Gate
 

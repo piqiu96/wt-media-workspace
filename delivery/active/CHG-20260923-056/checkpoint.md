@@ -9,14 +9,18 @@ Completed:
 - T-01：四仓 AI 入口文档各自独立提交（desktop `47a6263`、cloud `3b733ff`、workspace `e0444cd`；agent 上一轮 `d3ab02f` 已提交）；配置格式按 D-05 回写为 TOML（`change.md` §6 D-01/§2/§5/§7/§8 + 程序总纲 §2 + planned CHG-059）；测试基线证据按模板规范化。
 
 Current:
-- T-07 Desktop Config 链路（与 T-08 同批）。
+- T-09 联调回归 + 证据落盘（三模式真实启动、AC 矩阵、两向 CSP 端到端检查）。
 
 Next:
-- T-07 + T-08 同批：`bootstrap.rs` 把已就位的 `config.rs`/`paths.rs` 接到 `main`、移除
-  `8765` 与无超时的 `Client::new()`、CSP 改运行时注入、`uuid` per-launch token、
-  sidecar 两条 spawn 路径同一组环境变量、`get_public_config`（含 `dto/config.rs`、
-  `commands/public_config.rs`）；Cloud Web 的 `init.js` 与 `LocalLogsPage.vue`。
-  **两处必须同批**：Agent 一强制 token，`LocalLogsPage.vue` 的无头 `fetch` 立即 401。
+- T-09：证据工具（`evidence/tools/`，照 CHG-055 先例）；AC-01～AC-11 逐条取证；
+  **并闭合 T-07 登记的三处**——两条 spawn 路径各一次真实启动（bundled + dev fallback）、
+  `get_public_config` 的 `generate_handler!` 注册、`.setup()`/`run()` 先后链；
+  另加两向 CSP 端到端检查（故意写错的 `csp_connect_src` 必须产生前端 CSP 违规，改对后不得再有）。
+  **不复用 `verify_m1_integration.py`**（`contract_revision` 期望已过期，且其 `run_desktop_verify`
+  依赖不存在的 `package.json`）。
+- T-10：三仓 `AGENT-INDEX.md`/`DIRECTORY_MAP.md` 按实际落位回写、workspace 基线核对并登记
+  `core/` 撤销、`change.md` §12/§13 + `LEDGER.md` + `status/*.md` + evidence 齐全、
+  `prepare_ai_workspace.py` 再生成快照、DONE Gate 逐项签字。
 
 Blocked:
 - None.
@@ -270,3 +274,60 @@ Open（未覆盖面，已枚举，不以「测试通过」代替）:
   （`.github/workflows/m0-desktop.yml` + 6 个 `npm` shell script + 2 个 mjs）引用的
   `package.json` 不存在，**该 CI workflow 在任何分支上都不可能通过**——这也解释了坏掉的
   `npm test` 为何一直没被发现。
+
+### T-07 完成（desktop `4b3a7b4` → `35a2ee9`，7 个 commit）
+
+Completed:
+- `1276e98` `token.rs`（`RuntimeToken`，`Uuid::new_v4()`，无 `Debug`/`Display`/`Serialize`）；
+  `b4d4dc4` 生产布局不再理会 `WT_MEDIA_DESKTOP_CONFIG`；`2afe1d9` `bootstrap.rs` 配置定位/
+  载入 + CSP 注入时机 + `include_str!` 编译内置兜底；`d838ccd` 两个 client 接配置（超时来自
+  TOML），`LocalAgentClient` 持有 token；`14ff67c` `tauri.conf.json` 的 CSP 字面量退役、
+  留下棘轮 + 金标；`6f94cbb` 第 18 个命令 `get_public_config`（只返回三个非敏感字段）；
+  `35a2ee9` sidecar 与 Python fallback 注入同一组四个环境变量，token 成为**强制**。
+- 于是 `8765` 字面量与 CSP 字面量消失，`config.rs`/`paths.rs` 首次有消费者（T-06 的中间态告警
+  随之收口）。
+
+Verification（详见 `evidence/task-07-desktop-config.md`）:
+- 逐 commit 测试矩阵（**强制重编**再量）：42/45/46/52/55/56/59/**63**，单调不减；
+  bin warnings 27/29/29/7/6/6/6/**4**（余 4 条即 §5 明写不动的四个空壳，不虚报为 0）。
+- 变异矩阵四组：CSP 6/6、`get_public_config` 6/6、`cloudBaseUrl` 5/5、sidecar **5/7 杀
+  + 2 存活（预期内，登记归 T-09）**。
+- 真实副作用（D 的前提）：真启动一次，监听 `127.0.0.1:18766`，`/healthz` 200/401/401
+  三态齐备，`<scratch>` 下 `local-agent.sqlite3`/`logs`/`versions` 齐备且仓库 `.local/` 未被触碰，
+  0 个残留监听。
+- 静态闭合一条运行时风险：6 个 `State<'_, T>` 与 6 次 `.manage()` 精确相等。
+
+Deviations / Corrections:
+- 计划写「CSP 运行时经 `ctx.config_mut()` 注入」，**注入点写浅了**：`AppManager` 持有 config
+  的拷贝、`App` 无 `config_mut`、`.setup()` 在配置窗口建好之后；唯一可行点是 `Builder::run`
+  之前对 `Context` 施加。计划写「第 17 个命令」，实为**第 18 个** handler 条目（计数笔误）。
+- **自查纠正**：data-dir 检查脚本第一版断言 `$SCRATCH/data`，报 `exists=no`；错在脚本——
+  override 分支把 `<override>` 本身当 data_dir（`runtime/paths.py:64-71`）。
+
+Open（未覆盖面，已枚举）:
+- M-06/M-07（两条 spawn 路径都注入环境）无单元测试覆盖——`Command` 需 `AppHandle`，
+  结构性性质 `cargo test` 看不见；运行期归 T-09。
+- `generate_handler!` 的注册本身测试看不到；`connect_timeout` 未单独验证；`.setup()`/`run()`
+  先后链与 `bindTrustedLocalAgent()` 归 T-09。
+
+### T-08 完成（cloud `305d002`，1 个 commit）
+
+Completed:
+- `init.js::cloudBaseUrl()` 改问 `get_public_config`（失败回退**空串**，**永不**回退回环字面量），
+  并缓存最后已知良好值；`LocalLogsPage.vue` 改走 `createLocalAgentService().health()`。
+- 与 T-07 D **必须同批**：Agent 一强制 token，无头 `fetch` 立即 401——两者同时落地才不留下
+  一个已知的破碎状态。
+
+Verification（详见 `evidence/task-08-cloud-web.md`）:
+- 红是**行为性**的（先只导出、函数体不动），不是导入失败。
+- 变异矩阵 **5/5 杀，0 存活，0 无效**。
+- `npm test` → 21 files / **101** tests passed（改动前 96）。
+- AC-05 的 grep 已**升级为常驻断言**（`carries no hard-coded Cloud address` +
+  local-logs 页规则），两条规则显式限定文件范围并注明理由。
+
+Corrections / Open:
+- 值级哨兵 `"true"` 已删除：红跑里**从未触发**，且布尔只有两种拼写、都不是哨兵——它只为
+  错误的理由匹配将来的任何字段；该字段的保证划给键集棘轮。
+- `LocalLogsPage` 的 `health()` 调用无单元测试（只断言不再直连）；`bindTrustedLocalAgent()`
+  本身归 T-09 真实启动。
+
