@@ -44,6 +44,9 @@
 - **唯一性**：全项目唯一。`scripts/verify_agent_entry.py` 在父层重新出现副本时直接判错。
 - **版本控制**：该文件入 git（`.gitignore` 不排除 `.ai/`）。因此每次重新生成都是一次可评审的 diff；它也随 `git worktree` 检出一起带走，这正是「快照放在仓库内而非父层」的第二个理由。
 - **生成方式**：`python3 scripts/prepare_ai_workspace.py --change <CHG>`。禁止手工编辑。
+  关闭最后一个 CHG 后 active 名额可为空，该状态同样由脚本渲染：`--no-active` 写出 `Active CHG: `none``
+  与 `Status: `NONE``，且在 `delivery/active/` 仍存在 CHG 时拒绝执行；`--change` 与 `--no-active` 互斥。
+  `verify_delivery_governance.py` 早已把该状态定义为合法，生成与校验两侧必须同时支持。
 - **体积预算**：≤ 8000 字符（中英混排约 2700–4000 token，对应 <3000 token 目标）。脚本按 `字符数 / 2.5` 估算 token 并在校验时输出。
 - **内容**：当前 Milestone、当前 CHG、状态、必读文件顺序、受影响仓库、稳定基线路径、稳定职责边界。
 - **禁止写入**：历史记录、完整决策库、历史 spec、临时验证内容。
@@ -127,7 +130,7 @@
 | `scripts/verify_m0_config.py` | **红 3 项**：`cloud_api` 与 `local_agent_api` 的 `contract_revision` 期望值落后于 `config/contract-map.yaml`；缺失 `.github/workflows/m0-workspace.yml` |
 | `scripts/verify_product_master_alignment.py` | **红 9 项**：M2/M3 状态词漂移 2 项、M2/M3 候选关键词缺失 5 项、以及「active CHG 缺 current repository」「active CHG 不得有待决问题」各 1 项 |
 | `scripts/verify_m2_acceptance.py` | **红 1 项**：`wt-media-cloud/internal/modules/cloudagent/compatibility.go` 在云仓已不存在 |
-| `python3 -m unittest discover -s tests -q` | 45 项中 4 项失败，全部来自上面三个脚本；修完即转绿 |
+| `python3 -m unittest discover -s tests -q` | 4 项失败，全部来自上面三个脚本；修完即转绿（2026-09-23 计数：69 项中 4 项失败。此前本行记为「45 项中 4 项」，总数只因后续新增测试而变，**红项集未变**） |
 
 上述红项**不在 Agent 入口工作范围内**，需各自独立开 CHG 处理。在它们转绿之前，不要假定本仓库门禁整体是绿的。
 

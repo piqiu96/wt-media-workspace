@@ -23,6 +23,9 @@ Paths are maintained in [`config/repository-map.yaml`](config/repository-map.yam
 `.ai/CURRENT_CONTEXT.md` in this repository is the **only** execution snapshot.
 
 - It is generated, not authored: `python3 scripts/prepare_ai_workspace.py --change <CHG>`.
+- When a close-out leaves no active CHG, the same script renders that state too:
+  `python3 scripts/prepare_ai_workspace.py --no-active` (writes `Active CHG: \`none\``).
+  It refuses if `delivery/active/` still holds a CHG.
 - Do not edit it by hand.
 - Do not create or keep a copy at the outer execution root. `scripts/verify_agent_entry.py` fails if one reappears there.
 - Keep it a snapshot, not a knowledge base: no history, no full decision library, no temporary verification notes.

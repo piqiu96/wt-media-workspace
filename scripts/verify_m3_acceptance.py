@@ -41,7 +41,10 @@ WS_ROOT = SCRIPT_DIR.parent
 CLOUD_ROOT = Path(
     os.environ.get("WT_MEDIA_CLOUD_ROOT", str(WS_ROOT.parent / "wt-media-cloud"))
 )
-EVIDENCE = WS_ROOT / "delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923"
+# CHG-20260916-052 已于 2026-09-23 归档为 HANDOFF，M3 亦于同日签收；证据随记录移入 completed/。
+# 这里必须指归档位置：EVIDENCE 既读旧运行产物（raw/*.log）也写新产物，
+# 若仍指 active/，重跑会（a）读不到旧日志而在 P10 崩掉，（b）在 active/ 下重新造出一个孤儿证据目录。
+EVIDENCE = WS_ROOT / "delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923"
 RAW_DIR = EVIDENCE / "raw"
 SHOT_DIR = EVIDENCE / "screenshots"
 # 会话 cookie 是活的凭据：绝不落在证据目录里（证据工件不得包含凭据值）。
@@ -401,7 +404,7 @@ def phase_g0():
     _state["cloud_head"], _state["ws_head"] = cloud_head, ws_head
 
     own_artifacts = ("scripts/verify_m3_acceptance.py", "scripts/m3-acceptance.sh",
-                     "delivery/active/CHG-20260916-052/")
+                     "delivery/completed/CHG-20260916-052/")
     ws_lines = [line for line in ws_status.splitlines() if line.strip()]
     foreign = [line for line in ws_lines
                if not any(marker in line for marker in own_artifacts)]

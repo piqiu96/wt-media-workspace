@@ -8,12 +8,27 @@ from pathlib import Path
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "prepare_ai_workspace.py"
+GOVERNANCE_SCRIPT_PATH = (
+    Path(__file__).resolve().parents[1] / "scripts" / "verify_delivery_governance.py"
+)
 
 
 def load_module():
     spec = importlib.util.spec_from_file_location("prepare_ai_workspace", SCRIPT_PATH)
     if spec is None or spec.loader is None:
         raise RuntimeError("could not load prepare_ai_workspace.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_governance_module():
+    spec = importlib.util.spec_from_file_location(
+        "verify_delivery_governance", GOVERNANCE_SCRIPT_PATH
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load verify_delivery_governance.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
@@ -105,6 +120,63 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
             self.module.prepare_workspace(
                 workspace_repo=self.workspace,
                 change_id="CHG-20260714-999",
+                write_context=False,
+            )
+
+    def test_no_active_change_renders_none_snapshot(self) -> None:
+        """Closing the last CHG must stay a generated state, not a hand edit.
+
+        The verifier already accepts `Active CHG: `none`` with an empty ledger
+        (see test_verify_delivery_governance), so the generator has to be able
+        to produce exactly that pair.
+        """
+        summary = self.module.prepare_workspace(
+            workspace_repo=self.workspace,
+            no_active=True,
+            write_context=True,
+        )
+
+        text = (self.workspace / ".ai" / "CURRENT_CONTEXT.md").read_text(encoding="utf-8")
+        self.assertIsNone(summary["active_change"])
+        self.assertIn("- Active CHG: `none`", text)
+        self.assertIn("- Status: `NONE`", text)
+        self.assertNotIn("Current milestone:", text)
+        self.assertNotIn("Change file:", text)
+        self.assertIn(
+            "- None",
+            text,
+            "an empty active set must still render the affected-repositories block",
+        )
+
+        ledger = self.workspace / "delivery" / "LEDGER.md"
+        ledger.parent.mkdir(parents=True, exist_ok=True)
+        ledger.write_text(
+            "# Delivery Ledger\n\nNo active M/L CHG.\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(
+            load_governance_module().validate_delivery_governance(self.workspace),
+            [],
+        )
+
+    def test_no_active_refuses_while_a_change_is_still_active(self) -> None:
+        self.write_change("CHG-20260714-002")
+
+        with self.assertRaises(ValueError):
+            self.module.prepare_workspace(
+                workspace_repo=self.workspace,
+                no_active=True,
+                write_context=False,
+            )
+
+    def test_change_and_no_active_together_fail(self) -> None:
+        self.write_change("CHG-20260714-002")
+
+        with self.assertRaises(ValueError):
+            self.module.prepare_workspace(
+                workspace_repo=self.workspace,
+                change_id="CHG-20260714-002",
+                no_active=True,
                 write_context=False,
             )
 

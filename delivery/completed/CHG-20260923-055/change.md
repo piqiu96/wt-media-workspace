@@ -3,7 +3,7 @@
 > 标题原为「Desktop 内容池封面加载与标题换行修复」。用户实机复核后陆续追加了
 > 图标（根因 E）与列宽被压（根因 F）等问题，范围已超出原标题，故放宽。
 
-- Status: ACTIVE
+- Status: DONE（2026-09-23 归档；见文末「关闭记录」）
 - Level: S
 - Milestone: `delivery/milestones/M3-content-discovery-v2.md`
 - 日期：2026-09-23
@@ -29,7 +29,9 @@
 - 呈现与时间列：三页时间列收窄到 150px 且**去秒**；「互动/发现结果/最近效果」的数字由 `·` 串行改为**竖排一行一项**（用户裁定）。
 
 不含于本 CHG：不新增 Cloud 图片代理端点、不精简内容池列集、
-不标 M3 DONE、不修 CHG-054 已登记的 D1～D10/S-1。
+不修 CHG-054 已登记的 D1～D10/S-1。
+（原文另含「不标 M3 DONE」——那是执行期的自我约束；用户已于 2026-09-23 签收 M3-E3，
+M3 据此转 DONE，见文末「关闭记录」。）
 
 > **修订记录（2026-09-23，根因 F 轮次）**：上文原写「不动 `scroll.x`」。该决定**已被取代**——
 > 三张表的 `scroll.x` 现改为由列宽推导，断言写死 `2060px` 的那条测试也一并改写。
@@ -96,6 +98,26 @@ F 曾被**误判为不复现**（见 `evidence/20260923-symptom-f-not-reproduced
 - **不做完整弹性布局**——用户已裁定自适应「可以不修」。全列定宽后靠横向滚动，与现状一致。
 - 不精简列集（用户裁定「列集不动」）。
 - 不改 `config/credentials/douyin.toml`；S-1 原样登记在 CHG-054，本 CHG 不处置。
-- 不标 M3 DONE（签收属用户）；不激活 `CHG-20260915-051`；不碰 `CHG-20260923-053`。
+- 不激活 `CHG-20260915-051`；不碰 `CHG-20260923-053`。
+- **不修** CHG-054 已登记的 D1、D2、D3、D6、D7、D8、D9、D10、D-scheduler-2、S-1。
 
 > 「不动 `scroll.x`」已于根因 F 轮次被取代，见上文「修订记录」。
+
+## 关闭记录（2026-09-23）
+
+- **用户签收**：用户在 DMG 原生应用上复核后确认「字体变小是对的」，并要求把
+  「发现结果 / 互动 / 最近效果」三列收窄；收窄完成后指示「收尾了，给 M3 优化完成」，
+  并就范围二选一裁定「关 CHG-055 + 记录 M3-E3 签收」。
+- **本 CHG 结论**：四条根因（A、C、D、E、F 五条，见上表）全部证实并修复，其中
+  A/C/D/E 有模拟台或实机读数，E 由用户实机确认图标恢复，F 由用户实机截图逐列量测证实。
+  呈现与时间列改动（150px 去秒、竖排计数）经用户确认。
+- **关闭时的验证快照**：`npm run test` 96 passed；`go test ./...` 57 ok / 0 FAIL；
+  `cargo test` 11 passed；`build:cloud` / `build:desktop` 通过；DMG "valid on disk"；
+  `local-control.sh verify` 全项 PASS；`verify_delivery_governance.py` 0 ERROR。
+- **遗留**：`CHG-20260923-054`（planned）继续承载 D1～D10、D-scheduler-2、S-1；
+  用户已裁定 **D3 不阻塞 M3**（该 CHG 正文仍标其为基线 §5 阻塞项，处置时按其自身范围推进）。
+- **顺带补的治理工具缺口**：归档本 CHG 后 active 目录首次为空，而
+  `prepare_ai_workspace.py` 当时只能 `--change <CHG>`、渲染不出「无 active CHG」快照，
+  补 `--no-active` 并加测试（含与 `verify_delivery_governance.py` 的交叉断言）。
+  不补则只能手工编辑生成物，而那是被明令禁止的。详见
+  `evidence/20260923-closeout-and-m3-signoff.md`。

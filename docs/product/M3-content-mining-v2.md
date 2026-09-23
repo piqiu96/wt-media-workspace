@@ -10,7 +10,7 @@
 > 凡**描述性**表述（入口名称、枚举、状态取值、统计口径、周期语法）一律改写为事实；
 > 凡**要求性**表述（例如“不重复排队”“必须能真实周期触发”）**一律保留**——
 > 实现未达标属于缺陷，不能通过下调基线来消解。本轮实测发现的偏离集中登记在
-> `delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md`
+> `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md`
 > 与 `14-verdict.md`。
 
 ## 1. 目标与产品结构
@@ -256,5 +256,5 @@ content_channel 是受控渠道能力抽象；不要求本期增加渠道后台�
 > 2026-09-23 更新：原第 7 项含「及只读流转视图」核验，按第 6 节的裁定删除该项核验，只保留三页面、
 > 权限拒绝、M2 回归与 Web/Desktop 走查。
 > 本轮验收的执行证据与逐项判定见
-> `delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/14-verdict.md`：
+> `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/14-verdict.md`：
 > 第 2 项因缺陷 D-scheduler 判**不通过**；第 7 项因 Desktop 未走查判**部分通过**；其余各项通过。

@@ -207,7 +207,7 @@ Web 端是普通浏览器、根本没有 CSP，图片照常加载——**这就�
 ```
 cd /Users/aqiuye/Develop/workspace/wt-media
 WT055_PASSWORD=<运营账号密码> bash \
-  wt-media-workspace/delivery/active/CHG-20260923-055/evidence/tools/run-capture.sh \
+  wt-media-workspace/delivery/completed/CHG-20260923-055/evidence/tools/run-capture.sh \
   <输出目录> "after-01-csp-1280x800:1280x800" \
              "after-02-csp-1512x900-scrolled-right:1512x900:right" \
              "after-03-csp-1512-rowdetail:1512x900:rowdetail"

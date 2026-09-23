@@ -2,7 +2,7 @@
 
 - 状态：PLANNED（未激活）。按用户 2026-09-23 裁定登记——「缺陷移入 planned，另立后续 CHG」。
 - Completed（登记阶段已完成的治理动作）：
-  - 缺陷与安全问题清单已逐条对齐 `delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md`：D1、D2、D3、D6、D7、D8、D9、D10、D-scheduler-2，以及安全问题 S-1（S-2 已处置，不在本 CHG 范围）。
+  - 缺陷与安全问题清单已逐条对齐 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md`：D1、D2、D3、D6、D7、D8、D9、D10、D-scheduler-2，以及安全问题 S-1（S-2 已处置，不在本 CHG 范围）。
   - 已区分「影响验收项的缺陷」与「不影响验收项的质量/体验/安全债」：唯一影响验收项的是 **D3**（基线 §5 的「不重复排队」），其余均不影响 `14-verdict.md` 第 1～7 项的成立。
   - 已把三项**需产品决策**的问题单列为「待决」而非直接排期：D9（空返回语义）、D-scheduler-2（daily 漏 tick 兜底）、S-1（处置范围）。
 - Current：未开始实施，不占用 active 名额。

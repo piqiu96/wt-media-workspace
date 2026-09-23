@@ -52,4 +52,4 @@ worker 的资源计划都补了 `clientsResource()`，**唯独调度路径漏补
 （Cloud 新增 `defaultSchedulerDiscoveryService()`，`RunDue` 改走它；`runDue` 只读库入队，
 从不解引用 `s.crawler`）。`schedulerResourcePlan()` 与其测试原样保留。
 进程级复验通过（无人值守触发端到端成立），详见治理仓库
-`delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`。
+`delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`。

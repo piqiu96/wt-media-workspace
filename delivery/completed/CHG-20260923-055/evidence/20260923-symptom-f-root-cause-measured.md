@@ -175,7 +175,7 @@ Received: [ "{ colKey: 'name', title: '策略名称', minWidth: 180 }" ]
 ## 复现命令
 
 ```bash
-cd delivery/active/CHG-20260923-055/evidence/tools
+cd delivery/completed/CHG-20260923-055/evidence/tools
 # 量「已嵌入 DMG 的那份产物」，不接触任何凭据
 bash measure-stub.sh /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/.generated/frontend \
   /tmp/wt055-m3 embed 1280x800 2560x1440

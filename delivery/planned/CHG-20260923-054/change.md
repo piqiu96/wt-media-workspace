@@ -2,7 +2,7 @@
 
 - Status: PLANNED
 - Level: S
-- 锚点：`delivery/milestones/M3-content-discovery-v2.md` §2.1；验收登记 `delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`
+- 锚点：`delivery/milestones/M3-content-discovery-v2.md` §2.1；验收登记 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`
 - 日期：2026-09-23
 - 基线：`docs/product/M3-content-mining-v2.md`；ADR-0013、ADR-0014、ADR-0015
 - 当前仓库：`wt-media-cloud` 为主；`wt-media-workspace`（验收脚本与治理记录）为辅。
@@ -33,7 +33,7 @@
 
 **本清单不变，且不新增条目**：E3 验收之后从生产形态 DMG 原生应用报出的内容池呈现问题
 （封面被 CSP 拦截、标题省略号漏了 `<a>` 渲染分支）已由
-[CHG-20260923-055](../../active/CHG-20260923-055/change.md) 单独处置。
+[CHG-20260923-055](../../completed/CHG-20260923-055/change.md) 单独处置。
 它**不在本 CHG 内跟踪**，也不属于本节口径（本节收的是 E3 验收期内**已登记未修**的项）。
 S-1 的现状与裁定不因 055 改变：055 未读取、未修改、未引用该凭据文件。
 

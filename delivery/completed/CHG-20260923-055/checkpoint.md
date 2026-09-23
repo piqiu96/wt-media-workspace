@@ -54,3 +54,14 @@
     （`ContentPoolPage-Cht9c0Jj.js` 等各 1），两个旧 chunk 名 0 命中——证明内嵌的是新产物。
   - **待用户亲眼确认**：内容列标题与平台 ID 是否回来、挖掘任务三列是否正常、时间列是否 150px 无秒、
     数字是否竖排。**WebKit 实际行高需由截图重读后回写 `change.md` 行高节**。
+- 2026-09-23 收尾（关闭）：
+  - 用户实机复核确认「字体变小是对的」，并要求「发现结果 / 互动 / 最近效果」三列收窄；
+    按实测（探针量最宽项，非估算）收窄到 130 / 120 / 120，重建 DMG。
+  - 用户裁定「关 CHG-055 + 记录 M3-E3 签收」→ 本 CHG 转 **DONE** 并归档到
+    `delivery/completed/CHG-20260923-055/`；M3 里程碑转 **DONE**。
+  - 用户同时裁定 **D3 不阻塞 M3**（D3 仍在 CHG-054 planned，标为基线 §5 阻塞项，按该 CHG 自身范围处置）。
+  - 归档后 `delivery/active/` 首次为空，暴露出生成器缺口：`prepare_ai_workspace.py` 无法渲染
+    「无 active CHG」快照（而 `verify_delivery_governance.py` 早已把该状态定义为合法并有测试）。
+    补 `--no-active` + 3 条测试，快照仍由脚本生成，不手工编辑。
+  - 关闭时全套验证复跑通过；`verify_delivery_governance.py` → `Active CHG: none`，0 ERROR。
+  - 完成记录与签收依据见 `evidence/20260923-closeout-and-m3-signoff.md`。

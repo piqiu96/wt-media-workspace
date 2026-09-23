@@ -152,7 +152,7 @@ TODO → IMPLEMENTED → VERIFIED → CLOSED
 | M0 | `DONE` | M0 工程基线复验通过。Cloud/Web/Agent/Desktop 真实构建、测试、启动验证完成。MySQL 真实连接。修复 2 个测试问题。 | M0 冻结。不继续扩建。 |
 | M1 | `DONE` | M1 任务链路闭环复验通过。创建→领取→执行→上报→查询完整链路跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：router 连接、mysql_registry 时间格式。 | M1 冻结。不扩建通用任务系统。 |
 | M2 | `DONE` | 2026-09-14 用户完成本轮综合人工验收并确认完整通过。M2-A/B/C/E 的真实依赖、构建、Desktop 与人工走查证据均已归档；M2-D 保持 `DEFERRED`。 | M2 冻结为当前运行环境与账号管理基线；后续内容发现从 M3 开始，M2-D 或真实受限样本校准须以独立 CHG 恢复。 |
-| M3 | `IN_PROGRESS` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收已于 2026-09-23 执行一轮并判未通过（硬阻断 D-scheduler），用户签收未完成 | 以第 3 节 M3 为准；未达退出条件前不得标记 `DONE` |
+| M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
 | M4-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
 > 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的 `IN_PROGRESS` 自相矛盾。依据第 3 节 M3 字段、其闭环 `delivery/milestones/M3-content-discovery-v2.md` 与 active CHG-20260916-052，M3 为 `IN_PROGRESS`，M4～M10 为 `NOT_STARTED`，故拆为两行；M3 未达退出条件，不标 `DONE`。
@@ -355,16 +355,16 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS`（A～E1 有真实证据；C2/E2 已暂停；E3 综合验收已执行一轮、判未通过，用户签收未完成） |
+| 状态 | `DONE`（2026-09-23 用户签收；A～E1 有真实证据；C2/E2 已暂停；E3 验收矩阵第 1～7 项全 PASS） |
 | 产品方向 | 用户已明确确认内容挖掘 V2（2026-09-15）；M2 保持 `DONE`。 |
 | 目标 | 两个人工入口（内容池「ID/链接发现」与「关键词发现」）与关键词自动策略统一入内容池，经人工筛选或策略规则转为可追踪素材；M3 自动发现由 Cloud Scheduler + Cloud Worker/Crawler 执行，不创建 Agent 任务。博主搜索与作者策略已暂停。 |
 | 依赖 | M2 `DONE`；按阶段解决接口、权限、周期与状态口径。 |
-| 规划状态 | A～E 与八个 CHG 草案已拆分；当前由 CHG-20260916-052 承载实施，M3-B～E 由 Cloud Scheduler + Cloud Crawler 承担，不创建 Agent 任务。 |
+| 规划状态 | A～E 与八个 CHG 草案已拆分；M3-B～E 由 CHG-20260916-052 承载并已实施，由 Cloud Scheduler + Cloud Crawler 承担，不创建 Agent 任务。 |
 | 闭环 | `delivery/milestones/M3-content-discovery-v2.md` |
 | 产品/决策 | `docs/product/M3-content-mining-v2.md`；ADR-0013（第 3、7 条已于 2026-09-23 增补）、ADR-0014（团队级隔离已确认）、ADR-0015（Cloud-owned 执行） |
-| Active CHG | CHG-20260916-052 |
-| Evidence | Cloud `docs/superpowers/handoffs/`（2026-09-18、2026-09-21、2026-09-22）与 CHG-052 `checkpoint.md`/`evidence/`；关键词链路经真实凭据取得 `status=success`。C2/E2 无真实外部证据。 |
-| 完成日期 | None |
+| Active CHG | None（M3 已关闭，active 名额为空） |
+| Evidence | Cloud `docs/superpowers/handoffs/`（2026-09-18、2026-09-21、2026-09-22）与 CHG-052 `checkpoint.md`/`evidence/`；关键词链路经真实凭据取得 `status=success`；E3 验收矩阵见 CHG-052 `evidence/m3-e3-acceptance-20260923/`（含 `14-verdict.md` 与 `15-`～`17-` 补验）。C2/E2 无真实外部证据。 |
+| 完成日期 | 2026-09-23（用户签收；记录见里程碑第 2.2 节） |
 | Commit/Tag | None |
 
 三个页面：内容池、挖掘策略、挖掘任务。
@@ -389,7 +389,7 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 | M3-E2 | 作者周期任务与真实增量入池（**已暂停**，后续版本再评估） | CHG-20260915-050 |
 | M3-E3 | 综合验收与用户签收；独立的只读运行视图本期不做（2026-09-23 裁定移出交付要求） | CHG-20260915-051 |
 
-A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停（本期不做，后续版本再做），移出验收范围。E3 的独立验收 CHG-20260915-051 仍为 DISCUSSION、未启动，其执行草案位于 `delivery/planned`；但 E3 的**综合验收走查已于 2026-09-23 在 Cloud `aaf66c5` 上执行一轮并判未通过**（106 步中 87 PASS / 7 FAIL，唯一硬阻断为 D-scheduler：无人值守的真实周期触发未交付），用户签收未完成，结论见 CHG-052 `checkpoint.md` 与 `delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`。原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。C 阶段由 C1 完成，M3-E 由 E1 与 E3 完成。逐阶段状态见 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1 节。
+A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停（本期不做，后续版本再做），移出验收范围。E3 的独立验收草案 CHG-20260915-051 仍为 DISCUSSION、未启动，其执行草案位于 `delivery/planned`；E3 的**综合验收走查已于 2026-09-23 在 Cloud `aaf66c5` 上执行**（106 步中 87 PASS / 7 FAIL，唯一硬阻断为 D-scheduler：无人值守的真实周期触发未交付），D-scheduler 同日修复并复验通过，Desktop 走查与 `material_failed` 注入两项覆盖缺口同补，**验收矩阵第 1～7 项全部通过并经用户签收**，结论见 CHG-052 `checkpoint.md` 与 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`。原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。C 阶段由 C1 完成，M3-E 由 E1 与 E3 完成。逐阶段状态见 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1、2.2 节。
 
 明确不做：视频下载/存储/校验、剪辑、AI 评分、自动生产/发布/互动/数据分析、其他渠道真实采集、工作流引擎、可视化调度器、任意脚本执行、crawl_result、完整历史原始 JSON。
 
@@ -403,7 +403,7 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 - source_content 三态、crawl_task 五态（含 `partial_success`）与部分失败口径均明确，统计/错误和业务事实一致。
 - 全局唯一、权限隔离、忽略保护、人工转换事务与素材来源可追踪同时成立。
 - 仅预留渠道/策略扩展抽象；独立的只读运行视图本期不做（2026-09-23 裁定移出交付要求，不因此改变 ADR-0013 第 8 条对编排/拖拽/条件分支/任意脚本的禁止性约束）。
-- Cloud Web/Desktop、受控故障、M2 回归及用户最终验收通过后才标 M3 DONE。
+- Cloud Web/Desktop、受控故障、M2 回归及用户最终验收通过后才标 M3 DONE。**（2026-09-23 已满足：四项均有证据，用户同日签收。）**
 
 ### M4：素材使用与本地合成闭环
 

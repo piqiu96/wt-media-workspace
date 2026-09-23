@@ -84,7 +84,7 @@ CSP 原样取自 `tauri.conf.json`。
 ## 复现命令
 
 ```bash
-cd delivery/active/CHG-20260923-055/evidence/tools
+cd delivery/completed/CHG-20260923-055/evidence/tools
 bash measure-stub.sh /tmp/wt055-before /tmp/wt055-m before 1280x800 1512x900 1920x1080 2560x1440
 bash measure-stub.sh /tmp/wt055-after  /tmp/wt055-m after  1280x800 2560x1440
 ```
