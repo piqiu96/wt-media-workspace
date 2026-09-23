@@ -9,21 +9,18 @@ Completed:
 - T-01：四仓 AI 入口文档各自独立提交（desktop `47a6263`、cloud `3b733ff`、workspace `e0444cd`；agent 上一轮 `d3ab02f` 已提交）；配置格式按 D-05 回写为 TOML（`change.md` §6 D-01/§2/§5/§7/§8 + 程序总纲 §2 + planned CHG-059）；测试基线证据按模板规范化。
 
 Current:
-- T-09 联调回归 + 证据落盘（三模式真实启动、AC 矩阵、两向 CSP 端到端检查）。
+- T-10 模块分工回写 + 收尾（三仓 `AGENT-INDEX.md`/`DIRECTORY_MAP.md` 按实际落位回写、
+  workspace 架构基线核对并登记 `core/` 撤销、`change.md` §13 DONE Gate 逐项签字、
+  `LEDGER.md`/`status/*.md`/evidence 齐全、`prepare_ai_workspace.py` 再生成快照）。
 
 Next:
-- T-09：证据工具（`evidence/tools/`，照 CHG-055 先例）；AC-01～AC-11 逐条取证；
-  **并闭合 T-07 登记的三处**——两条 spawn 路径各一次真实启动（bundled + dev fallback）、
-  `get_public_config` 的 `generate_handler!` 注册、`.setup()`/`run()` 先后链；
-  另加两向 CSP 端到端检查（故意写错的 `csp_connect_src` 必须产生前端 CSP 违规，改对后不得再有）。
-  **不复用 `verify_m1_integration.py`**（`contract_revision` 期望已过期，且其 `run_desktop_verify`
-  依赖不存在的 `package.json`）。
-- T-10：三仓 `AGENT-INDEX.md`/`DIRECTORY_MAP.md` 按实际落位回写、workspace 基线核对并登记
-  `core/` 撤销、`change.md` §12/§13 + `LEDGER.md` + `status/*.md` + evidence 齐全、
-  `prepare_ai_workspace.py` 再生成快照、DONE Gate 逐项签字。
+- T-10 完成后本 CHG 走 DONE Gate。
+- 三项**待用户裁定**（都不阻塞 T-10）：①生产 CSP 是否把 `ipc:` 加进 `connect-src`；
+  ②回环 client 是否加 `.no_proxy()`；③开发者 Cloud `:18080` 上被误建的那个 `noop_task`
+  是否撤销（`task_b21340775ace100173202de3`，见 T-09 段 Open）。
 
 Blocked:
-- None.
+- None.（T-07 遗留③ `connect_timeout` 的隔离量测**被②挡住**，已按实测机制登记，非阻塞。）
 
 Recent verification:
 - 审计：源码级 grep/阅读，2026-09-23。
@@ -330,4 +327,81 @@ Corrections / Open:
   错误的理由匹配将来的任何字段；该字段的保证划给键集棘轮。
 - `LocalLogsPage` 的 `health()` 调用无单元测试（只断言不再直连）；`bindTrustedLocalAgent()`
   本身归 T-09 真实启动。
+
+### T-09 完成（**本 Task 未改任何产品代码**；产物 = `evidence/tools/` 11 个工具 + 2 份证据 + 治理回写）
+
+Completed:
+- AC-01…AC-11 逐条落到**可重跑的工具**上并各带阳性对照：`evidence/tools/`（`ac01_ac09_agent_modes.py`、
+  `ac02_agent_boundary.sh`、`ac04_desktop.sh`、`ac05_desktop_launch.py` + `ac05_probe/`、
+  `ac06_local_chains.py`、`ac07_three_repos.sh`、`ac08_governance.sh`、`ac10_task_chain.py`）。
+  **不复用 `verify_m1_integration.py`**（`contract_revision` 期望已过期，且其 `run_desktop_verify`
+  依赖不存在的 `package.json`）。
+- **四次 Desktop 真实启动**（AC-05 的 M1–M4）：M1 错 CSP / M2 Python fallback / M3 exe 旁 sidecar /
+  M4 只加 `ipc:` 的反事实。逐 leg 独立 scratch 端口、独立配置与数据目录，退出后**零残留监听**，
+  **四次都未触碰开发者 `:8765` 的 dev Agent**。
+- T-07 遗留 **①②④ 运行期闭合**：①两条 spawn 路径的四个变量**全部由行为反推**（HOST/PORT 看监听
+  地址、DATA_DIR 看 scratch 下的 sqlite、token 看 401/错 401/Desktop 自己 200），两 leg 的 `ppid`
+  均等于 Desktop 的 pid；②四次启动 `get_public_config` 都被调用并返回；④策略在真 WebView 里
+  真的生效 = 注入点在 `Builder::run` 之前的唯一运行期信号。
+- **两向 CSP 成立**：错地址 rejected + 违规（`originalPolicy` 逐字含该地址）/ 对地址 resolved
+  零违规 / M4 反事实（`ipc://` 拒绝 3 → 0）/ `localhost:18080` 四 leg 全拒（按源精确）。
+- 探针页进真 WebView 的办法：`TAURI_CONFIG` 把 `devUrl` 置 `null`（RFC 7386 即删键）令
+  `tauri-codegen` 嵌 `frontendDist`，得到一个服务于任意页面且带运行期 CSP 的 debug 二进制；
+  **未改动任何受版本管理的文件**。
+
+Verification（详见 `evidence/task-09-acceptance.md` 与 `evidence/task-09-desktop-launch.md`）:
+- AC-01 四棵树（未知键忽略 / **凭据键按名忽略不报值** / 改值生效 / 坏 TOML `exit=1`）+ `/healthz` 200。
+- AC-02 grep 带分母与活对照：`executors/` 0/395、`local_api/` 0/714、`os.environ` 2 命中均落在
+  `runtime/config.py`；AST 29 tests OK。
+- AC-03 sidecar 三态 200/401/401（另由 AC-05 的 M3 从 Desktop 侧再证一次）。
+- AC-04 `cargo test --workspace` 63 passed；`main.rs` **115 行**（< 300）。
+- AC-05 运行期（页面自报值 = 当次配置值）+ 静态面 `grep 18080 src/apps/desktop/` **0 命中 / 分母 9**。
+- AC-06 真实链路 16 项（含 36 个真实 cookie 与「cookie 值不入日志」的阳性对照）；
+  **3 项未做，理由逐条列出**。
+- AC-07 agent **253 tests OK**（基线 85）/ desktop 63 / web 21 files·101 tests。
+- AC-08 两个校验器 0 ERROR，**且同对校验器在弄坏的副本上 exit=1**。
+- AC-09 三模式各一次（cloud 对死地址 0.09s 退出 0 = 无出站请求）。
+- AC-10 两 leg：全链 `succeeded`/`progress=100` 且 checkpoint 已清；中途 SIGKILL → 盘上留 `running`
+  → 重启 `recovering 1 incomplete task(s)` + `resuming task <id>`，**按实际行为断言「不重跑」**。
+  该 leg 走 `sidecar_main` + `RUN_RUNNER=1`，故**同时清掉 T-04 遗留③**。
+- AC-11 常驻测试 + `/tmp/ac11-mutants.py` **6/6 CAUGHT / 0 SURVIVED**（含探测器自检）。
+
+Corrections（本轮我自己的缺陷，均已修正并披露）:
+- **健康检查断言错了，不是 Agent 坏了**：最初断言响应体是裸词 `ok`，而 Agent 答 JSON
+  `{"status":"ok",…}`。
+- **违规计数方式错了**：第一版把 CSP 违规**平摊计数**，M3 因此误报失败（`ipc://localhost/log_js_error`
+  的违规被算到 Cloud 的 fetch 头上）；改为按前缀分区 + 只断言被测 URL 自己的 `refusals`，并补 M4。
+- **`UnboundLocalError`**：新插的「未归类违规」块引用了尚未定义的 `loopback`，挪到控制组之后。
+- **文本与证据不同步**：加完 M4 后 docstring/表头/PASS 串仍写「three」，改完措辞后**没有重跑**，
+  故 `run4` 日志里的 PASS 行属于旧文本；证据改用 **`run5`**（与当前工具文本一致），
+  run1–run4 保留为调试过程。
+- **`ps -wwE -p <pid>` 被自动模式分类器拒绝**（会把开发者的 Agent runtime token 物化进转写文本）：
+  拒绝被接受，**没有绕路**，改为四项行为判据；D-04 的否定面另有 argv 断言 + **植入阳性对照**。
+
+Deviations（已披露）:
+- AC-05 的验证方式由计划写的「dev 模式断点/日志」改为**真 WebView 内的探针页**：
+  断点做不到（`tauri dev` 的页面不受策略约束——CSP 只管 Tauri 自己发出的资源，
+  见 `Manager::get_asset` → `protocol/tauri.rs:182`），探针页更强（页面自己调命令并回报值）。
+- 「两条 spawn 路径」用 **dev fallback + exe 旁 sidecar** 两条真实路径取证，而非计划措辞里的
+  「bundled」；打包路径需重签才能启动（既存问题，归 CHG-D(059)）。
+
+Findings（实测，只登记未改，均为**既有行为**）:
+- `development.python_fallback` 是**装饰键**（真门是 `development_python_fallback_enabled()`）。
+- `connect-src` 缺 `ipc:`，Tauri 的**首选** IPC 传输每启动被拒 3 次后全程走 `postMessage` 回退。
+- `reqwest` 默认启用 `system-proxy`，macOS 上由 hyper-util 读系统代理且**不读 `ExceptionsList`**，
+  故回环请求被代理接管——**这也是 T-07 遗留③查不下去的真实原因**（`connect_timeout` 要隔离量测
+  必须让 reqwest 不走代理）。同一条实测还暴露：`LocalAgentClient` 的每个请求都带 per-launch token，
+  在开了系统代理的 macOS 上会交给该代理。
+
+Open（未覆盖面 / 待收尾，已枚举，不以「测试通过」代替）:
+- **真实前端 bundle 未被驱动**：仓内快照 `.generated/frontend`（Sep 23 18:26）早于 T-08 的
+  `init.js` 改动（`305d002`，Sep 24 00:34），跑它等于测旧代码，故 `bindTrustedLocalAgent()`/
+  `cloudBaseUrl()` 在真 WebView 里**无端到端证据**（仅 `npm test`）。补法已写明。
+- **只测了 macOS**；探针用 `mode:"no-cors"` 故只量策略放行与否、不量 HTTP 状态；
+  `profile-create/update/delete` 与 bind 的 Cloud 往返未驱动；`connect_timeout` 不闭合。
+- 待收尾：隔离 Cloud（`:18199`，PID 21224，cwd `/tmp/ac10/root`，日志 `/tmp/ac10/server.log`）
+  与 scratch schema `wt_media_cloud_ac10`；`/tmp/wt-ac05/` 等 scratch；**开发者 Cloud `:18080`
+  上被误建的 `noop_task`**（`task_b21340775ace100173202de3`，`pending`，created 2026-09-24T00:49:21）。
+  该行无害（`claimTask` 取 `created_at` 最早者，7 月的积压排在其前），但属本次误写，**待用户裁定是否撤销**
+  （写开发者的 Cloud 不在本 CHG 授权范围内，故不擅自写）。
 

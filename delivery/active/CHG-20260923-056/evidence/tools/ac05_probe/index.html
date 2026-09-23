@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AC-05 probe</title>
+    <!--
+      This page is embedded into the Desktop binary as `frontendDist` and served
+      by Tauri's own asset protocol, so the runtime CSP applies to it. It has no
+      inline script and no inline style on purpose: the policy `apply_csp`
+      installs is `default-src 'self'; ...` with no nonce and no hash, and no
+      asset hashes are compiled in (tauri.conf.json carries no `csp`), so an
+      inline script would be blocked by the very policy this page measures.
+    -->
+    <script src="probe.js"></script>
+  </head>
+  <body>
+    <p>AC-05 probe — results are on the process's stdout, prefixed <code>[WEBVIEW]</code>.</p>
+  </body>
+</html>

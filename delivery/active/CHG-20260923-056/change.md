@@ -127,17 +127,17 @@
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Agent 脱离 Desktop 独立启动，`/healthz` 200 | 手动启动 + curl，evidence 记录 | TODO |
-| AC-02 | Agent executors 无 os.getenv 自建 client，Client 全构造注入 | AST 测试 + grep 证据 | TODO |
-| AC-03 | sidecar 以受控参数启动且鉴权生效（无 token 请求 401） | 手动验证 + evidence | TODO |
-| AC-04 | Desktop `cargo test` 全绿，main.rs < 300 行 | 命令输出 + wc -l | TODO |
-| AC-05 | Vue 从 `get_public_config` 获取 Cloud 地址（无硬编码 18080） | dev 模式断点/日志 + 代码 grep | TODO |
-| AC-06 | 既有 M2 链路 dev 回归通过（bind/account_check/cookie_read/profile） | 手动回归 + evidence | TODO |
-| AC-07 | 三仓既有测试全绿（unittest 85+ 迁移后、cargo test、web 测试） | 命令输出 | TODO |
-| AC-08 | 治理校验通过（verify_agent_entry、verify_delivery_governance） | 脚本输出 | TODO |
-| AC-09 | Local / Cloud / sidecar 三种模式各有一次真实启动与健康输出记录（吸收 053 验收 1） | 手动启动 + evidence | TODO |
-| AC-10 | 任务链路 e2e：Cloud Task → runner → executor → client/service → 结果上报 → checkpoint 落库 → 重启恢复，至少跑通一次（吸收 053 验收 2） | 手动回归 + evidence | TODO |
-| AC-11 | 新增一个 executor + 一个 client 的 demo 证明无需改 runtime（吸收 053 验收 3） | demo 代码 + evidence | TODO |
+| AC-01 | Agent 脱离 Desktop 独立启动，`/healthz` 200 | 手动启动 + curl，evidence 记录 | **PASS** `tools/ac01_ac09_agent_modes.py`（四棵树证明配置文件真被读；`/healthz` 200、`/api/v1/status` 200、真实 BitBrowser 40 profiles）→ `evidence/task-09-acceptance.md` AC-01 |
+| AC-02 | Agent executors 无 os.getenv 自建 client，Client 全构造注入 | AST 测试 + grep 证据 | **PASS** `tools/ac02_agent_boundary.sh`（grep 带分母与活对照：`executors/` 0/395、`local_api/` 0/714；`os.environ` 2 命中均落在 `runtime/config.py`）+ AST 29 tests OK |
+| AC-03 | sidecar 以受控参数启动且鉴权生效（无 token 请求 401） | 手动验证 + evidence | **PASS** 两处：工具 MODE 3（直接启动）与 Desktop 真实拉起（AC-05 的 M3）。三态齐备 200/401/401，且端口来自当次配置（非 8765） |
+| AC-04 | Desktop `cargo test` 全绿，main.rs < 300 行 | 命令输出 + wc -l | **PASS** `tools/ac04_desktop.sh`：63 passed；`main.rs` **115 行**（T-06 时 89，T-07 接线后 115） |
+| AC-05 | Vue 从 `get_public_config` 获取 Cloud 地址（无硬编码 18080） | dev 模式断点/日志 + 代码 grep | **PASS** 运行期改由**真 WebView 内的探针页**取证（比断点更强：页面自己调 `get_public_config` 并回报值），四次启动均返回当次配置的值；静态面 `grep 18080 src/apps/desktop/` **0 命中 / 分母 9 文件**（阳性对照命中 `init.js`）→ `evidence/task-09-desktop-launch.md` |
+| AC-06 | 既有 M2 链路 dev 回归通过（bind/account_check/cookie_read/profile） | 手动回归 + evidence | **PASS（16 exercised / 3 not，逐条枚举）** `tools/ac06_local_chains.py`：真实 bilibili 账号识别、36 个真实 cookie 且值不入日志（含「profile id 在日志中可见」的阳性对照）、profile open/close 使 BitBrowser 自身 status 0→1→0 并复原；3 条未做连同理由列在输出末尾 |
+| AC-07 | 三仓既有测试全绿（unittest 85+ 迁移后、cargo test、web 测试） | 命令输出 | **PASS** `tools/ac07_three_repos.sh`：agent **253 tests OK**（基线 85）、desktop 63 passed、web 21 files / 101 tests passed |
+| AC-08 | 治理校验通过（verify_agent_entry、verify_delivery_governance） | 脚本输出 | **PASS** `tools/ac08_governance.sh`：两者 0 ERROR，**且同对校验器在故意弄坏的副本上 exit=1**（0 ERROR 只在「校验器会红」被证明后才有意义） |
+| AC-09 | Local / Cloud / sidecar 三种模式各有一次真实启动与健康输出记录（吸收 053 验收 1） | 手动启动 + evidence | **PASS** 三模式各一次（cloud 0.09s 退出 0、对死地址无出站请求；local 连真实 BitBrowser 40 profiles；sidecar 见 AC-03），另加 Desktop 真实拉起的 4 次 |
+| AC-10 | 任务链路 e2e：Cloud Task → runner → executor → client/service → 结果上报 → checkpoint 落库 → 重启恢复，至少跑通一次（吸收 053 验收 2） | 手动回归 + evidence | **PASS** `tools/ac10_task_chain.py` 两 leg：LEG A 全链 `succeeded`/`progress=100` 且 checkpoint 已清；LEG B 中途 SIGKILL → 盘上留 `running` → 重启 `recovering 1 incomplete task(s)` + `resuming task <id>`。隔离 Cloud（独立实例 + 独立 schema，空表起步），**不碰**开发者 :18080 的积压任务表 |
+| AC-11 | 新增一个 executor + 一个 client 的 demo 证明无需改 runtime（吸收 053 验收 3） | demo 代码 + evidence | **PASS** 常驻测试 `tests/test_new_task_type.py`（产品代码零改动，经公开缝 `register_executor` 装入）+ 失败验证 `/tmp/ac11-mutants.py`：**6/6 CAUGHT，0 SURVIVED**，含探测器自检 |
 
 ## 11. Evidence
 
@@ -152,6 +152,8 @@ Evidence files live in `evidence/`，按 Task 编号记录事实。
 
 - `evidence/task-07-desktop-config.md`：T-07 Config 链路取证——7 个 commit 的逐 commit 测试矩阵（42→63 单调不减；告警 27→4 且**余 4 条为空壳**，不虚报为 0）、四份变异矩阵（CSP 6/6、`get_public_config` 6/6、`cloudBaseUrl` 5/5、sidecar 5/7 **+2 存活并登记**）、CSP 退役的三重证据（棘轮 + 金标 + `dev_csp` 保持 `None`）、**真实副作用**验证（真启动一次：`127.0.0.1:18766`、200/401/**401 三态齐备**、`<scratch>` 下三目录齐备且仓库 `.local/` 未被触碰、0 残留监听）、我自己的 data-dir 检查脚本缺陷（override 分支语义）**自查纠正**、一处计划偏差（CSP 注入点写浅了）与计划计数笔误（第 17/18 个命令）、以及**已枚举的未覆盖面**（两条 spawn 路径、`generate_handler!` 注册、`connect_timeout`）。
 - `evidence/task-08-cloud-web.md`：T-08 Cloud Web 取证——单个 commit `305d002`、**行为性**的红输出（而非导入失败）、5/5 变异矩阵、`npm test` 96→**101**、AC-05 grep 升级为**常驻断言**（两条规则显式限定文件范围并注明理由）、一处**值级哨兵自查删除**（`"true"` 在红跑里从未触发，只为错误的理由匹配），以及**已枚举的未覆盖面**（`health()` 调用无单测、`bindTrustedLocalAgent()` 归 T-09）。
+- `evidence/task-09-desktop-launch.md`：T-09 Desktop 真实启动取证——**四次**真实启动（M1 错 CSP / M2 Python fallback / M3 exe 旁 sidecar / M4 加 `ipc:` 的反事实），逐 leg 的实测输出；探针页如何经 `TAURI_CONFIG` 把 `devUrl` 置 `null` 而被嵌进真二进制（以及「首次构建疑似没生效」的判定过程）；T-07 遗留①②④的运行期闭合；**两向 CSP**（错地址 rejected+违规且 `originalPolicy` 逐字含该地址 / 对地址 resolved 零违规 / 按源精确：`localhost:18080` 四 leg 全拒）；**子进程环境从不读取**（`ps -wwE` 被拒后改为四项行为判据 + argv 的植入阳性对照）；三条实测发现（`development.python_fallback` 是装饰键、`connect-src` 缺 `ipc:`、`reqwest` 默认读 macOS 系统代理导致回环请求被接管）与**已枚举的未覆盖面**。
+- `evidence/task-09-acceptance.md`：T-09 AC-01…AC-11 验收矩阵——逐条命令与实测输出、每条的**阳性对照**、环境事实表（含「为什么另建隔离 Cloud」）、以及 §覆盖边界 **7 条未覆盖项**（真实前端 bundle 未被驱动、只有 macOS、BitBrowser 链路依赖真实账号状态、`profile-create/update/delete` 与 bind 的 Cloud 往返未驱动、`connect_timeout` 不闭合、两处待裁定的产品决定、Cloud 仓 Go 测试不在验收面内）。
 
 ## 12. Current Checkpoint
 
@@ -200,19 +202,36 @@ Completed:
   `4b3a7b4` 退出报告补持有行数。`main.rs` **1570 → 89 行**（AC-04），测试 **11 → 42**，
   `generate_handler!` 17/17 逐字同序，9 条既有测试逐字不变。
 
+- T-07 Desktop Config 链路，desktop `4b3a7b4` → `35a2ee9` 共 **7** 个 commit：
+  `1276e98` `RuntimeToken`（`Uuid::new_v4()`，无 `Debug`/`Display`/`Serialize`）、
+  `b4d4dc4` 生产布局不再理会 `WT_MEDIA_DESKTOP_CONFIG`、`2afe1d9` `bootstrap.rs` 配置定位/载入 +
+  CSP 注入时机 + 编译内置兜底、`d838ccd` 两个 client 接配置（超时来自 TOML）+
+  `LocalAgentClient` 持有 token、`14ff67c` `tauri.conf.json` 的 CSP 字面量退役、
+  `6f94cbb` 第 18 个命令 `get_public_config`、`35a2ee9` 两条 spawn 路径注入同一组四个变量、
+  **token 成为强制**（与 T-08 同批）。`8765` 字面量与 `Client::new()` 的无超时同时退役；
+  `resources/desktop.production.toml` 成为部署事实来源。测试 42 → 63、bin warnings 27 → 4
+  （余 4 条即四个空壳）。
+- T-08 Cloud Web 单个 commit `305d002`：`init.js::cloudBaseUrl()` 改问 `get_public_config`、
+  `LocalLogsPage.vue` 改走 `createLocalAgentService().health()`。`npm test` 96 → 101。
+- T-09 联调回归与证据落盘（**本 Task 不动产品代码**，全部工具位于 `evidence/tools/`）：
+  AC-01…AC-11 逐条落到可重跑的工具上并附阳性对照，四次 Desktop 真实启动闭合 T-07 的三处
+  运行期遗留并完成两向 CSP 检查。矩阵见 `evidence/task-09-acceptance.md`，Desktop 深挖见
+  `evidence/task-09-desktop-launch.md`。
+
 Current:
-- T-07 Desktop Config 链路（`bootstrap.rs` 把已就位的 `config.rs`/`paths.rs` 接上、移除
-  `8765`、CSP 运行时注入、http 超时、`uuid` per-launch token、两条 spawn 路径同一组环境变量、
-  `get_public_config`），**与 T-08 同批落地**。
+- T-10 模块分工回写 + 收尾（三仓 `AGENT-INDEX.md`/`DIRECTORY_MAP.md` 按实际布局回写、
+  workspace 架构基线核对并登记 `core/` 撤销、`change.md` §13 DONE Gate 逐项签字、
+  `LEDGER.md`/`status/*.md`/快照再生成）。
 
 Next:
-- T-07 + T-08（同批）：Desktop 配置接线与 Cloud Web 两文件。T-08 的两处必须在 T-07 的
-  token 强制落地**同批**，否则 Agent 一强制 token，`LocalLogsPage.vue` 的无头 `fetch`
-  立即 401、`init.js` 的地址链路也卡住。
-- 之后 T-09（联调回归 + 证据落盘）、T-10（模块分工回写 + DONE Gate）。
+- T-10 完成后本 CHG 走 DONE Gate。
+- 两处**待用户裁定的产品决定**（本 CHG 只登记未改，见 `task-09-desktop-launch.md` §Findings）：
+  ①生产 CSP 是否把 `ipc:` 加进 `connect-src`（可只改 `config`，`csp_connect_src` 本就允许空格分隔多值）；
+  ②回环 client 是否加 `.no_proxy()`（涉及 Cloud client 是否保留系统代理）。
 
 Blocked:
-- None.
+- None.（T-07 遗留③ `connect_timeout` 的隔离量测**被②挡住**：`reqwest` 默认走 macOS 系统代理，
+  回环请求到不了 connect 阶段。这不是阻塞项，已按实测机制登记。）
 
 Recent verification:
 - 审计结论来自源码 grep/阅读（2026-09-23）。
@@ -400,6 +419,74 @@ Recent verification:
 - T-08 未覆盖面（已枚举）：`LocalLogsPage` 的 `health()` 调用**没有单元测试**（只断言了它不再
   直连）——断言「用的是 `health()` 而不是 `status()`」属对实现细节过拟合，且两者都经桥、
   都不越界，无可断言的行为差异；运行期由 T-09 覆盖。
+- T-09 四次 Desktop 真实启动（`tools/ac05_desktop_launch.py`，`/tmp/ac05-run5.log` = PASS）：
+  M1 错 CSP / M2 Python fallback / M3 exe 旁 sidecar / M4 加 `ipc:` 的反事实。每 leg 独立
+  scratch 端口（**四次都未触碰开发者 :8765 的 dev Agent**）、独立配置与数据目录、退出后
+  实测**零残留监听**。
+- T-09 探针页**怎么进到真 WebView**：Tauri 的 CSP 只管它自己发出的资源
+  （`Manager::get_asset` → `protocol/tauri.rs:182`），**外部 `devUrl` 的页面完全没有策略**——
+  所以 `tauri dev` 测不了 CSP，是机制而非配置问题。办法是 `TAURI_CONFIG` 把 `devUrl` 置
+  `null`（RFC 7386 里 `null` 即删键），`tauri-codegen` 便会嵌 `frontendDist`
+  （`context.rs:178`），得到一个服务于任意页面且带运行期 CSP 的 debug 二进制。
+  **未改动任何受版本管理的文件**（desktop 工作树在落盘时 clean）。
+- T-09 首次构建曾被误判「没生效」（6.9s、体积不变、二进制里搜不到探针字符串）。判据不是再猜
+  一次，而是拿**不存在的 `frontendDist`** 去编——报 `proc macro panicked … this path doesn't
+  exist`，证明 `TAURI_CONFIG` 确实抵达 codegen；再用嵌入资源的**键名**（`/index.html`、
+  `/probe.js`）确认；原先搜不到是 brotli 压缩所致。
+- T-09 **两向 CSP 成立**：错地址 `http://127.0.0.1:19998` → `rejected` + 违规，且违规的
+  `originalPolicy` **逐字含该地址**；对地址 → `resolved` 且**零违规**；M4 只加
+  `ipc: http://ipc.localhost` 便把 `ipc://` 拒绝从 3 降到 **0**（反事实）。另：
+  `localhost:18080` 在**四个 leg 全部被拒**——策略是按**源**精确的，不是「大概放行了回环」。
+  生效 header 是 Tauri 渲染后的版本（`connect-src` 逐字来自配置；多出的 `script-src 'self' 'sha256-…'`
+  是 Tauri 给自己注入的引导脚本加的，`csp_policy()` 里没有）。
+- T-09 T-07 遗留①②④的运行期闭合：①M2/M3 两条 spawn 路径的**四个变量全部由行为反推**
+  （HOST/PORT 看监听地址、DATA_DIR 看 scratch 下的 sqlite、token 看 **401/错 401/Desktop 自己 200**
+  ——空 token 对一切放行，故 401 是非空 token 已抵达的正向证明），两 leg 的 `ppid` 均等于
+  Desktop 的 pid；②四次启动 `get_public_config` 都被调用并返回（漏注册只会以「命令不存在」出现）；
+  ④策略**在页面里真的生效**，这正是注入点在 `Builder::run` 之前的唯一运行期信号。
+- T-09 **子进程的环境从不读取**：最直接的读法（`ps -wwE -p <pid>`）被自动模式分类器**正确地
+  拒绝**——它会把开发者的 Agent runtime token 物化进转写文本。拒绝被接受，**没有绕路**，
+  改为上面那套行为判据；D-04 的否定面（token 不经 argv）另有取证：读 argv 断言无 token 形状
+  参数，并用一次**植入阳性对照**（种下 `--token 9f2ac41d…`）证明这个检查会失败。
+- T-09 三条**实测发现**（均只登记未改）：①`development.python_fallback` 是**装饰键**——
+  M1（文件 `true`、环境变量未设）失败，M2（文件 `false`、环境变量 `1`）走 Python 路径，
+  真门是 `development_python_fallback_enabled()`（`commands/agent.rs:64`）；②`connect-src`
+  不含 `ipc:`，Tauri 的**首选** IPC 传输（`fetch(ipc://localhost/<cmd>)`）每启动被拒 3 次，
+  之后全程走 `postMessage` 回退——**既有事实**（退役的 `tauri.conf.json` 字面量同缺此源，
+  T-07 逐字保留），修法可只改配置；③`reqwest` 默认读 **macOS 系统代理**
+  （`reqwest-0.12.28/Cargo.toml:105,180` → `hyper-util/client-proxy-system`；mac 分支只读
+  `HTTPEnable/HTTPProxy/HTTPPort`，**不读 `ExceptionsList`**），故本机回环请求被 Clash 接管
+  （裸 connect 挂起 vs 同一个 client 拿到 `502`，两者对照 + `curl -x` 复现同形 502）。
+  后果：系统设置里开了代理的 macOS 上，`LocalAgentClient` 的每个请求（含 per-launch token）
+  都会交给该代理——本机因代理在回环才「能用」，远端代理会让 Desktop 完全够不到自己的 sidecar。
+  这也是 **T-07 遗留③查不下去的真实原因**：`connect_timeout` 要隔离量测必须让 reqwest 不走代理。
+- T-09 一处**工具自身的断言错误**被抓住并改正：健康检查最初断言响应体是裸词 `ok`，而 Agent 答的是
+  JSON `{"status":"ok",…}`——**是断言错了，不是 Agent 坏了**。同类还有一处：第一版把 CSP 违规
+  **平摊计数**，M3 因此误报失败（`ipc://localhost/log_js_error` 的违规被算到 Cloud 的 fetch 头上）；
+  改为按前缀分区、只断言被测 URL 自己的 `refusals`，并补 M4 作反事实。
+- T-09 一处**文本与证据不同步**的处置：加完 M4 后 docstring/表头/PASS 串仍写「three」，
+  改完措辞后**没有重跑**，故 `/tmp/ac05-run4.log` 里的 PASS 行属于旧文本；证据因此改用
+  **`/tmp/ac05-run5.log`**（与当前工具文本一致的那一次），run1–run4 留在记录里作为调试过程。
+- T-09 AC-01…AC-11 逐条判据与阳性对照见 `evidence/task-09-acceptance.md`：AC-07 = agent
+  **253 tests OK** / desktop 63 passed / web 21 files·101 tests；AC-08 = 两个校验器 0 ERROR
+  **且同对校验器在弄坏的副本上 exit=1**；AC-10 = 两 leg（全链 `succeeded`+`progress=100` 且
+  checkpoint 已清；中途 SIGKILL → 盘上留 `running` → 重启 `recovering 1 incomplete task(s)`）；
+  AC-11 = 常驻测试 + **6/6 CAUGHT / 0 SURVIVED**（含探测器自检）。AC-10 另建实例与 schema
+  跑，因为 `claimTask` 无 type/agent 过滤（`repository/mysql_task_store.go:123-126`），
+  在开发者的表上起 runner 会打开真实 profile 并把 7 月的积压任务标成失败。
+- T-09 未覆盖面（已枚举，不以「测试通过」代替）：**真实前端 bundle 未被驱动**——仓内快照
+  `.generated/frontend`（Sep 23 18:26）早于 T-08 的 `init.js` 改动（`305d002`，Sep 24 00:34），
+  跑它等于测旧代码，故 `bindTrustedLocalAgent()`/`cloudBaseUrl()` 在真 WebView 里**没有端到端证据**，
+  只有 `npm test` 的单元与变异证据；**只测了 macOS**；探针用 `mode:"no-cors"` 故只量策略放行与否、
+  不量 HTTP 状态；`profile-create/update/delete` 与 bind 的 Cloud 往返未驱动；
+  `connect_timeout` 不闭合（原因如上）。
+- T-09 待收尾的三项（本记录落盘时仍未做）：隔离 Cloud（`:18199`，PID 21224，cwd `/tmp/ac10/root`，
+  日志 `/tmp/ac10/server.log`）与其 scratch schema `wt_media_cloud_ac10` 的停用与清理；
+  `/tmp/wt-ac05/` 等 scratch 目录；以及**开发者的 Cloud `:18080` 上被误建的一个 `noop_task`**
+  （`task_b21340775ace100173202de3`，`pending`，created_at 2026-09-24T00:49:21，AC-10 工具早期
+  调试所留）。该行**无害**（`claimTask` 取 `created_at` 最早者，7 月的积压排在其前），
+  但它是本次误写，**登记待用户决定是否撤销**（写开发者的 Cloud 不属本 CHG 授权范围，
+  故不擅自写）。
 
 ## 13. DONE Gate
 

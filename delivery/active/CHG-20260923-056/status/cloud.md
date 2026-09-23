@@ -6,3 +6,5 @@
 - 2026-09-24 T-08 把 AC-05 的一次性 grep **升级为常驻断言**：`localAgentBoundary.test.js` 新增 `carries no hard-coded Cloud address`（`not.toMatch(/18080/)`）与「local-logs 页不直接够得着 Agent 端口」两条规则，**显式限定文件范围**并注明理由——全树规则今天就会红，只能靠删规则来通过。
 - 2026-09-24 T-08 一处**自查删除**：值级哨兵 `"true"`（想覆盖 `development.python_fallback`）在红跑里**从未触发**，且布尔只有两种拼写、都不是哨兵——它只为**错误的理由**匹配将来的任何字段。该字段的保证划给键集棘轮。
 - 2026-09-24 T-08 遗留事实（T-09 需接）：`LocalLogsPage` 的 `health()` 调用**无单元测试**（只断言它不再直连，断言用的是 `health()` 而非 `status()` 属对实现细节过拟合）；`bindTrustedLocalAgent()` 本身需真实 Tauri 窗口，归 T-09 的 Desktop 真实启动观察。
+- 2026-09-24 T-09 验收取证：AC-05 静态面 `grep -rn 18080 src/apps/desktop/` **0 命中 / 分母 9 个 js/vue 文件**（阳性对照 `get_public_config` 命中 `init.js`；同目录 `127.0.0.1` 字面量亦 0 命中），`shared/api/http.js:89` 的 1 处按用户裁定登记为 CHG 外残留；AC-07 `npm test` → **21 files / 101 tests passed**。
+- 2026-09-24 T-09 遗留事实（**仍未覆盖**）：T-08 登记的 `bindTrustedLocalAgent()` 端到端**依旧没有证据**——Desktop 真实启动用的是探针页，而仓内快照 `.generated/frontend`（Sep 23 18:26）早于本仓 T-08 的 `init.js` 改动（`305d002`，Sep 24 00:34），跑它等于测旧代码，故不跑。若 T-10 后要补：按 T-08 后的源码重建一次该快照，再以 `tools/ac05_desktop_launch.py` 同法启动真页面。`LocalLogsPage` 的 `health()` 调用同样仍无单元测试。
