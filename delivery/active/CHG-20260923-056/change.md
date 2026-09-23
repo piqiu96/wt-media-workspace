@@ -73,6 +73,7 @@
 | D-04 | CHG-20260923-053 并入本程序：其 Task 1～5 并入本 CHG（采纳其更细目录方案：`clients/bitbrowser/` 包并新增公开 `open_url()`、`services/{browser,net}/`、`runner/` 三拆并重导出保住 `TaskRunner` 语义、storage 整理重导出、`utils/time.py`、executor 不直连私有 `_post`、`test_patch_targets.py`）；Task 6 归 057、Task 7 归 059；唯一偏差：sidecar 按**受控环境变量传参**执行（不保字面 argv），`test_sidecar_entry.py` 断言相应调整 | CONFIRMED（2026-09-23 用户裁定） |
 | D-05 | Agent 配置文件格式定为 **TOML**（`config/agent.toml` + `config_online/agent.toml`），用标准库 `tomllib` 解析，不引入 YAML 依赖；D-01 与程序总纲 §2 的「YAML」措辞据此回写 | CONFIRMED（2026-09-23 用户裁定，替代原表述） |
 | D-06 | T-02 实测得 22 条跨层边，其中**仅两条**越过 ADR-0016 的层级下降序，二者均照此执行并需进 T-05 白名单：①`runtime/environment.py → clients.bitbrowser`（§1 称 runtime 不引用业务层，§4 却把环境探测指派给该模块；它必须区分 `BitBrowserIdentityError` → `identity_unverifiable` 与 `BitBrowserError` → `unreachable`，此行为有测试覆盖。取 §4，并把白名单**收窄到单文件粒度**，不放开整条 `runtime → clients`）；②`clients/bilibili/identity.py → services.browser`（§1 将 `{clients, services, storage}` 列为无序集合，§3 明禁边只有 `clients→executors`、`services→executors`、`utils→业务层`，同级边被允许） | CONFIRMED（2026-09-23，T-02 执行时依 ADR-0016 判定，计划已载明；证据 `task-02-structure-migration.md` §4） |
+| D-07 | Agent 配置中的凭据通路**收窄为仅环境变量**：`config/agent.toml` 与 `config_online/agent.toml` 里出现的任何敏感键（token/password/secret/cookie 等）一律被加载器忽略，并按**键名**告警（绝不输出值）；`runtime_token` 只能来自 `WT_MEDIA_AGENT_RUNTIME_TOKEN`。依据是用户批准的程序总纲 §4「敏感与临时运行上下文不混进部署配置」，与 ADR-0016 §7（允许凭据放在仓库配置中）取**更严**者，**ADR-0016 本身不改**。后果：`config_online/` 的「整目录替换」分发机制不承载凭据，CHG-D(059) 的发布校验不得依赖该通路；`config/README.md` 与 `config_online/README.md` 已声明此收窄 | CONFIRMED（2026-09-23 用户批准的程序总纲 §4；T-03 落地，证据 `task-03-runtime-config.md` §9） |
 
 ## 7. Pending Questions
 
@@ -86,7 +87,7 @@
 |---|---|---|---|
 | T-01 | 治理工件就绪：本 change.md、checkpoint、status×3、planned 057/058/059、LEDGER、CURRENT_CONTEXT 再生成；CHG-053 标注 SUPERSEDED 并入 | DONE | `verify_agent_entry.py` 通过；CURRENT_CONTEXT 指向本 CHG |
 | T-02 | Agent 结构迁移（吸收 053 Task 1-3）：`constants.py`→`runtime/`（含 `runtime/version.py`）；`clients/bitbrowser/` 包拆分并新增公开 `open_url()`，executor 不再直连私有 `_post`；`clients/cloud/` 迁移；`services/{browser,net}/` 建立；`runtime/environment.py` 委托 services 并撤销 `runtimes/`；`storage/` 整理（checkpoint/sqlite/migration 重导出，`storage.migration` 路径与符号不变）；`runner/` 三拆并重导出 `TaskRunner`/`TaskRunnerConfig`（测试零改动）；`local_api/` 瘦身；`utils/time.py`；既有 85 用例随迁全绿 | DONE | `bash scripts/test.sh`（≥85 OK）；`migrate-storage.sh` 连续两次成功；`verify-health.sh` 通过 |
-| T-03 | Agent runtime/config + paths（吸收 053 Task 5）：强类型 AgentConfig（env>file>default，TOML/`tomllib`，测试目录接缝）；`configs/`→`config/` + `config_online/` 同构镜像；RuntimePaths 三态；统一 `WT_MEDIA_LOG_LEVEL`；删除 config.py/log_setup.py 死代码与目录双实现 | TODO | config loader 测试（默认/文件/env/非法/凭据忽略）全绿；运行时代码零处引用 `config_online`（打包校验除外） |
+| T-03 | Agent runtime/config + paths（吸收 053 Task 5）：强类型 AgentConfig（env>file>default，TOML/`tomllib`，测试目录接缝）；`configs/`→`config/` + `config_online/` 同构镜像；RuntimePaths 三态；统一 `WT_MEDIA_LOG_LEVEL`；删除 config.py/log_setup.py 死代码与目录双实现 | DONE | config loader 测试（默认/文件/env/非法/凭据忽略）全绿；运行时代码零处引用 `config_online`（打包校验除外） |
 | T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | TODO | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试 |
 | T-05 | Agent AST 边界测试（ADR-0016 第 3 条机器校验，含 `test_patch_targets.py`）+ 平台 URL 常量化 | TODO | AST 测试全绿；server.py/account_check.py 无内联 URL 字面量 |
 | T-06 | Desktop 拆分 main.rs：bootstrap/config/paths/state/commands/agent.rs；17 命令原样迁移；account_check/cookie_read 重复 preflight 提取共用；HttpClient 超时；端口进配置 | TODO | `cargo test` 全绿；`cargo build` 通过 |
@@ -142,6 +143,7 @@ Evidence files live in `evidence/`，按 Task 编号记录事实。
 
 - `evidence/task-02-baseline.md`：Agent 测试基线实测（85 tests OK，含解释器版本矩阵）。
 - `evidence/task-02-structure-migration.md`：T-02 结构迁移取证——14 个 commit 的逐 commit 测试矩阵（均 ≥85 且 OK）、冻结导入 sha256 恒等、冻结路径与符号清单、22 条跨层边全集与**仅有**的两条 ADR-0016 例外、PyInstaller 产物 PYZ 模块清单。
+- `evidence/task-03-runtime-config.md`：T-03 配置/路径取证——10 个 commit 的逐 commit 测试矩阵（107→172，单调不减）、`log_setup.py → runtime/logging.py` 的 blob 级纯移动证明（`R100`）、冻结导入 sha256 与 T-02 同值、`src/` 环境变量读取点归零（带阳性对照）、19/19 变异对照（并**作废**本会话早先因变异脚本未分发而不可采信的一组记录）、`factory` 零覆盖缺口的补测、取证中发现的既有连接泄漏（`ResourceWarning` 20→0）与修复、唯一行为变更的记录、以及**已枚举的未覆盖面**。
 
 ## 12. Current Checkpoint
 
@@ -157,12 +159,20 @@ Completed:
   `94750df` 删死 import、`287bca3` utils/time 收口、`b1233cc` 补两个 `__init__.py`。
   目标树 29 文件齐备；`runtimes/`、`core/`、`constants.py`、`proxy_check.py`、
   `runner.py` 均已删除；冻结路径/符号/console scripts 全部未动。
+- T-03 Agent runtime/config + paths 完成，agent `b1233cc` → `d870d1f` 共 **10** 个 commit：
+  `9c7d3db` RuntimePaths 三态、`2e7afa3` config/ + config_online/ 与声明式加载器、
+  `416a56a` log_setup.py 纯移动入 runtime/ 并删死代码 config.py、`4e7ecb8` 日志接配置
+  （`server.main` 不再读环境变量）、`3bfc66b` 两个超时覆盖改构造注入、`3d1be25` 5 处
+  自建 client 改由 factory 构造、`ad066e5` `default_data_dir` 委托 RuntimePaths、
+  `6f987a7` DIRECTORY_MAP 回写、`54e2636` 补 factory 测试、`d870d1f` 修既有连接泄漏。
+  新增 `runtime/paths.py`；`src/` 中 `runtime/config.py` 之外的环境变量读取点为
+  **0**；`config.py` 删除、`log_setup.py` 迁移（blob 级零改动）；测试 107 → 172。
 
 Current:
-- T-03 Agent runtime/config + paths（`runtime/{paths,config,logging}.py`、`config/agent.toml` + `config_online/agent.toml`、删除 `config.py`/`log_setup.py`）。
+- T-04 Agent bootstrap + executors 注入。
 
 Next:
-- T-04 Agent bootstrap + executors 注入。
+- T-04 Agent bootstrap + executors 注入（`bootstrap/{app,local,cloud,sidecar}.py`、删除 5 处 `os.getenv` 自建 client、`sidecar_main.py` 受控环境变量传参、`test_bootstrap.py`）。
 
 Blocked:
 - None.
@@ -180,6 +190,26 @@ Recent verification:
 - 打包：PyInstaller 6.22.2 实构建，PYZ 含 28 个 `wt_media_agent` 模块；
   `runner`/`executors` 为 0（sidecar 尚够不到，T-04 后需重新取证）。
 - TOML 裁定的三条依据均已实测复核（见 D-05 与程序总纲 §2）。
+- T-03 逐 commit 测试矩阵（同样以 `git archive` 导出后各自实跑，非采信当时记录）：
+  107/133/133/145/155/155/163/163/171/172，全部 `OK`，单调不减，无一个低于 T-02 收尾的 94。
+- T-03 冻结导入：`tests/test_runner_session.py` sha256 在 10 个 commit 上恒为
+  `888113ca…`（**与 T-02 记录同值**），`git log -- <该文件>` 计数 0；对照空串哈希
+  `e3b0c442…` 证明提取未静默失败。
+- T-03 纯移动：`416a56a` 的 `--raw -M` 为 `R100`，新旧 blob 同为 `63c36d3…`，
+  即「移动」与「删死代码」同 commit 但均未改一行逻辑。
+- T-03 环境变量收口：`runtime/config.py` 之外读取点 0，对照（该文件自身）2 处命中；
+  死 import 扫描 0，对照植入 `socket`/`json` 均被报出。
+- T-03 变异对照 19/19 全部转红并还原为绿。**本会话早先记录的一组变异结果已作废**：
+  脚本 `/tmp/mut.sh` 当时只定义函数未分发 `"$@"`，以 `bash` 调用时静默空转；
+  修复分发后整组重做，并要求「基线先绿 / 变异转红 / 还原回绿」三步俱全才计数。
+- T-03 真实进程：`migrate-storage.sh --data-dir` ×2 → `2 applied` 后 `0 applied`；
+  不带 `--data-dir` 落在 `<repo>/.local/data/`（已被 `.gitignore:2` 覆盖）；
+  `verify-health.sh` 输出配置格式日志行 `2026-09-23T23:00:37 [INFO] __main__: …` 与
+  `wt-media-agent health ok`。
+- T-03 取证中发现并修复既有缺陷：`with sqlite3.connect(...)` 不关连接，`apply_migrations`
+  每次调用泄漏一个（启动路径上）。`ResourceWarning` 由 T-02 收尾的 0 条升到 20 条是
+  因为 T-03 新测试多调了几次才使其可见；三站点改用 `closing(...)` 后回到 **0** 条，
+  且迁移的提交语义经真实进程复核未变。
 
 ## 13. DONE Gate
 
