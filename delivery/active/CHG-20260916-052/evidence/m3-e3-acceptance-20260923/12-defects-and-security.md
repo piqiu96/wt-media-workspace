@@ -174,6 +174,10 @@ panic: douyin: Get called before Initialize
   库内 19 行 == `added` 19。
   详见 `15-dscheduler-fix-reverification.md`（两种形态的覆盖范围见该文第三节）。**验收项 2 由
   「不通过」改判「复验通过」**（`14-verdict.md` 已同步；仍不标记 M3 DONE）。
+  **用户 2026-09-23 裁定闭环**：残留周期策略（id=9、10、29、37）已停用，停用后再起调度进程
+  80 秒确认 **0 新增任务**（该文第八节）。**本项闭环。**
+
+  > 闭环范围**不含** D-scheduler-2（见下），亦**不构成 M3 签收**。
 
 ### D-scheduler-2　`daily HH:MM` 漏 tick 即丢当天　【2026-09-23 复验时新登记，未修】
 
@@ -203,7 +207,7 @@ panic: douyin: Get called before Initialize
 
 | 缺陷 | 是否影响基线 §8 验收项 | 说明 |
 | --- | --- | --- |
-| D-scheduler | **曾是**，验收项 2 | 在冻结修订 `aaf66c5` 上真实周期触发未交付；2026-09-23 修复并复验通过（`interval:N` 与 `daily HH:MM` 两形态均覆盖），验收项 2 已改判（见 `15-dscheduler-fix-reverification.md`） |
+| D-scheduler | **曾是**，验收项 2 | 在冻结修订 `aaf66c5` 上真实周期触发未交付；2026-09-23 修复并复验通过（`interval:N` 与 `daily HH:MM` 两形态均覆盖），验收项 2 已改判，用户同日裁定**闭环**（见 `15-dscheduler-fix-reverification.md`） |
 | D-scheduler-2 | 否（潜在，非本轮实测失败） | daily 漏 tick 即丢当天且无补偿；影响无人值守可靠性，未构成本轮任何验收项失败 |
 | D1 / D2 | 否 | 边界与体验问题，不影响既定验收项成立 |
 | D3 | **是**，基线 §5 的「不重复排队」 | 手工 `/run` 路径不达标 |

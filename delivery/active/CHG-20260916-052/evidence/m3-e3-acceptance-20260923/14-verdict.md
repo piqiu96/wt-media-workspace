@@ -175,7 +175,8 @@ M3 保持 `IN_PROGRESS`，`CHG-20260915-051` 未被激活。
 1. ~~**修复 D-scheduler**（`schedulerResourcePlan()` 补 `clientsResource()`）~~ —— **已按更正确的修法完成
    （2026-09-23）**：不补 clients，改为让调度路径不再持有 crawler（`defaultSchedulerDiscoveryService()`）。
    理由与复验证据见 `15-dscheduler-fix-reverification.md`；`interval:N` 与 `daily HH:MM` 两种形态
-   均已无人值守复验通过；**此项已闭环**。
+   均已无人值守复验通过；残留周期策略（id=9、10、29、37）已停用并确认 0 新增任务。
+   **用户 2026-09-23 裁定「scheduler 修复已完成」，此项闭环。**
 2. **决策：daily 漏 tick 即丢当天**（2026-09-23 复验时新登记）。`daily HH:MM` 要求 tick 落在
    `HH:MM` 那一分钟内且无补偿机制：调度进程若在该分钟不在跑（或漏一次 tick），当天即无任务，
    后续 tick 不会补触发。既有设计、非本次修复引入；是否补「当天未跑则补触发」由用户裁定。

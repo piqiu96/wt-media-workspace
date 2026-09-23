@@ -41,14 +41,18 @@ Cloud、Agent、Workspace 分仓提交；Desktop 不因本次 M3 纠偏修改，
 ## Checkpoint
 
 - Completed：用户已确认 Scheduler/Worker 职责边界；ADR-0015 已更新为“Scheduler 只入队、Worker 统一执行”，手动立即执行同样入队。2026-09-23：用户确认自动转素材为 M3 正式能力，已回写产品基线 §4 与 ADR-0013 第 3 条；`partial_success` 按实施事实回写产品基线 §5 与 ADR-0013 第 7 条；M3 产品基线落回 `docs/product/M3-content-mining-v2.md`。
-- Current：M3 阶段状态已同步至 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1 节——A～E1 有真实证据，C2/E2 已暂停；**E3 综合验收已于 2026-09-23 执行一轮**（106 步，87 PASS / 7 FAIL），唯一硬阻断 D-scheduler 已同日修复并按无人值守路径复验通过（验收项 2 改判通过）。CHG 继续保留，用于 M3 用户签收与其余缺陷处置。
+- Current：M3 阶段状态已同步至 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1 节——A～E1 有真实证据，C2/E2 已暂停；**E3 综合验收已于 2026-09-23 执行一轮**（106 步，87 PASS / 7 FAIL），唯一硬阻断 D-scheduler 已同日修复并按无人值守路径复验通过（验收项 2 改判通过），并经用户同日裁定**闭环**。CHG 继续保留，用于 M3 用户签收与其余缺陷处置。
 - Next：进入 E3（CHG-20260915-051）综合验收与用户签收；C2/E2 已暂停，不再作为 E3 前置。关键词链路的真实外部读回需先具备 Cloud 凭据环境。
 - Blockers：关键词链路的真实外部读回依赖 `config/credentials/douyin.toml` 形式的凭据（2026-09-23 更正：Cloud 运行时只读 `config/` 下的 TOML，`WT_MEDIA_DOUYIN_*` 环境变量与 `.env.local` 对其无效），凭据不在仓库内。不以 mock 或 HTTP 200 替代真实业务读回。
 - Recent verification：`scripts/test.sh` 的 Go 全包与 Web 20/76 Vitest 通过；迁移 `20260916_031` 已应用；独立 Scheduler/Worker 入口（后收敛为 `cmd/discovery-scheduler`、`cmd/discovery-worker`）在空队列返回成功；本机 `/api/v1/health` 通过。详见 `evidence/20260916-scheduler-worker-boundary.md`。
 - Open follow-ups（非阻塞）：本轮全量验收产生的 4 项后续待决，归属待用户裁定，均不阻塞本 CHG。
   - D9：上游空返回是否应区分为「查无结果」与「上游异常」（现为如实透传为「成功且 0 条发现」）。
   - D6 / D2：来源方式标签失真与 `schedule` 无服务端校验的修复归属（本 CHG 修复，还是另立 CHG）。
-  - D-scheduler：**已闭环（2026-09-23）**——在本 CHG 内修复并完成无人值守进程级复验，验收项 2 由「不通过」改判「复验通过」；M3 仍保持 `IN_PROGRESS`，不构成签收。详见 `evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`。
+  - D-scheduler：**已闭环（2026-09-23，用户裁定「scheduler 修复已完成」）**——在本 CHG 内修复并完成
+    无人值守进程级复验（`interval:N` 与 `daily HH:MM` 两形态均覆盖），验收项 2 由「不通过」改判
+    「复验通过」；残留周期策略 id=9、10、29、37 已停用并确认 0 新增任务。闭环**不含** D-scheduler-2
+    （daily 漏 tick 即丢当天，已登记未修）。M3 仍保持 `IN_PROGRESS`，不构成签收。
+    详见 `evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`（第八节收尾确认）。
   - `material_failed`：NOT VERIFIED 的状态可达性是否以受控故障注入补验，由本 CHG 还是后续 CHG 承担。
 
 ## 6. Pending Questions

@@ -187,6 +187,9 @@ tick 网格锚定进程启动秒 `:50` → 到期 tick = **13:57:50**。
 daily_rows=1 interval_rows=11`。
 无残留进程：收尾后仅剩复验前即在运行的 Desktop 外壳与 Agent `local_api:8765`。
 
+**残留周期策略已于同日停用（2026-09-23，见第八节）**：上表 `discovery_strategies` 的 1 行
+（id=37）与更早验收遗留的 id=9、10、29 一并由 `enabled` 改为 `disabled`；行本身未删除。
+
 ## 七、对验收项 2 的结论
 
 验收项 2（关键词策略真实周期触发 → 任务 → 执行 → 自动入池）的**唯一阻断点已消除**，
@@ -201,3 +204,49 @@ daily_rows=1 interval_rows=11`。
 - **覆盖范围**：`interval:N` 与 `daily HH:MM` 成立；`manual` 不在调度范围；非法 `schedule`
   的服务端校验缺失另属缺陷 D2，不影响本项判定。
 - 这是**对已执行验收轮的复验补证**，不是重开签收；**M3 状态保持 `IN_PROGRESS`，未标 DONE**。
+
+## 八、收尾确认（2026-09-23，用户裁定闭环）
+
+用户 2026-09-23 裁定：**「直接都停用，当前我可以收尾认为 scheduler 修复已完成」**。
+
+### 8.1 停用残留周期策略
+
+停用前的判定依据：**`status='enabled'` 且 `schedule <> 'manual'`** 的策略才会真正被调度触发
+（`discovery.go:581` 以 `strategy.Status != model.StrategyEnabled` 短路，`scheduleDue` 对
+`manual` 恒返回 false）。该集合共 5 条：
+
+| id | team | name | schedule | 定性 | 处置 |
+| --- | --- | --- | --- | --- | --- |
+| 2 | 1 | 三角洲热点 | `daily 09:00` | **真实业务策略** | **未改动**（保留 enabled） |
+| 9 | 2 | m3acc0923-周期触发-daily 05:33 | `daily 05:33` | 验收残留 | → `disabled` |
+| 10 | 2 | m3acc0923-周期调度-interval5 | `interval:5` | 验收残留 | → `disabled` |
+| 29 | 2 | m3acc0923-周期调度-interval5-061451 | `interval:5` | 验收残留 | → `disabled` |
+| 37 | 2 | m3acc0923-周期触发-daily1357 | `daily 13:57` | 本轮补验样本 | → `disabled` |
+
+执行：`UPDATE ... SET status='disabled' WHERE id IN (9,10,29,37) AND status='enabled'
+AND name LIKE 'm3acc0923-%'`（行未删除，沿用阶段 11「残留不删除」口径）。
+**id=2 未被触及**（`updated_at` 仍为 2026-09-22 20:27:08，早于本次操作，可作佐证）。
+
+> 注：首轮汇报残留时只列了 10、29、37，**漏报了同为残留且会触发的 id=9**（`daily 05:33`）。
+> 本轮按同一口径一并停用。此处如实记录该遗漏。
+
+### 8.2 停用生效的进程级确认
+
+以同一调度二进制再起一次，确认停用后不再产生任务：
+
+| 时刻 | 观测 |
+| --- | --- |
+| 14:11:11 | 基线 `max_id=93 / total=71`；启动调度进程（PID 53652） |
+| 14:12:34 | 存活 **1 分 23 秒**、跨 ≥2 个 tick、`scheduler2.log` **0 字节** |
+| 14:12:34 | `max_id=93 / total=71`，**`id>93` 计数 = 0** → 无任何新增任务 |
+| 14:12:35 | 主动 `pkill` 停止，无残留进程 |
+
+即：残留策略停用后，调度进程照常存活但**不再入队**（`status != enabled` 被短路）；
+在册唯一还会周期触发的是真实业务策略 id=2。
+
+### 8.3 闭环判定
+
+- **D-scheduler：已修复、已复验（`interval:N` + `daily HH:MM`）、残留已停用 → 用户确认闭环。**
+- **D-scheduler-2（daily 漏 tick 即丢当天）：仍为「已登记、未修」**，闭环不覆盖该项；
+  是否补「当天未跑则补触发」的兜底仍待用户裁定。
+- 本闭环**不构成 M3 签收**：`M3` 保持 `IN_PROGRESS`，`CHG-20260915-051` 未激活。
