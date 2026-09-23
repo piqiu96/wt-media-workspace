@@ -36,6 +36,20 @@ M3 的内容挖掘只需要访问公开/已授权的内容数据接口，不涉�
 经实测仍然成立，未作改动。
 
 同日亦记录一项实现偏离（缺陷 D-scheduler，不改变本 ADR 的主张）：独立
-`cmd/discovery-scheduler` 进程因 `schedulerResourcePlan()` 缺少 `clientsResource()`，
-首次 tick 即 `panic: douyin: Get called before Initialize` 退出，导致本期**无人值守的真实周期触发未交付**。
-该偏离属实现缺陷，应回前序 CHG 修复；本 ADR 对 Scheduler 职责的规定不变。
+`cmd/discovery-scheduler` 进程首次 tick 即 `panic: douyin: Get called before Initialize` 退出，
+导致本期**无人值守的真实周期触发未交付**。
+
+**同日第二次更正（根因归因）**：原文把根因写作「`schedulerResourcePlan()` 缺少 `clientsResource()`」，
+**该归因有误**。真正原因是**未收尾的迁移遗留**：`0699e8a` 把单进程拆成三个 CMD 时，crawler 由
+「自读配置的 `NewDouyinCrawlerFromEnv()`」换成「生命周期管理的单例 `douyinclient`」，server 与
+worker 的资源计划都补了 `clientsResource()`，**唯独调度路径漏补**；同一提交又用
+`TestInitializeSchedulerDoesNotInitializeDouyinClient` 把「调度计划不含 clients」锁定为预期，
+两边从未对齐。
+
+**修法（2026-09-23，用户裁定）**：「scheduler 只是扫库做任务调度，不需要依赖这些额外的 client」。
+故**不给 `schedulerResourcePlan()` 补 `clientsResource()`** —— 那会与本 ADR 第 3 条
+「不得在调度调用栈中执行 Crawler」的分离主张相悖 —— 而是让调度路径不再持有 crawler
+（Cloud 新增 `defaultSchedulerDiscoveryService()`，`RunDue` 改走它；`runDue` 只读库入队，
+从不解引用 `s.crawler`）。`schedulerResourcePlan()` 与其测试原样保留。
+进程级复验通过（无人值守触发端到端成立），详见治理仓库
+`delivery/active/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`。

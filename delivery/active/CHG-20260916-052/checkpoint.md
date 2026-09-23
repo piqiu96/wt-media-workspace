@@ -10,6 +10,7 @@
 
 - 验收在 Cloud `aaf66c5` 上完成：`run-manifest.json` 共 106 步，87 PASS / 7 FAIL / 1 NOT VERIFIED / 1 ADJUDICATED。
 - 唯一硬阻断是 D-scheduler：独立 `cmd/discovery-scheduler` 首次 tick 即 panic 退出，**无人值守的真实周期触发本期未交付**（管理员 `run-due` 受控端点与周期 tick 共用实现，但不等于无人值守触发）。
-- 其他缺陷：D1 策略重名返回 500、D2 `schedule` 无服务端校验、D3 `/run` 可重复排队、D9 上游空返回透传为成功；`material_failed` 记 NOT VERIFIED（未构造公开 API 触发路径）。
+- **D-scheduler 已于同日修复并复验通过**（用户裁定：scheduler 只扫库调度，不依赖额外 client；修法是让调度路径不再持有 crawler，而非给 `schedulerResourcePlan()` 补 `clientsResource()`）。复验以**无人值守**路径端到端成立：调度进程跨 ≥6 tick 存活、日志 0 字节，未调 `run-due`、未启 HTTP server 即自行按窗口入队 4 个任务，Worker 领取执行后全部 `success`，库内新增 25 行与统计 `added` 合计一致。**验收项 2 由「不通过」改判「复验通过」**。详见 `evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`。
+- 其他缺陷仍未修：D1 策略重名返回 500、D2 `schedule` 无服务端校验、D3 `/run` 可重复排队、D9 上游空返回透传为成功、D8 `ErrCrawlerUnavailable` 未映射；`material_failed` 记 NOT VERIFIED（未构造公开 API 触发路径）。
 - 独立的只读业务流转视图按用户 2026-09-23 裁定移出验收范围（ADJUDICATED），不作为缺口；ADR-0013 第 8 条的禁止性约束不变。
-- 结论：**未标记 M3 DONE**，M3 保持 `IN_PROGRESS`。详细证据见 `evidence/m3-e3-acceptance-20260923/`（判定见 `14-verdict.md`，缺陷与安全问题见 `12-defects-and-security.md`）。
+- 结论：**未标记 M3 DONE**，M3 保持 `IN_PROGRESS`（修复不构成用户签收，`CHG-20260915-051` 未激活）。详细证据见 `evidence/m3-e3-acceptance-20260923/`（判定见 `14-verdict.md`，缺陷与安全问题见 `12-defects-and-security.md`）。

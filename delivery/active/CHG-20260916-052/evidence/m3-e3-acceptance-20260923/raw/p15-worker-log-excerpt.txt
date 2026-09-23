@@ -1,0 +1,24 @@
+# Worker 进程日志摘录（原始 /tmp/wtmedia-acc/worker.log 为 784KB GORM SQL，此处截断）
+# 用途：佐证执行走的是真实上游返回 + 真实唯一键冲突去重，而非 mock。
+# 说明：x-signature / x-expires 为上游 CDN 签名参数，不是本项目凭据；
+#       证据中不含 config/credentials/douyin.toml 的任何凭据值。
+
+## 真实唯一键冲突（内容已在池中，由数据库约束拦下 —— 去重生效）
+Error 1062 (23000): Duplicate entry '2-douyin-7678288098908743090' for key 'source_contents.uq_source_contents_team_platform_content'
+Error 1062 (23000): Duplicate entry '2-douyin-7686402620601659299' for key 'source_contents.uq_source_contents_team_platform_content'
+Error 1062 (23000): Duplicate entry '2-douyin-7688185143803393642' for key 'source_contents.uq_source_contents_team_platform_content'
+Error 1062 (23000): Duplicate entry '2-douyin-7688239581451308338' for key 'source_contents.uq_source_contents_team_platform_content'
+Error 1062 (23000): Duplicate entry '2-douyin-7688271103290117418' for key 'source_contents.uq_source_contents_team_platform_content'
+
+## 冲突计数（本次 Worker 运行的 4 个任务共触发多少次唯一键冲突）
+55
+
+## 真实入库的标题样本（截断至 60 字符，来自上游真实返回）
+'#孙尚香云端乐园皮肤CG  三丽鸥家族联动第四弹CG——一起创造快乐，享受此刻！#王者三丽鸥家族联动CG  #王者荣耀'
+',NULL,1,1,'
+'1103517466233260'
+'1898234738119644'
+'2-douyin-7678288098908743090'
+'2-douyin-7686402620601659299'
+'2-douyin-7688185143803393642'
+'2-douyin-7688239581451308338'

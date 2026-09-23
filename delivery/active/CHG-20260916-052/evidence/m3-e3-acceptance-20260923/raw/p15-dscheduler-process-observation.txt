@@ -1,0 +1,142 @@
+# D-scheduler 修复后的进程级复验：按时间顺序的原始观察
+#
+# 被验代码：Cloud 工作树修复（defaultSchedulerDiscoveryService），基于 aaf66c5 + 本修复
+# 环境：MySQL 127.0.0.1:3306 wt_media_cloud；discovery_interval=1m；worker_interval=5s
+# 复验期间**未启动 HTTP server**，**未调用管理员 run-due 端点**：
+# 下列任务只能来自调度进程自身的 tick（无人值守）。
+
+============================================================
+T0  2026-09-23 13:20:23　启动前的基线（实测）
+============================================================
+$ mysql ... -e "SELECT CONCAT('max_task_id=',MAX(id)), CONCAT('total=',COUNT(*)), \
+                CONCAT('with_key=',SUM(schedule_key IS NOT NULL AND schedule_key<>'')) FROM crawl_tasks;"
+max_task_id=84  total=62  with_key=3
+
+$ ... WHERE schedule_key IS NOT NULL AND schedule_key<>'' ORDER BY id;
+id  strategy_id  schedule_key           status   created_at
+49  10           interval:5:5967043     success  2026-09-23 05:38:17.961113
+72  29           interval:5:5967051     success  2026-09-23 06:16:08.621619
+73  10           interval:5:5967051     success  2026-09-23 06:16:08.630699
+# 这 3 条均产生于上一轮验收的 `POST /discovery-scheduler/run-due`（非无人值守）。
+
+在册且启用的周期策略：id=10（interval:5）、id=29（interval:5），均属 team 2。
+
+============================================================
+T1  2026-09-23 13:20:23　启动 /tmp/wtmedia-acc/discovery-scheduler
+============================================================
+（cwd = wt-media-cloud 仓库根，配置文件按 config/ 加载）
+
+$ $SCHEDULER > /tmp/wtmedia-acc/scheduler.log 2>&1 &
+PID 50129，lstart = Wed Sep 23 13:20:23 2026
+
+--- T1 观测：实跑于 13:20:52（启动后约 29 秒）---
+$ ps -o pid,lstart,etime -p 50129
+  PID STARTED                      ELAPSED
+50124 Wed Sep 23 13:20:23 2026       00:29      <- 包装 shell
+50129 /tmp/wtmedia-acc/discovery-scheduler    <- 调度进程本体（首个 tick 立即执行）
+
+$ wc -c /tmp/wtmedia-acc/scheduler.log
+0
+# 日志 0 字节 = 无 panic。修复前此处为 `panic: douyin: Get called before Initialize` 后 exit 2。
+
+$ ... SELECT id,strategy_id,schedule_key,status,created_at,started_at,finished_at FROM crawl_tasks WHERE id>84 ORDER BY id;
+id  strategy_id  schedule_key         status   created_at                     started_at  finished_at
+85  29           interval:5:5967136   pending  2026-09-23 13:20:23.871661     NULL        NULL
+86  10           interval:5:5967136   pending  2026-09-23 13:20:23.899115     NULL        NULL
+# 首个 tick 即按到期策略入队：每条启用策略在窗口 5967136 下恰好 1 行。
+
+============================================================
+T2  2026-09-23 13:22:44　≥3 个 tick 后的存活与防重（核心断言）
+============================================================
+tick 网格：13:20:23 → 13:21:23 → 13:22:23（discovery_interval=1m）
+
+$ date "+%Y-%m-%d %H:%M:%S"
+2026-09-23 13:22:44
+
+$ ps -o pid,lstart,etime -p 50129
+  PID STARTED                      ELAPSED
+50124 Wed Sep 23 13:20:23 2026       02:21
+ALIVE
+# 存活 2 分 21 秒，跨 3 个 tick。修复前：首个 tick 即整进程退出。
+
+$ wc -c /tmp/wtmedia-acc/scheduler.log
+       0 /tmp/wtmedia-acc/scheduler.log
+# 仍为 0 字节。
+
+$ ... SELECT id,strategy_id,schedule_key,status,created_at FROM crawl_tasks WHERE id>84 ORDER BY id;
+85  29  interval:5:5967136  pending  2026-09-23 13:20:23.871661
+86  10  interval:5:5967136  pending  2026-09-23 13:20:23.899115
+# tick2、tick3 未新增任何行 —— 同窗口防重成立（`sameScheduleWindow` + 唯一索引双层）。
+
+$ ... GROUP BY strategy_id,schedule_key HAVING c>1;
+(空)
+# 无任何 (strategy, window) 出现重复行。
+
+============================================================
+T3  2026-09-23 13:25:24　跨窗口继续触发（≥5 个 tick）
+============================================================
+窗口推进到 5967137，调度进程在无人干预下再各入队 1 行：
+87  29  interval:5:5967137  created_at=2026-09-23 13:25:23.945532
+88  10  interval:5:5967137  created_at=2026-09-23 13:25:24.016302
+
+============================================================
+T4  停止调度进程（本次复验主动 pkill）
+============================================================
+$ pkill -f "wtmedia-acc/discovery-scheduler"
+STOPPED
+# 停止时刻：在观测到 87/88（13:25:24 创建）之后、Worker 启动（13:27:39）之前，约 13:25:35。
+# 故存活时长约 5 分 10 秒（13:20:23 → 约 13:25:35），跨 ≥6 个 tick。
+# 直接观测存活两次（13:20:52 elapsed=00:29、13:22:44 elapsed=02:21），
+# 第三次由 13:25:24 仍产生新行反证（进程若已退出则不会入队）。
+# 背景任务回报的 exit code 144 = 本次主动 pkill 所致，**不是**进程自身 panic 退出；
+# 判据：scheduler.log 全程 0 字节，且进程在 pkill 前一直存活。
+
+$ ... WHERE status='pending' ORDER BY id;
+85  29  interval:5:5967136  pending
+86  10  interval:5:5967136  pending
+87  29  interval:5:5967137  pending
+88  10  interval:5:5967137  pending
+
+============================================================
+T5  2026-09-23 13:27:39 起　独立 Worker 进程领取并执行
+============================================================
+$ /tmp/wtmedia-acc/discovery-worker > /tmp/wtmedia-acc/worker.log 2>&1 &
+# Worker 日志含 GORM SQL（真实 INSERT 与真实唯一键冲突去重），此处只摘录决定性读回。
+
+$ ... SELECT id,strategy_id,schedule_key,status,created_at,started_at,finished_at FROM crawl_tasks WHERE id>84 ORDER BY id;
+id  strategy_id  schedule_key         status   created_at                     started_at                     finished_at
+85  29           interval:5:5967136   success  2026-09-23 13:20:23.871661     2026-09-23 13:27:39.680345     2026-09-23 13:27:44.557207
+86  10           interval:5:5967136   success  2026-09-23 13:20:23.899115     2026-09-23 13:27:44.586836     2026-09-23 13:27:47.181323
+87  29           interval:5:5967137   success  2026-09-23 13:25:23.945532     2026-09-23 13:27:47.195773     2026-09-23 13:27:49.009656
+88  10           interval:5:5967137   success  2026-09-23 13:25:24.016302     2026-09-23 13:27:49.035341     2026-09-23 13:27:53.374478
+# started_at/finished_at 由 Worker 写入（调度进程不写这两个字段）；四态终态均为 success。
+
+$ ... SELECT id,status,stats_json FROM crawl_tasks WHERE id>84 ORDER BY id;
+85  success  {"scanned": 20, "found": 20, "added": 17, "duplicate":  3, "failed": 0, "pending": 17, "auto_materialized": 0}
+86  success  {"scanned": 20, "found": 20, "added":  6, "duplicate": 14, "failed": 0, "pending":  6, "auto_materialized": 0}
+87  success  {"scanned": 20, "found": 20, "added":  2, "duplicate": 18, "failed": 0, "pending":  2, "auto_materialized": 0}
+88  success  {"scanned": 20, "found": 20, "added":  0, "duplicate": 20, "failed": 0, "pending":  0, "auto_materialized": 0}
+
+$ ... SELECT crawl_task_id, COUNT(*) rows_in_pool, SUM(status='pending') pending, SUM(status='material_created') materialized
+      FROM source_contents WHERE crawl_task_id IN (85,86,87,88) GROUP BY crawl_task_id ORDER BY crawl_task_id;
+crawl_task_id  rows_in_pool  pending  materialized
+85             17            17       0
+86              6             6       0
+87              2             2       0
+# 合计 25 行，与 added 合计 17+6+2+0=25 精确一致（接口统计 == 库内真实行）。
+# task 88 的 added=0 / duplicate=20 是上游真实全量去重的自然证据。
+
+$ ... SELECT COUNT(*) tasks_gt84, SUM(schedule_key IS NULL OR schedule_key='') without_key FROM crawl_tasks WHERE id>84;
+tasks_gt84  without_key
+4           0
+# 本轮新增的 4 条全部带非空 schedule_key → 全部来自调度路径，无手工/HTTP 路径掺入。
+
+============================================================
+T6  2026-09-23 13:29:24　收尾
+============================================================
+$ pkill -f "wtmedia-acc/discovery-worker"   -> STOPPED
+$ pgrep -fl "wtmedia-acc|wt-media"
+仅剩既有无关进程：Desktop 外壳（/Volumes/WT Media）、Agent local_api :8765（复验前即在跑）。
+
+不变式：复验期间**未修改/未删除任何既有行**。
+既有 62 条任务与 3 条带 key 的任务保持原值；本轮只新增 4 条任务与其执行产生的 25 行内容。

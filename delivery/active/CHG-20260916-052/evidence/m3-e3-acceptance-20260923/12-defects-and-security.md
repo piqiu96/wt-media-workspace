@@ -145,10 +145,14 @@ panic: douyin: Get called before Initialize
   ← bootstrap.runSchedulerProcess.func1
 ```
 
-- 根因：`schedulerResourcePlan()`（`internal/bootstrap/resource.go:46-54`）只装配
-  config / logger / metrics / tracing / database，**缺 `clientsResource()`**；
-  而周期触发路径会构造需要 `Initialize` 的 `douyinCrawler`。
-  `serverResourcePlan()` 也没有 job 步骤，所以两条路径都不执行周期调度。
+- 根因（2026-09-23 修复时更正，原归因有误）：**不是「`schedulerResourcePlan()` 缺 `clientsResource()`」，
+  而是未收尾的迁移遗留**。`0699e8a` 把单进程拆成三个 CMD 时，crawler 由「自读配置的
+  `NewDouyinCrawlerFromEnv()`」换成「生命周期管理的单例 `douyinclient`」：server 与 worker 的
+  资源计划都补了 `clientsResource()`，**唯独调度路径漏补**，同时同一提交又用
+  `TestInitializeSchedulerDoesNotInitializeDouyinClient` 把「调度计划不含 clients」锁定为预期。
+  `100899d` 删除 `NewDouyinCrawlerFromEnv` 并把 service 构造挪进 job 体内，panic 遂落在首个 tick 的
+  裸 goroutine 中。因 `internal/`+`pkg/` 全仓零 `recover()`，整进程退出并带走同进程的 `proxy-expiry`。
+  （`serverResourcePlan()` 没有 job 步骤这一点仍属实。）详见 `15-dscheduler-fix-reverification.md`。
 - 实测：启动 `cmd/discovery-scheduler` 观察 75 秒 → `存活=False exit=2`。
 - **影响（重要）**：本期内**没有任何进程在执行周期调度**。库中所有 `schedule_key` 非空的任务
   都是在验收期间由管理员调用 `POST /discovery-scheduler/run-due` 产生的；
@@ -156,7 +160,14 @@ panic: douyin: Get called before Initialize
   换句话说，**「关键词策略能通过真实周期触发」这一验收项在真实运行中并未交付**，
   验收只能证明其**调度语义正确**（窗口键、双层防重、防重唯一索引），
   不能证明「无人值守的周期触发」可用。见 `14-verdict.md` 的验收项 2。
-- 处置：本轮只登记，不修（修复属运行时改动）。
+- 处置（**已修复并复验，2026-09-23**）：按用户裁定「scheduler 只是扫库做任务调度，不需要依赖这些
+  额外的 client」，**不给 `schedulerResourcePlan()` 补 `clientsResource()`**，而是让调度路径不再持有
+  crawler（Cloud 新增 `defaultSchedulerDiscoveryService()`，`RunDue` 改走它；`RunDue` 只用
+  `s.store` 与 `s.createRun`，从不解引用 `s.crawler`）。`schedulerResourcePlan()` 与其测试**原样保留**。
+  进程级复验：调度进程跨 ≥6 个 tick 存活、日志 0 字节，并在**未调用 `run-due`、未启动 HTTP server**
+  的情况下自行按窗口入队 4 个任务，Worker 领取执行后全部 `success`、库内新增 25 行与统计一致。
+  详见 `15-dscheduler-fix-reverification.md`。**验收项 2 由「不通过」改判「复验通过」**
+  （`14-verdict.md` 已同步；仍不标记 M3 DONE）。
 
 ### D10　`scripts/verify_m2_acceptance.py` 指向已迁移的文件路径　【实测 FAIL 10.3】
 
@@ -174,7 +185,7 @@ panic: douyin: Get called before Initialize
 
 | 缺陷 | 是否影响基线 §8 验收项 | 说明 |
 | --- | --- | --- |
-| D-scheduler | **是**，验收项 2 | 真实周期触发未交付，只能证调度语义 |
+| D-scheduler | **曾是**，验收项 2 | 在冻结修订 `aaf66c5` 上真实周期触发未交付；2026-09-23 修复并复验通过，验收项 2 已改判（见 `15-dscheduler-fix-reverification.md`） |
 | D1 / D2 | 否 | 边界与体验问题，不影响既定验收项成立 |
 | D3 | **是**，基线 §5 的「不重复排队」 | 手工 `/run` 路径不达标 |
 | D6 | 否 | 来源方式标签失真，不影响入池与去重正确性 |

@@ -17,6 +17,12 @@
 
 ## 备注
 
-- **6.2**：schedulerResourcePlan() 不含 clientsResource()，而 RunDiscoverySchedule→RunDue→newDouyinCrawler()→douyin.Get() 要求已 Initialize，故首次 tick 即 panic 退出
+> **2026-09-23 复验补记（本页为原始渲染，保留不改）**：6.2 已修复并复验通过，
+> 验收项 2 改判通过。**下方 6.2 的根因归因已被更正**：不是「`schedulerResourcePlan()`
+> 不含 `clientsResource()`」，而是 `0699e8a` 拆分进程时只给 server/worker 补了 clients、
+> 调度路径漏补的**未收尾迁移遗留**。详见 `15-dscheduler-fix-reverification.md`。
+
+- **6.2**：~~schedulerResourcePlan() 不含 clientsResource()~~（归因已更正，见上方补记），
+  而 RunDiscoverySchedule→RunDue→newDouyinCrawler()→douyin.Get() 要求已 Initialize，故首次 tick 即 panic 退出
 - **6.3**：这一步验证调度语义，不主张等价于周期 tick（tick 执行者已崩溃）
 - **6.9**：D3：/run 传空 schedule_key→NULL，唯一索引不拦 NULL，可重复排队
