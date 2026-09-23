@@ -88,7 +88,7 @@
 | T-01 | 治理工件就绪：本 change.md、checkpoint、status×3、planned 057/058/059、LEDGER、CURRENT_CONTEXT 再生成；CHG-053 标注 SUPERSEDED 并入 | DONE | `verify_agent_entry.py` 通过；CURRENT_CONTEXT 指向本 CHG |
 | T-02 | Agent 结构迁移（吸收 053 Task 1-3）：`constants.py`→`runtime/`（含 `runtime/version.py`）；`clients/bitbrowser/` 包拆分并新增公开 `open_url()`，executor 不再直连私有 `_post`；`clients/cloud/` 迁移；`services/{browser,net}/` 建立；`runtime/environment.py` 委托 services 并撤销 `runtimes/`；`storage/` 整理（checkpoint/sqlite/migration 重导出，`storage.migration` 路径与符号不变）；`runner/` 三拆并重导出 `TaskRunner`/`TaskRunnerConfig`（测试零改动）；`local_api/` 瘦身；`utils/time.py`；既有 85 用例随迁全绿 | DONE | `bash scripts/test.sh`（≥85 OK）；`migrate-storage.sh` 连续两次成功；`verify-health.sh` 通过 |
 | T-03 | Agent runtime/config + paths（吸收 053 Task 5）：强类型 AgentConfig（env>file>default，TOML/`tomllib`，测试目录接缝）；`configs/`→`config/` + `config_online/` 同构镜像；RuntimePaths 三态；统一 `WT_MEDIA_LOG_LEVEL`；删除 config.py/log_setup.py 死代码与目录双实现 | DONE | config loader 测试（默认/文件/env/非法/凭据忽略）全绿；运行时代码零处引用 `config_online`（打包校验除外） |
-| T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | TODO | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试 |
+| T-04 | Agent bootstrap + executors 注入（吸收 053 Task 4，按 D-04 偏差执行）：`bootstrap/{local,cloud,sidecar,app}.py` 真实组装（接通 TaskRunner，runner 默认关闭）；删除 5 处 os.getenv 自建 client；CloudAgentClient timeout 接入配置；sidecar_main 瘦身为受控环境变量传参（`WT_MEDIA_LOCAL_API_HOST/PORT`、`WT_MEDIA_AGENT_RUNTIME_TOKEN`、`WT_MEDIA_AGENT_DATA_DIR`），pyproject 入口重指；`test_sidecar_entry.py` 断言调整 | DONE | bootstrap 组装测试（FakeClient）；grep 证明 executors 无 os.getenv；sidecar 参数测试 |
 | T-05 | Agent AST 边界测试（ADR-0016 第 3 条机器校验，含 `test_patch_targets.py`）+ 平台 URL 常量化 | TODO | AST 测试全绿；server.py/account_check.py 无内联 URL 字面量 |
 | T-06 | Desktop 拆分 main.rs：bootstrap/config/paths/state/commands/agent.rs；17 命令原样迁移；account_check/cookie_read 重复 preflight 提取共用；HttpClient 超时；端口进配置 | TODO | `cargo test` 全绿；`cargo build` 通过 |
 | T-07 | Desktop Cloud 地址链路 + sidecar 传参：`get_public_config` command；`resources/desktop.production.toml`；`local_agent_start` 传环境变量；生产模式忽略地址类 env 覆盖 | TODO | config loader 单测（默认/文件/env/非法/生产忽略） |
@@ -144,6 +144,7 @@ Evidence files live in `evidence/`，按 Task 编号记录事实。
 - `evidence/task-02-baseline.md`：Agent 测试基线实测（85 tests OK，含解释器版本矩阵）。
 - `evidence/task-02-structure-migration.md`：T-02 结构迁移取证——14 个 commit 的逐 commit 测试矩阵（均 ≥85 且 OK）、冻结导入 sha256 恒等、冻结路径与符号清单、22 条跨层边全集与**仅有**的两条 ADR-0016 例外、PyInstaller 产物 PYZ 模块清单。
 - `evidence/task-03-runtime-config.md`：T-03 配置/路径取证——10 个 commit 的逐 commit 测试矩阵（107→172，单调不减）、`log_setup.py → runtime/logging.py` 的 blob 级纯移动证明（`R100`）、冻结导入 sha256 与 T-02 同值、`src/` 环境变量读取点归零（带阳性对照）、19/19 变异对照（并**作废**本会话早先因变异脚本未分发而不可采信的一组记录）、`factory` 零覆盖缺口的补测、取证中发现的既有连接泄漏（`ResourceWarning` 20→0）与修复、唯一行为变更的记录、以及**已枚举的未覆盖面**。
+- `evidence/task-04-bootstrap-injection.md`：T-04 bootstrap/注入取证——4 个 commit 的逐 commit 测试矩阵（184→204，单调不减；「移动文件」与「改逻辑」分列两个 commit）、冻结导入 sha256 与 T-02/T-03 同值、7/7 变异对照（其中 2 条初跑**不可判别**，各暴露一个真实测试缺口：`_as_bool` 的假值拼写与 `agent_id` 的**空断言**，补测后全部可判别）、AC-09 三模式真实进程输出（cloud 只报告 / local 连到真实 BitBrowser 40 个 profile / sidecar 401-401-200 token 矩阵且 token 不入 `ps`）、冻结入口脚本 ×3、静态扫描含阳性对照、PyInstaller 产物 PYZ 模块集 28→53（`runner`/`executors` 首次进包）、以及**已枚举的未覆盖面**（`bootstrap/local.py` 无单测、打包产物未重签时无法启动这一既存问题归 CHG-D(059)）。
 
 ## 12. Current Checkpoint
 
@@ -167,12 +168,22 @@ Completed:
   `6f987a7` DIRECTORY_MAP 回写、`54e2636` 补 factory 测试、`d870d1f` 修既有连接泄漏。
   新增 `runtime/paths.py`；`src/` 中 `runtime/config.py` 之外的环境变量读取点为
   **0**；`config.py` 删除、`log_setup.py` 迁移（blob 级零改动）；测试 107 → 172。
+- T-04 Agent bootstrap + executors 注入完成，agent `d870d1f` → `7e19622` 共 **4** 个 commit：
+  `f7ed012` 执行器注入链（4 个执行器必填第三参、registry 闭包绑 client、runner 收注入注册表）、
+  `587496b` 纯移动（4 个 `LocalApiServer` 测试迁出 `test_app.py`）、
+  `3e47985` `bootstrap/` 包 + 三个模式入口 + `LocalApiServer` 必填 client +
+  `CloudAgentClient` 超时接配置 + 两个配置键 + 删 `app.py`、
+  `7e19622` `DIRECTORY_MAP.md` 回写。
+  5 处自建 client 清零且无新增构造点；未装配的 runner 走既有 `no_executor` 路径（fail-closed）；
+  三个模式首次各有真实进程启动；测试 184 → 204。侧记：`sidecar_main.main()` **无参数**，
+  这正是 token 不能经 argv 泄漏的机制（AC-03）。
 
 Current:
-- T-04 Agent bootstrap + executors 注入。
+- T-05 Agent AST 边界测试 + 平台 URL 常量化。
 
 Next:
-- T-04 Agent bootstrap + executors 注入（`bootstrap/{app,local,cloud,sidecar}.py`、删除 5 处 `os.getenv` 自建 client、`sidecar_main.py` 受控环境变量传参、`test_bootstrap.py`）。
+- T-05 `tests/test_dependency_boundaries.py`（R1–R10，含 D-06 两条例外与 R6 环境变量规则）、
+  `tests/test_patch_targets.py`、`executors/account_check.py` 平台 URL 移入 `clients/**` 并公开 `open_url()`。
 
 Blocked:
 - None.
@@ -210,6 +221,26 @@ Recent verification:
   每次调用泄漏一个（启动路径上）。`ResourceWarning` 由 T-02 收尾的 0 条升到 20 条是
   因为 T-03 新测试多调了几次才使其可见；三站点改用 `closing(...)` 后回到 **0** 条，
   且迁移的提交语义经真实进程复核未变。
+- T-04 逐 commit 测试矩阵（同样以 `git archive` 导出后各自实跑）：`f7ed012`/`587496b`
+  为 184，`3e47985`/`7e19622` 为 204，全部 `OK`，单调不减，无一低于 T-03 收尾的 172。
+- T-04 冻结导入：`tests/test_runner_session.py` sha256 在 4 个 commit 上恒为 `888113ca…`
+  （与 T-02/T-03 记录同值）；本 CHG 范围（`99f408c^..7e19622`）内 `git log -- <该文件>`
+  计数 **0**，全史仅 `1e3e96f` 一次（本 CHG 之前）。
+- T-04 变异对照 7/7 全部「基线绿 → 转红 → 还原绿」，另加 `f7ed012` 的 5 条。其中
+  **M-11/M-12 初跑不可判别**，各暴露一个真实测试缺口并已补测：`_as_bool` 未覆盖
+  `"false"/"0"/"off"` 这类 shell 会写的假值（读错会把「别跑」变成「去轮询 Cloud」）；
+  `agent_id` 断言是**空断言**（配置默认值与 dataclass 默认值恰好同为 `local-agent-dev`）。
+- T-04 静态扫描：`src/` 环境变量读取点仍只有 `runtime/config.py` 一处；死 import 0 条，
+  阳性对照植入的未使用 import 被报出（证明扫描器非空转）。
+- T-04 真实进程（AC-09）：cloud 模式打印环境事实 JSON 并 `exit=0`、无出站请求；
+  local 模式 `/healthz` 200、`/api/v1/status` 的 `bitbrowser_status=normal` 且
+  `profile_count=40`（真实 BitBrowser，非 mock）；sidecar 模式 token 矩阵 401/401/200，
+  `ps` 中无 token，数据目录生效。冻结脚本 `migrate-storage.sh` ×2 → `2 applied`/`0 applied`，
+  `verify-health.sh` → `health ok`。
+- T-04 打包重新取证：PyInstaller 6.22.2 实构建，PYZ 内 `wt_media_agent.*` 由 T-02 的
+  **28 → 53**（`runner` 0→4、`executors` 0→8、`bootstrap` 3），T-02 遗留的
+  「sidecar 够不到 runner/executors」已消除。未重签的产物启动失败（`different Team IDs`）
+  属既存打包/签名问题，登记归 CHG-D(059)，不作为 T-04 的通过条件。
 
 ## 13. DONE Gate
 

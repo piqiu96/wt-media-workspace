@@ -9,10 +9,13 @@ Completed:
 - T-01：四仓 AI 入口文档各自独立提交（desktop `47a6263`、cloud `3b733ff`、workspace `e0444cd`；agent 上一轮 `d3ab02f` 已提交）；配置格式按 D-05 回写为 TOML（`change.md` §6 D-01/§2/§5/§7/§8 + 程序总纲 §2 + planned CHG-059）；测试基线证据按模板规范化。
 
 Current:
-- T-04 Agent bootstrap + executors 注入。
+- T-05 Agent AST 边界测试 + 平台 URL 常量化。
 
 Next:
-- T-04 Agent bootstrap + executors 注入（`bootstrap/{app,local,cloud,sidecar}.py`、删除 5 处 `os.getenv` 自建 client、`sidecar_main.py` 受控环境变量传参、`test_bootstrap.py`；并重新取证打包产物，`runner`/`executors` 应首次进包）。
+- T-05 `tests/test_dependency_boundaries.py`（R1–R10，含 D-06 两条例外的**单文件粒度**白名单、
+  R6 环境变量规则、R10 冻结边集棘轮）、`tests/test_patch_targets.py`（固化
+  `local_api.server.urlrequest.urlopen` 等三个 patch 目标）、
+  `executors/account_check.py` 的平台 URL 移入 `clients/**` 并公开 `open_url()`。
 
 Blocked:
 - None.
@@ -90,3 +93,51 @@ Scope addition（不在 T-03 计划条目内，已披露）:
   `d870d1f` 修既有连接泄漏——`with sqlite3.connect(...)` 提交但不关闭，
   `apply_migrations` 每次调用泄漏一个，而它在启动路径上。三站点改 `closing(...)` 后
   `ResourceWarning` 由 20 条回到 0 条。
+
+### T-04 完成（agent `d870d1f` → `7e19622`，4 个 commit）
+
+Completed:
+- 新增 `bootstrap/{__init__,app,local,cloud,sidecar}.py`：`app.py` 是**唯一**的生产装配
+  入口（显式 9 步有序序列，无注册表/容器/locator），`local`/`cloud`/`sidecar` 三个模式面
+  消费同一个 `Components`。
+- 5 处自建 client 清零且无新增构造点：4 个 executor 的第三参 `bitbrowser` **必填**
+  （可选默认值正是要消灭的注入缝），`LocalApiServer.bitbrowser` 改为关键字必填。
+- `runner/registry.py::default_executor_factories(bitbrowser)` 用闭包绑 client；
+  `TaskRunner` 第 4 参 `executors` 关键字可选、**默认空** ⇒ 未装配即 fail-closed
+  走既有 `no_executor` 路径，不摸 Cloud 与 BitBrowser。
+- `CloudAgentClient` 的 `timeout=10` 接配置（`cloud.timeout_seconds`），常量留作默认值。
+- `local_main.py`/`cloud_main.py` 成 3 行委托；`app.py`/`test_app.py` 删除；
+  `sidecar_main.py` 保留路径与 `local_api_server` 属性名，`main()` 改为 `return sidecar.run()`
+  且**不接任何参数**——这是 token 不能经 argv 进入 `ps` 的机制。
+- 新增配置键 `agent.id`、`agent.run_runner`（新增 `_as_bool`），两个 config 目录 1:1 同步；
+  `run_runner` 默认 **false**（写错命令不会把 Agent 拉起来轮询 Cloud）。
+- 新增 `tests/support.py`（`UnusedBitBrowser`：被触碰即断言失败）。
+
+Verification（详见 `evidence/task-04-bootstrap-injection.md`）:
+- 逐 commit 测试矩阵：`f7ed012`/`587496b` 184、`3e47985`/`7e19622` 204，全部 `OK`。
+- 冻结导入 sha256 恒为 `888113ca…`（与 T-02/T-03 同值），`git log` 计数仍为 1。
+- 变异对照 7/7（另 `f7ed012` 5 条）全部三步俱全；`/tmp/t04mut.py` 要求锚点唯一匹配。
+- 真实进程三模式（AC-09）：cloud 打印事实 JSON 并 `exit=0`；local `/healthz` 200、
+  `profile_count=40`（真实 BitBrowser）；sidecar 401/401/200 且 token 不入 `ps`。
+- 冻结脚本 `migrate-storage.sh` ×2 → `2 applied`/`0 applied`，`verify-health.sh` → `health ok`。
+- 打包重新取证：PYZ 内 `wt_media_agent.*` 28 → **53**，`runner` 0→4、`executors` 0→8。
+
+Corrections（T-04 内暴露的测试缺口，均已补测而非记成通过）:
+- **M-11**：`_as_bool` 把 `"false"/"0"/"off"` 读成真时无测试转红。这些恰是 shell 写这个
+  变量的方式，读错会把「别跑」变成「去轮询 Cloud」。补 `RunRunnerSwitchTest`。
+- **M-12**：`state.agent_id` 与 `config.agent_id` 的断言当时是**空断言**——配置默认值
+  `local-agent-dev` 与 `LocalAgentState` 的 dataclass 默认值恰好相同。改为显式配
+  `agent-7f3c` 后再比。
+
+Deviations（已披露）:
+- 计划写「sidecar_main 读四个受控环境变量」，实际读环境变量的动作仍在
+  `runtime/config.py`（四个都是 `_SPEC` 已登记的键），sidecar 只消费解析结果。
+  理由：R6 要求全 `src/` 只有该模块读环境变量，否则 T-05 的 AST 规则会立刻把
+  `sidecar_main.py` 列为违规。行为与计划等价。
+- 打包产物未重签时启动失败（`different Team IDs`）：与 T-04 改动无关的既存问题，
+  登记归 CHG-D(059)，且**不作为 T-04 的通过条件**（T-04 只主张模块集合正确）。
+
+Open（未覆盖面，已枚举）:
+- `bootstrap/local.py` 无单元测试（只有真实进程取证）；`local_api/server.py:main` 的
+  「不传 `--host/--port` 时取配置值」分支无测试；`bootstrap/sidecar.py` 的
+  `run_runner=true` 守护线程分支未被真实进程走过（AC-10 归 T-09）。
