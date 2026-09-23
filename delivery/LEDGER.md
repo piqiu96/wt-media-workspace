@@ -10,6 +10,8 @@ Completed delivery records are removed after their final product, engineering, c
 
 M2 已由用户验收通过。M3-A 的闭环记录已随其并入门槛转出活动目录，归档在 [completed/CHG-20260915-044](completed/CHG-20260915-044/change.md)（`Status: HANDOFF`，未改写为 DONE）；M3-B～E 已在 CHG-20260916-052 收敛为当前实施变更。
 
-M3 当前阶段状态（2026-09-23 同步）：M3 保持 `IN_PROGRESS`。A～E1 有真实证据；C2、E2（博主搜索与作者策略）已暂停，本期不做、移出验收范围；E3 未开始。逐阶段状态与证据指向见 [M3-content-discovery-v2.md](milestones/M3-content-discovery-v2.md) 第 2.1 节。用户最终验收前不得标记 M3 DONE。
+M3 当前阶段状态（2026-09-23 同步）：M3 保持 `IN_PROGRESS`。A～E1 有真实证据；C2、E2（博主搜索与作者策略）已暂停，本期不做、移出验收范围；**E3 综合验收已在本次 CHG 内执行并经同日补验收口**——验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED；**未标记 M3 DONE**（签收属用户裁定）。逐阶段状态与证据指向见 [M3-content-discovery-v2.md](milestones/M3-content-discovery-v2.md) 第 2.1 节。
+
+验收期间只登记未修的缺陷与安全问题已按用户裁定移入 planned（[CHG-20260923-054](planned/CHG-20260923-054/change.md)）。
 
 待规划/待决记录见 [Planned index](planned/README.md)，不计为正在执行的变更。

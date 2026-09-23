@@ -7,10 +7,16 @@
 
 | | |
 | --- | --- |
-| 可判定为通过的验收项 | 5 项（第 1、3、4、5、6 项） |
-| 部分通过 | 1 项（第 7 项：Cloud Web 走查通过，Desktop 未走查） |
+| 可判定为通过的验收项 | **7 项（第 1–7 项）** |
 | 原不通过、**2026-09-23 复验改判通过** | 1 项（第 2 项：真实周期触发，D-scheduler 修复后复验；`interval:N` 与 `daily HH:MM` 两形态均覆盖） |
+| 原带例外、**2026-09-23 补验后去例外** | 2 项（第 6 项：`material_failed` 受控故障注入，见 `17-material-failed-injection.md`；第 7 项：Desktop 走查，见 `16-desktop-walkthrough.md`） |
 | 状态约束 | 第 8 项成立：**未标记 M3 DONE** |
+
+> **本轮补验（2026-09-23）**：首轮验收的两处缺口已分别补齐——
+> 第 6 项以**受控故障注入**证实 `material_failed` 可达且失败项可重试恢复；
+> 第 7 项完成 **Cloud Desktop 走查**。两者均以真实服务、真实上游、真实数据库读回取得，
+> 未使用 mock 替代。补验结论见 `16-`、`17-` 两份文件。
+> **补验不构成签收**：M3 仍为 `IN_PROGRESS`，签收属用户裁定。
 
 > **本文档保留 2026-09-23 首轮验收的原始判定**（其结论对当时的冻结修订 `aaf66c5` 生效）。
 > 第 2 项在原判定下**不通过**，唯一阻断是 **D-scheduler**：独立 `cmd/discovery-scheduler`
@@ -123,7 +129,7 @@ D-scheduler 已按下述修法修复（**不给 `schedulerResourcePlan()` 补 cl
 策略页走查可见三种规则的真实渲染：`赞≥2.3千`（AND）、`赞≥200000万 或 藏≥1`（OR）、`关闭`
 （`screenshots/03-discovery-strategies.png`）。
 
-### 第 6 项　统计、失败原因、受控恢复；五态边界含 `partial_success` 与失败项重试　→ **通过（`material_failed` 除外）**
+### 第 6 项　统计、失败原因、受控恢复；五态边界含 `partial_success` 与失败项重试　→ **通过**
 
 | 证据 | 结果 |
 | --- | --- |
@@ -134,12 +140,34 @@ D-scheduler 已按下述修法修复（**不给 `schedulerResourcePlan()` 补 cl
 | 8.7　重试只处理失败项 | 重试任务 `scanned=1`，等于 `len(retry_items)` |
 | 8.4 / 8.9　负例 | 对非失败任务重试、空选择确认 → 均 `400 / 14008` |
 | 8.10　未选择零写入 | `source_contents` 476→476 |
-| **8.8　`material_failed`** | **NOT VERIFIED**（无法经公开 API 触发，未注入故障） |
+| **8.8　`material_failed`** | **首轮 NOT VERIFIED → 2026-09-23 补验通过**（受控故障注入，见下） |
 
-`material_failed` 未被证实可达，是本项唯一的缺口；它不影响其余五态与重试的结论，但
-基线 §3 把该状态列为处理状态之一，建议后续单独做受控故障注入验证。
+#### 补验改判（2026-09-23，受控故障注入）
 
-### 第 7 项　三页面沿用 WT UI；权限拒绝、M2 回归、Cloud Web/Desktop 走查　→ **部分通过**
+首轮把 8.8 记为「无法经公开 API 触发」，理由写的是「`materialize` 在 `FOR UPDATE` 下幂等」。
+**该理由不成立**：本轮实测 `SELECT … FOR UPDATE` 的锁**确实挡住** `materials` 的 INSERT，
+阻塞到 `innodb_lock_wait_timeout` 后报 `ERROR 1205`。首轮踩的是「用加锁读探锁」的陷阱——
+**间隙锁之间互不冲突**，读探针永远测不出写入被挡，必须用写语句探（详见 `17-` 第一节）。
+
+| 补验证据 | 结果 |
+| --- | --- |
+| 状态可达 | 任务 94 的 `result_json` 中 **3 条** `processing_status='material_failed'`，各带真实 `failure_reason='Error 1205 (HY000): Lock wait timeout exceeded'` |
+| 非误标 | 3 条命中者 `like` = 81282 / 66706 / 72313 均 ≥ 阈值 60000；16 条 `pending` 最大 `like` = 58916 < 阈值 —— 与 `shouldAutoMaterialize` 逐条复算一致 |
+| 统计自洽 | `failed=3` 且 `pending=19`，正是该分支同时 `Failed++`/`Pending++` 的结果（`19 = 16 + 3`）；终态 `partial_success` 合于 `processed>0 且 failed>0` |
+| 无半写 | `materials` 全程恒为 **146**，三次失败**未留下素材行** |
+| 失败原因可读 | `failure_reason` 为数据库真实错误文本，非构造串 |
+| 受控恢复 | 释放锁后 `POST /crawl-tasks/94/retry-failed` → 任务 95 `success`、`auto_materialized=3`、`failure_reason` 被移除；`materials` **146 → 149**（id=151/152/153，`source_content_id` 857/864/873 一一对应） |
+| 重试不重建来源 | `source_contents WHERE crawl_task_id=95` = **0** —— 走 `s.content.get()` 直接 `materialize`，故不会因唯一键判重退化为 `duplicate` 而永远转不成素材 |
+| 服务端交叉核对 | 内容池 `material_created 34→37`、`pending 91→107`、总计 `125→144`，与 19 条新增来源自洽 |
+
+- **判定：通过。** 五态中 `material_failed` 已被证实**可达、可读因、可恢复**，
+  第 6 项不再带例外。
+- **覆盖范围**：已覆盖可达性、`failure_reason` 写入、统计语义、失败项重试恢复、
+  无半写、重试不重建来源；**未覆盖**非基础设施类失败（业务性报错）文案、
+  重试后仍持续失败的分支、同一任务内 `material_failed` 与 `auto_materialized` 并存、
+  以及该状态在界面上的呈现——逐项列于 `17-` 第六节，**不据此外推**。
+
+### 第 7 项　三页面沿用 WT UI；权限拒绝、M2 回归、Cloud Web/Desktop 走查　→ **通过**
 
 | 证据 | 结果 |
 | --- | --- |
@@ -154,11 +182,29 @@ D-scheduler 已按下述修法修复（**不给 `schedulerResourcePlan()` 补 cl
 | 10.4　M2 静态矩阵（仅修该路径的临时副本） | 全绿 |
 | 10.5 / 10.6　M2-B 本地 | Cloud/Agent 健康通过；BitBrowser 腿经 Agent 自身代码连真实比特浏览器得 `bitbrowser_status=normal`、40 profiles |
 | 10.7　**Cloud Web 视觉走查** | 四页截图，真实登录态、真实数据（内容池 319/231/87/1） |
-| Cloud **Desktop** 走查 | **未做** |
+| Cloud **Desktop** 走查 | **首轮未做 → 2026-09-23 补做**（见下） |
 
-两项保留：
-- 「只读流转视图」按裁定移出验收范围（见 `13-blocked-and-adjudicated.md`），不作为本项缺口；
-- **Desktop 走查未执行**，故本项只能判「部分通过」。若要求覆盖 Desktop，需另立一次走查。
+#### 补验改判（2026-09-23，Desktop 走查）
+
+首轮因 Desktop 走查未执行而只能判「部分通过」。本轮以端到端脚本 `scripts/local-control.sh start`
+起全链路（各检查点 PASS，DMG 构建于 14:27），对**打进 DMG 的前端产物**完成走查：
+
+| 补验证据 | 结果 |
+| --- | --- |
+| 覆盖页面 | 四页在打包产物上真实渲染、真实登录态、真实数据：内容池、素材库、挖掘策略、挖掘任务 |
+| 交互 1 | 策略编辑弹窗中「作者（维护中）」**禁用态**可见（`05-strategy-edit-author-disabled.png`） |
+| 交互 2 | 任务详情抽屉四个标签页：结果概览 / 发现内容 / 执行过程 / 异常记录（4 张截图） |
+| 交互 3 | 审核模式四按钮可见，点「跳过」后流转**真实推进**：`当前 1/91 → 2/91` |
+| 界面↔接口一致 | 内容池 125 = `material_created 34 + pending 91`，审核分母 91 = pending 数，逐项相符 |
+| 只读性 | 全程**零服务端写入**：打开弹窗未保存；标签页均为 GET；「跳过」在 `ContentPoolPage.vue:351-354` 于任何 `client.*` 调用前即 `return`，仅改本地索引。会写库的「转素材并下一条 / 忽略并下一条 / 保存」均未点击 |
+| 新增产品事实 | Desktop **拒绝管理员与高级运营**登录（界面提示「当前角色不能登录 Desktop，请使用 Cloud Web 管理。」），只允许运营角色——非缺陷，是既有规则 |
+
+- **判定：通过。** 首轮「Desktop 走查未做」的缺口已补齐；「只读流转视图」仍按裁定移出范围
+  （见 `13-blocked-and-adjudicated.md`），不作为本项缺口。
+- **覆盖范围**：已覆盖四个页面渲染、三项点击交互、运营角色全链路、界面与接口一致、只读性。
+  **未覆盖**原生 Tauri 窗口取图（本环境无屏幕录制权限，取图对象是打进 DMG 的前端产物在
+  Chromium 中的渲染）、Desktop 上的写操作、审核模式其余两个分支、异常态界面、多分辨率——
+  逐项列于 `16-desktop-walkthrough.md` 第七节，**不据此外推**。
 
 ### 第 8 项　用户最终验收前不得标记 M3 DONE　→ **成立**
 
@@ -177,14 +223,19 @@ M3 保持 `IN_PROGRESS`，`CHG-20260915-051` 未被激活。
    理由与复验证据见 `15-dscheduler-fix-reverification.md`；`interval:N` 与 `daily HH:MM` 两种形态
    均已无人值守复验通过；残留周期策略（id=9、10、29、37）已停用并确认 0 新增任务。
    **用户 2026-09-23 裁定「scheduler 修复已完成」，此项闭环。**
-2. **决策：daily 漏 tick 即丢当天**（2026-09-23 复验时新登记）。`daily HH:MM` 要求 tick 落在
+2. ~~补齐 Desktop 走查与 `material_failed` 故障注入验证~~ —— **已完成（2026-09-23）**：
+   Desktop 走查见 `16-desktop-walkthrough.md`；`material_failed` 受控注入与重试恢复见
+   `17-material-failed-injection.md`。**验收项 6、7 的例外均已去除。**
+3. **决策：daily 漏 tick 即丢当天**（2026-09-23 复验时新登记）。`daily HH:MM` 要求 tick 落在
    `HH:MM` 那一分钟内且无补偿机制：调度进程若在该分钟不在跑（或漏一次 tick），当天即无任务，
    后续 tick 不会补触发。既有设计、非本次修复引入；是否补「当天未跑则补触发」由用户裁定。
-2. **修复 D3**（`CreateRun` 传空计划键）以让基线 §5「同发布队不重复排队」成立。
-3. **决策 D9**：上游空返回是否应区分为「查无结果」与「上游异常」。
-4. **决策 D6 / D2**：来源方式标签失真、`schedule` 无校验。
-5. 补齐 Desktop 走查与 `material_failed` 故障注入验证。
-6. 处置安全问题 S-1（轮换、停止跟踪、加 `.gitignore`）。
-7. 上述完成后，再进入 `CHG-20260915-051`（E3 签收）。
+4. **修复 D3**（`CreateRun` 传空计划键）以让基线 §5「同发布队不重复排队」成立。
+5. **决策 D9**：上游空返回是否应区分为「查无结果」与「上游异常」。
+6. **决策 D6 / D2**：来源方式标签失真、`schedule` 无校验。
+7. 处置安全问题 S-1（轮换、停止跟踪、加 `.gitignore`）。
+8. 上述完成后，再进入 `CHG-20260915-051`（E3 签收）。
+
+> 第 3–7 条（缺陷与安全问题）按用户 2026-09-23 裁定**移入 planned、另立后续 CHG**，
+> 不在本 CHG 内修复；登记见 `delivery/planned/CHG-20260923-054/`。
 
 > 本文档只做**验收判定**，不做签收。M3 是否 DONE 由用户裁定。

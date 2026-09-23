@@ -1,6 +1,6 @@
 # M3 Milestone V2：内容挖掘自动化入口建设
 
-> 更新：2026-09-23。产品方向：CONFIRMED，依据用户明确提供的 M3 Milestone；A～E1 已实施并具备真实证据，C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停。E3 综合验收已于 2026-09-23 执行一轮并判**未通过**（硬阻断 D-scheduler）；D-scheduler 已于同日修复并按**无人值守**路径进程级复验通过，验收项 2 改判通过。**用户签收仍未完成，CHG-051 未启动。**
+> 更新：2026-09-23。产品方向：CONFIRMED，依据用户明确提供的 M3 Milestone；A～E1 已实施并具备真实证据，C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停。E3 综合验收已于 2026-09-23 执行一轮并判**未通过**（硬阻断 D-scheduler）；D-scheduler 已于同日修复并按**无人值守**路径进程级复验通过，验收项 2 改判通过。同日另补证两处覆盖缺口：**Desktop 走查**与 **`material_failed` 受控故障注入**，验收项 6、7 的例外均已去除——**验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED**。**用户签收仍未完成，CHG-051 未启动。**
 > 实施状态：IN_PROGRESS（用户最终验收前不得标记 M3 DONE，见产品基线 §8 与 Master Plan 退出条件）；Active CHG：CHG-20260916-052；M2 保持 DONE。
 > 有效 Product：[内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)；决策：[ADR-0013](../../docs/decisions/0013-m3-content-mining-entry.md)、[ADR-0014](../../docs/decisions/0014-m3-team-content-scope.md)、[ADR-0015](../../docs/decisions/0015-m3-cloud-owned-discovery-execution.md)。
 > 替代 M3-content-discovery.md 及旧 CHG-037～043 的实施资格，不将旧草案视为已完成工作。
@@ -43,7 +43,7 @@
 | M3-D 挖掘策略配置 | 暂时通过 | 统一 `discovery_strategy`（本期 keyword；`author` 取值保留）、启停与执行周期配置 |
 | M3-E1 关键词自动挖掘 | 暂时通过 | 受控触发 → `crawl_task` → Worker 执行 → 自动入池；含自动转素材规则实测。无人值守的真实周期触发：2026-09-23 首测因独立调度进程首次 tick panic 退出（D-scheduler）判未交付，**同日修复后复验通过**（调度进程跨 ≥6 tick 存活、未调 `run-due` 即按窗口入队，Worker 执行后全部 `success`，库内读回与统计一致；见 `evidence/m3-e3-acceptance-20260923/15-dscheduler-fix-reverification.md`） |
 | M3-E2 博主自动挖掘 | **暂停** | 同上：`author` 取值与共用生命周期约束保留，本期不交付作者链路 |
-| M3-E3 综合验收 | **已执行；唯一阻断项已复验通过，待用户签收** | 2026-09-23 已在 Cloud `aaf66c5` 上执行一轮全量验收（106 步：87 PASS / 7 FAIL / 1 NOT VERIFIED / 1 ADJUDICATED），唯一硬阻断为 D-scheduler（无人值守的真实周期触发未交付），另第 7 项因 Desktop 未走查判部分通过。D-scheduler 同日修复并复验通过，**验收项 2 改判通过**；其余 FAIL 为 D1/D2/D3/D9/D10，均非阻断。**用户签收未完成**，CHG-20260915-051 仍为 DISCUSSION、未启动 |
+| M3-E3 综合验收 | **已执行且验收矩阵全项通过；待用户签收** | 2026-09-23 已在 Cloud `aaf66c5` 上执行一轮全量验收（106 步：87 PASS / 7 FAIL / 1 NOT VERIFIED / 1 ADJUDICATED）。首轮有三处未通过/未证：硬阻断 D-scheduler（验收项 2）、Desktop 未走查（验收项 7）、`material_failed` 未构造（验收项 6 的例外）。三者已同日分别以**修复后无人值守复验**、**Desktop 走查**、**受控故障注入**补齐，**验收项 1～7 全部通过，无 FAIL、无 NOT VERIFIED**（判定见 `evidence/m3-e3-acceptance-20260923/14-verdict.md`，补验见 `15-`、`16-`、`17-`）。其余 FAIL 为 D1/D2/D3/D9/D10，均不影响验收项成立，已按用户裁定移入 planned（`CHG-20260923-054`）。**用户签收未完成**，CHG-20260915-051 仍为 DISCUSSION、未启动 |
 
 证据指向 Cloud 仓库 `docs/superpowers/handoffs/` 的三份交接记录（2026-09-18 基础收敛、2026-09-21 内容池发现闭环、2026-09-22 内容池发现加固），以及 CHG-052 的 `checkpoint.md` 与 `evidence/`。2026-09-22 之后的五个切片（视觉/产品闭环、数据完整性、视频搜索、UX 优化、领域流转）只有 spec 与 plan，没有交接记录与凭据读回，本表不据其判定通过。
 

@@ -2,6 +2,10 @@
 
 > 由 `tools/render-evidence.py` 从 `run-manifest.json` 渲染，每一步可回溯。
 > 判定分布：INFO=1，NOT VERIFIED=1，PASS=8。
+>
+> **2026-09-23 更新：8.8 已由受控故障注入补验通过，本阶段 NOT VERIFIED 清零。**
+> 补验不重渲染本表（本表如实记录冻结修订 `aaf66c5` 的当轮执行），
+> 结论与证据见 `17-material-failed-injection.md` 与 `14-verdict.md` 第 6 项。
 
 | 步骤 | 判定 | 请求 | 期望 | 实际 |
 | --- | --- | --- | --- | --- |

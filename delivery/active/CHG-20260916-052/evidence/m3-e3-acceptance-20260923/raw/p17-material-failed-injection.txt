@@ -1,0 +1,200 @@
+p17　`material_failed` 受控故障注入　原始观察记录
+================================================================
+观察日期：2026-09-23
+目标：证实 `processing_status = material_failed` 可经真实代码路径到达（首轮验收记 NOT VERIFIED）
+手法：在独立 MySQL 会话持有 `materials` 全表 X 锁，使 `materialize` 的 INSERT 阻塞至
+      `innodb_lock_wait_timeout` 后失败；不注入 mock、不改运行时代码、不改表结构。
+环境：Cloud 18080（`cmd/server`）／独立 `cmd/discovery-worker`／MySQL 127.0.0.1:3306
+      （`localhost` 权限仅授予本机，凭据只从 `config/database/primary.toml` 读取，未落盘）
+账号：operator01（运营角色，仅本团队 team_id=1）
+
+----------------------------------------------------------------
+T0　基线
+----------------------------------------------------------------
+materials 行数            = 146
+materials MAX(id)         = 146
+crawl_tasks MAX(id)       = 93
+历史上 material_failed 条数 = 0   （crawl_tasks.result_json LIKE '%material_failed%'）
+待领取任务（pending/running）= 空
+@@global.transaction_isolation = REPEATABLE-READ
+innodb_lock_wait_timeout       = 50
+
+----------------------------------------------------------------
+T0.1　创建注入策略（走公开 API，非直接 INSERT）
+----------------------------------------------------------------
+POST /api/v1/discovery-strategies        errcode=0 success   → id=38
+  name             = m3acc0923-material_failed受控注入
+  team_id          = 1      game_id = sjz
+  strategy_type    = keyword
+  config           = {"keywords":["三角洲行动 干员"],"authors":[],"auto_material":true,
+                      "material_rule":"OR","like_threshold":60000,"favorite_threshold":0}
+  schedule         = manual          status = enabled
+库内复核：config_json 与提交值逐字段一致；status/schedule = enabled / manual
+说明：`schedule=manual` 故调度器不会自动触发（`runDue` 跳过 manual），触发只能来自显式 `/run`。
+      阈值 60000 的作用是让命中面收窄（见 T2 的 pending 分布）。
+      依 `normalizeMaterialConfig`（discovery.go:103）与 `shouldAutoMaterialize`（:535），
+      `favorite_threshold<=0` 是「未设置」而非「恒真」——`conditions` 只在阈值 >0 时追加，
+      故 OR 下实际只有 like 一个条件生效。这一点由 T2 的 pending 分布反向验证。
+
+----------------------------------------------------------------
+T0.2　注入机制验证（关键：必须先证明锁真能挡住写入）
+----------------------------------------------------------------
+用 `SELECT id FROM materials FOR UPDATE` 取锁后，第二会话执行
+
+  START TRANSACTION; SELECT id FROM materials WHERE id=999999999 FOR UPDATE NOWAIT; ROLLBACK;
+
+→ 无冲突。**该探针无效**：间隙锁之间互不冲突，加锁读不能用来探测插入是否被阻塞。
+表锁实测显示：PRIMARY 上 146 个 `X,REC_NOT_GAP`，而 `uq_materials_source_content` 上另有
+147 个 next-key 锁（含 `supremum pseudo-record`）——即唯一二级索引的间隙确实被锁住。
+
+改用**真实 INSERT 探针**（同形语句 + ROLLBACK，无副作用）：
+
+  SET SESSION innodb_lock_wait_timeout=2;
+  START TRANSACTION;
+  INSERT INTO materials (<id 以外全部列>) SELECT <同列> FROM materials WHERE id=1;
+  ROLLBACK;
+
+→ `ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction`
+→ 结论：写入确被阻塞。复核 `SELECT COUNT(*) FROM materials` = 146（ROLLBACK 无残留）。
+   同一探针在 T1 释放锁后改报 `ERROR 1062 Duplicate entry '84' for key
+   'uomaterials.uq_materials_source_content'`（真到达唯一键校验），反向确认阻塞已消失。
+
+----------------------------------------------------------------
+T1　注入 setup（锁窗口 1800s）
+----------------------------------------------------------------
+持锁会话：`START TRANSACTION; SELECT id FROM materials FOR UPDATE;
+            SELECT CONCAT('LOCKED ',NOW(3)), CONNECTION_ID(); SELECT SLEEP(1800);`
+锁确认：information_schema.processlist 中 `SELECT SLEEP(1800)` 会话存在（id=725）
+写入探针复测：`ERROR 1205`（与 T0.2 一致）
+
+----------------------------------------------------------------
+T2　触发策略并执行（无人值守 Worker）
+----------------------------------------------------------------
+2026-09-23 14:38:54.781  POST /api/v1/discovery-strategies/38/run   errcode=0 success
+                          → crawl_task id=94，status=pending，task_type=discovery_task
+                          snapshot 含 auto_material=true / like_threshold=60000 /
+                          material_rule=OR / game_id=sjz
+库内复核：94 | pending | strategy_id=38 | team_id=1 | schedule_key=NULL | 14:38:54.809674
+
+14:39:1x  启动独立 `cmd/discovery-worker`（二进制由本仓源码构建，未改动任何源码）
+14:39:14.987  任务 94 → running（Worker 领取，写入 started_at）
+
+轮询（每 10s，取「状态变化」与「materials 行数」两个量）：
+  T+  0s | task94: running          | started_at=14:39:14 | finished_at=- | materials=146
+  T+151s | task94: partial_success  | started_at=14:39:14 | finished_at=14:41:50 | materials=146
+
+→ **materials 全程恒为 146**：三次 materialize 全部失败且**未留下半写行**。
+
+终态：task 94 | partial_success | task_type=discovery_task | strategy_id=38 | team_id=1
+      started_at=14:39:14.987 | finished_at=14:41:50.301
+      （耗时 155.3s ≈ 3 次失败 × innodb_lock_wait_timeout 50s）
+
+stats_json = {"added":19,"found":20,"failed":3,"pending":19,"scanned":20,
+              "duplicate":1,"auto_materialized":0}
+
+result_json（20 条）processing_status 分布：
+  pending            16
+  material_failed     3
+  duplicate           1
+
+material_failed 逐条：
+  #1 platform_content_id=7658590066154949929  like=81282  favorite=10003
+     title = 新赛季红皮是乌鲁鲁？时至今日全干员红皮，哪款才是你的心头好？ #三角洲行动 #三…
+     source_content_id=857
+     failure_reason = Error 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+  #2 platform_content_id=7642658407740083507  like=66706  favorite=34225
+     title = 你知道三角洲干员是怎么加入GTI的吗？ #三角洲#创作者扶持计划#三角洲新赛季#
+     source_content_id=864
+     failure_reason = Error 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+  #3 platform_content_id=7463510597309664566  like=72313  favorite=15676
+     title = G.T.I.年度表彰，最佳干员就是？ 新年快乐，欢聚一刻，不止现在！
+     source_content_id=873
+     failure_reason = Error 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+
+未被转素材的条目（like 全部 < 60000，证明阈值收窄生效、不是「全都没转」）：
+  pending like=617 / 52426 / 37797 / 412 / 21788 / 56470 / 50191 / 6157 / 35701 / 230 /
+          2064 / 58916 / 8199 / 987 / 32780 / 4350
+  duplicate like=203119  （已在池中，去重命中）
+
+三条判读：
+  a) 命中的 3 条 like 分别为 81282 / 66706 / 72313，全部 ≥ 60000；
+     16 条 pending 的最大 like 为 58916 < 60000。阈值语义与 `shouldAutoMaterialize` 一致。
+  b) `failed=3` 与 `pending=19` 同时计数，正是 `projectDiscoveredItem` 中
+     `material_failed` 分支的 `task.Stats.Failed++` + `task.Stats.Pending++`（discovery.go:400-404）；
+     19 = 16（未命中阈值）+ 3（转素材失败）。
+  c) 任务终态 `partial_success` 符合判定式 `processed>0 且 failed>0`。
+
+----------------------------------------------------------------
+T3　受控恢复：释放锁 → retry-failed
+----------------------------------------------------------------
+14:42:21  释放锁（KILL 持锁会话 725）
+          写入探针复测：`ERROR 1062 Duplicate entry '84' ...` → **已不再阻塞**
+          materials 行数仍为 146
+
+14:42:21  POST /api/v1/crawl-tasks/94/retry-failed   errcode=0 success
+          → 新任务 id=95，task_type=retry_failed_task，parent_task_id=94，
+            status=pending，snapshot.retry_items 仅含 3 条 material_failed 项
+
+14:42:30.345  任务 95 → running（同一 Worker 领取）
+14:42:30.378  任务 95 → success      耗时 33ms
+              stats_json = {"added":0,"found":3,"failed":0,"pending":0,"scanned":3,
+                            "duplicate":0,"auto_materialized":3}
+              result_json（3 条）全部：
+                status=auto_materialized  like=81282  source_id=857  material_id=151
+                status=auto_materialized  like=66706  source_id=864  material_id=152
+                status=auto_materialized  like=72313  source_id=873  material_id=153
+              `failure_reason` 字段已从三条中移除（`delete(item,"failure_reason")`，
+              见 `executeRetryClaimed`，discovery.go:475-479）
+
+14:42:30  素材库读回：
+  materials 149 → **146 + 3 = 149** ✓
+    151 | team_id=1 | source_content_id=857 | created_at=14:42:30.358 | 新赛季红皮是乌鲁鲁？…
+    152 | team_id=1 | source_content_id=864 | created_at=14:42:30.367 | 你知道三角洲干员是怎么加入GTI的吗？…
+    153 | team_id=1 | source_content_id=873 | created_at=14:42:30.375 | G.T.I.年度表彰，最佳干员就是？…
+
+重试未重建来源行：`SELECT COUNT(*) FROM source_contents WHERE crawl_task_id=95` = **0**
+（`executeRetryClaimed` 对 `material_failed` 走 `s.content.get(...)` 取既有 source，
+不再 `createSource`，故不产生重复来源，也不会因唯一键冲突退化为 duplicate）
+
+自增空洞：materials id 147–150 未落行（4 个空洞），与「3 次 materialize 失败 + 探针尝试」
+消耗自增号一致——InnoDB 自增值不回滚。既有 id≤146 共 146 行，未被修改。
+
+----------------------------------------------------------------
+T4　服务端交叉核对（公开 API 读回）
+----------------------------------------------------------------
+GET /api/v1/content-pool?status=material_created  → data 长度 37
+GET /api/v1/content-pool?status=pending           → data 长度 107
+  基线（同一接口，本轮注入前）：material_created 34、pending 91、池总计 125
+  本次变化：material_created 34→37（+3，即本轮新入库素材）
+            pending          91→107（+16，即任务 94 的 16 条未命中阈值条目）
+  池总计 125→144，与 19 条新增来源（19 = 16 + 3）自洽。
+
+----------------------------------------------------------------
+T5　收尾与残留登记
+----------------------------------------------------------------
+已停进程：`cmd/discovery-worker`（pkill，残留检查为空）
+持锁会话：无（`SELECT SLEEP(...)` 查询为 0 条）
+策略 38：enabled → **disabled**（`POST /discovery-strategies/38/status`，行未删除）
+
+本轮新增残留行（只登记，不删除）：
+  discovery_strategies  +1  id=38（已停用）
+  crawl_tasks           +2  id=94（partial_success）、id=95（success）
+  source_contents      +19  全部由 crawl_task_id=94 产生（task 95 未新增）
+  materials             +3  id=151、152、153
+
+既有行为未改动核对：
+  materials id<=146 行数      = 146（与基线一致）
+  crawl_tasks id<=93 行数     = 71
+  既有非终态（pending/running）任务 = 空
+  策略 2「三角洲热点」等既有策略状态未变（仅 38 由本轮新增后停用）
+
+----------------------------------------------------------------
+证据边界（本轮**没有**证明的部分）
+----------------------------------------------------------------
+- 本轮注入的失败原因是**数据库锁等待超时（1205）**，属基础设施类失败；
+  未覆盖「materialize 因业务性原因失败」（如源内容被删除、素材唯一键冲突）的文案与呈现。
+- 未覆盖 `materialize` 在**重试后仍持续失败**的路径（即重试任务自身再落 failed 的分支）。
+- 未覆盖前端对 `material_failed` 的**界面呈现**（本轮只读回接口与库；
+  界面取图见 `16-desktop-walkthrough.md` 的说明——素材库页只呈现已入库素材）。
+- 未构造 `material_failed` 与 `auto_materialized` 在**同一任务内并存**的样本（本任务内
+  `auto_materialized=0`，因为锁让**所有**命中项都失败）。

@@ -19,6 +19,16 @@
 
 按依赖顺序逐项激活，最多一项 active。M3-A 按团队级隔离实施，不做游戏维度或跨团队共享；B～E 按 ADR-0015 由 Cloud Scheduler + Cloud Crawler 实施，不依赖 Agent/BitBrowser/Desktop。逐阶段状态与证据指向见 [M3-content-discovery-v2.md](../milestones/M3-content-discovery-v2.md) 第 2.1 节。
 
+### M3 验收遗留
+
+E3 综合验收已由 `CHG-20260916-052` 执行并经 2026-09-23 补验收口（验收矩阵无 FAIL、无 NOT VERIFIED）。验收期间**只登记未修**的缺陷与安全问题按用户裁定移入 planned：
+
+| 草案 | 内容 | 状态 |
+| --- | --- | --- |
+| [CHG-20260923-054](CHG-20260923-054/change.md) | M3 综合验收缺陷与安全问题处置（D1、D2、D3、D6、D7、D8、D9、D10、D-scheduler-2、S-1） | PLANNED（未激活） |
+
+其中 D3 是唯一影响验收项的缺陷（基线 §5 的「不重复排队」）；D9、D-scheduler-2 与 S-1 的处置范围需先有用户裁定。
+
 ## 已替代的旧 M3 草案
 
 原 `delivery/milestones/M3-content-discovery.md`（已移除，链接不再有效）与以下记录均为 SUPERSEDED；保留历史，不执行、不算已完成，旧编号与 V2 不强行一一映射：
