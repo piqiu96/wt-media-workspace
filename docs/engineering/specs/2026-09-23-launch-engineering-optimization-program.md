@@ -26,9 +26,9 @@
 | 分歧点 | 融合结果 |
 |---|---|
 | config/logging 目录归属 | 收口在 `runtime/` 下（`runtime/config.py`、`runtime/logging/`），遵循 ADR-0016 第 2 条 |
-| 配置文件组织 | `config/`（运行时唯一读取）+ `config_online/`（发布整目录替换）1:1 镜像，单文件 `agent.yaml` + environment 字段区分，不按模式选文件 |
+| 配置文件组织 | `config/`（运行时唯一读取）+ `config_online/`（发布整目录替换）1:1 镜像，单文件 `agent.toml` + environment 字段区分，不按模式选文件 |
 | 配置优先级 | **env > file > default**（ADR-0016 第 8 条）；模式区分靠 bootstrap 入口传 context |
-| 配置格式 | YAML，对齐 Cloud |
+| 配置格式 | **TOML**，对齐 Cloud。本表原写「YAML」，2026-09-23 经核实回写：Cloud `config/` 全是 TOML（13 个文件、0 个 YAML），而 Agent 为 `dependencies = []` 零运行时依赖、`uv.lock` 无 YAML 解析器，Python 3.12 起的标准库已自带 `tomllib`。改 TOML 是唯一「对齐 Cloud」且不引入依赖的选项 |
 | 开发运行目录 | `.local/{data,logs,versions}`（架构基线 §5.8）；`cache` 子目录出现真实需求时再入基线 |
 
 新方案的内容全部落地：三类配置分离（部署配置/用户设置/敏感与临时运行上下文）、强类型配置模型、Executor 构造注入 Client、日志脱敏与保留策略、Desktop 用户设置 `settings.toml`。

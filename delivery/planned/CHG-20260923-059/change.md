@@ -16,7 +16,7 @@ Sidecar 协议完善（动态端口就绪通知、实例身份验证防连旧进
 关键验收点（来自程序总纲）：
 - 发布可追溯：Desktop 版本、Agent 版本、前端构建版本、Contract 版本、组件与资源版本。
 - 发布脚本验证目标架构、Sidecar 完整性、必要资源及版本兼容性；前端与 Rust 使用同一目标环境（CHG-A 已建一致性检查的强化）。
-- `config_online/agent.yaml` 与 `resources/desktop.production.toml` 的生产真实地址必须替换占位（Q-01 的关闭条件）。
+- `config_online/agent.toml` 与 `resources/desktop.production.toml` 的生产真实地址必须替换占位（Q-01 的关闭条件）。
 
 ## 明确不做
 
