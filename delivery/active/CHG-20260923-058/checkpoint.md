@@ -48,10 +48,29 @@
   消费方在 T-04/T-05，**不用 `allow` 盖掉**）。证据 `evidence/task-03-app-paths.md`。
   **待 T-09 承接**：cache 落在 `~/Library/Caches` 而**不在**数据根之内，§5.8 目录树要照此写，见证据边界 1。
 
+- T-04 **DONE**（desktop `7825a75`）：新模块 `src-tauri/src/settings.rs`（817 行）+ `main.rs` 一行
+  `mod settings;`。落到 **`AppPaths` 的数据根**之下（装机态 `Application Support/WTMedia/Desktop`、
+  开发态 `<crate>/.local/data`），`save` 不创建那个目录（建目录是 `prepare` 的职责）。
+  替换走**同级临时文件 + `sync_all` + `rename`**，写动作注入成参数 ⇒「写到一半中断」可测：
+  目标逐字节不变、临时文件清掉、返回 `Err`。坏形态（不可读 / 解析失败 / 版本不认识）一律 `Err`
+  且**原文件一个字节都不动**；只有「文件不存在」才是首次启动。版本判定用 `!=`（v1 是第一版）。
+  **`save` 读得通才写**——把「调用方拿 `Err` 却用默认值写回去」这条静默清空路径变成不可达，
+  代价是用户想重置得自己删文件。
+  计数 desktop **176 → 198**（+22，0 删除，0 skipped）；**16 个变异全灭 + 1 个登记为等价**
+  （toml 0.9 自己就省略 `None`，`skip_serializing_if` 在该 crate 上不承载语义）；
+  非测试警告 23 → 35（+12 全为本模块 `never used`，测试构建 0 条）。证据 `evidence/task-04-user-settings.md`。
+  **边界**：`save_dir` = 素材下载/成片输出目录，**今天 0 个消费方**（`UserSettings` 全仓 0 命中），
+  T-08 的页面能改它不等于任务会按它落盘——收尾时别把 T-04 当成端到端可用；文件无目录 `fsync`；
+  `save` 不校验路径合法性；它**不是**四个运行目录的 override 通道。
+  **harness 教训**：第一版变异脚本用 `--quiet`，逐条用例名被吞 ⇒ 把「失败」读成「没编译」，
+  整批误报 0/16；现已内建「未变异字节必须 0 failed」的阴性对照。
+
 ## Next
 
-- T-04 `UserSettings` + `settings.toml` + `schema_version`，写到 **`AppPaths::resolve()?.data`**；
-  原子替换（临时文件 + rename）；损坏时**保留原文件并明确提示**，不得静默清空（AC-05）。
+- T-05 `UserSettings` 的**消费面**（只读命令）：可用空间、缓存占用、日志占用、列出日志文件
+  （含两棵树，见 Q-08）；`logging::rolling` 补公开读取面；**读取失败必须是错误而非 0 MB**
+  （AC-06）。T-03 留的开口要在这里关：Agent 的日志树 `~/Library/Logs/WTMedia/Agent`
+  在 Desktop 侧**尚无住处**，不要默认它已经存在。
 
 ## Blocked
 
@@ -72,3 +91,11 @@
   `verified 10 skill source files`。
 - T-03 后：desktop `176 passed`（起点 160，+16）；`cargo test app_paths` 16 条 **0 skipped**
   （只读目录那条的**前提在本机成立**，所以它真的跑了断言）；非测试构建警告 **23**（起点 9，+14 见上）。
+- T-04 后：desktop `198 passed`（起点 176，+22）；`cargo test settings` 22 条 **0 skipped**；
+  非测试构建警告 **35**（+12 全归本模块）；变异脚本自带阴性对照，跑完文件逐字节还原
+  （`sha256:4e38ccc7b296aee5`）。
+
+## 记录口径的一处更正
+
+- `change.md` §9 的 `- [ ]` 复选框是**立项时的分工清单，不是进度跟踪器**（T-02 已 DONE 而它的框仍未勾）。
+  进度以 §8 任务状态列与本文件为准；§9 不逐任务回勾，免得两处口径互相打架。
