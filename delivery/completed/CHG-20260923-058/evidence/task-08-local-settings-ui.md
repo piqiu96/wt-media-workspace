@@ -89,7 +89,13 @@ desktop 的 +22 = 4（`settings::tests`）/ 2（`dto::settings::tests`）/ 9（`
    测它就会在跑测试的机器上开一个窗口。可测的那半是它之前的全部：标签词汇、解析、
    「目录不存在」的拒绝。该分支留为常驻 `#[ignore]` 用例
    `reveal_opens_a_directory_that_is_there`，手工跑 `cargo test -- --ignored reveal_opens`。
-   **真机手工验证已做**：页面上的「打开设置文件夹」与两处「打开文件夹」都打开了预期目录。
+   ~~**真机手工验证已做**：页面上的「打开设置文件夹」与两处「打开文件夹」都打开了预期目录。~~
+   → **上一句已于 2026-09-25 收回**（原文保留删除线，不抹掉）。它是**无凭证的断言**：记录里没有命令、
+   没有输出、没有时刻；更硬的是它与本 CHG 的 `change.md` **直接矛盾**——`§10` 的 AC-08/AC-09 两行
+   都把「真机操作」这一臂标为**未执行**（「页面点击本轮没有通路，见 §12『未做』」），`§13` 第 5 项也写
+   「不完全满足」。同一份归档里两处说法相反，正确的是 `change.md`，**本行让位**。
+   能拿到的实机凭证只有 `open::that` 这一步本身，读数见 **§7**；**页面按钮被真的点过这件事没有发生**，
+   那一臂原样并入 CHG-D 的干净机 `manual_acceptance`。
 2. **本机设置页不能浏览目录**，只能手输路径。`@tauri-apps/plugin-dialog` 不在依赖里，
    装它要新引一个包 + 一次 capabilitiy 变更；用户裁定「尽量使用开源，尽可能不改轮子」，
    而 `check_save_dir` 已经把「路径不存在」变成一句人话。这**是**能力上的缺口，不是设计偏好，
@@ -101,8 +107,9 @@ desktop 的 +22 = 4（`settings::tests`）/ 2（`dto::settings::tests`）/ 9（`
    登记而非隐藏；每次击杀报的是具体用例名，不受影响。
 5. **`main.rs` 的接线行不可断言**（命令真的被 `invoke_handler!` 注册）。
    与 T-07 的 `DiagnosticHost::secrets` 接线行同一类边界。web 侧的 `wiring` 组覆盖了
-   **前端**那一半（路由名 ↔ 免鉴权名单 ↔ 导航路径 ↔ 组件文件存在），Rust 那一半以
-   `npm run build:desktop` + 真机点击为准。
+   **前端**那一半（路由名 ↔ 免鉴权名单 ↔ 导航路径 ↔ 组件文件存在）；Rust 那一半里
+   `open::that` 开窗已由 **§7 的配对实验**取到实机读数，`npm run build:desktop` 见 §4；
+   **`invoke_handler!` 的端到端「点一下」仍未做**，并入 CHG-D（同 §3 第 1 条）。
 
 ## 4. 构建抓到、单测结构上看不见的一条（**这一条值得单独记**）
 
@@ -157,3 +164,42 @@ diff 检查：desktop 侧只暂存了那 9 个路径，13 个只被 rustfmt 重�
 （`bootstrap.rs`、`commands/agent.rs` 等）**原样留在工作区未提交**；cloud 侧只暂存那 13 个路径，
 `dump.rdb`（跑着的 redis 的产物）未提交，`web/dist-desktop/` 被 `.gitignore` 覆盖
 （`git check-ignore -v` 确认）。
+
+## 7. 关闭后补记（2026-09-25）：`open::that` 的实机凭证，与 §3 里被收回的那句
+
+§3 第 1 条原写「真机手工验证已做：页面上的三个按钮都打开了预期目录」。**那句收回**，
+理由与范围见该条。这一节只放**确实取到了**的那一部分——`open::that` 开出的窗口本身。
+
+**配对实验**（同一台机器，连续三步；探针是 `osascript` 问 Finder，不是推断）：
+
+| 步 | 动作 | 窗口数 | 窗口名 | 这一行证明什么 |
+|---|---|---|---|---|
+| 1 控制 | `close every window` | **0** | `[]` | 探针能读出「无」——不是永远有值的空心读数 |
+| 2 控制 | `open -a Finder /tmp` | **1** | `[tmp]` | 窗口能与「哪一次 open」对上；探针按目录区分，不是常量 |
+| 3 受测 | `cargo test -- --ignored reveal_opens` | **1** | `[Agent]` | 受测路径真的开出了一个窗口 |
+
+第 3 步的窗口 `target` 读数是 `/Users/aqiuye/Library/Logs/WTMedia/Agent/`——与
+`crate::logging::paths::agent_directory()` 解出的目录**同一路径**（也是本页 AC-09 里
+「打开日志文件夹」要去的那个目录）。用例本身 `1 passed; 0 failed; 0 ignored; 337 filtered out`。
+
+⇒ **`reveal()` 的最后一步在真机上被证到了「开出一个指向预期目录的 Finder 窗口」**，
+而不是退化成「spawn 返回 `Ok` 就算过」。
+
+**环境说明**：取证时会话处于锁定态（`CGSSessionScreenIsLocked = True`，锁定时刻
+`2026-09-25 00:26:18`）。屏幕锁定**不阻止**窗口被创建，只让人看不见；所以这三行读数有效，
+但「有窗口」与「有人看见过」是两件事，后者仍未被证明。
+
+**这条用例自身的一处精度**（记录，不在已归档的 C 内改）：`reveal.rs:336` 的
+`assert_eq!(opened, directory.display().to_string())` **结构上不可能失败**——`opened` 就是
+`reveal()` 内部对同一表达式算出的返回值。用例真正的内容在 `:334` 的
+`.expect("the tree exists on this machine")`（opener 报错即 panic）。故本节的读数由**窗口计数**
+承担，不由那行 assert 承担。改它属于新任务：C 已归档，运行时代码不在本 CHG 内再动。
+
+**本节明确没有证明的三件**（与 §3 第 1 条同一范围，不重复计数）：
+
+1. 页面上的四个按钮**被真的点过**——未发生。本环境无点击通路：macOS 无 WebKit WebDriver
+   （`tauri-driver` 不可用）、`osascript` → System Events 报 `-1743 未获得授权`、会话处于锁定态。
+2. Tauri 命令层 `local_open_place`（`place` 串 → `directory_of` → `reveal`）**经 IPC** 的端到端行为。
+3. 另外三个「打开文件夹」各自指向的目录——本页只开了 Agent 日志树这一个。
+
+原始读数留在 `/tmp/chg058/t09/reveal-window-paired-experiment.out`（临时目录，不随仓入库）。

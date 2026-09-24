@@ -171,26 +171,30 @@
   `names a component file that exists` 的第一版正则**匹配 0 次而通过**，分母守卫（`expect(checked).toBe(loaders.length)`）
   当场把它打掉，才发现 Vite 把 `import()` 改写成 `__vite_ssr_dynamic_import__("/src/…")`（路径已解析）。
   `router.ts` 因此把路由表导出为 `desktopRoutes`——建 router 要浏览器 history，路由表不需要（本仓 vitest 无 DOM）。
-  **边界**：`commands::reveal` 最后那行 `open::that` 不可测（测它就会开窗口），留常驻 `#[ignore]` 用例，
-  **真机手工已验证**「打开设置文件夹」与两处「打开文件夹」都到预期目录；本机设置页**不能浏览目录**，
+  **边界**：`commands::reveal` 最后那行 `open::that` 不可测（测它就会开窗口），留常驻 `#[ignore]` 用例；
+  ~~**真机手工已验证**「打开设置文件夹」与两处「打开文件夹」都到预期目录~~ → **这句 2026-09-25 收回**：
+  它与本 CHG `change.md` §10（AC-08/AC-09 都把这臂标为**未执行**）相反，正确的是 `change.md`；
+  实机取到的是 `open::that` **开窗**本身（配对实验：关窗读 0 → `open /tmp` 读 `[tmp]` →
+  跑该 `#[ignore]` 用例读 `[Agent]`，`target` = `~/Library/Logs/WTMedia/Agent/`），
+  **页面按钮被真的点过没有发生**，那一臂并入 CHG-D。读数见 `evidence/task-08-local-settings-ui.md` §7。
+  本机设置页**不能浏览目录**，
   只能手输路径（无 `plugin-dialog`；`check_save_dir` 把「路径不存在」变成一句人话）——登记为**能力缺口**而非偏好；
   `main.rs` 的接线行不可断言（与 T-07 的 `DiagnosticHost::secrets` 同类），前端那一半由 `wiring` 组覆盖
-  （路由名 ↔ 免鉴权名单 ↔ 导航路径 ↔ 组件文件存在），Rust 那一半以 `npm run build:desktop` + 真机点击为准。
+  （路由名 ↔ 免鉴权名单 ↔ 导航路径 ↔ 组件文件存在），Rust 那一半以 `npm run build:desktop`（见 T-08 证据 §4）
+  + `open::that` 的配对实验（同证据 §7）为准；**「点一下」的端到端仍未做**，并入 CHG-D。
   证据 `evidence/task-08-local-settings-ui.md`。
 
 ## Next
 
-- T-09 回写与收尾：`cache/` 写入程序总纲 §2 与架构 §5.8 目录树（承 T-03 的开口，cache 落在 `~/Library/Caches`
-  而**不在**数据根之内）、本机设置页与命令面的基线陈述、入口文档；`Status: DONE` → `git mv` 归档 →
-  去 LEDGER 行 → `--no-active` 冷启动重生成快照 → **主动扫**失效指针（报分母 + 阳性对照）；
-  `evidence/task-09-writeback-and-archive.md`。
-- T-09 之后：CHG-C 关闭门禁（三验证器 + `unittest discover` 的同集合阳性对照）与端到端验收
-  （`package-release-macos.sh` 出一份包，走完整链路并打开归档确认不含凭证/Cookie/代理密码/媒体文件），
-  然后**才**激活 CHG-D（`059`）。
+- 无。T-09 已完成，本 CHG 已关闭并归档到 `delivery/completed/CHG-20260923-058/`。
+- 交给后继：①**页面点击走查**（六个动作 + 诊断包开包核对）并入 CHG-D 的干净机 `manual_acceptance`；
+  ②CHG-057 归档记录里指向 `active/CHG-20260923-058` 的那条链接已随本次归档改指 `completed/`；
+  ③CHG-D（`059`）的硬前置「C 关闭」已满足，但它有**一条继承阻塞 Q-01**（生产真实 Cloud 地址），
+  需先有用户裁定——**不在本 CHG 内**。
 
 ## Blocked
 
-- 无。§7 的 Q-01…Q-08 全部 `Blocking = NO`。
+- 无。§7 的 Q-01…Q-08 全部 `Blocking = NO`；Q-01 是 CHG-D 的继承阻塞，本 CHG 的关闭不以它为条件。
 
 ## Recent verification
 
@@ -238,7 +242,41 @@
   逐字节还原且**还原后各组再跑一次仍绿**；`npm run build:desktop` 成功。
   **未跑** workspace 门禁——与 T-05/T-06/T-07 同，留待 T-09 的关闭门禁（同集合阳性对照）。
 
+- T-09 后（关闭门禁，归档前的同一棵树）：三个校验器全绿（`Active CHG: CHG-20260923-058` /
+  快照 2159 字符 / 10 个 skill 源）；`unittest discover` **69 tests / 4 failures**，四个失败项**名字**
+  与 `git archive HEAD` 的同集合阳性对照**逐名相同**——对照树取在真实 `wt-media/` 之内，
+  故路径敏感的兄弟仓用例不会静默 `skipTest`（那正是 CHG-057 把 4 条读成 2 条的原因）。
+  三仓现取读数：agent `Ran 377 tests … OK`、desktop `336 passed; 0 failed; 2 ignored`、
+  web `25 文件 / 166 tests`；见 `evidence/test-summary.md`。
+  **端到端（出货包）**：稳定名 `desktop.log` 落盘、强制轮转产出 `desktop.log.2026-09-24-23`
+  并**重建**活文件、15 天前归档被删而 1 天前的留下、九个新命令同时在内嵌前端产物（9/9）
+  与出货二进制里（且两个页面 chunk 名作为内嵌资源键出现在二进制中）；单实例守卫用
+  **同一调用路径的配对观测**证得——对照（无同伴）存活且 +3 行、受试（有同伴）退出码 0 且 +0 行。
+  `open -a` 那个观测方式**被否证**：LaunchServices 层就不会起第二个进程，它什么都证明不了。
+  **未做**：页面点击走查六个动作与诊断包开包核对——执行时会话锁定（`CGSSessionScreenIsLocked = Yes`）
+  且无 System Events 权限，没有点击通路；该臂并入 CHG-D 的干净机 `manual_acceptance`。
+  回写由先失败检查钉着（8/8 事实进基线、4/4 旧口径清零、5/5 阳性对照在活）；归档后**主动扫两遍**：
+  字符串扫描档外 **2 → 0**（档内 3 处判为 T-01 的过去时命令，照 CHG-057 先例保留）、
+  链接 resolve 分母 62 坏 **0**——并抓到一条字符串扫描**结构上**看不见的坏链
+  （`../completed/` 在移动后成了 `completed/completed/`）。
+  详见 `evidence/task-09-writeback-and-archive.md`。
+- **归档后核对记录时抓到一条自相矛盾，已更正**（2026-09-25）：本文件 T-08 段与
+  `evidence/task-08-local-settings-ui.md` §3 各有一句「**真机手工已验证**…三个按钮都打开了预期目录」，
+  而 `change.md` §10（AC-08/AC-09）与 §13 第 5 项把**同一臂**记为**未执行**。同一份归档两处相反，
+  以 `change.md` 为准，那两句**收回**（原文留删除线 + 收回说明，不抹掉）。
+  同时把**确实取得到**的那一半做实：`open::that` 开窗由**配对实验**证到——
+  关掉全部 Finder 窗口读 `0`（控制：探针能读出「无」）→ `open -a Finder /tmp` 读 `[tmp]`
+  （控制：窗口能与哪一次 open 对上）→ 跑常驻 `#[ignore]` 用例 `reveal_opens` 读 `[Agent]`，
+  窗口 `target` = `~/Library/Logs/WTMedia/Agent/`，与 `agent_directory()` 解出的同一路径。
+  取证时会话处于锁定态，锁定不阻止窗口被创建，只让人看不见——**「有窗口」与「有人看见过」是两件事**。
+  该用例自身还有一处精度已登记：`reveal.rs:336` 的 `assert_eq!(opened, …)` 结构上不可能失败
+  （比的是 `reveal()` 内部算出的同一表达式），真正的内容在 `:334` 的 `.expect(...)`。
+  故读数由窗口计数承担。改那行属于新任务——**C 已归档，运行时代码不在本 CHG 内再动**。
+  未证的三件（四个按钮被点过、`local_open_place` 经 IPC、另外三个「打开文件夹」）**不重复计数**，
+  仍在 §12「未做」里，并入 CHG-D。证据 `evidence/task-08-local-settings-ui.md` §7。
+
 ## 记录口径的一处更正
 
-- `change.md` §9 的 `- [ ]` 复选框是**立项时的分工清单，不是进度跟踪器**（T-02 已 DONE 而它的框仍未勾）。
-  进度以 §8 任务状态列与本文件为准；§9 不逐任务回勾，免得两处口径互相打架。
+- `change.md` §9 的 `- [ ]` 复选框是**立项时的分工清单，不是进度跟踪器**：执行期间它**不逐任务回勾**
+  （T-02 已 DONE 而它的框长期未勾），进度以 §8 任务状态列与本文件为准，免得两处口径互相打架。
+  **关闭时一次性勾齐**——此刻每一项都确实完成，全勾才是准确状态；这条只适用于关闭时，不适用于执行期间。

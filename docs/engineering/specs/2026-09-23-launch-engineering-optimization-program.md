@@ -1,9 +1,9 @@
 # Desktop × Agent 联合上线工程优化程序（Program）
 
 - 日期：2026-09-23
-- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）。A、B 两阶段已于 2026-09-24 归档 `DONE`；**C 已于 2026-09-24 激活执行中**；D 待 C 关闭后激活
+- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）。A、B 两阶段已于 2026-09-24 归档 `DONE`；**C 已于 2026-09-25 归档 `DONE`**；D 待激活
 - 性质：上线前工程加固程序，不属 M2/M3 里程碑范围（先例：CHG-20260923-055 里程碑外工程 CHG）
-- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、[CHG-20260923-057](../../../delivery/completed/CHG-20260923-057/change.md)（B，**2026-09-24 归档 DONE**）、[CHG-20260923-058](../../../delivery/active/CHG-20260923-058/change.md)（C，**2026-09-24 激活执行中**）、CHG-20260923-059（D，planned）
+- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、[CHG-20260923-057](../../../delivery/completed/CHG-20260923-057/change.md)（B，**2026-09-24 归档 DONE**）、[CHG-20260923-058](../../../delivery/completed/CHG-20260923-058/change.md)（C，**2026-09-25 归档 DONE**）、CHG-20260923-059（D，planned）
 - 上游基线：ADR-0016（Agent 运行时分层的目录、依赖与配置边界）；架构基线 `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` §5.8
 
 ## 1. 问题与目标
@@ -29,7 +29,7 @@
 | 配置文件组织 | `config/`（运行时唯一读取）+ `config_online/`（发布整目录替换）1:1 镜像，单文件 `agent.toml` + environment 字段区分，不按模式选文件 |
 | 配置优先级 | **env > file > default**（ADR-0016 第 8 条）；模式区分靠 bootstrap 入口传 context |
 | 配置格式 | **TOML**，对齐 Cloud。本表原写「YAML」，2026-09-23 经核实回写：Cloud `config/` 全是 TOML（13 个文件、0 个 YAML），而 Agent 为 `dependencies = []` 零运行时依赖、`uv.lock` 无 YAML 解析器，Python 3.12 起的标准库已自带 `tomllib`。改 TOML 是唯一「对齐 Cloud」且不引入依赖的选项 |
-| 开发运行目录 | `.local/{data,logs,versions}`（架构基线 §5.8）；`cache` 子目录出现真实需求时再入基线 |
+| 开发运行目录 | `.local/{data,logs,versions}`（架构基线 §5.8）；`cache` 子目录**已入基线**——真实需求在 CHG-C 出现（本机设置页的缓存占用与清理，2026-09-25 归档时补进基线）：**只有 Desktop 有 `cache`，Agent 侧没有**；Desktop 装态是 `~/Library/Caches/WTMedia/Desktop`、开发态 `<repo>/.local/cache`，**装机态不在数据根之内**（见架构基线 §5.8） |
 
 新方案的内容全部落地：三类配置分离（部署配置/用户设置/敏感与临时运行上下文）、强类型配置模型、Executor 构造注入 Client、日志脱敏与保留策略、Desktop 用户设置 `settings.toml`。
 
@@ -67,7 +67,7 @@ Desktop/Agent 独立运行目录、日志初始化、落盘、轮转、清理及
 > 2026-09-24（CHG-20260923-058 T-02）用户裁定改写本节前四条：原「单文件 ≤ 20 MB / 总容量受限
 > （Agent 400 MB、Desktop 100 MB）/ 按日期分档（UTC）/ 以 `create_new` 抢名保多实例安全」不再成立，
 > 改为上面的按小时切割 + 按天保留 + 稳定默认名 + 单实例守卫。裁定原文、设计裁定与例外登记见
-> [CHG-20260923-058 change.md §6/§7](../../../delivery/active/CHG-20260923-058/change.md)。
+> [CHG-20260923-058 change.md §6/§7](../../../delivery/completed/CHG-20260923-058/change.md)。
 - `operation_id` 本轮**只在各进程内部**生成，跨端串联不交付（不加 Header、不进 sidecar 环境）。
 
 详见 [CHG-20260923-057 change.md](../../../delivery/completed/CHG-20260923-057/change.md)。
@@ -75,6 +75,30 @@ Desktop/Agent 独立运行目录、日志初始化、落盘、轮转、清理及
 ### CHG-C：Desktop 本机设置
 
 目录查看与修改、存储空间、日志查看（约 500 行 + 级别筛选）、缓存清理、历史日志清理、诊断导出（脱敏）。
+
+落定后的口径（本节是这些事实的**权威落点**；2026-09-25 CHG-C 归档时写入，取代立项时的一句话范围）：
+
+- **页面在 `wt-media-cloud/web` 构建**（`web/src/apps/desktop/features/local-settings/` 与 `features/local-logs/`），
+  路由 `/settings`，路由名 / 免鉴权名单 / 侧边导航三处必须一致。**页面不直连 Agent 的回环端口**——
+  窗口的 CSP 挡着，直连只会得到一句「Agent 不可达」，这条由 `localAgentBoundary.test.js` 钉住。
+- **命令面新增恰 9 个**（Desktop `src-tauri/src/commands/`，全部**追加**在 `invoke_handler!` 末尾）：
+  `local_settings_get` / `local_settings_set` / `local_open_place`、
+  `local_storage_usage` / `local_log_files` / `local_log_tail`、
+  `local_cache_cleanup` / `local_log_cleanup`、`local_diagnostic_export`。
+  页面与命令之间只有这一条通路；参数名在前端是 camelCase、在 Rust 是 snake_case。
+- **用户设置**是数据根下的 `settings.toml`（`schema_version` + 同级临时文件 + `rename` 的原子替换；
+  损坏时**保留原文件并报错**，不静默清空）。`save_dir` 目前**没有任何消费方**——页面能改它，
+  不等于下载会按它落盘。
+- **存储与日志的读取面遵守「列表即白名单」**：命令先列目录再按名查找，从不把用户给的字符串拼到路径上；
+  **不在 ⇒ 0，读不到 ⇒ `Err`**（不是 0 MB）。日志筛选的语义是**该级别及以上**，未分级的行不受影响。
+- **清理只删可安全再生的文件与已轮转的归档**：活文件永不删；数据根下的素材/成片/SQLite/检查点/待回传
+  结果都在保护面内；读者认不出的日志名（`Other`）是**显示**类目、不是删除类目。一次只清**一棵**日志树，
+  回报的是**实际释放字节**（由一次独立 walk 对账，不是可用空间差值）。
+- **诊断导出**是**一个 gzip tar + 一棵目录树**（`summary.json` + `manifest.txt` + `logs/{desktop,agent}/…`），
+  摘要值是**归档外的兄弟 `.sha256`**（放进包里会自指）。每条进包的字符串都过脱敏，日志条目**两次**。
+  「不含用户媒体」由**布局**保证（每棵树只读一层），不靠名字过滤。
+
+详见 [CHG-20260923-058 change.md](../../../delivery/completed/CHG-20260923-058/change.md)。
 
 ### CHG-D：Sidecar、打包、升级与回归
 

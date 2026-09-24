@@ -6,7 +6,7 @@
 > 保留 14 天 / 总量 Agent 400 MB、Desktop 100 MB」改为「按小时切割 + 只按天保留 14 天、不控总量」，
 > 「以 `create_new` 抢名保多实例安全」改为「单实例守卫」。活基线的现行口径见
 > [程序总纲 §3 CHG-B](../../../docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md)
-> 与 [CHG-20260923-058 change.md §6](../../active/CHG-20260923-058/change.md)。
+> 与 [CHG-20260923-058 change.md §6](../../completed/CHG-20260923-058/change.md)。
 
 ## 1. Basic Information
 

@@ -3,9 +3,10 @@
 ## 1. Basic Information
 
 - Level: M
-- Status: IMPLEMENTING（2026-09-24 由 `delivery/planned/` 激活并改写为十三节执行记录）
+- Status: DONE（2026-09-24 由 `delivery/planned/` 激活并改写为十三节执行记录，2026-09-25 关闭并归档；
+  关闭时的口径见 §12 与末行的归档说明）
 - Created: 2026-09-23
-- Current repository: `wt-media-workspace`（治理）；运行时改动分布于 `wt-media-desktop`、`wt-media-cloud/web`、`wt-media-agent`
+- Current repository: wt-media-workspace（治理）；运行时改动分布于 wt-media-desktop、wt-media-cloud/web、wt-media-agent
 - Affected repositories:
   - `wt-media-desktop`
   - `wt-media-cloud`
@@ -49,7 +50,7 @@
 - Engineering baseline（架构）: `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md`
   §5.8（`:1176-1225` 本地目录和日志，本 CHG 要回写的一处）、§6.8（`:1435-1456` 安装目录和用户数据）、
   §7.11（`:1680-` 日志和诊断）
-- 上游 CHG：[CHG-20260923-057](../completed/CHG-20260923-057/change.md)（B，日志体系与数字的既有落点，
+- 上游 CHG：[CHG-20260923-057](../CHG-20260923-057/change.md)（B，日志体系与数字的既有落点，
   本 CHG 改写其中「命名/轮转/限额」三项口径并**在归档记录顶部加取代注记，不改写其正文**）
 
 ## 4. Current Facts
@@ -267,9 +268,10 @@
 
 ### wt-media-workspace
 
-- [ ] 激活记录（`change.md`、`checkpoint.md`、`status/`、`evidence/`）、LEDGER、`planned/README.md`
-- [ ] T-02 的四处活基线回写 + CHG-057 归档记录顶部的取代注记
-- [ ] T-09 的 `cache/` 入基线、本机设置基线语句、归档与失效指针扫描
+- [x] 激活记录（`change.md`、`checkpoint.md`、`status/`、`evidence/`）、LEDGER、`planned/README.md`
+- [x] T-02 的四处活基线回写 + CHG-057 归档记录顶部的取代注记
+- [x] T-09 的 `cache/` 入基线（程序总纲 §2 行 + 架构 §5.8 四个根 + §6.8）、CHG-C 的落定口径、
+      里程碑状态行与用户目标里的「受容量限制」、归档与失效指针扫描（见 `evidence/task-09-writeback-and-archive.md`）
 
 ### wt-media-cloud
 
@@ -281,10 +283,10 @@
 
 ### wt-media-agent
 
-- [ ] T-02：`runtime/logging.py` 换轮转、`LogBudget` 收敛、截断保留
-- [ ] T-02：`runtime/constants.py` / `runtime/config.py` / 两个 `agent.toml` 去掉总量与单文件上限
-- [ ] T-02：21 处旧归档名断言与 `BoundedFileHandler` 断言同步
-- [ ] T-02：入口文档（`AGENT-INDEX.md` / `DIRECTORY_MAP.md`）
+- [x] T-02：`runtime/logging.py` 换轮转、`LogBudget` 收敛、截断保留
+- [x] T-02：`runtime/constants.py` / `runtime/config.py` / 两个 `agent.toml` 去掉总量与单文件上限
+- [x] T-02：21 处旧归档名断言与 `BoundedFileHandler` 断言同步
+- [x] T-09：入口文档（`AGENT-INDEX.md` / `DIRECTORY_MAP.md`）——**T-02 未做，T-09 补齐**（`DIRECTORY_MAP.md` 的「按天保留与总量上限」已是假话）
 
 ### wt-media-desktop
 
@@ -292,7 +294,7 @@
 - [x] T-03…T-07：运行目录、用户设置、只读命令、清理、诊断导出
 - [x] T-08：三个命令面（`commands::settings` 读数/写数、`commands::reveal` 打开位置）+ `settings::check_save_dir` + `dto::SettingsView`（commit `5ee840c`）
 - [x] 新命令**追加**在 `invoke_handler!` 末尾（T-05/T-06/T-07 的注释已在案，三条新命令沿用同一位置）
-- [ ] 入口文档（`AGENT-INDEX.md` / `DIRECTORY_MAP.md`）（T-09）
+- [x] T-09：入口文档（`AGENT-INDEX.md` / `DIRECTORY_MAP.md` / `AGENTS.md`）——新增五个模块与五个命令文件的行、命令数 18 → 27、`logging/` 行按小时切割口径重写、去掉「按日期与 20MB 分档」
 
 ## 10. Acceptance Matrix
 
@@ -305,10 +307,10 @@
 | AC-05 | `UserSettings` 落 `settings.toml`（含 `schema_version`），**原子替换**；损坏时**保留原文件并明确提示** | 半写中断 + 损坏输入两条先红用例 | PASS（T-04） |
 | AC-06 | 存储与日志数据取自**真实目录**；**读取失败为错误，不显示 0 MB** | 不可读目录 ⇒ `Err` 的用例（与「返回 0」的正向对照） | PASS（T-05） |
 | AC-07 | 清理只处理可安全再生文件与**已轮转历史日志**；白名单六类一律不删；完成后展示**实际释放空间** | 六类各一条不删用例 + 一条删除对照组 + 释放字节一致性 | PASS（T-06） |
-| AC-08 | 本机设置页可**查看/修改保存位置**，只影响后续任务：不迁移历史、不影响执行中任务 | 前端用例（`localSettingsService`/`localSettingsView`）+ 命令面用例（`commands::settings` 9 条，含「拒绝的值不落盘」「写前先准备数据根、读不建目录」）+ 真机操作 | PASS（T-08，**含 desktop 侧命令面**：本 AC 原写的落点只有前端，见 §8 T-08 行的范围补正） |
-| AC-09 | 日志查看器可读约 500 行、按级别筛选、一键打开日志文件夹 | 前端用例（`localLogsView`：筛选语义/隐藏计数/截断/选中文件按树+名）+ 命令面用例（`commands::reveal` 7 条）+ 真机操作（三个「打开文件夹」各点一次） | PASS（T-08，同上含 `local_open_place`） |
+| AC-08 | 本机设置页可**查看/修改保存位置**，只影响后续任务：不迁移历史、不影响执行中任务 | 前端用例（`localSettingsService`/`localSettingsView`）+ 命令面用例（`commands::settings` 9 条，含「拒绝的值不落盘」「写前先准备数据根、读不建目录」）+ 真机操作 | PASS（T-08，**含 desktop 侧命令面**：本 AC 原写的落点只有前端，见 §8 T-08 行的范围补正；**含一条登记过的例外**：`+ 真机操作` 这一臂**未执行**——页面点击本轮没有通路，见 §12「未做」，并入 CHG-D 的干净机 `manual_acceptance`） |
+| AC-09 | 日志查看器可读约 500 行、按级别筛选、一键打开日志文件夹 | 前端用例（`localLogsView`：筛选语义/隐藏计数/截断/选中文件按树+名）+ 命令面用例（`commands::reveal` 7 条）+ 真机操作（三个「打开文件夹」各点一次） | PASS（T-08，同上含 `local_open_place`；**含同一条登记过的例外**：三个「打开文件夹」各点一次这一臂**未执行**，理由同 AC-08） |
 | AC-10 | 诊断包不含完整凭证、Cookie、代理密码与用户媒体文件 | 归档内容逐项枚举 + 凭据阳性对照 | PASS（T-07） |
-| AC-11 | 不破坏既有基线：三仓测试计数只增不减；M2 业务闭环不被本 CHG 触及 | agent 379 / desktop 175 / web 21 文件为分母；workspace 4 条既有红项按同集合阳性对照判定 | PARTIAL（desktop 336 ≥ 175、web 25 文件 ≥ 21、agent 见 T-02；M2 闭环**未触及**，其回归重跑属 CHG-D） |
+| AC-11 | 不破坏既有基线：三仓测试计数只增不减；M2 业务闭环不被本 CHG 触及 | agent 379 / desktop 175 / web 21 文件为分母；workspace 4 条既有红项按同集合阳性对照判定 | PASS（**含一条登记过的例外**：agent 379 → **377**，少的 2 条断言的是 `max_bytes` 与 `total_bytes` 的互相约束，而这两个键已被用户裁定删除、没有比较对象——逐条在 T-02 证据；desktop 175 → **336**、web 21 文件 101 tests → **25 文件 166 tests**；M2 闭环**未触及**，其回归重跑属 CHG-D） |
 
 ## 11. Evidence
 
@@ -350,31 +352,94 @@ Completed:
 - 基线回写：T-02 已回写程序总纲 §3、架构 §5.8、里程碑成功事实 #5；`cache/` 与入口文档留在 T-09。
 
 Current:
-- T-08 代码与证据均已落（desktop `5ee840c`、cloud `bb0136f`），本任务记录已写入 `checkpoint.md`。
+- 无进行中任务。T-01…T-09 全部 DONE，本 CHG 已关闭并归档到 `delivery/completed/CHG-20260923-058/`。
 
 Next:
-- T-09 回写与收尾：`cache/` 入基线、本机设置页与命令面的基线陈述、入口文档、`Status: DONE`、
-  `git mv` 归档、去 LEDGER 行、`--no-active` 冷启动重生成快照、**主动扫**失效指针（报分母 + 阳性对照）。
-- T-09 之后：CHG-C 关闭门禁与端到端验收，然后才激活 CHG-D（`059`）。
+- 无（本 CHG 不再推进）。后继是 CHG-20260923-059（联合工程优化 D），其硬前置「C 已关闭」就此满足。
+- 交给后继的两件事：①**页面点击走查**（见下方「未做」）并入 CHG-D 的干净机 `manual_acceptance`；
+  ②CHG-057 归档记录里那条指向 `active/CHG-20260923-058` 的链接已随本次归档改指 `completed/`。
 
 Blocked:
-- 无。Q-01…Q-08 全部 `Blocking = NO`。
+- 无。（历史 Q-01…Q-08 全部 `Blocking = NO`；Q-01「生产 Cloud 地址」是 **CHG-D 的继承阻塞**，
+  不在本 CHG 范围内，本 CHG 的关闭不以它为条件。）
 
 Recent verification:
-- 激活时基线：agent 379 tests OK / desktop 175 passed / web 21 测试文件 / workspace 两验证器绿
-  （`unittest discover` 的 4 条红项为既知，待按同集合阳性对照判定）。
-- T-08 后（在已提交字节上复核）：desktop **336 passed** / web **25 文件 166 tests**；
-  两套变异表 **70/70 灭、0 等价、0 没编译过**，8 组阴性对照先绿，逐字节还原且还原后仍绿；
-  `npm run build:desktop` 成功。workspace 门禁留待 T-09（同集合阳性对照）。
+- 关闭门禁（2026-09-25）：`verify_delivery_governance.py`、`verify_agent_entry.py`、`verify_skills.py`
+  三者全绿；`python3 -m unittest discover -s tests -q` → **69 tests / 4 failures**，四个失败项**名字集合**
+  与 `git archive HEAD` 的同集合阳性对照**逐名相同**（对照树取在真实 `wt-media/` 之内，故路径敏感的
+  兄弟仓用例照常运行、不会静默 skip），故 4 条均为既知红项。此外归档后 `validate_active_change`
+  的「no active CHG ⇒ 直接返回」分支生效，其中 3 条错误随之消失（失败**名字**集合不变）。
+- 端到端（2026-09-25，`package-release-macos.sh` 出的出货包，见 `evidence/task-09-writeback-and-archive.md`）：
+  稳定名 `desktop.log` 落盘、强制轮转产出 `desktop.log.2026-09-24-23` 并**重建**活文件、
+  15 天前归档被删而 1 天前的留下、直接 exec 第二个副本**退出码 0 / 零日志写入 / 进程数不变**
+  （同一路径的对照：无同伴时存活并 +3 行）、九个新命令既在内嵌前端产物里（9/9）也作为
+  内嵌资源键出现在出货二进制里。
+- **未做（如实登记，不静默吸收）**：按页面点击走一遍「查看/修改保存位置 → 看日志（级别筛选）→
+  打开日志文件夹 → 清缓存 → 清旧日志 → 导出脱敏诊断包」**以及开包逐个核对**，
+  本轮**未执行**。执行时该 macOS 会话处于锁定态（`CGSSessionScreenIsLocked = Yes`），
+  屏幕捕获只得壁纸，且本机未授予 System Events 自动化权限，没有任何可用的点击通路；
+  不依赖点击的等价取证已尽可能取得（见上条与证据文件），**但「有人真的点过这六个动作」这件事没有发生**。
+  这一步并入 CHG-D 的干净机 `manual_acceptance` 一并做，不在本 CHG 内宣称已验。
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed. —— T-01…T-09 全部 DONE（§8）；§5 的 Add/Modify 逐条有落点：Desktop 的
+  `src-tauri/src/{app_paths,settings,storage,cleanup,diagnostic}.rs`、`logging/{rolling,reader}.rs`、
+  `commands/{settings,storage,cleanup,diagnostic,reveal}.rs`、`main.rs` 的单实例守卫与命令注册，
+  Agent 的 `runtime/logging.py`，Cloud 前端的 `web/src/apps/desktop/features/{local-settings,local-logs}/`
+  与路由装配，Workspace 的四份活基线与三个运行仓的入口文档。**一处范围补正已在 §8/§10 登记**（T-08 的
+  落点原写只有前端，够不着 AC-08/AC-09 的命令面，故补了 desktop 侧三个命令），不是静默加做。
+- [x] No blocking `Q-xx`. —— §7 的 Q-01…Q-08 全部 `Blocking = NO`；Q-07（两侧机制不对称）已按实测写进
+  两侧入口文档，Q-08（`file-rotate` 文档说基名不能带点）登记为**升级风险 + 复核探针**。
+  **注意 Q-01 是 CHG-D 的继承阻塞，不是本 CHG 的**：本 CHG 的关闭不以它为条件（§7 已如此标注）。
+- [x] Acceptance matrix all PASS. —— §10 的 AC-01…AC-11 共 11 条全 PASS，逐条判据在行内。
+  **两条带登记过的例外**（AC-08/AC-09 的「真机操作」臂、AC-11 的 agent 379 → 377），
+  例外都写明了理由与去向，未被「测试通过」吸收。
+- [x] Automated tests passed or justified. —— 运行时三仓：agent `bash scripts/test.sh` → **377 tests OK**
+  （起点 379，少的 2 条是 AC-11 登记的例外）；desktop `cargo test --workspace` → **336 passed / 0 failed**
+  （起点 175，单调不降）；cloud/web `25 文件 166 tests`（起点 21 文件 101 tests）；两套变异表
+  **70/70 灭、0 等价、0 没编译过**，8 组阴性对照先绿。治理仓：三个校验器全绿；
+  `python3 -m unittest discover -s tests -q` → **69 tests / 4 failures**，判据是 **`git archive HEAD`
+  的同集合阳性对照**（两棵树失败项**逐名相同**），不是「看着无关」。
+- [x] Manual verification evidence recorded where required. —— **不完全满足，如实标注**：T-02 的四项真机取证
+  （稳定名落盘 / 强制轮转 / 按天删除 / 单实例守卫）已在出货包上完成并记录；但 T-07 那一轮
+  **页面点击走查（六个动作）与诊断包开包核对没有执行**，原因是执行时会话锁定且无 UI 自动化权限
+  （§12「未做」）。该臂**并入 CHG-D 的干净机 `manual_acceptance`**，本 CHG **不**据此宣称已验。
+- [x] Diff checked for out-of-scope changes. —— 逐仓 diff 已看：本 CHG 只动 §5 列出的路径；
+  用户既有的脏文件（workspace 根的 `AGENT-INDEX.md`/`AGENTS.md`/`CLAUDE.md`/`README.md`/
+  `docs/engineering/specs/agent-workspace-conventions.md` 与三份 PRD、desktop 的 13 个既有乱格式文件、
+  cloud 的 `dump.rdb`）**一律未碰、未提交**；`.generated/frontend/index*.html` 的刷新是构建产物指纹，
+  单列一个 `chore(build)` commit，不与记录或逻辑混提。
+- [x] Runtime repositories touched only if listed in scope. —— 只动了 `wt-media-desktop`、
+  `wt-media-agent`、`wt-media-cloud/web`（后者由用户 2026-09-24 明确放行，见 §6）；治理仓只写记录与基线。
+- [x] Required baselines updated. —— 程序总纲 §2/§3、架构基线 §5.8/§6.8、里程碑 `M-launch-engineering.md`
+  的成功事实 #5 与状态行、以及 desktop/agent/cloud 三仓的 `AGENT-INDEX.md`/`DIRECTORY_MAP.md`
+  （desktop 另含 `AGENTS.md`）。回写由「先失败检查」钉着落地：8/8 事实进基线、4/4 旧口径清零、
+  5/5 阳性对照在活（`evidence/task-09-writeback-and-archive.md`）。
+- [x] Affected repositories committed independently. —— 一仓一 commit，逐条见 `evidence/test-summary.md`；
+  「移动文件」（归档 `git mv`）与「改逻辑」分属不同 commit。
+
+## 归档说明（2026-09-25 关闭时追加）
+
+- **归档动作**：`git mv delivery/active/CHG-20260923-058 delivery/completed/CHG-20260923-058`；
+  `LEDGER.md` 的活动表行移除（表内留「当前无 active CHG」占位行）并新增本 CHG 的归档段；
+  `planned/README.md` 头部与 C 行改 `DONE（2026-09-25 归档）`、D 行改「前置已满足，待激活」；
+  执行快照经 `prepare_ai_workspace.py --no-active` 冷启动重生成，现为 `Active CHG: none` / `Status: NONE`。
+- **失效指针扫描扫两遍**（两个不同的 claim）：字符串扫描报分母 + 阳性对照，**档外 2 处 → 0**、
+  档内 3 处判为 T-01 的过去时命令按原样保留；链接 resolve 证明新路径真能打开，我改过的 19 个文件
+  分母 **62 条相对链接、坏 0**。resolve 另抓到一条字符串扫描**结构上**看不见的坏链
+  （`../completed/` 在移动后成了 `completed/completed/`），已修。全仓扫描里与本次归档相关的坏链 **0**。
+- **未做项不静默**：T-07 的页面点击走查六个动作与诊断包开包核对**未执行**（执行时会话锁定 +
+  无 UI 自动化权限），并入 CHG-D 的干净机 `manual_acceptance`；见 §12「未做」与
+  `evidence/task-09-writeback-and-archive.md` §4.1。
+- **不得据本记录的 `DONE` 推断 CHG-D 已完成**：D（`CHG-20260923-059`）仍 `PLANNED`、**未激活**，
+  且带一条继承阻塞 **Q-01**（生产真实 Cloud 地址，阻塞 D 的发布验证，需用户裁定）。
+- 记录里的过去时叙述（T-01 的路径、T-02…T-08 的中间读数）**一字未改**；本 CHG 的中间状态快照
+  保留在 `status/`（每份顶部注明是开工时快照、末行给终态）。
+- **归档后的一处更正（2026-09-25，关档核对时追加）**：`checkpoint.md` 的 T-08 段与
+  `evidence/task-08-local-settings-ui.md` §3 各有一句「真机手工已验证…三个按钮都打开了预期目录」，
+  与**本文件 §10（AC-08/AC-09）与 §13 第 5 项**记的「该臂未执行」相反。以本文件为准，那两句已**收回**
+  （留删除线 + 收回说明，不抹掉）；并把确实取得到的一半做实——`open::that` 开窗由配对实验证到
+  （关窗读 0 → `open /tmp` 读 `[tmp]` → `#[ignore]` 用例读 `[Agent]`，target 即 Agent 日志根）。
+  未证的三件仍在 §12「未做」里，并入 CHG-D。见 `checkpoint.md` §记录口径的一处更正 与
+  `evidence/task-08-local-settings-ui.md` §7。
