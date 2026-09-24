@@ -28,7 +28,7 @@
   全套 **267 tests OK**；**四次真实启动**取证，臂 D 一次给出三条两向证据（真实 traceback 只在 agent.log；
   error.log 收到同一 ERROR 但无栈；非 runner 的 ERROR 不进 task.log）。
 
-- 2026-09-24 T-05：`error.log` **结构化字段通道**（`wt-media-agent`，本次提交）——`error_code=` 必现
+- 2026-09-24 T-05：`error.log` **结构化字段通道**（`wt-media-agent` `3a546dc`）——`error_code=` 必现
   （缺省 `none`）、`task_id=`/`context=` 有则现；`_field()` 把值的换行转义，保住「一行一记录」。
   **计划写定的机制被实测推翻**：`setLogRecordFactory` 预置字段会让 `Logger.makeRecord` 拒绝
   `extra={"error_code": …}`（KeyError），两半不可共存 ⇒ 缺省改放 formatter，并把该碰撞写成测试。
@@ -36,13 +36,29 @@
   `task_id` **仍留在消息里**。全套 **278 tests OK**；两次真实启动：臂 A 真实任务失败在 `error.log`
   按 `error_code`/`task_id` 定位（字段命中 1/0/0），臂 B 未注册类型的 WARNING 不进 `error.log`。
 
+- 2026-09-24 T-06：Agent **脱敏**（`wt-media-agent` `b66d7f5` + `70c1f93`）——掩码落在 **formatter** 而非
+  `logging.Filter`：Filter 改 `record.msg` 碰不到 traceback，而凭据最容易出现在 traceback 里；四个 handler
+  （stderr + 三文件）共用同一 formatter ⇒ 全部出口一次覆盖。词表由 `SENSITIVE_KEY_NAMES` 生成（不另起一份）。
+  表 **15 行**先量后改：同一探针 **15/15 漏 → 0/15**（`gone`/`kept` 两列都断言）。
+  `AgentConfig.runtime_token` 改 `field(repr=False)`。
+  **顺带实测到诊断包一处真泄漏并修**：`environment_facts()` 的 `cloud_base_url` 可以是
+  `https://alice:pw123456@host/api`，原样进 facts（`True`），而它走 `print` → **stdout**、不经任何 handler，
+  Rust 侧 `drain.rs` 还会尾随 20 行 ⇒ 有真实外溢路径；值统一过 `redact()`（`True → False`，URL 仍可读）。
+  **顺带追平套件 27 条 `--- Logging error ---`**：逐用例插桩点名 **`test_bootstrap.py`（9 条）**与
+  **`test_sidecar_entry.py`（1 条）**——都走真实装配（`build_components` 即裁定要求的唯一 Logger 入口）
+  却不恢复 logging 状态，之后每条恢复都把死集合原样放回；我的第一个假设（T-05 测试文件只恢复 root）
+  **被计数推翻（仍 27）**。修后泄漏 `245 → 0`、噪声 `27 → 0`，并加机器规则
+  `test_logging_state_isolation.py`（**先红且恰好点名这两个文件**）。基类还暴露出第二个缺陷：
+  两处 `setUp` 覆盖没调 `super().setUp()` ⇒ 7 条用例报错，补上即绿。
+  全套 **293 tests OK**；两个提交各自 checkout 亦 293 OK（见 `evidence/task-06-redaction.md`）。
+
 ## Current
 
-- T-06 待开始（脱敏 Filter：表驱动，含 Cookie/Authorization/Bearer/proxy_password/本机 runtime token 逐字值 + 配置对象脱敏 `__repr__`）。
+- T-06 已收尾（两个 Agent 提交 + 本记录）；T-07（保留/轮转/截断）待开始。
 
 ## Next
 
-- 阶段 1 Agent：T-06 → T-07 → T-08 → T-09（T-02/T-03/T-04/T-05 已完成）。
+- 阶段 1 Agent：T-07 → T-08 → T-09（T-02/T-03/T-04/T-05/T-06 已完成）。
 - **T-08 的题设要重测**：实测 BitBrowser 指向死端口时 `/api/v1/status` **已返回 200 + `unreachable`**，
   不能假设外部依赖不可用会抛。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
@@ -76,6 +92,12 @@
   臂 A 真实 `cookie_read_task` 失败：`error.log` 得 `error_code=executor_error task_id=t05-real-1`，
   字段命中分母 `error.log 1 / agent.log 0 / task.log 0`；臂 B 未注册类型：WARNING 进 `agent.log`、
   `error.log` **0 字节**。见 `evidence/task-05-error-fields.md`。
+- T-06：`bash scripts/test.sh` → **293 tests OK，exit=0**（291 → 293：+1 隔离规则、+1 诊断包用例）；
+  两个 Agent 提交各自单独 checkout 再跑，**均 293 OK**（提交边界真实）。
+  探针四组：脱敏表 `15 → 0`（同一探针改动前后）、诊断包密码 `True → False`、死 handler 泄漏 `245 → 0`、
+  `Logging error` `27 → 0`。**一次对照无效如实记录**：`.local/` 守卫的第一次对照把目录建在跑之前
+  （BEFORE 里就有它），改为对 `comm` 比较本身做对照并报出 `.local/logs/task.log`。
+  见 `evidence/task-06-redaction.md`。
 - T-04：`bash scripts/test.sh` → **267 tests OK，exit=0**（259 → 267，+8，两向成对）；
   真实启动四臂（A 常规 / B DEBUG+死 Cloud / C 自建 scratch Cloud 回 11001 / D 不可解析 URL）——
   臂 D：`agent.log` 2406 字节含 `Traceback … ValueError: Invalid IPv6 URL`、`error.log` 101 字节**同一个

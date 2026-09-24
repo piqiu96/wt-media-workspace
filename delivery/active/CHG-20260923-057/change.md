@@ -219,7 +219,7 @@
 | T-03 | Agent dev/override **真落盘**（推翻 `paths.py:107`，一行行为）；同步删 `config/agent.toml`、`config_online/agent.toml` 的已假注释 | DONE | `evidence/task-03-dev-writes-logs.md`；改前 7 处红；真实 dev 启动 → `agent.log` 114 字节非空，**对照臂无该文件** |
 | T-04 | Agent 三文件布局 + 路由（`agent.log` 全量含 traceback / `task.log` 仅 `wt_media_agent.runner.*` / `error.log` ERROR 级不带 traceback） | DONE | `evidence/task-04-three-files-routing.md`；267 tests OK + **四次真实启动**（臂 D 一次给出三条两向证据） |
 | T-05 | `error.log` 结构化字段通道（`error_code`/`task_id`/`context`；**缺省放 formatter 而非 `setLogRecordFactory`**——实测后者预置字段会让 `extra=` 必然抛 KeyError；`task_id` 在 `runner.py` 的 **9** 个 task-scoped emit 点加 `extra`，**消息里仍保留**，3 处配已有字面量的 `error_code`） | DONE | `evidence/task-05-error-fields.md`；278 tests OK + **两次真实启动**（真实任务失败按 `error_code`/`task_id` 定位；未注册类型的 WARNING 不进 `error.log`） |
-| T-06 | Agent 脱敏 Filter（表驱动：`Cookie:`/`Authorization:`/`Bearer`/`proxy_password=`/`password=`/`refresh_token=`/本机 runtime token 逐字值；脱敏后周围文本仍在）+ 配置对象脱敏 `__repr__` | TODO | 表里先放今天会漏的用例 → 红 |
+| T-06 | Agent 脱敏（表驱动，15 行两列断言；落点**在 formatter 不在 Filter**——Filter 改 `record.msg` 碰不到 traceback；词表取自 `SENSITIVE_KEY_NAMES`，不另起一份；`AgentConfig.runtime_token` 改 `field(repr=False)`）。**顺带**：实测诊断包 `environment_facts` 的 `cloud_base_url` 可原样带密码（走 `print`→stdout，`drain.rs` 还会尾随 20 行）→ 值统一过 `redact()`；并追平套件里 27 条 `--- Logging error ---`——**点名**是 `test_bootstrap.py`/`test_sidecar_entry.py` 走真实装配却不恢复 logging 状态，修后加机器规则 | DONE | `evidence/task-06-redaction.md`；**293 tests OK**（+1 规则 +1 诊断包用例）；表 `15/15 漏 → 0/15`；诊断包密码 `True → False`；死 handler 泄漏 `245 → 0`、Logging error `27 → 0`；两个提交各自 checkout 均 293 OK |
 | T-07 | Agent 保留与轮转：单文件 20MB、14 天、总量上限、**单条截断标 `truncate=true original_size=<n>`** | TODO | 六向变异：日期翻档/20MB 翻档/截断/按天删/按量删/当前文件永不删 |
 | T-08 | `GET /api/v1/health` 聚合健康检查（Cloud/BitBrowser/Storage 各一例不可用 → 200 + `abnormal`/`unknown` 不抛）+ 契约同步；`/healthz` 逐字不变 | TODO | scratch 端口 curl；`/healthz` 与今天逐字比对 |
 | T-09 | 修既有缺陷并锁死唯一入口：~~①`paths.py:104-106` 已假注释~~（**T-03 已随 docstring 重写完成**）；②删 `server.py:38`/`:591` 第二次 `configure_from`；③`server.py:65` `state` 改必传；④**新增 AST 边界测试**：`src/` 内除 `bootstrap/app.py` 外不得 import `configure_from`/`configure_logging`（**今天就会红**） | TODO | 新 AST 测试先红后绿 |
@@ -253,7 +253,8 @@
 - [x] T-02 测试隔离；T-03 dev 落盘
 - [x] T-04 三文件路由
 - [x] T-05 字段通道（**缺省改放 formatter**，理由与实测见证据）；
-- [ ] T-06 脱敏；T-07 保留/轮转/截断；T-08 `/api/v1/health`；T-09 缺陷与唯一入口；T-19 不误连外部服务
+- [x] T-06 脱敏（**落点在 formatter**；诊断包那处真泄漏一并实测并修；套件 logging 状态隔离补机器规则）；
+- [ ] T-07 保留/轮转/截断；T-08 `/api/v1/health`；T-09 缺陷与唯一入口；T-19 不误连外部服务
 - [ ] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
 
 ### wt-media-desktop
@@ -275,10 +276,10 @@
 | AC-04 | 日志不会无限增长（裁定十三·4） | 20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，逐条变异（T-07/T-12） | TODO |
 | AC-05 | 日志目录异常不阻断启动（裁定十三·5） | Agent 侧已成立：`configure_from` 降级仅 stderr 且既有单测绿（T-03）；Desktop 侧待 T-15 | 部分（T-03） |
 | AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 待 T-16 | 部分（T-04/T-05） |
-| AC-07 | 日志不泄露敏感信息（裁定十三·7） | 表驱动脱敏 + 落盘后 grep 不到 token（T-06/T-13） | TODO |
+| AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧已成立：表驱动 15 行两列断言、落盘后读文件断言 token 不在、traceback 面同覆盖（T-06）；Desktop 侧（target 白名单 + 落盘 grep）待 T-13 | 部分（T-06） |
 | AC-08 | Desktop 与 Agent 日志职责清晰（裁定十三·8） | 两向断言：**该进的不进 = 失败**（T-04/T-16） | TODO |
 | AC-09 | Sidecar stdout 持续消费且**不转存**（裁定十三·9） | 50 行普通 sidecar 输出 → **零**条 desktop 记录（阳性对照）（T-16） | TODO |
-| AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | 诊断包路径本 CHG 不新增采集面；`/api/v1/health` 响应与日志行均不含凭据（T-06/T-08） | TODO |
+| AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | **实测到一处真泄漏并修**：`environment_facts` 的 `cloud_base_url` 原样带密码（`True → False`，URL 仍可读）且走 `print`→stdout（T-06）；`/api/v1/health` 响应面待 T-08；`status` 响应体本 Task **未测**（契约面，已登记） | 部分（T-06） |
 | AC-11a | 测试**不写真实检出目录**（里程碑失败行为） | T-02：规则「不得把派生根接 `.local`」（33/34 模块在扫）+ `scripts/test.sh` 前后新增路径守卫，变异探针证明守卫独立于测试结果 | PASS |
 | AC-11b | 测试**不误连真实外部服务**（里程碑失败行为） | T-19：AST 规则（客户端构造必须注入假 transport）。**T-02 期间实测：今天无任何规则在守**，计划把 AC-11 整条映射给 T-02 是乐观的，见 §7 Q-08 | TODO |
 
@@ -297,6 +298,7 @@
 - `evidence/task-03-dev-writes-logs.md`（T-03）
 - `evidence/task-04-three-files-routing.md`（T-04）
 - `evidence/task-05-error-fields.md`（T-05）
+- `evidence/task-06-redaction.md`（T-06）
 - `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
@@ -312,16 +314,21 @@ Completed:
 - 2026-09-24 T-02：Agent 测试目录隔离落地（`wt-media-agent` `7382fed`，test-only，`src/` 零改动）。
 - 2026-09-24 T-03：Agent dev/override 真落盘（`2f07db4`，一行行为），对照组坐实归因。
 - 2026-09-24 T-04：Agent 三文件布局与路由（`305975b`），四次真实启动取证。
-- 2026-09-24 T-05：`error.log` 结构化字段通道（本次提交），**推翻计划写定的机制**：
+- 2026-09-24 T-05：`error.log` 结构化字段通道（`wt-media-agent` `3a546dc`），**推翻计划写定的机制**：
   `setLogRecordFactory` 预置字段与 `extra=` 约定不可共存（实测 KeyError），缺省改放 formatter。
+- 2026-09-24 T-06：Agent 脱敏（`wt-media-agent` `b66d7f5` + `70c1f93`）——掩码落在 **formatter**（Filter 碰不到
+  traceback），词表取自 `SENSITIVE_KEY_NAMES`；表 `15/15 → 0/15`；配置对象 `repr=False`。
+  **实测到诊断包一处真泄漏并修**（`cloud_base_url` 的密码原样进 `environment_facts`，且走 `print`→stdout）
+  并**追平套件 27 条 `Logging error`**：点名 `test_bootstrap.py`/`test_sidecar_entry.py` 走真实装配却不恢复
+  logging 状态（我的第一个假设被判错，见证据），修后加机器规则 `test_logging_state_isolation.py`。
 
 Current:
 
-- T-05 已收尾；T-06（脱敏 Filter）待开始。
+- T-06 已收尾（两个 Agent 提交 + 本记录）；T-07（保留/轮转/截断）待开始。
 
 Next:
 
-- T-06 → T-07 → T-08 → T-09（阶段 1 Agent 余项）；
+- T-07 → T-08 → T-09（阶段 1 Agent 余项）；
   阶段 2 Desktop T-10…T-17；阶段 3 T-18 收尾；**T-19**（AC-11b 的规则，见 §7 Q-05）排在阶段 1 余项之后。
 
 Blockers:
@@ -330,8 +337,9 @@ Blockers:
 
 Recent verification:
 
-- 全套 `bash scripts/test.sh` → **278 tests OK，exit=0**（253 → 259 → 259 → 267 → 278，只增不减）；
-  T-02 的 `.local/` 守卫全程不响。T-05 的两向证据见 `evidence/task-05-error-fields.md`。
+- 全套 `bash scripts/test.sh` → **293 tests OK，exit=0**（253 → 259 → 259 → 267 → 278 → 291 → 293，只增不减）；
+  T-02 的 `.local/` 守卫全程不响。T-05/T-06 的两向证据见 `evidence/task-05-error-fields.md`、
+  `evidence/task-06-redaction.md`。
 
 Blocked:
 
@@ -344,6 +352,8 @@ Recent verification:
 - T-01：见 `evidence/task-01-governance.md`。
 - T-02：`bash scripts/test.sh` → **259 tests OK，exit=0**（253 → 259）；改前规则红且**恰好 1 处命中**；
   变异探针下守卫 `exit=1` 而套件打印 `OK`（守卫独立于测试结果）。见 `evidence/task-02-isolation.md`。
+- T-03…T-06：见 `evidence/task-03-dev-writes-logs.md`…`evidence/task-06-redaction.md`。
+  T-06 的全套为 **293 tests OK，exit=0**；每个 Agent 提交单独 checkout 亦 293 OK。
 - **后续 Task 的定向验证一律带 `PYTHONPATH=tests` 前缀**：`tests/` 无 `__init__.py`，
   `python -m unittest tests.<模块>` 会把仓根而非 `tests/` 放上 `sys.path`，对 34 个模块中 import `support` 的
   6 个（其中 5 个是既有的）报 `ModuleNotFoundError`。这是**既有**布局属性，非 T-02 引入，故本 CHG 不动布局。
