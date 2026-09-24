@@ -1,6 +1,6 @@
 # WT Media Current AI Context
 
-- Generated: 2026-09-24T03:55:56Z
+- Generated: 2026-09-24T04:09:38Z
 - Active CHG: `CHG-20260924-060` — CHG-056 归档遗留的 CSP `ipc:`、回环代理与占位包处置
 - Status: `IMPLEMENTING`
 - Change file: `delivery/active/CHG-20260924-060/change.md`

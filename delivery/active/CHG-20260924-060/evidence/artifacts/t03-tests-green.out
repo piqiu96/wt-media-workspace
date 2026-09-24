@@ -1,0 +1,102 @@
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell" test) generated 4 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running unittests src/main.rs (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/debug/deps/wt_media_desktop_shell-e8de6e901396e803)
+
+running 68 tests
+test bootstrap::tests::a_debug_build_is_development_and_a_release_build_is_production ... ok
+test bootstrap::tests::tauri_conf_carries_no_policy_of_its_own ... ok
+test commands::profile::tests::create_profile_payload_requires_real_group ... ok
+test commands::profile::tests::restore_payload_only_contains_safe_profile_fields ... ok
+test commands::profile::tests::create_profile_payload_maps_safe_bitbrowser_fields ... ok
+test commands::profile::tests::verify_restored_profiles_rejects_mismatched_readback ... ok
+test commands::profile::tests::verify_restored_profiles_accepts_matching_readback ... ok
+test commands::profile::tests::verify_snapshot_has_profile_rejects_missing_created_profile ... ok
+test bootstrap::tests::the_policy_is_shape_for_shape_the_literal_it_replaced ... ok
+test bootstrap::tests::the_policy_takes_its_connect_src_from_the_config ... ok
+test bootstrap::tests::apply_csp_writes_the_field_a_dev_build_would_otherwise_prefer_over ... ok
+test bootstrap::tests::a_development_build_reads_the_tree_and_reports_it ... ok
+test config::tests::development_honours_the_python_fallback_opt_in ... ok
+test config::tests::environment_can_only_be_narrowed_never_widened ... ok
+test config::tests::malformed_and_incomplete_toml_are_rejected ... ok
+test bootstrap::tests::a_rejected_file_falls_back_and_says_why_without_echoing_a_value ... ok
+test config::tests::empty_cloud_address_is_development_only ... ok
+test bootstrap::tests::production_ignores_the_environment_end_to_end ... ok
+test config::tests::rejected_values_are_not_echoed_in_validation_errors ... ok
+test config::tests::production_ignores_the_whole_env_namespace ... ok
+test config::tests::shipped_production_resource_parses_and_validates ... ok
+test dto::profile::tests::profile_operation_args_accepts_tauri_camel_case_payload ... ok
+test config::tests::agent_host_rule_accepts_loopback_and_rejects_everything_else ... ok
+test dto::profile::tests::profile_operation_result_can_omit_snapshot_for_open_close ... ok
+test dto::config::tests::each_fact_is_read_from_the_config ... ok
+test config::tests::unknown_key_is_rejected_by_name_without_echoing_its_value ... ok
+test dto::config::tests::no_private_value_appears_anywhere_in_the_answer ... ok
+test dto::config::tests::the_page_gets_exactly_the_three_facts_it_is_allowed ... ok
+test config::tests::out_of_range_values_are_rejected ... ok
+test http::tests::only_loopback_destinations_are_treated_as_local ... ok
+test paths::tests::a_production_build_ignores_the_locator ... ok
+test paths::tests::an_existing_file_that_cannot_be_read_falls_back_instead_of_panicking ... ok
+test paths::tests::development_order_is_override_then_manifest_resources_only ... ok
+test paths::tests::locate_takes_the_first_candidate_that_exists ... ok
+test paths::tests::no_candidate_existing_falls_through_to_the_compiled_default ... ok
+test paths::tests::production_order_is_resource_then_exe ... ok
+test paths::tests::the_compiled_default_is_a_usable_config ... ok
+test preflight::tests::binding_guard_uses_the_callers_sentence ... ok
+test preflight::tests::cloud_base_url_is_normalized_then_checked ... ok
+test preflight::tests::divergent_wording_is_not_shared ... ok
+test preflight::tests::identity_guard_accepts_a_readable_normal_bitbrowser ... ok
+test preflight::tests::message_parity ... ok
+test preflight::tests::release_failure_composes_the_flows_own_sentence ... ok
+test preflight::tests::release_text_still_names_the_account_check_flow ... ok
+test preflight::tests::status_is_rendered_by_display_including_the_reason_phrase ... ok
+test sidecar::drain::tests::blank_chunks_are_dropped_and_garbled_ones_are_kept ... ok
+test sidecar::drain::tests::exit_report_distinguishes_held_lines_from_shown_lines ... ok
+test sidecar::drain::tests::exit_report_names_the_status_held_count_and_the_lines ... ok
+test sidecar::drain::tests::keeps_the_newest_lines_and_forgets_the_oldest ... ok
+test sidecar::drain::tests::summary_appends_the_tail_under_a_header ... ok
+test http::local_agent::tests::every_request_carries_its_own_clients_token ... ok
+test sidecar::drain::tests::summary_is_empty_when_nothing_was_captured ... ok
+test http::local_agent::tests::the_base_url_comes_from_the_config ... ok
+test sidecar::drain::tests::tail_returns_the_end_in_order ... ok
+test sidecar::drain::tests::the_reported_window_is_the_same_one_either_way ... ok
+test sidecar::tests::the_fallback_command_line_is_only_the_module_name ... ok
+test sidecar::tests::an_unset_data_dir_is_omitted_and_a_set_one_is_passed_through ... ok
+test sidecar::tests::the_agent_is_told_where_to_listen_and_what_to_demand ... ok
+test tests::python_fallback_requires_debug_build_and_explicit_opt_in ... ok
+test token::tests::a_token_is_a_canonical_v4_uuid ... ok
+test token::tests::expose_is_stable_for_a_given_token ... ok
+test sidecar::tests::the_token_the_agent_is_told_is_the_one_the_requests_carry ... ok
+test http::tests::a_closed_loopback_port_is_refused_promptly_instead_of_hanging ... ok
+test http::tests::a_loopback_request_does_not_reach_the_proxy_it_was_handed ... ok
+test token::tests::tokens_do_not_repeat_across_launches ... ok
+test http::tests::the_unproxied_client_is_built_without_the_system_proxy ... ok
+test http::cloud::tests::a_loopback_cloud_url_is_sent_without_the_system_proxy ... ok
+test http::tests::a_request_to_a_silent_server_gives_up_instead_of_waiting_forever ... ok
+
+test result: ok. 68 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+
