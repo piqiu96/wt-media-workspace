@@ -6,6 +6,13 @@
 
 当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：用户方向已确认，A～E 与八个执行草案已拆分，实施中——A～E1 有真实证据，C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围，E3 未开始；逐阶段状态见该文件第 2.1 节。M3 产品事实源为 [Product M3 内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
 
+M4-M5 于 2026-09-24 按用户确认方向完成闭环重划，当前均为 `NOT_STARTED`：
+
+- [M4 Cloud 内容生产闭环](M4-content-production.md)：素材库 → 我的素材 → 人工 `compose_task` → Cloud Worker + FFmpeg → 我的成片 → 下载；
+- [M5 策略自动生产与 Worker 资源控制](M5-automatic-production.md)：`compose_strategy.schedule` → Scheduler → Worker Pool → 自动成片。
+
+两者共同依据 ADR-0017；不再使用本地/Cloud Agent 合成、`production_rule`、`compose_pool_item`、成片池或成片领取对象。M4 首个 planned 执行单元是 CHG-20260924-061，当前 active CHG 不变。
+
 Milestone 不替代 Product、Engineering、MASTER PLAN、AI Spec、CHG 或 Evidence。它只回答：用户按什么顺序操作，以及哪些业务结果和真实外部效果必须同时成立，才能认为该 M 的一段闭环完成。
 
 每张闭环卡只包含：

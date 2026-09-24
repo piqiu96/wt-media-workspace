@@ -17,8 +17,8 @@ M0 项目治理与工程基线
 → M1 Cloud-Agent-Desktop 最小任务闭环
 → M2 用户、角色、媒体账号与运行环境
 → M3 内容挖掘自动化入口建设
-→ M4 素材使用与本地合成闭环
-→ M5 云端自动生产与云端成片池
+→ M4 Cloud 内容生产闭环
+→ M5 策略自动生产与 Worker 资源控制
 → M6 发布通用底座与 B站辅助发布
 → M7 百家号辅助发布
 → M8 互动管理闭环
@@ -405,13 +405,15 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 - 仅预留渠道/策略扩展抽象；独立的只读运行视图本期不做（2026-09-23 裁定移出交付要求，不因此改变 ADR-0013 第 8 条对编排/拖拽/条件分支/任意脚本的禁止性约束）。
 - Cloud Web/Desktop、受控故障、M2 回归及用户最终验收通过后才标 M3 DONE。**（2026-09-23 已满足：四项均有证据，用户同日签收。）**
 
-### M4：素材使用与本地合成闭环
+### M4：Cloud 内容生产闭环
 
 | 字段 | 内容 |
 |---|---|
 | 状态 | `NOT_STARTED` |
-| 目标 | 打通素材领取、合成任务、本地 Agent FFmpeg 执行和成片元数据闭环。 |
+| 目标 | 打通素材库、我的素材、人工创建合成任务、Cloud Worker 生成成片和下载的完整闭环。 |
 | 依赖 | M3 `DONE` |
+| 闭环 | `delivery/milestones/M4-content-production.md` |
+| 产品/决策 | 第五章素材生产；ADR-0017；M4-M5 Cloud 内容生产工程设计 |
 | Active CHG | None |
 | Evidence | None，未进入里程碑验证。 |
 | 完成日期 | None |
@@ -422,56 +424,59 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 ```text
 material
 → material_usage
-→ compose_pool_item
-→ task
-→ Local Agent + FFmpeg
+→ compose_strategy
+→ compose_task
+→ Cloud Compose Worker + FFmpeg
 → composite_output
+→ file_transfer_task
+→ 运营电脑本地文件 / 去发布
 ```
 
 候选 CHG：
 
 ```text
-M4-C1 material 生命周期、公共/私有素材和私转公审核
-M4-C2 material_usage 领取、下载、放弃与恢复
-M4-C3 合成模板、版本与参数 Schema
-M4-C4 合成策略、版本、快照与多版本选择
-M4-C5 compose_pool_item、合成任务台、批量、取消与卡死处理
-M4-C6 Local Agent SQLite、文件索引、Desktop 桥和 FFmpeg 环境
-M4-C7 素材下载、Hash/文件校验、重试与重新定位
-M4-C8 本地视频合成 Executor
-M4-C9 composite_output、失败重试、强制中断和本地文件管理
-M4-C10 本地合成真实视频综合验收
+M4-C1 / CHG-20260924-061 素材库、material_usage 与原素材懒加载准备/下载
+M4-C2 compose_strategy 模板、参数、版本和人工选择
+M4-C3 compose_task 模型、API、状态、策略快照、取消和重试
+M4-C4 对象存储、FFmpeg/FFprobe 与 Cloud Compose Worker 基础设施
+M4-C5 人工任务从源视频准备到 composite_output 的真实闭环
+M4-C6 我的成片、来源追踪和去发布入口
+M4-C7 file_transfer_task、下载中心 Drawer 与 Local Agent 本地文件落地
+M4-C8 真实视频、对象存储、故障恢复和 UI 综合验收
 ```
 
 关键约束：
 
-- 正式运行不依赖系统 Python；
-- FFmpeg 不依赖系统 PATH；
-- Agent 不自行创建正式业务任务；
-- 失败任务不进入成片列表；
-- 成片默认保存在本地；
-- Cloud 保存正式元数据和必要引用。
+- 视频合成只在 Cloud Compose Worker 执行；Desktop / Local Agent 不执行 FFmpeg；
+- HTTP Server 不同步等待视频生成，也不启动 Scheduler / Worker；
+- 原素材采用懒加载，进入素材库只保存源链接；
+- `material_usage` 是唯一“我的素材”关系；
+- `compose_task` 是唯一生产任务，不创建 `compose_pool_item` 或 Agent task；
+- 失败、取消、超时、文件损坏或对象存储写入失败不创建成片；
+- 原素材和成片下载统一使用 `file_transfer_task`。
 
 退出条件：
 
-- material 支持 active、paused、retired 生命周期，公共/私有范围和私转公审核；
-- `material_usage` 支持领取、下载、放弃和恢复，且权限范围明确；
-- 合成前素材必须下载并通过 Hash、文件存在性和可读性校验；
-- compose_pool_item 支持批量、取消、卡死和异常池处理；
-- 能从一个真实素材生成可播放视频；
-- 来源素材、模板版本、策略版本和参数快照可追溯；
-- FFmpeg 不兼容时禁止执行；
-- Local Agent SQLite、文件索引和 Desktop 真实桥接可验证；
-- 失败、重试、强制中断和本地文件状态明确；
-- M4-C10 通过真实文件、FFmpeg、Desktop UI、Agent 重启恢复和独立提交验收。
+- 素材库展示来源和 `not_downloaded / downloading / ready / failed` 视频状态；
+- 同一用户、同一素材最多一个有效 `material_usage`，移出后历史任务和成片保留；
+- 人工选择 `compose_strategy` 创建 `compose_task`，任务保存不可变策略快照；
+- 源视频未就绪时先创建 Cloud 文件准备任务，成功后才执行 FFmpeg；
+- Cloud Worker 从真实素材生成可播放视频，完成媒体校验和对象存储落盘后才创建 `composite_output`；
+- 我的成片可预览、追溯来源、下载和进入发布管理；
+- 原素材和成片能通过下载中心落到运营电脑并通过大小/Hash 校验；
+- 取消、输入损坏、FFmpeg 失败、上传失败、Worker 崩溃和本地下载失败均无假成功；
+- Desktop 退出不影响 Cloud 合成；Agent 侧不存在合成 Executor；
+- M4-C8 通过真实 FFmpeg、对象存储、Cloud Web/Desktop WebView、Local Agent 下载和独立提交验收。
 
-### M5：云端自动生产与云端成片池
+### M5：策略自动生产与 Worker 资源控制
 
 | 字段 | 内容 |
 |---|---|
 | 状态 | `NOT_STARTED` |
-| 目标 | 复用本地合成核心，打通 Cloud Agent 生产、云端成片池、领取、下载和清理。 |
+| 目标 | 在 M4 已验证的 Cloud 合成底座上，由 `compose_strategy` 定时自动创建任务，并完成批量、并发、超时、重试和恢复。 |
 | 依赖 | M4 `DONE` |
+| 闭环 | `delivery/milestones/M5-automatic-production.md` |
+| 产品/决策 | 第五章素材生产；ADR-0017；M4-M5 Cloud 内容生产工程设计 |
 | Active CHG | None |
 | Evidence | None，未进入里程碑验证。 |
 | 完成日期 | None |
@@ -480,50 +485,47 @@ M4-C10 本地合成真实视频综合验收
 目标闭环：
 
 ```text
-production_rule
-→ material
-→ compose_pool_item
-→ task
-→ Cloud Agent
+compose_strategy.schedule
+→ Cloud Scheduler
+→ 幂等创建 compose_task
+→ Worker Pool
 → composite_output
-→ composite_output_pool
-→ composite_output_claim
-→ Local Agent 下载到本地
 ```
 
 候选 CHG：
 
 ```text
-M5-C1 production_rule 范围、调度和单次/每日数量
-M5-C2 素材风险校验、审核池和处置
-M5-C3 Cloud Agent 共享合成核心、对象存储与完整性
-M5-C4 compose_pool_item/task、重试、卡死和异常处理
-M5-C5 composite_output_pool 和可见范围策略
-M5-C6 composite_output_claim 独占领取和自动/人工释放
-M5-C7 云端下载、Hash 校验和本地成片记录
-M5-C8 7 天清理、重复风险和生产/发布摘要回写
-M5-C9 云端生产与成片池综合验收
+M5-C1 compose_strategy.schedule、启停、时区、单次/每日上限和素材范围
+M5-C2 Compose Scheduler 到期扫描、调度幂等和重启恢复
+M5-C3 Worker Pool 并发、租约、heartbeat、超时和资源保护
+M5-C4 批量任务、部分失败、防重和数量控制
+M5-C5 技术重试、卡死恢复、取消和对象存储异常处置
+M5-C6 自动执行 UI、运行统计、日志摘要和人工处置
+M5-C7 真实定时、批量、并发、恢复和回归综合验收
 ```
 
 明确不做：
 
 - 独立生产规则管理平台；
+- `production_rule` 表；
+- `compose_pool_item` 或重复生产任务表；
 - 动态工作流引擎；
 - 独立策略组表；
 - `composite_output_download_task`；
-- 独立 `pool_policy` 表。
+- 成片池、成片领取或独立 `pool_policy` 表；
+- MQ、微服务和动态 Worker 注册中心。
 
 退出条件：
 
-- Local Agent 和 Cloud Agent 复用同一合成核心；
-- 云端生产保留 `material -> compose_pool_item -> task` 正式链路；
-- 对象存储上传、Hash、下载、生命周期和恢复可验证；
-- 高风险素材进入审核池，处置行为有日志；
-- 同一成片不会被多人重复领取；
-- 领取失败、超时和高级运营释放不会永久锁死；
-- 下载通过完整性校验并进入本地成片管理；
-- 清理、重复风险和生产/发布摘要回写可验证；
-- M5-C9 通过真实 Cloud Agent、对象存储、调度、领取并发、下载恢复和独立提交验收。
+- `compose_strategy.schedule` 是自动规则唯一事实源，禁用策略不创建任务；
+- Scheduler 只创建 `pending compose_task`，不下载文件、不执行 FFmpeg；
+- 同策略、同时间槽、同素材不重复创建任务；
+- 单次和每日上限真实生效，批量部分失败不回滚其他成功任务；
+- Worker 实际并发不超过配置，配置非法时拒绝以无限并发启动；
+- 同一任务只被一个 Worker 执行，heartbeat、租约过期、超时终止和重启恢复可验证；
+- 技术错误在上限内退避重试，业务错误和结果不明确不盲目重试；
+- HTTP Server 单独运行不会启动 Scheduler / Worker；
+- M5-C7 通过真实计划时间、对象存储、并发压力、Worker 重启、故障注入、UI 和独立提交验收。
 
 ### M6：发布通用底座与 B站辅助发布
 
@@ -736,7 +738,7 @@ M9-C8 数据统计综合验收
 M10-C1 Cloud Docker Compose、反向代理、HTTPS、配置和 Migration 部署
 M10-C2 MySQL/Object Storage 备份、恢复和回滚
 M10-C3 Agent 正式打包、受控依赖和可复现构建
-M10-C4 FFmpeg/FFprobe 分发、Manifest、Hash 和许可证
+M10-C4 Cloud Compose Worker 的 FFmpeg/FFprobe 镜像、Manifest、Hash、许可证和回滚
 M10-C5 Desktop 生产级 WebView、Sidecar 生命周期和本地数据目录
 M10-C6 Windows x64、macOS Intel/Apple Silicon 安装包、签名和公证
 M10-C7 组件更新、版本兼容、升级、回滚和用户数据保留
@@ -748,7 +750,7 @@ M10-C10 全系统生产发布综合验收
 退出条件：
 
 - 用户不需要安装系统 Python；
-- 不依赖系统 FFmpeg；
+- Cloud Compose Worker 不依赖系统 PATH 中的 FFmpeg，Desktop / Agent 不打包或执行视频合成；
 - Cloud 可通过 HTTPS 部署，Migration、备份、恢复和回滚可演练；
 - MySQL 和 Object Storage 均有可验证备份/恢复；
 - 三种桌面目标可以构建、安装、启动、卸载，macOS 完成签名和公证；
