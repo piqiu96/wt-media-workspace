@@ -8,6 +8,32 @@
 
 ## Completed
 
+- 2026-09-24 T-15：**Desktop 接进 `main`（唯一初始化入口）**（`wt-media-desktop` `a312aa0`，1 个 commit）——
+  新增 `logging/setup.rs`：`plan()` 承担**全部决定**（`levels`/`limits`/`directory: Result<PathBuf, String>`/
+  `configured_level`/两个 `Environment`，全部参数注入），`install(plan, secrets)` 只剩装配与
+  `set_global_default`，**连 `&DesktopConfig` 都不再拿**。**这条拆分是本 Task 第一个变异逼出来的**：
+  M1 把 `install` 里的环境改成 `config.environment`（错误的一侧）时**整套 152 条用例全绿**——
+  subscriber 每进程只能装一次，留在 `install` 里的判断只能靠启动程序才够得着。拆出 `plan` 后
+  N1/N2/N6/N7 四个变异各自转红。
+  **环境取构建期**（`bootstrap::build_environment()`）：出货文件恒声明 production 且 `load_with` 取更严一侧
+  ⇒ 取生效环境会让开发态目录与开发 DEBUG **永不可达**；代价（进程内两种「环境」并存）由摘要同时写出两者抵消
+  （`环境 production（构建 development）`）。token 生成提前到日志之前，sink 才能拿它的值做掩码。
+  **变异两轮 22 个**（控制行两次先绿）：第一轮 12 个中 M3/M4 起初存活——正向臂与期望值**都从 `filter_of` 推导**
+  （与 T-14 的 M6 同一形状的通病，第二次出现）⇒ 新增 `PINNED_LEVELS` **手写对表** + `join(" ")` 绑回
+  `LOG_LEVELS`，N3/N4/N5 转红。**三个幸存者逐条登记**：`main` 的两个实参（N8 token / N9 环境）与
+  「已被装过」那条臂（N10，本程序内**不可达**）——N9 由**臂 1 的真实启动**守（目录与级别两处可分辨事实），
+  N8 是**无处可验**（真实启动的 grep 分母为 0：今天没有记录携带 token），N10 无守，不谎称已覆盖。
+  **真机三臂**：① 开发态布局下 stderr 与 `src-tauri/.local/logs/desktop-20260924-1.log`（249 字节）
+  **都有摘要且文件首条即摘要**（AC-02）；② 用普通文件占住 `<repo>/.local/logs` → **仍启动、摘要在 stderr、
+  不 panic、占位文件不被改**（AC-05 第二臂）；③ `level="warn"` 臂 **0 条 stderr 记录、不建文件**，
+  对照臂 `level="info"` 1 条记录 + 255 字节文件——**实测后果比计划写的更宽**：两层共用同一个 filter，
+  严于 INFO 的级别**连 stderr 一起静默**（计划只预测「不建文件」），如实登记并可能进 §7。
+  测试 147 → **153**；build 警告 **93 → 9**、clippy **97 → 13**——**与四处登记的待验期望 4/10 不符**，
+  差 5 条逐条点名（`rolling` 的 `SHIPPED`/三个 `DEFAULT_*`/`open_path` 现在**只在测试里**被引用，
+  根因是 T-14 按计划把配置文件变成四个数字的来源），另 4 条是既有桩 ⇒ 本 Task 新增代码 **0 条 lint**；
+  反证三条（计数降了 84 条说明接线到位、臂 1 真的建出文件、clippy 的 13−9 全是既有项）写在证据里。
+  见 `evidence/task-15-desktop-main-wiring.md`。
+
 - 2026-09-24 T-14：**Desktop `[logging]` 配置 + 校验 + 出货资源**（`wt-media-desktop`，1 个 commit）——
   出货 TOML 补 `[logging]`（`level = "auto"`、20MB / 14 天 / 100MB）；`Logging` 与其余六节同款
   `deny_unknown_fields`、**无** `#[serde(default)]`；`validate()` 五条检查**只点名键、不回显值**；
@@ -194,35 +220,34 @@
 
 ## Current
 
-- T-14 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-15**（接进 `main`，唯一初始化入口）。
+- T-15 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-16**（三个既有 emit 点改道 + 启停/健康补点）。
 
 ## Next
 
-- **T-15**：接进 `main`（`bootstrap::resolve` 之后、启动摘要之前，使摘要成为 `desktop.log` 的**第一条记录**），
-  新建 `logging/setup.rs`（`home`/`manifest_dir`/`Environment` 全部**参数注入**，测试不解析真实 `$HOME`），
-  `set_global_default`（已设则 `note` 后继续，不 panic），始终挂一个 stderr writer。
-  **级别取自 `bootstrap::build_environment()`（构建期）而不是 `startup.config.environment`**：
-  出货文件恒声明 `production` 且 `load_with` 取 `max`（`config.rs:126`）⇒ 取后者会让开发态目录与开发 DEBUG
-  **永不可达**，且摘要里要同时写出两个环境与落点。该裁定登记为 §7 新增问题（见下）。
-  T-14 已把 `LOG_LEVELS`/`LOG_LEVEL_AUTO` 备好：`auto` → `targets::Levels::shipped(env)`，显式值直接采用，
-  **不要再手写一份词表**。三个界（AC-02 摘要入文件、AC-05 目录不可占**仍启动**、`level="warn"` **不建文件**）
-  各自真机取证。之后 T-16 → T-17，然后阶段 3 T-18。
+- **T-16**：`drain.rs` 的 `report_exit` → `agent.supervisor`（**恰一条**，按裁定五**保留末 20 行尾**）、
+  `CommandEvent::Error` 分支补一条、`commands/logging.rs` **先纯重命名** `commands/webview.rs`（单独 commit，
+  命令名 `log_js_error` 不变）再改走 logger `target=webview`、`commands/agent.rs` 的启停与健康补点
+  （health 响应体**只在 DEBUG**，失败记录**不带尾行**）。之后 T-17，然后阶段 3 T-18。
+- **T-15 的两个新登记要进 T-18 的 §7/§10**：①`level` 严于 INFO 时 **stderr 与文件一起静默**
+  （两层共用同一个 filter，实测；计划只预测「不建文件」）；②`main.rs` 的**两个实参无测试守**
+  （N8/N9），其中 N9 由臂 1 的真实启动守、N8 分母为 0（无记录携带 token）。
 - **Agent 侧两处真泄漏待你裁定**（`Blocking = NO`，但 DONE Gate 前必须落地）：§7 **Q-07**（Agent 侧脱敏实测
   出两处真泄漏——一行里第二个凭据不掩；复数 `cookies:` 键只掩第一个值——另有第三处形状错：JSON 键的闭引号
   被吃掉，行不再合法）。T-06 已提交，拟开 Agent 侧独立 Task（T-20，自己的 commit + evidence + 变异），
   **等你一句话**再动 Agent 仓。见 `evidence/task-13-desktop-backend.md` §2/§7。
   （注：T-13 的证据与上一版 checkpoint 把这个 ID 写成 `Q-08`，而 `change.md` §7 里它是 **Q-07**；
   §7 另有一段说明 `Q-08` 这个 ID 早先被 T-19 行与 AC-11b 用作 Q-05 内容的别名。T-18 统一编号时一并收口。）
-- **T-15 待验的期望**（T-11 登记、T-12 更新，T-13 再更新）：接线完成后 `cargo build` 条目级警告应从 **93**
-  回到 **4**、clippy `--all-targets` 从 **97** 回到 **10**。不降即说明模块没被真正接上。
-  （计数法：`touch src/main.rs` 后 `cargo build 2>&1 | grep -cE '^warning: [a-z]'`，clippy 同理。）
+- **T-15 的待验期望已被实测取代**：登记的「93 → 4 / 97 → 10」**不成立**，实测 **93 → 9 / 97 → 13**，
+  差的 5 条是 `rolling` 现在**只在测试里**被引用的项（`SHIPPED`/三个 `DEFAULT_*`/`open_path`），
+  根因 T-14 已按计划把配置文件变成四个数字的来源。**这条期望不再作为后续 Task 的判据**，
+  T-16/T-17 不再引用它；新增代码的 lint 判据改为「增量逐文件核对、新文件里 0 条真 lint」。
 - **访问 crates.io 必须带 `HTTPS_PROXY=http://127.0.0.1:7897`**（T-10 查明的根因：本机直连的证书被劫持）。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
-- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 → T-16 → T-17。
+- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 → T-17。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
@@ -242,6 +267,21 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
 ## Recent verification
+
+- T-15：`cargo test --workspace` → **153 passed; 0 failed**（147 → +6：`setup.rs` 5 条 + 手写对表 1 条；
+  环境两向那条在拆分后由 `plan` 承担并改名，是改名不是新增）；`cargo build` 条目级警告 **93 → 9**、
+  clippy `--all-targets` **97 → 13**——**与登记期望不符，差的 5 条逐条点名**（`rolling.rs` 的
+  `DEFAULT_MAX_FILE_BYTES`/`DEFAULT_RETENTION_DAYS`/`DEFAULT_TOTAL_BYTES`/`SHIPPED`/`open_path`，
+  现在只在测试里被引用），另 4 条是既有桩（filesystem/secure_store/system/updater），
+  clippy 的 13−9=4 全是既有项（`main.rs:45`、`account.rs` ×2、`drain.rs:212`）⇒ **本 Task 新增代码 0 条 lint**。
+  变异 **两轮 22 个**（控制行两次先绿，每次从 pristine 副本还原）：第一轮 12 个（4 个起初存活）、
+  第二轮 10 个（拆分后重跑，3 个幸存且**逐条登记守卫方式**）。
+  真机三臂（真实二进制、每次先清开发态日志目录）：臂 1 摘要入 stderr **且**入
+  `src-tauri/.local/logs/desktop-20260924-1.log`（249 字节，首条即摘要）；臂 2 占住目录仍启动、不 panic；
+  臂 3 `warn` 0 条 stderr / 不建文件 vs 对照 `info` 1 条 / 255 字节。
+  `rustfmt` 只对新文件 `setup.rs` 整文件跑（新文件无既有脏行），`main.rs` 未跑全文件格式化，
+  `git diff -U0` 的删除行只有那一条 `eprintln!`。
+  见 `evidence/task-15-desktop-main-wiring.md`。
 
 - T-14：`cargo test --workspace` → **147 passed; 0 failed**（144 → +3：出货值漂移 1 + 级别正向/词表钉死 2；
   原有的 `unknown_key_is_rejected...` 由顶层单点改为**逐节枚举**，用例数不变而覆盖面变宽）。
