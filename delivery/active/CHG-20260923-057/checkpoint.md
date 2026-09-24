@@ -132,6 +132,13 @@
   故判据只能是结构性的 R11，不能声称有行为差异。
   见 `evidence/task-09-single-entry.md`。
 
+- 2026-09-24 T-11：**Desktop 日志目录解析**（`wt-media-desktop` `f1edae6`）——`logging::paths`：
+  `directory()` 纯函数（`home`/`environment`/`manifest_dir` 全注入）、`prepare()` 唯一 IO
+  （建目录 + **真实写探测**，因为目录已存在时 `create_dir_all` 返回 `Ok`）、`LogDirectoryError` 不 panic。
+  两套布局互斥且各有一条「只读一个输入」的断言（M2/M3 证明它能红）。`.gitignore` 补 `.local/`
+  （`git check-ignore -v` 回报命中该条）。变异 8/8 红，并补齐两个缺口。
+  见 `evidence/task-11-desktop-log-paths.md`。
+
 - 2026-09-24 T-10：**Desktop 引入 `tracing` + `tracing-subscriber`**（`wt-media-desktop` `5194d49`，
   **两行依赖 + 一段说明注释，零源码改动**）——两处都关默认 features（`attributes` 会拖进过程宏；
   `env-filter`/`ansi` 会拖进 matchers、regex、nu-ansi-term）；不引 `tracing-appender`（它的 rolling
@@ -146,28 +153,51 @@
 
 ## Current
 
-- T-10 已收尾（一个 Desktop 提交 + 本记录）；**阶段 2 开始**，下一个是 T-11（日志目录解析）。
+- T-11 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-12**（rolling writer）。
 
 ## Next
 
-- **T-11**：Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production →
-  `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest_dir>/.local/logs`）+ 仓根 `.gitignore` 补 `.local/`。
-  测试**绝不解析真实 `$HOME`**；不可写目录返回错误值而非 panic。之后 T-12 → … → T-17，然后阶段 3 T-18。
+- **T-12**：`logging::rolling` writer（`Clock` 注入，使每行变异可测）——日期翻档、20MB 翻档、
+  **单条超限截断并标 `truncate=true original_size=<n>`**、按天删除、按总量删除、**当前文件永不被删**；
+  写文件用 `create_new` 式命名防多实例写同一文件。之后 T-13 → … → T-17，然后阶段 3 T-18。
+- **T-15 待验的期望**（T-11 登记）：接线完成后 `cargo build` 条目级警告应从 12 回到 **4**、
+  clippy `--all-targets` 从 18 回到 **10**。不降即说明模块没被真正接上。
 - **访问 crates.io 必须带 `HTTPS_PROXY=http://127.0.0.1:7897`**（T-10 查明的根因：本机直连的证书被劫持）。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
-- 阶段 2 Desktop：T-10 ✓ → T-11 → T-12 → T-13 → T-14 → T-15 → T-16 → T-17。
+- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 → T-13 → T-14 → T-15 → T-16 → T-17。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
 
 - None。裁定十三节已把草案的待决项全部定下；§7 的 Q-01…Q-04 均为 `Blocking = NO`，已按读数实施。
 
+### 工作区里不属本 CHG 的既有改动（**不被本 CHG 提交**）
+
+T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚于上一提交（14:51 vs 14:49），
+内容是对入口文档的一次成体系改写：`AGENT-INDEX.md`（+207/-…）、`AGENTS.md`（大幅删减）、
+`CLAUDE.md`、`README.md`、`docs/engineering/specs/agent-workspace-conventions.md`。
+
+**不是本 CHG 写的，因此不并入本 CHG 的记录提交**——「一仓一 commit」与「diff 检查越界改动」都要求
+把它们分开。两个验证器在**带这组改动的工作区**上仍报绿（`verify_agent_entry` 0 warning、
+`verify_delivery_governance` Active CHG 一致），故不构成阻塞。
+
+登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
+
 ## Recent verification
 
+- T-11：`cargo test --workspace` → **78 passed; 0 failed**（68 → +10）；`cargo build` 条目级警告
+  **4 → 12**、clippy `--all-targets` **10 → 18**，**+8 全是新模块的 `dead_code`**（调用方在 T-15）。
+  变异 **8/8 红、控制臂先绿**；探针查出两个缺口并补齐：**M8**（`create_new` 与 `create` 只差在
+  「崩溃后留下探测文件」这一种情形）补了 stale-probe 用例才红；**M7** 起初看着像等价变异，
+  **一量发现不是**——macOS 实测 `create_dir_all` 撞到被文件占住的路径报 `AlreadyExists`，
+  绕过它让探测去撞得到的是 `NotADirectory`，故 M7 是把根因换成了下游原因，断言改成实测的 kind 后转红。
+  **M6 多红一条的根因也量了**：只读目录里**打开已存在的可写文件是成功的**，只有 `remove_file` 会失败，
+  M6 删的恰是那一步 ⇒ 属诚实耦合。只读那一臂在本机**真的跑了**（`--nocapture` 无 skip 行）。
+  见 `evidence/task-11-desktop-log-paths.md`。
 - T-10：`cargo test --workspace` → **68 passed; 0 failed**（与改前逐字相同，本 Task 按计划不加测试）；
   `cargo tree --no-dedupe` 具名节点 **267 → 271**，**恰好 +4 且具名**、移除 0；阴性对照
   `nu-ansi-term`/`matchers`/`tracing-log`/`tracing-attributes` **全 0**，而 `regex`/`smallvec`

@@ -126,7 +126,8 @@
 
 ### 4.6 测试与工具基线
 
-- Desktop：**68**（CHG-060 checkpoint「测试 **63 → 68**」为终点；其 `task-02-csp.md` 里的 63 是 T-03 加 5 条**之前**的中途数）。
+- Desktop：**起点 68**（CHG-060 checkpoint「测试 **63 → 68**」为终点；其 `task-02-csp.md` 里的 63 是 T-03 加 5 条**之前**的中途数）。
+  T-10 后仍 **68**（依赖引入不改测试），T-11 后为 **78**（只增不减）。
   本仓是**二进制 crate**（`Cargo.toml:2`，无 `[lib]`）⇒ `cargo test --lib` **不成立**，用 `--workspace`
   或 `--bin wt-media-desktop-shell <filter>`（CHG-060 已记录）。
 - Agent：`bash scripts/test.sh`（`python -m unittest discover -s tests`），**起点 253 tests OK**（与 CHG-056/060 一致）；
@@ -231,7 +232,7 @@
 | T-08 | `GET /api/v1/health` 聚合健康检查（Cloud/BitBrowser/Storage 各一例不可用 → 200 + `abnormal`/`unknown` 不抛）+ 契约同步；`/healthz` 逐字不变 | DONE | `evidence/task-08-health.md`；**345 tests OK**；12 个变异（控制行先绿）；真机两臂 **20/20**，Cloud 侧实测 `connections=1 received=b''`；契约 `2026.09.24.1` |
 | T-09 | 修既有缺陷并锁死唯一入口（**T-07 顺带实测：`-m` 启动时 server 的 logger 名是 `__main__`，HTTP 侧记录看不出组件来源，属本 Task 范围**）：~~①`paths.py:104-106` 已假注释~~（**T-03 已随 docstring 重写完成**）；②删 `server.py` 第二次 `configure_from`；③`state` 改必传（`LocalApiServer` 与 `serve`）；④**新增 R11 AST 规则**（**今天就会红**）；⑤`LOGGER_NAME` 显式写出，`-m` 下记录名不再是 `__main__` | DONE | `evidence/task-09-single-entry.md`；**354 tests OK**；R11 三个反例（含「规则被改成 `return []` 时全红」）；六个变异各自打掉自己的用例；真机 `-m` 探针 11/11，且把 `LOGGER_NAME` 变异回 `__name__` 后 A3/A4 转红 |
 | T-10 | Desktop 引入 `tracing` + `tracing-subscriber`（**例外的无失败测试项**） | DONE | `evidence/task-10-desktop-deps.md`；依赖树 **267 → 271，恰好 +4 且具名**（tracing-subscriber 0.3.23 / sharded-slab 0.1.7 / thread_local 1.1.10 / lazy_static 1.5.0）、移除 0；阴性对照：`nu-ansi-term`/`matchers`/`tracing-log`/`tracing-attributes` 全 0（`regex`/`smallvec` **本就在树里**，不计入）；起点 **68 → 68** 逐字不动；clippy **10 → 10**；阻塞根因查明是本机直连 crates.io 证书被劫持（见 §4 平台边界），**经本机代理仍是官方后端**，未换实现 |
-| T-11 | Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production → `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest>/.local/logs`）+ `.gitignore` 补 `.local/` | TODO | 测试不解析真实 `$HOME`；不可写目录返回而非 panic |
+| T-11 | Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production → `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest>/.local/logs`）+ `.gitignore` 补 `.local/` | DONE | `evidence/task-11-desktop-log-paths.md`；**78 tests OK**（68 → +10：4 条纯规则 + 6 条 IO/边界）；测试全程不解析真实 `$HOME`；不可写 → `Err` 不 panic（只读臂**在本机真的跑了**，断言含 `PermissionDenied`）；变异 **8/8 红**且控制臂先绿，并**补上两个探针查出的缺口**（M8 补 stale-probe 用例；M7 量出根因是 `AlreadyExists` 而 `NotADirectory` 是下游，故不是等价变异）；新增 8 个 `dead_code` 警告是本模块的调用方在 T-15，**登记为待验期望**（T-15 接线后应回到 4/10） |
 | T-12 | `rolling` writer（`Clock` 注入）：日期翻档、20MB 翻档、**单条截断标 `truncate=true original_size=<n>`**、按天删、按量删、当前文件永不删 | TODO | 六向变异，逐条 |
 | T-13 | Desktop 后端装配 + target 白名单（默认 `OFF`，`const OWNED_TARGETS` 枚举断言；`agent.supervisor` 永不比 INFO 更严）+ 格式 + 脱敏 | TODO | 外来 target 不入文件 / 自有 target 入文件（两向）；落盘后 grep 不到 token |
 | T-14 | Desktop `[logging]` 配置 + 校验 + 出货资源（非法级别、三个 0、总量小于单文件上限先红；报错只点名键不回显值） | TODO | `out_of_range_values_are_rejected` 先行红 |
@@ -269,8 +270,9 @@
 
 ### wt-media-desktop
 
-- [x] T-10 依赖；T-11 目录解析；T-12 rolling；T-13 装配/白名单/脱敏；T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id
-- [ ] 入口文档回写 + `.gitignore` 补 `.local/`（T-11/T-18）
+- [x] T-10 依赖；T-11 目录解析（**这两项已 DONE**）
+- [ ] T-12 rolling；T-13 装配/白名单/脱敏；T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id
+- [ ] 入口文档回写（T-18）；`.gitignore` 补 `.local/` **已在 T-11 完成**
 
 ### wt-media-cloud
 
@@ -314,6 +316,7 @@
 - `evidence/task-09-single-entry.md`（T-09）
 - `evidence/task-19-no-external-services.md`（T-19）
 - `evidence/task-10-desktop-deps.md`（T-10）
+- `evidence/task-11-desktop-log-paths.md`（T-11）
 - `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
