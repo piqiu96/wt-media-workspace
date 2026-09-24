@@ -26,7 +26,8 @@ cargo test --workspace 2>&1 | sed -n '/^failures:/,$p'   # -> artifacts/t02-csp-
 cargo test --workspace
 
 # 3. 真实启动取证（判据 = ipc:// 拒绝数）
-python3 delivery/active/CHG-20260924-060/evidence/tools/t02_csp_shipped_value_launch.py
+#    路径在归档后由 active/ 改为 completed/，命令其余一字未改
+python3 delivery/completed/CHG-20260924-060/evidence/tools/t02_csp_shipped_value_launch.py
 ```
 
 第 3 步的驱动脚本**从 `resources/desktop.production.toml` 解析出 `csp_connect_src`**，

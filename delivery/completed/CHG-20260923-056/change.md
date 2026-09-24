@@ -627,6 +627,32 @@ Recent verification:
   ②回环 client 是否加 `.no_proxy()`；③`modes/`+`generated/` 占位包与基线 §5.2「不保留」的冲突；
   ④T-09 期间在开发者 Cloud `:18080` 上被误建的惰性 `noop_task`（`task_b21340775ace100173202de3`）
   如何处置。四者全是计划明示的范围外事项或新增发现，故不构成未完成的 scope。
+- **上述四项遗留的裁定与处置（2026-09-24 追加，由 `CHG-20260924-060` 承接）**：本段是归档后的
+  收尾追加，**不改上文原文**。
+  - ①生产 CSP 加 `ipc:` → **加**。`wt-media-desktop` `9945f58`。取值是
+    `ipc: http://ipc.localhost http://127.0.0.1:18080`，**不是裸 `ipc:`**——`ipc:` 是 scheme-source、
+    只匹配 `ipc:` 方案的 URL，而 macOS 上 Tauri 的 IPC fetch 目标是 `http://ipc.localhost`（方案 `http`）。
+    真实启动判据：`ipc://` 拒绝数 **3 → 0**（同一二进制、同一探针页，只有那一行配置不同）。
+  - ②回环 client 是否加 `.no_proxy()` → **按回环目标禁用，远程 Cloud 保留系统代理**。
+    `wt-media-desktop` `d329abc`。`reqwest` 0.12.28 没有「系统代理，但排除这些主机」这个表达
+    （`proxy()` 与 `no_proxy()` 都会关掉 `auto_sys_proxy`，且无公开方式设回），
+    故拆成两个 client 按 URL 选。
+  - ③`modes/`+`generated/` 与基线 §5.2「不保留」的冲突 → **删**。`wt-media-agent` `c33680f`
+    （删包 + 收紧 `PLACEHOLDER_PACKAGES`）与 `4d8e9ab`（文档回写）。**基线无需回写**——§5.2 `:1040`
+    早已明写不保留这两者，是目录一直没跟上；`adapters/` 不在该名单里，保留。
+  - ④开发者 Cloud 上被误建的惰性 `noop_task` → **暂时不处理**。该项**至今未处置**，
+    且不在 `CHG-20260924-060` 的授权内（清除它要动开发者的 Cloud，该 CHG 明示不碰）。
+  - **一处派生更正**：上文 `Blocked` 记的「T-07 遗留③ `connect_timeout` 隔离量测被②挡住」，
+    ②落地后**并未闭合**，应改记为**改写**——回环上的关闭端口由内核立刻 `ECONNREFUSED`
+    （实测 405µs），产生不了「SYN 无人应答」这个 `connect_timeout` 存在的条件，**有无代理都如此**。
+    准确表述：「回环请求不再被系统代理截获；`connect_timeout` 在回环上仍不可触发。」
+  - **本目录一处证据缺口已修补**：`evidence/artifacts/ac05-run5.log`（8975 字节）原先
+    **被引用但未入库**——本仓 `.gitignore` 第 3 条 `*.log` 在 `git add -A` 时静默吃掉它。
+    引用它的有**六处、四个文件**：`change.md` 两处、`evidence/task-09-desktop-launch.md` 两处、
+    `evidence/artifacts/README.md` 与该目录的表格、`status/desktop.md` 各一处。后果是换一个
+    clone 打开这份归档，「四次真实启动全部 PASS」这条最强证据会指向一个不存在的文件。
+    本次以 `git add -f` 补入，**内容一字未改、结论未改**。补入前已扫过凭证特征
+    （Bearer/Authorization/token/password/Cookie/UUID 均无值命中）。
 - **明确不在本次关闭内**：本 CHG 未实现日志轮转/清理/脱敏、用户设置 UI、端口就绪通知、
   打包完整性校验与升级回归——这些按程序总纲分属 CHG-057/058/059，**不得**据本记录的 DONE
   推断它们已完成。
