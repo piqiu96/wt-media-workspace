@@ -132,15 +132,20 @@
   故判据只能是结构性的 R11，不能声称有行为差异。
   见 `evidence/task-09-single-entry.md`。
 
+- 2026-09-24 T-19：**测试不误连真实外部服务**（`wt-media-agent` `978155f`，**test-only，生产代码 0 行改动**）——
+  新增 `tests/test_no_external_services.py`：两条通道（客户端构造必须注入 `transport`；`urlopen` 必须被
+  patch）+ 5 处带非空理由的 `# network-ok:` 标记 + 按文件冻结的标记棘轮，11 条用例。
+  修复一处真误报（`as urlopen` 绑的是 mock）并登记两个自查出的对照缺陷（读整树报告 → 假理由变红）。
+  `bash scripts/test.sh` → **365 OK**（354 → +11）。见 `evidence/task-19-no-external-services.md`。
+
 ## Current
 
-- T-09 已收尾（一个 Agent 提交 + 本记录）；阶段 1 只剩 **T-19**。
+- T-19 已收尾（一个 Agent 提交 + 本记录）；**阶段 1（Agent 半）全部完成**：T-02…T-09 + T-19。
 
 ## Next
 
-- **T-19**：AC-11b 的 AST 规则（`tests/` 内客户端构造必须注入假 `transport`）。**T-02 期间实测：
-  今天无任何规则在守**（见 §7 Q-08），故这条规则今天大概率会先红，先量清分母再修。
-- 之后：阶段 2 Desktop T-10 → T-17；阶段 3 T-18 回写与收尾。
+- **阶段 2 Desktop，从 T-10 开始**（引入 `tracing` + `tracing-subscriber`；该 Task 明示无「先失败的测试」，
+  证据 = `cargo tree` 前后对比 + 下载清单具名 + 起点 68 条仍绿）。T-10 → T-11 → … → T-17；然后阶段 3 T-18。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
@@ -155,6 +160,22 @@
 
 ## Recent verification
 
+- T-19：`bash scripts/test.sh` → **365 tests OK，exit=0**（354 → 365，只增不减）；`.local/` 守卫不响；
+  **先量分母再写结论**：计划写「41 处 / 34 模块」，实测 **40 模块 / 38 处客户端构造 / 3 处 `urlopen`**
+  ——41 是后两类之和（计划的分类粒度不同），**模块数是真的偏低**，按实测登记。
+  规则第一次跑就报出 **5 处真命中**，且**五处都不该改代码**（3 处打的是刚起的 loopback server，
+  2 处真实传输就是被测对象）→ 走 `# network-ok:` 标记通道，理由必须非空，按**文件**冻结计数
+  （按行号会因上方任何编辑而失效，棘轮红的理由届时没人能处理）。
+  变异表：控制臂先绿，**7 个变异逐个红**（真实文件逐次破一处，用 monkeypatch `test_files()` 跑真的那 11 条），
+  三条真断言 **A1/A2/A3 各自都有变异能红它**（A1 ← M7 扫描只剩 1 个文件；A2 ← M1/M2/M3/M4/M6；A3 ← M1/M2/M5/M6）。
+  **两处自查出的问题**：①一处**真误报**——`with mock.patch.object(urlrequest,"urlopen") as urlopen:`
+  之后 `urlopen()` 调的是 mock，规则按函数名判定，把驱动假传输最干净的写法判成联网；改为解析名字在
+  该作用域的绑定（`as`/参数/赋值 → local 跳过，import → 照报），并修掉「顺序决定判定」与
+  「模块级被兄弟函数的绑定开脱」两个次生问题。②**两个对照读整棵树的报告**，于是 M1/M2/M6 这类
+  真实树变动会让它们为**假理由**变红——看起来和控制臂正常工作一模一样；已改成只读自己种的那个文件。
+  改后仍会红的只剩 M3/M4，那是把违规种进了同一个文件，属诚实耦合，**如实登记不掩盖**。
+  规则看不见的四种形态（经助手到达网络 / 构造了但不调用的外部 URL / `os.system`、裸 socket / 假传输有没被用）
+  写在文件头。见 `evidence/task-19-no-external-services.md`。
 - T-09：`bash scripts/test.sh` → **354 tests OK，exit=0**（345 → 354，只增不减）；`.local/` 守卫不响；
   六个变异各自打掉自己的用例（控制行先绿）；R11 三个反例（含「规则被改成 `return []` 时全红」）；
   真机 `-m` 探针 11/11 且变异后 A3/A4 红。见 `evidence/task-09-single-entry.md`。

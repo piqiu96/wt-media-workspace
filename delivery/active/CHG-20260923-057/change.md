@@ -130,7 +130,7 @@
   本仓是**二进制 crate**（`Cargo.toml:2`，无 `[lib]`）⇒ `cargo test --lib` **不成立**，用 `--workspace`
   或 `--bin wt-media-desktop-shell <filter>`（CHG-060 已记录）。
 - Agent：`bash scripts/test.sh`（`python -m unittest discover -s tests`），**起点 253 tests OK**（与 CHG-056/060 一致）；
-  T-09 后为 **354**（只增不减）。
+  T-09 后为 **354**，T-19 后为 **365**（只增不减）。
 - 应用 `.cargo/config.toml`：`retry = 10`、`timeout = 600`、`low-speed-limit = 1`、`multiplexing = false`
   ⇒ 网络已知不稳，依赖引入必须先跑 `cargo fetch` 探明（T-10）。
 - 三个配置结构均 `#[serde(deny_unknown_fields)]`（`config.rs:43,55,67,73,79,86,92`），由 `config.rs:280` 的测试钉住。
@@ -233,7 +233,7 @@
 | T-16 | 三个既有 emit 点改道（`main.rs:65`→`desktop.startup`；`drain.rs:158`→`agent.supervisor`；`commands/logging.rs` 先纯重命名 `commands/webview.rs` 单独 commit，再改走 logger `target=webview`）+ Agent 启停与健康检查补点 | TODO | `report_exit` 恰一条该 target 记录；50 行普通 sidecar 输出 → 零条 |
 | T-17 | Desktop `operation_id`（**仅进程内**）：断言出站请求头集合与今天**逐字相同**；`sidecar/mod.rs` 的 `assert_eq!(vars.len(), 3)` 仍绿 | TODO | 头集合逐字比对 + 环境变量数不变 |
 | T-18 | 回写与收尾：基线（程序总纲 §3 CHG-B 补数字、架构基线 §5.8/§6.8 补三文件与 Desktop 路径）、入口文档、`[logging]` 注释；`Status: DONE` → `git mv` 归档 → 移除 LEDGER 行 → `--no-active` 冷启动重生成 → **主动扫**失效指针 | TODO | 两验证器绿；扫描报分母 + 阳性对照 |
-| T-19 | **测试不误连真实外部服务**（T-02 执行中发现，见 §7 Q-08）：AST 规则——`tests/` 内每次网络客户端构造（`BitBrowserClient` / `CloudAgentClient`）必须注入假 `transport`，`urlopen` 调用必须被 patch；T-02 只覆盖了 AC-11 的后半 | TODO | 规则先红（拿一个真实构造点造对照），报分母：41 处网络调用点 / 34 个测试模块 |
+| T-19 | **测试不误连真实外部服务**（T-02 执行中发现，见 §7 Q-08）：AST 规则——`tests/` 内每次网络客户端构造（`BitBrowserClient` / `CloudAgentClient`）必须注入假 `transport`，`urlopen` 调用必须被 patch；T-02 只覆盖了 AC-11 的后半 | DONE | `evidence/task-19-no-external-services.md`；**365 tests OK**；计划的分母与实测不符（计划 41 处/34 模块，实测 41 = 38 处构造 + 3 处 `urlopen`、**40 模块**）；规则先红报出 5 处真命中且都走标记而非改代码；7 个变异逐个红且三条真断言各有变异能红它；一处真误报（`as urlopen` 绑的是 mock）与**两个自查出的对照缺陷**（读整树报告 → 假理由变红） |
 
 > **T-19 的来源**：T-02 执行时逐条核对 AC-11，发现计划把 AC-11 整条映射给 T-02，但 T-02 只交付了
 > 「不写真实检出目录」那半——「不误连真实外部服务」**今天没有任何规则在守**（实测：无该规则；
@@ -258,7 +258,7 @@
 - [x] T-07 保留/轮转/截断（**启动清理空转**是真缺陷，已修）；
 - [x] T-08 `/api/v1/health`（两条禁令落成机制：Cloud 探针只连不发、聚合恒 200 不抛；契约同步）；
 - [x] T-09 唯一入口（R11 AST 规则 + 三个反例）、`state` 必传、`-m` 下记录名（`LOGGER_NAME`）；
-- [ ] T-19 不误连外部服务（AC-11b）
+- [x] T-19 不误连外部服务（AC-11b）
 - [ ] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
 
 ### wt-media-desktop
@@ -285,7 +285,7 @@
 | AC-09 | Sidecar stdout 持续消费且**不转存**（裁定十三·9） | 50 行普通 sidecar 输出 → **零**条 desktop 记录（阳性对照）（T-16） | TODO |
 | AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | **实测到一处真泄漏并修**：`environment_facts` 的 `cloud_base_url` 原样带密码（`True → False`，URL 仍可读）且走 `print`→stdout（T-06）；`/api/v1/health` 响应面已量（T-08 真机两臂：体里只有 `agent_version`/`agent_status` 与三个依赖的状态词，**没有** `cloud_base_url` 本身、没有 token）；`status` 响应体本 Task **未测**（契约面，已登记） | 部分（T-06/T-08） |
 | AC-11a | 测试**不写真实检出目录**（里程碑失败行为） | T-02：规则「不得把派生根接 `.local`」（33/34 模块在扫）+ `scripts/test.sh` 前后新增路径守卫，变异探针证明守卫独立于测试结果 | PASS |
-| AC-11b | 测试**不误连真实外部服务**（里程碑失败行为） | T-19：AST 规则（客户端构造必须注入假 transport）。**T-02 期间实测：今天无任何规则在守**，计划把 AC-11 整条映射给 T-02 是乐观的，见 §7 Q-08 | TODO |
+| AC-11b | 测试**不误连真实外部服务**（里程碑失败行为） | T-19：AST 规则（客户端构造必须注入假 transport）。**T-02 期间实测：今天无任何规则在守**，计划把 AC-11 整条映射给 T-02 是乐观的，见 §7 Q-08 | **PASS**（`evidence/task-19-no-external-services.md`：规则先红报 5 处真命中；控制臂先绿、7 个变异逐个红、三条真断言各有变异能红它；规则看不见的四种形态在文件头写明） |
 
 **每项否定结论都要阳性对照，对照臂不出红即记「对照无效」，不得记为通过**（CHG-060 的 AC-08 先例）。
 
@@ -306,6 +306,7 @@
 - `evidence/task-07-retention.md`（T-07）
 - `evidence/task-08-health.md`（T-08）
 - `evidence/task-09-single-entry.md`（T-09）
+- `evidence/task-19-no-external-services.md`（T-19）
 - `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
@@ -352,12 +353,12 @@ Completed:
 
 Current:
 
-- T-09 已收尾（一个 Agent 提交 + 本记录）；阶段 1 只剩 **T-19**。
+- T-19 已收尾（一个 Agent 提交 + 本记录）；**阶段 1（Agent 半）T-02…T-09 + T-19 全部完成**。
 
 Next:
 
-- **T-19**（AC-11b：`tests/` 内客户端构造必须注入假 `transport` 的 AST 规则），然后进阶段 2
-  Desktop T-10…T-17，最后阶段 3 T-18 回写与收尾。
+- **阶段 2（Desktop 半）T-10…T-17**，从 T-10 引依赖开始（该 Task 明示无「先失败的测试」，
+  证据是 `cargo tree` 前后对比 + 下载清单具名 + 起点 68 条仍绿）；最后阶段 3 T-18 回写与收尾。
 
 Blockers:
 
@@ -379,6 +380,12 @@ Recent verification:
   六个变异各自打掉自己的用例（控制行先绿）；R11 的第三个反例证明「规则被改成 `return []`」时三个反例全红；
   真机 `-m` 探针 11/11，把 `LOGGER_NAME` 变异回 `__name__` 后 A3/A4 转红（`names=['__main__']`）。
   见 `evidence/task-09-single-entry.md`。
+- T-19：全套 **365 tests OK，exit=0**（354 → 365，只增不减），`.local/` 守卫不响；
+  分母按实测登记（计划 41/34 → 实测 41 = 38 处构造 + 3 处 `urlopen`、**40 模块**）；
+  控制臂先绿、7 个变异逐个红，三条真断言各至少有一个变异能红它；
+  **两处自查**：一处真误报（`as urlopen` 绑的是 mock，驱动假传输的最干净写法被判成联网）、
+  两个对照读整树报告导致任何真实树变动都让它们为假理由变红。
+  见 `evidence/task-19-no-external-services.md`。
 
 Blocked:
 
