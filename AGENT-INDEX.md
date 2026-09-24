@@ -78,7 +78,8 @@ are still missing the file.
 | 修改 Desktop Vue Runtime 适配 | Cloud Web，必要时联动 Desktop |
 | 修改 BitBrowser 实际执行逻辑 | Agent |
 | 修改 Playwright 平台适配 | Agent |
-| 修改本地 FFmpeg 合成执行 | Agent |
+| 修改 M4-M5 Cloud FFmpeg / 视频合成执行 | Cloud |
+| 修改文件下载到运营电脑 | Agent |
 | 修改 Agent Sidecar 启停 | Desktop |
 | 修改 Tauri 安全桥 | Desktop |
 | 修改 Windows/macOS 安装包 | Desktop |
