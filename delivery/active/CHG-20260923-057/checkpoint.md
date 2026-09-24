@@ -8,6 +8,24 @@
 
 ## Completed
 
+- 2026-09-24 T-14：**Desktop `[logging]` 配置 + 校验 + 出货资源**（`wt-media-desktop`，1 个 commit）——
+  出货 TOML 补 `[logging]`（`level = "auto"`、20MB / 14 天 / 100MB）；`Logging` 与其余六节同款
+  `deny_unknown_fields`、**无** `#[serde(default)]`；`validate()` 五条检查**只点名键、不回显值**；
+  `LOG_LEVELS`/`LOG_LEVEL_AUTO` 常量 `pub` 给 T-15 的 subscriber 复用（不许再手写第二份词表）。
+  **先红**：表的第 4 列（报错必须点名的键）+ 每行先断言 `PRODUCTION_TOML.contains(from)` ⇒
+  在 `[logging]` 写进出货文件之前，表自己先报 `row "unusable log level" matches nothing`。
+  **变异 9/9 红**（控制行 147 passed 先绿），**两个缺口当场补掉**：
+  ①M6「词表删掉 trace」**起初存活**——正向臂与报错文案都从 `LOG_LEVELS` 推导，改小数组时两侧一起变，
+  故把常量本身用手写值钉死（`len == 6` + `join(" ")` 逐字 + `auto` 不在表内；用 `join` 而不是数组比较，
+  因为后者在长度变化时**编不过**，而编不过的变异什么都证明不了）；②M9「撤掉 `Logging` 的
+  `deny_unknown_fields`」起初存活——既有用例把未知键放在**顶层**，只被顶层 derive 拒掉，
+  每个子结构的那行 derive 都无人守 ⇒ 改为**逐节枚举**（顶层 + 七个节头）。
+  三处超出计划原文的检查逐条登记：`retention_days <= 0`（TOML 能装负数）、
+  `total_bytes >= max_file_bytes`（更小的总量不可满足）、逐节 `deny_unknown_fields`。
+  测试 144 → **147**；build 警告 **93 → 93**、clippy **97 → 97**（新常量被 `validate()` 引用，不入 `dead_code`）
+  ⇒ **T-15 的待验期望起点未被本 Task 移动，仍是 93 → 4 / 97 → 10**。
+  见 `evidence/task-14-desktop-logging-config.md`。
+
 - 2026-09-23：草案建于 `delivery/planned/CHG-20260923-057/`（PLANNED）。
 - 2026-09-24 T-01：`git mv` 移入 `delivery/active/`（**不留副本**），改写为十三节执行记录
   （`change.md`、本 `checkpoint.md`、`evidence/`、`status/`），§4 记下实测起点。
@@ -176,19 +194,25 @@
 
 ## Current
 
-- T-13 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-14**（`[logging]` 配置 + 校验 + 出货资源）。
+- T-14 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-15**（接进 `main`，唯一初始化入口）。
 
 ## Next
 
-- **T-14**：`[logging]` 配置 + 校验 + `resources/desktop.production.toml`。**先红**：非法级别、
-  单文件上限 0、保留天数 0、总量 0、**总量小于单文件上限**；每个配置结构都是 `#[serde(deny_unknown_fields)]`
-  且**不能**带 `#[serde(default)]`；报错**只点名键、绝不回显值**。
-- **T-15**：接进 `main`（`bootstrap::resolve` 之后、启动摘要之前，使摘要成为 desktop.log 的第一条记录），
-  始终挂一个 stderr writer。之后 T-16 → T-17，然后阶段 3 T-18。
-- **Q-08 待你裁定**（`Blocking = NO`，但 DONE Gate 前必须落地）：Agent 侧脱敏实测出两处真泄漏
-  （一行里第二个凭据不掩；复数 `cookies:` 键只掩第一个值），另有第三处（JSON 键的闭引号被吃掉，
-  行不再合法）。T-06 已提交，拟开 Agent 侧独立 Task（T-20，自己的 commit + evidence + 变异），
+- **T-15**：接进 `main`（`bootstrap::resolve` 之后、启动摘要之前，使摘要成为 `desktop.log` 的**第一条记录**），
+  新建 `logging/setup.rs`（`home`/`manifest_dir`/`Environment` 全部**参数注入**，测试不解析真实 `$HOME`），
+  `set_global_default`（已设则 `note` 后继续，不 panic），始终挂一个 stderr writer。
+  **级别取自 `bootstrap::build_environment()`（构建期）而不是 `startup.config.environment`**：
+  出货文件恒声明 `production` 且 `load_with` 取 `max`（`config.rs:126`）⇒ 取后者会让开发态目录与开发 DEBUG
+  **永不可达**，且摘要里要同时写出两个环境与落点。该裁定登记为 §7 新增问题（见下）。
+  T-14 已把 `LOG_LEVELS`/`LOG_LEVEL_AUTO` 备好：`auto` → `targets::Levels::shipped(env)`，显式值直接采用，
+  **不要再手写一份词表**。三个界（AC-02 摘要入文件、AC-05 目录不可占**仍启动**、`level="warn"` **不建文件**）
+  各自真机取证。之后 T-16 → T-17，然后阶段 3 T-18。
+- **Agent 侧两处真泄漏待你裁定**（`Blocking = NO`，但 DONE Gate 前必须落地）：§7 **Q-07**（Agent 侧脱敏实测
+  出两处真泄漏——一行里第二个凭据不掩；复数 `cookies:` 键只掩第一个值——另有第三处形状错：JSON 键的闭引号
+  被吃掉，行不再合法）。T-06 已提交，拟开 Agent 侧独立 Task（T-20，自己的 commit + evidence + 变异），
   **等你一句话**再动 Agent 仓。见 `evidence/task-13-desktop-backend.md` §2/§7。
+  （注：T-13 的证据与上一版 checkpoint 把这个 ID 写成 `Q-08`，而 `change.md` §7 里它是 **Q-07**；
+  §7 另有一段说明 `Q-08` 这个 ID 早先被 T-19 行与 AC-11b 用作 Q-05 内容的别名。T-18 统一编号时一并收口。）
 - **T-15 待验的期望**（T-11 登记、T-12 更新，T-13 再更新）：接线完成后 `cargo build` 条目级警告应从 **93**
   回到 **4**、clippy `--all-targets` 从 **97** 回到 **10**。不降即说明模块没被真正接上。
   （计数法：`touch src/main.rs` 后 `cargo build 2>&1 | grep -cE '^warning: [a-z]'`，clippy 同理。）
@@ -198,7 +222,7 @@
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
-- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 → T-14 → T-15 → T-16 → T-17。
+- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 → T-16 → T-17。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
@@ -218,6 +242,16 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
 ## Recent verification
+
+- T-14：`cargo test --workspace` → **147 passed; 0 failed**（144 → +3：出货值漂移 1 + 级别正向/词表钉死 2；
+  原有的 `unknown_key_is_rejected...` 由顶层单点改为**逐节枚举**，用例数不变而覆盖面变宽）。
+  `cargo build` 条目级警告 **93 → 93**、clippy `--all-targets` **97 → 97**——**测量结果，不是默认**：
+  新增的 `LOG_LEVELS`/`LOG_LEVEL_AUTO` 都被 `validate()`（非测试代码）引用，`Logging` 的字段由 derive 读写，
+  故没有新增 `dead_code`；T-15 的期望起点 **93 → 4 / 97 → 10** 未被本 Task 移动。
+  变异 **9/9 红**（控制行 147 passed 先绿），M6/M9 两个缺口当场补齐（见 §Completed 的 T-14 条）。
+  `rustfmt` 只对本文件跑，**逐行比对**其输出与我的版本：差异只有 7 处**既有脏行**（本仓不是 rustfmt-clean 的，
+  T-13 已量化），已全部还原 ⇒ 本 Task 的 diff 里没有一行与 T-14 无关的重排。
+  见 `evidence/task-14-desktop-logging-config.md`。
 
 - T-13：`cargo test --workspace` → **144 passed; 0 failed**（116 → +28：redact 8 / targets 8 / backend 12；
   `logging::` 过滤 **76 passed**，144 − 76 = 68 = 起点）；`cargo build` 条目级警告 **43 → 93**、
