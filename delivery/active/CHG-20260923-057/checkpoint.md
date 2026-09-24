@@ -75,15 +75,39 @@
   **顺带实测登记给 T-09**：`-m` 启动时 server 的 logger 名是 `__main__`（HTTP 侧记录看不出组件来源）。
   见 `evidence/task-07-retention.md`。
 
+- 2026-09-24 T-08：Agent **聚合健康检查**（`wt-media-agent` `87b1264`）——架构基线 §5.6 的双端点。
+  `/healthz` 逐字冻结（单测逐字断言 + 两臂真实进程各量一次，机器守而不是约定）；
+  新增 `GET /api/v1/health` 返回 Agent 版本/状态 + Cloud/BitBrowser/Storage 状态。
+  裁定那两条禁令都落成**机制**而非承诺：
+  ①「不得触发任何对外写请求」——Cloud 侧只有写接口（`clients/cloud/client.py` 无一只读），故探针是
+  `socket.create_connection` 到 host:port 后**立刻关闭**，真机实测 `connections=1 received=b''`
+  （连上了、一个字节没发）；代价写进契约与 docstring：**连上即 `normal`，token 被拒也仍是 `normal`**，
+  那是可达性不是健康，更宽的问题归 `/api/v1/status`。空/非 http(s)、端口非数字 → `unknown`。
+  ②「不得因依赖不可用而抛」——每个依赖各自降级（`BitBrowserError`→`unreachable`、
+  Cloud `OSError`/存储失败→`abnormal`、未预期的失败→**`unknown` 且留 traceback**），响应恒 200；
+  常规不可用只记一行警告不留 traceback（Desktop 轮询不该把 `agent.log` 灌满）。
+  `CheckpointStore.probe()` 读一行 `task_checkpoints`：能开文件 ≠ 能干活（未迁移的库要报坏），
+  库文件不存在即失败且**绝不创建**（那等于自己造出被验对象），且是本类唯一显式 close 的连接。
+  测试 **345 OK**（T-07 后 320 → +25）。新类的「先红」只是 ImportError ⇒ 改量**变异**：
+  12 个变异控制行先绿、**全部转红**。**两处自查出的假绿**：①AST「探针不走 HTTP 客户端」检查对
+  `from urllib import request` 只取 `node.module`，deny-list 永远匹配不上——**是变异把它救回来的**；
+  ②真机探针的就绪判断误用宽 catch 的 `get()` ⇒ 首次连接被拒也当「起来了」，臂 A 全跑在没人服务的端口上。
+  真机两臂（真实入口、scratch 端口/临时树）**20/20**：臂 A 全 `normal` + `/healthz` 逐字 + BitBrowser 侧
+  只有 `POST /group/list`（读）；臂 B 三依赖全灭仍 200 + `abnormal/unreachable/abnormal`。
+  **登记一处范围外事实**：存储不可用时**既有的** `/api/v1/status` **确实抛**（处理函数异常 → 连接被关、
+  无响应，实测 `status=-1`），与聚合的 200 构成同进程对照；不在本 Task 改动范围（裁定只约束聚合端点），
+  **只如实登记、不改它**。契约 +`/api/v1/health` 与 `AggregateHealth`/`DependencyStatus`，版本 `2026.09.24.1`。
+  见 `evidence/task-08-health.md`。
+
 ## Current
 
-- T-07 已收尾（一个 Agent 提交 + 本记录）；T-08 `/api/v1/health` 待开始。
+- T-08 已收尾（一个 Agent 提交 + 本记录）；T-09 待开始。
 
 ## Next
 
-- 阶段 1 Agent：T-08 → T-09（T-02…T-07 已完成）。
-- **T-08 的题设要重测**：实测 BitBrowser 指向死端口时 `/api/v1/status` **已返回 200 + `unreachable`**，
-  不能假设外部依赖不可用会抛。
+- 阶段 1 Agent：T-09（T-02…T-08 已完成）。
+- T-09 的三项：删 `server.py:38`/`:591` 第二次 `configure_from`、`state` 改必传、
+  加「`src/` 内除 `bootstrap/app.py` 外不得 import `configure_from`/`configure_logging`」的 AST 边界测试（今天就会红）。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
@@ -98,6 +122,10 @@
 
 ## Recent verification
 
+- T-08：`bash scripts/test.sh` → **345 tests OK，exit=0**（320 → 345，只增不减）；`.local/` 守卫不响；
+  12 个变异**全部转红**（控制行先绿，探针先跑未变异对照行）；真机两臂 **20/20**；
+  契约只用 `ruby -ryaml` 验可解析 + 路径/schema 齐全（本仓**无** openapi 校验器，如实登记）。
+  见 `evidence/task-08-health.md`。
 - Start Gate（2026-09-24）：四仓工作区干净（governance/agent/desktop/cloud 各 `git status --porcelain` 为空）；
   `delivery/active/` 仅 `.gitkeep`；`LEDGER.md` 无表行；快照 `Active CHG: none`。
 - 起点测试基线：Desktop **68**（二进制 crate，`cargo test --lib` 不成立）、Agent **253 tests OK**。
