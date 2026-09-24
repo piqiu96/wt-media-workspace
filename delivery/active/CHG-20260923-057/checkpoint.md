@@ -8,6 +8,29 @@
 
 ## Completed
 
+- 2026-09-24 T-17：**Desktop 进程内会话 `operation_id`**（`wt-media-desktop` `9051480`，1 个 commit）——
+  一次 Agent 会话一个 id：`start` 生成并在**存下 child 之后**登记、`stop` 在**记完「已停止」之后**清除，
+  存在 `state.rs` 里 `AgentProcess` **旁边**（两者回答同一个问题：有没有一个会话在跑）。id 只作为**字段**
+  落在 `agent.supervisor` 的记录上：会话内的记录带 `operation_id=`，会话外的**一律不带这个字段**——
+  不能写成 `operation_id=None`，那是对「这条记录属于哪个会话」的**错误回答**，也会改掉今天已有的行形状；
+  这就是 `lifecycle!` 宏有**两个 `event!` 分支**的原因。**不加新 target**（`OWNED_TARGETS` 仍恰 3）、
+  **不发 Header**、**不进 sidecar 环境**（裁定九/D-10）——三条各有一个变异去打（M1 query / M2 Header /
+  M3 环境变量），M3 打掉的是**既有**用例 `vars.len() == 3`。
+  出站头的基准是**桩套接字实际收到的字节**（`authorization`/`accept`/`host` 逐字，`host` 由 hyper 在 send
+  时加、`build()` 看不到），不是 `build()` 推断的集合。`begin`/`ended` 再从 `start`/`stop` 拆出一层：
+  spawn 之后与 kill 之后的动作是**可以测的**，不该藏在要 `AppHandle`/`CommandChild` 才能进的函数里。
+  **变异 R1–R3 + M1–M5 全部 KILLED**（R2/R3 成对：只回退登记或只回退清除，另一个方向仍会绿）；
+  **两个诚实幸存者**：`start` 里的 `begin(...)` 与 `stop` 里的 `ended(...)` 各一行调用点，单测进不去
+  ⇒ **只由真机臂覆盖**（会话 A 三条同 id、stop 之后那条**无字段**就是它们跑过的证据），未写假替身。
+  **真机臂**复用 T-16 的探针页套路：两个会话、六条记录、5 条带 id（两个不同值）、1 条不带（stop 之后的
+  health），探针打印的返回值里**一条都不含 id**；脚手架逐项还原（`index.html` sha256 逐字相同、
+  5174/18767 无残留、无残留进程），未碰 `:8765`/`:18080`/`:54345`。
+  测试 166 → **175**；build **9 → 9**、clippy **13 → 13**；`rustfmt` 新增行 **0 处**差异
+  （`state.rs` 整文件干净；`commands/agent.rs` 既有脏行 9 → 8，未整文件重排）。
+  **另登记三条**：退出报告**有意不带 id**（`drain` 在进程退出时写，那时会话可能已被清除，同一记录类型
+  「有时带有时不带」比一律不带更误导）；`already_running` 带 id 只在单测表里（真机臂时序没走到）；
+  两侧 id **不相关**（T-21 的 id 是请求级，不做串联）。见 `evidence/task-17-desktop-operation-id.md`。
+
 - 2026-09-24 T-16：**三个既有 emit 点改道 + 生命周期补点**（`wt-media-desktop` `5eb7d0c` 纯重命名 +
   `b02130c` 改道，**2 个 commit**）——① `drain::report_exit` 由 `eprintln!` 改走 `agent.supervisor`
   记录（**恰一条**，按裁定五**保留末 20 行尾**，`single_line` 把整份报告转义成一行）；② `CommandEvent::Error`
@@ -244,14 +267,30 @@
 
 ## Current
 
-- T-16 已收尾（Desktop 两个提交 + 本记录）；阶段 2 下一个是 **T-17**（Desktop 进程内 `operation_id`）。
+- T-17 已收尾（Desktop 一个提交 `9051480` + 本记录）；**阶段 2（Desktop 半）T-10…T-17 全部完成**，
+  下一个是 Agent 侧的 **T-20**（Agent 脱敏三处泄漏/一处形状），随后 T-21、最后 workspace T-18。
 
 ## Next
 
-- **T-17**：Desktop 进程内 `operation_id`——复用已有 `uuid` 依赖（**不新增**）、一次 Agent 会话一个 id
-  （start 生成、stop 清除）、存在 `state.rs` 里 `AgentProcess` 旁边，落点 `info!(target: "agent.supervisor",
-  operation_id = %id, …)`；**不加新 target**、**不发 Header**、**不进 sidecar 子进程环境**（裁定九/D-10）。
-  注意 T-16 已把命令体拆成 `health`/`start`/`stop` 三个自由函数 ⇒ id 的**读取点**就在这三个体里，测试可以直接调它们。
+- **T-20**（Agent 侧，**先红 → 最小实现 → 测试 → 变异 ≥4 → 真机 → agent commit ×1**）：脱敏四处实测缺陷
+  ——a `token=aaa password=bbb`（同行第二个凭据不掩）、b `cookies: a=1; b=2`（复数键只掩第一个值）、
+  c `{"client_secret": "s3cr3tvalue"}`（闭引号被吃掉，**形状错、非泄漏**）、d `mytoken=abcdefghijkl password=zzz`
+  （形似键吞掉整行，遮蔽被静默关掉）。修复形态**两条正则**（`_TAIL_KEYED` 整尾家族 / `_VALUE_KEYED` 单值家族，
+  回显用原文字前缀保住键的引号），`_is_cookie_key` 同时认 `cookie`/`cookies`；**不用**「有界残余循环」。
+  断言改用**精确字符串**（既有两列表风格看不见 c）。T-13 的 20 行差分表做成 fixture。
+  收尾再对 desktop 仓 `logging/redact.rs:7-20` 那句现在变假的注释单独发一个 doc commit。
+- **T-21**（Agent 侧）：请求级 `operation_id`（`secrets.token_hex(8)` + contextvar + 覆写
+  `handle_one_request` 且 `try/finally` 复位），进 `FMT`/`ERROR_FMT`，`error.log` 放在 logger 名之后、
+  `error_code` 之前（裁定六）。测试用 `ThreadingHTTPServer(("127.0.0.1", 0), …)` + `http.client`
+  （**端口 0，绝不碰 8765**；**不用 `urlopen`**，避开 T-19 的 AST 规则）。**不做跨端串联**（D-10 不变）。
+- **T-17 的三条新登记要进 T-18 的 §7/§10**：① 退出报告（`drain::report_exit`）**有意不带 `operation_id`**
+  （进程退出时会话可能已被清除，同一记录类型「有时带有时不带」比一律不带更误导）；② `already_running`
+  带 id 的形态**只在单测表里**（真机臂每次都先 stop 再 start，槽位总是空的）；③ **两侧的 id 不相关**
+  ——Desktop 的 id 标识「一次 Desktop 监督的会话」、T-21 的 id 标识一个请求，来源与粒度都不同，
+  本 CHG **不**做跨端对照（D-10 不变）。
+- **T-17 的一条环境事实复述**（T-16 已登记，T-17 再次撞上并沿用同一绕法）：debug 二进制带 `cfg(dev)` ⇒
+  窗口加载 `devUrl` 而非 `frontendDist`，没有 Vite 时窗口整页空白 ⇒ 真机臂只能靠**探针页替身**驱动命令层，
+  真前端未跑。
 - **T-16 的三条新登记要进 T-18 的 §7/§10**：① **AC-09 的真机分母是 1 行**不是 50（那 1 行确实是
   sidecar 输出、确实只出现在退出报告的尾行里；规模只由单测证）；② **`start` 的 spawn 失败分支在本地这棵树
   够不着**（随应用提供的 sidecar 存在且能 spawn 成功，只是运行期因 macOS Team ID 起不来 ⇒
@@ -264,10 +303,11 @@
 - **T-15 的两个新登记要进 T-18 的 §7/§10**：①`level` 严于 INFO 时 **stderr 与文件一起静默**
   （两层共用同一个 filter，实测；计划只预测「不建文件」）；②`main.rs` 的**两个实参无测试守**
   （N8/N9），其中 N9 由臂 1 的真实启动守、N8 分母为 0（无记录携带 token）。
-- **Agent 侧两处真泄漏待你裁定**（`Blocking = NO`，但 DONE Gate 前必须落地）：§7 **Q-07**（Agent 侧脱敏实测
-  出两处真泄漏——一行里第二个凭据不掩；复数 `cookies:` 键只掩第一个值——另有第三处形状错：JSON 键的闭引号
-  被吃掉，行不再合法）。T-06 已提交，拟开 Agent 侧独立 Task（T-20，自己的 commit + evidence + 变异），
-  **等你一句话**再动 Agent 仓。见 `evidence/task-13-desktop-backend.md` §2/§7。
+- **Agent 侧脱敏已由用户裁定开 Task 修**（不再是待裁定项）：§7 **Q-07** 的三处实测缺陷（一行里第二个凭据
+  不掩；复数 `cookies:` 键只掩第一个值；JSON 键的闭引号被吃掉 ⇒ 行不再合法）**加上 T-13 之后新发现的
+  第四处 d**（形似键 `mytoken=` 吞掉整行、遮蔽被静默关掉）由 **T-20** 在本 CHG 内修，Agent 仓自己的
+  commit + evidence + 变异。T-20 落地后 Q-07 的**行文本身也变假**（它按旧行为描述），T-18 一并改写。
+  见 `evidence/task-13-desktop-backend.md` §2/§7。
   （注：T-13 的证据与上一版 checkpoint 把这个 ID 写成 `Q-08`，而 `change.md` §7 里它是 **Q-07**；
   §7 另有一段说明 `Q-08` 这个 ID 早先被 T-19 行与 AC-11b 用作 Q-05 内容的别名。T-18 统一编号时一并收口。）
 - **T-15 的待验期望已被实测取代**：登记的「93 → 4 / 97 → 10」**不成立**，实测 **93 → 9 / 97 → 13**，
@@ -277,10 +317,13 @@
 - **访问 crates.io 必须带 `HTTPS_PROXY=http://127.0.0.1:7897`**（T-10 查明的根因：本机直连的证书被劫持）。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
-- 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
+- **T-19 已完成**（`978155f`，test-only）：AC-11b 的 AST 规则——客户端构造必须注入假 `transport`、
+  `urlopen` 必须被 patch；**编号排末位**以免打乱 T-03…T-18。它给 T-21 留下一条约束：
+  **新测试里不用 `urlopen`**（用 `http.client`），否则会被这条规则判红。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
-- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 ✓ → T-17。
+- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 ✓ → T-17 ✓（**本阶段完成**）。
+- 阶段 2 Agent 补做：T-20（脱敏）、T-21（请求级 `operation_id`）——由用户本次裁定新开。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
@@ -300,6 +343,20 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
 ## Recent verification
+
+- T-17：`cargo test --workspace` → **175 passed; 0 failed**（166 → +9 = `state` 3 + `commands/agent` 5 +
+  `http/local_agent` 1，**只增不减**）；`cargo build` 条目级警告 **9 → 9**、clippy `--all-targets` **13 → 13**
+  （**未增**）。`rustfmt --edition 2021 --check --config skip_children=true`：`state.rs` **整文件 0 处差异**，
+  `commands/agent.rs` **8 处既有脏行**（改动前 9，因我改动而变长的三行按 rustfmt 写法顺手改掉；**未**整文件重排）。
+  变异 **R1–R3 + M1–M5 全部 KILLED**（控制行 175 passed 先绿；R2/R3 成对），**N1/N2 如实 SURVIVED**
+  ——`start` 里的 `begin(...)` 与 `stop` 里的 `ended(...)` 各一行调用点单测进不去（要 `AppHandle` / 真
+  `CommandChild`），**只由真机臂覆盖**。
+  真机臂（探针页 + scratch 端口 18767 的 stub，**不是 8765**）：两个会话、六条 `agent.supervisor` 记录，
+  5 条带 id（`1190a95e…` / `f386572a…`，**两个不同值**）、1 条不带（stop 之后的 health ⇒ `clear` 真的跑过）；
+  探针打印的六条返回值**一条都不含 id**（id 不出进程）；`stop` 后立即 `start` 得**新 id**（不跨会话复用）；
+  退出报告两条**都没有 id**（有意为之）。脚手架逐项还原（`index.html` 的 sha256 `e568216d…` 与备份逐字相同、
+  5174/18767 无监听残留、无残留进程、未碰 `:8765`/`:18080`/`:54345`、未向仓库配置写代理）。
+  二进制在两次启动前核对过 mtime（晚于最后一次源码改动）。
 
 - T-16：`cargo test --workspace` → **166 passed; 0 failed**（153 → +13 = drain 4 + webview 2 + agent 7；
   agent 那 7 条 = 生命周期全表 1 + 记录文案与返回串 3 + **真实套接字上**的命令体 3，其中 health 成功那条

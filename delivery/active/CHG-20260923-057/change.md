@@ -213,7 +213,11 @@
 | Q-04 | 裁定七还列了「用户设置异常」与「更新异常」，但 Desktop **没有** settings 命令（`commands/` 只有 account/agent/bind/logging/profile/public_config），`updater/mod.rs` 也**没有任何 emit 与可上报的异常路径**——**无来源可接**。登记为未交付，**不造假发射点**。 | NO |
 | Q-05 | **AC-11 的覆盖被计划高估**：计划把 AC-11 整条（含「测试不误连真实外部服务」）映射给 T-02，T-02 执行时实测该半**今天无任何规则在守**。处置：AC-11 拆为 AC-11a（PASS，T-02）/ AC-11b（未覆盖），新增 **T-19** 在本 CHG 内补上这条规则（里程碑的失败行为锚点就写着它，丢弃会使该锚点无人守）。**未静默吸收，也未静默丢弃。** 若要移出本 CHG 请一句话。 | NO |
 | Q-06 | **T-13 定下的两条稳定事实**（回写用）：①target 词汇表 `{agent.supervisor, desktop.startup, webview}`，`agent.supervisor` 的运行级别**永不比 INFO 更严**；②Desktop 记录为**单行纯文本**，时间戳 `%Y-%m-%dT%H:%M:%SZ`（UTC，因为 T-12 的文件名已按 UTC 分档），与 Agent 的本地时间无 `Z` 是**有意**差异。三条都有机器守（枚举断言 + 变异 6/8/11/12）。要改口径请一句话。 | NO |
-| Q-07 | **Agent 侧脱敏的三处实测发现**（T-13 差分表 20 行跑出来的，**其中两处是真泄漏**）：①`_KEYED` 的 `[^\n]*` + `re.sub` 从整段匹配之后续扫 ⇒ 一行里的**第二个凭据永不进扫描**（实测 `token=aaa password=bbb` → `token=*** password=bbb`）；②`_is_cookie_key` 只认单数 `cookie`，而词表里有复数 `cookies` ⇒ 复数键走通用路径，**只掩第一个值**（`cookies: a=1; b=2` → `cookies: ***; b=2`）；③`_KEYED` 的 `["']?` 被消费掉而回显只拼 `key+separator` ⇒ **JSON 键的闭引号丢失**，该行不再是合法 JSON。T-06 已提交（`b66d7f5`/`70c1f93`），按「一仓一 commit」不在 T-13 里改。拟开 **Agent 侧独立 Task（T-20）**：把这张 20 行差分表做成用例 + 一条变异 + 真实启动取证，自己的 commit 与 evidence。**`Blocking = NO`（不挡 T-14…T-18），但 DONE Gate 前必须落地**——两处真泄漏直接咬成功事实 #5「敏感信息不进日志」。等你一句话再动 Agent 仓。 | NO |
+| Q-07 | **Agent 侧脱敏的三处实测发现**（T-13 差分表 20 行跑出来的，**其中两处是真泄漏**）：①`_KEYED` 的 `[^\n]*` + `re.sub` 从整段匹配之后续扫 ⇒ 一行里的**第二个凭据永不进扫描**（实测 `token=aaa password=bbb` → `token=*** password=bbb`）；②`_is_cookie_key` 只认单数 `cookie`，而词表里有复数 `cookies` ⇒ 复数键走通用路径，**只掩第一个值**（`cookies: a=1; b=2` → `cookies: ***; b=2`）；③`_KEYED` 的 `["']?` 被消费掉而回显只拼 `key+separator` ⇒ **JSON 键的闭引号丢失**，该行不再是合法 JSON。T-06 已提交（`b66d7f5`/`70c1f93`），按「一仓一 commit」不在 T-13 里改。
+**已由用户裁定开 Agent 侧独立 Task **T-20**（§8 有行）**：把这张 20 行差分表做成用例 + 一条变异 + 真实启动取证，
+自己的 commit 与 evidence。**`Blocking = NO`（不挡 T-14…T-18），但 DONE Gate 前必须落地**——两处真泄漏直接
+咬成功事实 #5「敏感信息不进日志」。**T-13 之后又实测出第四处**（T-13 那张 20 行表看不见：形似键 `mytoken=`
+吞掉整行致遮蔽静默关闭），一并归 T-20 修；本条的行文按**旧行为**描述，T-20 落地后本条须整体改写（T-18）。 | NO |
 
 无阻塞项（`Blocking = NO`）：Q-01…Q-07 均已按上述口径实施或登记，用户可在任一 checkpoint 用一句话改判。
 `Q-08` 这个 ID 在 §8 的 T-19 行与 §10 的 AC-11b 里被引用（指「T-02 实测 AC-11 的『不误连外部服务』那半今天无规则在守」），
@@ -242,14 +246,22 @@
 | T-14 | Desktop `[logging]` 配置 + 校验 + 出货资源（非法级别、三个 0、总量小于单文件上限先红；报错只点名键不回显值） | DONE | `evidence/task-14-desktop-logging-config.md`；出货 TOML 补 `[logging]`（`level="auto"`、20MB/14 天/100MB），`Logging` 同款 `deny_unknown_fields` 且**无** `#[serde(default)]`；`validate()` 五条检查只点名键；**先红**：表的第 4 列（报错须点名的键）+ 每行先断言 `contains(from)` ⇒ `[logging]` 尚未写进出货文件时表自己报 `row "unusable log level" matches nothing`；**变异 9/9 红**（控制行 147 passed 先绿），**两个缺口当场补齐**——M6「词表删 trace」起初存活（正向臂与文案都从 `LOG_LEVELS` 推导 ⇒ 常量须用手写值钉死）、M9「撤 `Logging` 的 `deny_unknown_fields`」起初存活（既有用例只测顶层 ⇒ 改为逐节枚举）；三处超出计划的检查逐条登记（`retention_days <= 0`、`total_bytes >= max_file_bytes`、逐节 deny）；**147 tests OK**（144 → +3）；build **93 → 93** / clippy **97 → 97**（新常量被 `validate()` 引用，不入 `dead_code`）⇒ T-15 期望起点仍 **93→4 / 97→10** |
 | T-15 | 接进 `main`（唯一入口）：插在 `bootstrap::resolve` 之后、启动摘要之前；**stderr 照旧**，目录不可写时仅 stderr 且仍启动 | DONE | `evidence/task-15-desktop-main-wiring.md`；`logging/setup.rs` 拆 `plan()`（全部决定）/`install(plan, secrets)`（只剩装配，**不再持有 `&DesktopConfig`**）——**拆分由第一个变异逼出**：环境取 `config.environment` 时整套 152 条全绿，拆后 N1/N2/N6/N7 各自红；环境取**构建期**；token 生成提前到日志之前；变异**两轮 22 个**（控制行两次先绿），M3/M4 起初存活（期望与实际**都从 `filter_of` 推导**，与 T-14 的 M6 同形）⇒ `PINNED_LEVELS` 手写对表 + `join(" ")` 绑回 `LOG_LEVELS`；**三个幸存者逐条登记**（`main` 的两个实参 + 不可达的「已被装过」臂，N9 由臂 1 的真实启动守、N8 分母为 0）；真机三臂（摘要入 stderr **且**入开发态文件且首条即摘要 / 占住目录仍启动不 panic / `warn` 0 条不建文件 vs 对照 `info` 1 条 255 字节）；**153 tests OK**（147 → +6）；build **93 → 9** / clippy **97 → 13**，与登记的 4/10 不符的 5 条逐条点名（`rolling` 的 `SHIPPED`/三个 `DEFAULT_*`/`open_path` 只在测试里被引用）且新增代码 0 条 lint |
 | T-16 | 三个既有 emit 点改道（`main.rs:65`→`desktop.startup`；`drain.rs:158`→`agent.supervisor`；`commands/logging.rs` 先纯重命名 `commands/webview.rs` 单独 commit，再改走 logger `target=webview`）+ Agent 启停与健康检查补点 | DONE | `evidence/task-16-desktop-emit-points.md`；`report_exit` 恰一条该 target 记录且带末 20 行尾；50 行普通 sidecar 输出 → 零条（对照：这 50 行确实在缓冲里）；**166 tests OK**（153 → +13）；变异 **13/13 KILLED**（3 个回退到旧形态 + 10 个新形态）、控制行先绿；真机**探针页**三轮取证；build **9** / clippy **13**（前后相同，逐条点名无一条落在新代码上）；命令体拆 `health`/`start`/`stop` 后只剩 `start` 的 spawn 够不着，如实登记 |
-| T-17 | Desktop `operation_id`（**仅进程内**）：断言出站请求头集合与今天**逐字相同**；`sidecar/mod.rs` 的 `assert_eq!(vars.len(), 3)` 仍绿 | TODO | 头集合逐字比对 + 环境变量数不变 |
+| T-17 | Desktop `operation_id`（**仅进程内**）：断言出站请求头集合与今天**逐字相同**；`sidecar/mod.rs` 的 `assert_eq!(vars.len(), 3)` 仍绿 | DONE | `evidence/task-17-desktop-operation-id.md`；一次会话一个 id（`start` 生成并在存下 child **之后**登记、`stop` 在记完「已停止」**之后**清除），id 是**字段**：会话内带 `operation_id=`、会话外**一律不带**（`lifecycle!` 因此有**两个 `event!` 分支**——写成 `operation_id=None` 是对「这条记录属于哪个会话」的错误回答，且会改掉今天的行形状）；**不加新 target** / **不发 Header** / **不进 sidecar 环境**三条各有一个变异打掉自己（M1 query / M2 Header / M3 环境变量，M3 打的是**既有** `vars.len() == 3`）；**头集合基准是桩套接字实收字节**（`authorization`/`accept`/`host` 逐字，`host` 由 hyper 在 send 时加、`build()` 看不到）而非推断；**175 tests OK**（166 → +9）；变异 **R1–R3 + M1–M5 全 KILLED**（R2/R3 成对）、控制行先绿；**N1/N2 如实 SURVIVED**（`begin(...)`/`ended(...)` 各一行调用点单测进不去）**只由真机臂覆盖**；真机探针页臂：两会话六条记录 5 带 id（两值不同）/1 不带，返回值不含 id；build **9** / clippy **13**（未增）；退出报告**有意不带 id**、`already_running` 带 id 只在单测表里、**两侧 id 不相关**三条已登记 |
 | T-18 | 回写与收尾：基线（程序总纲 §3 CHG-B 补数字、架构基线 §5.8/§6.8 补三文件与 Desktop 路径）、入口文档、`[logging]` 注释；`Status: DONE` → `git mv` 归档 → 移除 LEDGER 行 → `--no-active` 冷启动重生成 → **主动扫**失效指针 | TODO | 两验证器绿；扫描报分母 + 阳性对照 |
 | T-19 | **测试不误连真实外部服务**（T-02 执行中发现，见 §7 Q-08）：AST 规则——`tests/` 内每次网络客户端构造（`BitBrowserClient` / `CloudAgentClient`）必须注入假 `transport`，`urlopen` 调用必须被 patch；T-02 只覆盖了 AC-11 的后半 | DONE | `evidence/task-19-no-external-services.md`；**365 tests OK**；计划的分母与实测不符（计划 41 处/34 模块，实测 41 = 38 处构造 + 3 处 `urlopen`、**40 模块**）；规则先红报出 5 处真命中且都走标记而非改代码；7 个变异逐个红且三条真断言各有变异能红它；一处真误报（`as urlopen` 绑的是 mock）与**两个自查出的对照缺陷**（读整树报告 → 假理由变红） |
+| T-20 | **Agent 侧脱敏**（§7 Q-07 的三处 + T-13 之后新发现的第四处）：把 20 行差分表做成 fixture + 四处缺陷行的**精确串**用例；修复形态两条正则（整尾家族 / 单值家族）；幂等；`SENSITIVE_KEY_NAMES` × {`=`,`:`} 全覆盖 | TODO | 变异 ≥4 各自打掉自己的用例、控制行先绿；真实 logger 落 tmpdir 后读回 `agent.log` 断言凭据不在且周围文本仍在；T-13 的 20 行表 20/20 与 Desktop 参考实现一致 |
+| T-21 | **Agent 侧请求级 `operation_id`**（§8 无任务承接、§5 Scope/Add 要求）：`secrets.token_hex(8)` + contextvar（落在 `runtime/logging.py`）+ 覆写 `handle_one_request` 并 `try/finally` 复位；进 `FMT`/`ERROR_FMT`，`error.log` 位置在 logger 名之后、`error_code` 之前 | TODO | 端口 0 + `http.client` 的真实 HTTP 两条记录各带 16 位十六进制 id 且两 id 不同、请求外不带；变异各自红 |
 
 > **T-19 的来源**：T-02 执行时逐条核对 AC-11，发现计划把 AC-11 整条映射给 T-02，但 T-02 只交付了
 > 「不写真实检出目录」那半——「不误连真实外部服务」**今天没有任何规则在守**（实测：无该规则；
 > `54345`/`18080`/`8765` 出现 30 余处但**多为数据**，配注入的假 transport 或断言出货配置值）。
 > 该失败行为写在里程碑的成功事实锚点上，故**留在本 CHG 内**而不是丢弃；编号排末位以免打乱既有 T-03…T-18。
+
+> **T-20/T-21 的来源**：用户本次裁定——**开 T-20** 在本 CHG 内修掉 §7 Q-07 的 Agent 侧脱敏缺陷（两处真泄漏
+> 直接咬成功事实 #5，`Blocking = NO` 但 DONE Gate 前必须落地），**补 T-21** 交付 §5 Scope/Add 要求而 §8
+> 无任务承接的 Agent 侧进程内 `operation_id`（实仓零命中）。二者编号续在 T-19 之后，同 `T-19 的来源` 的理由：
+> 不重排既有 T-03…T-18。T-21 的关联范围**仅请求内、处理线程内**（跨线程不传播 contextvar），
+> 跨端串联仍**不交付**（裁定九/D-10 不变）。
 
 ## 9. Repository Checklist
 
@@ -270,6 +282,8 @@
 - [x] T-08 `/api/v1/health`（两条禁令落成机制：Cloud 探针只连不发、聚合恒 200 不抛；契约同步）；
 - [x] T-09 唯一入口（R11 AST 规则 + 三个反例）、`state` 必传、`-m` 下记录名（`LOGGER_NAME`）；
 - [x] T-19 不误连外部服务（AC-11b）
+- [ ] T-20 脱敏（§7 Q-07 的三处 + 新发现的第四处；两条正则 + 20 行差分表进 fixture）
+- [ ] T-21 请求级 `operation_id`（contextvar + `handle_one_request`；三文件位置一致）
 - [ ] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
 
 ### wt-media-desktop
@@ -277,7 +291,7 @@
 - [x] T-10 依赖；T-11 目录解析（**这两项已 DONE**）
 - [x] T-12 rolling（**已 DONE**）
 - [x] T-13 装配/白名单/脱敏（**已 DONE**）
-- [x] T-14 配置；T-15 main；T-16 改道与补点（**这三项已 DONE**）；T-17 operation_id
+- [x] T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id（**四项已 DONE，Desktop 半 T-10…T-17 全部完成**）
 - [ ] 入口文档回写（T-18）；`.gitignore` 补 `.local/` **已在 T-11 完成**
 
 ### wt-media-cloud
@@ -290,11 +304,11 @@
 |---|---|---|---|
 | AC-01 | Agent 脱离 Desktop 可独立运行并产生日志（裁定十三·1） | 真实独立启动 ✓；**三文件**各收到真实记录（T-04 臂 C 三者均 127 字节）✓；常规启动 `agent.log` 非空（T-03/T-04 臂 A） | PASS |
 | AC-02 | Desktop 正式启动产生自身日志（裁定十三·2） | 真实启动（臂 1）后 `src-tauri/.local/logs/desktop-20260924-1.log` 249 字节、**首条记录即启动摘要**且与 stderr 那一行逐字相同（T-15）。**口径**：出货级别（`auto`）下验证；`level` 严于 INFO 时不建文件（惰性建文件，T-12 设计）且**连 stderr 一起静默**（两层共用 filter，T-15 臂 3 实测） | PASS（T-15） |
-| AC-03 | Config/Logger **只初始化一次**（裁定十三·3） | Agent 侧已成立：R11 AST 规则（除 `bootstrap/app.py` 外不得到达 `configure_from`/`configure_logging`）+ 三个反例（含规则被改成 `return []` 时全红）；`server.py` 那次重复调用已删。出站头集合逐字相同（T-17，Desktop） | 部分（T-09） |
+| AC-03 | Config/Logger **只初始化一次**（裁定十三·3） | Agent 侧已成立：R11 AST 规则（除 `bootstrap/app.py` 外不得到达 `configure_from`/`configure_logging`）+ 三个反例（含规则被改成 `return []` 时全红）；`server.py` 那次重复调用已删。Desktop 侧的 `operation_id` **没有开出第二条初始化/传递通道**：出站头集合与今天**逐字相同**（T-17 在**桩套接字实收字节**上钉死 `authorization`/`accept`/`host`，并断言整份请求不含该 id）、不加新 target（`OWNED_TARGETS` 仍恰 3）、不进 sidecar 环境（既有 `vars.len() == 3`） | PASS（T-09/T-17） |
 | AC-04 | 日志不会无限增长（裁定十三·4） | Agent 侧已成立：20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，六个界各一次变异；真机两臂 8/8。**总量口径**：`total_bytes` 在轮转/启动点强制，真实上界 `total_bytes + 3×max_bytes`（出厂 400MB + 60MB），是有界而非逐字节精确（T-07）；Desktop 侧已成立：日期翻档 / 20MB 翻档 / 单条截断（`truncate=true original_size=<n>`）/ 按天删 / 按量删 / 当前文件永不删，变异 **25/25 红**（T-12），**跨午夜的第二个实例**未覆盖（T-12 如实登记） | PASS（T-07/T-12） |
 | AC-05 | 日志目录异常不阻断启动（裁定十三·5） | Agent 侧已成立：`configure_from` 降级仅 stderr 且既有单测绿（T-03）；Desktop 侧已成立：用普通文件占住 `<repo>/.local/logs` 后**仍启动**（8 秒后仍存活）、摘要在 stderr、**不 panic**、占位文件未被改动，且原因随摘要一起写出（T-15 臂 2；同形的单测 `an_unusable_directory_is_a_reason_and_not_a_failure`） | PASS（T-03/T-15） |
 | AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 已在真实进程上成立：**五个生命周期记录各自的调用点都跑到过**（启动 / 已在运行 / 健康成功 / 停止 / 未在运行，T-16 臂 C）+ 退出报告（T-16 臂 B）——在此之前「Agent 没在跑」与「在跑但拒绝」在前端只表现为一条失败命令；请求级 `operation_id` 由 **T-21**（Agent 侧进程内）承接，落地前该字段在本条下**未验** | 部分（T-04/T-05/T-16；T-21 待做） |
-| AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧已成立：表驱动 15 行两列断言、落盘后读文件断言 token 不在、traceback 面同覆盖（T-06）；**但 T-13 的差分表实测出 Agent 侧还剩两处真泄漏**（一行里第二个凭据、复数 `cookies:` 只掩第一个值）→ §7 **Q-07**，DONE 前必须落地。Desktop 侧已成立到模块层与真实进程：target 白名单（外来 target 有对照臂地不入文件）、含 token 的记录走完 sink 后 grep 不到且周围文本仍在（T-13）、真实启动确实建出文件并走完 sink（T-15 臂 1）。**登记一处无验证手段**：`main` 把 token 交给掩码这一行（T-15 的 N8）**无用例可打**——真实启动的 grep 分母为 0（今天没有记录携带 token）⇒ 该行由 T-13 的 sink 级用例 + 调用点单行守，不谎称已覆盖 | 部分（T-06/T-13/T-15） |
+| AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧**部分**：表驱动 15 行两列断言、落盘后读文件断言 token 不在、traceback 面同覆盖（T-06）；**但 T-13 的差分表实测出 Agent 侧还剩两处真泄漏**（一行里第二个凭据、复数 `cookies:` 只掩第一个值），**加上 T-13 之后新发现的第四处**（形似键吞掉整行致遮蔽静默关闭）⇒ §7 **Q-07**，由 **T-20** 在本 CHG 内修（DONE 前必须落地）。Desktop 侧已成立到模块层与真实进程：target 白名单（外来 target 有对照臂地不入文件）、含 token 的记录走完 sink 后 grep 不到且周围文本仍在（T-13）、真实启动确实建出文件并走完 sink（T-15 臂 1）。**登记一处无验证手段**：`main` 把 token 交给掩码这一行（T-15 的 N8）**无用例可打**——真实启动的 grep 分母为 0（今天没有记录携带 token）⇒ 该行由 T-13 的 sink 级用例 + 调用点单行守，不谎称已覆盖 | 部分（T-06/T-13/T-15；T-20 待做） |
 | AC-08 | Desktop 与 Agent 日志职责清晰（裁定十三·8） | 两向断言，两边各一条对照臂：**Agent 业务日志**进 `agent.log`、不进 `desktop.log`——T-04 三文件路由（真实进程）+ T-16 的 `ordinary_output_reaches_the_buffer_and_no_record`（50 行普通输出 → 该 target 零条记录，**对照**是这 50 行确实在 `drain` 缓冲里，「零条」不来自一个什么都没收到的 drain）；**Desktop 自己的生命周期**（启停、健康、退出）进 `desktop.log` 的 `agent.supervisor`——T-16 五分支真机臂 + 退出报告 | PASS（T-04/T-16） |
 | AC-09 | Sidecar stdout 持续消费且**不转存**（裁定十三·9）。**口径按裁定五收窄为「进程存活期间」** | ①**进程存活期间的普通输出零条 desktop 记录**：单测 50 行（对照：50 行在缓冲里）；**真机分母是 1 行而不是 50**（sidecar 只来得及打印 1 行就死了）⇒ 真机只证明「那 1 行没变成记录、且确实到了 drain」，**不**证明规模；②**异常退出另立一臂**：恰**一条**该 target 记录且**含末 20 行尾**（裁定五），尾行在整份 `desktop.log` 里**只出现这一次**（臂 B 逐行核对：`[PYI-…]` 只在退出记录里）；③读失败（`CommandEvent::Error`）也是**一条**记录——进程未退出时的读失败否则永不为人所见；④对照臂：同一次失败，前端拿到的串**带**尾行、记录**不带** | PASS（T-16） |
 | AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | **实测到一处真泄漏并修**：`environment_facts` 的 `cloud_base_url` 原样带密码（`True → False`，URL 仍可读）且走 `print`→stdout（T-06）；`/api/v1/health` 响应面已量（T-08 真机两臂：体里只有 `agent_version`/`agent_status` 与三个依赖的状态词，**没有** `cloud_base_url` 本身、没有 token）；`status` 响应体本 Task **未测**（契约面，已登记） | 部分（T-06/T-08） |
@@ -328,7 +342,8 @@
 - `evidence/task-14-desktop-logging-config.md`（T-14）
 - `evidence/task-15-desktop-main-wiring.md`（T-15）
 - `evidence/task-16-desktop-emit-points.md`（T-16）
-- `evidence/task-XX-<topic>.md`（**T-17 / T-18 / T-20 / T-21** 每项一份，随 Task 落地——原句写的「T-03…T-19 每项一份」已按上面的实名清单更正）
+- `evidence/task-17-desktop-operation-id.md`（T-17）
+- `evidence/task-XX-<topic>.md`（**T-18 / T-20 / T-21** 每项一份，随 Task 落地——原句写的「T-03…T-19 每项一份」已按上面的实名清单更正）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
 ## 12. Current Checkpoint
@@ -405,32 +420,60 @@ Completed:
   信号 9 两种状态。未覆盖项逐条登记（`start` 的 spawn 失败分支、真机分母是 1 行不是 50、
   探针页是替身、`already_running` 在 sidecar 死后仍说「已在运行」、`local_agent_status` 未加记录）。
 
+- 2026-09-24 T-17：Desktop 进程内会话 `operation_id`（`wt-media-desktop` `9051480`，1 个 commit）——
+  一次 Agent 会话一个 id（`start` 生成并在存下 child **之后**登记、`stop` 在记完「已停止」**之后**清除），
+  存在 `state.rs` 里 `AgentProcess` **旁边**。id 只作为**字段**落在 `agent.supervisor` 的记录上：会话内带
+  `operation_id=`、会话外**一律不带**（`lifecycle!` 因此有两个 `event!` 分支——写成 `operation_id=None`
+  是对「这条记录属于哪个会话」的**错误回答**，也会改掉今天的行形状）。**不加新 target** / **不发 Header** /
+  **不进 sidecar 环境**三条各有一个变异打掉自己（M1 query / M2 Header / M3 环境变量，M3 打的是**既有**
+  `vars.len() == 3`）。出站头集合的基准**测量自桩套接字实收字节**（`authorization`/`accept`/`host`，
+  `host` 由 hyper 在 send 时加、`build()` 看不到）。`begin`/`ended` 再从 `start`/`stop` 拆一层：
+  spawn 之后与 kill 之后的动作是**可以测的**。**变异 R1–R3 + M1–M5 全 KILLED**（R2/R3 成对）、控制行先绿；
+  **N1/N2 如实 SURVIVED**（`begin(...)`/`ended(...)` 各一行调用点单测进不去）**只由真机臂覆盖**。
+  **175 tests OK**（166 → +9）；build **9 → 9** / clippy **13 → 13**；`rustfmt` 新增行 0 处差异。
+  真机探针页臂（T-16 同一套路）：两会话六条记录，5 条带 id（两值不同）、1 条不带（stop 之后的 health
+  ⇒ `clear` 真跑过），返回值里一条都不含 id。**三条登记**：退出报告**有意不带 id**、`already_running`
+  带 id 只在单测表里、**两侧 id 不相关**（不做跨端串联，D-10 不变）。
+
 Current:
 
-- T-16 已收尾（`wt-media-desktop` 两个提交 + 本记录）；**阶段 2（Desktop 半）T-10…T-16 完成**，
-  下一个是 **T-17**。
+- T-17 已收尾（`wt-media-desktop` 一个提交 + 本记录）；**阶段 2（Desktop 半）T-10…T-17 全部完成**，
+  下一个是 Agent 侧的 **T-20**（脱敏四处实测缺陷），随后 T-21，最后阶段 3 的 T-18 回写与收尾。
 
 Next:
 
-- **阶段 2 余项 T-17**：Desktop 进程内 `operation_id`——复用已有 `uuid` 依赖（**不新增**）、一次 Agent 会话
-  一个 id（start 生成、stop 清除）、存在 `state.rs` 里 `AgentProcess` 旁边，落点
-  `info!(target: "agent.supervisor", operation_id = %id, …)`；**不加新 target**、**不发 Header**、
-  **不进 sidecar 子进程环境**（裁定九/D-10）。T-16 已把命令体拆成 `health`/`start`/`stop` 三个自由函数
-  ⇒ id 的**读取点**就在这三个体里，测试可以直接调它们。
-  **T-16 新登记的三条**：①`start` 的 spawn 失败分支（`failed` 的那次调用）在本地这棵树里够不着——
-  随应用提供的 sidecar 存在且能 spawn，只是运行期因 macOS Team ID 起不来；②AC-09 的真机分母是 **1 行**
-  （sidecar 只打印 1 行就死了），结论按分母收窄；③`already_running` 在 sidecar 自己死掉之后仍会说
-  「已在运行」（既有行为，T-16 只是让它第一次可听见）——留作 **T-18 的 §7 候选条目**。
-  另：**debug 二进制不加载 `frontendDist`**（`cfg(dev)` + `devUrl`），本环境真机跑不到前端，
-  T-17 的真机臂要照 T-16 的探针页办法办，或如实登记够不着。
-  之后阶段 3 T-18 回写与收尾（含 Agent 侧 T-20/T-21 落地）。
+- **T-20（Agent 侧）**：脱敏四处**实测**缺陷——a 同行第二个凭据不掩、b 复数 `cookies:` 只掩第一个值、
+  c JSON 键的闭引号被吃掉（**形状错、非泄漏**）、d 形似键 `mytoken=` 吞掉整行致遮蔽静默关闭。
+  修复形态**两条正则**（整尾家族 / 单值家族）；断言改用**精确字符串**；T-13 的 20 行差分表做成 fixture；
+  变异 ≥4 且控制行先绿；真机落盘取证。收尾对 desktop 仓 `logging/redact.rs:7-20` 那句现在变假的注释
+  **单独一个 doc commit**。**agent commit ×1**。
+- **T-21（Agent 侧）**：请求级 `operation_id`（`secrets.token_hex(8)` + contextvar + 覆写
+  `handle_one_request` 且 `try/finally` 复位），进 `FMT`/`ERROR_FMT`（`error.log` 放在 logger 名之后、
+  `error_code` 之前）；测试用端口 0 + `http.client`（**不用 `urlopen`**，避开 T-19 的 AST 规则）。
+- **T-17 的三条登记要进 T-18 的 §7/§10**：退出报告**有意不带 id**；`already_running` 带 id 只在单测表里；
+  **两侧 id 不相关**（来源与粒度不同，不做跨端对照，D-10 不变）。
+- **T-16 的三条登记同样进 T-18 的 §7/§10**：`start` 的 spawn 失败分支够不着；AC-09 真机分母是 **1 行**；
+  `already_running` 在 sidecar 死后仍说「已在运行」。另有一条**环境事实**（非缺陷）：debug 二进制带
+  `cfg(dev)` ⇒ 加载 `devUrl` 而非 `frontendDist`，没有 Vite 时窗口整页空白，真机臂只能靠探针页替身。
+- 之后阶段 3 **T-18** 回写与收尾（含 §7 关掉 Q-07、新增 Q-08、§8 补 T-20/T-21 两行、§10 陈旧行修正、
+  归档与冷启动重生成、失效指针扫描报分母 + 阳性对照）。
 
 Blockers:
 
 - None。§7 的 Q-01…Q-07 均 `Blocking = NO`，已按读数实施或登记。
-  **但 Q-07（Agent 侧脱敏的两处真泄漏）在 DONE Gate 前必须落地**，拟开 Agent 侧 T-20，等你一句话。
+  **Q-07（Agent 侧脱敏）已由用户裁定开 T-20 在本 CHG 内修**，不再是待裁定项；T-20 落地后 Q-07 的行文本身
+  也变假（它按旧行为描述），T-18 一并改写。
 
 Recent verification:
+
+- T-17：`cargo test --workspace` → **175 passed; 0 failed**（166 → +9 = `state` 3 + `commands/agent` 5 +
+  `http/local_agent` 1，只增不减）；build **9 → 9** / clippy `--all-targets` **13 → 13**（未增）；
+  `rustfmt --check --config skip_children=true`：`state.rs` 整文件 0 处差异、`commands/agent.rs` 8 处
+  既有脏行（改动前 9，未整文件重排）；**变异 R1–R3 + M1–M5 全 KILLED**（控制行先绿，R2/R3 成对）、
+  **N1/N2 如实 SURVIVED**（两行调用点单测进不去，只由真机臂覆盖）；
+  真机探针页臂两会话六条记录，5 带 id / 1 不带，脚手架逐项还原（`index.html` sha256 逐字相同、
+  5174/18767 无残留、无残留进程、未碰 `:8765`/`:18080`/`:54345`）。
+  见 `evidence/task-17-desktop-operation-id.md`。
 
 - T-16：`cargo test --workspace` → **166 passed; 0 failed**（153 → +13 = drain 4 + webview 2 + agent 7）；
   build **9** / clippy **13**（T-15 后也是 9/13，**未增**，13 条逐条列过）；**变异 13/13 KILLED**
