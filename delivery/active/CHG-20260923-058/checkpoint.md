@@ -36,10 +36,22 @@
   以及新补的**收口门禁同集合对照**一节）；`change.md` 加 D-09/D-10、D-04 补实测排序事实。
   workspace 侧按 Task 一个 commit。
 
+- T-03 **DONE**（desktop `3a0ea08`）：新模块 `src-tauri/src/app_paths.rs`（753 行）+ `main.rs` 一行
+  `mod app_paths;`，**未动 `paths.rs`、未动 `logging/paths.rs`**。四个根：
+  装机态 `Application Support/WTMedia/Desktop`(data) / `…/Desktop/versions` / `Logs/WTMedia/Desktop` /
+  `Caches/WTMedia/Desktop`，开发态 `<crate>/.local/{data,data/versions,logs,cache}`——
+  形状照抄 Agent 的 `runtime/paths.py`（含「装机态数据根即组件目录、开发态下沉一层」那条不对称）。
+  `directory`（纯）/ `resolve`（收拢，装机态缺 `HOME` 即 `Err`）/ `prepare`（唯一碰盘：建目录 + 真写探针）；
+  **读方只用 `directory`，写方才 `prepare`**。logs 一根本模块**不复述**、委托 `logging::paths`。
+  计数 desktop **160 → 176**（+16，0 删除，0 skipped）；**12 个实现变异全灭**（rustfmt 之后重跑过，
+  故表指的是将提交的字节）。非测试构建警告 9 → 23（+14 全为本模块 `never used`，测试构建 0 条，
+  消费方在 T-04/T-05，**不用 `allow` 盖掉**）。证据 `evidence/task-03-app-paths.md`。
+  **待 T-09 承接**：cache 落在 `~/Library/Caches` 而**不在**数据根之内，§5.8 目录树要照此写，见证据边界 1。
+
 ## Next
 
-- T-03 `AppPaths`（Desktop 侧 data/logs/versions/cache 四目录 + 开发态 `.local/` 解析，抄
-  `logging/paths.rs` 的注入式写法，不读环境变量）。
+- T-04 `UserSettings` + `settings.toml` + `schema_version`，写到 **`AppPaths::resolve()?.data`**；
+  原子替换（临时文件 + rename）；损坏时**保留原文件并明确提示**，不得静默清空（AC-05）。
 
 ## Blocked
 
@@ -58,3 +70,5 @@
   `test_static_cross_repo_contract_and_security_matrix`）；还原后 `git status` 与交换前 **IDENTICAL**。
   三验证器绿：governance ok（Active CHG: CHG-20260923-058）、快照 **2159 字符** / 0 warning、
   `verified 10 skill source files`。
+- T-03 后：desktop `176 passed`（起点 160，+16）；`cargo test app_paths` 16 条 **0 skipped**
+  （只读目录那条的**前提在本机成立**，所以它真的跑了断言）；非测试构建警告 **23**（起点 9，+14 见上）。
