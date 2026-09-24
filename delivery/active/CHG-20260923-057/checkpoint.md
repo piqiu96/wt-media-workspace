@@ -265,20 +265,30 @@
   修复一处真误报（`as urlopen` 绑的是 mock）并登记两个自查出的对照缺陷（读整树报告 → 假理由变红）。
   `bash scripts/test.sh` → **365 OK**（354 → +11）。见 `evidence/task-19-no-external-services.md`。
 
+- 2026-09-24 T-20：**Agent 侧脱敏四处实测缺陷**（`wt-media-agent` `65725f4` + desktop doc commit `572d1cf`）——
+  形态**两条正则按族分治**：`_TAIL_KEYED`（cookie / authorization，值 = 行尾）+
+  `_VALUE_KEYED`（其余族，值 = 一个前导词元且**匹配在此结束**）。这条界是关键：`re.sub` 从整段匹配之后
+  **续扫**，值吃到行尾就把后面的凭据一并吞掉——`token=aaa password=bbb` 只掩第一个正是这么来的。
+  回显改用**原文字前缀**（`key+separator` 拼回会丢掉 JSON 键的闭引号 → 写出 `{"client_secret: "***"}`）；
+  `_is_cookie_key` 认 `cookie` **与** `cookies`；两个回调各带族守卫 ⇒ 两趟**与顺序无关**。
+  **先红**用「换回修前模块」证（`git archive HEAD` + `git show 978155f:…`，**不碰工作树**）：
+  同一份用例 → **FAILED (failures=7)**（7 个失败 = 5 个用例，逐个点名），控制臂 **19 OK**。
+  **20 行差分表的期望串是量出来的**（临时探针跑 Desktop + `git checkout` + sha256 `a3fad427…` 核对），
+  断言从「两列」换成**整行精确串**（两列看不见形状错）。**变异 8 个**：M1–M5/M7/M8 KILLED
+  （M1 连**既有** T-06 两列表的 7 条一起打掉）、**M6（换序）如实 SURVIVED——它就是「顺序无关」的证据**。
+  **真机两臂**（同源副本、scratch 18769、两个死端口、5 次真实 POST）：修后三条泄漏针各 0，
+  对照 payload 1 / 修前日志 2；**另三个针两侧都掩、修前日志不作对照**（脚本第一版共用对照当场报
+  3 条 `CONTROL INVALID`，拆成两组各配能失败的对照）。`371 tests OK`（365 → +6）。
+  **一处如实登记的代价**：整尾家族触达行尾 ⇒ `cookies:` 行后的 `group_id=g-1` 一并被掩（真机 8/10），
+  **两侧一致**（Desktop 实测同三个串）且触达范围修前修后未变，只登记不改。见 `evidence/task-20-agent-redaction.md`。
+
 ## Current
 
-- T-17 已收尾（Desktop 一个提交 `9051480` + 本记录）；**阶段 2（Desktop 半）T-10…T-17 全部完成**，
-  下一个是 Agent 侧的 **T-20**（Agent 脱敏三处泄漏/一处形状），随后 T-21、最后 workspace T-18。
+- T-20 已收尾（`wt-media-agent` 一个提交 `65725f4` + desktop doc commit `572d1cf` + 本记录）；
+  **Agent 半只剩 T-21**，随后阶段 3 的 T-18 回写与收尾。
 
 ## Next
 
-- **T-20**（Agent 侧，**先红 → 最小实现 → 测试 → 变异 ≥4 → 真机 → agent commit ×1**）：脱敏四处实测缺陷
-  ——a `token=aaa password=bbb`（同行第二个凭据不掩）、b `cookies: a=1; b=2`（复数键只掩第一个值）、
-  c `{"client_secret": "s3cr3tvalue"}`（闭引号被吃掉，**形状错、非泄漏**）、d `mytoken=abcdefghijkl password=zzz`
-  （形似键吞掉整行，遮蔽被静默关掉）。修复形态**两条正则**（`_TAIL_KEYED` 整尾家族 / `_VALUE_KEYED` 单值家族，
-  回显用原文字前缀保住键的引号），`_is_cookie_key` 同时认 `cookie`/`cookies`；**不用**「有界残余循环」。
-  断言改用**精确字符串**（既有两列表风格看不见 c）。T-13 的 20 行差分表做成 fixture。
-  收尾再对 desktop 仓 `logging/redact.rs:7-20` 那句现在变假的注释单独发一个 doc commit。
 - **T-21**（Agent 侧）：请求级 `operation_id`（`secrets.token_hex(8)` + contextvar + 覆写
   `handle_one_request` 且 `try/finally` 复位），进 `FMT`/`ERROR_FMT`，`error.log` 放在 logger 名之后、
   `error_code` 之前（裁定六）。测试用 `ThreadingHTTPServer(("127.0.0.1", 0), …)` + `http.client`
@@ -303,11 +313,18 @@
 - **T-15 的两个新登记要进 T-18 的 §7/§10**：①`level` 严于 INFO 时 **stderr 与文件一起静默**
   （两层共用同一个 filter，实测；计划只预测「不建文件」）；②`main.rs` 的**两个实参无测试守**
   （N8/N9），其中 N9 由臂 1 的真实启动守、N8 分母为 0（无记录携带 token）。
-- **Agent 侧脱敏已由用户裁定开 Task 修**（不再是待裁定项）：§7 **Q-07** 的三处实测缺陷（一行里第二个凭据
-  不掩；复数 `cookies:` 键只掩第一个值；JSON 键的闭引号被吃掉 ⇒ 行不再合法）**加上 T-13 之后新发现的
-  第四处 d**（形似键 `mytoken=` 吞掉整行、遮蔽被静默关掉）由 **T-20** 在本 CHG 内修，Agent 仓自己的
-  commit + evidence + 变异。T-20 落地后 Q-07 的**行文本身也变假**（它按旧行为描述），T-18 一并改写。
-  见 `evidence/task-13-desktop-backend.md` §2/§7。
+- **Agent 侧脱敏已由 T-20 修完**（`65725f4`，四处实测缺陷全部关闭）：§7 **Q-07** 的三处（一行里第二个
+  凭据不掩；复数 `cookies:` 键只掩第一个值；JSON 键的闭引号被吃掉 ⇒ 行不再合法）**加上 T-13 之后新发现的
+  第四处 d**（形似键 `mytoken=` 吞掉整行、遮蔽被静默关掉）。**但 Q-07 的行文本身仍按旧行为描述**
+  （它把两处列成「实测输出」），**T-18 须整体改写这一行**（关掉它或改写成「已由 T-20 修」），
+  否则读者会以为那两处还漏。见 `evidence/task-20-agent-redaction.md` 与 `evidence/task-13-desktop-backend.md` §2/§7。
+- **T-20 的两条登记要进 T-18 的 §7/§10**：① **整尾家族的触达是行尾**——`cookies:` 行之后的
+  `group_id=g-1` 会与 cookie 头一起被掩（真机 8/10 条记录带它，缺的 2 条正是 `cookies:` 那两条）；
+  该行为**两侧一致**（同样三行在 Desktop 实现上实测返回逐字相同的串）、**修前修后触达范围未变**
+  （改变的只是掩得全不全），故**只登记、不改任何一侧的答案**——改一侧是有意对「两侧早已一致回答过」
+  的问题单方面改答案，不属本 Task。② `error.log`/`task.log` 两条臂**未在 T-20 重跑**：四个缺陷同在
+  同一个 formatter 路径上（三文件共用 `redact`），路由未改；但「三文件里的凭据不在」这一点，
+  本 Task 只由单测表 + `agent.log` 臂覆盖，**不声称三文件逐条重跑过**。
   （注：T-13 的证据与上一版 checkpoint 把这个 ID 写成 `Q-08`，而 `change.md` §7 里它是 **Q-07**；
   §7 另有一段说明 `Q-08` 这个 ID 早先被 T-19 行与 AC-11b 用作 Q-05 内容的别名。T-18 统一编号时一并收口。）
 - **T-15 的待验期望已被实测取代**：登记的「93 → 4 / 97 → 10」**不成立**，实测 **93 → 9 / 97 → 13**，
@@ -323,7 +340,7 @@
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
 - 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 ✓ → T-17 ✓（**本阶段完成**）。
-- 阶段 2 Agent 补做：T-20（脱敏）、T-21（请求级 `operation_id`）——由用户本次裁定新开。
+- 阶段 2 Agent 补做：T-20 ✓（脱敏，`65725f4`）、T-21（请求级 `operation_id`，**下一步**）——由用户本次裁定新开。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
@@ -343,6 +360,28 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
 ## Recent verification
+
+- T-20：`bash scripts/test.sh` → **371 tests OK**（365 → +6 = 新类 6 个用例，**只增不减**）；
+  `logging.py` sha256 `d82d52efaa5f63351477abf64ebd4970c365dbd61c4147e643ba3c22db8251cd`（= `65725f4`），
+  `git status --porcelain` 空。**先红**在 git 对象上做（`git archive HEAD` + `git show 978155f:…logging.py`，
+  不碰工作树）：`/tmp/t20/red` → **FAILED (failures=7)**（7 个失败 = 5 个用例：
+  `every_row_matches_the_desktop_reference` 3 条 subTest + `the_three_rows_that_used_to_differ_are_named` +
+  `the_json_row_is_still_json` + `the_tail_families_reach_the_end_of_the_line_on_both_sides` +
+  `a_lookalike_key_no_longer_hides_the_credential_behind_it`），控制臂 `/tmp/t20/ctl` → **19 OK**。
+  **变异 8 个**（`/tmp/t20_mutate.py`，控制行 371 OK 先绿，逐次改一处、跑完即从 pristine 副本还原）：
+  M1 值组改回 `[^\n]*` / M2 复数 / M3 回显重建 / M4 守卫丢非敏感半 / M5 守卫丢家族半 / M7 整尾趟不跑 /
+  M8 cookie 尾只吃一个词元 → **全部 KILLED 且各自打掉自己的用例**；**M6（两趟换序）SURVIVED**——
+  **有意**，它就是「两趟与顺序无关」这条声明的证据，不为它补一条把实现细节写死的用例。
+  **真机两臂**（`/tmp/t20/real_arm.sh`；scratch 端口 18769，BitBrowser/Cloud 指向死端口
+  18790/18791，5 次真实 `POST` 各得 `502`，body 落 `requests.out` 供对照）：
+  `/tmp/t20/assert_arm.py` → **ALL ASSERTIONS PASS**——三条泄漏针 `bbb`/`b=2`/`password=zzz` 在修后
+  `agent.log` 里各 **0**、对照 payload **1** / 修前日志 **2**；另三个针 `aaa`/`a=1`/`s3cr3tvalue` **两侧都掩**，
+  修前日志**不作对照**（脚本第一版共用对照当场报 3 条 `CONTROL INVALID`，故拆两组）；周围文本 7 项仍在
+  （`name=` 10、`start`/`failure` 各 5、`error=` 4、`duration_ms=` 4、`plain-name-with-no-secret` 2、
+  `mytoken=abcdefghijkl` 2）；`group_id=g-1` **8/10**（缺的两条正是 `cookies:` 那两条，已登记）。
+  跑完 `lsof -nP -iTCP:18769 -sTCP:LISTEN` 为空、无残留进程，全程**未碰** `:8765`/`:18080`/`:54345`。
+  Desktop 侧 `cargo test --workspace` → **175 passed**（未增，本 Task 未动 desktop 代码）；
+  `572d1cf` 只改注释（过滤注释行后 diff 为空；`redact.rs` 测量时 sha `a3fad427…` → 现值 `c47e5aca…`）。
 
 - T-17：`cargo test --workspace` → **175 passed; 0 failed**（166 → +9 = `state` 3 + `commands/agent` 5 +
   `http/local_agent` 1，**只增不减**）；`cargo build` 条目级警告 **9 → 9**、clippy `--all-targets` **13 → 13**
