@@ -132,6 +132,12 @@
   故判据只能是结构性的 R11，不能声称有行为差异。
   见 `evidence/task-09-single-entry.md`。
 
+- 2026-09-24 T-10：**Desktop 引入 `tracing` + `tracing-subscriber`**（`wt-media-desktop` `5194d49`，
+  **两行依赖 + 一段说明注释，零源码改动**）——两处都关默认 features（`attributes` 会拖进过程宏；
+  `env-filter`/`ansi` 会拖进 matchers、regex、nu-ansi-term）；不引 `tracing-appender`（它的 rolling
+  表达不了 20MB 上限、总量预算与单条截断）。依赖树 267 → 271（+4 具名，移除 0），起点 68 条不动。
+  见 `evidence/task-10-desktop-deps.md`。
+
 - 2026-09-24 T-19：**测试不误连真实外部服务**（`wt-media-agent` `978155f`，**test-only，生产代码 0 行改动**）——
   新增 `tests/test_no_external_services.py`：两条通道（客户端构造必须注入 `transport`；`urlopen` 必须被
   patch）+ 5 处带非空理由的 `# network-ok:` 标记 + 按文件冻结的标记棘轮，11 条用例。
@@ -140,18 +146,20 @@
 
 ## Current
 
-- T-19 已收尾（一个 Agent 提交 + 本记录）；**阶段 1（Agent 半）全部完成**：T-02…T-09 + T-19。
+- T-10 已收尾（一个 Desktop 提交 + 本记录）；**阶段 2 开始**，下一个是 T-11（日志目录解析）。
 
 ## Next
 
-- **阶段 2 Desktop，从 T-10 开始**（引入 `tracing` + `tracing-subscriber`；该 Task 明示无「先失败的测试」，
-  证据 = `cargo tree` 前后对比 + 下载清单具名 + 起点 68 条仍绿）。T-10 → T-11 → … → T-17；然后阶段 3 T-18。
+- **T-11**：Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production →
+  `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest_dir>/.local/logs`）+ 仓根 `.gitignore` 补 `.local/`。
+  测试**绝不解析真实 `$HOME`**；不可写目录返回错误值而非 panic。之后 T-12 → … → T-17，然后阶段 3 T-18。
+- **访问 crates.io 必须带 `HTTPS_PROXY=http://127.0.0.1:7897`**（T-10 查明的根因：本机直连的证书被劫持）。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
-- 阶段 2 Desktop：T-10 → T-11 → T-12 → T-13 → T-14 → T-15 → T-16 → T-17。
+- 阶段 2 Desktop：T-10 ✓ → T-11 → T-12 → T-13 → T-14 → T-15 → T-16 → T-17。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
@@ -160,6 +168,16 @@
 
 ## Recent verification
 
+- T-10：`cargo test --workspace` → **68 passed; 0 failed**（与改前逐字相同，本 Task 按计划不加测试）；
+  `cargo tree --no-dedupe` 具名节点 **267 → 271**，**恰好 +4 且具名**、移除 0；阴性对照
+  `nu-ansi-term`/`matchers`/`tracing-log`/`tracing-attributes` **全 0**，而 `regex`/`smallvec`
+  **改前就在树里**（不计入我们的开销）；clippy 警告 **10 → 10**（用 `git stash` 取改前读数）。
+  **一次阻塞先查根因再定性**：`cargo add` 报证书过期——实测直连 `index.crates.io:443` 落在一张
+  `CN=YE1`、`notAfter=Sep 20 2026` 且**主题名不匹配**的证书上（被劫持，早于施工日 4 天过期），
+  而经开发者本机代理 `127.0.0.1:7897` 取 `config.json` 与 `tracing-subscriber-0.3.20.crate`
+  **均 200**。`curl` 与 `cargo` 都不读 macOS `scutil --proxy`，故两者都走了坏路。
+  修法 = 调用时带 `HTTPS_PROXY`，**仍是官方后端**（未换实现），且**不写进仓库配置**。
+  见 `evidence/task-10-desktop-deps.md`。
 - T-19：`bash scripts/test.sh` → **365 tests OK，exit=0**（354 → 365，只增不减）；`.local/` 守卫不响；
   **先量分母再写结论**：计划写「41 处 / 34 模块」，实测 **40 模块 / 38 处客户端构造 / 3 处 `urlopen`**
   ——41 是后两类之和（计划的分类粒度不同），**模块数是真的偏低**，按实测登记。

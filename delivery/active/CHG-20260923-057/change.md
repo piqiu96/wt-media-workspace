@@ -133,6 +133,12 @@
   T-09 后为 **354**，T-19 后为 **365**（只增不减）。
 - 应用 `.cargo/config.toml`：`retry = 10`、`timeout = 600`、`low-speed-limit = 1`、`multiplexing = false`
   ⇒ 网络已知不稳，依赖引入必须先跑 `cargo fetch` 探明（T-10）。
+  **T-10 实测的真根因不是「不稳」**：本机**直连** `index.crates.io` 的 TLS 证书被劫持
+  （`issuer=Let's Encrypt CN=YE1`、`notAfter=Sep 20 2026`、主题名不匹配，早于施工日 4 天即过期），
+  而经开发者本机代理 `127.0.0.1:7897` 取 `config.json` 与 `.crate` 归档均 200。
+  `curl` 与 `cargo` 都不读 macOS 的 `scutil --proxy`，故两者都走了那条坏路。修法是**调用时带
+  `HTTPS_PROXY=http://127.0.0.1:7897`**（仍是官方后端，不是换实现）；**不写进仓库配置**，
+  以免把某台机器的 localhost 代理固化进出货产物。后续如需 registry 访问同样要带它。
 - 三个配置结构均 `#[serde(deny_unknown_fields)]`（`config.rs:43,55,67,73,79,86,92`），由 `config.rs:280` 的测试钉住。
 
 ## 5. Scope
@@ -224,7 +230,7 @@
 | T-07 | Agent 保留与轮转：单文件 20MB、14 天、总量上限、**单条截断标 `truncate=true original_size=<n>`**（`BoundedFileHandler` + **三文件共享一个 `LogBudget`** 取代 `RotatingFileHandler`）。**真机实测到一处真缺陷并修**：启动清理此前**空转**——prune 按已注册家族名匹配，而家族名要等 handler 构造才注册（有轮转时才「看起来生效」）→ 先预注册再 prune + 回归测试先红 | DONE | `evidence/task-07-retention.md`；**320 tests OK**；六个界各一次实现变异、各自打掉自己的用例；真机两臂（小界/出厂界）8/8 判据；总量真实上界 `total_bytes + 3×max_bytes` 如实写进 docstring |
 | T-08 | `GET /api/v1/health` 聚合健康检查（Cloud/BitBrowser/Storage 各一例不可用 → 200 + `abnormal`/`unknown` 不抛）+ 契约同步；`/healthz` 逐字不变 | DONE | `evidence/task-08-health.md`；**345 tests OK**；12 个变异（控制行先绿）；真机两臂 **20/20**，Cloud 侧实测 `connections=1 received=b''`；契约 `2026.09.24.1` |
 | T-09 | 修既有缺陷并锁死唯一入口（**T-07 顺带实测：`-m` 启动时 server 的 logger 名是 `__main__`，HTTP 侧记录看不出组件来源，属本 Task 范围**）：~~①`paths.py:104-106` 已假注释~~（**T-03 已随 docstring 重写完成**）；②删 `server.py` 第二次 `configure_from`；③`state` 改必传（`LocalApiServer` 与 `serve`）；④**新增 R11 AST 规则**（**今天就会红**）；⑤`LOGGER_NAME` 显式写出，`-m` 下记录名不再是 `__main__` | DONE | `evidence/task-09-single-entry.md`；**354 tests OK**；R11 三个反例（含「规则被改成 `return []` 时全红」）；六个变异各自打掉自己的用例；真机 `-m` 探针 11/11，且把 `LOGGER_NAME` 变异回 `__name__` 后 A3/A4 转红 |
-| T-10 | Desktop 引入 `tracing` + `tracing-subscriber`（**例外的无失败测试项**） | TODO | `cargo tree` 前后 + 下载清单具名 + 起点 68 仍绿；`cargo fetch` 失败即阻塞上报 |
+| T-10 | Desktop 引入 `tracing` + `tracing-subscriber`（**例外的无失败测试项**） | DONE | `evidence/task-10-desktop-deps.md`；依赖树 **267 → 271，恰好 +4 且具名**（tracing-subscriber 0.3.23 / sharded-slab 0.1.7 / thread_local 1.1.10 / lazy_static 1.5.0）、移除 0；阴性对照：`nu-ansi-term`/`matchers`/`tracing-log`/`tracing-attributes` 全 0（`regex`/`smallvec` **本就在树里**，不计入）；起点 **68 → 68** 逐字不动；clippy **10 → 10**；阻塞根因查明是本机直连 crates.io 证书被劫持（见 §4 平台边界），**经本机代理仍是官方后端**，未换实现 |
 | T-11 | Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production → `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest>/.local/logs`）+ `.gitignore` 补 `.local/` | TODO | 测试不解析真实 `$HOME`；不可写目录返回而非 panic |
 | T-12 | `rolling` writer（`Clock` 注入）：日期翻档、20MB 翻档、**单条截断标 `truncate=true original_size=<n>`**、按天删、按量删、当前文件永不删 | TODO | 六向变异，逐条 |
 | T-13 | Desktop 后端装配 + target 白名单（默认 `OFF`，`const OWNED_TARGETS` 枚举断言；`agent.supervisor` 永不比 INFO 更严）+ 格式 + 脱敏 | TODO | 外来 target 不入文件 / 自有 target 入文件（两向）；落盘后 grep 不到 token |
@@ -263,7 +269,7 @@
 
 ### wt-media-desktop
 
-- [ ] T-10 依赖；T-11 目录解析；T-12 rolling；T-13 装配/白名单/脱敏；T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id
+- [x] T-10 依赖；T-11 目录解析；T-12 rolling；T-13 装配/白名单/脱敏；T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id
 - [ ] 入口文档回写 + `.gitignore` 补 `.local/`（T-11/T-18）
 
 ### wt-media-cloud
@@ -307,6 +313,7 @@
 - `evidence/task-08-health.md`（T-08）
 - `evidence/task-09-single-entry.md`（T-09）
 - `evidence/task-19-no-external-services.md`（T-19）
+- `evidence/task-10-desktop-deps.md`（T-10）
 - `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
