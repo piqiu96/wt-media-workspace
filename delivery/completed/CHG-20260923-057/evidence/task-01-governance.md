@@ -6,6 +6,13 @@
 - Type: command
 - Status: PASS
 
+> **归档后追加（2026-09-24，T-18）**：本文是 T-01 当时的**原始记录**，其中的
+> `delivery/active/CHG-20260923-057/...` 是 T-01 那一刻的真实路径，**原文一字未改**。本 CHG 已于
+> 2026-09-24 归档，记录现位于 `delivery/completed/CHG-20260923-057/`；本文件里 9 处 `active/` 引用
+> （`:21`/`:22` 的两条命令、`:46-51` 的 `find` 输出、`:111` 的 README 改写说明）**保留为叙述**，
+> 不改成 `completed/`——改了就不是 T-01 的证据了。外部指向 active 的**活链接**已由 T-18 全部改掉
+> （见 `change.md` §13 的关闭记录：分母 10 / 2 文件，全部在本记录内部，外部 0）。
+
 ## Purpose
 
 把 `delivery/planned/CHG-20260923-057/` 的 PLANNED 草案转为 `delivery/active/` 下的可执行记录，

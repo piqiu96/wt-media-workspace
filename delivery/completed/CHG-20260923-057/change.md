@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: M
-- Status: IMPLEMENTING（2026-09-24 激活；此前为 planned 下的 PLANNED 草案，见 §12）
+- Status: DONE（2026-09-24 激活并于同日关闭；此前为 planned 下的 PLANNED 草案，见 §12）
 - Created: 2026-09-23
 - Current repository: wt-media-workspace（治理）；运行时改动分布于 wt-media-agent、wt-media-desktop
 - Affected repositories: wt-media-agent（主）、wt-media-desktop（主）、wt-media-workspace（治理记录与基线回写）
@@ -213,15 +213,15 @@
 | Q-04 | 裁定七还列了「用户设置异常」与「更新异常」，但 Desktop **没有** settings 命令（`commands/` 只有 account/agent/bind/logging/profile/public_config），`updater/mod.rs` 也**没有任何 emit 与可上报的异常路径**——**无来源可接**。登记为未交付，**不造假发射点**。 | NO |
 | Q-05 | **AC-11 的覆盖被计划高估**：计划把 AC-11 整条（含「测试不误连真实外部服务」）映射给 T-02，T-02 执行时实测该半**今天无任何规则在守**。处置：AC-11 拆为 AC-11a（PASS，T-02）/ AC-11b（未覆盖），新增 **T-19** 在本 CHG 内补上这条规则（里程碑的失败行为锚点就写着它，丢弃会使该锚点无人守）。**未静默吸收，也未静默丢弃。** 若要移出本 CHG 请一句话。 | NO |
 | Q-06 | **T-13 定下的两条稳定事实**（回写用）：①target 词汇表 `{agent.supervisor, desktop.startup, webview}`，`agent.supervisor` 的运行级别**永不比 INFO 更严**；②Desktop 记录为**单行纯文本**，时间戳 `%Y-%m-%dT%H:%M:%SZ`（UTC，因为 T-12 的文件名已按 UTC 分档），与 Agent 的本地时间无 `Z` 是**有意**差异。三条都有机器守（枚举断言 + 变异 6/8/11/12）。要改口径请一句话。 | NO |
-| Q-07 | **Agent 侧脱敏的三处实测发现**（T-13 差分表 20 行跑出来的，**其中两处是真泄漏**）：①`_KEYED` 的 `[^\n]*` + `re.sub` 从整段匹配之后续扫 ⇒ 一行里的**第二个凭据永不进扫描**（实测 `token=aaa password=bbb` → `token=*** password=bbb`）；②`_is_cookie_key` 只认单数 `cookie`，而词表里有复数 `cookies` ⇒ 复数键走通用路径，**只掩第一个值**（`cookies: a=1; b=2` → `cookies: ***; b=2`）；③`_KEYED` 的 `["']?` 被消费掉而回显只拼 `key+separator` ⇒ **JSON 键的闭引号丢失**，该行不再是合法 JSON。T-06 已提交（`b66d7f5`/`70c1f93`），按「一仓一 commit」不在 T-13 里改。
-**已由用户裁定开 Agent 侧独立 Task **T-20**（§8 有行）**：把这张 20 行差分表做成用例 + 一条变异 + 真实启动取证，
-自己的 commit 与 evidence。**`Blocking = NO`（不挡 T-14…T-18），但 DONE Gate 前必须落地**——两处真泄漏直接
-咬成功事实 #5「敏感信息不进日志」。**T-13 之后又实测出第四处**（T-13 那张 20 行表看不见：形似键 `mytoken=`
-吞掉整行致遮蔽静默关闭），一并归 T-20 修；本条的行文按**旧行为**描述，T-20 落地后本条须整体改写（T-18）。 | NO |
+| Q-07 | **Agent 侧脱敏的四处实测缺陷，已由 T-20 全部修完**（`wt-media-agent` `65725f4`）——本条原按**旧行为**行文，T-18 按裁定改写为已修状态：①`_KEYED` 的 `[^\n]*` + `re.sub` 从整段匹配之后续扫 ⇒ 一行里的**第二个凭据永不进扫描**（实测修前 `token=aaa password=bbb` → `token=*** password=bbb`，修后 `token=*** password=***`）；②`_is_cookie_key` 只认单数 `cookie`，而词表里两个都有 ⇒ 复数键只掩第一个值（修前 `cookies: a=1; b=2` → `cookies: ***; b=2`，修后 `cookies: a=***; b=***`）；③`_KEYED` 的 `["']?` 被消费掉而回显只拼 `key+separator` ⇒ **JSON 键的闭引号丢失**、该行不再是合法 JSON（修后 `{"client_secret": "***"}`，仍是合法 JSON）。**T-13 之后又实测出第四处**（那张 20 行表看不见：形似键 `mytoken=` 吞掉整行致遮蔽**静默关闭**），`_VALUE_KEYED` 的「匹配在值的前导词元处结束」一并修掉。修复形态、先红、变异 8 个与真机两臂见 `evidence/task-20-agent-redaction.md`；**形状错（缺陷 c）的验证锚点在 AC-06**（它坏的是「这一行还读得懂吗」，不是「泄漏了没有」）。 | NO |
+| Q-08 | **Desktop 的「环境」取构建期，不取生效配置**（T-15 定下）：`logging` 的落点与 `auto` 级别取自 `bootstrap::build_environment()`，**不是** `startup.config.environment`。依据：出货文件恒声明 `production` 且 `load_with` 取更严一侧 ⇒ 生效环境**每次普通启动都是 Production**，取它会让 D-06 的开发态 `<repo>/.local/logs` **永不可达**、裁定四的开发 DEBUG 不可达、T-15 自己的验收行（「stderr 与开发态日志文件里都有摘要」）**无法成立**。代价：进程内两种「环境」并存，已由启动摘要同时写出两者抵消（`环境 production（构建 development）`）。T-15 的第一个变异就是这个反例（取 `config.environment` 时整套 152 条**全绿**），故 `plan()`/`install()` 的拆分与 `PINNED_LEVELS` 手写对表都是这条裁定的产物。要改口径请一句话。 | NO |
 
-无阻塞项（`Blocking = NO`）：Q-01…Q-07 均已按上述口径实施或登记，用户可在任一 checkpoint 用一句话改判。
-`Q-08` 这个 ID 在 §8 的 T-19 行与 §10 的 AC-11b 里被引用（指「T-02 实测 AC-11 的『不误连外部服务』那半今天无规则在守」），
-其定义即上面 **Q-05** 的内容；**保留原引用不改**，在此登记以免读者以为漏了一行。
+无阻塞项（`Blocking = NO`）：Q-01…Q-08 均已按上述口径实施或登记，用户可在任一 checkpoint 用一句话改判。
+
+> **Q-08 这个 ID 曾指别的东西**：§8 的 T-19 行与 §10 的 AC-11b 原写「见 §7 Q-08」，指的是「T-02 实测
+> AC-11 的『不误连外部服务』那半今天无规则在守」，而它的定义一直就在 **Q-05**（见 `change.md` 的 Q-05 行）。
+> 也就是说那两处引用指向一个当时并不存在的 ID。T-18 把两处都改成 **Q-05**，并把 Q-08 这个号让给上面
+> 这条真正的新问题——**不保留一个会指向两条不同内容的号**。
 
 ## 8. Implementation Tasks
 
@@ -248,7 +248,7 @@
 | T-16 | 三个既有 emit 点改道（`main.rs:65`→`desktop.startup`；`drain.rs:158`→`agent.supervisor`；`commands/logging.rs` 先纯重命名 `commands/webview.rs` 单独 commit，再改走 logger `target=webview`）+ Agent 启停与健康检查补点 | DONE | `evidence/task-16-desktop-emit-points.md`；`report_exit` 恰一条该 target 记录且带末 20 行尾；50 行普通 sidecar 输出 → 零条（对照：这 50 行确实在缓冲里）；**166 tests OK**（153 → +13）；变异 **13/13 KILLED**（3 个回退到旧形态 + 10 个新形态）、控制行先绿；真机**探针页**三轮取证；build **9** / clippy **13**（前后相同，逐条点名无一条落在新代码上）；命令体拆 `health`/`start`/`stop` 后只剩 `start` 的 spawn 够不着，如实登记 |
 | T-17 | Desktop `operation_id`（**仅进程内**）：断言出站请求头集合与今天**逐字相同**；`sidecar/mod.rs` 的 `assert_eq!(vars.len(), 3)` 仍绿 | DONE | `evidence/task-17-desktop-operation-id.md`；一次会话一个 id（`start` 生成并在存下 child **之后**登记、`stop` 在记完「已停止」**之后**清除），id 是**字段**：会话内带 `operation_id=`、会话外**一律不带**（`lifecycle!` 因此有**两个 `event!` 分支**——写成 `operation_id=None` 是对「这条记录属于哪个会话」的错误回答，且会改掉今天的行形状）；**不加新 target** / **不发 Header** / **不进 sidecar 环境**三条各有一个变异打掉自己（M1 query / M2 Header / M3 环境变量，M3 打的是**既有** `vars.len() == 3`）；**头集合基准是桩套接字实收字节**（`authorization`/`accept`/`host` 逐字，`host` 由 hyper 在 send 时加、`build()` 看不到）而非推断；**175 tests OK**（166 → +9）；变异 **R1–R3 + M1–M5 全 KILLED**（R2/R3 成对）、控制行先绿；**N1/N2 如实 SURVIVED**（`begin(...)`/`ended(...)` 各一行调用点单测进不去）**只由真机臂覆盖**；真机探针页臂：两会话六条记录 5 带 id（两值不同）/1 不带，返回值不含 id；build **9** / clippy **13**（未增）；退出报告**有意不带 id**、`already_running` 带 id 只在单测表里、**两侧 id 不相关**三条已登记 |
 | T-18 | 回写与收尾：基线（程序总纲 §3 CHG-B 补数字、架构基线 §5.8/§6.8 补三文件与 Desktop 路径）、入口文档、`[logging]` 注释；`Status: DONE` → `git mv` 归档 → 移除 LEDGER 行 → `--no-active` 冷启动重生成 → **主动扫**失效指针 | TODO | 两验证器绿；扫描报分母 + 阳性对照 |
-| T-19 | **测试不误连真实外部服务**（T-02 执行中发现，见 §7 Q-08）：AST 规则——`tests/` 内每次网络客户端构造（`BitBrowserClient` / `CloudAgentClient`）必须注入假 `transport`，`urlopen` 调用必须被 patch；T-02 只覆盖了 AC-11 的后半 | DONE | `evidence/task-19-no-external-services.md`；**365 tests OK**；计划的分母与实测不符（计划 41 处/34 模块，实测 41 = 38 处构造 + 3 处 `urlopen`、**40 模块**）；规则先红报出 5 处真命中且都走标记而非改代码；7 个变异逐个红且三条真断言各有变异能红它；一处真误报（`as urlopen` 绑的是 mock）与**两个自查出的对照缺陷**（读整树报告 → 假理由变红） |
+| T-19 | **测试不误连真实外部服务**（T-02 执行中发现，见 §7 Q-05）：AST 规则——`tests/` 内每次网络客户端构造（`BitBrowserClient` / `CloudAgentClient`）必须注入假 `transport`，`urlopen` 调用必须被 patch；T-02 只覆盖了 AC-11 的后半 | DONE | `evidence/task-19-no-external-services.md`；**365 tests OK**；计划的分母与实测不符（计划 41 处/34 模块，实测 41 = 38 处构造 + 3 处 `urlopen`、**40 模块**）；规则先红报出 5 处真命中且都走标记而非改代码；7 个变异逐个红且三条真断言各有变异能红它；一处真误报（`as urlopen` 绑的是 mock）与**两个自查出的对照缺陷**（读整树报告 → 假理由变红） |
 | T-20 | **Agent 侧脱敏**（§7 Q-07 的三处 + T-13 之后新发现的第四处）：把 20 行差分表做成 fixture + 四处缺陷行的**精确串**用例；修复形态两条正则（整尾家族 / 单值家族）；幂等；`SENSITIVE_KEY_NAMES` × {`=`,`:`} 全覆盖 | DONE | `evidence/task-20-agent-redaction.md`；形态：`_TAIL_KEYED`（cookie/authorization，值 = 行尾）+ `_VALUE_KEYED`（其余族，值 = **一个前导词元且匹配在此结束**——`re.sub` 从整段匹配之后续扫，值吃到行尾就会吞掉后面的凭据），两个回调各带族守卫 ⇒ **两趟与顺序无关**；回显改用**原文字前缀**（`key+separator` 拼回会丢掉 JSON 键的闭引号）；`_is_cookie_key` 认 `cookie` **与** `cookies`（词表里两个都有）；`_KEYED`/`_mask_keyed` 删除，接口零变化。**先红**：同一份用例打在修前模块上（`git archive HEAD` + 换 `logging.py`，不碰工作树）→ **FAILED (failures=7)** = 5 个用例，控制臂 **19 OK**；**20 行差分表的期望串是在 Desktop 实现上测量出来的**（临时探针 + `git checkout` + sha256 `a3fad427…` 核对），不是抄它的表；**变异 8 个**（控制行 371 OK 先绿）：M1–M5/M7/M8 **KILLED**（M1 连**既有** T-06 两列表的 7 条一起打掉），**M6（两趟换序）如实 SURVIVED——它本身就是「顺序无关」这条声明的证据**；真机两臂（同源两个副本、scratch 端口 18769、两个死端口、5 次真实 POST）：修后 `agent.log` 三条泄漏针 `bbb`/`b=2`/`password=zzz` 各 **0**（对照：payload 里 1、修前日志里 2；另三个针 `aaa`/`a=1`/`s3cr3tvalue` **两侧都掩**，修前日志**不作对照**，已点名），周围文本 7 项仍在；**371 tests OK**（365 → +6）；`redact.rs` 那句因此变假的注释在 desktop 仓**单独一个 doc commit** `572d1cf`（14 行注释，代码 0 改动，`175 passed` 未增） |
 | T-21 | **Agent 侧请求级 `operation_id`**（§8 无任务承接、§5 Scope/Add 要求）：`secrets.token_hex(8)` + contextvar（落在 `runtime/logging.py`）+ 覆写 `handle_one_request` 并 `try/finally` 复位；进 `FMT`/`ERROR_FMT`，`error.log` 位置在 logger 名之后、`error_code` 之前 | DONE | `evidence/task-21-agent-operation-id.md`；形态：id 源在 `local_api/server.py`（`secrets` 已 import，`dependencies = []` 不变）、载体是 `runtime/logging.py` 里的 `ContextVar`（不用 thread-local：今天碰巧能用，请求里任何一段搬到执行器就失效）、边界在 `AgentHandler.handle_one_request`——该位置 **upstream 于 `_check_auth`/`do_OPTIONS`/`send_error`**，故 401/404/畸形请求行**构造上**都带 id 且新 `do_*` 不会忘；字段经 formatter 的 `prepare` 盖上（**渲染槽名故意不叫 `operation_id`**，免得调用方 `extra={...}` 被静默盖掉），无请求时渲染 `""`。**先红分两步**（首次红是 ImportError，那种红不算数）：第 1 步字段机制 → **6 pass / 2 fail**，两个失败**恰是两条真 HTTP 用例**；第 2 步接线 → 8 OK。**一个界测不到、如实登记**：`AgentHandler` 未设 `protocol_version`（实为 HTTP/1.0，答完即关）⇒ 按请求与按连接分配在真实 socket 上**产出相同的行**，故 M7 换成按连接**只**被结构用例打掉（该用例自陈弱于行为断言）。**变异 9/9 KILLED、0 SURVIVED**（控制行 379 OK 先绿，锚点不唯一即跳过不算 KILLED）：M2 固定 id、M6 `reset` 改清空、M8 永不复位、M9 id 进响应头各自打掉行为用例，M3/M4/M5 打掉两文件的渲染与顺序。**真机两臂**（同源、scratch 端口 18771、两个死端口、各 2 次真实 POST ⇒ 每次请求 **2 条**记录）：修后 4 条请求记录带 id、同请求同 id、两次请求 id 不同、进程自己的启动行**不带**；对照臂（`git archive HEAD src`，修前）**同一个针命中 0/5** ⇒ 针会失败；**去掉 id 字段后修后每一行与修前逐字相等**。**登记三条**：SSE 整条流共用一个 id；contextvar **不跨线程**（实测：同一请求里另起线程写的记录不带 id，`runner.task` 仍靠 `task_id`）；`error.log` 的 id 是 D-03 五字段之外的**第六个**可选字段（裁定六）。**379 tests OK**（371 → +8）；`runtime/logging.py` +94/−16、`local_api/server.py` +26/−0、新测试 +304 |
 
@@ -269,8 +269,8 @@
 
 - [x] T-01：`delivery/active/CHG-20260923-057/`（`change.md`、`checkpoint.md`、`evidence/`、`status/`）；`delivery/planned/CHG-20260923-057/` 移入且**不留副本**
 - [x] T-01：`delivery/LEDGER.md` 加裸 id 表行 + 说明段；`delivery/planned/README.md` B 行 → ACTIVE
-- [ ] 基线回写：程序总纲 §3 CHG-B（20MB/14d/总量/截断标记/三文件纯文本）、架构基线 §5.8/§6.8（Desktop 日志路径、dev 也落盘）（T-18）
-- [ ] 归档收尾与失效指针扫描（T-18）
+- [x] 基线回写：程序总纲 §3 CHG-B（20MB/14d/总量/截断标记/三文件纯文本）、架构基线 §5.8/§6.8（Desktop 日志路径、dev 也落盘）（T-18）
+- [x] 归档收尾与失效指针扫描（T-18）（`git mv` → `completed/`；LEDGER 活动行移除 + 说明段改写；`prepare_ai_workspace.py --no-active`；扫描分母 10 处/2 文件全部在档内、档外 0，附两个阳性对照）
 
 ### wt-media-agent
 
@@ -284,7 +284,7 @@
 - [x] T-19 不误连外部服务（AC-11b）
 - [x] T-20 脱敏（§7 Q-07 的三处 + 新发现的第四处；两条正则 + 20 行差分表进 fixture）
 - [x] T-21 请求级 `operation_id`（contextvar + `handle_one_request`；三文件位置一致）
-- [ ] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
+- [x] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
 
 ### wt-media-desktop
 
@@ -292,7 +292,7 @@
 - [x] T-12 rolling（**已 DONE**）
 - [x] T-13 装配/白名单/脱敏（**已 DONE**）
 - [x] T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id（**四项已 DONE，Desktop 半 T-10…T-17 全部完成**）
-- [ ] 入口文档回写（T-18）；`.gitignore` 补 `.local/` **已在 T-11 完成**
+- [x] 入口文档回写（T-18）；`.gitignore` 补 `.local/` **已在 T-11 完成**
 
 ### wt-media-cloud
 
@@ -307,13 +307,13 @@
 | AC-03 | Config/Logger **只初始化一次**（裁定十三·3） | Agent 侧已成立：R11 AST 规则（除 `bootstrap/app.py` 外不得到达 `configure_from`/`configure_logging`）+ 三个反例（含规则被改成 `return []` 时全红）；`server.py` 那次重复调用已删。Desktop 侧的 `operation_id` **没有开出第二条初始化/传递通道**：出站头集合与今天**逐字相同**（T-17 在**桩套接字实收字节**上钉死 `authorization`/`accept`/`host`，并断言整份请求不含该 id）、不加新 target（`OWNED_TARGETS` 仍恰 3）、不进 sidecar 环境（既有 `vars.len() == 3`） | PASS（T-09/T-17） |
 | AC-04 | 日志不会无限增长（裁定十三·4） | Agent 侧已成立：20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，六个界各一次变异；真机两臂 8/8。**总量口径**：`total_bytes` 在轮转/启动点强制，真实上界 `total_bytes + 3×max_bytes`（出厂 400MB + 60MB），是有界而非逐字节精确（T-07）；Desktop 侧已成立：日期翻档 / 20MB 翻档 / 单条截断（`truncate=true original_size=<n>`）/ 按天删 / 按量删 / 当前文件永不删，变异 **25/25 红**（T-12），**跨午夜的第二个实例**未覆盖（T-12 如实登记） | PASS（T-07/T-12） |
 | AC-05 | 日志目录异常不阻断启动（裁定十三·5） | Agent 侧已成立：`configure_from` 降级仅 stderr 且既有单测绿（T-03）；Desktop 侧已成立：用普通文件占住 `<repo>/.local/logs` 后**仍启动**（8 秒后仍存活）、摘要在 stderr、**不 panic**、占位文件未被改动，且原因随摘要一起写出（T-15 臂 2；同形的单测 `an_unusable_directory_is_a_reason_and_not_a_failure`） | PASS（T-03/T-15） |
-| AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 已在真实进程上成立：**五个生命周期记录各自的调用点都跑到过**（启动 / 已在运行 / 健康成功 / 停止 / 未在运行，T-16 臂 C）+ 退出报告（T-16 臂 B）——在此之前「Agent 没在跑」与「在跑但拒绝」在前端只表现为一条失败命令；两侧进程内 `operation_id` **都已交付**：Desktop 按 Agent **会话**（T-17，仅进程内、不上线），Agent 按 **HTTP 请求**（T-21）——真机上 4 条请求记录带 id、同请求同 id、两次请求 id 不同、进程自己的启动行不带，对照臂同一个针命中 0/5；无请求时字段渲染 `""`，故「去掉该字段后与修前逐字相等」在真机上成立（请求外的行**形状未变**）。**登记三处不声称**：①Agent 侧关联**仅请求内、处理线程内**（contextvar 不跨线程，实测：同一请求里另起线程写的记录不带 id，`runner.task` 仍靠 `task_id`）；②SSE 整条流共用一个 id；③分配边界的**位置**（按请求而非按连接）与 `finally` 顺序只有**结构覆盖**——`AgentHandler` 未设 `protocol_version` ⇒ HTTP/1.0 ⇒ 两者在线上不可分，M7 只被结构用例打掉 | PASS（T-04/T-05/T-16/T-17/T-21） |
-| AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧**四处实测缺陷已全部修掉**（T-20）：`token=aaa password=bbb` → `token=*** password=***`、`cookies: a=1; b=2` → `cookies: a=***; b=***`、`{"client_secret": "s3cr3tvalue"}` → `{"client_secret": "***"}`（**仍是合法 JSON**，由 `json.loads` 判定，阳性对照在前）、`mytoken=abcdefghijkl password=zzz` → `mytoken=abcdefghijkl password=***`（形似键不再关掉遮蔽）。**单测**：T-13 的 20 行差分表做成 fixture，期望串是**在 Desktop 实现上测量**的，20/20 一致；四处各一条精确串用例；**变异 8 个里 7 个 KILLED**（M6 换序 SURVIVED，是有意成立的性质）。**真机**：真实进程 + 真实 HTTP 落盘后读回 `agent.log`，三条泄漏针各 0 而对照（payload / 修前日志）各 1 / 2，一个不带敏感形态的值原样通过。T-06 的 15 行两列表、落盘读回、traceback 面同覆盖仍有效。Desktop 侧已成立到模块层与真实进程：target 白名单（外来 target 有对照臂地不入文件）、含 token 的记录走完 sink 后 grep 不到且周围文本仍在（T-13）、真实启动确实建出文件并走完 sink（T-15 臂 1）。**登记两处不声称已覆盖**：①`main` 把 token 交给掩码这一行（T-15 的 N8）**无用例可打**——真实启动的 grep 分母为 0；②`error.log`/`task.log` 两条臂**未在本 Task 重跑**（四个缺陷同在 formatter 路径上，路由未改，但「三文件里的凭据不在」这一点本 Task 只由单测表与 `agent.log` 臂覆盖） | PASS（T-06/T-13/T-15/T-20） |
+| AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 已在真实进程上成立：**五个生命周期记录各自的调用点都跑到过**（启动 / 已在运行 / 健康成功 / 停止 / 未在运行，T-16 臂 C）+ 退出报告（T-16 臂 B）——在此之前「Agent 没在跑」与「在跑但拒绝」在前端只表现为一条失败命令；两侧进程内 `operation_id` **都已交付**：Desktop 按 Agent **会话**（T-17，仅进程内、不上线），Agent 按 **HTTP 请求**（T-21）——真机上 4 条请求记录带 id、同请求同 id、两次请求 id 不同、进程自己的启动行不带，对照臂同一个针命中 0/5；无请求时字段渲染 `""`，故「去掉该字段后与修前逐字相等」在真机上成立（请求外的行**形状未变**）。**登记三处不声称**：①Agent 侧关联**仅请求内、处理线程内**（contextvar 不跨线程，实测：同一请求里另起线程写的记录不带 id，`runner.task` 仍靠 `task_id`）；②SSE 整条流共用一个 id；③分配边界的**位置**（按请求而非按连接）与 `finally` 顺序只有**结构覆盖**——`AgentHandler` 未设 `protocol_version` ⇒ HTTP/1.0 ⇒ 两者在线上不可分，M7 只被结构用例打掉。**同一批脱敏缺陷里的「形状错」也挂在本条而不是 AC-07**（T-18 归位）：`{"client_secret": "s3cr3tvalue"}` 曾被改写成 `{"client_secret: "***"}`——闭引号丢失、该行**不再合法 JSON**，坏的是「这一行还读不读得回来」（本周的定位能力），不是「泄漏了没有」；T-20 修后由 `json.loads` 判定，用例的**对照在前**（先断言输入本身可解析，故下面的失败是脱敏器造成的，不是样板串造成的）。**补一句实测**（不是套件用例）：修前那个串 `{"client_secret: "***"}` 经 `json.loads` 抛 `JSONDecodeError: Expecting ':' delimiter` ——「形状错」是真的读不回来，不只是看着别扭 | PASS（T-04/T-05/T-16/T-17/T-21） |
+| AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧**四处实测缺陷已全部修掉**（T-20）：`token=aaa password=bbb` → `token=*** password=***`、`cookies: a=1; b=2` → `cookies: a=***; b=***`、`{"client_secret": "s3cr3tvalue"}` → `{"client_secret": "***"}`（**不再是形状错**：闭引号保住了，由 `json.loads` 判定，阳性对照在前；**这一条的验证锚点在 AC-06**，它坏的是「行还读不读得懂」而非泄漏）、`mytoken=abcdefghijkl password=zzz` → `mytoken=abcdefghijkl password=***`（形似键不再关掉遮蔽）。**单测**：T-13 的 20 行差分表做成 fixture，期望串是**在 Desktop 实现上测量**的，20/20 一致；四处各一条精确串用例；**变异 8 个里 7 个 KILLED**（M6 换序 SURVIVED，是有意成立的性质）。**真机**：真实进程 + 真实 HTTP 落盘后读回 `agent.log`，三条泄漏针各 0 而对照（payload / 修前日志）各 1 / 2，一个不带敏感形态的值原样通过。T-06 的 15 行两列表、落盘读回、traceback 面同覆盖仍有效。Desktop 侧已成立到模块层与真实进程：target 白名单（外来 target 有对照臂地不入文件）、含 token 的记录走完 sink 后 grep 不到且周围文本仍在（T-13）、真实启动确实建出文件并走完 sink（T-15 臂 1）。**登记两处不声称已覆盖**：①`main` 把 token 交给掩码这一行（T-15 的 N8）**无用例可打**——真实启动的 grep 分母为 0；②`error.log`/`task.log` 两条臂**未在本 Task 重跑**（四个缺陷同在 formatter 路径上，路由未改，但「三文件里的凭据不在」这一点本 Task 只由单测表与 `agent.log` 臂覆盖） | PASS（T-06/T-13/T-15/T-20） |
 | AC-08 | Desktop 与 Agent 日志职责清晰（裁定十三·8） | 两向断言，两边各一条对照臂：**Agent 业务日志**进 `agent.log`、不进 `desktop.log`——T-04 三文件路由（真实进程）+ T-16 的 `ordinary_output_reaches_the_buffer_and_no_record`（50 行普通输出 → 该 target 零条记录，**对照**是这 50 行确实在 `drain` 缓冲里，「零条」不来自一个什么都没收到的 drain）；**Desktop 自己的生命周期**（启停、健康、退出）进 `desktop.log` 的 `agent.supervisor`——T-16 五分支真机臂 + 退出报告 | PASS（T-04/T-16） |
 | AC-09 | Sidecar stdout 持续消费且**不转存**（裁定十三·9）。**口径按裁定五收窄为「进程存活期间」** | ①**进程存活期间的普通输出零条 desktop 记录**：单测 50 行（对照：50 行在缓冲里）；**真机分母是 1 行而不是 50**（sidecar 只来得及打印 1 行就死了）⇒ 真机只证明「那 1 行没变成记录、且确实到了 drain」，**不**证明规模；②**异常退出另立一臂**：恰**一条**该 target 记录且**含末 20 行尾**（裁定五），尾行在整份 `desktop.log` 里**只出现这一次**（臂 B 逐行核对：`[PYI-…]` 只在退出记录里）；③读失败（`CommandEvent::Error`）也是**一条**记录——进程未退出时的读失败否则永不为人所见；④对照臂：同一次失败，前端拿到的串**带**尾行、记录**不带** | PASS（T-16） |
-| AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | **实测到一处真泄漏并修**：`environment_facts` 的 `cloud_base_url` 原样带密码（`True → False`，URL 仍可读）且走 `print`→stdout（T-06）；`/api/v1/health` 响应面已量（T-08 真机两臂：体里只有 `agent_version`/`agent_status` 与三个依赖的状态词，**没有** `cloud_base_url` 本身、没有 token）；`status` 响应体本 Task **未测**（契约面，已登记） | 部分（T-06/T-08） |
+| AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | **实测到一处真泄漏并修**：`environment_facts` 的 `cloud_base_url` 原样带密码（`True → False`，URL 仍可读）且走 `print`→stdout（T-06）；`/api/v1/health` 响应面已量（T-08 真机两臂：体里只有 `agent_version`/`agent_status` 与三个依赖的状态词，**没有** `cloud_base_url` 本身、没有 token）。**T-18 把原先登记的 `status` 响应体补量了**（不再是「未测」）：两臂真机（`/tmp/t18/ac10_arm.sh`，scratch 端口 18773 + 两个死端口，凭据种在**该进程自己的** `WT_MEDIA_CLOUD_BASE_URL` 里）——①**对照臂**（`b66d7f5^` 的 `bootstrap/cloud.py`）：诊断包逐字打出 `https://alice:pw123456@cloud.example.invalid/api`（针**打得中**）；②当前诊断包：`https://alice:***@cloud.example.invalid/api`，密码不在、URL 仍可读，且「修前事实把密码换成 `***` 后**逐字等于**修后事实」（其余字段一字未变）；③`/api/v1/status` 体**两臂各 377 字节**、键集合**恰 13 个**且与本行枚举的名单完全一致、**两臂都不含凭据**；④该体里**根本没有** `cloud_base_url` 这个键——环境那半边是**白名单**（`RuntimeEnvironmentReport.to_dict()` 的固定字段），不是「掩住了」，**修前修后都不在**。`/tmp/t18/assert_ac10.py` → **ALL ASSERTIONS PASS** | PASS（T-06/T-08/T-18） |
 | AC-11a | 测试**不写真实检出目录**（里程碑失败行为） | T-02：规则「不得把派生根接 `.local`」（33/34 模块在扫）+ `scripts/test.sh` 前后新增路径守卫，变异探针证明守卫独立于测试结果 | PASS |
-| AC-11b | 测试**不误连真实外部服务**（里程碑失败行为） | T-19：AST 规则（客户端构造必须注入假 transport）。**T-02 期间实测：今天无任何规则在守**，计划把 AC-11 整条映射给 T-02 是乐观的，见 §7 Q-08 | **PASS**（`evidence/task-19-no-external-services.md`：规则先红报 5 处真命中；控制臂先绿、7 个变异逐个红、三条真断言各有变异能红它；规则看不见的四种形态在文件头写明） |
+| AC-11b | 测试**不误连真实外部服务**（里程碑失败行为） | T-19：AST 规则（客户端构造必须注入假 transport）。**T-02 期间实测：今天无任何规则在守**，计划把 AC-11 整条映射给 T-02 是乐观的，见 §7 Q-05 | **PASS**（`evidence/task-19-no-external-services.md`：规则先红报 5 处真命中；控制臂先绿、7 个变异逐个红、三条真断言各有变异能红它；规则看不见的四种形态在文件头写明） |
 
 **每项否定结论都要阳性对照，对照臂不出红即记「对照无效」，不得记为通过**（CHG-060 的 AC-08 先例）。
 
@@ -345,7 +345,8 @@
 - `evidence/task-17-desktop-operation-id.md`（T-17）
 - `evidence/task-20-agent-redaction.md`（T-20）
 - `evidence/task-21-agent-operation-id.md`（T-21）
-- `evidence/task-18-<topic>.md`（**T-18** 的回写与归档，随 Task 落地——原句写的「T-03…T-19 每项一份」已按上面的实名清单更正）
+- `evidence/task-18-writeback-and-archive.md`（**T-18** 的回写与归档——基线回写、两仓入口文档、
+  AC-10 两条真机臂、§7/§10 归位、归档动作与失效指针扫描的全部分母与阳性对照）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
 ## 12. Current Checkpoint
@@ -474,31 +475,24 @@ Completed:
 
 Current:
 
-- T-21 已收尾（`wt-media-agent` `5570906` + 本记录）；**Agent 与 Desktop 两侧代码半都已完成**，
-  只剩阶段 3 的 **T-18** 回写与归档收尾。
+- 本 CHG 已关闭（`Status: DONE`）。T-01…T-21 全部 DONE；代码半落在 `wt-media-agent` 与
+  `wt-media-desktop` 两仓，治理半（基线回写、入口文档、§7/§10 归位、归档与失效指针扫描）即 T-18。
+  **未交付项与未覆盖项均逐条登记在 §7 与 §10，未静默吸收**。
 
-Next:
+Next（**均在本 CHG 之外，不构成未完成的 scope**）:
 
-- **T-21 的三条登记要进 T-18 的 §7/§10**：① SSE 整条流共用一个 id；② 关联**仅请求内、处理线程内**
-  （contextvar 不跨线程，`runner.task` 仍靠 `task_id`）；③ 分配边界的**位置**与 `finally` 顺序只有
-  **结构覆盖**（`protocol_version` 未设 ⇒ HTTP/1.0 ⇒ 按请求与按连接在线上不可分，M7 只被结构用例打掉）。
-- **T-20 的两条登记要进 T-18 的 §7/§10**：① 整尾家族的触达是**行尾**，故 `cookies:` 行后的
-  `group_id=g-1` 会一并被掩（真机 8/10 条记录带它，缺的 2 条正是 `cookies:` 那两条）——**两侧一致**
-  （在 Desktop 上实测同三个串）、修前修后触达范围未变，只登记不改某一侧的答案；
-  ② `error.log`/`task.log` 两条臂**未在 T-20 重跑**（缺陷同在 formatter 路径上）。
-- **T-17 的三条登记要进 T-18 的 §7/§10**：退出报告**有意不带 id**；`already_running` 带 id 只在单测表里；
-  **两侧 id 不相关**（来源与粒度不同，不做跨端对照，D-10 不变）。
-- **T-16 的三条登记同样进 T-18 的 §7/§10**：`start` 的 spawn 失败分支够不着；AC-09 真机分母是 **1 行**；
-  `already_running` 在 sidecar 死后仍说「已在运行」。另有一条**环境事实**（非缺陷）：debug 二进制带
-  `cfg(dev)` ⇒ 加载 `devUrl` 而非 `frontendDist`，没有 Vite 时窗口整页空白，真机臂只能靠探针页替身。
-- 之后阶段 3 **T-18** 回写与收尾（含 §7 关掉 Q-07、新增 Q-08、§10 陈旧行修正、
-  归档与冷启动重生成、失效指针扫描报分母 + 阳性对照）。
+- 跨端 `operation_id` 串联**仍不交付**（裁定九/D-10）：Desktop 不发 `X-Operation-Id`、Agent 不消费。
+  两侧 id 来源与粒度不同，若要做串联，先要裁定「以哪一端为源、粒度是会话还是请求」。
+- 程序总纲 C/D 两阶段（`CHG-20260923-058`、`CHG-20260923-059`）仍 `PLANNED`，**未激活**；
+  本记录的 DONE **不得**被读成它们已完成。
+- Windows 日志布局仍属未测（T-11 既有登记）；`level` 严于 INFO 时 Desktop 不建文件且连 stderr 一起静默
+  （T-12/T-15，有意，未改）。
 
 Blockers:
 
-- None。§7 的 Q-01…Q-07 均 `Blocking = NO`，已按读数实施或登记。
-  **Q-07（Agent 侧脱敏）已由 T-20 落地修完**（`65725f4`），四处实测缺陷全部关闭；
-  但 Q-07 的**行文本身仍按旧行为描述**（它把两处列成「实测输出」），T-18 须整体改写这一行。
+- None。§7 的 Q-01…Q-08 全部 `Blocking = NO`，已按读数实施或登记。
+  **Q-07（Agent 侧脱敏）已由 T-20 落地修完**（`65725f4`），四处实测缺陷全部关闭，本行已按裁定改写为已修状态；
+  **Q-08** 为 T-15 新开（Desktop 的「环境」取构建期），新增于本次收尾。
 
 Recent verification:
 
@@ -597,12 +591,66 @@ Recent verification:
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed. —— T-01…T-21 全部 DONE（§8；T-18 为收尾）。§5 的 Add/Modify 两节逐条有落点：
+  Agent 的 `runtime/{config,paths,logging}.py` 与 `local_api/server.py`、Desktop 的
+  `src-tauri/src/logging/`（5 个模块）、`commands/webview.rs`（原 `logging.rs`）、`sidecar/drain.rs`、
+  `commands/agent.rs`、`state.rs`、两仓的配置文件与出货资源。**两处计划内未交付已登记、未造假发射点**：
+  Q-04（Desktop 无 settings 命令、`updater` 无 emit 路径 ⇒ 无来源可接）与跨端 `operation_id`
+  串联（裁定九/D-10，§2 已声明不交付）。
+- [x] No blocking `Q-xx`. —— §7 的 Q-01…Q-08 全部 `Blocking = NO`；Q-07 已由 T-20 修完并按裁定改写，
+  Q-08 为本次 T-15 新开且已写清代价与抵消方式。Q-08 与旧别名（Q-05）的 ID 撞车**已在本次修掉**。
+- [x] Acceptance matrix all PASS. —— §10 的 AC-01…AC-11b 共 11 条全 PASS，逐条判据在行内并指到证据文件。
+  **每条否定结论都带阳性对照**：AC-09 的「零条」对照是「那 50 行确实在缓冲里」、AC-10 的对照是
+  **修前诊断包真的打得出密码**、AC-07 的对照是同一根针在 payload / 修前日志上打得中、
+  AC-11b 的规则先红报 5 处真命中。**未覆盖项逐条登记在行内**，未以「测试通过」替代真实进程证据。
+- [x] Automated tests passed or justified. —— agent `bash scripts/test.sh` → **379 tests OK**
+  （起点 253，全程单调不降）；desktop `cargo test --workspace` → **175 passed; 0 failed**（起点 63）；
+  desktop build **9** 条 / clippy `--all-targets` **13** 条，13 条逐条点名、**无一条落在新代码上**；
+  治理仓四个验证器见 §12 与 `evidence/task-18-writeback-and-archive.md` §7 —— 其中
+  `python3 -m unittest discover -s tests -q` 的 **4 条红是既有已知项**，判据是 **`git archive HEAD`
+  的同集合对照**（两棵树逐名相同、条数相同），不是「看着无关」。
+- [x] Manual verification evidence recorded where required. —— 每个 Task 都有真实进程取证，且
+  **全程 scratch 端口，未碰开发者自己的 `:54345`/`:18080`/`:8765`**：Agent 四次真实启动（T-04）、
+  真实任务失败臂（T-05）、五个界各一次变异 + 真机两臂 8/8（T-07）、`/healthz` 逐字未变的真机两臂（T-08）、
+  `-m` 探针 11/11（T-09）、Desktop 真实启动三臂（T-15）、五分支生命周期 + 两种退出状态（T-16）、
+  两会话六条记录（T-17）、Agent 与 Desktop 的脱敏差分表 20 行实跑（T-13）、
+  脱敏真机两臂（T-20）、请求级 id 真机两臂（T-21）、AC-10 的两条真机臂（T-18）。
+- [x] Diff checked for out-of-scope changes. —— 逐仓已核：agent 的改动全部落在 `src/`、`tests/`、
+  `contracts/`（T-08 的契约同步）与入口文档内；desktop 的改动全部落在 `src-tauri/src/`、
+  `src-tauri/resources/`、`src-tauri/Cargo.{toml,lock}`、`scripts/test.sh`（T-11 的 `.local/` 守卫）与入口文档内；
+  两者都**没有**范围外的产品行为变更。治理仓的六处与本 CHG 无关的未提交改动
+  （`AGENT-INDEX.md`/`AGENTS.md`/`CLAUDE.md`/`README.md`/`MASTER_IMPLEMENTATION_PLAN.md`/
+  `agent-workspace-conventions.md`）**按用户裁定原样保留、未被覆盖**。
+- [x] Runtime repositories touched only if listed in scope. —— 两仓都在 §1 的受影响仓库内并已声明；
+  `wt-media-cloud` **一行未碰**（全程 `git status --porcelain` 为空）；`wt-media-workspace` 只写知识、
+  规范与交付状态，未成为运行时依赖（未新增任何跨仓 import/引用）。
+- [x] Required baselines updated. —— 程序总纲 §3 CHG-B 的数字与口径、架构基线 §5.8/§6.8 的日志树与「dev 也落盘」，
+  见 `evidence/task-18-writeback-and-archive.md` §1；两个运行仓的 `AGENTS.md`/`AGENT-INDEX.md`/`DIRECTORY_MAP.md`
+  按实际新布局回写完毕（同文件 §2）。**一处旧基线冲突按「回写基线而非回退实现」处置**：
+  架构基线原先读得出「开发态不落盘」，T-03 已让它落盘，故改的是基线。
+- [x] Affected repositories committed independently. —— 一仓一 commit、按 Task 分开：「移动文件」与「改逻辑」
+  不进同一 commit（`commands/logging.rs → webview.rs` 是**单独一个纯重命名 commit** `5eb7d0c`）。
+  agent `7382fed`…`5570906`；desktop `5194d49`…`9051480` + `572d1cf`（T-20 的注释回写，单独提交）+
+  本次入口文档提交；workspace 按 Task 分别提交，本次收尾提交含 §1/§7/§9/§10/§11/§12/§13 回写、
+  T-18 证据、归档移动、LEDGER 与四处失效指针、快照再生成。
+
+## 关闭记录（2026-09-24）
+
+- **关闭依据是 DONE Gate，不是用户签收**（如实登记，勿读成后者）：本 CHG 的授权来自用户
+  2026-09-23 对执行计划的批准、2026-09-24 的《日志治理裁定补充说明》十三节与「继续完成任务」的指示；
+  执行期间**没有**针对本 CHG 的用户验收轮次。§13 九项由我逐项签字，判据逐条写在签字行里。
+  若需要用户签收口径，请在此追加。
+- **归档动作**：记录由 `delivery/active/CHG-20260923-057/` 移入 `delivery/completed/`；
+  `LEDGER.md` 的活动表行移除并把原说明段改写为归档叙述；`planned/README.md` 的头段与 B 行、
+  里程碑状态行、`planned/CHG-20260923-053/change.md` 的并入去向行四处**活链接**改指 `completed/`；
+  快照以 `prepare_ai_workspace.py --no-active` 冷启动重生成，现为 `Active CHG: none` / `Status: NONE`。
+- **失效指针扫描报分母 + 阳性对照**：`active/CHG-20260923-057` 命中 **10 处 / 2 文件，两个文件都在归档记录内部**，
+  **档外残留 0**；三个兄弟仓各 0；外层执行根 0。两个阳性对照（`completed/CHG-20260923-056` **13 处 / 9 文件**、
+  `active/CHG-` **80 处**）证明该 grep 在别处有命中，故「0」不是空转。档内那 10 处**判为叙述、一字未改**
+  （改了就不是 T-01 的证据了），另在该证据文件顶部加了一段归档后追加的注记。详见
+  `evidence/task-18-writeback-and-archive.md` §6。
+- **随记录归档、不阻塞本次关闭的范围外事项**：①`planned/CHG-20260923-053/change.md` 里同形式的
+  CHG-059 链接仍是坏的（不是本 CHG 引入，也不该由归档 057 顺手改）；②Windows 日志布局未测（T-11 登记）；
+  ③`level` 严于 INFO 时 Desktop 不建文件且连 stderr 一起静默（T-12/T-15，合法但**有意**未改）。
+- **明确不在本次关闭内**：程序总纲的 C/D 两阶段（`CHG-20260923-058`、`CHG-20260923-059`）仍 `PLANNED`，
+  **未激活**；跨端 `operation_id` 串联**未交付**（D-10）。**不得**据本记录的 DONE 推断它们已完成。

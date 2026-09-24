@@ -1,6 +1,6 @@
 # Checkpoint — CHG-20260923-057
 
-- 状态：IMPLEMENTING（2026-09-24 激活）。
+- 状态：DONE（2026-09-24 激活并于同日关闭；记录归档在 `delivery/completed/CHG-20260923-057/`）。
 - 性质：联合工程优化 B——Paths、Logger 和运行目录。Level M，跨两仓（agent / desktop）+ 治理回写。
 - 权威：用户 2026-09-24《CHG-057 日志治理裁定补充说明》十三节。它**推翻**了本 CHG 草案的三处：
   Agent 日志改「三文件纯文本」而非 JSON、Desktop 后端只用官方 `tracing-subscriber`（无自写降级路径）、
@@ -306,12 +306,39 @@
   ③ `error.log` 的 id 是 D-03 五字段之外的**第六个**可选字段（裁定六）。见
   `evidence/task-21-agent-operation-id.md`。
 
+- 2026-09-24 T-18：**基线回写、入口文档、验收补量与归档收尾**（治理仓，本次收尾提交）——
+  ①**基线**：程序总纲 §3 CHG-B 补进八条「落定后的数字与口径」（本节是这些数字的权威落点，原先只在
+  CHG-053 草案里且那处自称「来自程序总纲」不成立）、架构基线 §5.8/§6.8 补「dev 也落盘」与 Desktop 的
+  另一棵树；②**入口文档**：两个运行仓的 `AGENTS.md`/`AGENT-INDEX.md`/`DIRECTORY_MAP.md`（改前的
+  drain 行写着「不落盘/不轮转/不脱敏」，T-15/T-16/T-17 之后**已经变假**）；③**AC-10 从「未测」改成实测
+  PASS**：两臂真机（scratch 18773 + 两个死端口、凭据种在进程自己的 `WT_MEDIA_CLOUD_BASE_URL` 里），
+  对照臂用 `b66d7f5^` 的 `bootstrap/cloud.py` **确实打得出密码**，`assert_ac10.py` 8/8 PASS——其中
+  一条**推翻了自己上一版口径**：「环境那半边是白名单、本来就进不去」，不是「掩住了」；④§10 归位
+  （AC-06 点名 T-21 并收「形状错」、AC-07 按四处缺陷改写）、§7 关掉 Q-07 并新增 Q-08，**顺带修掉一处
+  ID 撞车**（Q-08 早先被 T-19 行与 AC-11b 当作 Q-05 内容的别名用过，两处已改指 Q-05）；
+  ⑤**归档**：`git mv` → `completed/`、LEDGER 活动行移除并把说明段改写为归档叙述、四处活链接改指
+  `completed/`、`prepare_ai_workspace.py --no-active` 冷启动重生成（现 `Active CHG: none`）；
+  ⑥**失效指针扫描报分母 + 阳性对照**：`active/CHG-20260923-057` 命中 **10 处 / 2 文件，两个文件都在
+  归档记录内部**、档外 **0**、三个兄弟仓各 0、外层执行根 0；两个阳性对照（`completed/CHG-20260923-056`
+  **13 处 / 9 文件**、`active/CHG-` **80 处**）证明 grep 在别处有命中，故「0」不是空转——档内那 10 处
+  **判为叙述、一字未改**（改了就不是 T-01 的证据了），只在其顶部加了一段归档后追加的注记。
+  **关闭时的四条验证**：agent `bash scripts/test.sh` → **379 tests OK**；desktop `cargo test --workspace`
+  → **175 passed / 0 failed**；`verify_delivery_governance.py` → **ok, Active CHG: none**；
+  `verify_agent_entry.py` → **0 warning（快照 1668 字符）**。workspace 的
+  `unittest discover -s tests -q` 有 **4 条红**，判据是 **`git archive HEAD` 的同集合对照**
+  （两棵树逐名相同、条数相同）且与 `README.md` 已登记的已知红项逐条对上——**不是**「看着无关」。
+  见 `evidence/task-18-writeback-and-archive.md`。
+
 ## Current
 
-- T-21 已收尾（`wt-media-agent` `5570906` + 本记录）；**Agent 与 Desktop 两侧代码半都已完成**，
-  只剩阶段 3 的 **T-18** 回写与归档收尾。
+- **本 CHG 已关闭**（`Status: DONE`，记录归档在 `delivery/completed/CHG-20260923-057/`）。
+  T-01…T-21 全部 DONE；T-18 的回写、归档与失效指针扫描已完成。
 
 ## Next
+
+> **下列各条「要进 T-18 的 §7/§10」的登记都已在 T-18 落地**，保留原文是为了留住每条的**理由**；
+> 落点见 §10 矩阵各行与 §7 的 Q-07/Q-08，收尾过程与分母见
+> `evidence/task-18-writeback-and-archive.md`。**下面这些是范围的封闭条件，不是待办。**
 
 - **T-21 的三条登记要进 T-18 的 §7/§10**：① SSE 整条流共用一个 id（有意：id 的单位是「一次请求」）；
   ② 关联**仅请求内、处理线程内**——contextvar 不跨线程（实测），`runner.task` 的记录仍靠 `task_id`；
@@ -366,11 +393,13 @@
 - 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 ✓ → T-17 ✓（**本阶段完成**）。
 - 阶段 2 Agent 补做：T-20 ✓（脱敏，`65725f4`）、T-21 ✓（请求级 `operation_id`，`5570906`）——
   由用户本次裁定新开，**两者均已完成**。
-- 阶段 3：T-18 回写与收尾（**下一步，仅此一项**）。
+- 阶段 3：T-18 回写与收尾 —— **已完成**（基线回写、两仓入口文档、AC-10 两条真机臂、§7/§10 归位、
+  `git mv` 归档、LEDGER 活动行移除、快照冷启动重生成、失效指针扫描报分母 + 阳性对照）。
 
 ## Blockers
 
-- None。裁定十三节已把草案的待决项全部定下；§7 的 Q-01…Q-04 均为 `Blocking = NO`，已按读数实施。
+- None。裁定十三节已把草案的待决项全部定下；§7 的 **Q-01…Q-08** 全部 `Blocking = NO`，已按读数实施
+  或登记（Q-07 已由 T-20 修完并按裁定改写，Q-08 为 T-15 新开且代价已写明）。**本 CHG 已关闭，无遗留阻塞**。
 
 ### 工作区里不属本 CHG 的既有改动（**不被本 CHG 提交**）
 
@@ -384,7 +413,28 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
+**T-18 收尾（归档时）的结论，闭合上面这条**：按用户本次裁定，这组改动**原样保留、不碰、不覆盖、不提交**。
+T-18 改的是两个**运行仓**的入口文档（`wt-media-agent`、`wt-media-desktop`），与治理仓这六个文件
+**没有重叠**；收尾提交只 stage 本 CHG 自己的路径，未用 `git add -A`。归档后 `git status --porcelain`
+里这六项**仍在**（`AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`、`README.md`、
+`delivery/MASTER_IMPLEMENTATION_PLAN.md`、`docs/engineering/specs/agent-workspace-conventions.md`），
+即它们**没有被本 CHG 的收尾提交吞掉**。
+
 ## Recent verification
+
+- T-18（**关闭时快照**）：agent `bash scripts/test.sh` → **Ran 379 tests … OK**；
+  desktop `cargo test --workspace` → **175 passed; 0 failed**；
+  `verify_delivery_governance.py` → **ok, Active CHG: none**；
+  `verify_agent_entry.py` → **ok, 0 warning(s)**，快照 **1668 字符**；`verify_skills.py` → **10 skill 源文件**；
+  `python3 -m unittest discover -s tests -q` → `Ran 69 tests, FAILED (failures=4)`——
+  **对照**：`git archive HEAD` 出来的同构树（含 `delivery/active/CHG-20260923-057`）也 `Ran 69, failures=4`，
+  **失败集合逐名相同**，且与 `README.md` 的已知红项逐条对上；另有结构性旁证
+  （`verify_product_master_alignment.validate_active_change()` 在无 active CHG 时**直接返回 `[]`**）。
+  AC-10 两臂：`/tmp/t18/ac10_arm.sh` + `python3 /tmp/t18/assert_ac10.py` → **8/8 PASS**
+  （对照臂 `b66d7f5^` 确实打出 `https://alice:pw123456@cloud.example.invalid/api`）。
+  失效指针扫描：分母 **10 处 / 2 文件**（全在档内）、档外 **0**；阳性对照
+  `completed/CHG-20260923-056` **13 处 / 9 文件**、`active/CHG-` **80 处**。见
+  `evidence/task-18-writeback-and-archive.md`。
 
 - T-21：`bash scripts/test.sh` → **379 tests OK**（371 → +8 = 新模块 8 个用例，**只增不减**）；
   `PYTHONPATH=tests python3 -m unittest tests.test_log_operation_id` → **8 OK**。

@@ -1,7 +1,8 @@
 # M-launch-engineering：上线前联合工程优化
 
 - 日期：2026-09-23
-- 状态：执行中（CHG-A 已于 2026-09-24 归档 `DONE`；B/C/D 仍 planned 待激活）
+- 状态：执行中（CHG-A、CHG-B 已于 2026-09-24 归档 `DONE`，**成功事实 #5 已由 CHG-B 达成**，见
+  [CHG-20260923-057](../completed/CHG-20260923-057/change.md)；C/D 仍 planned 待激活）
 - 程序总纲：`docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md`
 - 关联 CHG：CHG-20260923-056（A）、CHG-20260923-057（B）、CHG-20260923-058（C）、CHG-20260923-059（D）
 - 性质：工程加固（非业务里程碑）；不改变 M2/M3 已验收业务闭环

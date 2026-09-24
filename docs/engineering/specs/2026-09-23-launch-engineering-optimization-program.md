@@ -1,9 +1,9 @@
 # Desktop × Agent 联合上线工程优化程序（Program）
 
 - 日期：2026-09-23
-- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）
+- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）。A、B 两阶段已于 2026-09-24 归档 `DONE`；C/D 仍待激活
 - 性质：上线前工程加固程序，不属 M2/M3 里程碑范围（先例：CHG-20260923-055 里程碑外工程 CHG）
-- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、CHG-20260923-057（B）、CHG-20260923-058（C）、CHG-20260923-059（D，均 planned）
+- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、[CHG-20260923-057](../../../delivery/completed/CHG-20260923-057/change.md)（B，**2026-09-24 归档 DONE**）、CHG-20260923-058（C）、CHG-20260923-059（D，均 planned）
 - 上游基线：ADR-0016（Agent 运行时分层的目录、依赖与配置边界）；架构基线 `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` §5.8
 
 ## 1. 问题与目标
@@ -46,6 +46,22 @@
 ### CHG-B：Paths、Logger 和运行目录
 
 Desktop/Agent 独立运行目录、日志初始化、落盘、轮转、清理及脱敏；`operation_id` 日志关联；测试目录隔离；sidecar stdout 持续消费（不转存全部 INFO）。
+
+落定后的数字与口径（本节是这些数字的**权威落点**；此前它们只在 CHG-053 草案里出现过，而那处自称「来自程序总纲」并不成立）：
+
+- 轮转与限额：**单文件 ≤ 20 MB**、**保留 ≤ 14 天**、**总容量受限**（Agent 400 MB / Desktop 100 MB）。
+  三个值都可配（Agent `[logging] max_bytes/retention_days/total_bytes`、Desktop `[logging]`）。
+  轮转按日期分档（UTC）并以 `create_new` 抢名，故多实例不会写进同一文件。
+- 单条超长记录**截断而非丢弃**，尾部标 `truncate=true original_size=<原字节数>`（Agent 与 Desktop 同形）。
+- Agent 保持**三个纯文本文件**：`agent.log`（全量、唯一含 traceback）、`task.log`（只收
+  `wt_media_agent.runner.*`）、`error.log`（只收 ERROR、无 traceback，每行含
+  `error_code` / 可选 `task_id` / 可选 `context`）。**不做 JSONL 改造**，
+  053 草案的「三个 JSON 日志文件」不采纳。
+- Desktop 单文件 `desktop-YYYYMMDD-N.log`（`~/Library/Logs/WTMedia/Desktop`；开发态 `<repo>/.local/logs`），
+  只记 Desktop 自身的启动退出、配置加载、Agent 启停与健康检查、sidecar 异常退出；**不转存** Agent 业务日志。
+- `operation_id` 本轮**只在各进程内部**生成，跨端串联不交付（不加 Header、不进 sidecar 环境）。
+
+详见 [CHG-20260923-057 change.md](../../../delivery/completed/CHG-20260923-057/change.md)。
 
 ### CHG-C：Desktop 本机设置
 

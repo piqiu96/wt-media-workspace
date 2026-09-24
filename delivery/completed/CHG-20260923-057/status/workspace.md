@@ -5,3 +5,9 @@
   `planned/README.md` 的 B 行改 ACTIVE；快照经 `prepare_ai_workspace.py --change CHG-20260923-057` 再生成。
 - 待办：T-18 的基线回写（程序总纲 §3 CHG-B 补 20MB/14d/总量/截断标记；架构基线 §5.8/§6.8 补
   Desktop 日志路径与「dev 也落盘」）与归档收尾（`--no-active` 冷启动重生成 + 主动扫失效指针）。
+
+**终态（2026-09-24 关闭时追加，上文一字未改）**：上面这条待办**已完成**——两处基线已回写，
+两个运行仓的入口文档另加回写，记录已 `git mv` 至 `delivery/completed/`，`LEDGER.md` 活动行已移除，
+快照经 `prepare_ai_workspace.py --no-active` 冷启动重生成（现 `Active CHG: none` / `Status: NONE`），
+失效指针扫描报出分母与阳性对照（档外残留 **0**）。`verify_delivery_governance.py` 与
+`verify_agent_entry.py` 均绿。详见 `../evidence/task-18-writeback-and-archive.md`。
