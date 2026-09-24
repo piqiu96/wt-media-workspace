@@ -282,17 +282,41 @@
   **一处如实登记的代价**：整尾家族触达行尾 ⇒ `cookies:` 行后的 `group_id=g-1` 一并被掩（真机 8/10），
   **两侧一致**（Desktop 实测同三个串）且触达范围修前修后未变，只登记不改。见 `evidence/task-20-agent-redaction.md`。
 
+- 2026-09-24 T-21：**Agent 请求级 `operation_id`**（`wt-media-agent` `5570906`，1 个 commit）——id 源
+  `secrets.token_hex(8)` 在 `local_api/server.py`（`secrets` 已 import，`dependencies = []` 不变）、
+  载体是 `runtime/logging.py` 的 `ContextVar`（不用 thread-local：`ThreadingHTTPServer` 每连接一线程，
+  thread-local **今天碰巧能用**，请求里任何一段搬到执行器就失效）、边界覆写 `AgentHandler.handle_one_request`
+  且 `try/finally` 复位——该位置 **upstream 于 `_check_auth`/`do_OPTIONS`/`send_error`**，故 401/404/
+  畸形请求行**构造上**都带 id，且以后新加的 `do_*` 不会忘。字段经 formatter 的 `prepare` 盖上
+  （**渲染槽名故意不叫 `operation_id`** ⇒ 调用方 `extra={"operation_id": …}` 不会被静默盖掉），
+  无请求时渲染 `""` ⇒ 请求外的行**逐字未变**。`_single_line` 从 `_field` 提出供两者共用；
+  `NoTracebackFormatter` 不再自带 `format`（只剩一行 `prepare` 调 `super().prepare`）。
+  **先红分两步**（首次红是 ImportError，那种红什么都证明不了）：第 1 步字段机制 → **6 pass / 2 fail**，
+  两个失败**恰是两条真 HTTP 用例** ⇒ 接线窟窿在行为上显形；第 2 步接线 → **8 OK**。
+  **一个界测不到并如实登记**：`AgentHandler` 未设 `protocol_version`（实为 HTTP/1.0、答完即关，已核）
+  ⇒ 按请求与按连接分配在真实 socket 上**产出相同的行**，故 M7（挪到 `handle`）**只**被结构用例
+  `test_the_id_is_set_before_the_request_line_is_read` 打掉（该用例 docstring 自陈弱于行为断言，
+  并说明它代表的 401/404/畸形请求行没有文件可落）。**变异 9/9 KILLED、0 SURVIVED**（控制行 379 OK
+  先绿，锚点不唯一即跳过不算 KILLED）；M2 固定 id、M6 `reset` 改清空、M8 永不复位、M9 id 进响应头
+  各自打掉**行为**用例。**真机两臂**（同源、scratch 18771、死端口 18792/18793、各 2 次真实 POST 各 502
+  ⇒ 每次请求 **2 条**记录）：修后 4 条带 id、同请求同 id、两次不同、**进程自己的启动行不带**；
+  **对照臂（`git archive HEAD src`）同一个针命中 0/5** ⇒ 针会失败；且**去掉该字段后修后每一行与修前
+  逐字相等**。**379 tests OK**（371 → +8）。三条登记：① SSE 整条流共用一个 id；② contextvar
+  **不跨线程**（实测：同一请求里另起线程写的记录不带 id，`runner.task` 仍靠 `task_id`）；
+  ③ `error.log` 的 id 是 D-03 五字段之外的**第六个**可选字段（裁定六）。见
+  `evidence/task-21-agent-operation-id.md`。
+
 ## Current
 
-- T-20 已收尾（`wt-media-agent` 一个提交 `65725f4` + desktop doc commit `572d1cf` + 本记录）；
-  **Agent 半只剩 T-21**，随后阶段 3 的 T-18 回写与收尾。
+- T-21 已收尾（`wt-media-agent` `5570906` + 本记录）；**Agent 与 Desktop 两侧代码半都已完成**，
+  只剩阶段 3 的 **T-18** 回写与归档收尾。
 
 ## Next
 
-- **T-21**（Agent 侧）：请求级 `operation_id`（`secrets.token_hex(8)` + contextvar + 覆写
-  `handle_one_request` 且 `try/finally` 复位），进 `FMT`/`ERROR_FMT`，`error.log` 放在 logger 名之后、
-  `error_code` 之前（裁定六）。测试用 `ThreadingHTTPServer(("127.0.0.1", 0), …)` + `http.client`
-  （**端口 0，绝不碰 8765**；**不用 `urlopen`**，避开 T-19 的 AST 规则）。**不做跨端串联**（D-10 不变）。
+- **T-21 的三条登记要进 T-18 的 §7/§10**：① SSE 整条流共用一个 id（有意：id 的单位是「一次请求」）；
+  ② 关联**仅请求内、处理线程内**——contextvar 不跨线程（实测），`runner.task` 的记录仍靠 `task_id`；
+  ③ 分配边界的**位置**与 `finally` 顺序只有**结构覆盖**（`protocol_version` 未设 ⇒ HTTP/1.0 ⇒
+  按请求与按连接在线上不可分，M7 只被结构用例打掉）。
 - **T-17 的三条新登记要进 T-18 的 §7/§10**：① 退出报告（`drain::report_exit`）**有意不带 `operation_id`**
   （进程退出时会话可能已被清除，同一记录类型「有时带有时不带」比一律不带更误导）；② `already_running`
   带 id 的形态**只在单测表里**（真机臂每次都先 stop 再 start，槽位总是空的）；③ **两侧的 id 不相关**
@@ -340,8 +364,9 @@
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
 - 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 ✓ → T-17 ✓（**本阶段完成**）。
-- 阶段 2 Agent 补做：T-20 ✓（脱敏，`65725f4`）、T-21（请求级 `operation_id`，**下一步**）——由用户本次裁定新开。
-- 阶段 3：T-18 回写与收尾。
+- 阶段 2 Agent 补做：T-20 ✓（脱敏，`65725f4`）、T-21 ✓（请求级 `operation_id`，`5570906`）——
+  由用户本次裁定新开，**两者均已完成**。
+- 阶段 3：T-18 回写与收尾（**下一步，仅此一项**）。
 
 ## Blockers
 
@@ -360,6 +385,29 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
 ## Recent verification
+
+- T-21：`bash scripts/test.sh` → **379 tests OK**（371 → +8 = 新模块 8 个用例，**只增不减**）；
+  `PYTHONPATH=tests python3 -m unittest tests.test_log_operation_id` → **8 OK**。
+  **先红分两步**（首次红是 ImportError，按既有规则那种红不算数）：第 1 步字段机制 + 两个 `FMT` 槽位 →
+  **6 pass / 2 fail**，两个失败**恰是两条真 HTTP 用例**（`…each_request_gets_its_own_id…`、
+  `…the_id_is_set_before_the_request_line_is_read`）；第 2 步加 `handle_one_request` 覆写 → **8 OK**。
+  **变异 9 个**（`/tmp/t21_mutate.py`，控制行 379 OK 先绿，逐次改一处、跑完即从 pristine 副本还原，
+  锚点不唯一即报 `ANCHOR PROBLEM` 跳过且**不算 KILLED**——M1/M7 第一版锚点就是错的，改对后才有判定）：
+  M1 完全不设 id / M2 整进程固定 id / M3 `FMT` 去槽 / M4 `ERROR_FMT` 去槽 / M5 id 挪到 `error_code` 之后 /
+  M6 `reset` 改清空 / M7 挪到 `handle`（按连接）/ M8 永不复位 / M9 id 进响应头 →
+  **9/9 KILLED、0 SURVIVED**，各自打掉自己的用例并逐个点名。
+  **M7 只被结构用例打掉**，这是「分配边界的位置在线上不可分」的实测（`protocol_version` 未设
+  ⇒ HTTP/1.0、答完即关，已核），已登记。
+  **真机两臂**（`/tmp/t21/real_arm.sh`；scratch 端口 **18771**，BitBrowser/Cloud 指向死端口 18792/18793，
+  各 2 次真实 `POST` 各得 `502` ⇒ **每次请求 2 条**记录，比单条更能证明 id 按请求分组）：
+  臂 A `WS=/tmp/t21/pre`（`git archive HEAD src`，修前）、臂 B `WS=/tmp/t21/ws`（工作树副本）——
+  修后 4 条请求记录带 16 位十六进制 id、同请求同 id（`927a813c8e69b04c`）、两次不同
+  （`925cc1c99adc2bce`）、**进程自己的启动行不带**；
+  **对照臂同一个针命中 0/5** ⇒ 针会失败；去掉 id 字段后**修后每一行与修前逐字相等**。
+  `/tmp/t21/assert_arm.py` → **ALL ASSERTIONS PASS**；跑完 `left listening: 0`，
+  全程**未碰** `:8765`/`:18080`/`:54345`。
+  跨线程实测（`/tmp/t21/threads.py`）：同一请求里另起线程写的记录**不带** id。
+  见 `evidence/task-21-agent-operation-id.md`。
 
 - T-20：`bash scripts/test.sh` → **371 tests OK**（365 → +6 = 新类 6 个用例，**只增不减**）；
   `logging.py` sha256 `d82d52efaa5f63351477abf64ebd4970c365dbd61c4147e643ba3c22db8251cd`（= `65725f4`），

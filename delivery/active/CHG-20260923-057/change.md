@@ -250,7 +250,7 @@
 | T-18 | 回写与收尾：基线（程序总纲 §3 CHG-B 补数字、架构基线 §5.8/§6.8 补三文件与 Desktop 路径）、入口文档、`[logging]` 注释；`Status: DONE` → `git mv` 归档 → 移除 LEDGER 行 → `--no-active` 冷启动重生成 → **主动扫**失效指针 | TODO | 两验证器绿；扫描报分母 + 阳性对照 |
 | T-19 | **测试不误连真实外部服务**（T-02 执行中发现，见 §7 Q-08）：AST 规则——`tests/` 内每次网络客户端构造（`BitBrowserClient` / `CloudAgentClient`）必须注入假 `transport`，`urlopen` 调用必须被 patch；T-02 只覆盖了 AC-11 的后半 | DONE | `evidence/task-19-no-external-services.md`；**365 tests OK**；计划的分母与实测不符（计划 41 处/34 模块，实测 41 = 38 处构造 + 3 处 `urlopen`、**40 模块**）；规则先红报出 5 处真命中且都走标记而非改代码；7 个变异逐个红且三条真断言各有变异能红它；一处真误报（`as urlopen` 绑的是 mock）与**两个自查出的对照缺陷**（读整树报告 → 假理由变红） |
 | T-20 | **Agent 侧脱敏**（§7 Q-07 的三处 + T-13 之后新发现的第四处）：把 20 行差分表做成 fixture + 四处缺陷行的**精确串**用例；修复形态两条正则（整尾家族 / 单值家族）；幂等；`SENSITIVE_KEY_NAMES` × {`=`,`:`} 全覆盖 | DONE | `evidence/task-20-agent-redaction.md`；形态：`_TAIL_KEYED`（cookie/authorization，值 = 行尾）+ `_VALUE_KEYED`（其余族，值 = **一个前导词元且匹配在此结束**——`re.sub` 从整段匹配之后续扫，值吃到行尾就会吞掉后面的凭据），两个回调各带族守卫 ⇒ **两趟与顺序无关**；回显改用**原文字前缀**（`key+separator` 拼回会丢掉 JSON 键的闭引号）；`_is_cookie_key` 认 `cookie` **与** `cookies`（词表里两个都有）；`_KEYED`/`_mask_keyed` 删除，接口零变化。**先红**：同一份用例打在修前模块上（`git archive HEAD` + 换 `logging.py`，不碰工作树）→ **FAILED (failures=7)** = 5 个用例，控制臂 **19 OK**；**20 行差分表的期望串是在 Desktop 实现上测量出来的**（临时探针 + `git checkout` + sha256 `a3fad427…` 核对），不是抄它的表；**变异 8 个**（控制行 371 OK 先绿）：M1–M5/M7/M8 **KILLED**（M1 连**既有** T-06 两列表的 7 条一起打掉），**M6（两趟换序）如实 SURVIVED——它本身就是「顺序无关」这条声明的证据**；真机两臂（同源两个副本、scratch 端口 18769、两个死端口、5 次真实 POST）：修后 `agent.log` 三条泄漏针 `bbb`/`b=2`/`password=zzz` 各 **0**（对照：payload 里 1、修前日志里 2；另三个针 `aaa`/`a=1`/`s3cr3tvalue` **两侧都掩**，修前日志**不作对照**，已点名），周围文本 7 项仍在；**371 tests OK**（365 → +6）；`redact.rs` 那句因此变假的注释在 desktop 仓**单独一个 doc commit** `572d1cf`（14 行注释，代码 0 改动，`175 passed` 未增） |
-| T-21 | **Agent 侧请求级 `operation_id`**（§8 无任务承接、§5 Scope/Add 要求）：`secrets.token_hex(8)` + contextvar（落在 `runtime/logging.py`）+ 覆写 `handle_one_request` 并 `try/finally` 复位；进 `FMT`/`ERROR_FMT`，`error.log` 位置在 logger 名之后、`error_code` 之前 | TODO | 端口 0 + `http.client` 的真实 HTTP 两条记录各带 16 位十六进制 id 且两 id 不同、请求外不带；变异各自红 |
+| T-21 | **Agent 侧请求级 `operation_id`**（§8 无任务承接、§5 Scope/Add 要求）：`secrets.token_hex(8)` + contextvar（落在 `runtime/logging.py`）+ 覆写 `handle_one_request` 并 `try/finally` 复位；进 `FMT`/`ERROR_FMT`，`error.log` 位置在 logger 名之后、`error_code` 之前 | DONE | `evidence/task-21-agent-operation-id.md`；形态：id 源在 `local_api/server.py`（`secrets` 已 import，`dependencies = []` 不变）、载体是 `runtime/logging.py` 里的 `ContextVar`（不用 thread-local：今天碰巧能用，请求里任何一段搬到执行器就失效）、边界在 `AgentHandler.handle_one_request`——该位置 **upstream 于 `_check_auth`/`do_OPTIONS`/`send_error`**，故 401/404/畸形请求行**构造上**都带 id 且新 `do_*` 不会忘；字段经 formatter 的 `prepare` 盖上（**渲染槽名故意不叫 `operation_id`**，免得调用方 `extra={...}` 被静默盖掉），无请求时渲染 `""`。**先红分两步**（首次红是 ImportError，那种红不算数）：第 1 步字段机制 → **6 pass / 2 fail**，两个失败**恰是两条真 HTTP 用例**；第 2 步接线 → 8 OK。**一个界测不到、如实登记**：`AgentHandler` 未设 `protocol_version`（实为 HTTP/1.0，答完即关）⇒ 按请求与按连接分配在真实 socket 上**产出相同的行**，故 M7 换成按连接**只**被结构用例打掉（该用例自陈弱于行为断言）。**变异 9/9 KILLED、0 SURVIVED**（控制行 379 OK 先绿，锚点不唯一即跳过不算 KILLED）：M2 固定 id、M6 `reset` 改清空、M8 永不复位、M9 id 进响应头各自打掉行为用例，M3/M4/M5 打掉两文件的渲染与顺序。**真机两臂**（同源、scratch 端口 18771、两个死端口、各 2 次真实 POST ⇒ 每次请求 **2 条**记录）：修后 4 条请求记录带 id、同请求同 id、两次请求 id 不同、进程自己的启动行**不带**；对照臂（`git archive HEAD src`，修前）**同一个针命中 0/5** ⇒ 针会失败；**去掉 id 字段后修后每一行与修前逐字相等**。**登记三条**：SSE 整条流共用一个 id；contextvar **不跨线程**（实测：同一请求里另起线程写的记录不带 id，`runner.task` 仍靠 `task_id`）；`error.log` 的 id 是 D-03 五字段之外的**第六个**可选字段（裁定六）。**379 tests OK**（371 → +8）；`runtime/logging.py` +94/−16、`local_api/server.py` +26/−0、新测试 +304 |
 
 > **T-19 的来源**：T-02 执行时逐条核对 AC-11，发现计划把 AC-11 整条映射给 T-02，但 T-02 只交付了
 > 「不写真实检出目录」那半——「不误连真实外部服务」**今天没有任何规则在守**（实测：无该规则；
@@ -283,7 +283,7 @@
 - [x] T-09 唯一入口（R11 AST 规则 + 三个反例）、`state` 必传、`-m` 下记录名（`LOGGER_NAME`）；
 - [x] T-19 不误连外部服务（AC-11b）
 - [x] T-20 脱敏（§7 Q-07 的三处 + 新发现的第四处；两条正则 + 20 行差分表进 fixture）
-- [ ] T-21 请求级 `operation_id`（contextvar + `handle_one_request`；三文件位置一致）
+- [x] T-21 请求级 `operation_id`（contextvar + `handle_one_request`；三文件位置一致）
 - [ ] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
 
 ### wt-media-desktop
@@ -307,7 +307,7 @@
 | AC-03 | Config/Logger **只初始化一次**（裁定十三·3） | Agent 侧已成立：R11 AST 规则（除 `bootstrap/app.py` 外不得到达 `configure_from`/`configure_logging`）+ 三个反例（含规则被改成 `return []` 时全红）；`server.py` 那次重复调用已删。Desktop 侧的 `operation_id` **没有开出第二条初始化/传递通道**：出站头集合与今天**逐字相同**（T-17 在**桩套接字实收字节**上钉死 `authorization`/`accept`/`host`，并断言整份请求不含该 id）、不加新 target（`OWNED_TARGETS` 仍恰 3）、不进 sidecar 环境（既有 `vars.len() == 3`） | PASS（T-09/T-17） |
 | AC-04 | 日志不会无限增长（裁定十三·4） | Agent 侧已成立：20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，六个界各一次变异；真机两臂 8/8。**总量口径**：`total_bytes` 在轮转/启动点强制，真实上界 `total_bytes + 3×max_bytes`（出厂 400MB + 60MB），是有界而非逐字节精确（T-07）；Desktop 侧已成立：日期翻档 / 20MB 翻档 / 单条截断（`truncate=true original_size=<n>`）/ 按天删 / 按量删 / 当前文件永不删，变异 **25/25 红**（T-12），**跨午夜的第二个实例**未覆盖（T-12 如实登记） | PASS（T-07/T-12） |
 | AC-05 | 日志目录异常不阻断启动（裁定十三·5） | Agent 侧已成立：`configure_from` 降级仅 stderr 且既有单测绿（T-03）；Desktop 侧已成立：用普通文件占住 `<repo>/.local/logs` 后**仍启动**（8 秒后仍存活）、摘要在 stderr、**不 panic**、占位文件未被改动，且原因随摘要一起写出（T-15 臂 2；同形的单测 `an_unusable_directory_is_a_reason_and_not_a_failure`） | PASS（T-03/T-15） |
-| AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 已在真实进程上成立：**五个生命周期记录各自的调用点都跑到过**（启动 / 已在运行 / 健康成功 / 停止 / 未在运行，T-16 臂 C）+ 退出报告（T-16 臂 B）——在此之前「Agent 没在跑」与「在跑但拒绝」在前端只表现为一条失败命令；请求级 `operation_id` 由 **T-21**（Agent 侧进程内）承接，落地前该字段在本条下**未验** | 部分（T-04/T-05/T-16；T-21 待做） |
+| AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 已在真实进程上成立：**五个生命周期记录各自的调用点都跑到过**（启动 / 已在运行 / 健康成功 / 停止 / 未在运行，T-16 臂 C）+ 退出报告（T-16 臂 B）——在此之前「Agent 没在跑」与「在跑但拒绝」在前端只表现为一条失败命令；两侧进程内 `operation_id` **都已交付**：Desktop 按 Agent **会话**（T-17，仅进程内、不上线），Agent 按 **HTTP 请求**（T-21）——真机上 4 条请求记录带 id、同请求同 id、两次请求 id 不同、进程自己的启动行不带，对照臂同一个针命中 0/5；无请求时字段渲染 `""`，故「去掉该字段后与修前逐字相等」在真机上成立（请求外的行**形状未变**）。**登记三处不声称**：①Agent 侧关联**仅请求内、处理线程内**（contextvar 不跨线程，实测：同一请求里另起线程写的记录不带 id，`runner.task` 仍靠 `task_id`）；②SSE 整条流共用一个 id；③分配边界的**位置**（按请求而非按连接）与 `finally` 顺序只有**结构覆盖**——`AgentHandler` 未设 `protocol_version` ⇒ HTTP/1.0 ⇒ 两者在线上不可分，M7 只被结构用例打掉 | PASS（T-04/T-05/T-16/T-17/T-21） |
 | AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧**四处实测缺陷已全部修掉**（T-20）：`token=aaa password=bbb` → `token=*** password=***`、`cookies: a=1; b=2` → `cookies: a=***; b=***`、`{"client_secret": "s3cr3tvalue"}` → `{"client_secret": "***"}`（**仍是合法 JSON**，由 `json.loads` 判定，阳性对照在前）、`mytoken=abcdefghijkl password=zzz` → `mytoken=abcdefghijkl password=***`（形似键不再关掉遮蔽）。**单测**：T-13 的 20 行差分表做成 fixture，期望串是**在 Desktop 实现上测量**的，20/20 一致；四处各一条精确串用例；**变异 8 个里 7 个 KILLED**（M6 换序 SURVIVED，是有意成立的性质）。**真机**：真实进程 + 真实 HTTP 落盘后读回 `agent.log`，三条泄漏针各 0 而对照（payload / 修前日志）各 1 / 2，一个不带敏感形态的值原样通过。T-06 的 15 行两列表、落盘读回、traceback 面同覆盖仍有效。Desktop 侧已成立到模块层与真实进程：target 白名单（外来 target 有对照臂地不入文件）、含 token 的记录走完 sink 后 grep 不到且周围文本仍在（T-13）、真实启动确实建出文件并走完 sink（T-15 臂 1）。**登记两处不声称已覆盖**：①`main` 把 token 交给掩码这一行（T-15 的 N8）**无用例可打**——真实启动的 grep 分母为 0；②`error.log`/`task.log` 两条臂**未在本 Task 重跑**（四个缺陷同在 formatter 路径上，路由未改，但「三文件里的凭据不在」这一点本 Task 只由单测表与 `agent.log` 臂覆盖） | PASS（T-06/T-13/T-15/T-20） |
 | AC-08 | Desktop 与 Agent 日志职责清晰（裁定十三·8） | 两向断言，两边各一条对照臂：**Agent 业务日志**进 `agent.log`、不进 `desktop.log`——T-04 三文件路由（真实进程）+ T-16 的 `ordinary_output_reaches_the_buffer_and_no_record`（50 行普通输出 → 该 target 零条记录，**对照**是这 50 行确实在 `drain` 缓冲里，「零条」不来自一个什么都没收到的 drain）；**Desktop 自己的生命周期**（启停、健康、退出）进 `desktop.log` 的 `agent.supervisor`——T-16 五分支真机臂 + 退出报告 | PASS（T-04/T-16） |
 | AC-09 | Sidecar stdout 持续消费且**不转存**（裁定十三·9）。**口径按裁定五收窄为「进程存活期间」** | ①**进程存活期间的普通输出零条 desktop 记录**：单测 50 行（对照：50 行在缓冲里）；**真机分母是 1 行而不是 50**（sidecar 只来得及打印 1 行就死了）⇒ 真机只证明「那 1 行没变成记录、且确实到了 drain」，**不**证明规模；②**异常退出另立一臂**：恰**一条**该 target 记录且**含末 20 行尾**（裁定五），尾行在整份 `desktop.log` 里**只出现这一次**（臂 B 逐行核对：`[PYI-…]` 只在退出记录里）；③读失败（`CommandEvent::Error`）也是**一条**记录——进程未退出时的读失败否则永不为人所见；④对照臂：同一次失败，前端拿到的串**带**尾行、记录**不带** | PASS（T-16） |
@@ -344,7 +344,8 @@
 - `evidence/task-16-desktop-emit-points.md`（T-16）
 - `evidence/task-17-desktop-operation-id.md`（T-17）
 - `evidence/task-20-agent-redaction.md`（T-20）
-- `evidence/task-XX-<topic>.md`（**T-18 / T-21** 每项一份，随 Task 落地——原句写的「T-03…T-19 每项一份」已按上面的实名清单更正）
+- `evidence/task-21-agent-operation-id.md`（T-21）
+- `evidence/task-18-<topic>.md`（**T-18** 的回写与归档，随 Task 落地——原句写的「T-03…T-19 每项一份」已按上面的实名清单更正）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
 ## 12. Current Checkpoint
@@ -458,16 +459,29 @@ Completed:
   （真机 8/10 条带它），**两侧一致**（Desktop 上实测同三个串）且修前修后触达范围未变，故只登记不改。
   见 `evidence/task-20-agent-redaction.md`。
 
+- 2026-09-24 T-21：Agent 请求级 `operation_id`（`wt-media-agent` `5570906`，1 个 commit）——id 源
+  `secrets.token_hex(8)` 在 `local_api/server.py`、载体是 `runtime/logging.py` 的 `ContextVar`、
+  边界覆写 `AgentHandler.handle_one_request` 且 `try/finally` 复位；字段经 formatter 的 `prepare` 盖上，
+  **渲染槽名不叫 `operation_id`**（免得调用方 `extra={...}` 被静默盖掉），无请求时渲染 `""`。
+  **先红分两步**（首次红是 ImportError，那种红不算数）：字段机制 **6 pass / 2 fail**（两个失败恰是
+  两条真 HTTP 用例）→ 接线 **8 OK**。**一个界测不到并如实登记**：未设 `protocol_version` ⇒ HTTP/1.0 ⇒
+  按请求与按连接分配在线上不可分，M7 换按连接**只**被结构用例打掉（该用例自陈弱于行为断言）。
+  **变异 9/9 KILLED、0 SURVIVED**；**真机两臂**（scratch 18771 + 两个死端口、每次请求 2 条记录）：
+  修后 4 条带 id、同请求同 id、两次不同、启动行不带，**对照臂同一个针命中 0/5**，
+  且**去掉该字段后与修前逐字相等**。**379 tests OK**（371 → +8）。
+  三条登记：SSE 整条流共用一个 id；contextvar **不跨线程**（实测）；`error.log` 的 id 是 D-03
+  五字段之外的第六个可选字段（裁定六）。
+
 Current:
 
-- T-20 已收尾（`wt-media-agent` 一个提交 `65725f4` + desktop 一个 doc commit `572d1cf` + 本记录）；
-  **Agent 半只剩 T-21**，随后阶段 3 的 T-18 回写与收尾。
+- T-21 已收尾（`wt-media-agent` `5570906` + 本记录）；**Agent 与 Desktop 两侧代码半都已完成**，
+  只剩阶段 3 的 **T-18** 回写与归档收尾。
 
 Next:
 
-- **T-21（Agent 侧）**：请求级 `operation_id`（`secrets.token_hex(8)` + contextvar + 覆写
-  `handle_one_request` 且 `try/finally` 复位），进 `FMT`/`ERROR_FMT`（`error.log` 放在 logger 名之后、
-  `error_code` 之前）；测试用端口 0 + `http.client`（**不用 `urlopen`**，避开 T-19 的 AST 规则）。
+- **T-21 的三条登记要进 T-18 的 §7/§10**：① SSE 整条流共用一个 id；② 关联**仅请求内、处理线程内**
+  （contextvar 不跨线程，`runner.task` 仍靠 `task_id`）；③ 分配边界的**位置**与 `finally` 顺序只有
+  **结构覆盖**（`protocol_version` 未设 ⇒ HTTP/1.0 ⇒ 按请求与按连接在线上不可分，M7 只被结构用例打掉）。
 - **T-20 的两条登记要进 T-18 的 §7/§10**：① 整尾家族的触达是**行尾**，故 `cookies:` 行后的
   `group_id=g-1` 会一并被掩（真机 8/10 条记录带它，缺的 2 条正是 `cookies:` 那两条）——**两侧一致**
   （在 Desktop 上实测同三个串）、修前修后触达范围未变，只登记不改某一侧的答案；
@@ -487,6 +501,19 @@ Blockers:
   但 Q-07 的**行文本身仍按旧行为描述**（它把两处列成「实测输出」），T-18 须整体改写这一行。
 
 Recent verification:
+
+- T-21：`bash scripts/test.sh` → **379 tests OK**（371 → +8，只增不减）；模块
+  `PYTHONPATH=tests python3 -m unittest tests.test_log_operation_id` → **8 OK**；
+  **先红分两步**（首次红是 ImportError，那种红不算数）：第 1 步字段机制 **6 pass / 2 fail**（两个失败
+  恰是两条真 HTTP 用例）、第 2 步接线 **8 OK**；
+  **变异 9/9 KILLED、0 SURVIVED**（`/tmp/t21_mutate.py`，控制行 379 OK 先绿，锚点不唯一即跳过）；
+  M7（按连接分配）**只**被结构用例打掉——`protocol_version` 未设 ⇒ HTTP/1.0 ⇒ 两者线上不可分，已登记；
+  **真机两臂**（`/tmp/t21/real_arm.sh`，scratch 18771 + 死端口 18792/18793，各 2 次真实 POST 各 502）：
+  `/tmp/t21/assert_arm.py` → **ALL ASSERTIONS PASS**（修后 4 条请求记录带 id、同请求同 id、两次不同、
+  启动行不带；**对照臂同一个针命中 0/5**；去掉 id 字段后与修前逐字相等）；
+  跑完 `left listening: 0`，全程**未碰** `:8765`/`:18080`/`:54345`；
+  跨线程实测（`/tmp/t21/threads.py`）：同一请求里另起线程写的记录**不带** id。
+  见 `evidence/task-21-agent-operation-id.md`。
 
 - T-20：`bash scripts/test.sh` → **371 tests OK**（365 → +6，只增不减）；模块 sha256
   `d82d52efaa5f63351477abf64ebd4970c365dbd61c4147e643ba3c22db8251cd` 与 `65725f4` 一致，工作树干净；
