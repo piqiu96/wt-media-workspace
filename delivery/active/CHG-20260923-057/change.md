@@ -220,9 +220,9 @@
 | T-04 | Agent 三文件布局 + 路由（`agent.log` 全量含 traceback / `task.log` 仅 `wt_media_agent.runner.*` / `error.log` ERROR 级不带 traceback） | DONE | `evidence/task-04-three-files-routing.md`；267 tests OK + **四次真实启动**（臂 D 一次给出三条两向证据） |
 | T-05 | `error.log` 结构化字段通道（`error_code`/`task_id`/`context`；**缺省放 formatter 而非 `setLogRecordFactory`**——实测后者预置字段会让 `extra=` 必然抛 KeyError；`task_id` 在 `runner.py` 的 **9** 个 task-scoped emit 点加 `extra`，**消息里仍保留**，3 处配已有字面量的 `error_code`） | DONE | `evidence/task-05-error-fields.md`；278 tests OK + **两次真实启动**（真实任务失败按 `error_code`/`task_id` 定位；未注册类型的 WARNING 不进 `error.log`） |
 | T-06 | Agent 脱敏（表驱动，15 行两列断言；落点**在 formatter 不在 Filter**——Filter 改 `record.msg` 碰不到 traceback；词表取自 `SENSITIVE_KEY_NAMES`，不另起一份；`AgentConfig.runtime_token` 改 `field(repr=False)`）。**顺带**：实测诊断包 `environment_facts` 的 `cloud_base_url` 可原样带密码（走 `print`→stdout，`drain.rs` 还会尾随 20 行）→ 值统一过 `redact()`；并追平套件里 27 条 `--- Logging error ---`——**点名**是 `test_bootstrap.py`/`test_sidecar_entry.py` 走真实装配却不恢复 logging 状态，修后加机器规则 | DONE | `evidence/task-06-redaction.md`；**293 tests OK**（+1 规则 +1 诊断包用例）；表 `15/15 漏 → 0/15`；诊断包密码 `True → False`；死 handler 泄漏 `245 → 0`、Logging error `27 → 0`；两个提交各自 checkout 均 293 OK |
-| T-07 | Agent 保留与轮转：单文件 20MB、14 天、总量上限、**单条截断标 `truncate=true original_size=<n>`** | TODO | 六向变异：日期翻档/20MB 翻档/截断/按天删/按量删/当前文件永不删 |
+| T-07 | Agent 保留与轮转：单文件 20MB、14 天、总量上限、**单条截断标 `truncate=true original_size=<n>`**（`BoundedFileHandler` + **三文件共享一个 `LogBudget`** 取代 `RotatingFileHandler`）。**真机实测到一处真缺陷并修**：启动清理此前**空转**——prune 按已注册家族名匹配，而家族名要等 handler 构造才注册（有轮转时才「看起来生效」）→ 先预注册再 prune + 回归测试先红 | DONE | `evidence/task-07-retention.md`；**320 tests OK**；六个界各一次实现变异、各自打掉自己的用例；真机两臂（小界/出厂界）8/8 判据；总量真实上界 `total_bytes + 3×max_bytes` 如实写进 docstring |
 | T-08 | `GET /api/v1/health` 聚合健康检查（Cloud/BitBrowser/Storage 各一例不可用 → 200 + `abnormal`/`unknown` 不抛）+ 契约同步；`/healthz` 逐字不变 | TODO | scratch 端口 curl；`/healthz` 与今天逐字比对 |
-| T-09 | 修既有缺陷并锁死唯一入口：~~①`paths.py:104-106` 已假注释~~（**T-03 已随 docstring 重写完成**）；②删 `server.py:38`/`:591` 第二次 `configure_from`；③`server.py:65` `state` 改必传；④**新增 AST 边界测试**：`src/` 内除 `bootstrap/app.py` 外不得 import `configure_from`/`configure_logging`（**今天就会红**） | TODO | 新 AST 测试先红后绿 |
+| T-09 | 修既有缺陷并锁死唯一入口（**T-07 顺带实测：`-m` 启动时 server 的 logger 名是 `__main__`，HTTP 侧记录看不出组件来源，属本 Task 范围**）：~~①`paths.py:104-106` 已假注释~~（**T-03 已随 docstring 重写完成**）；②删 `server.py:38`/`:591` 第二次 `configure_from`；③`server.py:65` `state` 改必传；④**新增 AST 边界测试**：`src/` 内除 `bootstrap/app.py` 外不得 import `configure_from`/`configure_logging`（**今天就会红**） | TODO | 新 AST 测试先红后绿 |
 | T-10 | Desktop 引入 `tracing` + `tracing-subscriber`（**例外的无失败测试项**） | TODO | `cargo tree` 前后 + 下载清单具名 + 起点 68 仍绿；`cargo fetch` 失败即阻塞上报 |
 | T-11 | Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production → `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest>/.local/logs`）+ `.gitignore` 补 `.local/` | TODO | 测试不解析真实 `$HOME`；不可写目录返回而非 panic |
 | T-12 | `rolling` writer（`Clock` 注入）：日期翻档、20MB 翻档、**单条截断标 `truncate=true original_size=<n>`**、按天删、按量删、当前文件永不删 | TODO | 六向变异，逐条 |
@@ -254,7 +254,8 @@
 - [x] T-04 三文件路由
 - [x] T-05 字段通道（**缺省改放 formatter**，理由与实测见证据）；
 - [x] T-06 脱敏（**落点在 formatter**；诊断包那处真泄漏一并实测并修；套件 logging 状态隔离补机器规则）；
-- [ ] T-07 保留/轮转/截断；T-08 `/api/v1/health`；T-09 缺陷与唯一入口；T-19 不误连外部服务
+- [x] T-07 保留/轮转/截断（**启动清理空转**是真缺陷，已修）；
+- [ ] T-08 `/api/v1/health`；T-09 缺陷与唯一入口（含 `__main__` 记录名）；T-19 不误连外部服务
 - [ ] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
 
 ### wt-media-desktop
@@ -273,7 +274,7 @@
 | AC-01 | Agent 脱离 Desktop 可独立运行并产生日志（裁定十三·1） | 真实独立启动 ✓；**三文件**各收到真实记录（T-04 臂 C 三者均 127 字节）✓；常规启动 `agent.log` 非空（T-03/T-04 臂 A） | PASS |
 | AC-02 | Desktop 正式启动产生自身日志（裁定十三·2） | 真实启动后读 `desktop.log` 首条记录为启动摘要（T-15） | TODO |
 | AC-03 | Config/Logger **只初始化一次**（裁定十三·3） | 新增 AST 边界测试转绿；出站头集合逐字相同（T-09/T-17） | TODO |
-| AC-04 | 日志不会无限增长（裁定十三·4） | 20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，逐条变异（T-07/T-12） | TODO |
+| AC-04 | 日志不会无限增长（裁定十三·4） | Agent 侧已成立：20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，六个界各一次变异；真机两臂 8/8。**总量口径**：`total_bytes` 在轮转/启动点强制，真实上界 `total_bytes + 3×max_bytes`（出厂 400MB + 60MB），是有界而非逐字节精确（T-07）；Desktop 侧待 T-12 | 部分（T-07 Agent 半） |
 | AC-05 | 日志目录异常不阻断启动（裁定十三·5） | Agent 侧已成立：`configure_from` 降级仅 stderr 且既有单测绿（T-03）；Desktop 侧待 T-15 | 部分（T-03） |
 | AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 待 T-16 | 部分（T-04/T-05） |
 | AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧已成立：表驱动 15 行两列断言、落盘后读文件断言 token 不在、traceback 面同覆盖（T-06）；Desktop 侧（target 白名单 + 落盘 grep）待 T-13 | 部分（T-06） |
@@ -299,6 +300,7 @@
 - `evidence/task-04-three-files-routing.md`（T-04）
 - `evidence/task-05-error-fields.md`（T-05）
 - `evidence/task-06-redaction.md`（T-06）
+- `evidence/task-07-retention.md`（T-07）
 - `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
@@ -321,15 +323,21 @@ Completed:
   **实测到诊断包一处真泄漏并修**（`cloud_base_url` 的密码原样进 `environment_facts`，且走 `print`→stdout）
   并**追平套件 27 条 `Logging error`**：点名 `test_bootstrap.py`/`test_sidecar_entry.py` 走真实装配却不恢复
   logging 状态（我的第一个假设被判错，见证据），修后加机器规则 `test_logging_state_isolation.py`。
+- 2026-09-24 T-07：Agent 保留与轮转（`wt-media-agent` `f07d9e8`）——四个界（20MB／14 天／总量／单条截断）
+  各一次实现变异，各自打掉自己的用例。**真机两臂实测到一处真缺陷并修**：启动清理此前**空转**
+  （prune 匹配的是已注册家族名，而家族名要等 handler 构造才注册），有轮转时才「看起来生效」；
+  先注册再 prune + 回归测试先红。**总量的真实上界如实改成 `total_bytes + 3×max_bytes`**
+  （是有界，不是逐字节精确）。
 
 Current:
 
-- T-06 已收尾（两个 Agent 提交 + 本记录）；T-07（保留/轮转/截断）待开始。
+- T-07 已收尾（一个 Agent 提交 + 本记录）；T-08 `/api/v1/health` 待开始。
 
 Next:
 
-- T-07 → T-08 → T-09（阶段 1 Agent 余项）；
+- T-08 → T-09（阶段 1 Agent 余项；T-07 已完成）；
   阶段 2 Desktop T-10…T-17；阶段 3 T-18 收尾；**T-19**（AC-11b 的规则，见 §7 Q-05）排在阶段 1 余项之后。
+- T-08 的题设要重测；T-09 另需处理 **T-07 顺带实测的 `__main__` 记录名**（`-m` 启动时 server 的 logger 名是 `__main__`，见 `evidence/task-07-retention.md` §7）。
 
 Blockers:
 
@@ -337,8 +345,11 @@ Blockers:
 
 Recent verification:
 
-- 全套 `bash scripts/test.sh` → **293 tests OK，exit=0**（253 → 259 → 259 → 267 → 278 → 291 → 293，只增不减）；
-  T-02 的 `.local/` 守卫全程不响。T-05/T-06 的两向证据见 `evidence/task-05-error-fields.md`、
+- 全套 `bash scripts/test.sh` → **320 tests OK，exit=0**（253 → … → 293 → 320，只增不减）；
+  T-02 的 `.local/` 守卫全程不响，`--- Logging error ---` 0 条。
+- T-07：六个界各做一次实现变异，**各自打掉自己的用例**（探针先跑未变异对照行）；
+  真机两臂（真实入口 + scratch 端口/临时树）8/8 判据；`f07d9e8` 单独 worktree 亦 320 OK。
+  见 `evidence/task-07-retention.md`。T-05/T-06 的两向证据见 `evidence/task-05-error-fields.md`、
   `evidence/task-06-redaction.md`。
 
 Blocked:

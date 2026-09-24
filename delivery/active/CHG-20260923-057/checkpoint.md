@@ -52,15 +52,40 @@
   两处 `setUp` 覆盖没调 `super().setUp()` ⇒ 7 条用例报错，补上即绿。
   全套 **293 tests OK**；两个提交各自 checkout 亦 293 OK（见 `evidence/task-06-redaction.md`）。
 
+- 2026-09-24 T-07：Agent **保留与轮转**（`wt-media-agent` `f07d9e8`）——裁定六的四个界
+  （单文件 20MB、14 天、三文件共享总量 400MB、单条超限截断并标 `truncate=true original_size=<n>`），
+  由 `BoundedFileHandler` + `LogBudget` 承接（stdlib 的 `backupCount × maxBytes` 表达不了时间窗、
+  总量与单条上限）。三条口径：**日期翻档用「文件覆盖的那一天」命名**、**单条上限即单文件上限**
+  （故超长单条既不涨文件也不新开文件）、**预算只在轮转与启动两点强制**。
+  测试 **320 OK**（T-06 后 293 → +21 轮转/预算 +6 配置）。
+  新类的「先红」只是 ImportError ⇒ 改量**变异**：六个界逐个关掉，各自打掉自己的用例（探针先跑对照行）。
+  两处此前**测不到**的地方补了测试：①「当前文件永不被删」原本靠「名字不匹配轮转正则」而非守卫通过
+  （新增一例让活跃文件名恰好长得像历史，两向断言）；②**真机两臂实测到一处真缺陷**——
+  **启动清理此前空转**（prune 匹配已注册家族名，而家族名要等 handler 构造才注册，只有发生轮转时
+  才「看起来生效」）；单元测试之所以绿，是因为它先建了 handler。修：先预注册三个文件再 prune +
+  `register` 幂等 + 回归测试（先红）。
+  真机两臂（真实入口、scratch 端口 18793、BitBrowser 指向死端口 `:15432`）**8/8 判据**：
+  小界臂真的滚出 `agent-20260924-2.log`、真的有 `original_size=3185` 的截断标记、1999 年历史被删、
+  预算退掉当日 `task-…-1.log`；出厂界臂同样流量**不滚不截断**（对照），但照样按天删。
+  **不准的地方如实写**：总量真实上界是 `total_bytes + 3×max_bytes`（出厂 400MB + 60MB），
+  不是逐字节精确（臂 A 实测停在 6500 > 6000）——裁定要的「有界」成立，精确性不成立，
+  已写进 `LogBudget` docstring 并用「写 200KB 进去总量仍 ≤ 500+600」的用例钉住。
+  走查时补一处并发守卫（三线程共享预算：列出后被改名走 → `FileNotFoundError` 会中断 prune
+  并丢记录）→ `_size` 把已消失的文件计 0，配测试（去守卫即红）。
+  **顺带实测登记给 T-09**：`-m` 启动时 server 的 logger 名是 `__main__`（HTTP 侧记录看不出组件来源）。
+  见 `evidence/task-07-retention.md`。
+
 ## Current
 
-- T-06 已收尾（两个 Agent 提交 + 本记录）；T-07（保留/轮转/截断）待开始。
+- T-07 已收尾（一个 Agent 提交 + 本记录）；T-08 `/api/v1/health` 待开始。
 
 ## Next
 
-- 阶段 1 Agent：T-07 → T-08 → T-09（T-02/T-03/T-04/T-05/T-06 已完成）。
+- 阶段 1 Agent：T-08 → T-09（T-02…T-07 已完成）。
 - **T-08 的题设要重测**：实测 BitBrowser 指向死端口时 `/api/v1/status` **已返回 200 + `unreachable`**，
   不能假设外部依赖不可用会抛。
+- **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
+  得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
@@ -92,6 +117,10 @@
   臂 A 真实 `cookie_read_task` 失败：`error.log` 得 `error_code=executor_error task_id=t05-real-1`，
   字段命中分母 `error.log 1 / agent.log 0 / task.log 0`；臂 B 未注册类型：WARNING 进 `agent.log`、
   `error.log` **0 字节**。见 `evidence/task-05-error-fields.md`。
+- T-07：`bash scripts/test.sh` → **320 tests OK，exit=0**（293 → 320：+21 轮转/预算、+6 配置）；
+  六个界各一次实现变异**各自打掉自己的用例**；真机两臂 8/8；`f07d9e8` 单独 worktree 亦 320 OK。
+  **一次「测到了但没测到点上」如实记录**：启动清理的单元测试先建了 handler，故对启动路径的空转是瞎的。
+  见 `evidence/task-07-retention.md`。
 - T-06：`bash scripts/test.sh` → **293 tests OK，exit=0**（291 → 293：+1 隔离规则、+1 诊断包用例）；
   两个 Agent 提交各自单独 checkout 再跑，**均 293 OK**（提交边界真实）。
   探针四组：脱敏表 `15 → 0`（同一探针改动前后）、诊断包密码 `True → False`、死 handler 泄漏 `245 → 0`、
