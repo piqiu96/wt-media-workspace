@@ -99,15 +99,48 @@
   **只如实登记、不改它**。契约 +`/api/v1/health` 与 `AggregateHealth`/`DependencyStatus`，版本 `2026.09.24.1`。
   见 `evidence/task-08-health.md`。
 
+- 2026-09-24 T-09：**唯一入口、`state` 必传、`-m` 下的记录名**（`wt-media-agent` `1f07cee`）——裁定二的
+  「唯一初始化入口」从约定变成机器规则。删掉 `local_api/server.py` 那次重复的 `configure_from`
+  （`bootstrap/app.py` 在 `build_components()` 里已经初始化过），新增 **R11**：
+  `test_dependency_boundaries.py` 内除 `bootstrap/app.py` 外不得到达 `configure_from`/`configure_logging`，
+  **符号拼写与模块拼写两条路径都认**（后者正是 T-08 那条假绿检查栽的地方）。规则今天就会红，
+  删掉那行 import 转绿；三个反例在规则被改成 `return []` 时全红。
+  **规则第一版太宽**：写成「除 `app.py` 外不得 import `runtime.logging`」时误报了
+  `bootstrap/cloud.py:20` 引的纯函数 `redact`——会误报在跑的代码的规则，第一个被削掉的就是它，
+  故收窄成点名两个初始化器与两条到达路径。第三个反例（「树里没有初始化器」）第一版与真实违规纠缠，
+  改成对**每个文件**都删该行。
+  **推翻计划的一处说法**：计划把 `state or LocalAgentState()` 写成「component 构造器成了第二个初始化点」
+  ——裁定二的唯一性说的是 **Config 与 Logger**，`LocalAgentState()` 是内存状态，不是初始化点。
+  真问题是：忘了传 state 的调用方拿到一个**看起来完全正常**的默认态（`agent_id="local-agent-dev"`、
+  `status="idle"`），`/api/v1/status` 于是描述一个**没在跑**的 Agent 且毫无迹象。修法成立、理由改掉。
+  同时复核更严重的失效模式**不成立**：`LocalAgentState` 是普通 dataclass、无 `__bool__`/`__len__`，
+  传进去的 state 不会被 `or` 丢掉。`state` 在 `LocalApiServer` 与 `serve` 两处都改必传
+  （照本文件 `bitbrowser` 的先例），连带 30 个测试构造点显式传 `LocalAgentState()`。
+  **两处自查出的问题**：①`test_the_bitbrowser_client_must_be_supplied` 原本靠 `LocalApiServer()`
+  断言 TypeError，state 也必传后这个 TypeError 改由 state 触发、测试名就不成立了 → 改为传 state 再断言；
+  ②新写的 `serve` 用例第一版**直接调用 `serve(bitbrowser=…)`**，而在默认值还在时那会真的去
+  `ThreadingHTTPServer(("127.0.0.1", 8765))` ——**开发者正在跑的 dev Agent 端口**（红跑当场报端口被占）
+  → 改为读 `inspect.signature`，判据不许伸向 8765。
+  ③`-m` 下的记录名（T-07 登记）：改用显式 `LOGGER_NAME = "wt_media_agent.local_api.server"`，
+  它在 import 路径上的取值与 `__name__` **完全一致**，故三条生产入口零变化。
+  测试 **354 OK**（T-08 后 345 → +9）。六个变异控制行先绿、各自打掉自己的用例；
+  真机 `-m` 探针 **11/11**，把 `LOGGER_NAME` 变异回 `__name__` 后 A3/A4 **转红**
+  （实测 `names=['__main__']`）——T-07 登记的缺陷是真的。
+  **探针的解析器第一版自己空转**：找 `"]: "` 而真实格式是 `] <name>: `，一个名字都没解析出来，
+  A3 因「没有东西可查」而通过；加分母并修解析后才成真检查（本 CHG 第三处「检查自己先坏了」）。
+  **如实登记一处测不出差异**：第二次 `configure_from` 没有可观测的独立后果（`configure_logging` 幂等），
+  故判据只能是结构性的 R11，不能声称有行为差异。
+  见 `evidence/task-09-single-entry.md`。
+
 ## Current
 
-- T-08 已收尾（一个 Agent 提交 + 本记录）；T-09 待开始。
+- T-09 已收尾（一个 Agent 提交 + 本记录）；阶段 1 只剩 **T-19**。
 
 ## Next
 
-- 阶段 1 Agent：T-09（T-02…T-08 已完成）。
-- T-09 的三项：删 `server.py:38`/`:591` 第二次 `configure_from`、`state` 改必传、
-  加「`src/` 内除 `bootstrap/app.py` 外不得 import `configure_from`/`configure_logging`」的 AST 边界测试（今天就会红）。
+- **T-19**：AC-11b 的 AST 规则（`tests/` 内客户端构造必须注入假 `transport`）。**T-02 期间实测：
+  今天无任何规则在守**（见 §7 Q-08），故这条规则今天大概率会先红，先量清分母再修。
+- 之后：阶段 2 Desktop T-10 → T-17；阶段 3 T-18 回写与收尾。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
@@ -122,6 +155,9 @@
 
 ## Recent verification
 
+- T-09：`bash scripts/test.sh` → **354 tests OK，exit=0**（345 → 354，只增不减）；`.local/` 守卫不响；
+  六个变异各自打掉自己的用例（控制行先绿）；R11 三个反例（含「规则被改成 `return []` 时全红」）；
+  真机 `-m` 探针 11/11 且变异后 A3/A4 红。见 `evidence/task-09-single-entry.md`。
 - T-08：`bash scripts/test.sh` → **345 tests OK，exit=0**（320 → 345，只增不减）；`.local/` 守卫不响；
   12 个变异**全部转红**（控制行先绿，探针先跑未变异对照行）；真机两臂 **20/20**；
   契约只用 `ruby -ryaml` 验可解析 + 路径/schema 齐全（本仓**无** openapi 校验器，如实登记）。
