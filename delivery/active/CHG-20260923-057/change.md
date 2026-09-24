@@ -202,8 +202,9 @@
 | Q-02 | Agent/Desktop 的**总容量上限数字**：裁定六列了「总容量限制」但未给数字。按 053 草案取 **Agent 400MB / Desktop 100MB**，做成 `[logging] total_bytes` 可覆盖，T-18 回写程序总纲 §3 CHG-B。要改请一句话。 | NO |
 | Q-03 | Desktop 日志文件名格式：建议 `desktop-YYYYMMDD-N.log`（UTC 日期；本地日期需 `localtime_r`，不安全），`N` 用 `create_new` 防多实例写同一文件。 | NO |
 | Q-04 | 裁定七还列了「用户设置异常」与「更新异常」，但 Desktop **没有** settings 命令（`commands/` 只有 account/agent/bind/logging/profile/public_config），`updater/mod.rs` 也**没有任何 emit 与可上报的异常路径**——**无来源可接**。登记为未交付，**不造假发射点**。 | NO |
+| Q-05 | **AC-11 的覆盖被计划高估**：计划把 AC-11 整条（含「测试不误连真实外部服务」）映射给 T-02，T-02 执行时实测该半**今天无任何规则在守**。处置：AC-11 拆为 AC-11a（PASS，T-02）/ AC-11b（未覆盖），新增 **T-19** 在本 CHG 内补上这条规则（里程碑的失败行为锚点就写着它，丢弃会使该锚点无人守）。**未静默吸收，也未静默丢弃。** 若要移出本 CHG 请一句话。 | NO |
 
-无阻塞项（`Blocking = NO`）：Q-01…Q-04 均已按上述口径实施，用户可在任一 checkpoint 用一句话改判。
+无阻塞项（`Blocking = NO`）：Q-01…Q-05 均已按上述口径实施，用户可在任一 checkpoint 用一句话改判。
 
 ## 8. Implementation Tasks
 
@@ -213,7 +214,7 @@
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | 建 active 记录并激活（本文件、`checkpoint.md`、`evidence/`、`status/`），LEDGER 加表行，`planned/README.md` B 行改 ACTIVE，快照再生成，两验证器绿 | DONE | `verify_agent_entry.py` + `verify_delivery_governance.py` |
-| T-02 | Agent 测试目录隔离（§5.13）：新增「跑完 `REPO_ROOT/.local/` 的清单与 mtime 不变」断言；修 `tests/test_storage_migration_paths.py:46` 对真实检出目录的断言；落隔离助手 | TODO | `bash scripts/test.sh`；改前该断言红 |
+| T-02 | Agent 测试目录隔离（§5.13）：落「不得把检出当运行时目录」的规则 + `scripts/test.sh` 守卫；修 `tests/test_storage_migration_paths.py:46` 对真实检出目录的断言；落隔离助手 `isolated_paths()` | DONE | `evidence/task-02-isolation.md`；改前恰好 1 处命中（红），改后 259 tests OK |
 | T-03 | Agent dev/override **真落盘**（推翻 `paths.py:107`）；同步删 `config/agent.toml:57`、`config_online/agent.toml:54` 的已假注释 | TODO | dev 启动后 `.local/logs/` 非空 |
 | T-04 | Agent 三文件布局 + 路由（`agent.log` 全量含 traceback / `task.log` 仅 `wt_media_agent.runner.*` / `error.log` ERROR 级不带 traceback） | TODO | 两向断言：该进的不进 = 失败 |
 | T-05 | `error.log` 结构化字段通道（`error_code`/`task_id`/`context`，`setLogRecordFactory` 缺省 `None` + `extra={}` 约定；`task_id` 在 `runner.py` 的 emit 点由文本插值改为 `extra`） | TODO | 有 `extra` 出字段、无 `extra` 不抛 |
@@ -230,13 +231,19 @@
 | T-16 | 三个既有 emit 点改道（`main.rs:65`→`desktop.startup`；`drain.rs:158`→`agent.supervisor`；`commands/logging.rs` 先纯重命名 `commands/webview.rs` 单独 commit，再改走 logger `target=webview`）+ Agent 启停与健康检查补点 | TODO | `report_exit` 恰一条该 target 记录；50 行普通 sidecar 输出 → 零条 |
 | T-17 | Desktop `operation_id`（**仅进程内**）：断言出站请求头集合与今天**逐字相同**；`sidecar/mod.rs` 的 `assert_eq!(vars.len(), 3)` 仍绿 | TODO | 头集合逐字比对 + 环境变量数不变 |
 | T-18 | 回写与收尾：基线（程序总纲 §3 CHG-B 补数字、架构基线 §5.8/§6.8 补三文件与 Desktop 路径）、入口文档、`[logging]` 注释；`Status: DONE` → `git mv` 归档 → 移除 LEDGER 行 → `--no-active` 冷启动重生成 → **主动扫**失效指针 | TODO | 两验证器绿；扫描报分母 + 阳性对照 |
+| T-19 | **测试不误连真实外部服务**（T-02 执行中发现，见 §7 Q-08）：AST 规则——`tests/` 内每次网络客户端构造（`BitBrowserClient` / `CloudAgentClient`）必须注入假 `transport`，`urlopen` 调用必须被 patch；T-02 只覆盖了 AC-11 的后半 | TODO | 规则先红（拿一个真实构造点造对照），报分母：41 处网络调用点 / 34 个测试模块 |
+
+> **T-19 的来源**：T-02 执行时逐条核对 AC-11，发现计划把 AC-11 整条映射给 T-02，但 T-02 只交付了
+> 「不写真实检出目录」那半——「不误连真实外部服务」**今天没有任何规则在守**（实测：无该规则；
+> `54345`/`18080`/`8765` 出现 30 余处但**多为数据**，配注入的假 transport 或断言出货配置值）。
+> 该失败行为写在里程碑的成功事实锚点上，故**留在本 CHG 内**而不是丢弃；编号排末位以免打乱既有 T-03…T-18。
 
 ## 9. Repository Checklist
 
 ### wt-media-workspace
 
 - [x] T-01：`delivery/active/CHG-20260923-057/`（`change.md`、`checkpoint.md`、`evidence/`、`status/`）；`delivery/planned/CHG-20260923-057/` 移入且**不留副本**
-- [ ] `delivery/LEDGER.md` 表行 + 关闭说明；`delivery/planned/README.md` B 行 → ACTIVE（T-01）
+- [x] T-01：`delivery/LEDGER.md` 加裸 id 表行 + 说明段；`delivery/planned/README.md` B 行 → ACTIVE
 - [ ] 基线回写：程序总纲 §3 CHG-B（20MB/14d/总量/截断标记/三文件纯文本）、架构基线 §5.8/§6.8（Desktop 日志路径、dev 也落盘）（T-18）
 - [ ] 归档收尾与失效指针扫描（T-18）
 
@@ -268,7 +275,8 @@
 | AC-08 | Desktop 与 Agent 日志职责清晰（裁定十三·8） | 两向断言：**该进的不进 = 失败**（T-04/T-16） | TODO |
 | AC-09 | Sidecar stdout 持续消费且**不转存**（裁定十三·9） | 50 行普通 sidecar 输出 → **零**条 desktop 记录（阳性对照）（T-16） | TODO |
 | AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | 诊断包路径本 CHG 不新增采集面；`/api/v1/health` 响应与日志行均不含凭据（T-06/T-08） | TODO |
-| AC-11 | 测试不误连真实外部服务、不写真实检出目录（里程碑失败行为） | T-02 的「`REPO_ROOT/.local/` 清单与 mtime 不变」断言 | TODO |
+| AC-11a | 测试**不写真实检出目录**（里程碑失败行为） | T-02：规则「不得把派生根接 `.local`」（33/34 模块在扫）+ `scripts/test.sh` 前后新增路径守卫，变异探针证明守卫独立于测试结果 | PASS |
+| AC-11b | 测试**不误连真实外部服务**（里程碑失败行为） | T-19：AST 规则（客户端构造必须注入假 transport）。**T-02 期间实测：今天无任何规则在守**，计划把 AC-11 整条映射给 T-02 是乐观的，见 §7 Q-08 | TODO |
 
 **每项否定结论都要阳性对照，对照臂不出红即记「对照无效」，不得记为通过**（CHG-060 的 AC-08 先例）。
 
@@ -281,7 +289,8 @@
 被六处引用的证据静默没入库。
 
 - `evidence/task-01-governance.md`（T-01）
-- `evidence/task-XX-<topic>.md`（T-02…T-18 每项一份）
+- `evidence/task-02-isolation.md`（T-02）
+- `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
 ## 12. Current Checkpoint
@@ -291,15 +300,16 @@ Completed:
 - 2026-09-23 起草（`delivery/planned/CHG-20260923-057/`，PLANNED）。
 - 2026-09-24 用户下发书面《CHG-057 日志治理裁定补充说明》十三节，取代草案中的待决项。
 - 2026-09-24 T-01：记录移入 `delivery/active/`，改写为十三节执行记录。
+- 2026-09-24 T-02：Agent 测试目录隔离落地（`wt-media-agent` `7382fed`，test-only，`src/` 零改动）。
 
 Current:
 
-- T-02 待开始（Agent 测试目录隔离）。
+- T-03 待开始（Agent dev/override 真落盘，推翻 `paths.py:107`）。T-02 已把它变成安全的改动。
 
 Next:
 
-- `delivery/LEDGER.md` 加裸 id 表行 + 说明段；`delivery/planned/README.md` 的 B 行改 ACTIVE；
-  `prepare_ai_workspace.py --change CHG-20260923-057`；两个验证器绿。
+- T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09（阶段 1 Agent 余项）；
+  阶段 2 Desktop T-10…T-17；阶段 3 T-18 收尾；**T-19**（AC-11b 的规则，见 §7 Q-05）排在阶段 1 余项之后。
 
 Blocked:
 
@@ -310,6 +320,11 @@ Recent verification:
 - Start Gate（2026-09-24）：四仓工作区全部干净（governance/agent/desktop/cloud 各 `git status --porcelain` 为空）；
   `delivery/active/` 仅 `.gitkeep`；`delivery/LEDGER.md` 无表行；快照 `Active CHG: none`。
 - T-01：见 `evidence/task-01-governance.md`。
+- T-02：`bash scripts/test.sh` → **259 tests OK，exit=0**（253 → 259）；改前规则红且**恰好 1 处命中**；
+  变异探针下守卫 `exit=1` 而套件打印 `OK`（守卫独立于测试结果）。见 `evidence/task-02-isolation.md`。
+- **后续 Task 的定向验证一律带 `PYTHONPATH=tests` 前缀**：`tests/` 无 `__init__.py`，
+  `python -m unittest tests.<模块>` 会把仓根而非 `tests/` 放上 `sys.path`，对 34 个模块中 import `support` 的
+  6 个（其中 5 个是既有的）报 `ModuleNotFoundError`。这是**既有**布局属性，非 T-02 引入，故本 CHG 不动布局。
 
 ## 13. DONE Gate
 

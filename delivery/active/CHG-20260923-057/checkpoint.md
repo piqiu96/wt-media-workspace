@@ -11,18 +11,23 @@
 - 2026-09-23：草案建于 `delivery/planned/CHG-20260923-057/`（PLANNED）。
 - 2026-09-24 T-01：`git mv` 移入 `delivery/active/`（**不留副本**），改写为十三节执行记录
   （`change.md`、本 `checkpoint.md`、`evidence/`、`status/`），§4 记下实测起点。
+- 2026-09-24 T-02：Agent 测试目录隔离（`wt-media-agent` `7382fed`，**test-only，`src/` 零改动**）——
+  规则「测试不得把派生根接 `.local`」+ `scripts/test.sh` 前后新增路径守卫 + `isolated_paths()` 隔离助手；
+  修掉 `tests/test_storage_migration_paths.py:46` 对真实检出的断言（改注入根，**未删断言**）。
+  **先量后改**：实测今天本机与干净克隆都不写 `.local/`，故本 Task 的定位是 **T-03 之前的守卫**，不是修当下泄漏。
+  顺带查出 AC-11 被计划高估——「不误连真实外部服务」那半今天**无规则在守**，已拆为 AC-11b 并新增 **T-19**（§7 Q-05）。
 
 ## Current
 
-- T-02 待开始（Agent 测试目录隔离）。
+- T-03 待开始（Agent dev/override 真落盘，推翻 `paths.py:107`）。T-02 已使这一步安全。
 
 ## Next
 
-- T-01 收尾：`delivery/LEDGER.md` 加**裸 id** 表行（markdown 链接会让验证器读成 `none`）+
-  `delivery/planned/README.md` 的 B 行改 ACTIVE；`prepare_ai_workspace.py --change CHG-20260923-057`；
-  两个验证器绿；快照 `Active CHG: CHG-20260923-057`。
-- 阶段 1 Agent：T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09（**顺序有依赖**：T-02 必须先行，
+- 阶段 1 Agent：T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09（T-02 已完成，是它们的**前置**：
   否则 T-03 让 dev 真落盘后，测试会写进真实检出目录 `.local/`）。
+- 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
+- **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
+  6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
 - 阶段 2 Desktop：T-10 → T-11 → T-12 → T-13 → T-14 → T-15 → T-16 → T-17。
 - 阶段 3：T-18 回写与收尾。
 
@@ -36,6 +41,10 @@
   `delivery/active/` 仅 `.gitkeep`；`LEDGER.md` 无表行；快照 `Active CHG: none`。
 - 起点测试基线：Desktop **68**（二进制 crate，`cargo test --lib` 不成立）、Agent **253 tests OK**。
 - T-01：见 `evidence/task-01-governance.md`。
+- T-02：`bash scripts/test.sh` → **259 tests OK，exit=0**（253 → 259，只增不减）。改前规则**红且恰好 1 处命中**
+  （`test_storage_migration_paths.py:46`）；阳性对照两处实跑出红（规则内正则；端到端探针模块报出
+  `test_zz_probe_forbidden.py:3`）；变异探针下 `scripts/test.sh` `exit=1` 点名路径**而套件打印 `OK`**
+  ⇒ 守卫独立于测试结果。见 `evidence/task-02-isolation.md`。
 
 ## 执行期间的边界（不得越界）
 
