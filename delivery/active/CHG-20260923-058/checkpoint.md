@@ -114,7 +114,7 @@
   这些改动留在工作区未动，完整 diff 存 `/tmp/chg058/fmt-stray/stray-formatting.patch`。
 
 
-- T-07 **DONE**（desktop 待提交）：三个新模块——`diagnostic.rs`（1768 行，规则本体）、
+- T-07 **DONE**（desktop `9c938d0`）：三个新模块——`diagnostic.rs`（1768 行，规则本体）、
   `commands/diagnostic.rs`（784 行，接线 + 保留的 `#[ignore]` 真机探针）、`dto/diagnostic.rs`（262 行，线上形状），
   加 `main.rs`（`mod` + `DiagnosticHost` + **一份 `secrets` 两个读者**）、`paths.rs`/`config.rs`（`Source::code`/`Environment::code`）、
   `logging/backend.rs`（抽出唯一的 `stamp_with`）、`app_paths.rs`（日志根不在数据根里）。
@@ -139,14 +139,54 @@
   cargo 认为树干净、**用上一次变异的产物**跑这一轮（症状：组内 7/7 灭而紧接着一次 `cargo test` 报红）；
   ②`finally` 在 SIGTERM 下不执行 ⇒ 一次被停掉的运行在工作区留下 **d16** 的源码。
   修法是墙钟推 mtime + 组末尾**再跑一次阴性对照**（断言留下的是**绿的**树）+ 注册 `SIGINT/SIGTERM/SIGHUP`；
-```
+
+- T-08 **DONE**（desktop `5ee840c`、cloud `bb0136f`）：本机设置页与日志查看器。**先说范围补正**：§8 的 T-08 行
+  把落点写成 `wt-media-cloud/web`，执行时实测那一半**不够**——AC-08 要「查看/修改保存位置」，而 T-04 的
+  `settings.rs` **没有任何命令读它**（T-04 证据边界自己写着「设置页与命令面（T-05/T-08）负责」，T-05 没取这一半）；
+  AC-09 要「一键打开日志文件夹」，而三仓范围内**没有任何打开目录的命令**（`plugin-shell` 不在 `web/package.json`）。
+  故 T-08 实际是两半，**登记为范围补正而不是把两个 AC 留成 TODO**。
+  **desktop 半**：三个新命令 `local_settings_get`/`local_settings_set`/`local_open_place`，加 `settings::check_save_dir`、
+  `dto::SettingsView`、`commands::reveal::Place`（词汇复用 `Source::label()`——开的那棵树就是读的那棵树）。
+  **cloud/web 半**：`local-settings/service.js`（九个命令 + 八个正常化器 + `createMockInvoke`）、两个纯派生模块
+  （`local-settings-view.js` / `local-logs-view.js`）、`LocalSettingsPage.vue`、`LocalLogsPage.vue`
+  （41 行硬编码桩 → 查看器）、路由/导航/免鉴权名单、四个测试文件。
+  计数 desktop **314 → 336 passed / 2 ignored**（+22 = 4+2+9+7）；web **21 文件 101 → 25 文件 166 tests**；
+  两套变异表 **70/70 灭（20 Rust + 50 JS）、0 等价、0「没编译过」**，8 组阴性对照先绿（37/9/7/2 + 20/19/17/12），
+  还原后逐字节一致**且树仍绿**（两个不同的断言）；`npm run build:desktop` 成功。
+  **三条先灭后补**（变异表抓出的真覆盖缺口，不是放宽断言）：`lw12`（原 fixture 的 agent 树是空的 ⇒
+  「只比文件名」也满足断言；改成**两棵树各有一个 `error.log`** 并逐个断言被标记的行）、
+  `sv13`（mock 按**精确**级别筛也能过原断言，差别恰在级别更高的那行；补一条 `error` 记录并逐级别列出）、
+  `sv08`/`sw08`（`logFiles` 不逐文件正常化；「无文件可清」不列 kept）。
+  **一处登记为等价**：`sw04`（本地时区 vs UTC）只在年边界有别，本机是 `CST +0800`，普通时刻两个 getter 相同，
+  所以第一版用例看不见它；改法不是放宽而是**让用例在本机自己的时区里找一个两者不同的时刻**（跨 UTC 年边界
+  取四个候选 + 阳性对照——同一时刻的 UTC 拼法与之**不相等**，证明不是在比同一个字符串）。在 `TZ=UTC` 的机器上
+  它是**真等价**，用例走「偏移为 0」分支而不假装测过。
+  **三处结构性的东西值得单独记**：①**mock 曾是第二套服务而不是 `invoke` 替身**——它直接返回 camelCase，
+  绕过正常化，于是浏览器预览能渲染出一个应用里空白的页；改成 `createMockInvoke()` 按 Rust 拼写应答、
+  两侧共用同一条正常化路径（我自己的用例 `expected undefined to be null` 抓到的）。
+  ②**构建抓到 166 个单测结构上照不到的一条**：重写后的查看器从 `local-logs-view.js` 导 `logKindLabel`
+  （它住在 `local-settings-view.js`）——本仓 vitest **从不编译 `.vue`**，页面里的错 import 只有构建看得见，
+  而构建（6.35s + 写 `dist-desktop/`）不该是唯一在看的东西；补 `desktop page imports`（逐个具名绑定比对
+  模块真实导出表 + 分母守卫），变异 `wr10`/`wr11` 证明它会红。③同一个文件里
+  `names a component file that exists` 的第一版正则**匹配 0 次而通过**，分母守卫（`expect(checked).toBe(loaders.length)`）
+  当场把它打掉，才发现 Vite 把 `import()` 改写成 `__vite_ssr_dynamic_import__("/src/…")`（路径已解析）。
+  `router.ts` 因此把路由表导出为 `desktopRoutes`——建 router 要浏览器 history，路由表不需要（本仓 vitest 无 DOM）。
+  **边界**：`commands::reveal` 最后那行 `open::that` 不可测（测它就会开窗口），留常驻 `#[ignore]` 用例，
+  **真机手工已验证**「打开设置文件夹」与两处「打开文件夹」都到预期目录；本机设置页**不能浏览目录**，
+  只能手输路径（无 `plugin-dialog`；`check_save_dir` 把「路径不存在」变成一句人话）——登记为**能力缺口**而非偏好；
+  `main.rs` 的接线行不可断言（与 T-07 的 `DiagnosticHost::secrets` 同类），前端那一半由 `wiring` 组覆盖
+  （路由名 ↔ 免鉴权名单 ↔ 导航路径 ↔ 组件文件存在），Rust 那一半以 `npm run build:desktop` + 真机点击为准。
+  证据 `evidence/task-08-local-settings-ui.md`。
 
 ## Next
 
-- T-08 前端「本机设置」页与 `LocalLogsPage` 重写（`wt-media-cloud/web`）：两条硬约束仍未触碰——
-  `localAgentBoundary.test.js` 禁页面出现 `127.0.0.1`/`fetch(`；`localAgentService.test.js` 断言
-  `invoke` 的**精确**参数对象（三个只读命令 + 两个清理命令都追加在 `invoke_handler!` 末尾，未插队）。
-- T-09 回写基线（含 §5.8 的 `cache/`，承 T-03 的开口）与归档收尾。
+- T-09 回写与收尾：`cache/` 写入程序总纲 §2 与架构 §5.8 目录树（承 T-03 的开口，cache 落在 `~/Library/Caches`
+  而**不在**数据根之内）、本机设置页与命令面的基线陈述、入口文档；`Status: DONE` → `git mv` 归档 →
+  去 LEDGER 行 → `--no-active` 冷启动重生成快照 → **主动扫**失效指针（报分母 + 阳性对照）；
+  `evidence/task-09-writeback-and-archive.md`。
+- T-09 之后：CHG-C 关闭门禁（三验证器 + `unittest discover` 的同集合阳性对照）与端到端验收
+  （`package-release-macos.sh` 出一份包，走完整链路并打开归档确认不含凭证/Cookie/代理密码/媒体文件），
+  然后**才**激活 CHG-D（`059`）。
 
 ## Blocked
 
@@ -191,6 +231,12 @@
   `87159bd6…` 与 `.sha256` 首字段逐字符相同；扫描模式**阳性对照 5/5**，真归档 **0 命中 / 1593 字节 / 4 条目**，
   两个凭据 `present=false`；真机两棵树的根不同（`.local/logs` 与 `~/Library/Logs/WTMedia/Agent`）。
   该探针**保留**为常驻 `#[ignore]` 用例（与 T-05/T-06 的「跑完即撤销」不同，理由见证据）。
+
+- T-08 后：desktop `336 passed / 0 failed / 2 ignored`（起点 314，+22 = 4+2+9+7）、web `25 文件 / 166 tests`
+  ——**两条都是在已提交的字节上复核的**（`5ee840c` / `bb0136f` 之后重跑；desktop 工作树除 13 个既有脏文件外干净、
+  无变异残留字节，web 工作树除未跟踪的 `dump.rdb` 外干净）；两套变异表 70/70 灭、8 组阴性对照先绿、
+  逐字节还原且**还原后各组再跑一次仍绿**；`npm run build:desktop` 成功。
+  **未跑** workspace 门禁——与 T-05/T-06/T-07 同，留待 T-09 的关闭门禁（同集合阳性对照）。
 
 ## 记录口径的一处更正
 

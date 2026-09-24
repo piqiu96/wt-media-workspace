@@ -257,7 +257,7 @@
 | T-05 | **存储与日志只读命令**：可用空间、缓存占用、日志占用、列出日志文件（含两棵树，见 Q-08）；**读取失败必须是错误而非 0 MB**；`logging::rolling` 补公开读取面（列文件 + 读尾部约 500 行 + 级别筛选所需字段）。**落点偏离（已登记）**：读取面落在**新模块 `logging/reader.rs`**，不写进 `rolling`——`rolling` 现为 `file-rotate` 的薄壳，读的规则要与那个 crate 的**命名规则**对齐，写进去会被误读成它自己的格式；`rolling` 只多导出两个既有常量，理由见证据「登记的偏离」 | DONE | 先红：不可读目录 ⇒ `Err`（**不是** 0 MB）；分母与阳性对照齐备；命令追加在 `invoke_handler!` 末尾；`evidence/task-05-storage-read.md` |
 | T-06 | **清理闭环**：缓存清理（只处理可安全再生文件）与历史日志清理（只处理**已轮转归档**，正在写入的活文件永不删）；白名单排除素材/成片/SQLite/检查点/待回传结果/正在写入文件；完成后回报**实际释放字节**。**落点**：`cleanup.rs`（规则）+ `commands/cleanup.rs`（接线）+ `dto/cleanup.rs`（线上形状）；保护实现为**一条路径而不是一个名字清单**——五类在数据根下、命令不收路径参数，第六类在可达树内按**种类**保护（见证据） | DONE | 分母 5 类 × 3 根 × 2 布局 = 30 次比较 + 阳性对照；逐类「留」用例与删除对照组齐备；`freed_bytes` 由**独立 walk**（`storage::directory_bytes`）对账；变异 26 行 26 灭 0 等价；`evidence/task-06-cleanup.md` |
 | T-07 | **脱敏诊断导出**：版本 + 组件状态 + 已脱敏日志 + 失败任务摘要，打成单个归档；不得含完整凭证/Cookie/代理密码/用户媒体文件。**落点**：`diagnostic.rs`（规则）+ `commands/diagnostic.rs`（接线）+ `dto/diagnostic.rs`（线上形状）；一个 gzip tar，摘要值是**归档外的兄弟文件**（放进包里会自指）；「不含用户媒体」由**布局**保证（每棵树只读一层、本组件日志根不在数据根里），不靠名字过滤 | DONE | 归档内容逐项枚举（6 条：2 信封 + 4 日志）；凭据阳性对照（先证明针抓得住 + 报分母）；条目名/载荷/摘要三类上限各一条边界用例；摘要值由**独立读者**（`shasum -a 256`）对账；变异 32 行 32 灭 0 等价；真机探针**保留**为常驻 `#[ignore]` 用例；`evidence/task-07-diagnostic-export.md` |
-| T-08 | **前端「本机设置」页 + 日志查看器重写**（`wt-media-cloud/web`）：设置页（保存位置查看/修改、存储与日志、清理、导出）+ `LocalLogsPage.vue` 重写成约 500 行查看器（级别筛选、打开日志文件夹）；路由 + 导航项 + `main.ts:43` 免鉴权名单 + 适配两条既有测试 | TODO | `npx vitest run` 21 文件全绿；`localAgentBoundary.test.js` 的两条禁令（`127.0.0.1`/`fetch(`）不被触碰；`localAgentService.test.js` 的精确参数断言同步；`evidence/task-08-local-settings-ui.md` |
+| T-08 | **前端「本机设置」页 + 日志查看器重写**（`wt-media-cloud/web`）：设置页（保存位置查看/修改、存储与日志、清理、导出）+ `LocalLogsPage.vue` 重写成查看器（级别筛选、打开日志文件夹）；路由 + 导航项 + `main.ts` 免鉴权名单 + 适配既有测试。**范围补正（已登记）**：本行原写「落点 `wt-media-cloud/web`」，执行时实测那一半够不着 AC-08/AC-09——T-04 只交付了 `settings.rs` 模块而**没有任何命令读它**（T-04 证据边界 1/4 把命令面留给「T-05/T-08」，T-05 未取），且三仓范围内没有任何打开目录的命令。故本任务实际是两半：desktop 三个命令（`local_settings_get` / `local_settings_set` / `local_open_place`）+ web 页面 | DONE | desktop 314 → **336 passed / 2 ignored**；web 21 文件 101 → **25 文件 166 tests**；`npm run build:desktop` 成功；两套变异表 **70/70 灭、0 等价、0 没编译过**，8 组阴性对照先绿，还原后树仍绿；`evidence/task-08-local-settings-ui.md` |
 | T-09 | **回写与收尾**：`cache/` 入基线（程序总纲 §2 表最后一行「出现真实需求时再入基线」+ 架构 §5.8 目录树）；本机设置页与命令面的基线语句；`Status: DONE` → `git mv` 归档 → 移除 LEDGER 行 → `--no-active` 冷启动重生成 → **主动扫**失效指针（报分母 + 阳性对照） | TODO | 两验证器绿；扫描报分母 + 阳性对照；`evidence/task-09-writeback-and-archive.md` |
 
 > **T-02 排在 T-03 之前**的原因：用户裁定 D-06 明确「折进 CHG-C 第一个任务」，且日志目录解析（T-03）
@@ -273,10 +273,11 @@
 
 ### wt-media-cloud
 
-- [ ] 只碰 `web/`：`features/local-settings/` 新页面、路由、导航项、`main.ts` 免鉴权名单
-- [ ] `LocalLogsPage.vue` 重写为查看器（守住两条禁令）
-- [ ] 两条既有前端测试同步（`localAgentBoundary` / `localAgentService`）
-- [ ] **不碰** Cloud 后端 Go 代码
+- [x] 只碰 `web/`：`features/local-settings/` 新页面、路由、导航项、`main.ts` 免鉴权名单（T-08，commit `bb0136f`）
+- [x] `LocalLogsPage.vue` 重写为查看器（守住两条禁令）
+- [x] 既有前端测试同步：`localAgentBoundary.test.js` 的规则扩到四个模块；
+      `localAgentService.test.js` **未改**（三条新命令追加在 `invoke_handler!` 末尾，既有精确参数断言逐字不变）
+- [x] **不碰** Cloud 后端 Go 代码
 
 ### wt-media-agent
 
@@ -287,10 +288,11 @@
 
 ### wt-media-desktop
 
-- [ ] T-02：`file-rotate` + `chrono`、`rolling.rs` 去自写轮转、单实例守卫、`[logging]` 键收敛
-- [ ] T-03…T-07：运行目录、用户设置、只读命令、清理、诊断导出
-- [ ] 新命令**追加**在 `main.rs:131-152` 末尾
-- [ ] 入口文档（`AGENT-INDEX.md` / `DIRECTORY_MAP.md`）
+- [x] T-02：`file-rotate` + `chrono`、`rolling.rs` 去自写轮转、单实例守卫、`[logging]` 键收敛
+- [x] T-03…T-07：运行目录、用户设置、只读命令、清理、诊断导出
+- [x] T-08：三个命令面（`commands::settings` 读数/写数、`commands::reveal` 打开位置）+ `settings::check_save_dir` + `dto::SettingsView`（commit `5ee840c`）
+- [x] 新命令**追加**在 `invoke_handler!` 末尾（T-05/T-06/T-07 的注释已在案，三条新命令沿用同一位置）
+- [ ] 入口文档（`AGENT-INDEX.md` / `DIRECTORY_MAP.md`）（T-09）
 
 ## 10. Acceptance Matrix
 
@@ -303,10 +305,10 @@
 | AC-05 | `UserSettings` 落 `settings.toml`（含 `schema_version`），**原子替换**；损坏时**保留原文件并明确提示** | 半写中断 + 损坏输入两条先红用例 | PASS（T-04） |
 | AC-06 | 存储与日志数据取自**真实目录**；**读取失败为错误，不显示 0 MB** | 不可读目录 ⇒ `Err` 的用例（与「返回 0」的正向对照） | PASS（T-05） |
 | AC-07 | 清理只处理可安全再生文件与**已轮转历史日志**；白名单六类一律不删；完成后展示**实际释放空间** | 六类各一条不删用例 + 一条删除对照组 + 释放字节一致性 | PASS（T-06） |
-| AC-08 | 本机设置页可**查看/修改保存位置**，只影响后续任务：不迁移历史、不影响执行中任务 | 前端用例 + 真机操作 | TODO |
-| AC-09 | 日志查看器可读约 500 行、按级别筛选、一键打开日志文件夹 | 真机操作 + 前端用例 | TODO |
+| AC-08 | 本机设置页可**查看/修改保存位置**，只影响后续任务：不迁移历史、不影响执行中任务 | 前端用例（`localSettingsService`/`localSettingsView`）+ 命令面用例（`commands::settings` 9 条，含「拒绝的值不落盘」「写前先准备数据根、读不建目录」）+ 真机操作 | PASS（T-08，**含 desktop 侧命令面**：本 AC 原写的落点只有前端，见 §8 T-08 行的范围补正） |
+| AC-09 | 日志查看器可读约 500 行、按级别筛选、一键打开日志文件夹 | 前端用例（`localLogsView`：筛选语义/隐藏计数/截断/选中文件按树+名）+ 命令面用例（`commands::reveal` 7 条）+ 真机操作（三个「打开文件夹」各点一次） | PASS（T-08，同上含 `local_open_place`） |
 | AC-10 | 诊断包不含完整凭证、Cookie、代理密码与用户媒体文件 | 归档内容逐项枚举 + 凭据阳性对照 | PASS（T-07） |
-| AC-11 | 不破坏既有基线：三仓测试计数只增不减；M2 业务闭环不被本 CHG 触及 | agent 379 / desktop 175 / web 21 文件为分母；workspace 4 条既有红项按同集合阳性对照判定 | TODO |
+| AC-11 | 不破坏既有基线：三仓测试计数只增不减；M2 业务闭环不被本 CHG 触及 | agent 379 / desktop 175 / web 21 文件为分母；workspace 4 条既有红项按同集合阳性对照判定 | PARTIAL（desktop 336 ≥ 175、web 25 文件 ≥ 21、agent 见 T-02；M2 闭环**未触及**，其回归重跑属 CHG-D） |
 
 ## 11. Evidence
 
@@ -342,11 +344,18 @@ Completed:
 - 本机环境已收拢：app / sidecar / cloud / redis 全部停止，旧日志存档 `/tmp/chg058/preexisting/`；
   并**顺带实测到 CHG-D 范围内的一条真缺陷**（退出 app 后 sidecar 存活并仍占 8765，§4.8）。
 
+- T-01…T-08 全部 DONE，逐任务的证据、计数、变异读数与边界登记见 `checkpoint.md` 与 `evidence/`。
+  T-08 执行时发现 §8 把落点写成只有 `wt-media-cloud/web` 是**够不着 AC-08/AC-09 的**，故补上 desktop 侧命令面
+  （三个新命令），并在 §8/§10 按范围补正登记，而不是把两个 AC 留成 TODO。
+- 基线回写：T-02 已回写程序总纲 §3、架构 §5.8、里程碑成功事实 #5；`cache/` 与入口文档留在 T-09。
+
 Current:
-- T-01 激活中：LEDGER、`planned/README.md`、快照重生成与两验证器待跑。
+- T-08 代码与证据均已落（desktop `5ee840c`、cloud `bb0136f`），本任务记录已写入 `checkpoint.md`。
 
 Next:
-- 跑 `prepare_ai_workspace.py --change CHG-20260923-058` 与两验证器，然后提交激活记录，转入 T-02。
+- T-09 回写与收尾：`cache/` 入基线、本机设置页与命令面的基线陈述、入口文档、`Status: DONE`、
+  `git mv` 归档、去 LEDGER 行、`--no-active` 冷启动重生成快照、**主动扫**失效指针（报分母 + 阳性对照）。
+- T-09 之后：CHG-C 关闭门禁与端到端验收，然后才激活 CHG-D（`059`）。
 
 Blocked:
 - 无。Q-01…Q-08 全部 `Blocking = NO`。
@@ -354,6 +363,9 @@ Blocked:
 Recent verification:
 - 激活时基线：agent 379 tests OK / desktop 175 passed / web 21 测试文件 / workspace 两验证器绿
   （`unittest discover` 的 4 条红项为既知，待按同集合阳性对照判定）。
+- T-08 后（在已提交字节上复核）：desktop **336 passed** / web **25 文件 166 tests**；
+  两套变异表 **70/70 灭、0 等价、0 没编译过**，8 组阴性对照先绿，逐字节还原且还原后仍绿；
+  `npm run build:desktop` 成功。workspace 门禁留待 T-09（同集合阳性对照）。
 
 ## 13. DONE Gate
 
