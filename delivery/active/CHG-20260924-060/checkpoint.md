@@ -28,11 +28,11 @@
 
 ## Current
 
-- T-04 待开始（Agent 删占位包）。
+- T-05 待开始（文档回写与归档）。
 
 ## Next
 
-- T-04 Agent 删占位包 → T-05 文档回写与归档。
+- T-05 文档回写与归档（含 CHG-056 那个被引用但未入库的 `ac05-run5.log`）。
 - 一仓一 commit；「删除/搬移」与「改逻辑」不混进同一提交。
 - **T-05 新增一项**：归档的 CHG-056 有个**被引用但未入库**的证据文件 `ac05-run5.log`
   （见 `evidence/task-02-csp.md` 末节），与被 *.gitignore* 的 `*.log` 规则吃掉，T-05 一并补入。
@@ -50,6 +50,18 @@
 - T-03：见 `evidence/task-03-proxy.md`；原始输出 4 份在 `evidence/artifacts/t03-*.out`。
   末轮 `cargo test --workspace` = **68 passed; 0 failed**，`cargo build` 通过，
   `cargo clippy` 零新增 warning。
+- T-04：见 `evidence/task-04-packages.md`；原始输出 2 份在 `evidence/artifacts/t04-*.out`。
+  `bash scripts/test.sh` = **253 tests OK**（与删包前一致）。
+
+## T-05 待清单（收尾用）
+
+- agent 仓文档回写：`DIRECTORY_MAP.md:98/102/104/117`、`AGENTS.md:27/36`、`CLAUDE.md:9`、
+  `AGENT-INDEX.md:64`。注意 `AGENTS.md:36` 与 `CLAUDE.md:9` 的**意图**（不得手改生成代码）
+  仍然成立，但不能再指向一个不存在的路径——是**改写**，不是直接删。
+- 修归档 CHG-056 那个**被引用但未入库**的 `ac05-run5.log`（见 `evidence/task-02-csp.md` 末节）。
+- `CHG-056` §12 四项待裁定按裁定结果标注处置去向。
+- `Status: DONE` → 移入 `delivery/completed/CHG-20260924-060/` → 移除 LEDGER 行 →
+  `prepare_ai_workspace.py --no-active` 重生成快照 → **主动扫**归档连带的失效指针。
 
 ## 执行期间的边界（不得越界）
 

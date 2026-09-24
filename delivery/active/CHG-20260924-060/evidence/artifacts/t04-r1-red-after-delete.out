@@ -1,0 +1,30 @@
+# After: rm -rf src/wt_media_agent/{modes,generated}   (PLACEHOLDER_PACKAGES not yet updated)
+# $ bash scripts/test.sh
+FAIL: test_r1_every_module_is_in_a_known_place (test_dependency_boundaries.BoundaryScanTests.test_r1_every_module_is_in_a_known_place)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/test_dependency_boundaries.py", line 620, in test_r1_every_module_is_in_a_known_place
+    self.assertEqual(r1_unknown_modules(self.files), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['R1 wt_media_agent/generated/ must stay a[81 chars] []'] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+'R1 wt_media_agent/generated/ must stay a placeholder, found []'
+
++ []
+- ['R1 wt_media_agent/generated/ must stay a placeholder, found []',
+-  'R1 wt_media_agent/modes/ must stay a placeholder, found []']
+
+----------------------------------------------------------------------
+Ran 253 tests in 2.967s
+
+FAILED (failures=1)
+storage migration ok: 2 applied, 2 total
+database /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpv3dszo2e/local-agent.sqlite3
+applied 0001_base base
+applied 0002_task_checkpoints task_checkpoints
+storage migration ok: 2 applied, 2 total
+database /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpy_8d6sea/local-agent.sqlite3
+applied 0001_base base
+applied 0002_task_checkpoints task_checkpoints

@@ -1,0 +1,4 @@
+# After: PLACEHOLDER_PACKAGES = frozenset({"adapters"})
+# $ bash scripts/test.sh
+Ran 253 tests in 3.001s
+OK
