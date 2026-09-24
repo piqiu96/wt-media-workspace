@@ -132,6 +132,14 @@
   故判据只能是结构性的 R11，不能声称有行为差异。
   见 `evidence/task-09-single-entry.md`。
 
+- 2026-09-24 T-12：**Desktop 日志文件的有界读写**（`wt-media-desktop` `66f8f02`）——`logging::rolling`：
+  `date_of`/`fit`/`rotation`/`expired` 四条**纯规则**（`Clock` 注入）+ `Writer` 一处薄 IO（**永不 panic**）。
+  裁定六的四条界（20MB / 14 天 / Desktop 100MB 总量 / 单条截断标记）与计划的五条逐条落成可单测的规则，
+  覆盖面按条枚举在证据里。命名 `desktop-YYYYMMDD-N.log`——**每个文件都带日期、含正在写的那个**，因为
+  两实例可能同时开着，稳定名会让两者写同一文件再由其中一个改走；`create_new` 抢名字是原子抢占。
+  单条超限的标记与 Agent 侧**逐字相同**。测试 78 → 116；变异 25/25 红，并补齐两个探针查出的缺口。
+  见 `evidence/task-12-desktop-rolling.md`。
+
 - 2026-09-24 T-11：**Desktop 日志目录解析**（`wt-media-desktop` `f1edae6`）——`logging::paths`：
   `directory()` 纯函数（`home`/`environment`/`manifest_dir` 全注入）、`prepare()` 唯一 IO
   （建目录 + **真实写探测**，因为目录已存在时 `create_dir_all` 返回 `Ok`）、`LogDirectoryError` 不 panic。
@@ -153,22 +161,24 @@
 
 ## Current
 
-- T-11 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-12**（rolling writer）。
+- T-12 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-13**（后端装配 + target 白名单 + 格式 + 脱敏）。
 
 ## Next
 
-- **T-12**：`logging::rolling` writer（`Clock` 注入，使每行变异可测）——日期翻档、20MB 翻档、
-  **单条超限截断并标 `truncate=true original_size=<n>`**、按天删除、按总量删除、**当前文件永不被删**；
-  写文件用 `create_new` 式命名防多实例写同一文件。之后 T-13 → … → T-17，然后阶段 3 T-18。
-- **T-15 待验的期望**（T-11 登记）：接线完成后 `cargo build` 条目级警告应从 12 回到 **4**、
-  clippy `--all-targets` 从 18 回到 **10**。不降即说明模块没被真正接上。
+- **T-13**：Desktop 后端装配（`tracing-subscriber`）+ target 白名单（默认 `OFF`；`const OWNED_TARGETS`
+  枚举断言逐个可用）+ 记录格式 + 脱敏。两向断言：外来 target 不入文件、自有 target 入文件；
+  含 token 的记录落盘后 grep 不到且周围文本仍在。`agent.supervisor` 永不比 INFO 更严。
+  之后 T-14 → … → T-17，然后阶段 3 T-18。
+- **T-15 待验的期望**（T-11 登记、T-12 更新）：接线完成后 `cargo build` 条目级警告应从 **43** 回到 **4**、
+  clippy `--all-targets` 从 **48** 回到 **10**。不降即说明模块没被真正接上。
+  （计数法：`touch src/main.rs` 后 `cargo build 2>&1 | grep -cE '^warning: [a-z]'`，clippy 同理。）
 - **访问 crates.io 必须带 `HTTPS_PROXY=http://127.0.0.1:7897`**（T-10 查明的根因：本机直连的证书被劫持）。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
   得名 `__main__`，真实运行的 HTTP 侧记录看不出组件来源——削弱「日志可定位问题」，属 T-09 范围。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
-- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 → T-13 → T-14 → T-15 → T-16 → T-17。
+- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 → T-14 → T-15 → T-16 → T-17。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
@@ -189,6 +199,20 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 
 ## Recent verification
 
+- T-12：`cargo test --workspace` → **116 passed; 0 failed**（78 → +38）；`cargo build` 条目级警告
+  **12 → 43**、clippy `--all-targets` **18 → 48**，增量**全是 `rolling.rs` 的 `dead_code`**（逐文件核对：
+  rolling 31 + paths 8 + 既有存根 4 = 43，没有一条来自别的文件）。
+  变异 **25/25 红、控制行先绿**，探针 sha256 核对还原（`c3301b6334b3` 与提交文本一致）。
+  **探针查出两个缺口并补齐**：**M13 第一版编不过**（临时值借不到 `&str`）——记成 `NO-COMPILE` 是对的，
+  编译失败的变异证明不了任何事，改成可编译的等价变异后转红；**M23 起初全绿**——`rolled_by_us` 只在
+  「总量界要删一个今天的文件」时起作用，原有用例要么总量宽、要么删的是昨天的，补了
+  `a_file_this_writer_rolled_today_is_reclaimable_under_pressure`（20B 单文件 + 30B 总量，算出第 5 条
+  写入时删 `-1` 停在 `-2`）才红。
+  **两处 clippy 真意见当场改掉**（`Send + Sync` 是 `Clock` 超 trait 已保证的；测试里 `x + 1 <= 字面量`
+  的写法），clippy 条目数 51 → 48。
+  **如实登记一处未覆盖**：跨午夜的第二个实例——它在昨天启动、现在还在跑，其活文件日期是昨天，
+  而昨天的文件无论谁写的都是历史，故会被按天删。writer 无法区分对端的活文件与历史，不假装解决了。
+  见 `evidence/task-12-desktop-rolling.md`。
 - T-11：`cargo test --workspace` → **78 passed; 0 failed**（68 → +10）；`cargo build` 条目级警告
   **4 → 12**、clippy `--all-targets` **10 → 18**，**+8 全是新模块的 `dead_code`**（调用方在 T-15）。
   变异 **8/8 红、控制臂先绿**；探针查出两个缺口并补齐：**M8**（`create_new` 与 `create` 只差在
