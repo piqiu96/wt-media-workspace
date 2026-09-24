@@ -250,7 +250,7 @@
 | T-02 | **日志命名与轮转改造（两侧）+ 基线回写**：Desktop 引 `file-rotate`/`chrono` 取代自写轮转（活文件 `desktop.log`、归档 `desktop.log.<YYYY-MM-DD-HH>`、年龄删除归 crate）；Agent `BoundedFileHandler` → `TimedRotatingFileHandler`（`backupCount=0`）+ 保留截断包装；`LogBudget` 收敛为纯按天；两侧去掉总量与单文件上限；`tauri-plugin-single-instance`；回写四处活基线，并在 CHG-057 归档记录顶部加取代注记 | DONE | 两侧单测计数只增不减；真机取证（稳定名 + 归档名 + 20/15/2 天年龄删除基准 + 第二个实例不产生第二个 writer）；`evidence/task-02-log-rotation.md` |
 | T-03 | **Desktop 运行目录解析**：新模块（**不动 `paths.rs`**），data/logs/versions/cache 四个目录 + 开发态 `.local/`；抄 `logging/paths.rs` 的注入式写法（`home`/`environment`/`manifest_dir` 入参，纯函数优先）；不可写时报 `Err` 不 panic | DONE | 纯规则用例 + IO 边界；测试不解析真实 `$HOME`；变异打掉自己；`evidence/task-03-app-paths.md` |
 | T-04 | **用户设置持久化**：`UserSettings` + `settings.toml` + `schema_version`，写到用户数据目录；**原子替换**（临时文件 + rename）；**损坏时保留原文件并明确提示**，不得静默清空 | DONE | 先红：损坏输入 ⇒ 原文件仍在 + 明确错误；半写中断 ⇒ 不产生半个文件；`evidence/task-04-user-settings.md` |
-| T-05 | **存储与日志只读命令**：可用空间、缓存占用、日志占用、列出日志文件（含两棵树，见 Q-08）；**读取失败必须是错误而非 0 MB**；`logging::rolling` 补公开读取面（列文件 + 读尾部约 500 行 + 级别筛选所需字段） | TODO | 先红：不可读目录 ⇒ `Err`（**不是** 0 MB）；分母与阳性对照齐备；命令追加在 `invoke_handler!` 末尾；`evidence/task-05-storage-read.md` |
+| T-05 | **存储与日志只读命令**：可用空间、缓存占用、日志占用、列出日志文件（含两棵树，见 Q-08）；**读取失败必须是错误而非 0 MB**；`logging::rolling` 补公开读取面（列文件 + 读尾部约 500 行 + 级别筛选所需字段）。**落点偏离（已登记）**：读取面落在**新模块 `logging/reader.rs`**，不写进 `rolling`——`rolling` 现为 `file-rotate` 的薄壳，读的规则要与那个 crate 的**命名规则**对齐，写进去会被误读成它自己的格式；`rolling` 只多导出两个既有常量，理由见证据「登记的偏离」 | DONE | 先红：不可读目录 ⇒ `Err`（**不是** 0 MB）；分母与阳性对照齐备；命令追加在 `invoke_handler!` 末尾；`evidence/task-05-storage-read.md` |
 | T-06 | **清理闭环**：缓存清理（只处理可安全再生文件）与历史日志清理（只处理**已轮转归档**，正在写入的活文件永不删）；白名单排除素材/成片/SQLite/检查点/待回传结果/正在写入文件；完成后回报**实际释放字节** | TODO | 每个白名单类别各一条「不删」用例 + 一条「删了」对照组；释放字节与实际差值一致；`evidence/task-06-cleanup.md` |
 | T-07 | **脱敏诊断导出**：版本 + 组件状态 + 已脱敏日志 + 失败任务摘要，打成单个归档；不得含完整凭证/Cookie/代理密码/用户媒体文件 | TODO | 归档内容逐项枚举；凭据阳性对照（先证明针抓得住）；文件名与大小上限；`evidence/task-07-diagnostic-export.md` |
 | T-08 | **前端「本机设置」页 + 日志查看器重写**（`wt-media-cloud/web`）：设置页（保存位置查看/修改、存储与日志、清理、导出）+ `LocalLogsPage.vue` 重写成约 500 行查看器（级别筛选、打开日志文件夹）；路由 + 导航项 + `main.ts:43` 免鉴权名单 + 适配两条既有测试 | TODO | `npx vitest run` 21 文件全绿；`localAgentBoundary.test.js` 的两条禁令（`127.0.0.1`/`fetch(`）不被触碰；`localAgentService.test.js` 的精确参数断言同步；`evidence/task-08-local-settings-ui.md` |
@@ -297,7 +297,7 @@
 | AC-03 | 脱敏**不回退**：Cookie/Token/授权/代理密码/运行时 token 不进日志 | 沿用 CHG-057 的表驱动用例 + 真机阳性对照（先证明针抓得住） | PASS（T-02） |
 | AC-04 | 单实例守卫：第二个实例不产生第二个 sidecar、不产生第二个日志写入者 | 真机两实例；`desktop.log` 只有一个写入者 | PASS（T-02） |
 | AC-05 | `UserSettings` 落 `settings.toml`（含 `schema_version`），**原子替换**；损坏时**保留原文件并明确提示** | 半写中断 + 损坏输入两条先红用例 | PASS（T-04） |
-| AC-06 | 存储与日志数据取自**真实目录**；**读取失败为错误，不显示 0 MB** | 不可读目录 ⇒ `Err` 的用例（与「返回 0」的正向对照） | TODO |
+| AC-06 | 存储与日志数据取自**真实目录**；**读取失败为错误，不显示 0 MB** | 不可读目录 ⇒ `Err` 的用例（与「返回 0」的正向对照） | PASS（T-05） |
 | AC-07 | 清理只处理可安全再生文件与**已轮转历史日志**；白名单六类一律不删；完成后展示**实际释放空间** | 六类各一条不删用例 + 一条删除对照组 + 释放字节一致性 | TODO |
 | AC-08 | 本机设置页可**查看/修改保存位置**，只影响后续任务：不迁移历史、不影响执行中任务 | 前端用例 + 真机操作 | TODO |
 | AC-09 | 日志查看器可读约 500 行、按级别筛选、一键打开日志文件夹 | 真机操作 + 前端用例 | TODO |
