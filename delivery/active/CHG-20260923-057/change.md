@@ -212,8 +212,12 @@
 | Q-03 | Desktop 日志文件名格式：建议 `desktop-YYYYMMDD-N.log`（UTC 日期；本地日期需 `localtime_r`，不安全），`N` 用 `create_new` 防多实例写同一文件。 | NO |
 | Q-04 | 裁定七还列了「用户设置异常」与「更新异常」，但 Desktop **没有** settings 命令（`commands/` 只有 account/agent/bind/logging/profile/public_config），`updater/mod.rs` 也**没有任何 emit 与可上报的异常路径**——**无来源可接**。登记为未交付，**不造假发射点**。 | NO |
 | Q-05 | **AC-11 的覆盖被计划高估**：计划把 AC-11 整条（含「测试不误连真实外部服务」）映射给 T-02，T-02 执行时实测该半**今天无任何规则在守**。处置：AC-11 拆为 AC-11a（PASS，T-02）/ AC-11b（未覆盖），新增 **T-19** 在本 CHG 内补上这条规则（里程碑的失败行为锚点就写着它，丢弃会使该锚点无人守）。**未静默吸收，也未静默丢弃。** 若要移出本 CHG 请一句话。 | NO |
+| Q-06 | **T-13 定下的两条稳定事实**（回写用）：①target 词汇表 `{agent.supervisor, desktop.startup, webview}`，`agent.supervisor` 的运行级别**永不比 INFO 更严**；②Desktop 记录为**单行纯文本**，时间戳 `%Y-%m-%dT%H:%M:%SZ`（UTC，因为 T-12 的文件名已按 UTC 分档），与 Agent 的本地时间无 `Z` 是**有意**差异。三条都有机器守（枚举断言 + 变异 6/8/11/12）。要改口径请一句话。 | NO |
+| Q-07 | **Agent 侧脱敏的三处实测发现**（T-13 差分表 20 行跑出来的，**其中两处是真泄漏**）：①`_KEYED` 的 `[^\n]*` + `re.sub` 从整段匹配之后续扫 ⇒ 一行里的**第二个凭据永不进扫描**（实测 `token=aaa password=bbb` → `token=*** password=bbb`）；②`_is_cookie_key` 只认单数 `cookie`，而词表里有复数 `cookies` ⇒ 复数键走通用路径，**只掩第一个值**（`cookies: a=1; b=2` → `cookies: ***; b=2`）；③`_KEYED` 的 `["']?` 被消费掉而回显只拼 `key+separator` ⇒ **JSON 键的闭引号丢失**，该行不再是合法 JSON。T-06 已提交（`b66d7f5`/`70c1f93`），按「一仓一 commit」不在 T-13 里改。拟开 **Agent 侧独立 Task（T-20）**：把这张 20 行差分表做成用例 + 一条变异 + 真实启动取证，自己的 commit 与 evidence。**`Blocking = NO`（不挡 T-14…T-18），但 DONE Gate 前必须落地**——两处真泄漏直接咬成功事实 #5「敏感信息不进日志」。等你一句话再动 Agent 仓。 | NO |
 
-无阻塞项（`Blocking = NO`）：Q-01…Q-05 均已按上述口径实施，用户可在任一 checkpoint 用一句话改判。
+无阻塞项（`Blocking = NO`）：Q-01…Q-07 均已按上述口径实施或登记，用户可在任一 checkpoint 用一句话改判。
+`Q-08` 这个 ID 在 §8 的 T-19 行与 §10 的 AC-11b 里被引用（指「T-02 实测 AC-11 的『不误连外部服务』那半今天无规则在守」），
+其定义即上面 **Q-05** 的内容；**保留原引用不改**，在此登记以免读者以为漏了一行。
 
 ## 8. Implementation Tasks
 
@@ -234,7 +238,7 @@
 | T-10 | Desktop 引入 `tracing` + `tracing-subscriber`（**例外的无失败测试项**） | DONE | `evidence/task-10-desktop-deps.md`；依赖树 **267 → 271，恰好 +4 且具名**（tracing-subscriber 0.3.23 / sharded-slab 0.1.7 / thread_local 1.1.10 / lazy_static 1.5.0）、移除 0；阴性对照：`nu-ansi-term`/`matchers`/`tracing-log`/`tracing-attributes` 全 0（`regex`/`smallvec` **本就在树里**，不计入）；起点 **68 → 68** 逐字不动；clippy **10 → 10**；阻塞根因查明是本机直连 crates.io 证书被劫持（见 §4 平台边界），**经本机代理仍是官方后端**，未换实现 |
 | T-11 | Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production → `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest>/.local/logs`）+ `.gitignore` 补 `.local/` | DONE | `evidence/task-11-desktop-log-paths.md`；**78 tests OK**（68 → +10：4 条纯规则 + 6 条 IO/边界）；测试全程不解析真实 `$HOME`；不可写 → `Err` 不 panic（只读臂**在本机真的跑了**，断言含 `PermissionDenied`）；变异 **8/8 红**且控制臂先绿，并**补上两个探针查出的缺口**（M8 补 stale-probe 用例；M7 量出根因是 `AlreadyExists` 而 `NotADirectory` 是下游，故不是等价变异）；新增 8 个 `dead_code` 警告是本模块的调用方在 T-15，**登记为待验期望**（T-15 接线后应回到 4/10） |
 | T-12 | `rolling` writer（`Clock` 注入）：日期翻档、20MB 翻档、**单条截断标 `truncate=true original_size=<n>`**、按天删、按量删、当前文件永不删；命名 `desktop-YYYYMMDD-N.log`，`create_new` 抢名防多实例 | DONE | `evidence/task-12-desktop-rolling.md`；**116 tests OK**（78 → +38）；变异 **25/25 红**、控制行先绿，探针 sha256 核对还原（`c3301b6334b3` 与提交文本一致）；**探针查出并补齐两个缺口**：M13 第一版**编不过**（NO-COMPILE 不算守住，换成可编译的等价变异才红）、M23「翻档记住自己翻过谁」**原本无用例**（补 20B 单文件 + 30B 总量那条才红）；两处 clippy 真意见当场改掉；警告 12 → **43** / clippy 18 → **48**，增量全是本模块 `dead_code`（调用方在 T-15），**T-15 的待验期望据此更新为 43→4 / 48→10**；**如实登记一处未覆盖**：跨午夜的第二个实例（其活文件日期是昨天 ⇒ 会被按天删） |
-| T-13 | Desktop 后端装配 + target 白名单（默认 `OFF`，`const OWNED_TARGETS` 枚举断言；`agent.supervisor` 永不比 INFO 更严）+ 格式 + 脱敏 | TODO | 外来 target 不入文件 / 自有 target 入文件（两向）；落盘后 grep 不到 token |
+| T-13 | Desktop 后端装配 + target 白名单（默认 `OFF`，`const OWNED_TARGETS` 枚举断言；`agent.supervisor` 永不比 INFO 更严）+ 格式 + 脱敏 | DONE | `evidence/task-13-desktop-backend.md`；三个新模块 `logging::{redact,targets,backend}`（`assemble` 返回而不安装，测试用线程局部注入）；掩码落在 **sink**（与 T-06 的 formatter 同一处「记录成形后、离开进程前」）；**与 Agent 的差分表 20 行实跑**：17 同 / 3 异，三处根因从 Agent 源码读出，**两处是真泄漏**（一行里第二个凭据、复数 `cookies:` 只掩第一个值）→ 登记 §7 **Q-07**（拟开 Agent 侧 T-20）；外来 target 不入 / 自有 target 入（两向 + 同条对照臂）、落盘后 grep 不到 token 且周围文本仍在、`agent.supervisor` 下限在规则层与 filter 层各一条；**变异 12/12 红**（控制行 76 passed 先绿，逐次 sha256 核对还原），补齐三个缺口（含我自己表测先抓到的一个真 bug）；**144 tests OK**（116 → +28）；build 43 → **93** / clippy 48 → **97**，+50 全是新模块 `dead_code`（`rolling` 的 −1 已查明＝`Date::{year,month,day}` 因 `backend::stamp` 变活）；`cargo fmt` 连带面如实登记（**本仓不是 rustfmt-clean 的**，重排 16 文件已按纯格式量过、备份后还原，全仓格式化不在本 Task） |
 | T-14 | Desktop `[logging]` 配置 + 校验 + 出货资源（非法级别、三个 0、总量小于单文件上限先红；报错只点名键不回显值） | TODO | `out_of_range_values_are_rejected` 先行红 |
 | T-15 | 接进 `main`（唯一入口）：插在 `bootstrap::resolve` 之后、启动摘要之前；**stderr 照旧**，目录不可写时仅 stderr 且仍启动 | TODO | 真实启动：stderr 与开发态日志文件里**都**有摘要 |
 | T-16 | 三个既有 emit 点改道（`main.rs:65`→`desktop.startup`；`drain.rs:158`→`agent.supervisor`；`commands/logging.rs` 先纯重命名 `commands/webview.rs` 单独 commit，再改走 logger `target=webview`）+ Agent 启停与健康检查补点 | TODO | `report_exit` 恰一条该 target 记录；50 行普通 sidecar 输出 → 零条 |
@@ -272,7 +276,8 @@
 
 - [x] T-10 依赖；T-11 目录解析（**这两项已 DONE**）
 - [x] T-12 rolling（**已 DONE**）
-- [ ] T-13 装配/白名单/脱敏；T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id
+- [x] T-13 装配/白名单/脱敏（**已 DONE**）
+- [ ] T-14 配置；T-15 main；T-16 改道与补点；T-17 operation_id
 - [ ] 入口文档回写（T-18）；`.gitignore` 补 `.local/` **已在 T-11 完成**
 
 ### wt-media-cloud
@@ -289,7 +294,7 @@
 | AC-04 | 日志不会无限增长（裁定十三·4） | Agent 侧已成立：20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，六个界各一次变异；真机两臂 8/8。**总量口径**：`total_bytes` 在轮转/启动点强制，真实上界 `total_bytes + 3×max_bytes`（出厂 400MB + 60MB），是有界而非逐字节精确（T-07）；Desktop 侧待 T-12 | 部分（T-07 Agent 半） |
 | AC-05 | 日志目录异常不阻断启动（裁定十三·5） | Agent 侧已成立：`configure_from` 降级仅 stderr 且既有单测绿（T-03）；Desktop 侧待 T-15 | 部分（T-03） |
 | AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由已在真实进程两侧证实（T-04）；`error.log` 五字段已在真实任务上证实、`context` 通道就绪但**今日无生产点**（T-05）；`agent.supervisor` 待 T-16 | 部分（T-04/T-05） |
-| AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧已成立：表驱动 15 行两列断言、落盘后读文件断言 token 不在、traceback 面同覆盖（T-06）；Desktop 侧（target 白名单 + 落盘 grep）待 T-13 | 部分（T-06） |
+| AC-07 | 日志不泄露敏感信息（裁定十三·7） | Agent 侧已成立：表驱动 15 行两列断言、落盘后读文件断言 token 不在、traceback 面同覆盖（T-06）；**但 T-13 的差分表实测出 Agent 侧还剩两处真泄漏**（一行里第二个凭据、复数 `cookies:` 只掩第一个值）→ §7 **Q-07**，DONE 前必须落地。Desktop 侧已成立到模块层：target 白名单（外来 target 有对照臂地不入文件）、含 token 的记录走完 sink 后 grep 不到且周围文本仍在（T-13）；真实启动的落盘取证待 T-15 | 部分（T-06/T-13） |
 | AC-08 | Desktop 与 Agent 日志职责清晰（裁定十三·8） | 两向断言：**该进的不进 = 失败**（T-04/T-16） | TODO |
 | AC-09 | Sidecar stdout 持续消费且**不转存**（裁定十三·9） | 50 行普通 sidecar 输出 → **零**条 desktop 记录（阳性对照）（T-16） | TODO |
 | AC-10 | 敏感信息不进诊断包（成功事实 #5 后半） | **实测到一处真泄漏并修**：`environment_facts` 的 `cloud_base_url` 原样带密码（`True → False`，URL 仍可读）且走 `print`→stdout（T-06）；`/api/v1/health` 响应面已量（T-08 真机两臂：体里只有 `agent_version`/`agent_status` 与三个依赖的状态词，**没有** `cloud_base_url` 本身、没有 token）；`status` 响应体本 Task **未测**（契约面，已登记） | 部分（T-06/T-08） |
@@ -319,6 +324,7 @@
 - `evidence/task-10-desktop-deps.md`（T-10）
 - `evidence/task-11-desktop-log-paths.md`（T-11）
 - `evidence/task-12-desktop-rolling.md`（T-12）
+- `evidence/task-13-desktop-backend.md`（T-13）
 - `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
@@ -363,21 +369,37 @@ Completed:
   R11 第一版误报 `bootstrap/cloud.py` 引纯函数 `redact`（会误报在跑的代码的规则活不长）；
   新写的 `serve` 用例第一版**真的去 bind 8765**（dev Agent 端口），改为读签名。
 
+- 2026-09-24 T-10：Desktop 引入 `tracing` + `tracing-subscriber`（`wt-media-desktop` `5194d49`）——
+  依赖树 267 → 271（+4 具名、移除 0），阻塞根因是本机直连 crates.io 证书被劫持（经代理仍是官方后端）。
+- 2026-09-24 T-11：Desktop 日志目录解析（`wt-media-desktop` `f1edae6`）——`logging::paths`，变异 8/8 红。
+- 2026-09-24 T-12：Desktop `rolling` writer（`wt-media-desktop` `66f8f02`）——四条界 + `Writer`，变异 25/25 红。
+- 2026-09-24 T-13：Desktop 后端装配 + 白名单 + 格式 + 脱敏（`wt-media-desktop`，本 Task 的提交）——
+  `logging::{redact,targets,backend}`；与 Agent 的差分表 20 行实测出 Agent 侧两处真泄漏（§7 Q-07）；
+  变异 12/12 红；144 tests OK。
+
 Current:
 
-- T-19 已收尾（一个 Agent 提交 + 本记录）；**阶段 1（Agent 半）T-02…T-09 + T-19 全部完成**。
+- T-13 已收尾（一个 Desktop 提交 + 本记录）；**阶段 2（Desktop 半）T-10…T-13 完成**，下一个是 **T-14**。
 
 Next:
 
-- **阶段 2（Desktop 半）T-10…T-17**，从 T-10 引依赖开始（该 Task 明示无「先失败的测试」，
-  证据是 `cargo tree` 前后对比 + 下载清单具名 + 起点 68 条仍绿）；最后阶段 3 T-18 回写与收尾。
+- **阶段 2 余项 T-14…T-17**：T-14 `[logging]` 配置 + 校验 + 出货资源（先红：非法级别、三个 0、总量小于单文件上限），
+  T-15 接进 `main`（唯一入口，摘要成为 desktop.log 第一条记录；stderr 照旧），T-16 三个既有 emit 点改道 + 生命周期补点
+  （`commands/logging.rs` → `commands/webview.rs` 的**纯重命名单独一个 commit**），T-17 进程内 `operation_id`
+  （不发 `X-Operation-Id`、出站头逐字相同）；最后阶段 3 T-18 回写与收尾。
 
 Blockers:
 
-- None。§7 的 Q-01…Q-05 均 `Blocking = NO`，已按读数实施。
+- None。§7 的 Q-01…Q-07 均 `Blocking = NO`，已按读数实施或登记。
+  **但 Q-07（Agent 侧脱敏的两处真泄漏）在 DONE Gate 前必须落地**，拟开 Agent 侧 T-20，等你一句话。
 
 Recent verification:
 
+- T-13：`cargo test --workspace` → **144 passed; 0 failed**（116 → +28），`logging::` 过滤 76 passed（144 − 76 = 68 = 起点）；
+  build 93 / clippy 97（+50 全是新模块 `dead_code`，逐文件核对；`rolling` 的 −1 已查明＝`Date::{year,month,day}` 因
+  `backend::stamp` 变活）；**变异 12/12 红**、控制行先绿、逐次 sha256 核对还原；
+  **差分表 20 行实跑** Agent vs Desktop（17 同 / 3 异，三处根因从 Agent 源码读出）。
+  见 `evidence/task-13-desktop-backend.md`。
 - 全套 `bash scripts/test.sh` → **320 tests OK，exit=0**（253 → … → 293 → 320，只增不减）；
   T-02 的 `.local/` 守卫全程不响，`--- Logging error ---` 0 条。
 - T-07：六个界各做一次实现变异，**各自打掉自己的用例**（探针先跑未变异对照行）；

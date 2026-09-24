@@ -132,6 +132,21 @@
   故判据只能是结构性的 R11，不能声称有行为差异。
   见 `evidence/task-09-single-entry.md`。
 
+- 2026-09-24 T-13：**Desktop 后端装配 + target 白名单 + 单行格式 + 脱敏**（`wt-media-desktop`，本 Task 的提交）——
+  三个新模块：`logging::redact`（手写扫描器，**零依赖**，次序 `keyed → userinfo → bearer → jwt → known`）、
+  `logging::targets`（`OWNED_TARGETS` 3 个 + `SUPERVISION_TARGET` 的 INFO 下限 + `Levels::filter()` 默认 `OFF`）、
+  `logging::backend`（`assemble` 装配 `Registry` + 文件/终端两个 layer，**返回而不安装**，测试用线程局部注入）。
+  **掩码点选在 sink**（成品行 → writer 的唯一收口），与 T-06 在 Agent 侧实测出的教训同一处：
+  `Filter` 改不到 traceback。**与 Agent 的差分表 20 行实跑**：17 行逐字相同、3 行不同，
+  三处根因都从 Agent 自己的代码读出——其中 **#13（一行里第二个凭据不掩）与 #16（复数 `cookies:` 只掩第一个值）
+  是真泄漏**，登记为 **Q-08**（Agent 侧独立 Task，等你一句话）。
+  变异 **12/12 红**，控制行先绿；探针查出并补齐三个缺口（其中 M2 是我自己表测先抓到的真 bug：
+  值的尾巴被打印两遍）。`cargo fmt` 连带面如实登记：**本仓不是 rustfmt-clean 的**（重排 16 个文件），
+  已逐文件量过是纯格式、备份成 patch + `stash@{0}` 后还原，全仓格式化不在本 Task。
+  测试 116 → **144**；build 43 → **93** / clippy 48 → **97**（+50 全是新模块 `dead_code`；
+  `rolling` 的 **−1** 已查明＝`Date::{year,month,day}` 因 `backend::stamp` 变活）。
+  见 `evidence/task-13-desktop-backend.md`。
+
 - 2026-09-24 T-12：**Desktop 日志文件的有界读写**（`wt-media-desktop` `66f8f02`）——`logging::rolling`：
   `date_of`/`fit`/`rotation`/`expired` 四条**纯规则**（`Clock` 注入）+ `Writer` 一处薄 IO（**永不 panic**）。
   裁定六的四条界（20MB / 14 天 / Desktop 100MB 总量 / 单条截断标记）与计划的五条逐条落成可单测的规则，
@@ -161,16 +176,21 @@
 
 ## Current
 
-- T-12 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-13**（后端装配 + target 白名单 + 格式 + 脱敏）。
+- T-13 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-14**（`[logging]` 配置 + 校验 + 出货资源）。
 
 ## Next
 
-- **T-13**：Desktop 后端装配（`tracing-subscriber`）+ target 白名单（默认 `OFF`；`const OWNED_TARGETS`
-  枚举断言逐个可用）+ 记录格式 + 脱敏。两向断言：外来 target 不入文件、自有 target 入文件；
-  含 token 的记录落盘后 grep 不到且周围文本仍在。`agent.supervisor` 永不比 INFO 更严。
-  之后 T-14 → … → T-17，然后阶段 3 T-18。
-- **T-15 待验的期望**（T-11 登记、T-12 更新）：接线完成后 `cargo build` 条目级警告应从 **43** 回到 **4**、
-  clippy `--all-targets` 从 **48** 回到 **10**。不降即说明模块没被真正接上。
+- **T-14**：`[logging]` 配置 + 校验 + `resources/desktop.production.toml`。**先红**：非法级别、
+  单文件上限 0、保留天数 0、总量 0、**总量小于单文件上限**；每个配置结构都是 `#[serde(deny_unknown_fields)]`
+  且**不能**带 `#[serde(default)]`；报错**只点名键、绝不回显值**。
+- **T-15**：接进 `main`（`bootstrap::resolve` 之后、启动摘要之前，使摘要成为 desktop.log 的第一条记录），
+  始终挂一个 stderr writer。之后 T-16 → T-17，然后阶段 3 T-18。
+- **Q-08 待你裁定**（`Blocking = NO`，但 DONE Gate 前必须落地）：Agent 侧脱敏实测出两处真泄漏
+  （一行里第二个凭据不掩；复数 `cookies:` 键只掩第一个值），另有第三处（JSON 键的闭引号被吃掉，
+  行不再合法）。T-06 已提交，拟开 Agent 侧独立 Task（T-20，自己的 commit + evidence + 变异），
+  **等你一句话**再动 Agent 仓。见 `evidence/task-13-desktop-backend.md` §2/§7。
+- **T-15 待验的期望**（T-11 登记、T-12 更新，T-13 再更新）：接线完成后 `cargo build` 条目级警告应从 **93**
+  回到 **4**、clippy `--all-targets` 从 **97** 回到 **10**。不降即说明模块没被真正接上。
   （计数法：`touch src/main.rs` 后 `cargo build 2>&1 | grep -cE '^warning: [a-z]'`，clippy 同理。）
 - **访问 crates.io 必须带 `HTTPS_PROXY=http://127.0.0.1:7897`**（T-10 查明的根因：本机直连的证书被劫持）。
 - **T-09 新增一项**（T-07 顺带实测）：`python -m wt_media_agent.local_api.server` 使 `getLogger(__name__)`
@@ -198,6 +218,17 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
 ## Recent verification
+
+- T-13：`cargo test --workspace` → **144 passed; 0 failed**（116 → +28：redact 8 / targets 8 / backend 12；
+  `logging::` 过滤 **76 passed**，144 − 76 = 68 = 起点）；`cargo build` 条目级警告 **43 → 93**、
+  clippy `--all-targets` **48 → 97**，增量逐文件核对（redact 32 + backend 13 + targets 5 = +50，别的文件 0 增），
+  且 `97 − 93 = 4` 条非 `dead_code` 全是既有项（account ×2、main ×1、drain ×1）——**新模块里 0 条真 lint**。
+  那 **−1**（`rolling` 32 → 31）**已查明根因**：临时撤掉 `logging/mod.rs` 的三行 `pub mod` 复现出 T-12 状态
+  （build **43** / clippy **48**，与 T-12 证据逐字一致），差的那条是 `` Date::{year, month, day} is never used ``
+  ——`backend::stamp` 用了它，正好是「后端真的接上了 `rolling`」的独立证据。
+  变异 **12/12 红**（控制行 76 passed 先绿，每次还原都 sha256 核对）；
+  差分表 **20 行实跑**（Agent vs Desktop，17 同 / 3 异，三处根因都从 Agent 源码读出）。
+  见 `evidence/task-13-desktop-backend.md`。
 
 - T-12：`cargo test --workspace` → **116 passed; 0 failed**（78 → +38）；`cargo build` 条目级警告
   **12 → 43**、clippy `--all-targets` **18 → 48**，增量**全是 `rolling.rs` 的 `dead_code`**（逐文件核对：
