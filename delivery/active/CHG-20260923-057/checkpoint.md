@@ -28,13 +28,21 @@
   全套 **267 tests OK**；**四次真实启动**取证，臂 D 一次给出三条两向证据（真实 traceback 只在 agent.log；
   error.log 收到同一 ERROR 但无栈；非 runner 的 ERROR 不进 task.log）。
 
+- 2026-09-24 T-05：`error.log` **结构化字段通道**（`wt-media-agent`，本次提交）——`error_code=` 必现
+  （缺省 `none`）、`task_id=`/`context=` 有则现；`_field()` 把值的换行转义，保住「一行一记录」。
+  **计划写定的机制被实测推翻**：`setLogRecordFactory` 预置字段会让 `Logger.makeRecord` 拒绝
+  `extra={"error_code": …}`（KeyError），两半不可共存 ⇒ 缺省改放 formatter，并把该碰撞写成测试。
+  `runner.py` **9 个** task-scoped emit 点加 `extra={"task_id"}`（计划写 8，实测分母 9），3 处配已存在的码；
+  `task_id` **仍留在消息里**。全套 **278 tests OK**；两次真实启动：臂 A 真实任务失败在 `error.log`
+  按 `error_code`/`task_id` 定位（字段命中 1/0/0），臂 B 未注册类型的 WARNING 不进 `error.log`。
+
 ## Current
 
-- T-05 待开始（`error.log` 的结构化字段通道：`error_code`/`task_id`/`context`）。
+- T-06 待开始（脱敏 Filter：表驱动，含 Cookie/Authorization/Bearer/proxy_password/本机 runtime token 逐字值 + 配置对象脱敏 `__repr__`）。
 
 ## Next
 
-- 阶段 1 Agent：T-05 → T-06 → T-07 → T-08 → T-09（T-02/T-03/T-04 已完成）。
+- 阶段 1 Agent：T-06 → T-07 → T-08 → T-09（T-02/T-03/T-04/T-05 已完成）。
 - **T-08 的题设要重测**：实测 BitBrowser 指向死端口时 `/api/v1/status` **已返回 200 + `unreachable`**，
   不能假设外部依赖不可用会抛。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
@@ -62,6 +70,12 @@
   真实启动：`curl /healthz` 200、`.local/logs/agent.log` 114 字节含监听记录、stderr 同时有同一条；
   对照臂同启动下 `.local/logs/` 是**空目录**（同时实测坐实了 §4 那条「dev 的 `.local/logs` 是空的」起点读数）。
   见 `evidence/task-03-dev-writes-logs.md`。
+- T-05：`bash scripts/test.sh` → **278 tests OK，exit=0**（267 → 278，+11，正反成对）；
+  **设计前提先实测**：`factory 预置 error_code` + `extra={"error_code":…}` → `KeyError "Attempt to overwrite …"`
+  ⇒ 缺省改放 formatter（该碰撞有专门测试）。真实启动两臂（scratch Cloud 17901，`/tmp` 工作树副本）——
+  臂 A 真实 `cookie_read_task` 失败：`error.log` 得 `error_code=executor_error task_id=t05-real-1`，
+  字段命中分母 `error.log 1 / agent.log 0 / task.log 0`；臂 B 未注册类型：WARNING 进 `agent.log`、
+  `error.log` **0 字节**。见 `evidence/task-05-error-fields.md`。
 - T-04：`bash scripts/test.sh` → **267 tests OK，exit=0**（259 → 267，+8，两向成对）；
   真实启动四臂（A 常规 / B DEBUG+死 Cloud / C 自建 scratch Cloud 回 11001 / D 不可解析 URL）——
   臂 D：`agent.log` 2406 字节含 `Traceback … ValueError: Invalid IPv6 URL`、`error.log` 101 字节**同一个
