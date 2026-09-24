@@ -17,14 +17,19 @@
   **先量后改**：实测今天本机与干净克隆都不写 `.local/`，故本 Task 的定位是 **T-03 之前的守卫**，不是修当下泄漏。
   顺带查出 AC-11 被计划高估——「不误连真实外部服务」那半今天**无规则在守**，已拆为 AC-11b 并新增 **T-19**（§7 Q-05）。
 
+- 2026-09-24 T-03：Agent dev/override **真落盘**（`wt-media-agent` `2f07db4`）——`default_log_file` 恒为
+  `<logs_dir>/agent.log`（**一行行为**；`logging.py` 零改动，因为 file 分支一直存在、只是永不可达）。
+  先红 7 处 → 全套 **259 OK**；真实 dev 启动（临时树 + scratch 端口 18765）→ `agent.log` 114 字节非空，
+  **对照臂**（仅回退那一行）同启动下**无该文件**，坐实归因。顺带完成 T-09 ①（已假注释随 docstring 重写删除）。
+
 ## Current
 
-- T-03 待开始（Agent dev/override 真落盘，推翻 `paths.py:107`）。T-02 已使这一步安全。
+- T-04 待开始（Agent 三文件布局 `agent.log`/`task.log`/`error.log` + 两向路由断言）。
 
 ## Next
 
-- 阶段 1 Agent：T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09（T-02 已完成，是它们的**前置**：
-  否则 T-03 让 dev 真落盘后，测试会写进真实检出目录 `.local/`）。
+- 阶段 1 Agent：T-04 → T-05 → T-06 → T-07 → T-08 → T-09（T-02/T-03 已完成：T-02 是前置守卫，
+  T-03 已让 dev 真的写盘，此后测试解析到真实检出会被 T-02 的规则与守卫拦下）。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
@@ -45,6 +50,11 @@
   （`test_storage_migration_paths.py:46`）；阳性对照两处实跑出红（规则内正则；端到端探针模块报出
   `test_zz_probe_forbidden.py:3`）；变异探针下 `scripts/test.sh` `exit=1` 点名路径**而套件打印 `OK`**
   ⇒ 守卫独立于测试结果。见 `evidence/task-02-isolation.md`。
+- T-03：`bash scripts/test.sh` → **259 tests OK，exit=0**；**T-02 的规则当场命中了我自己的 T-03 新代码**
+  （`test_runtime_logging.py` 里 `<标识符> / ".local"`，1 处）——**未放宽规则**，改测试为经由 `cfg.paths` 断言。
+  真实启动：`curl /healthz` 200、`.local/logs/agent.log` 114 字节含监听记录、stderr 同时有同一条；
+  对照臂同启动下 `.local/logs/` 是**空目录**（同时实测坐实了 §4 那条「dev 的 `.local/logs` 是空的」起点读数）。
+  见 `evidence/task-03-dev-writes-logs.md`。
 
 ## 执行期间的边界（不得越界）
 

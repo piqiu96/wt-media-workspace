@@ -92,9 +92,10 @@
   （`not_found` / `bitbrowser_identity_unverifiable` / `bitbrowser_response_error`，**无 Python 引用**）、
   DB 列 `error_code TEXT DEFAULT NULL`（`storage/migration.py:55/:69`）、以及 `runner.py:182` 一处硬编码
   `cp.error_code = "executor_error"` 与 `:109` `"no_executor"`、`:124` `"session_invalidated_result_uncertain"`。
-- **dev 今天不写日志文件**：`paths.py:107` `return "" if self.origin in {"dev","override"} else str(self.logs_dir / "agent.log")`
+- **（起点读数，T-03 已推翻，见 §8）dev 不写日志文件**：`paths.py:107` `return "" if self.origin in {"dev","override"} else str(self.logs_dir / "agent.log")`
   ⇒ 开发态只走 stderr。磁盘实证：`.local/data/local-agent.sqlite3`（36864 字节）与 `.local/data/versions/` 存在，
-  **`.local/logs/` 是空的**。
+  **`.local/logs/` 是空的**。T-03 已改为恒写 `<logs_dir>/agent.log`；上面这条留着是为了记住**起点**，
+  不是当前行为。当时是推断的那半（「目录空」）已在 T-03 的**对照臂**里实测坐实。
 
 ### 4.4 初始化与隔离的既有缺陷（本 CHG 修）
 
@@ -215,13 +216,13 @@
 |---|---|---|---|
 | T-01 | 建 active 记录并激活（本文件、`checkpoint.md`、`evidence/`、`status/`），LEDGER 加表行，`planned/README.md` B 行改 ACTIVE，快照再生成，两验证器绿 | DONE | `verify_agent_entry.py` + `verify_delivery_governance.py` |
 | T-02 | Agent 测试目录隔离（§5.13）：落「不得把检出当运行时目录」的规则 + `scripts/test.sh` 守卫；修 `tests/test_storage_migration_paths.py:46` 对真实检出目录的断言；落隔离助手 `isolated_paths()` | DONE | `evidence/task-02-isolation.md`；改前恰好 1 处命中（红），改后 259 tests OK |
-| T-03 | Agent dev/override **真落盘**（推翻 `paths.py:107`）；同步删 `config/agent.toml:57`、`config_online/agent.toml:54` 的已假注释 | TODO | dev 启动后 `.local/logs/` 非空 |
+| T-03 | Agent dev/override **真落盘**（推翻 `paths.py:107`，一行行为）；同步删 `config/agent.toml`、`config_online/agent.toml` 的已假注释 | DONE | `evidence/task-03-dev-writes-logs.md`；改前 7 处红；真实 dev 启动 → `agent.log` 114 字节非空，**对照臂无该文件** |
 | T-04 | Agent 三文件布局 + 路由（`agent.log` 全量含 traceback / `task.log` 仅 `wt_media_agent.runner.*` / `error.log` ERROR 级不带 traceback） | TODO | 两向断言：该进的不进 = 失败 |
 | T-05 | `error.log` 结构化字段通道（`error_code`/`task_id`/`context`，`setLogRecordFactory` 缺省 `None` + `extra={}` 约定；`task_id` 在 `runner.py` 的 emit 点由文本插值改为 `extra`） | TODO | 有 `extra` 出字段、无 `extra` 不抛 |
 | T-06 | Agent 脱敏 Filter（表驱动：`Cookie:`/`Authorization:`/`Bearer`/`proxy_password=`/`password=`/`refresh_token=`/本机 runtime token 逐字值；脱敏后周围文本仍在）+ 配置对象脱敏 `__repr__` | TODO | 表里先放今天会漏的用例 → 红 |
 | T-07 | Agent 保留与轮转：单文件 20MB、14 天、总量上限、**单条截断标 `truncate=true original_size=<n>`** | TODO | 六向变异：日期翻档/20MB 翻档/截断/按天删/按量删/当前文件永不删 |
 | T-08 | `GET /api/v1/health` 聚合健康检查（Cloud/BitBrowser/Storage 各一例不可用 → 200 + `abnormal`/`unknown` 不抛）+ 契约同步；`/healthz` 逐字不变 | TODO | scratch 端口 curl；`/healthz` 与今天逐字比对 |
-| T-09 | 修既有缺陷并锁死唯一入口：①`paths.py:104-106` 已假注释；②删 `server.py:38`/`:591` 第二次 `configure_from`；③`server.py:65` `state` 改必传；④**新增 AST 边界测试**：`src/` 内除 `bootstrap/app.py` 外不得 import `configure_from`/`configure_logging`（**今天就会红**） | TODO | 新 AST 测试先红后绿 |
+| T-09 | 修既有缺陷并锁死唯一入口：~~①`paths.py:104-106` 已假注释~~（**T-03 已随 docstring 重写完成**）；②删 `server.py:38`/`:591` 第二次 `configure_from`；③`server.py:65` `state` 改必传；④**新增 AST 边界测试**：`src/` 内除 `bootstrap/app.py` 外不得 import `configure_from`/`configure_logging`（**今天就会红**） | TODO | 新 AST 测试先红后绿 |
 | T-10 | Desktop 引入 `tracing` + `tracing-subscriber`（**例外的无失败测试项**） | TODO | `cargo tree` 前后 + 下载清单具名 + 起点 68 仍绿；`cargo fetch` 失败即阻塞上报 |
 | T-11 | Desktop 日志目录解析（纯函数，`home`/`environment` 注入；Production → `~/Library/Logs/WTMedia/Desktop`，Development → `<manifest>/.local/logs`）+ `.gitignore` 补 `.local/` | TODO | 测试不解析真实 `$HOME`；不可写目录返回而非 panic |
 | T-12 | `rolling` writer（`Clock` 注入）：日期翻档、20MB 翻档、**单条截断标 `truncate=true original_size=<n>`**、按天删、按量删、当前文件永不删 | TODO | 六向变异，逐条 |
@@ -249,7 +250,8 @@
 
 ### wt-media-agent
 
-- [ ] T-02 测试隔离；T-03 dev 落盘；T-04 三文件路由；T-05 字段通道；T-06 脱敏；T-07 保留/轮转/截断；T-08 `/api/v1/health`；T-09 缺陷与唯一入口
+- [x] T-02 测试隔离；T-03 dev 落盘
+- [ ] T-04 三文件路由；T-05 字段通道；T-06 脱敏；T-07 保留/轮转/截断；T-08 `/api/v1/health`；T-09 缺陷与唯一入口；T-19 不误连外部服务
 - [ ] 入口文档回写（`AGENTS.md`/`DIRECTORY_MAP.md`/`AGENT-INDEX.md`）（T-18）
 
 ### wt-media-desktop
@@ -265,11 +267,11 @@
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | Agent 脱离 Desktop 可独立运行并产生日志（裁定十三·1） | scratch 端口独立启动，`.local/logs/` 三文件非空（T-03/T-04） | TODO |
+| AC-01 | Agent 脱离 Desktop 可独立运行并产生日志（裁定十三·1） | scratch 端口独立启动 ✓ + `agent.log` 非空 ✓（T-03，含对照臂）；**三文件待 T-04** | 部分（T-03） |
 | AC-02 | Desktop 正式启动产生自身日志（裁定十三·2） | 真实启动后读 `desktop.log` 首条记录为启动摘要（T-15） | TODO |
 | AC-03 | Config/Logger **只初始化一次**（裁定十三·3） | 新增 AST 边界测试转绿；出站头集合逐字相同（T-09/T-17） | TODO |
 | AC-04 | 日志不会无限增长（裁定十三·4） | 20MB 翻档 + 14 天删除 + 总量删除 + 单条截断，逐条变异（T-07/T-12） | TODO |
-| AC-05 | 日志目录异常不阻断启动（裁定十三·5） | 不可写目录 → stderr 兜底 → 仍启动（T-03/T-15） | TODO |
+| AC-05 | 日志目录异常不阻断启动（裁定十三·5） | Agent 侧已成立：`configure_from` 降级仅 stderr 且既有单测绿（T-03）；Desktop 侧待 T-15 | 部分（T-03） |
 | AC-06 | 日志可定位问题（裁定十三·6） | 三文件路由 + `error.log` 五字段 + `agent.supervisor` 记录（T-04/T-05/T-16） | TODO |
 | AC-07 | 日志不泄露敏感信息（裁定十三·7） | 表驱动脱敏 + 落盘后 grep 不到 token（T-06/T-13） | TODO |
 | AC-08 | Desktop 与 Agent 日志职责清晰（裁定十三·8） | 两向断言：**该进的不进 = 失败**（T-04/T-16） | TODO |
@@ -290,6 +292,7 @@
 
 - `evidence/task-01-governance.md`（T-01）
 - `evidence/task-02-isolation.md`（T-02）
+- `evidence/task-03-dev-writes-logs.md`（T-03）
 - `evidence/task-XX-<topic>.md`（T-03…T-19 每项一份）
 - `evidence/test-summary.md`、`evidence/manual-verification.md`（收尾汇总）
 
