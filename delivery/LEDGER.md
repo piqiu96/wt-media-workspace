@@ -6,8 +6,9 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260923-057 | 联合工程优化 B——Paths、Logger 和运行目录 | IMPLEMENTING | wt-media-agent、wt-media-desktop、wt-media-workspace |
 
-No active M/L CHG（2026-09-24：CHG-20260924-060 关闭归档后，active 名额为空）。
+[CHG-20260923-057](active/CHG-20260923-057/change.md)（联合工程优化 B——Paths、Logger 和运行目录）于 **2026-09-24 激活为 `IMPLEMENTING`**，Level M，锚定 [M-launch-engineering](milestones/M-launch-engineering.md) **成功事实 #5**。跨 `wt-media-agent`（T-02…T-09）、`wt-media-desktop`（T-10…T-17）与治理仓（T-01/T-18）。权威是用户 2026-09-24《CHG-057 日志治理裁定补充说明》十三节：Agent 保持 `agent.log`/`task.log`/`error.log` **三文件纯文本**（**不采纳 CHG-053 草案的「三个 JSON 日志文件」**）、Desktop 用官方 `tracing` + `tracing-subscriber` 后端且**不留自写降级路径**、单文件 20MB / 保留 14 天 / 总容量受限 / **单条超限截断并标 `truncate=true original_size=<n>`**、Config 与 Logger **各只初始化一次**、目录不可写降级 stderr 且**不阻断启动**。**本 CHG 明确不交付跨端 `operation_id`**：Desktop **不发** `X-Operation-Id`、Agent **不消费**该头（裁定九），两端只做进程内关联。§4 记录了与草案预想**实质不同**的实测起点——Agent 运行目录与 sidecar 持续消费**已由 A 完成**，Desktop 日志**从零**，`AppPaths` 在 A 的交付里**不存在**，Agent dev 因 `paths.py:107` **今天不写任何日志文件**。
 
 [CHG-20260924-060](completed/CHG-20260924-060/change.md)（CHG-056 归档遗留的 CSP `ipc:`、回环代理与占位包处置）已于 2026-09-24 关闭归档为 `DONE`。Level S，承载用户 2026-09-24 对 CHG-056 §12 四项待裁定的裁定：①生产 CSP 的 `connect-src` **加** `ipc:`（取值是 `ipc: http://ipc.localhost http://127.0.0.1:18080`，**不是裸 `ipc:`**——`ipc:` 是 scheme-source，而 macOS 上 Tauri 的 IPC fetch 目标是 `http://ipc.localhost`；真实启动判据 `ipc://` 拒绝数 **3 → 0**）；②回环目标**禁用**系统代理、远程 Cloud 保留（`reqwest` 无「系统代理但排除这些主机」的表达，故拆两个 client 按 URL 选）；③删 `modes/`+`generated/` 占位包（**基线无需回写**——§5.2 `:1040` 早已明写不保留它们，是代码一直没跟上）；④开发者 Cloud 上被误建的惰性 `noop_task` **暂时不处置，只登记**。§13 DONE Gate 九项逐项签字；desktop **68 passed / 0 failed**（起点 63），agent **253 tests OK**（与删包前一致）。**一处判据被实测否证并如实降级**：AC-08 原拟用 20× 循环证明既有超时测试「由不确定变确定」，实测改动前后各 20/20 绿、该循环区分不了两个 client，故按该条自己的规则记为「对照无效」而非通过；「绕过存在」改由变异对照承载（删掉 `.no_proxy()` 后红了 2 条）。连带修补 CHG-056 归档中一个**被六处引用但未入库**的证据 `ac05-run5.log`。
 
