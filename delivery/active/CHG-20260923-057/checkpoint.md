@@ -22,14 +22,21 @@
   先红 7 处 → 全套 **259 OK**；真实 dev 启动（临时树 + scratch 端口 18765）→ `agent.log` 114 字节非空，
   **对照臂**（仅回退那一行）同启动下**无该文件**，坐实归因。顺带完成 T-09 ①（已假注释随 docstring 重写删除）。
 
+- 2026-09-24 T-04：Agent **三文件布局与路由**（`wt-media-agent` `305975b`）——`agent.log` 全量且唯一含
+  traceback、`task.log` 只收 `wt_media_agent.runner.*`（点边界）、`error.log` 只收 ERROR 且不带 traceback。
+  `NoTracebackFormatter` **格式化副本**而非改记录（记录是共享对象、`exc_text` 会被缓存，有专门测试复现该陷阱）。
+  全套 **267 tests OK**；**四次真实启动**取证，臂 D 一次给出三条两向证据（真实 traceback 只在 agent.log；
+  error.log 收到同一 ERROR 但无栈；非 runner 的 ERROR 不进 task.log）。
+
 ## Current
 
-- T-04 待开始（Agent 三文件布局 `agent.log`/`task.log`/`error.log` + 两向路由断言）。
+- T-05 待开始（`error.log` 的结构化字段通道：`error_code`/`task_id`/`context`）。
 
 ## Next
 
-- 阶段 1 Agent：T-04 → T-05 → T-06 → T-07 → T-08 → T-09（T-02/T-03 已完成：T-02 是前置守卫，
-  T-03 已让 dev 真的写盘，此后测试解析到真实检出会被 T-02 的规则与守卫拦下）。
+- 阶段 1 Agent：T-05 → T-06 → T-07 → T-08 → T-09（T-02/T-03/T-04 已完成）。
+- **T-08 的题设要重测**：实测 BitBrowser 指向死端口时 `/api/v1/status` **已返回 200 + `unreachable`**，
+  不能假设外部依赖不可用会抛。
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
@@ -55,6 +62,10 @@
   真实启动：`curl /healthz` 200、`.local/logs/agent.log` 114 字节含监听记录、stderr 同时有同一条；
   对照臂同启动下 `.local/logs/` 是**空目录**（同时实测坐实了 §4 那条「dev 的 `.local/logs` 是空的」起点读数）。
   见 `evidence/task-03-dev-writes-logs.md`。
+- T-04：`bash scripts/test.sh` → **267 tests OK，exit=0**（259 → 267，+8，两向成对）；
+  真实启动四臂（A 常规 / B DEBUG+死 Cloud / C 自建 scratch Cloud 回 11001 / D 不可解析 URL）——
+  臂 D：`agent.log` 2406 字节含 `Traceback … ValueError: Invalid IPv6 URL`、`error.log` 101 字节**同一个
+  ERROR 但无 traceback**、`task.log` **0 字节**（非 runner 的 ERROR 不进）。见 `evidence/task-04-three-files-routing.md`。
 
 ## 执行期间的边界（不得越界）
 
