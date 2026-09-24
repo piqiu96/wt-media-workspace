@@ -1,0 +1,67 @@
+shipped config: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/resources/desktop.production.toml
+  csp_connect_src = 'ipc: http://ipc.localhost http://127.0.0.1:18080'
+  pre-change value = 'http://127.0.0.1:18080'
+
+==============================================================================
+BUILD: the probe page, embedded as the app's frontend
+==============================================================================
+  TAURI_CONFIG={"build": {"devUrl": null, "frontendDist": "/tmp/wt-ac05/probe"}}
+  cargo build -> exit=0 in 6.9s
+
+==============================================================================
+S1-shipped-value  (csp_connect_src = ipc: http://ipc.localhost http://127.0.0.1:18080)
+==============================================================================
+  config      /tmp/wt-ac05/S1-shipped-value/desktop.toml
+  agent port  53070 (8765 belongs to the developer's own Agent — untouched)
+  data dir    /tmp/wt-ac05/S1-shipped-value/agent-data
+  fallback    file=False env=set sidecar_beside_exe=False
+  launched    pid=32452
+  desktop stderr: [wt-media-desktop] 配置来自环境变量指定的文件
+  reports: ['Boot', 'PublicConfig', 'CspFetchCloud', 'Violation', 'CspFetchLoopback', 'AgentStart', 'AgentHealth', 'Done']
+  Boot: {'internals': True, 'href': 'tauri://localhost', 'origin': 'tauri://localhost'}
+  get_public_config -> {'cloud_base_url': 'http://127.0.0.1:18080', 'local_agent_port': 53070, 'environment': 'development'}
+  ipc:// refusals  0 (Tauri's preferred transport)
+  fetch http://127.0.0.1:18080/healthz -> resolved refusals=0
+    no violation: the configured origin is allowed
+  fetch http://localhost:18080/healthz -> rejected refusals=1 (control: must be rejected in every leg, whatever the config says about the real origin)
+  local_agent_start -> ok=True value='started' error=None
+  local_agent_health -> ok=True body='{"status":"ok","service":"wt-media-agent","mode":"m1"}' attempts=1
+  listener    pid=32467 bound=127.0.0.1:53070
+  child       ppid=32452 argv=python3 -m wt_media_agent.local_api.server
+    argv carries no token-shaped argument
+  /healthz    no token -> 401, wrong token -> 401, the Desktop's own client -> 200
+  data dir    ['local-agent.sqlite3', 'logs', 'versions']
+  desktop stopped (exit=-15, was running=True)
+  after stop: nothing listening on 53070
+
+==============================================================================
+S2-control-pre-change-value  (csp_connect_src = http://127.0.0.1:18080)
+==============================================================================
+  config      /tmp/wt-ac05/S2-control-pre-change-value/desktop.toml
+  agent port  53132 (8765 belongs to the developer's own Agent — untouched)
+  data dir    /tmp/wt-ac05/S2-control-pre-change-value/agent-data
+  fallback    file=False env=set sidecar_beside_exe=False
+  launched    pid=32473
+  desktop stderr: [wt-media-desktop] 配置来自环境变量指定的文件
+  reports: ['Boot', 'Violation', 'PublicConfig', 'Violation', 'Violation', 'CspFetchCloud', 'Violation', 'CspFetchLoopback', 'AgentStart', 'AgentHealth', 'Done']
+  Boot: {'internals': True, 'href': 'tauri://localhost', 'origin': 'tauri://localhost'}
+  get_public_config -> {'cloud_base_url': 'http://127.0.0.1:18080', 'local_agent_port': 53132, 'environment': 'development'}
+  ipc:// refusals  3 (Tauri's preferred transport)
+    refused: ipc://localhost/get_public_config
+    refused: ipc://localhost/log_js_error
+    (registered finding: connect-src does not list ipc:, so Tauri falls back to postMessage for every later command)
+  fetch http://127.0.0.1:18080/healthz -> resolved refusals=0
+    no violation: the configured origin is allowed
+  fetch http://localhost:18080/healthz -> rejected refusals=1 (control: must be rejected in every leg, whatever the config says about the real origin)
+  local_agent_start -> ok=True value='started' error=None
+  local_agent_health -> ok=True body='{"status":"ok","service":"wt-media-agent","mode":"m1"}' attempts=1
+  listener    pid=32479 bound=127.0.0.1:53132
+  child       ppid=32473 argv=python3 -m wt_media_agent.local_api.server
+    argv carries no token-shaped argument
+  /healthz    no token -> 401, wrong token -> 401, the Desktop's own client -> 200
+  data dir    ['local-agent.sqlite3', 'logs', 'versions']
+  desktop stopped (exit=-15, was running=True)
+  after stop: nothing listening on 53132
+
+==============================================================================
+RESULT: PASS -- the value the shipped config declares drives the ipc:// refusals to zero, and the pre-change value still produces them

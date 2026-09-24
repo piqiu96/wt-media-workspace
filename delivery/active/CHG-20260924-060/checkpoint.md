@@ -7,15 +7,20 @@
 
 - 2026-09-24 T-01：建 `delivery/active/CHG-20260924-060/`（`change.md` 十三节、本 `checkpoint.md`、`evidence/`、
   `status/`），`delivery/LEDGER.md` 加一行表行，快照经 `prepare_ai_workspace.py --change CHG-20260924-060` 再生成。
+- 2026-09-24 T-02（Desktop CSP，commit `9945f58`）：出货 TOML 的 `csp_connect_src` 加 `ipc:`；
+  先失败恰好两条守卫红（61 passed; 2 failed），同步后 63 passed。真实启动两条 leg：出货值 → `ipc://` 拒绝 0，
+  改动前的值（阳性对照）→ 3。顺带纠正金标 docstring 的失效说法。
 
 ## Current
 
-- T-02 待开始。
+- T-03 待开始（回环目标绕过系统代理）。
 
 ## Next
 
-- T-02 Desktop CSP → T-03 Desktop 回环代理 → T-04 Agent 删占位包 → T-05 文档回写与归档。
+- T-03 Desktop 回环代理 → T-04 Agent 删占位包 → T-05 文档回写与归档。
 - 一仓一 commit；「删除/搬移」与「改逻辑」不混进同一提交。
+- **T-05 新增一项**：归档的 CHG-056 有个**被引用但未入库**的证据文件 `ac05-run5.log`
+  （见 `evidence/task-02-csp.md` 末节），与被 *.gitignore* 的 `*.log` 规则吃掉，T-05 一并补入。
 
 ## Blockers
 

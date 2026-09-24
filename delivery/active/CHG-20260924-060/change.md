@@ -135,7 +135,7 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-01 | 建本 CHG 并激活（change.md/checkpoint.md/evidence/、LEDGER 一行、快照再生成、两个验证器绿）。 | DONE | `prepare_ai_workspace.py --change CHG-20260924-060`；两个验证器绿。 |
-| T-02 | Desktop：生产 CSP 加 `ipc:`（先失败 → 同步两处测试字面量 → 全绿 → 真实启动取证）。 | TODO | `cargo test --workspace` 全绿 + 真实启动 `ipc://` 拒绝数 3 → 0。 |
+| T-02 | Desktop：生产 CSP 加 `ipc:`（先失败 → 同步两处测试字面量 → 全绿 → 真实启动取证）。 | DONE | `cargo test --workspace` 63 passed；真实启动 `ipc://` 拒绝数 3 → 0（含阳性对照）。 |
 | T-03 | Desktop：回环目标绕过系统代理（`build_client_without_proxy` + `is_loopback_url` + 四层测试）。 | TODO | 谓词表 14 例、builder 差异、假代理 hits 计数、`ptr::eq` 接线；20× 循环含阳性对照。 |
 | T-04 | Agent：删 `modes/`、`generated/`（先失败 → 改 `PLACEHOLDER_PACKAGES` → 全绿）。 | TODO | 先 R1 报 `found []` 转红，再 `bash scripts/test.sh` 253 OK。 |
 | T-05 | 文档回写与收尾（agent 四份文档、workspace 记录、归档）。 | TODO | `verify_agent_entry.py` + `verify_delivery_governance.py` 绿；悬空指针扫描带阳性对照。 |
@@ -206,12 +206,18 @@ Evidence files live in `evidence/` and must record facts, not repeat requirement
 
 Completed:
 - T-01：建本记录并激活。
+- T-02：Desktop 生产 CSP 加 `ipc:`。先失败恰好两条守卫转红（`bootstrap.rs` 全策略金标、
+  `config.rs` 拒绝表的 `from` 串；61 passed; 2 failed），同步后 **63 passed; 0 failed**。
+  真实启动取证：新增驱动脚本从出货文件**解析**该值再交给真实二进制，两条 leg 只差一行配置——
+  出货值 → `ipc:// refusals 0`，改动前的值（阳性对照）→ `ipc:// refusals 3`。
+  同批纠正 `bootstrap.rs` 金标 docstring（原文声称与已删除的 `tauri.conf.json` 字面量逐字相同，
+  改值后不再成立）。Desktop commit `9945f58`。
 
 Current:
-- T-02 待开始（Desktop 的 CSP 改动）。
+- T-03 待开始（回环目标绕过系统代理）。
 
 Next:
-- T-02 → T-03 → T-04 → T-05，一仓一 commit，删除/搬移与改逻辑不混在同一提交。
+- T-03 → T-04 → T-05，一仓一 commit，删除/搬移与改逻辑不混在同一提交。
 
 Blocked:
 - None.（CHG-056 §12 的四项待裁定已全部由用户裁定，见 §6。）

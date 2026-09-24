@@ -1,0 +1,23 @@
+failures:
+
+---- bootstrap::tests::the_policy_is_shape_for_shape_the_literal_it_replaced stdout ----
+
+thread 'bootstrap::tests::the_policy_is_shape_for_shape_the_literal_it_replaced' (7155053) panicked at src-tauri/src/bootstrap.rs:266:9:
+assertion `left == right` failed
+  left: "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:18080; style-src 'self' 'unsafe-inline'; img-src 'self' https:"
+ right: "default-src 'self'; connect-src 'self' http://127.0.0.1:18080; style-src 'self' 'unsafe-inline'; img-src 'self' https:"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- config::tests::out_of_range_values_are_rejected stdout ----
+
+thread 'config::tests::out_of_range_values_are_rejected' (7155066) panicked at src-tauri/src/config.rs:413:13:
+row "empty csp connect-src in production" matches nothing
+
+
+failures:
+    bootstrap::tests::the_policy_is_shape_for_shape_the_literal_it_replaced
+    config::tests::out_of_range_values_are_rejected
+
+test result: FAILED. 61 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+
+error: test failed, to rerun pass `--bin wt-media-desktop-shell`
