@@ -113,12 +113,36 @@
   （本仓不是 rustfmt-clean，规则要求只对单个文件跑）。本次**只 add T-06 的路径**，
   这些改动留在工作区未动，完整 diff 存 `/tmp/chg058/fmt-stray/stray-formatting.patch`。
 
+
+- T-07 **DONE**（desktop 待提交）：三个新模块——`diagnostic.rs`（1768 行，规则本体）、
+  `commands/diagnostic.rs`（784 行，接线 + 保留的 `#[ignore]` 真机探针）、`dto/diagnostic.rs`（262 行，线上形状），
+  加 `main.rs`（`mod` + `DiagnosticHost` + **一份 `secrets` 两个读者**）、`paths.rs`/`config.rs`（`Source::code`/`Environment::code`）、
+  `logging/backend.rs`（抽出唯一的 `stamp_with`）、`app_paths.rs`（日志根不在数据根里）。
+  归档是**一个 gzip tar + 一棵目录树**（`summary.json` + `manifest.txt` + `logs/{desktop,agent}/…`），
+  摘要值是**归档外的兄弟 `.sha256`**——放进包里会变成自指（Q-06 已裁定容器；+4 依赖，lockfile 514 → 516）。
+  **脱敏不变量在门上**：每条进包的字符串都过 `mask`，日志条目**两次**（写它的那层一次、`bundle_files` 再一次），
+  由 `masking_twice_leaves_the_bytes_alone` 钉住幂等这条依赖。
+  **AC-10 的「不含用户媒体」靠布局不靠过滤器**：`reader::list` 本就不过滤名字（`Other` 照列，D-12），
+  故改由两条新用例承担——每棵树**只读一层**（含阳性对照：直接躺在树里的 `clip.mp4` 会被收进来）
+  与**本组件日志根不在数据根里**（两种布局）。**有意收进来的**与**有意省略的**都逐项写进 §6 D-13/D-14。
+  计数 desktop **276 → 314**（+38 = 28+4+2 新模块 + 4 处改动文件，另有 1 条 `ignored` 探针）；
+  **32 行实现变异 32 灭、0 等价**（19+6+7，三组各带阴性对照）。
+  非测试警告 **27 条不变**（`grep -c '^warning'` 读 28；按文件归位后**无一条落在本次任何文件上**）。
+  **只有跑起来才发现的三处**：落点目录可能不存在（探针报 `not a directory` ⇒ 写前 `create_dir_all`）、
+  manifest 的脱敏声明被换行拆开、`bundle_files` 首跑漏了复脱敏（单测抓出）。
+  **由变异表反推出来的覆盖缺口**：`AgentFacts::state()` 是第三处拼写且无人读（改成 `summary()` 也用它）、
+  摘要值只有自洽读者（新增**独立读者**：调本机 `shasum -a 256` 对账，变异 d18 由它打掉）、
+  `name_too_long` 无人读、dto 的 `bytes` 与 `source_bytes` 在夹具里恰好相等。
+  证据 `evidence/task-07-diagnostic-export.md`；**边界**：启动 token 进 `DiagnosticHost::secrets` 是一条
+  `main.rs` 接线行，类型上成立但**用例不可达**（登记为证据边界，不宣称已测）。
+  **变异工具的两处缺陷（本次发现并修掉，已写进证据）**：①还原走 `shutil.copy2` 保住源 mtime ⇒
+  cargo 认为树干净、**用上一次变异的产物**跑这一轮（症状：组内 7/7 灭而紧接着一次 `cargo test` 报红）；
+  ②`finally` 在 SIGTERM 下不执行 ⇒ 一次被停掉的运行在工作区留下 **d16** 的源码。
+  修法是墙钟推 mtime + 组末尾**再跑一次阴性对照**（断言留下的是**绿的**树）+ 注册 `SIGINT/SIGTERM/SIGHUP`；
+```
+
 ## Next
 
-- T-07 **脱敏诊断导出**：版本 + 组件状态 + 已脱敏日志 + 失败任务摘要，打成单个归档；
-  不得含完整凭证/Cookie/代理密码/用户媒体文件。先红的口径写在 T-07 行里：**归档内容逐项枚举**、
-  **凭据阳性对照**（先证明针抓得住再报「0 命中」）、文件名与大小上限。
-  （本 CHG §4.3 已实测：Cargo 里**无 zip/tar、无哈希**，归档依赖要新引，走代理的那次调用。）
 - T-08 前端「本机设置」页与 `LocalLogsPage` 重写（`wt-media-cloud/web`）：两条硬约束仍未触碰——
   `localAgentBoundary.test.js` 禁页面出现 `127.0.0.1`/`fetch(`；`localAgentService.test.js` 断言
   `invoke` 的**精确**参数对象（三个只读命令 + 两个清理命令都追加在 `invoke_handler!` 末尾，未插队）。
@@ -158,6 +182,15 @@
   `cargo check` 非测试警告 **27**（与 T-05 同，`grep -c '^warning'` 读 28）。真机探针（只读、跑完即撤销）
   读出缓存根 0 项 / `.local/logs` 1 个活文件 / Agent 树 3 个活文件、**两棵树 `would_remove` 均为 0**
   ——健康机器上清理是空操作（探针**不删任何文件**）。
+
+- T-07 后：desktop `314 passed`（起点 276，+38，逐件对账 28+4+2+4；另有 1 条 `ignored` 探针，
+  **不计入 passed**）；三组变异各带阴性对照（未变异字节必须 `0 failed`，读数 34/4/2 条），
+  跑完三文件**逐字节还原**（`426ba2458357`/`d08373452616`/`c98fa6557d72`）**并各自再跑一次
+  证明留下的是绿的树**；`cargo check` 非测试警告 **27**（与 T-05/T-06 同，`grep -c '^warning'` 读 28）。
+  真机探针（只读、写进替身 HOME）读回 **6 条**（2 信封 + 4 日志）、归档 1593 字节、摘要值
+  `87159bd6…` 与 `.sha256` 首字段逐字符相同；扫描模式**阳性对照 5/5**，真归档 **0 命中 / 1593 字节 / 4 条目**，
+  两个凭据 `present=false`；真机两棵树的根不同（`.local/logs` 与 `~/Library/Logs/WTMedia/Agent`）。
+  该探针**保留**为常驻 `#[ignore]` 用例（与 T-05/T-06 的「跑完即撤销」不同，理由见证据）。
 
 ## 记录口径的一处更正
 
