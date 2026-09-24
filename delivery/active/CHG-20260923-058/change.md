@@ -216,11 +216,13 @@
 | D-01 | 日志命名统一为 **`X.log.<时间戳>`**（Desktop `desktop.log.<ts>`、Agent `agent.log.<ts>`，`task`/`error` 同理），且**保留一个稳定的默认文件名**（正在写的是 `desktop.log`，归档是 `desktop.log.<ts>`）；**按小时切割**。 | CONFIRMED（用户 2026-09-24：日志名应为 `desktop.log.时间戳`；「默认是小时，有个默认文件，然后一个小时切割一次」） |
 | D-02 | **尽量用开源，不重复造轮子**。Desktop 用 **`file-rotate` 0.8.0**（`ContentLimit::Time(TimeFrequency::Hourly)` + `AppendTimestamp::with_format("%Y-%m-%d-%H", …)`）；Agent 用**标准库** `TimedRotatingFileHandler(when="H", suffix="%Y-%m-%d-%H", backupCount=0)`。 | CONFIRMED（用户 2026-09-24：「都是保留 desktop.log.时间戳 agent.log.时间戳 这里按理都是有开源工具不需要单独开发」「尽量使用开源，尽可能不改轮子」） |
 | D-03 | **不控制总量**：取消单文件上限与目录总量预算；**只按天保留**（超过 7 或 14 天自动删除）。截断标记按 §7 Q-01 处置。 | CONFIRMED（用户 2026-09-24：「对于日志不需要控制总量，只需要控制能保留多少天超过7天或14天自动删除，不需要控制总量」） |
-| D-04 | **加单实例守卫**（`tauri-plugin-single-instance`），第二次启动把已有窗口召到前台。**理由必须写清**：稳定默认名 `desktop.log` + crate 的 rename-on-roll ⇒ 两个实例会共用一个活文件，一个实例重命名时另一个的句柄还在写被改名的归档。**没有正当的多实例场景**——守卫是**禁止**一个坏状态，不是**启用**一个能力。 | CONFIRMED（用户 2026-09-24：「加实例守卫，需要说明下为何需要多实例什么场景下？」） |
+| D-04 | **加单实例守卫**（`tauri-plugin-single-instance`），第二次启动把已有窗口召到前台。**理由必须写清**：稳定默认名 `desktop.log` + crate 的 rename-on-roll ⇒ 两个实例会共用一个活文件，一个实例重命名时另一个的句柄还在写被改名的归档。**没有正当的多实例场景**——守卫是**禁止**一个坏状态，不是**启用**一个能力。**守卫必须跑在日志落盘之前**：插件的 `setup` 在 `Builder::build` 内部执行（tauri 2.11.5 `app.rs:2440`），第二次启动由插件自己 `std::process::exit(0)`；若按一次调用 `Builder::run(context)` 建应用，将死的那个进程会**先装好 sink、写下一条记录**再退出——实测该记录会让它按过期的 mtime 轮转、在第一个实例的句柄下把 `desktop.log` 改名成归档，第一个实例随后往归档里写真实记录。故拆成 `build(context)` + `app.run(...)`，**安装日志在 `build` 之后**（`main.rs`）。 | CONFIRMED（用户 2026-09-24：「加实例守卫，需要说明下为何需要多实例什么场景下？」）；时序与危害为**实测**（`/tmp/si-probe.sh`，变异版复现出 `desktop.log.2026-09-24-19` 与新 inode） |
 | D-05 | 本 CHG **允许修改 `wt-media-cloud/web`**。 | CONFIRMED（用户 2026-09-24：「允许改 cloud/web（推荐）」） |
 | D-06 | 日志改名与轮转改造**折进本 CHG 作为第一个任务 T-01**，不单独开 CHG。 | CONFIRMED（用户 2026-09-24：「折进 CHG-C 第一个任务（推荐）」） |
 | D-07 | 脱敏要求与「Desktop 不转存 Agent 业务日志」两条**不变**：它们与轮转正交，且是成功事实 #5 的另一半。 | CONFIRMED（承 CHG-057 D-07/D-08） |
 | D-08 | 本 CHG 的基线回写对象**限定为四处活基线 + 两个运行仓入口文档**（清单见 §5 Modify）；CHG-057 的**归档记录正文不改写**，只在其顶部加一段「被本 CHG 取代」的注记（照它自己 T-18 处置 T-01 的先例）。 | CONFIRMED（本次实施口径；依据 `archive-sweep-fix-paths-keep-narration` 的分类：过去时叙述判「留」） |
+| D-09 | **两侧都用本机时区**：归档名与记录戳同一个钟（Agent 的记录戳本来就已本地化——`logging.Formatter` 默认 `time.localtime` 且无处设 `converter`，只有 `LogBudget.today()` 是 UTC，故改名后名字与戳才对齐）；Desktop 的记录戳**去掉末尾 `Z`** 并与归档名同钟。比较的是**归档名里的时间戳字符串**，零填充 ⇒ 字典序即时序。 | CONFIRMED（用户 2026-09-24：「两侧都改本机时区（推荐）」） |
+| D-10 | **Agent 的小时轮转必须对齐到整点**，与 Desktop 一致。实测：标准库 `computeRollover` 只在 `MIDNIGHT` 与周模式有对齐分支，`when="H"` 直接返回 `currentTime + interval`——20:58 起的进程在 21:58 轮转，而 `doRollover` 用 `rolloverAt - interval` 命名 ⇒ 归档名说 20、内容却写到 21:58，**名字与内容差近一小时**。故覆写 `computeRollover` 为下一个本地整点。（另实测：`when="H"` 自选 suffix 为 `%Y-%m-%d_%H`，下划线，须在 `super().__init__` 之后显式设回 `ARCHIVE_FORMAT`。） | 本次实施裁定（用户 2026-09-24 明确的目的是「按小时切割」+「本机时区」；不对齐会让这两条同时落空）。**实测**自真机探针读 `rolloverAt`，非读文档推断 |
 
 ## 7. Pending Questions
 
@@ -244,8 +246,8 @@
 
 | Task | Goal | Status | Verification |
 |---|---|---|---|
-| T-01 | 激活与记录（本文件、`checkpoint.md`、`status/`、`evidence/`），LEDGER 加表行，`planned/README.md` 的 C 行改 ACTIVE，快照再生成，两验证器绿 | IN_PROGRESS | `verify_delivery_governance.py` + `verify_agent_entry.py` |
-| T-02 | **日志命名与轮转改造（两侧）+ 基线回写**：Desktop 引 `file-rotate`/`chrono` 取代自写轮转（活文件 `desktop.log`、归档 `desktop.log.<YYYY-MM-DD-HH>`、年龄删除归 crate）；Agent `BoundedFileHandler` → `TimedRotatingFileHandler`（`backupCount=0`）+ 保留截断包装；`LogBudget` 收敛为纯按天；两侧去掉总量与单文件上限；`tauri-plugin-single-instance`；回写四处活基线，并在 CHG-057 归档记录顶部加取代注记 | TODO | 两侧单测计数只增不减；真机取证（稳定名 + 归档名 + 20/15/2 天年龄删除基准 + 第二个实例不产生第二个 writer）；`evidence/task-02-log-rotation.md` |
+| T-01 | 激活与记录（本文件、`checkpoint.md`、`status/`、`evidence/`），LEDGER 加表行，`planned/README.md` 的 C 行改 ACTIVE，快照再生成，两验证器绿 | DONE | `verify_delivery_governance.py` + `verify_agent_entry.py` |
+| T-02 | **日志命名与轮转改造（两侧）+ 基线回写**：Desktop 引 `file-rotate`/`chrono` 取代自写轮转（活文件 `desktop.log`、归档 `desktop.log.<YYYY-MM-DD-HH>`、年龄删除归 crate）；Agent `BoundedFileHandler` → `TimedRotatingFileHandler`（`backupCount=0`）+ 保留截断包装；`LogBudget` 收敛为纯按天；两侧去掉总量与单文件上限；`tauri-plugin-single-instance`；回写四处活基线，并在 CHG-057 归档记录顶部加取代注记 | DONE | 两侧单测计数只增不减；真机取证（稳定名 + 归档名 + 20/15/2 天年龄删除基准 + 第二个实例不产生第二个 writer）；`evidence/task-02-log-rotation.md` |
 | T-03 | **Desktop 运行目录解析**：新模块（**不动 `paths.rs`**），data/logs/versions/cache 四个目录 + 开发态 `.local/`；抄 `logging/paths.rs` 的注入式写法（`home`/`environment`/`manifest_dir` 入参，纯函数优先）；不可写时报 `Err` 不 panic | TODO | 纯规则用例 + IO 边界；测试不解析真实 `$HOME`；变异打掉自己；`evidence/task-03-app-paths.md` |
 | T-04 | **用户设置持久化**：`UserSettings` + `settings.toml` + `schema_version`，写到用户数据目录；**原子替换**（临时文件 + rename）；**损坏时保留原文件并明确提示**，不得静默清空 | TODO | 先红：损坏输入 ⇒ 原文件仍在 + 明确错误；半写中断 ⇒ 不产生半个文件；`evidence/task-04-user-settings.md` |
 | T-05 | **存储与日志只读命令**：可用空间、缓存占用、日志占用、列出日志文件（含两棵树，见 Q-08）；**读取失败必须是错误而非 0 MB**；`logging::rolling` 补公开读取面（列文件 + 读尾部约 500 行 + 级别筛选所需字段） | TODO | 先红：不可读目录 ⇒ `Err`（**不是** 0 MB）；分母与阳性对照齐备；命令追加在 `invoke_handler!` 末尾；`evidence/task-05-storage-read.md` |
@@ -290,10 +292,10 @@
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | 日志文件名两侧统一为稳定默认文件 + `X.log.<YYYY-MM-DD-HH>` 小时归档 | 单测名表 + 真机目录列表 | TODO |
-| AC-02 | 取消单文件上限与总量预算后，**按天保留仍生效** | Desktop 由 crate（20/15/2 天基准）、Agent 由 `LogBudget`；各一条真机/单测两臂 | TODO |
-| AC-03 | 脱敏**不回退**：Cookie/Token/授权/代理密码/运行时 token 不进日志 | 沿用 CHG-057 的表驱动用例 + 真机阳性对照（先证明针抓得住） | TODO |
-| AC-04 | 单实例守卫：第二个实例不产生第二个 sidecar、不产生第二个日志写入者 | 真机两实例；`desktop.log` 只有一个写入者 | TODO |
+| AC-01 | 日志文件名两侧统一为稳定默认文件 + `X.log.<YYYY-MM-DD-HH>` 小时归档 | 单测名表 + 真机目录列表 | PASS（T-02） |
+| AC-02 | 取消单文件上限与总量预算后，**按天保留仍生效** | Desktop 由 crate（20/15/2 天基准）、Agent 由 `LogBudget`；各一条真机/单测两臂 | PASS（T-02） |
+| AC-03 | 脱敏**不回退**：Cookie/Token/授权/代理密码/运行时 token 不进日志 | 沿用 CHG-057 的表驱动用例 + 真机阳性对照（先证明针抓得住） | PASS（T-02） |
+| AC-04 | 单实例守卫：第二个实例不产生第二个 sidecar、不产生第二个日志写入者 | 真机两实例；`desktop.log` 只有一个写入者 | PASS（T-02） |
 | AC-05 | `UserSettings` 落 `settings.toml`（含 `schema_version`），**原子替换**；损坏时**保留原文件并明确提示** | 半写中断 + 损坏输入两条先红用例 | TODO |
 | AC-06 | 存储与日志数据取自**真实目录**；**读取失败为错误，不显示 0 MB** | 不可读目录 ⇒ `Err` 的用例（与「返回 0」的正向对照） | TODO |
 | AC-07 | 清理只处理可安全再生文件与**已轮转历史日志**；白名单六类一律不删；完成后展示**实际释放空间** | 六类各一条不删用例 + 一条删除对照组 + 释放字节一致性 | TODO |

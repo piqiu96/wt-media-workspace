@@ -1,5 +1,13 @@
 # CHG-20260923-057：联合工程优化 B——Paths、Logger 和运行目录
 
+> **注记（2026-09-24，CHG-20260923-058 T-02）**：本记录是**过去时**的关闭存档，正文按原样保留，不追改。
+> 其中关于日志的**口径已被 CHG-C 取代**：文件命名由 `desktop-YYYYMMDD-N.log` 改为
+> `desktop.log` + `desktop.log.<YYYY-MM-DD-HH>`（Agent 同理 `agent.log.<…>`），「单文件 20 MB /
+> 保留 14 天 / 总量 Agent 400 MB、Desktop 100 MB」改为「按小时切割 + 只按天保留 14 天、不控总量」，
+> 「以 `create_new` 抢名保多实例安全」改为「单实例守卫」。活基线的现行口径见
+> [程序总纲 §3 CHG-B](../../../docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md)
+> 与 [CHG-20260923-058 change.md §6](../../active/CHG-20260923-058/change.md)。
+
 ## 1. Basic Information
 
 - Level: M

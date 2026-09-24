@@ -49,16 +49,25 @@ Desktop/Agent 独立运行目录、日志初始化、落盘、轮转、清理及
 
 落定后的数字与口径（本节是这些数字的**权威落点**；此前它们只在 CHG-053 草案里出现过，而那处自称「来自程序总纲」并不成立）：
 
-- 轮转与限额：**单文件 ≤ 20 MB**、**保留 ≤ 14 天**、**总容量受限**（Agent 400 MB / Desktop 100 MB）。
-  三个值都可配（Agent `[logging] max_bytes/retention_days/total_bytes`、Desktop `[logging]`）。
-  轮转按日期分档（UTC）并以 `create_new` 抢名，故多实例不会写进同一文件。
-- 单条超长记录**截断而非丢弃**，尾部标 `truncate=true original_size=<原字节数>`（Agent 与 Desktop 同形）。
+- 轮转与保留：**按小时切割**——正在写的恒为稳定默认文件（`agent.log` / `desktop.log`），
+  每小时结束的归档名为 `X.log.<YYYY-MM-DD-HH>`（本机时区）；**只按天保留**，默认 14 天，超期自动删除。
+  **没有单文件上限、也没有总量预算**：被限定的是历史留多久，不是它有多少。
+  两个值都可配（Agent `[logging] max_record_bytes/retention_days`、Desktop `[logging]` 同名两键），
+  两侧出货值一致（14 天 / 1 MiB）。多实例靠**守卫**排除（Desktop `tauri-plugin-single-instance`、
+  Agent 单绑定 8765），不再靠 `create_new` 抢名。
+- 单条超长记录**截断而非丢弃**，尾部标 `truncate=true original_size=<原字节数>`（Agent 与 Desktop 同形，
+  默认阈值 1 MiB）。
 - Agent 保持**三个纯文本文件**：`agent.log`（全量、唯一含 traceback）、`task.log`（只收
   `wt_media_agent.runner.*`）、`error.log`（只收 ERROR、无 traceback，每行含
   `error_code` / 可选 `task_id` / 可选 `context`）。**不做 JSONL 改造**，
   053 草案的「三个 JSON 日志文件」不采纳。
-- Desktop 单文件 `desktop-YYYYMMDD-N.log`（`~/Library/Logs/WTMedia/Desktop`；开发态 `<repo>/.local/logs`），
+- Desktop 稳定文件 `desktop.log`（`~/Library/Logs/WTMedia/Desktop`；开发态 `<repo>/.local/logs`），
   只记 Desktop 自身的启动退出、配置加载、Agent 启停与健康检查、sidecar 异常退出；**不转存** Agent 业务日志。
+
+> 2026-09-24（CHG-20260923-058 T-02）用户裁定改写本节前四条：原「单文件 ≤ 20 MB / 总容量受限
+> （Agent 400 MB、Desktop 100 MB）/ 按日期分档（UTC）/ 以 `create_new` 抢名保多实例安全」不再成立，
+> 改为上面的按小时切割 + 按天保留 + 稳定默认名 + 单实例守卫。裁定原文、设计裁定与例外登记见
+> [CHG-20260923-058 change.md §6/§7](../../../delivery/active/CHG-20260923-058/change.md)。
 - `operation_id` 本轮**只在各进程内部**生成，跨端串联不交付（不加 Header、不进 sidecar 环境）。
 
 详见 [CHG-20260923-057 change.md](../../../delivery/completed/CHG-20260923-057/change.md)。

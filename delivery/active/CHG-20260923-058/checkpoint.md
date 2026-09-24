@@ -18,12 +18,28 @@
 
 ## Current
 
-- T-01 激活中：`checkpoint.md` / `status/` / `evidence/` 已建；LEDGER 与 `planned/README.md` 已改；
-  待跑快照重生成与两个验证器，然后提交激活记录。
+- T-01 **DONE**（`12ae5e9` 激活、`a2380a4` 证据）：十三节执行记录、`checkpoint.md`、`status/`×3、
+  LEDGER 表行、`planned/README.md` 的 C 行改 ACTIVE、程序总纲状态行改指 `active/`；
+  快照再生成 **2159 字符**；三验证器绿；定向检查「无残留 planned 指针」附阳性对照（12 处）。
+- T-02 **代码 DONE**（desktop `b344511`/`a4abcd6`/`f95cb28`、agent `1160f3c`；证据
+  `evidence/task-02-log-rotation.md`）。两侧形态一致：活文件 `X.log` + 归档 `X.log.<YYYY-MM-DD-HH>`、
+  按小时**整点**切割、只按天保留 14 天、出货值同为 14 天 / 1 MiB、单条截断标记同形。
+  计数：agent **377 OK**（基线 379，差额 2 逐条登记）、desktop **160 passed**（基线 175，34 删 19 增，
+  按类目全列）。Agent 10 项实现变异全灭；Desktop 每步先红。
+  **T-02 期间的实测发现**（已落进 §6 D-09/D-10 与证据）：标准库小时档自选下划线 suffix、
+  `computeRollover` 对小时档**不对齐**（归档名与内容差近一小时）、crate 的 `too_old` 比的是
+  **归档名字符串而非 mtime**；并纠正了本任务自己一条**空转的用例**（`_live` 保护原先靠年龄而非保护通过）。
+- T-02 的**基线回写 DONE**：程序总纲 §3 CHG-B 四条、架构基线 §5.8、里程碑成功事实 #5
+  （「受容量限制」→「按天保留」）、CHG-057 归档记录顶部取代注记（正文按 D-08 不动）。
+- T-02 的**记录与证据 DONE**：`evidence/task-02-log-rotation.md`（形态表、两侧计数差额逐条登记、
+  10 项实现变异、四条真机探针、三条实测发现、七条边界登记、探针方法论更正，
+  以及新补的**收口门禁同集合对照**一节）；`change.md` 加 D-09/D-10、D-04 补实测排序事实。
+  workspace 侧按 Task 一个 commit。
 
 ## Next
 
-- T-02 日志命名与轮转改造（两侧）+ 四处活基线回写（本 CHG 的第一个实现任务，用户裁定 D-06）。
+- T-03 `AppPaths`（Desktop 侧 data/logs/versions/cache 四目录 + 开发态 `.local/` 解析，抄
+  `logging/paths.rs` 的注入式写法，不读环境变量）。
 
 ## Blocked
 
@@ -34,3 +50,11 @@
 - 激活时基线：agent `379 tests OK` / desktop `175 passed, 0 failed` / web `21` 个测试文件 /
   workspace 两验证器绿；`unittest discover` 的 **4 条红项为既知**（见 `README.md`），
   判定要用 `git archive HEAD` 的**同集合阳性对照**，不用「看着无关」。
+- T-02 收口时的同集合对照**已按真实路径做**（`git archive` 到 `/tmp` 是**无效对照**：
+  路径敏感的兄弟仓用例在那里被 skip，把 4 红读成 2 红，见证据末节）。就地读数：
+  HEAD **4 红** vs 工作树 **4 红**，**逐名相同**（`test_contract_map_matches_m1_cloud_agent_compatibility`、
+  `test_contract_map_provider_paths_exist_in_full_workspace`、
+  `test_current_product_master_and_governance_are_aligned`、
+  `test_static_cross_repo_contract_and_security_matrix`）；还原后 `git status` 与交换前 **IDENTICAL**。
+  三验证器绿：governance ok（Active CHG: CHG-20260923-058）、快照 **2159 字符** / 0 warning、
+  `verified 10 skill source files`。

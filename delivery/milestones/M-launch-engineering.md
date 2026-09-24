@@ -37,7 +37,7 @@ Desktop 与 Agent 在正式上线前达到可长期部署、可诊断、可升�
 2. 已审计确认的硬编码（端口 8765/18080、超时、BitBrowser 地址散落）全部进配置或常量，grep 无残留。
 3. Desktop `cargo test`、Agent unittest（基线 ≥85 且不减少）、Web 测试全绿。
 4. 既有 M2 链路（bind/account_check/cookie_read/profile）dev 模式回归通过。
-5. 日志独立落盘、轮转、受容量限制；敏感信息（Cookie/Token/代理密码）不进日志与诊断包。
+5. 日志独立落盘、按小时轮转、**按天保留**（超过保留天数的归档自动删除；不控总量）；敏感信息（Cookie/Token/代理密码）不进日志与诊断包。
 6. 清理缓存/旧日志不删业务文件与运行数据；读取失败不显示 0 MB。
 7. 正式安装包脱离开发源码/venv/开发机路径可运行；发布可追溯五类版本（Desktop/Agent/前端/Contract/资源）。
 8. 升级不覆盖用户配置、SQLite、检查点与待回传结果。
