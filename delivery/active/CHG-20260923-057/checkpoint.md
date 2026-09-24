@@ -8,6 +8,30 @@
 
 ## Completed
 
+- 2026-09-24 T-16：**三个既有 emit 点改道 + 生命周期补点**（`wt-media-desktop` `5eb7d0c` 纯重命名 +
+  `b02130c` 改道，**2 个 commit**）——① `drain::report_exit` 由 `eprintln!` 改走 `agent.supervisor`
+  记录（**恰一条**，按裁定五**保留末 20 行尾**，`single_line` 把整份报告转义成一行）；② `CommandEvent::Error`
+  分支补一条 `warn!`（读失败是 Desktop 的问题，只缓冲则进程未退出时永不为人所见）；③ 两处 `println!`
+  改走 `webview` 记录（空 stack 不产生记录）；④ Agent 启停与健康补五处生命周期记录，
+  health 响应体**只在 DEBUG**、**失败记录不带尾行**（尾行只在前端拿到的返回串与那条退出记录里）。
+  **`CommandEvent` 是 `#[non_exhaustive]`，测试构造不出来** ⇒ 把「一行是什么」压成 `Heard`/`classify`/`heard`，
+  `follow` 里只剩收流。**命令体也拆了**（`health`/`start`/`stop` 三个自由函数）：与 T-15 拆 `plan` 同一形态的
+  理由——命令体吃 `State`，测试造不出来。**变异 13 个全部 KILLED**：3 个是**回退到改动前的旧形态**
+  （R1 `eprintln!` / R2 普通行也发射 / R3 读失败不记），10 个是新形态，每个都**点名打掉了自己的用例**；
+  M4（启动记录降 DEBUG）与 M7（`capture_at` 忽略级别）是**成对**的，各自只让一侧红。
+  **真机取证被一个环境事实改写**：debug 二进制带 `cargo:rustc-cfg=dev` ⇒ 窗口加载的是 **`devUrl`
+  （`127.0.0.1:5174`）而不是 dist**，开发机没起 Vite 时窗口**整页空白、连静态 HTML 都不渲染**，
+  按计划原样「真实启动即可驱动命令层」**不成立**（T-15 三臂只断言 Rust 侧记录，未受影响）。
+  改用**探针页**：把一页只调 `__TAURI_INTERNALS__.invoke` 的 HTML 挂在 5174（当场核查为空闲），真实启动
+  后一次跑齐 start→start→health→stop→stop，五个生命周期记录与前端返回值**逐条对应**；同一轮里
+  sidecar 打印的那 1 行**只**出现在退出报告的尾行里（不成为独立记录），前端那条失败串**带**尾行、
+  日志那条**不带**——裁定五的分工在真实进程里对照成立。脚手架逐项还原（`index.html` 的 `shasum`
+  与备份逐字相同、5174/18766 无残留、五个进程全部结束），全程未碰 `:8765`/`:18080`/`:54345`。
+  测试 153 → **166**；build 警告 **9 → 9**、clippy **13 → 13**（13 条逐条列过，无一条落在本 Task 新增代码上）。
+  **三条新登记**（见 `Next`）：AC-09 的真机分母是 **1 行**不是 50、`start` 的 spawn 失败分支在本地这棵树
+  **够不着**、`already_running` 在 sidecar 自己死掉之后**仍会说「已在运行」**。
+  见 `evidence/task-16-desktop-emit-points.md`。
+
 - 2026-09-24 T-15：**Desktop 接进 `main`（唯一初始化入口）**（`wt-media-desktop` `a312aa0`，1 个 commit）——
   新增 `logging/setup.rs`：`plan()` 承担**全部决定**（`levels`/`limits`/`directory: Result<PathBuf, String>`/
   `configured_level`/两个 `Environment`，全部参数注入），`install(plan, secrets)` 只剩装配与
@@ -220,14 +244,23 @@
 
 ## Current
 
-- T-15 已收尾（一个 Desktop 提交 + 本记录）；阶段 2 下一个是 **T-16**（三个既有 emit 点改道 + 启停/健康补点）。
+- T-16 已收尾（Desktop 两个提交 + 本记录）；阶段 2 下一个是 **T-17**（Desktop 进程内 `operation_id`）。
 
 ## Next
 
-- **T-16**：`drain.rs` 的 `report_exit` → `agent.supervisor`（**恰一条**，按裁定五**保留末 20 行尾**）、
-  `CommandEvent::Error` 分支补一条、`commands/logging.rs` **先纯重命名** `commands/webview.rs`（单独 commit，
-  命令名 `log_js_error` 不变）再改走 logger `target=webview`、`commands/agent.rs` 的启停与健康补点
-  （health 响应体**只在 DEBUG**，失败记录**不带尾行**）。之后 T-17，然后阶段 3 T-18。
+- **T-17**：Desktop 进程内 `operation_id`——复用已有 `uuid` 依赖（**不新增**）、一次 Agent 会话一个 id
+  （start 生成、stop 清除）、存在 `state.rs` 里 `AgentProcess` 旁边，落点 `info!(target: "agent.supervisor",
+  operation_id = %id, …)`；**不加新 target**、**不发 Header**、**不进 sidecar 子进程环境**（裁定九/D-10）。
+  注意 T-16 已把命令体拆成 `health`/`start`/`stop` 三个自由函数 ⇒ id 的**读取点**就在这三个体里，测试可以直接调它们。
+- **T-16 的三条新登记要进 T-18 的 §7/§10**：① **AC-09 的真机分母是 1 行**不是 50（那 1 行确实是
+  sidecar 输出、确实只出现在退出报告的尾行里；规模只由单测证）；② **`start` 的 spawn 失败分支在本地这棵树
+  够不着**（随应用提供的 sidecar 存在且能 spawn 成功，只是运行期因 macOS Team ID 起不来 ⇒
+  「找不到 sidecar」与「python 回退起不来」两条 `Err` 都到不了）；③ **`already_running` 在 sidecar 自己
+  死掉之后仍会说「已在运行」**（托管状态里的 `CommandChild` 不会因进程退出被清掉）——**既有行为**，
+  本 Task 只是让它第一次可听见，改它要动 `drain` 与 `AgentProcess` 的耦合，超出 T-16 范围。
+- **一条给下一个人的环境事实**（不是缺陷，别当 bug 修）：`cargo build`（debug）带 `cargo:rustc-cfg=dev`
+  ⇒ 窗口加载 `devUrl`（`127.0.0.1:5174`）而**不是** `frontendDist`；没起 Vite 时窗口空白到连静态 HTML
+  都不渲染。要让真前端在本地跑，得 `npm run dev:desktop`（T-16 用探针页替身取证，真前端未跑）。
 - **T-15 的两个新登记要进 T-18 的 §7/§10**：①`level` 严于 INFO 时 **stderr 与文件一起静默**
   （两层共用同一个 filter，实测；计划只预测「不建文件」）；②`main.rs` 的**两个实参无测试守**
   （N8/N9），其中 N9 由臂 1 的真实启动守、N8 分母为 0（无记录携带 token）。
@@ -247,7 +280,7 @@
 - 新增 **T-19**（AC-11b 的 AST 规则：客户端构造必须注入假 `transport`）排在阶段 1 余项之后，编号排末位以免打乱 T-03…T-18。
 - **定向验证命令一律带 `PYTHONPATH=tests`**：`tests/` 无 `__init__.py`，`python -m unittest tests.<模块>` 对
   6 个 import `support` 的模块（5 个是既有的）报 `ModuleNotFoundError`。既有布局属性，本 CHG 不动布局。
-- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 → T-17。
+- 阶段 2 Desktop：T-10 ✓ → T-11 ✓ → T-12 ✓ → T-13 ✓ → T-14 ✓ → T-15 ✓ → T-16 ✓ → T-17。
 - 阶段 3：T-18 回写与收尾。
 
 ## Blockers
@@ -267,6 +300,22 @@ T-11 收尾时工作区另有一组**与本 Task 无关**的改动，`mtime` 晚
 登记在此是为了：**T-18 的「入口文档回写」开始前必须先看这组改动是否要保留**，否则会覆盖掉它。
 
 ## Recent verification
+
+- T-16：`cargo test --workspace` → **166 passed; 0 failed**（153 → +13 = drain 4 + webview 2 + agent 7；
+  agent 那 7 条 = 生命周期全表 1 + 记录文案与返回串 3 + **真实套接字上**的命令体 3，其中 health 成功那条
+  发的是真 HTTP 请求（端口 0，内核分配）；`cargo build` 条目级警告 **9 → 9**、clippy `--all-targets`
+  **13 → 13**，13 条**逐条列出**（`rolling.rs` 5 + 四个占位 struct 4 + `main.rs:45` + `account.rs` 2 +
+  `drain.rs:284`）**无一条落在新增代码上**。
+  变异 **13 个全部 KILLED 且各自打掉自己的用例**（3 个旧形态回退 R1–R3 + 10 个新形态 M1–M10，
+  控制行 166 passed 先绿，每次从 pristine 副本还原）。
+  真机两臂（真实二进制 + **探针页**，因为 debug 构建加载 `devUrl`）：
+  臂 B 无 stub → `已启动（sidecar_started）` / 退出码 255 的退出记录（**含** sidecar 那 1 行）/
+  `agent unreachable: …`（**不含**尾行）/ `已停止`，前端那条串**含**尾行 ⇒ 裁定五一屏对照成立；
+  臂 C 用 stub 占住 scratch 端口 18766 → start / already_running / `[DEBUG] 健康检查成功：{"status":"ok",…}` /
+  stopped / not_running 五条，与前端返回值逐条对应。
+  脚手架全部还原（`index.html` 的 `shasum` 逐字相同、5174/18766 无监听残留、进程全清）。
+  `rustfmt` 只对新文件 `logging/test_support.rs` 整文件跑，四个既有文件只手改。
+  见 `evidence/task-16-desktop-emit-points.md`。
 
 - T-15：`cargo test --workspace` → **153 passed; 0 failed**（147 → +6：`setup.rs` 5 条 + 手写对表 1 条；
   环境两向那条在拆分后由 `plan` 承担并改名，是改名不是新增）；`cargo build` 条目级警告 **93 → 9**、
