@@ -1,9 +1,9 @@
 # Desktop × Agent 联合上线工程优化程序（Program）
 
 - 日期：2026-09-23
-- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）。A、B 两阶段已于 2026-09-24 归档 `DONE`；C/D 仍待激活
+- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）。A、B 两阶段已于 2026-09-24 归档 `DONE`；**C 已于 2026-09-24 激活执行中**；D 待 C 关闭后激活
 - 性质：上线前工程加固程序，不属 M2/M3 里程碑范围（先例：CHG-20260923-055 里程碑外工程 CHG）
-- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、[CHG-20260923-057](../../../delivery/completed/CHG-20260923-057/change.md)（B，**2026-09-24 归档 DONE**）、CHG-20260923-058（C）、CHG-20260923-059（D，均 planned）
+- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、[CHG-20260923-057](../../../delivery/completed/CHG-20260923-057/change.md)（B，**2026-09-24 归档 DONE**）、[CHG-20260923-058](../../../delivery/active/CHG-20260923-058/change.md)（C，**2026-09-24 激活执行中**）、CHG-20260923-059（D，planned）
 - 上游基线：ADR-0016（Agent 运行时分层的目录、依赖与配置边界）；架构基线 `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` §5.8
 
 ## 1. 问题与目标
