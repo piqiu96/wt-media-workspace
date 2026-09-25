@@ -1,0 +1,96 @@
+# T-06 收尾读数：六门禁 ＋ sync_skills.py check ＋ workspace 套件
+# 读数取在**最后一次改动之后**，且在本条之前已 `git add -A`（git ls-files 与 git grep 只看得见已跟踪与已暂存文件）
+
+## 分母
+#   已跟踪文件 = 999；未跟踪非忽略 = 0
+#   本次提交面（已暂存）：   6 A    3 M   41 R 
+
+## 逐条（每条打印自己的退出码）
+=== verify_delivery_governance ===
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: none
+exit=0
+
+=== verify_agent_entry ===
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+=== verify_skills ===
+verified 10 skill source files
+exit=0
+
+=== verify_m0_config ===
+Workspace config verification ok
+exit=0
+
+=== verify_product_master_alignment ===
+Product and Master Plan alignment verification ok
+exit=0
+
+=== verify_m2_acceptance ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+=== sync_skills.py check ===
+skill outputs are up to date
+exit=0
+
+=== unittest discover -s tests -q ===
+----------------------------------------------------------------------
+Ran 106 tests in 0.789s
+
+OK
+exit=0
+
+## 复跑确认（本产物写完前再跑一遍，2026-09-26 04:28:04）
+#   首跑与复跑在同一提交面上跑，逐条退出码一致；分母复读：
+#   已跟踪文件 = 999；未跟踪非忽略 = 0
+#   本次提交面（已暂存）：   6 A    3 M   41 R 
+=== verify_delivery_governance ===
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: none
+exit=0
+
+=== verify_agent_entry ===
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+=== verify_skills ===
+verified 10 skill source files
+exit=0
+
+=== verify_m0_config ===
+Workspace config verification ok
+exit=0
+
+=== verify_product_master_alignment ===
+Product and Master Plan alignment verification ok
+exit=0
+
+=== verify_m2_acceptance ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+=== sync_skills.py check ===
+skill outputs are up to date
+exit=0
+
+=== unittest discover -s tests -q ===
+----------------------------------------------------------------------
+Ran 106 tests in 0.785s
+
+OK
+exit=0
+
+## 本产物自身（自指，如实记）
+#   上面两轮读数之后，本文件是唯一再被写过的路径；本段追加发生在两轮读数之后。
+#   记录正文（change.md／checkpoint.md／evidence/task-06-closeout.md）与四仓工作树在两轮读数之间**未变**。
+#   写出本段时 `git status --porcelain` 条数 = 50（全部是本次收尾面）。

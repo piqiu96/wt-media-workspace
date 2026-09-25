@@ -1,0 +1,177 @@
+# T-06 四仓对账：HEAD / 工作树 / 改动路径逐条归属 §5（AC-06）
+# 锚: T-00 基线 workspace 5622622 / cloud e2ba4d8 / agent aa95332 / desktop 9ba5486
+# 口径: porcelain 取工作树全量（含未跟踪、不含被忽略）；改动路径取自 `git diff --name-status <基线>`（含已暂存）
+
+## HEAD 与工作树
+```
+wt-media-workspace HEAD d8d7ba4（基线 5622622）  porcelain: M .ai/CURRENT_CONTEXT.md| M delivery/MASTER_IMPLEMENTATION_PLAN.md|RM delivery/active/CHG-20260926-068/change.md -> delivery/completed/CHG-20260926-068/change.md|R  delivery/active/CHG-20260926-068/checkpoint.md -> delivery/completed/CHG-20260926-068/checkpoint.md|R  delivery/active/CHG-20260926-068/evidence/artifacts/t00-baseline.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t00-baseline.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t00-gate-activation.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t00-gate-activation.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t00-record-size.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t00-record-size.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t00-status-words.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t00-status-words.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t01-desktop-test-sh.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t01-desktop-test-sh.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t01-entry-fix-and-mutations.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t01-entry-fix-and-mutations.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t01-entry-red.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t01-entry-red.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t01-record-size.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t01-record-size.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t02-cloud-control.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-control.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t02-cloud-mutations.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-mutations.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t02-cloud-prefix-control.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-prefix-control.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t02-cloud-test-sh.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-test-sh.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t02-record-size.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t03-agent-control.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t03-agent-control.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t03-agent-mutations.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t03-agent-mutations.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t03-agent-test-sh.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t03-agent-test-sh.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t03-record-size.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t04-record-size.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t04-workspace-gate.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t04-workspace-gate.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t04-workspace-mutations.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t04-workspace-mutations.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-agent-verbs.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-agent-verbs.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-cloud-verbs.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-cloud-verbs.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-cloud-workspace-blocked.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-cloud-workspace-blocked.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-desktop-rootcause.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-rootcause.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs-fixed.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs-fixed.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-gate.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-gate.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-record-size.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-record-size.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05-workspace-verbs.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05-workspace-verbs.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05a-desktop-test-sh.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05a-desktop-test-sh.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05a-gate.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05a-gate.out|R  delivery/active/CHG-20260926-068/evidence/artifacts/t05a-record-size.out -> delivery/completed/CHG-20260926-068/evidence/artifacts/t05a-record-size.out|R  delivery/active/CHG-20260926-068/evidence/task-00-activation.md -> delivery/completed/CHG-20260926-068/evidence/task-00-activation.md|R  delivery/active/CHG-20260926-068/evidence/task-01-desktop-entry.md -> delivery/completed/CHG-20260926-068/evidence/task-01-desktop-entry.md|R  delivery/active/CHG-20260926-068/evidence/task-02-cloud-entry.md -> delivery/completed/CHG-20260926-068/evidence/task-02-cloud-entry.md|R  delivery/active/CHG-20260926-068/evidence/task-03-agent-entry.md -> delivery/completed/CHG-20260926-068/evidence/task-03-agent-entry.md|R  delivery/active/CHG-20260926-068/evidence/task-04-workspace-entry.md -> delivery/completed/CHG-20260926-068/evidence/task-04-workspace-entry.md|R  delivery/active/CHG-20260926-068/evidence/task-05-real-run.md -> delivery/completed/CHG-20260926-068/evidence/task-05-real-run.md|R  delivery/active/CHG-20260926-068/evidence/task-05a-desktop-devcmd-fix.md -> delivery/completed/CHG-20260926-068/evidence/task-05a-desktop-devcmd-fix.md|?? delivery/completed/CHG-20260926-068/evidence/artifacts/t06-repo-reconcile.out|?? delivery/completed/CHG-20260926-068/evidence/artifacts/t06-status-words.out|?? delivery/completed/CHG-20260926-068/evidence/artifacts/t06-sweep.out
+wt-media-cloud    HEAD 339cc15（基线 e2ba4d8）  porcelain: D internal/architecture/boundary_test.go
+wt-media-agent    HEAD 095196e（基线 aa95332）  porcelain: M AGENT-INDEX.md
+wt-media-desktop  HEAD b0ae3c3（基线 9ba5486）  porcelain: 
+```
+两条脏项**先于本 CHG 存在、全程未触碰**（T-00 基线已记）：
+- `wt-media-cloud`: `internal/architecture/boundary_test.go` —— 先于本 CHG 的既有删除（T-00 基线已记，D-03 归用户）
+- `wt-media-agent`: `AGENT-INDEX.md` —— 先于本 CHG 的未提交改动（CHG-067 记录已记，未触碰）
+⇒ workspace 的 `?? delivery/active/CHG-20260926-068/`（T-00 时的新目录）在 T-06 已归档，条目形态变为 rename 对，见下。
+
+## 本次改动路径逐条归属 §5
+```
+--- wt-media-workspace
+   M	.ai/CURRENT_CONTEXT.md
+      §5: §5 收尾：快照重生成（T-00 `--change`／T-06 `--no-active`）
+   M	delivery/LEDGER.md
+      §5: §5 收尾：关闭段（T-06）
+   M	delivery/MASTER_IMPLEMENTATION_PLAN.md
+      §5: §5 收尾：§3 读数列（T-00／T-06）
+   A	delivery/completed/CHG-20260926-068/change.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/checkpoint.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t00-baseline.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t00-gate-activation.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t00-record-size.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t00-status-words.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t01-desktop-test-sh.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t01-entry-fix-and-mutations.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t01-entry-red.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t01-record-size.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-control.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-mutations.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-prefix-control.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t02-cloud-test-sh.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t03-agent-control.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t03-agent-mutations.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t03-agent-test-sh.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t04-workspace-gate.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t04-workspace-mutations.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-agent-verbs.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-cloud-verbs.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-cloud-workspace-blocked.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-rootcause.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs-fixed.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-gate.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-record-size.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05-workspace-verbs.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05a-desktop-test-sh.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05a-gate.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/artifacts/t05a-record-size.out
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/task-00-activation.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/task-01-desktop-entry.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/task-02-cloud-entry.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/task-03-agent-entry.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/task-04-workspace-entry.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/task-05-real-run.md
+      §5: §5 收尾：归档移入（T-06）
+   A	delivery/completed/CHG-20260926-068/evidence/task-05a-desktop-devcmd-fix.md
+      §5: §5 收尾：归档移入（T-06）
+   M	scripts/test-control.sh
+      §5: §5 Modify（T-04）
+   A	tests/test_bin_control_entry.py
+      §5: §5 Add（T-04）
+   ??	delivery/completed/CHG-20260926-068/evidence/artifacts/t06-repo-reconcile.out
+      §5: §5 收尾：归档移入（T-06）
+   ??	delivery/completed/CHG-20260926-068/evidence/artifacts/t06-status-words.out
+      §5: §5 收尾：归档移入（T-06）
+   ??	delivery/completed/CHG-20260926-068/evidence/artifacts/t06-sweep.out
+      §5: §5 收尾：归档移入（T-06）
+--- wt-media-cloud
+   D	internal/architecture/boundary_test.go
+      §5: 先于本 CHG 的既有删除（T-00 基线已记，D-03 归用户）
+   M	scripts/README.md
+      §5: §5 Modify（T-02）
+   M	scripts/test.sh
+      §5: §5 Modify（T-02）
+   A	scripts/verify/test-control.sh
+      §5: §5 Add（T-02）
+--- wt-media-agent
+   M	AGENT-INDEX.md
+      §5: 先于本 CHG 的未提交改动（CHG-067 记录已记，未触碰）
+   A	tests/test_control_sh.py
+      §5: §5 Add（T-03）
+--- wt-media-desktop
+   M	bin/control.sh
+      §5: §5 Modify（T-01，只改模式，字节 0 改动）
+   M	src-tauri/tauri.conf.json
+      §5: §5 Modify（T-05A）
+   M	tests/README.md
+      §5: §5 Modify（§5 于 T-06 回写：T-01 同批的索引行；清单缺口见 §14 第 9 项）
+   A	tests/control.test.sh
+      §5: §5 Add（T-01）
+```
+⇒ **越界路径 0 条**。
+
+### 业务代码面（AC-06 的「业务代码零改动」）
+改动路径中带业务代码扩展名 ('.go', '.py', '.rs', '.vue', '.ts', '.tsx', '.js') 的 3 条：
+- wt-media-workspace: `A tests/test_bin_control_entry.py`
+- wt-media-cloud: `D internal/architecture/boundary_test.go`
+- wt-media-agent: `A tests/test_control_sh.py`
+
+### 端口值（AC-06 的「端口值零改动」）
+先按文件归类，再看命中落在哪一类——裸报「合计 N 行」会把记录里对**端口值的引用**读成**端口值的改动**：
+- wt-media-workspace: 命中 99 行，**归档记录之外 0 行**
+      32  delivery/completed/CHG-20260926-068/evidence/artifacts/t05-workspace-verbs.out
+      14  delivery/completed/CHG-20260926-068/evidence/artifacts/t03-agent-test-sh.out
+       8  delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs-fixed.out
+       6  delivery/completed/CHG-20260926-068/evidence/artifacts/t05-agent-verbs.out
+       5  delivery/completed/CHG-20260926-068/evidence/artifacts/t05-cloud-verbs.out
+       5  delivery/completed/CHG-20260926-068/evidence/artifacts/t05-desktop-verbs.out
+- wt-media-cloud: 命中 0 行，**归档记录之外 0 行**
+- wt-media-agent: 命中 0 行，**归档记录之外 0 行**
+- wt-media-desktop: 命中 0 行，**归档记录之外 0 行**
+⇒ 命中**全部**是本 CHG 自己归档记录里的原始捕获与叙述（`t05-*-verbs.out` 记的是运行实例的 `url=`／健康端点），
+  性质是「对端口值的引用」而非「端口值的改动」：四仓的运行代码／配置／脚本里端口值改动 **0** 行。
+
+
+阳性对照（证明这条过滤器能报出端口改动）：拿 CHG-067 的 desktop 提交 `9ba5486`（当时正在删端口字面量）跑同一过滤器
+```
+命中 2 行：
+  -const url = process.env.WT_MEDIA_DESKTOP_DEV_URL ?? "http://127.0.0.1:5174/";
+  -const url = process.env.WT_MEDIA_DESKTOP_DEV_URL ?? "http://127.0.0.1:5174/";
+```
+⇒ 控制组 2 > 0，过滤器有判别力（不是恒空的过滤器）。
+
+## AC-06 结论
+- 改动路径全部落在 §5 的 Add／Modify 清单内，**越界 0 条**；
+- 端口值相对基线的改动 **0** 行（控制组非 0，见上）；
+- 业务代码改动：见上节（唯一 `.go` 路径是先于本 CHG 的既有删除，归用户，D-03）。

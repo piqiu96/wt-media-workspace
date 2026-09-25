@@ -1,0 +1,31 @@
+# T-06 MASTER §3 读数列刷新：量法直接 import 门禁自己的 status_word()
+# 调用: verify_product_master_alignment.status_word
+# 取在 change.md 的 `- Status: DONE` 落地之后（归档后再测一次）
+
+归档后读数（本 Task 实测）
+  active   分母 = 0 篇  → {}
+  planned  分母 = 19 篇  → {'SUPERSEDED': 9, 'PLANNED': 3, 'DISCUSSION': 7}
+  活记录   分母 = 19 篇  → {'SUPERSEDED': 9, 'PLANNED': 3, 'DISCUSSION': 7}
+  归档记录 分母 = 43 篇  → {'VERIFYING': 1, 'IN_PROGRESS': 4, 'DONE': 33, 'CLOSED': 2, 'HANDOFF': 2, 'IMPLEMENTING': 1}
+  归档列 = DONE 33 + IMPLEMENTING 1 + VERIFYING 1 = 35
+  闭合式：归档列 35 ＋ CLOSED 2 ＋ HANDOFF 2 ＋ IN_PROGRESS 4 = 43
+  总分母 = 活 19 ＋ 归档 43 = 62
+
+## 与归档前（T-00 读数）的差
+| 量 | 归档前 | 归档后 | 差 |
+|---|---|---|---|
+| 活 `active` | 1 | 0 | -1（本 CHG 移出 active） |
+| 活 `IMPLEMENTING` | 1 | 0 | -1 |
+| 活记录合计 | 20 | 19 | -1 |
+| 归档 `DONE` | 32 | 33 | 1（本 CHG 由 IMPLEMENTING 转 DONE） |
+| 归档 `IMPLEMENTING` | 1 | 1 | 0 |
+| 归档列 | 34 | 35 | 1 |
+| 归档记录合计 | 42 | 43 | 1 |
+
+## 一处首测与终测的差（如实记）
+# 本 Task 第一次测（`- Status:` 还是 IMPLEMENTING 时）读到 归档 DONE 32 / 归档 IMPLEMENTING 2 / 归档列 35。
+# 数字自己暴露了漏项：本 CHG 的 change.md 还没改状态词就被算进归档列了。改成 DONE 后重测才与上表一致。
+# ⇒ 读数列的锚是 change.md 自身的状态词，**归档动作与状态词改写必须都落定后再测**。
+
+## 残余（沿用 CHG-066 §14 第 2 项，只登记不设对策）
+# 该数列每次归档即过期。本 CHG 只刷新这一次；通用机制留独立 CHG。

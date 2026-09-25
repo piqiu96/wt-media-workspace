@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: S
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-09-26
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -88,6 +88,8 @@ cloud `.cache/wt-media-cloud.pid` **不存在**（`stop` 不会误杀）；agent
 - **workspace** `scripts/test-control.sh`：把 `bash "$CONTROL"` 改为**直接调用**，补判据 1-4（原文件只有判据 4-6）。
 - **desktop** `src-tauri/tauri.conf.json`：`beforeDevCommand` 的 `cd ../../wt-media-cloud/web` → `cd ../wt-media-cloud/web`
   （**T-05A 扩范围**：T-05 真跑查出 dev 模式从来没起来过；用户当场裁定「修了」。原行是一段路径的孤立笔误，见 §14 第 6 项）。
+- **desktop** `tests/README.md`：新套件在测试索引里的**一行**。（**§5 于 T-06 回写**：该行随 T-01 一并提交，
+  T-00 的清单漏列；同类 cloud `scripts/README.md` 在清单内——清单缺口见 §14 第 9 项。）
 
 ### Delete
 
@@ -125,13 +127,13 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-00 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓基线与监听面读数；`MASTER` §3 按 F-06 刷新三项 | DONE（`e4e1587`） | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.`。见 `evidence/task-00-activation.md` |
-| T-01 | **desktop**：`bin/control.sh` 模式 → `100755`（磁盘＋index）；新建 `tests/control.test.sh`（755，六条判据） | DONE | 改前 `./bin/control.sh help` **126**／改后 **0**；先红 3/9；**变异红** 8 failed（`chmod -x`）与恰 1 failed（`git update-index --chmod=-x`）；`scripts/test.sh` `exit=0`（372／12／20）。见 `evidence/task-01-desktop-entry.md` |
-| T-02 | **cloud**：新建 `scripts/verify/test-control.sh`＋`scripts/test.sh` 一行＋`scripts/README.md` 一行 | DONE | `bash scripts/test.sh` `exit=0`（`^ok\s` 56／`^FAIL` 0／vitest 25-166／`[control]` 12-0）；**变异红** 8 failed 与恰 1 failed；`[control]` 13 行对门禁两条正则各贡献 0 行。见 `evidence/task-02-cloud-entry.md` |
-| T-03 | **agent**：新建 `tests/test_control_sh.py` | DONE | 7 用例绿；**变异红** 4 failed 与恰 1 failed；`Ran 416`（基线 409，+7）；`.local/` 护栏未触发。见 `evidence/task-03-agent-entry.md` |
+| T-01 | **desktop**：`bin/control.sh` 模式 → `100755`（磁盘＋index）；新建 `tests/control.test.sh`（755，六条判据） | DONE（desktop `ffe089d`） | 改前 `./bin/control.sh help` **126**／改后 **0**；先红 3/9；**变异红** 8 failed（`chmod -x`）与恰 1 failed（`git update-index --chmod=-x`）；`scripts/test.sh` `exit=0`（372／12／20）。见 `evidence/task-01-desktop-entry.md` |
+| T-02 | **cloud**：新建 `scripts/verify/test-control.sh`＋`scripts/test.sh` 一行＋`scripts/README.md` 一行 | DONE（cloud `339cc15`） | `bash scripts/test.sh` `exit=0`（`^ok\s` 56／`^FAIL` 0／vitest 25-166／`[control]` 12-0）；**变异红** 8 failed 与恰 1 failed；`[control]` 13 行对门禁两条正则各贡献 0 行。见 `evidence/task-02-cloud-entry.md` |
+| T-03 | **agent**：新建 `tests/test_control_sh.py` | DONE（agent `095196e`） | 7 用例绿；**变异红** 4 failed 与恰 1 failed；`Ran 416`（基线 409，+7）；`.local/` 护栏未触发。见 `evidence/task-03-agent-entry.md` |
 | T-04 | **workspace**：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓） | DONE | 两条绿；**变异** `chmod -x` 兄弟仓 desktop → **恰 3 failed 全标 desktop**（本仓检查仍 0）／本仓 → 恰 3 failed＋本仓检查 `exit=1`；缺席路径 skip 并印分母 `3/4`；六门禁 `exit=0`、`Ran 106`（+5）。见 `evidence/task-04-workspace-entry.md` |
 | T-05 | **workspace**：四仓四动词**真跑**（16 格），先停实况，逐仓 `status → start → status → restart → status → stop → status`，原始读数落 `evidence/artifacts/t05-*-verbs.out`；收尾留在运行态 | DONE | **16 格：13 端到端／3 止于既有前置／0 未覆盖。** cloud 4/4（64839／64919 真起真停，pid 文件＋监听＋`healthz` 三路旁证）、agent 4/4（58703／58731）、workspace 4/4（真起 cloud 65668＋agent 65686 并跑完整条验收链：BitBrowser／DMG／登录冒烟全 `PASS`）；desktop `status` 端到端，`start`／`restart`／`stop` 止于 `beforeDevCommand` 既有缺陷（§14 第 6 项）。清场靠按 pid 杀（用户授权后 2 s 内清空），环境留在运行态（70220／70244）。见 `evidence/task-05-real-run.md` |
 | T-05A | **desktop**：修 `beforeDevCommand` 少写的一段路径（T-05 真跑查出、用户裁定「修了」） | DONE（desktop `b0ae3c3`） | 改后真跑 `cargo tauri dev`：`start`／`restart` exit 0、vite 5174 答 200、`status` `alive=yes health=ok` exit 0、`stop` 真停；无 stray 进程。`scripts/test.sh` exit=0（372／12／20，与修复前同读数）。desktop 四格由「止于既有前置」转为**端到端**。见 `evidence/task-05a-desktop-devcmd-fix.md` |
-| T-06 | **workspace**：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | TODO | 六门禁 ＋ `unittest` ＋ `sync_skills.py check`，取在最后一次改动之后；两遍指针扫描（各带对照与分母，锚取**不变基线**）；四仓 `git status` 对账 |
+| T-06 | **workspace**：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | DONE | `git mv` 41 条 rename（40 纯 rename ＋ 1 rename＋modify）；LEDGER 表行移出＋关闭段；`MASTER` §3 按门禁自己的 `status_word()` 刷新（活记录 20→19、归档记录 42→43、归档列 34→35；**首测与终测差一处，见 `t06-status-words.out`**）；快照 `--no-active`；六门禁 ＋ `unittest` ＋ `sync_skills.py check` 取在最后一次改动之后（`t06-gate-final.out`，含复跑确认）；两遍指针扫描各带阳性对照与分母（`t06-sweep.out`）；四仓 `git status` 对账锚 T-00 基线、越界 0（`t06-repo-reconcile.out`） |
 
 ### 顺序与红窗（硬约束）
 
@@ -143,10 +145,10 @@ None.
 
 ### wt-media-workspace
 
-- [ ] `delivery/active/CHG-20260926-068/` 三件齐备；LEDGER 表行；快照 `--change`；`MASTER` §3 刷新（T-00）
+- [x] `delivery/active/CHG-20260926-068/` 三件齐备；LEDGER 表行；快照 `--change`；`MASTER` §3 刷新（T-00）
 - [x] `scripts/test-control.sh` 强化；`tests/test_bin_control_entry.py`（T-04）
-- [ ] 四仓四动词真跑与逐格覆盖面（T-05）
-- [ ] 归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描、四仓对账、AC 签字、DONE Gate（T-06）
+- [x] 四仓四动词真跑与逐格覆盖面（T-05 ＋ T-05A）
+- [x] 归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描、四仓对账、AC 签字、DONE Gate（T-06）
 
 ### wt-media-cloud
 
@@ -168,9 +170,9 @@ None.
 | AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PASS：desktop（T-01）／cloud（T-02）／agent（T-03）／workspace（T-04）各绿＋各两处变异 |
 | AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | PASS（T-05 ＋ T-05A）：**16 端到端／0 止于既有前置／0 未覆盖**，逐格标注落 `evidence/task-05-real-run.md`。desktop 那 3 格先被测成「止于既有前置」（既有缺陷，§14 第 6 项），T-05A 修复后复跑转为**端到端**（`t05-desktop-verbs-fixed.out`） |
 | AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PASS：四仓磁盘变异连带 3～8 项红、index 变异恰 1 项红；跨仓缺席路径有 skip 对照（分母 `3/4`） |
-| AC-05 | 跨仓回指与既有判据不被本 CHG 打红 | 六个静态门禁 `exit=0` ＋ `unittest` 套件 `OK` | TODO |
-| AC-06 | 改动逐条落在 §5；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 路径逐条归属；端口值 diff **0** | TODO |
-| AC-07 | 记录体量按**每 Task 增量**在界内 | `change.md` ≤ 5120 B／Task、`checkpoint.md` ≤ 4096、evidence md ≤ 9216；锚取上一 Task 提交后的 blob | TODO |
+| AC-05 | 跨仓回指与既有判据不被本 CHG 打红 | 六个静态门禁 `exit=0` ＋ `unittest` 套件 `OK` | PASS（T-06）：六门禁 **6/6 `exit=0`**、`sync_skills.py check` `exit=0`、套件 **`Ran 106`／`OK`**（基线 101，+5 为 T-04 新增），全部取在**最后一次改动之后**（`evidence/artifacts/t06-gate-final.out`，含复跑确认）。中间态实测一处：快照先改 `--no-active` 而 LEDGER 表行仍在时两门禁各报 2 条 ERROR，**由表行移出归零**（`evidence/task-06-closeout.md` §5） |
+| AC-06 | 改动逐条落在 §5；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 路径逐条归属；端口值 diff **0** | PASS（T-06）：四仓改动路径逐条归属 §5、**越界 0**；`.go`／`.py`／`.rs`／`.vue`／`.ts` 业务代码 **0** 条（唯一 `.go` 是先于本 CHG 的既有删除，D-03 归用户）；端口值**归档目录之外 0 行**，过滤器有阳性对照（`evidence/artifacts/t06-repo-reconcile.out`）。口径两处：只跑 `porcelain` 看不见已提交的改动（须用 `git diff --name-status <基线>`）；裸报「端口命中 99 行」是分母错 |
+| AC-07 | 记录体量按**每 Task 增量**在界内 | `change.md` ≤ 5120 B／Task、`checkpoint.md` ≤ 4096、evidence md ≤ 9216；锚取上一 Task 提交后的 blob | PASS（T-06）：`change.md` **+4944**／`checkpoint.md` **+3968**／`evidence/task-06-closeout.md` **+8804**（界 5120／4096／9216，均**界内**）；锚＝上一 Task 提交 `d8d7ba4`（`evidence/artifacts/t06-record-size.out`）|
 
 ## 11. Evidence
 
@@ -183,7 +185,7 @@ None.
 - `evidence/task-04-workspace-entry.md` ＋ `artifacts/t04-workspace-mutations.out`、`t04-workspace-gate.out`
 - `evidence/task-05-real-run.md` ＋ `artifacts/t05-cloud-verbs.out`、`t05-agent-verbs.out`、`t05-desktop-verbs.out`、`t05-desktop-rootcause.out`、`t05-workspace-verbs.out`、`t05-cloud-workspace-blocked.out`（清场前读数）、`t05-record-size.out`、`t05-gate.out`
 - `evidence/task-05a-desktop-devcmd-fix.md` ＋ `artifacts/t05-desktop-verbs-fixed.out`（修复后复跑的四格）、`t05a-desktop-test-sh.out`（`scripts/test.sh` 全跑）
-- 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
+- `evidence/task-06-closeout.md` ＋ `artifacts/t06-status-words.out`（`MASTER` §3 读数与分母，量法直接 import 门禁自己的 `status_word()`）、`t06-sweep.out`（两遍指针扫描）、`t06-repo-reconcile.out`（四仓对账）、`t06-gate-final.out`（六门禁＋套件＋`sync_skills.py check`，含复跑确认）、`t06-record-size.out`（每 Task 增量）
 
 ## 12. Current Checkpoint
 
@@ -191,16 +193,16 @@ None.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Required manual verification recorded.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Affected runtime repositories touched only when listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
-- [ ] Completed active records removed from `delivery/active` and `delivery/LEDGER.md`.
+- [x] Scope completed. — §5 的 4 Add／**5 Modify**（含 T-05A 扩的那一项）／0 Delete 全部落地；§5 Explicitly Not Doing 八条均未触碰。
+- [x] No blocking `Q-xx`. — §7 为 `None.`；T-05A 的范围扩张由用户当场裁定（D-06），非悬置问题。
+- [x] Acceptance matrix all PASS. — AC-01…AC-07 全 PASS（其中 AC-03 由 T-05 ＋ T-05A 两段合成，见 §10）。
+- [x] Automated tests passed or justified. — 六门禁 ＋ `sync_skills.py check` ＋ workspace 套件，读数落 `evidence/artifacts/t06-gate-final.out`，**取在最后一次改动之后**。
+- [x] Required manual verification recorded. — 16 格真跑读数落 `evidence/task-05-real-run.md` 与 `artifacts/t05-*.out`；T-05A 修复后的复跑落 `t05-desktop-verbs-fixed.out`。
+- [x] Diff checked for out-of-scope changes. — 四仓 `git status --porcelain` 对账锚 T-00 基线，改动路径逐条归属 §5，越界 0（`evidence/artifacts/t06-repo-reconcile.out`）。
+- [x] Affected runtime repositories touched only when listed in scope. — 三个运行仓各恰一处改动：cloud `scripts/test.sh`＋`scripts/README.md`＋新增 `scripts/verify/test-control.sh`、agent 新增 `tests/test_control_sh.py`、desktop 模式 ＋ `src-tauri/tauri.conf.json`，四者均在 §5。
+- [x] Required baselines updated. — `MASTER` §3 读数列按实测刷新（`t06-status-words.out`）；`.ai/CURRENT_CONTEXT.md` 以 `--no-active` 重生成。
+- [x] Affected repositories committed independently. — workspace 按 Task 分提交；cloud `339cc15`／agent `095196e`／desktop `ffe089d`（T-01）＋ `b0ae3c3`（T-05A）。
+- [x] Completed active records removed from `delivery/active` and `delivery/LEDGER.md`. — 本记录已 `git mv` 入 `delivery/completed/`，LEDGER 表行移出并留关闭段。
 
 ## 14. 实测推翻或补齐预想（本 CHG 登记，逐项在对应 Task 落地）
 
@@ -256,3 +258,14 @@ None.
 8. **T-05：我第一版产物的 exit 读数取错了位置。** `out="$(cmd)"; echo "$out"; echo "exit=$?"` 中间那个 `echo`
    把 `$?` 重置为 0 ⇒ cloud `status` 被记成 `exit=0`（实为 **1**）。改用 rc 紧跟命令取值后重测并订正，
    错误读数未留档，自纠段写在产物内。**「读数要对」也包含「读数取在正确的位置」**。
+
+9. **T-06：§5 的清单漏了 desktop `tests/README.md`——由四仓对账撞出来，不是由评审撞出来。** 该行随 T-01 提交（`ffe089d`，
+   `+1` 行，把新套件登记进该仓测试索引），性质与 cloud `scripts/README.md` 完全相同，而 cloud 的那条**在** §5 清单里。
+   ⇒ 按「实现已提交且与交付同性质」回写 §5 Modify（末条），并把缺口登记在此：**清单在 T-00 写完时不可能枚举到
+   「实现时要顺手更新的索引文件」**——这类路径只能靠收尾对账发现。附带一条口径教训：对账时**不能只跑
+   `git status --porcelain`**（desktop 工作树现在是干净的，那条改动早已进提交），必须跑 `git diff --name-status <基线>`。
+10. **T-06：对账的「端口值命中 99 行」是分母错，不是端口值改动。** 裸报「changed lines 里端口形态命中 N 行」把
+   记录里对端口值的**引用**读成了端口值的**改动**：99 行**全部**落在本 CHG 自己的归档记录内
+   （`t05-*-verbs.out` 记的是运行实例的 `url=` 与健康端点；`t03-agent-test-sh.out` 是套件输出），归档记录之外 **0** 行。
+   ⇒ 先按文件归类再下结论（`t06-repo-reconcile.out` 端口段）；四仓的运行代码／配置／脚本端口值改动 **0**，
+   且该过滤器有阳性对照（CHG-067 的 desktop 提交 `9ba5486` 命中 2 行）。

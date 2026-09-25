@@ -1,0 +1,111 @@
+== CHG-20260926-068 T-06 失效指针扫描（两遍，各带阳性对照与分母）==
+锚：不可变基线 d8d7ba4（归档前那棵树）／工作树
+分母：已跟踪文件 999（用 `core.quotePath=false` ＋ `-z` 取）。非 ASCII 名的已跟踪路径 18 条，**默认口径下 git 把它们转义成 "\347\244…"**：行数不变，但按名字打不开——实测默认口径下 507 篇 `*.md` 只有 496 篇可开，扫描器于是静默丢掉 11 篇（连同其中的链接），故必须修口径；未跟踪非忽略文件 0（无）
+自指排除：delivery/completed/CHG-20260926-068/evidence/artifacts/t06-sweep.out（本扫描的产物，按口径单列，不入分母）
+
+### 第一遍 —— 字符串面：旧 active 路径 `delivery/active/CHG-20260926-068`
+
+A. 工作树（已跟踪，已排除自指产物）：命中 32 行；git grep exit=0
+   - 归档原始捕获（T-05A 及以前，对当次 porcelain 的原样引用 ⇒ 判留）：25 行 — 逐条：
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t00-baseline.out:7:    ?? delivery/active/CHG-20260926-068/
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t00-record-size.out:7:change.md        fatal: path 'delivery/active/CHG-20260926-068/change.md'
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t00-record-size.out:8:checkpoint.md    fatal: path 'delivery/active/CHG-20260926-068/checkpoint
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t01-record-size.out:4:delivery/active/CHG-20260926-068/change.md               now= 15120 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t01-record-size.out:5:delivery/active/CHG-20260926-068/checkpoint.md           now=  4733 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t01-record-size.out:8:delivery/active/CHG-20260926-068/evidence/task-00-activation.md now=  573
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t01-record-size.out:9:delivery/active/CHG-20260926-068/evidence/task-01-desktop-entry.md now=  
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out:4:delivery/active/CHG-20260926-068/change.md               now= 16461 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out:5:delivery/active/CHG-20260926-068/checkpoint.md           now=  5925 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out:8:delivery/active/CHG-20260926-068/evidence/task-00-activation.md now=  573
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out:9:delivery/active/CHG-20260926-068/evidence/task-01-desktop-entry.md now=  
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out:10:delivery/active/CHG-20260926-068/evidence/task-02-cloud-entry.md now=  4
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out:4:delivery/active/CHG-20260926-068/change.md               now= 17735 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out:5:delivery/active/CHG-20260926-068/checkpoint.md           now=  6943 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out:8:delivery/active/CHG-20260926-068/evidence/task-00-activation.md now=  573
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out:9:delivery/active/CHG-20260926-068/evidence/task-01-desktop-entry.md now=  
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out:10:delivery/active/CHG-20260926-068/evidence/task-02-cloud-entry.md now=  4
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out:11:delivery/active/CHG-20260926-068/evidence/task-03-agent-entry.md now=  3
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out:4:delivery/active/CHG-20260926-068/change.md               now= 18659 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out:5:delivery/active/CHG-20260926-068/checkpoint.md           now=  8433 B  an
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out:8:delivery/active/CHG-20260926-068/evidence/task-00-activation.md now=  573
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out:9:delivery/active/CHG-20260926-068/evidence/task-01-desktop-entry.md now=  
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out:10:delivery/active/CHG-20260926-068/evidence/task-02-cloud-entry.md now=  4
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out:11:delivery/active/CHG-20260926-068/evidence/task-03-agent-entry.md now=  3
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out:12:delivery/active/CHG-20260926-068/evidence/task-04-workspace-entry.md now
+   - 归档记录正文（过去时叙述 ⇒ 判留）：5 行 — 逐条：
+       delivery/completed/CHG-20260926-068/change.md:148:- [x] `delivery/active/CHG-20260926-068/` 三件齐备；LEDGER 表行；快照 `--change`；`MASTER` §3 刷新（T-00）
+       delivery/completed/CHG-20260926-068/checkpoint.md:16:- **T-00 激活**：`delivery/active/CHG-20260926-068/` 三件齐备；§5 范围封闭（4 Add／4 Modify／0 Delete／8 Explicit
+       delivery/completed/CHG-20260926-068/evidence/task-00-activation.md:9:`delivery/active/CHG-20260926-068/` 新建：`change.md`（§5 范围封闭：4 Add／4 Modify／0 Delet
+       delivery/completed/CHG-20260926-068/evidence/task-00-activation.md:28:| workspace | `?? delivery/active/CHG-20260926-068/` | 本 CHG 自己的新目录 |
+       delivery/completed/CHG-20260926-068/evidence/task-06-closeout.md:8:git mv delivery/active/CHG-20260926-068 delivery/completed/CHG-20260926-068
+   - T-06 本次新写的产物（**自指**：它们复述了被扫的模式，单列不入结论）：2 行
+   ⇒ 结论口径：**归档目录之外 0 行 ＋ 三仓 0 行**；归档目录内的 30 行（记录正文 ＋ 原始捕获）全是过去时叙述或原样引用 ⇒ 判留；T-06 自己的产物另计 2 行，单列。
+   其中**归档目录之外**（即真正的外部指针）：**0 行**
+
+B. 工作树（含未跟踪）：
+   命中 32 行；exit=0；与 A 之差 0 行（未跟踪文件里的旧路径）
+
+C. 自指单列：产物自身（若入分母会自指）
+   delivery/completed/CHG-20260926-068/evidence/artifacts/t06-sweep.out 命中 43 行 —— 单列，不计入 A/B 的结论（这 43 行只是本产物在复述被扫的模式）
+
+D. 阳性对照：同一模式锚取不可变基线 d8d7ba4（归档前那棵树）必须命中
+   命中 32 行；exit=0；前 3 条：
+       d8d7ba4:.ai/CURRENT_CONTEXT.md:6:- Change file: `delivery/active/CHG-20260926-068/change.md`
+       d8d7ba4:.ai/CURRENT_CONTEXT.md:24:6. `delivery/active/CHG-20260926-068/change.md`
+       d8d7ba4:.ai/CURRENT_CONTEXT.md:59:  `delivery/active/CHG-20260926-068/status/<repo>.md`. Never edit this
+   ⇒ 判别力成立：命令在基线树上命中 32，在工作树上命中 32；逐文件归因差异：
+       .ai/CURRENT_CONTEXT.md: 基线 3 → 工作树 0
+       delivery/active/CHG-20260926-068/change.md: 基线 1 → 工作树 0
+       delivery/active/CHG-20260926-068/checkpoint.md: 基线 1 → 工作树 0
+       delivery/active/CHG-20260926-068/evidence/artifacts/t00-baseline.out: 基线 1 → 工作树 0
+       delivery/active/CHG-20260926-068/evidence/artifacts/t00-record-size.out: 基线 2 → 工作树 0
+       delivery/active/CHG-20260926-068/evidence/artifacts/t01-record-size.out: 基线 4 → 工作树 0
+       delivery/active/CHG-20260926-068/evidence/artifacts/t02-record-size.out: 基线 5 → 工作树 0
+       delivery/active/CHG-20260926-068/evidence/artifacts/t03-record-size.out: 基线 6 → 工作树 0
+       delivery/active/CHG-20260926-068/evidence/artifacts/t04-record-size.out: 基线 7 → 工作树 0
+       delivery/active/CHG-20260926-068/evidence/task-00-activation.md: 基线 2 → 工作树 0
+       delivery/completed/CHG-20260926-068/change.md: 基线 0 → 工作树 1
+       delivery/completed/CHG-20260926-068/checkpoint.md: 基线 0 → 工作树 1
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t00-baseline.out: 基线 0 → 工作树 1
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t00-record-size.out: 基线 0 → 工作树 2
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t01-record-size.out: 基线 0 → 工作树 4
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t02-record-size.out: 基线 0 → 工作树 5
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t03-record-size.out: 基线 0 → 工作树 6
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t04-record-size.out: 基线 0 → 工作树 7
+       delivery/completed/CHG-20260926-068/evidence/artifacts/t06-repo-reconcile.out: 基线 0 → 工作树 2
+       delivery/completed/CHG-20260926-068/evidence/task-00-activation.md: 基线 0 → 工作树 2
+       delivery/completed/CHG-20260926-068/evidence/task-06-closeout.md: 基线 0 → 工作树 1
+     归因：基线 32 ＝ 生成物 `.ai/CURRENT_CONTEXT.md` 3 行（旧版快照记旧路径）＋ 归档内 29 行；
+           工作树 32 ＝ **同一批 29 行**（逐文件命中数一一对应，只换了路径前缀 `delivery/active/…`→`delivery/completed/…`：这是改名不是新增）＋ 本 Task 自己新写的 3 行（`t06-repo-reconcile.out` 2 ＋ `task-06-closeout.md` 1，单列，不入结论）
+           ⇒ 29＋3＝32 ✓；29＋3＝32 ✓——两侧分母同为 32
+
+E. 跨仓：三个运行仓是否残留指向本 CHG 归档前路径的引用
+   wt-media-cloud: 命中 0 行（exit=1）
+   wt-media-agent: 命中 0 行（exit=1）
+   wt-media-desktop: 命中 0 行（exit=1）
+   ⇒ 三仓合计 0 行
+
+F. 反向对照：新路径必须命中（否则说明扫描面本身是空的）
+   `delivery/completed/CHG-20260926-068` 命中 53 行；exit=0
+
+### 第二遍 —— 链接面：解析每条站内相对链接（跳过代码跨与行内代码）
+
+分母：已跟踪 markdown 507 篇；可解析相对链接 128 条；未解析 6 条
+未解析逐条：
+   MISS delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:54 -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L27
+   MISS delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:55 -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L278
+   MISS delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:75 -> ../../../../../wt-media-cloud/internal/modules/contentpool/service/operations.go#L49
+   MISS delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:100 -> ../../../../../wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue#L251
+   MISS delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:112 -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L167
+   MISS delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:113 -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L280
+
+归因对照（证明扫描器能认本 CHG 的链接，否则「本 CHG 0 条」是空转）：
+   指向 CHG-20260926-068 的链接：1 条，已解析 1 条，未解析 0 条
+   指向 CHG-20260926-067 的链接：1 条，已解析 1 条，未解析 0 条
+
+行内代码区分度的**双向**对照（CHG-065 同法）：同一处死链，写在散文里要报出、写进行内代码不报
+   /tmp/t06-probe/prose.md: 可解析链接 1 条，未解析 1 条
+   /tmp/t06-probe/code.md: 可解析链接 0 条，未解析 0 条
+   ⇒ 散文报出、行内代码不报，两侧都实测
+
+结论：**指向本 CHG 的失效链接 0 条**；全仓 6 条未解析**全部**落在已归档记录里（d8d7ba4 之前的历史），按 `MASTER:132`「归档记录保持原样、不回改」只登记。

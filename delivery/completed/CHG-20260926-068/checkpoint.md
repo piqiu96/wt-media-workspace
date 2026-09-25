@@ -6,7 +6,7 @@
 
 ## 状态
 
-`IMPLEMENTING`（2026-09-26 激活；跨四仓）
+`DONE`（2026-09-26 激活；2026-09-26 关闭归档；跨四仓）
 
 State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record in
 `delivery/active/` may only be `IMPLEMENTING` or `VERIFYING`.
@@ -60,16 +60,21 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   `scripts/test.sh` `exit=0`（372／12／20，与修复前同读数）。改前查过**没有判据锚在该行**（四类读者只取 `version`／`devUrl`／CSP 键）。
   desktop `b0ae3c3`。详见 `evidence/task-05a-desktop-devcmd-fix.md`。
 
+- **T-06 workspace 收尾**：归档 → `delivery/completed/`（`git mv` **41 条 rename** ＝ 40 纯 rename ＋ 1 rename＋modify）；
+  LEDGER 表行移出并留关闭段；`MASTER` §3 读数列按门禁自己的 `status_word()` 刷新（活记录 20→19、活 `IMPLEMENTING` 1→0、
+  归档 `DONE` 32→33、归档列 34→35、归档记录 42→43，闭合式 35＋2＋2＋4＝43 ✓）；快照 `--no-active`；
+  **两遍指针扫描**（字符串面归档外 **0** 行、三仓 0；链接面未解析 **6** 条，与 CHG-065／066／067 三次读数逐条相同，
+  指向本 CHG 的链接 1 条已解析）；**四仓对账**锚 T-00 基线、越界 **0**；六门禁 ＋ `sync_skills` ＋ 套件**取在最后一次改动之后**。
+  §5 回写一条（desktop `tests/README.md`，T-00 清单漏列，§14 第 9 项）。详见 `evidence/task-06-closeout.md`。
+
 ## Current
 
-T-05A 完成；环境已按用户裁定**停掉**（cloud／agent 停、DMG 应用退出、挂载卷推出）。下一步 T-06 收尾。
+无。**本 CHG 已收口归档**（`delivery/active/` → `delivery/completed/`，LEDGER 表行移出，快照 `--no-active`）。
 
 ## Next
 
-T-06 workspace：归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字。
-六门禁 ＋ `unittest discover -s tests -q` ＋ `sync_skills.py check` **取在最后一次改动之后**；
-两遍失效指针扫描（各带阳性对照与分母，对照锚取**不变基线**）；四仓 `git status --porcelain` 对账。
-**无待裁定项**：desktop 路径已修（D-06）、环境已停（D-07）。
+无。下一个 CHG **不自动开始**——按 `executing-wt-media-change` 的 Completion Gate，只从 `MASTER` 与实况建议候选。
+**无待裁定项**：desktop 路径已修（D-06）、环境已停（D-07）、§5 的清单缺口按「实现已提交」回写并登记（§14 第 9 项）。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -84,7 +89,7 @@ T-06 workspace：归档 → `delivery/completed/`；LEDGER 同步；快照 `--no
 
 ## Blocked
 
-- None. （T-05 的 5 格已由用户授权按 pid 清场后补跑完毕。）
+- None. （T-05 的 5 格已由用户授权按 pid 清场后补跑完毕；收尾无阻塞。）
 
 ## Recent verification
 
@@ -119,3 +124,9 @@ T-06 workspace：归档 → `delivery/completed/`；LEDGER 同步；快照 `--no
 | desktop 回归（T-05A） | `scripts/test.sh` `exit=0`：cargo 372 passed／0 failed／5 ignored、`control.test.sh` 12/0、`release-versions` 20/0——与修复前同读数 |
 | 改前影响面（T-05A） | 全仓读 `tauri.conf.json` 的只有取 `version` 的三处、取 `devUrl` 的一处、`bootstrap.rs:250` 断言 CSP 键不存在；**无一读 `beforeDevCommand`** |
 | 环境收尾（D-07） | cloud／agent `stop` 后 18080／8765 归零；DMG 应用 72068 退出、`/Volumes/WT Media` 推出；比特浏览器 13947 仍活、未触碰 |
+| `MASTER` §3 读数列（T-06，归档后） | 活列 **19**（`SUPERSEDED` 9／`PLANNED` 3／`DISCUSSION` 7，`IMPLEMENTING` 归 0）；归档记录 **43**（`DONE` **33**／`IMPLEMENTING` 1／`VERIFYING` 1／`CLOSED` 2／`HANDOFF` 2／`IN_PROGRESS` 4）；闭合式 35＋2＋2＋4＝**43** ✓（`artifacts/t06-status-words.out`）。**首测与终测差一处**：归档动作与状态词改写必须都落定后再测，否则自己的记录会被读成 `IMPLEMENTING` 而计入归档列 |
+| 第一遍指针扫描（T-06） | 分母 **999** 已跟踪 ＋ **0** 未跟踪（取在 `git add -A` 之后；`core.quotePath=false` ＋ `-z`，否则含中文名的 18 个文件被八进制转义丢出分母）；**归档目录之外 0 行**，三仓 `git -C … grep` 亦 0；归档目录内 **32** 行（原始捕获 25 ＋ 记录正文 5 ＋ 本 Task 自写 2）全是过去时叙述与对 `porcelain` 的原样引用 ⇒ 判留（先例：CHG-067 自己的归档记录同样留着它的旧 active 路径）。阳性对照锚不可变基线 `d8d7ba4` 命中 **32** 行、与工作树同数：基线 32＝生成物快照 3＋归档内 29，工作树 32＝**同一批 29 行只换路径前缀**（改名不是新增）＋本 Task 自写 3 行；产物自指单列（`artifacts/t06-sweep.out`） |
+| 第二遍链接 resolve（T-06） | 分母 **507** 篇 `*.md`／**128** 条站内相对链接（跳过代码跨越**与行内代码**，双向对照：散文报出／行内代码不报）；**未解析 6 条**，与 CHG-065 T-09／CHG-066 T-06／CHG-067 T-07 三次读数**逐条相同**（同一批、同一成因：少一级 `..`），**全部在已归档记录里**，按 `MASTER:132` 判留；指向本 CHG 的链接 **1 条、已解析、未解析 0**（归因对照：指向 CHG-067 的 1 条亦已解析，证明扫描器认得出本 CHG 的链接形状）（同文件） |
+| 四仓对账（T-06） | 锚 T-00 基线（workspace `5622622`／cloud `e2ba4d8`／agent `aa95332`／desktop `9ba5486`）→ HEAD `d8d7ba4`／`339cc15`／`095196e`／`b0ae3c3`；改动路径逐条归属 §5，**越界 0**；两条脏项先于本 CHG 存在、未触碰；端口值：全仓命中 99 行**全部**落在本 CHG 自己的归档记录内（`t05-*-verbs.out` 的实例 `url=`），**归档之外 0**，过滤器阳性对照（CHG-067 的 `9ba5486`）命中 2 行（`artifacts/t06-repo-reconcile.out`） |
+| 六门禁 ＋ `sync_skills` ＋ 套件（T-06，最后一次改动之后） | 见 `artifacts/t06-gate-final.out`——**不在此内联**。中间态实测一处：快照先改 `--no-active` 而 LEDGER 表行仍在时，`verify_delivery_governance` 与 `verify_agent_entry` 各报 2 条 ERROR（`none != CHG-20260926-068`／`ledger references missing active CHG`），**两条都在 LEDGER 表行移出后归零** ⇒ 「快照重生成」与「表行移出」必须在同一次提交内落地 |
+| 记录体量（T-06） | 锚上一 Task 提交 `d8d7ba4`：`change.md` 增量、`checkpoint.md` 增量、`evidence/task-06-closeout.md` 新增量见 `artifacts/t06-record-size.out`（v5，按 Task 增量；`change.md` 在 T-00 起即在界外，本 Task 只保证**不再扩大**越界幅度） |
