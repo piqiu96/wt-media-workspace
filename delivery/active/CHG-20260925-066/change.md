@@ -104,9 +104,9 @@
 
 ### Delete
 
-- **只删可再生过程产物**，且**只删无任何入站引用的**。清单已由 T-02 逐类实测（见 §4 F-01b 与 `evidence/artifacts/t02-deletable-measure.out`）：**42 files / 140,556 B**，主要是 `__pycache__`／`.pyc` 与未被本 CHG 记录引用的 `.out`／`.log`／中间 `.json`。T-05 按该清单逐条执行并留痕（先例 `CHG-20260923-063:140`：即使 S 级也要逐条删除清单）。
+- **只删可再生过程产物**，且**只删无任何入站引用的**。T-02 逐类实测出的候选清单是 **42 files / 140,556 B**（`evidence/artifacts/t02-deletable-measure.out`）；**T-05 复检后实删 2 files / 54,810 B**——T-02 的入站引用仪器只认「精确文件名」一种写法，漏掉同 CHG 记录里的**带星 glob** 与**裸前缀**两种（§14 第 17 项），37/42 其实被点名。T-05 逐条执行并留痕（先例 `CHG-20260923-063:140`：即使 S 级也要逐条删除清单）：`evidence/task-05-deletion-list.md`。
 - **明确排除**（用户裁定 D-05）：全部 `.png` 截图（视觉缺陷的唯一判据——删了 `CHG-20260923-055` 的 CSP 布局结论无法复验）、CHG-052 的 `m3-e3-acceptance-20260923/` 证据包（占归档 55.2%，且 T-03 之后读取面仍是活依赖）、全部 `change.md`／`checkpoint.md`／手写证据、以及**任何被归档 `.md` 引用的产物**。
-- **删除规模的上限是 1.3%**（F-01b）。本 CHG **不**通过放宽上述排除来换取更大的删除量——用户在知悉该读数后明确选择不动 CHG-052 的包。
+- **删除规模的上限是 1.3%**（F-01b），实删 0.51%。**T-05 没有用满这个上限，是复检后清单变小的结果，不是放宽了排除**：本 CHG **不**通过放宽上述排除来换取更大的删除量——用户在知悉该读数后明确选择不动 CHG-052 的包。判「不删」的 3 个是 `probe-*.json`——它们是**测量**（过去时刻的探针结果，不是任何已跟踪源的确定性函数），不是派生（§14 第 18 项）。
 
 ### Explicitly Not Doing
 
@@ -139,7 +139,7 @@ None.
 | T-02 | 边界成文 ＋ 实测可删量：`completed/README.md`；`AGENT-INDEX.md` §8；`MASTER:132`；`README.md:51` 消歧；逐类实测可删量并落痕 | DONE | 判据串**先写后实现**（已写定，见 evidence §1）；可删量**42 files / 140,556 B ＝ 1.3%**，分母 ＝ F-01 的 698 文件 |
 | T-03 | 修掉唯一的写入者：`verify_m3_acceptance.py` 写入面移出归档；读取面只读且常量声明 | DONE | 判读为**读写两侧一并移出**（读点全是本轮产物）。三层判据：字面量 **0/1810**（阳性对照 2/1798）、19 个写点逐个归属 0 处写归档、运行三读数 ＋ 影子树两臂对照（臂 B 旧版写进归档 2 文件）。见 `evidence/task-03-writer-moved.md` |
 | T-04 | 门禁：`check_archive_readonly` ＋ `check_completed_has_boundary` | DONE | 判据层阳性对照（锚 `05c2045`）**11 处／0 处**；用例层四条变异全红成 `FAIL`、`ImportError` **0**、`ERROR` **0**；两条分母由 `main()` 打印（`scanned 12 script(s)`／`1 boundary marker(s)`）；六门禁 `exit=0` ＋ 套件 **94 → 100 OK**。见 `evidence/task-04-gate-mutation.md` |
-| T-05 | 删纯过程产物：按 T-02 清单执行；排除 PNG 与 CHG-052 的 m3-e3 包 | TODO | 逐条删除清单 ＋ 删前删后总字节读数；删后六门禁 ＋ unittest 全绿 |
+| T-05 | 删纯过程产物：按 T-02 清单执行；排除 PNG 与 CHG-052 的 m3-e3 包 | DONE | 复检后**实删 2 files / 54,810 B**（T-02 清单 42/140,556 是三形态里只认一种所致）：699→697 文件、10,740,897→10,686,087 B、`.pyc` 分母 2→0；仪器对照含「不存在的路径报不存在」；**git 侧零痕迹**（两个 `.pyc` 被 gitignore），唯一记录是 evidence ＋ `artifacts/t05-*`。删后六门禁 `exit=0` ＋ `Ran 100 OK` |
 | T-06 | 收尾：归档 → `completed/`；LEDGER 同步；快照 `--no-active`；两遍失效指针扫描 | TODO | 六门禁 `exit=0` ＋ unittest，**在最后一次改动之后**重测；四仓 `git status --porcelain` 对账 |
 
 ## 9. Repository Checklist
@@ -173,9 +173,9 @@ None.
 | AC-02 | `check_archive_readonly` **能失败** | 变异对照：把 T-03 的写入目标指回归档 → 报出；关掉判定 → 用例失败且非 `ImportError` | **PASS**（T-04：判据层跑改前脚本报 **11 处**、现树 **0 处**（锚 `05c2045`）；用例层 M1／M4 变异各红 2／4 条，`ImportError` **0**） |
 | AC-03 | `check_completed_has_boundary` **能失败** | 变异对照：删 `README.md` → 报出；去掉标记串 → 报出 | **PASS**（T-04：M2 变异红 4 条；删除 `README.md`、去掉标记串、整目录缺失三种形态各有用例，全部断言完整错误集合） |
 | AC-04 | 重跑 `verify_m3_acceptance.py` 的读写路径**不再写 `completed/`** | 跑前跑后对 `completed/` 做文件数 ＋ 字节数 ＋ `find -newer` 三读数；**阳性对照**：修改前的版本必须报出写入 | **PASS**（T-03：699/699、字节全等、`find -newer` **0** 个；对照臂旧版 `find -newer` **2** 个且 `.cache/` 不存在——全部写进归档；`artifacts/t03-write-surface.out`） |
-| AC-05 | 删除**只**落在可再生过程产物上，且逐条留痕 | 逐条删除清单（路径 ＋ 字节）；删前删后总字节读数；**PNG 与 CHG-052 m3-e3 包零删除**逐类枚举确认 | TODO |
+| AC-05 | 删除**只**落在可再生过程产物上，且逐条留痕 | 逐条删除清单（路径 ＋ 字节）；删前删后总字节读数；**PNG 与 CHG-052 m3-e3 包零删除**逐类枚举确认 | **PASS**（T-05：只删 2 个 `__pycache__/*.pyc`——已跟踪源码的确定性派生；3 个 `probe-*.json` **是测量不是派生**故不删，见 §14 第 18 项。699→697 文件、差 **54,810 B** 与逐条读数相等；PNG 0 个、CHG-052 包 0 个） |
 | AC-06 | `MASTER` §3 读数列与实测**逐词相等**（含本 CHG 激活后的分母） | 用与 `verify_product_master_alignment.py::status_word()` 同源的量法重测（先例：`re-measure-with-the-gates-own-function`） | TODO |
-| AC-07 | 归档区**从未被删过**这一事实在本 CHG 之后仍成立 | `git log --diff-filter=D -- delivery/completed` 的**净删除文件数**为 0（T-05 的删除须落在可再生的过程产物上，故本条按「记录文件」为分母重述） | TODO |
+| AC-07 | 归档区**从未被删过**这一事实在本 CHG 之后仍成立 | `git log --diff-filter=D -- delivery/completed` 的**净删除文件数**为 0（T-05 的删除须落在可再生的过程产物上，故本条按「记录文件」为分母重述） | **PASS**（T-05：删的两个 `.pyc` 在 `.gitignore` 内，`git status --porcelain` **无删除项**，故 git 侧的净删除仍为 0；两条命令的读数见 §14 第 19 项） |
 | AC-08 | 六个静态门禁 `exit=0` ＋ `unittest` OK | 在**最后一次改动之后**重测，读数落 `evidence/artifacts/` | TODO |
 | AC-09 | 四仓零越界：workspace 只得治理文件改动，三仓零改动 | 逐仓 `git status --porcelain` ＋ `git diff --stat` 对账，锚 T-01 基线提交 | TODO |
 | AC-10 | 门禁**报出分母**，且读数不是空转 | `check_archive_readonly` 打印被扫描脚本数与前缀匹配数；`check_completed_has_boundary` 打印被检查的标记串数 | **PASS**（T-04：`scanned 12 script(s) … 0 write(s)`／`1 boundary marker(s)`，两条由 `main()` 无条件打印；用例 `test_archive_checks_report_their_denominators` 逐字断言这两行） |
@@ -236,3 +236,11 @@ None.
 15. **判据的覆盖面是明写的，不是暗示的**（T-04）。`check_archive_readonly` 只扫 `scripts/*.py` 顶层：`scripts/` 下另有 **6 个 shell 脚本**不在判据内，`tests/` 也不在内。人工读数（不是判据）：这 6 个文件提到 `delivery/completed` 的行数 **0**。⇒ 按「证据覆盖面要枚举」记：边界写成「脚本不写归档」，而不是「任何东西都写不了归档」。
 
 16. **T-04 的记录成本**：读数见 `evidence/artifacts/t04-record-size.out`（**不内联**，同第 4 项与第 12 项）。
+
+17. **T-02 的「无入站引用」是三形态里只认一种量出来的**（T-05 复检）。该仪器只认**精确文件名／CHG 限定路径**；同一批同 CHG 记录里另有**带星 glob**（`原始输出（`t01-*`、`t03-*`）`）与**裸前缀**（`` `t01-`、`t03-`、`t05-` ``——**一个 `*` 都没有**，故任何基于 `*` 的扫描都看不见它）。三形态合计：**37 / 42 其实被同 CHG 的记录点名**，可删集从 42 掉到 5。⇒ 教训与「否定结论要先证明检查能失败」同族，但更窄一层：**报「无引用」之前要先把引用的写法枚举出来**——这次第三种写法连正则都够不着。**连 T-02 自己判为「同名碰撞、不是引用」的那 1 条（1,801 B）也在其中**。实删因此是 **2 files / 54,810 B（0.51%）**，不是 1.3%。
+
+18. **「可再生」要落到「派生 vs 测量」，不落到「是不是机器产物」**（T-05 逐条裁定）。三形态下 5 个无引用项里，3 个是 `CHG-20260923-055/evidence/raw/probe-*.json`——**过去时刻的 HTTP 探针结果**：源码（`tools/csp-probe-proxy.py`）还在，但那一刻的响应不会重现，所以它**不是**任何已跟踪源的确定性函数；且 `delivery/milestones/M3-content-discovery-v2.md:59` 有一条**活指针**指向那个 evidence 目录做「实机复核」。⇒ 判**不删**。另 2 个 `__pycache__/*.pyc` 由已跟踪源码确定性派生、全仓无一处点名 ⇒ 判**删**。**判据不是「它是不是机器产物」（两者都是），而是「重跑能不能得到同一个东西」。**
+
+19. **AC-07 的两条读数**：`git log --diff-filter=D -- delivery/completed` 的净删除 **0**（阳性对照：同一命令对 `delivery/active/CHG-20260714-001/change.md` 报出 `63092e8`——证明该命令能报出删除，0 不是空转）；`git status --porcelain` 无删除项（删的两个 `.pyc` 本在 `.gitignore` 内）。⇒ **本 Task 在 git 侧零痕迹，唯一记录是 `evidence/task-05-deletion-list.md` 与 `artifacts/t05-*.out`**。这是 §4 F-08 预判形态的第一次实际发生。
+
+20. **T-05 的记录成本是四个 Task 里唯一一次三项皆不越界**：`change.md`／`checkpoint.md`／本 Task evidence 三个增量全部落在界内（T-01 越界 3.2 倍见第 4 项、T-03 两处约 +10% 见第 12 项、T-04 见第 16 项）。成因不是写得少，是**本 Task 有真实的负向面积**：原计划删 42 files / 140,556 B 而实删 2 files / 54,810 B，复检推翻清单这件事本身把记录压回了界内——**所以这条读数不该被读成「写作纪律变好了」**。确切数字见 `evidence/artifacts/t05-record-size.out`（**不内联**，同第 4／12／16 项）。

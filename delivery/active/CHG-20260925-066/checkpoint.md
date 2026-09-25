@@ -22,14 +22,16 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 
 - **T-04 两条 ERROR 门禁**：`verify_delivery_governance.py` 新增 `check_archive_readonly`／`check_completed_has_boundary`，两条分母由 `main()` 无条件打印（`scanned 12 script(s)`／`1 boundary marker(s)`）。判据**锚在字符串字面量**上再从字面量追一跳（不做函数内闭包——那一步会爆炸，§14 第 11 项）。**判据层**阳性对照锚不变的基线 `05c2045`：改前脚本报 **11 处**归档写、现树 **0 处**；这 11 处里有 4 处是函数内局部名，靠那一跳才追得上。**用例层**四条变异（关掉两条判定／改错 `open` 的 mode 位置／摘掉接线）全部红成 `FAIL`，`ImportError` 与 `ERROR` 各 **0**。`write_target` 初版有一处真错（方法形式 `open("rb")` 被读成写，14 处 vs 11 处），由该对照抓出。套件 **94 → 100 OK**，六门禁全 `exit=0`。见 `evidence/task-04-gate-mutation.md`。
 
+- **T-05 删纯过程产物（复检后清单）**：T-02 的「42 files / 140,556 B ＝ 1.3%」是**高估**——它的入站引用仪器只认「精确文件名」一种写法，漏掉同 CHG 记录里的**带星 glob** 与**裸前缀**（`` `t01-` `` 这种一个 `*` 都没有的写法，任何基于 `*` 的扫描都够不着）。三形态复检：**37/42 其实被点名**，可删集 42 → 5。5 个里 3 个是 `probe-*.json`（**测量**，不是任何已跟踪源的确定性函数，且 M3 里程碑有活指针指向那个目录）判不删；**实删 2 个 `__pycache__/*.pyc`／54,810 B（0.51%）**。读数：699→697 文件、10,740,897→10,686,087 B、`.pyc` 分母 2→0；**git 侧零痕迹**（两个 `.pyc` 被 gitignore），唯一记录是 evidence ＋ `artifacts/t05-*`（§4 F-08 首次实际发生）。AC-07 两条读数已完成：净删除 **0**（阳性对照 `63092e8`）。删后六门禁 `exit=0` ＋ `Ran 100 OK`。见 `evidence/task-05-deletion-list.md`。
+
 ## Current
 
-T-04 已完成（未提交）；下一项是 T-05（删 T-02 实测出的 42 个纯过程产物）。
+T-05 已完成（未提交）；下一项是 T-06（收尾：归档、LEDGER、快照、两遍指针扫描）。
 
 ## Next
 
-1. **T-05**：按 T-02 清单删这 42 个文件；**排除**全部 PNG、CHG-052 的 `m3-e3-acceptance-20260923/` 包、以及任何被归档 `.md` 引用的产物。注意清单里有 **2 个被忽略的 `.pyc` 与 2 个被忽略的 `.log`**——删它们时 `git diff` 是空的，**唯一记录就是那张清单**（§4 F-08）。
-2. **T-06**：归档、LEDGER 同步、快照 `--no-active`、两遍失效指针扫描。
+1. **T-06**：归档 → `completed/`；LEDGER 同步；快照 `--no-active`；两遍失效指针扫描（字符串 ＋ 相对链接 resolve，各带阳性对照与分母）；`MASTER` §3 读数列按 D-04 再刷新一次；六门禁 ＋ unittest **在最后一次改动之后**重测；四仓 `git status --porcelain` 对账。
+2. **收尾时注意**：本轮 AC-05 的实删量（0.51%）低于 D-05 裁定的上限（1.3%），原因已登记 §14 第 17／18 项——**上限没用满不等于放宽了排除**，收尾结论文档要照这个口径写。
 
 ## Blocked
 
@@ -64,5 +66,12 @@ T-04 已完成（未提交）；下一项是 T-05（删 T-02 实测出的 42 个
 | T-04 六门禁 ＋ 套件 | 全 `exit=0`／`Ran 100 OK`（同上文件；与 T-03 的 94 对照） |
 | T-04 修掉第二处 fixture | `test_prepare_ai_workspace.py` 的临时树补合规归档区；不是放宽判据（§14 第 13 项） |
 | T-04 记录体量 | 见 `artifacts/t04-record-size.out`——**不在此内联**，本表的字节数会随写入而改变 |
+| T-05 入站引用三形态复检 | 形态 1＋2：21/42 被引用；加形态 3（裸前缀）：**37/42**；三形态皆无引用 **5/42**（`artifacts/t05-reference-forms.out`，三条对照全过） |
+| T-05 删除读数 | **2 files / 54,810 B**：699→697 文件、10,740,897→10,686,087 B、`.pyc` 2→0；仪器对照含「不存在的路径报不存在」（`artifacts/t05-deletion-list.out`） |
+| T-05 git 侧痕迹 | `git status --porcelain` **无删除项**——两个 `.pyc` 本在 `.gitignore` 内 |
+| AC-07 归档净删除 | **0**（分母：归档区被删除的已跟踪文件）；阳性对照同命令对 `delivery/active/CHG-20260714-001/change.md` 报出 `63092e8` |
+| T-05 六门禁 ＋ 套件 | 全 `exit=0`／`Ran 100 OK`（`artifacts/t05-gate-readings.out`） |
+| T-05 归档区新基线 | 697 文件 / 10,686,087 B |
+| T-05 记录体量 | 见 `artifacts/t05-record-size.out`——**不在此内联** |
 
 读数取在**最后一次内容改动之后**；原始输出在 `evidence/artifacts/`。

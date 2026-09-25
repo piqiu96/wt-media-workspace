@@ -1,0 +1,29 @@
+# T-05 记录体量收尾读数
+# date: 2026-09-26 00:13 CST
+# 判据（CHG-065 记录成本第五版，按 Task 增量）:
+#   change.md 增量 <= 5120 B / Task ; checkpoint.md 增量 <= 4096 B ; evidence <= 9216 B / Task
+# 量法: 上一 Task 提交处的 blob 字节数 vs 工作树当前字节数（非 HEAD 比对、非行数）
+# 基线锚: 提交 f07142d（T-04 的提交）
+# 取值时刻: 本 CHG 的 change.md／checkpoint.md 最后一次改动之后（§14 第 20 项写完再量）
+#           ——「收尾计数要在最后一次改动之后重跑」
+
+change.md                            29937 -> 33839        3902  界   5120  OK
+checkpoint.md                         7859 ->  9936        2077  界   4096  OK
+evidence/task-05-deletion-list.md        -                4586  界   9216  OK
+
+本 Task 的 artifacts 合计（不含本文件）  17195   = t05-deletion-list.out     1932
+                                                 + t05-gate-readings.out     1642
+                                                 + t05-reference-forms.out  13621
+# 不含本文件自身，是因为**把本文件算进去，这个数就被写它这个动作本身改变了**
+# ——「记录会改变被记录的量」的第三种锚失效形态。排除后该数对本文件的一切改写免疫。
+# 取值次序：先在 change.md／checkpoint.md 的最后一次改动之后重跑门禁并覆写
+# t05-gate-readings.out，再量上面三个数，最后写本文件——本文件是最后一个被写的。
+
+# T-04 提交时 change.md = 29937 B（本轮基线锚，非参照）。
+#
+# 本 Task 是 T-01..T-04 四个 Task 里**唯一一次三项皆不越界**，但成因不是写作纪律变好：
+# 原计划删 42 files / 140,556 B，复检推翻清单、实删 2 files / 54,810 B，是**复检这件事本身**
+# 把记录压回了界内。见 change.md §14 第 17／18／20 项。
+#
+# 另: 删掉的两个 .pyc 被 .gitignore 覆盖，git 侧无痕迹，故本 Task 的提交只有记录与
+# artifacts 两个面（§4 F-08 预判形态的首次实际发生，见 §14 第 19 项）。

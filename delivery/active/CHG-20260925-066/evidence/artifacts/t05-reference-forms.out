@@ -1,0 +1,169 @@
+## T-05 入站引用复检：三个形态
+日期：2026-09-26 00:09:30
+锚：HEAD = f07142d（删除前）
+
+T-02 的仪器只认形态 1。本脚本对同 42 条逐条问「同 CHG 的记录里有没有提到它」。
+
+=== 对照 ===
+  [OK] 形态 1 真引用：得 True 期望 True
+  [OK] 形态 2 真引用：得 True 期望 True
+  [OK] 形态 3 真引用：得 True 期望 True
+  [OK] 非引用（别的 CHG 的产物）：得 False 期望 False
+
+=== 被同 CHG 记录引用（三形态任一）：37 ===
+  CHG-20260923-055/evidence/raw/proxy-log-after-20260923T1627.log
+      ← glob:proxy-log-*.log  delivery/completed/CHG-20260923-055/evidence/20260923-closeout-and-m3-signoff.md:28
+      ← glob:*.log  delivery/completed/CHG-20260923-055/evidence/20260923-closeout-and-m3-signoff.md:35
+      ← glob:raw/*.log  delivery/completed/CHG-20260923-055/evidence/20260923-closeout-and-m3-signoff.md:80
+  CHG-20260923-055/evidence/raw/proxy-log-before-20260923T1553.log
+      ← glob:proxy-log-*.log  delivery/completed/CHG-20260923-055/evidence/20260923-closeout-and-m3-signoff.md:28
+      ← glob:*.log  delivery/completed/CHG-20260923-055/evidence/20260923-closeout-and-m3-signoff.md:35
+      ← glob:raw/*.log  delivery/completed/CHG-20260923-055/evidence/20260923-closeout-and-m3-signoff.md:80
+  CHG-20260925-063/evidence/artifacts/t01-baseline-unittest.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-062/evidence/artifacts/t03-unittest.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:26
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:27
+  CHG-20260925-065/evidence/artifacts/t06-ownership.out
+      ← 裸前缀:t06-  delivery/completed/CHG-20260925-065/change.md:240
+      ← glob:artifacts/*.out  delivery/completed/CHG-20260925-065/change.md:273
+      ← 裸前缀:t06-  delivery/completed/CHG-20260925-065/checkpoint.md:108
+  CHG-20260925-064/evidence/artifacts/t07-gate-readings.out
+      ← 精确  delivery/completed/CHG-20260925-064/evidence/artifacts/t07-gate-readings.out:40
+  CHG-20260925-064/evidence/artifacts/t05-gate-readings.out
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-064/change.md:376
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-064/change.md:395
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-064/evidence/task-12-close.md:53
+  CHG-20260925-063/evidence/artifacts/t03-mutation-control.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/change.md:82
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/checkpoint.md:58
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/evidence/artifacts/t03-mutation-control.py:8
+  CHG-20260925-064/evidence/artifacts/t12-gate-readings-confirm.out
+      ← 裸前缀:t12-  delivery/completed/CHG-20260925-064/change.md:344
+      ← 裸前缀:t12-  delivery/completed/CHG-20260925-064/change.md:375
+      ← 裸前缀:t12-  delivery/completed/CHG-20260925-064/change.md:376
+  CHG-20260925-063/evidence/artifacts/t02-scope-checks.out
+      ← 裸前缀:t02-  delivery/completed/CHG-20260925-063/evidence/task-02-m2-acceptance.md:74
+      ← 裸前缀:t02-  delivery/completed/CHG-20260925-063/evidence/task-02-m2-acceptance.md:75
+      ← 裸前缀:t02-  delivery/completed/CHG-20260925-063/evidence/task-02-m2-acceptance.md:76
+  CHG-20260925-063/evidence/artifacts/t01-milestone-status-vs-block.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-062/evidence/artifacts/t05-sweep-section13.out
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:203
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:273
+  CHG-20260925-063/evidence/artifacts/t03-postfix-test_verify_product_master_alignment.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/change.md:82
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/checkpoint.md:58
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/evidence/artifacts/t03-mutation-control.py:8
+  CHG-20260925-063/evidence/artifacts/t03-postfix-full-test-suite.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/change.md:82
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/checkpoint.md:58
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/evidence/artifacts/t03-mutation-control.py:8
+  CHG-20260925-065/evidence/artifacts/t02-gate-readings.out
+      ← glob:artifacts/*.out  delivery/completed/CHG-20260925-065/change.md:273
+      ← 裸前缀:t02-  delivery/completed/CHG-20260925-065/checkpoint.md:74
+      ← 精确  delivery/completed/CHG-20260925-065/evidence/artifacts/t09-gate-readings.out:27
+  CHG-20260925-062/evidence/artifacts/t03-verify_m2_acceptance.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:26
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:27
+  CHG-20260925-063/evidence/artifacts/t01-baseline-verify_product_master_alignment.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-063/evidence/artifacts/t04-mutation-control.out
+      ← 裸前缀:t04-  delivery/completed/CHG-20260925-063/change.md:200
+      ← 裸前缀:t04-  delivery/completed/CHG-20260925-063/change.md:240
+      ← 裸前缀:t04-  delivery/completed/CHG-20260925-063/change.md:241
+  CHG-20260925-062/evidence/artifacts/t03-verify_product_master_alignment.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:26
+      ← glob:artifacts/t03-verify_product_master_alignment*.out  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:27
+  CHG-20260925-065/evidence/artifacts/t07-ac11.out
+      ← 裸前缀:t07-  delivery/completed/CHG-20260925-065/change.md:240
+      ← glob:artifacts/*.out  delivery/completed/CHG-20260925-065/change.md:273
+      ← 裸前缀:t07-  delivery/completed/CHG-20260925-065/checkpoint.md:125
+  CHG-20260925-063/evidence/artifacts/t01-test-mutation-probes.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-062/evidence/artifacts/t03-verify_product_master_alignment-after.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:26
+      ← glob:artifacts/t03-verify_product_master_alignment*.out  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:27
+  CHG-20260925-062/evidence/artifacts/t05-sweep-skill-pointer.out
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:203
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:273
+  CHG-20260925-062/evidence/artifacts/t03-verify_m0_config.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:26
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-062/evidence/task-03-drift-sweep.md:27
+  CHG-20260925-063/evidence/artifacts/t01-postactivate-verify_agent_entry.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-062/evidence/artifacts/t01-verify-agent-entry.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/evidence/artifacts/t05-postarchive-sweep.out:7
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/evidence/artifacts/t05-postarchive-sweep.out:11
+  CHG-20260925-062/evidence/artifacts/t05-verify_agent_entry.out
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:203
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:273
+  CHG-20260925-063/evidence/artifacts/t01-postactivate-verify_delivery_governance.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-062/evidence/artifacts/t01-verify-governance.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/evidence/artifacts/t05-postarchive-sweep.out:7
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/evidence/artifacts/t05-postarchive-sweep.out:11
+  CHG-20260925-063/evidence/artifacts/t01-postactivate-verify_skills.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-062/evidence/artifacts/t05-verify_delivery_governance.out
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:203
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:273
+  CHG-20260925-063/evidence/artifacts/t01-baseline-status-wt-media-cloud.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-063/evidence/artifacts/t01-baseline-status-wt-media-desktop.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-063/evidence/artifacts/t01-baseline-status-wt-media-agent.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:33
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:34
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-063/evidence/task-01-m0-config.md:35
+  CHG-20260925-063/evidence/artifacts/t03-postfix-verify_product_master_alignment.out
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/change.md:82
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/checkpoint.md:58
+      ← 裸前缀:t03-  delivery/completed/CHG-20260925-063/evidence/artifacts/t03-mutation-control.py:8
+  CHG-20260925-062/evidence/artifacts/t01-verify-skills.out
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/evidence/artifacts/t05-postarchive-sweep.out:7
+      ← 裸前缀:t01-  delivery/completed/CHG-20260925-062/evidence/artifacts/t05-postarchive-sweep.out:11
+  CHG-20260925-062/evidence/artifacts/t05-verify_skills.out
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:203
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:221
+      ← 裸前缀:t05-  delivery/completed/CHG-20260925-062/change.md:273
+
+=== 三形态皆无引用：5 ===
+Traceback (most recent call last):
+  File "/tmp/t05_refcheck.py", line 115, in <module>
+    size = (WS / "delivery" / "completed" / target).stat().st_size
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 654, in stat
+    return os.stat(self, follow_symlinks=follow_symlinks)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/delivery/completed/CHG-20260923-056/evidence/tools/__pycache__/ac05_desktop_launch.cpython-314.pyc'

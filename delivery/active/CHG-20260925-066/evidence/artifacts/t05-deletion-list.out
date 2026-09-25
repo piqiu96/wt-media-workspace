@@ -1,0 +1,43 @@
+## T-05 删除清单与删前删后读数
+日期：2026-09-26 00:09:12
+锚：HEAD = f07142d
+
+=== 仪器对照（删除前先证明这套读数能失败）===
+  [OK] 删前存在：delivery/completed/CHG-20260923-056/evidence/tools/__pycache__/ac05_desktop_launch.cpython-314.pyc
+  [OK] 删前存在：delivery/completed/CHG-20260924-060/evidence/tools/__pycache__/t02_csp_shipped_value_launch.cpython-314.pyc
+  [OK] 阴性对照：不存在的路径报为不存在
+  分母：归档区全部 .pyc = 2 个
+
+=== 删前 ===
+  文件数 699
+  总字节 10740897
+
+=== 删除（逐条）===
+  已删 46581 B  delivery/completed/CHG-20260923-056/evidence/tools/__pycache__/ac05_desktop_launch.cpython-314.pyc
+  已删 8229 B  delivery/completed/CHG-20260924-060/evidence/tools/__pycache__/t02_csp_shipped_value_launch.cpython-314.pyc
+
+=== 删后 ===
+  文件数 697
+  总字节 10686087
+  归档区剩余 .pyc = 0 个
+
+=== git 侧读数 ===
+  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+  （空 = 这 2 个文件本就被 .gitignore 覆盖，删除不留 git 痕迹——唯一记录是上面这两行）
+
+=== AC-07：归档区在 git 侧的净删除 ===
+判据 1（分母：归档区被删除的已跟踪文件数）:
+  净删除行数 0
+  逐条（应为空）:
+
+阳性对照（同一个命令对一条**确实被删过**的路径）:
+  路径 delivery/active/CHG-20260714-001/change.md:
+    63092e8 chore: establish CHG execution records
+
+判据 2（本 Task 的删除在 git 侧留没留痕）:
+   M delivery/active/CHG-20260925-066/change.md
+  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-gate-readings.out
+  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-reference-forms.out
+  ?? delivery/active/CHG-20260925-066/evidence/task-05-deletion-list.md
+  （除本 CHG 自己的产物外应为空）

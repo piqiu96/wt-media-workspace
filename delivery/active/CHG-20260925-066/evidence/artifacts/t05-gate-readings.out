@@ -1,0 +1,41 @@
+## T-05 收尾读数（取在最后一次内容改动之后）
+日期：2026-09-26 00:11:58
+基线锚：提交 f07142d（T-04）。本轮在 T-05 删除（2 个 .pyc）＋ change.md／checkpoint.md 的 T-05 记录（含 §14 第 20 项）全部写完之后重取。
+用法：python3 -B -X pycache_prefix=/tmp/pyc-none（等长变异会被旧 .pyc 服务）
+
+--- scripts/verify_m0_config.py ---
+Workspace config verification ok
+exit=0
+--- scripts/verify_delivery_governance.py ---
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260925-066
+exit=0
+--- scripts/verify_agent_entry.py ---
+execution snapshot: 1930 characters (~772 tokens, budget 8000 characters)
+rule-text duplication: compared 98 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+--- scripts/verify_skills.py ---
+verified 10 skill source files
+exit=0
+--- scripts/verify_product_master_alignment.py ---
+Product and Master Plan alignment verification ok
+exit=0
+--- scripts/verify_m2_acceptance.py ---
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+--- python3 -m unittest discover -s tests -q ---
+----------------------------------------------------------------------
+Ran 100 tests in 0.625s
+
+OK
+exit=0
+--- scripts/sync_skills.py check ---
+skill outputs are up to date
+exit=0
+
+--- 归档区总量（删除后的新基线）---
+文件数 697
+总字节 10686087
