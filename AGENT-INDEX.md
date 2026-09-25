@@ -1,72 +1,96 @@
 # WT Media Agent Index
 
-## Current Repository
+> 本文件是 WT Media 全部仓库的 **Agent 统一索引与治理规范正文**（中文）。表述冲突时以本文件为准；与 `delivery/`、`docs/decisions` 中的确认记录冲突时，以确认记录为准。
+>
+> `AGENTS.md`（Codex 入口）与 `CLAUDE.md`（Claude Code 入口）是**薄入口**：只声明本文件的权威性与最小硬约束，不复制本文件内容。
 
-`wt-media-workspace`
+**读取顺序**：`AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md` → `.ai/CURRENT_CONTEXT.md` → 当前 CHG。
 
-## Repository Role
+**导航**
 
-- Governance control plane for WT Media.
-- Owns product, engineering, contract, decision, delivery, and release governance.
-- Does not own runtime code or runtime dependencies.
+| 我要… | 去 |
+| --- | --- |
+| 确认不可协商的红线 | §2 |
+| 找某个事实的权威来源 | §3 |
+| 知道先读什么、不读什么 | §4 |
+| 判断改动属于哪个仓库 | §5、§6 |
+| 知道一个需求的完整执行流程 | §7 |
+| 判断要不要建 CHG、如何收尾 | §8、§9 |
+| 维护入口文件与执行快照 | §10 |
+| 多工程并行执行 | §11 |
+| 在本地跑校验 | §12 |
 
-## Related Repositories
+## 1. 本仓库定位
 
-Paths are maintained in [`config/repository-map.yaml`](config/repository-map.yaml).
+`wt-media-workspace` 是 WT Media 多项目系统的研发控制中心（Engineering Control Plane）。
 
-- `cloud`: `../wt-media-cloud`
-- `agent`: `../wt-media-agent`
-- `desktop`: `../wt-media-desktop`
+- **拥有**：产品需求、工程架构、跨仓库协议、技术决策、交付生命周期、AI 开发协作规范。
+- **不拥有**：运行时代码、服务运行代码、构建产物、临时文件。
+- **只保存**：知识、规范、决策、交付状态。
 
-## Current Context
+运行时代码位于 `../wt-media-cloud`、`../wt-media-agent`、`../wt-media-desktop`。
 
-`.ai/CURRENT_CONTEXT.md` in this repository is the **only** execution snapshot.
+## 2. 红线（不可协商）
 
-- It is generated, not authored: `python3 scripts/prepare_ai_workspace.py --change <CHG>`.
-- When a close-out leaves no active CHG, the same script renders that state too:
-  `python3 scripts/prepare_ai_workspace.py --no-active` (writes `Active CHG: \`none\``).
-  It refuses if `delivery/active/` still holds a CHG.
-- Do not edit it by hand.
-- Do not create or keep a copy at the outer execution root. `scripts/verify_agent_entry.py` fails if one reappears there.
-- Keep it a snapshot, not a knowledge base: no history, no full decision library, no temporary verification notes.
+- 运行时改动只在对应工程仓库执行；本仓库不得成为任何运行时的依赖。
+- 本仓库不得存放运行时代码、业务实现、编译文件、临时输出或自动生成产物。
+- 讨论、建议与假设不是需求；只有 Delivery 或 Decision 中确认的内容可以驱动修改。
+- 不得实现 Delivery 中标记为 Explicitly Not Doing 的内容。
+- 关联工程路径以 `config/repository-map.yaml` 为准，脚本与文档不得另行硬编码，也不得与之漂移。
+- `.ai/CURRENT_CONTEXT.md` 由脚本生成；禁止手工编辑，执行根父层不得出现副本。
+- `skills/` 是唯一源；`.claude/skills`、`.codex/skills` 等生成副本不得手工编辑。
+- 不引入第二套任务管理系统。
 
-## Context Loading Rules
+## 3. 知识地图与唯一可信来源
 
-### Layer 1 — Fixed Entry
+| 位置 | 内容 | 权威性 |
+| --- | --- | --- |
+| `delivery/` | Milestone、实施状态、验证结果、完成交付 | 交付唯一可信来源 |
+| `docs/product` | 产品需求、用户场景、功能目标、验收标准 | 产品唯一可信来源 |
+| `docs/engineering/architecture` | 系统架构、模块边界、分层与通信规约 | 工程唯一可信来源 |
+| `docs/engineering/specs` | 技术规范、工程标准、开发约束 | 工程唯一可信来源 |
+| `docs/contracts` | API Contract、Cloud–Agent 协议、Cloud–Desktop 协议、Event Schema | 协议唯一可信来源 |
+| `docs/decisions` | 架构选择、技术取舍、ADR 记录 | 决策唯一可信来源 |
+| `config/` | repository-map、skills-distribution、contract-map、release-matrix | 配置事实 |
+| `skills/` | Codex / Claude skill 唯一源文件 | skill 唯一源 |
+| `scripts/` | 快照生成、skill 分发、入口与治理校验 | 治理工具 |
 
-Always read:
+其他历史文档（含执行根 `../docs`、`docs/superpowers/` 下的分析材料）不作为新开发依据；分析材料必须经 Delivery 或 Decision 确认后才可驱动修改。
 
-1. `AGENTS.md`
-2. `CLAUDE.md`
-3. `AGENT-INDEX.md`
-4. `.ai/CURRENT_CONTEXT.md`
+## 4. 读取顺序与上下文加载
 
-### Layer 2 — Current Task
+**渐进式加载**：
 
-Read only the active CHG identified by `.ai/CURRENT_CONTEXT.md`:
+1. **第一层（固定入口）**：`AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md` → `.ai/CURRENT_CONTEXT.md`。
+2. **第二层（当前任务）**：快照指明的当前 CHG 的 `change.md`、plan、spec、checkpoint。
+3. **第三层（目标工程）**：进入目标仓库后读其 `AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`、`DIRECTORY_MAP.md`，再进入相关代码与测试。
 
-- `delivery/active/<change-id>/change.md`
-- Its current plan, spec, and checkpoint, when present
+**理解优先级**（理解完成后再改代码）：
 
-### Layer 3 — Target Repository
+1. `delivery/active` —— 当前目标、范围、验收标准
+2. `docs/product` —— 为什么做
+3. `docs/engineering/architecture` —— 系统设计、模块边界
+4. `docs/contracts` —— 跨项目通信
+5. `docs/engineering/specs` —— 实现规范
 
-Before modifying code, enter the affected repository and read:
+**默认不加载**，除非当前任务明确需要：`delivery/completed`、旧 evidence、历史 decisions、历史 specs、临时实验目录。
 
-1. `AGENT-INDEX.md`
-2. `AGENTS.md`
-3. `CLAUDE.md`
-4. `DIRECTORY_MAP.md`（目录导航，按它定位目标目录）
+目标仓库尚无 `AGENT-INDEX.md` 时不得凭空创建：回退为「本文件 + 该仓 `AGENTS.md`」，并在当前 CHG 中登记该缺口；`scripts/verify_agent_entry.py` 会报告仍缺失该文件的仓库。
 
-Then read only the relevant code and tests.
+## 5. 关联仓库与职责边界
 
-When the target repository has no `AGENT-INDEX.md` yet, do not invent one.
-Fall back to this file plus that repository's `AGENTS.md`, and record the gap
-in the active CHG. `scripts/verify_agent_entry.py` reports which repositories
-are still missing the file.
+| 仓库 | 路径 | 拥有 | 不拥有 |
+| --- | --- | --- | --- |
+| `wt-media-cloud` | `../wt-media-cloud` | 后端服务、HTTP API、业务编排、数据存储（MySQL / Redis）、Scheduler、Cloud Runtime | 浏览器自动化、本地机器操作、Desktop UI |
+| `wt-media-agent` | `../wt-media-agent` | 本地执行能力、浏览器自动化、Agent Runtime、系统级操作 | Cloud 业务逻辑、数据业务管理 |
+| `wt-media-desktop` | `../wt-media-desktop` | Desktop 应用、Tauri 运行环境、用户交互、本地桥接能力 | Cloud 业务逻辑、Agent 内部执行能力 |
+| `wt-media-workspace` | `../wt-media-workspace` | 知识、规范、决策、交付状态 | 上述全部运行时职责 |
 
-## 跨工程需求定位
+工程可以并行执行，但不得同时修改其他工程拥有的代码与正式治理状态。
 
-不得只根据需求关键词判断工程，必须根据真正发生修改的能力定位：
+## 6. 需求路由
+
+按**真正发生修改的能力**定位工程，不按需求关键词：
 
 | 用户需求 | 主要责任工程 |
 | --- | --- |
@@ -86,24 +110,69 @@ are still missing the file.
 | 修改 Milestone、Plan、Spec 和 CHG | Workspace |
 | 修改跨工程 API 或通信契约 | Workspace 协调，责任工程分别实施 |
 
-工程定位后，进入对应仓库的 `AGENT-INDEX.md` 与 `DIRECTORY_MAP.md` 定位目录。
-工程可以并行执行，但不得同时修改其他工程拥有的代码和正式治理状态。
+定位后，进入对应仓库的 `AGENT-INDEX.md` 与 `DIRECTORY_MAP.md` 定位目录。
 
-## Default Exclusions
+## 7. 端到端工作流
 
-Do not load by default:
+收到端到端需求（例如 Cloud + Agent、Cloud + Desktop、Agent + Desktop）：
 
-- `delivery/completed`
-- old evidence
-- historical decisions
-- historical specs
-- temporary experiment directories
+1. **理解产品目标**，读取 Delivery 与稳定基线（见 §4）。
+2. **分析影响范围**：列出 Cloud、Agent、Desktop 的修改点与 Contract 变化。
+3. **确认职责边界**：不得把 Agent 能力实现到 Cloud、把业务逻辑实现到 Desktop、把 UI 逻辑实现到 Backend。
+4. **在对应工程仓库改代码**，遵守该仓库的 `AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`。
+5. **更新 Delivery**，并把架构、协议变化同步回 workspace。
 
-Load them only when the current task explicitly requires them.
+## 8. 交付治理
 
-## Execution Boundary
+必须创建 `delivery/active/<change-id>/` 的情形：中大型功能、跨项目修改、架构调整、Contract 调整。该目录至少包含 `change.md` 与 `checkpoint.md`。
 
-- Workspace is the governance source of truth.
-- Runtime code changes belong in the corresponding repository.
-- Do not turn workspace into a runtime dependency.
-- For parallel multi-repo work, use per-repository status files under the active CHG; do not concurrently edit `.ai/CURRENT_CONTEXT.md`.
+小修改可直接执行：文档修正、小 Bug、不影响行为的重构。
+
+## 9. 变更规则与完成检查
+
+- 只有记录在 Delivery 或 Decision 中的确认内容可以驱动代码修改。
+- 结束开发任务前必须更新 checkpoint，记录：已完成、未完成、阻塞、下一步。
+- 完成检查项：
+  - 修改项目归属正确
+  - 跨项目协议正确
+  - 未破坏模块边界
+  - Delivery 已更新
+  - Release Matrix 已同步（如适用）
+  - Skill 源文件与生成副本关系正确
+
+## 10. Agent 入口与执行快照
+
+### 入口文件
+
+| 文件 | 角色 | 强制 |
+| --- | --- | --- |
+| `AGENT-INDEX.md` | 统一索引与治理规范正文（权威源） | 必须存在 |
+| `AGENTS.md` | Codex / OpenAI Harness 薄入口，指向本文件 | 必须存在 |
+| `CLAUDE.md` | Claude Code 薄入口，指向本文件 | 必须存在 |
+| `.ai/CURRENT_CONTEXT.md` | 执行状态快照（生成物） | 必须存在且唯一 |
+
+`AGENTS.md` 与 `CLAUDE.md` 是**平级入口**，不允许互相软链或互相替代，也不与 `AGENT-INDEX.md` 矛盾。
+
+### 执行状态快照
+
+`.ai/CURRENT_CONTEXT.md` 只保存当前执行状态：当前 Milestone、当前 CHG、当前状态、必读文件顺序、受影响仓库、稳定基线路径与稳定职责边界。
+
+- 生成：`python3 scripts/prepare_ai_workspace.py --change <CHG>`
+- 无活动 CHG 时由 `--no-active` 渲染同一状态；`delivery/active/` 仍有 CHG 时拒绝执行
+- 禁止手工编辑；禁止在执行根父层再放一份
+- 禁止写入历史记录、完整决策库或临时验证内容
+- Milestone 专属决策不复制进快照，由当前 CHG 指明其依赖的 Decision 记录
+
+### 配置一致性
+
+`config/skills-distribution.yaml` 的 targets 与 `config/repository-map.yaml` 重复声明同一批 path，两者必须一致，由 `scripts/verify_agent_entry.py` 强制。
+
+## 11. 多 Agent 并行
+
+- 禁止多个 Agent 同时修改 `.ai/CURRENT_CONTEXT.md`。
+- **仅当同一个 CHG 需要多个工程并行实施时**，才在该 CHG 下建立 `delivery/active/<change-id>/status/`，按 `<repo>.md` 逐仓记录当前状态、修改内容、验证结果；单仓实施的 CHG 不建该目录。
+- 由 workspace 统一汇总，不引入第二套任务管理系统。
+
+## 12. 校验
+
+本地手工执行，本仓库当前不设 CI。`scripts/verify_agent_entry.py` 校验：入口文件存在性、执行快照唯一性与体积预算（≤ 8000 字符）、快照与 LEDGER/active 的一致性、配置 path 一致、各工程入口漂移（启发式 WARN）。
