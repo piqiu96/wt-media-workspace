@@ -48,7 +48,7 @@ Runtime code lives in `../wt-media-cloud`, `../wt-media-agent`, and `../wt-media
 - Do not use a `docs/` tree outside this repository as the source of truth for new implementation decisions; the execution root `wt-media/` carries none.
 - Do not store OpenAPI, schema, DTO, or event definitions here when a provider repository owns them.
 - Do not create `changes/active`; use `delivery/active/<change-id>/change.md`.
-- Remove completed delivery records after final outcomes are reflected in stable baselines and Git.
+- After final outcomes are reflected in stable baselines and Git, move the completed record out of `delivery/active/` and `delivery/LEDGER.md` into `delivery/completed/`. The record itself is kept as-is — never deleted, rewritten, or merged. See `delivery/completed/README.md` for the archive boundary.
 
 ## Verification
 

@@ -135,6 +135,8 @@
 
 小修改可直接执行：文档修正、小 Bug、不影响行为的重构。
 
+**归档边界**：`delivery/completed/` 是**只读归档**——不回改、不默认加载、不作为当前状态依据、扫描可整目录排除；收口一个 CHG 是把它从 `active/` 与 `LEDGER.md` **移出**并移入该目录，记录本身**不删除**。该边界的**唯一落点**是 [`delivery/completed/README.md`](delivery/completed/README.md)（含新增原始捕获的入库阈值与已知例外），由 `scripts/verify_delivery_governance.py` 强制；本节不复述其正文。
+
 ## 9. 变更规则与完成检查
 
 - 只有记录在 Delivery 或 Decision 中的确认内容可以驱动代码修改。

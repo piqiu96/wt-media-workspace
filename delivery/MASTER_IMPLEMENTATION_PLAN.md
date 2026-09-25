@@ -131,6 +131,8 @@ wt-media-workspace/
 
 **历史词汇**（不再取用；**归档记录**保持原样、不回改，**活记录一律改用上表的词**）：作为 **CHG 状态值**的 `TODO`、`IMPLEMENTED` 与 `VERIFIED` 在 58 篇记录中**零处使用**——它们只在本文档的旧版本里被列出过。（`TODO` 在**任务表**的状态列仍是合法值，那是另一个轴，见 §8 的任务表。）`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 0 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处）为已退役写法。落到 `delivery/active/` 的记录只有一个合法状态：`IMPLEMENTING`（实施中）或 `VERIFYING`（待验收）——由 `scripts/verify_product_master_alignment.py::validate_active_change` 强制。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
 
+**「归档记录保持原样」与「移除已完成 CHG」不矛盾，因为两者说的不是同一件事**：§2 完成清单第 7 项的「移除」指的是把记录**移出** `delivery/active/` 与 `delivery/LEDGER.md`；记录**本身**移入 `delivery/completed/` 并保持原样，**不删除、不重写、不合并**。`delivery/completed/` 的完整只读边界（含新增原始捕获的入库阈值与已知例外）唯一落点是 `delivery/completed/README.md`，本节不复述其正文。
+
 里程碑不能因为代码目录已经存在而标记为 `DONE`。必须逐项核验代码、自动测试、Contract、Evidence、人工验证、跨仓库集成、Git 提交和退出条件。
 
 历史 `DONE` 可以在退出条件被证明过宽或证据只覆盖脚手架时重新打开。重新打开不会删除历史提交和局部验证结果；这些结果标记为“继承证据”，只有重新满足当前退出条件后才能再次标记为 `DONE`。

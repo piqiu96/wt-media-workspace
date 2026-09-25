@@ -1,0 +1,61 @@
+# 归档总量: 698 files / 10736581 B
+# 硬排除包: CHG-20260916-052/evidence/m3-e3-acceptance-20260923
+
+=== 候选（原始捕获/可重放 + .pyc，扣硬排除包）: 200 files / 771364 B (7.2%) ===
+
+--- (A) 有真引用（同 CHG 内命中 / 跨 CHG 限定路径）→ 必须保留: 158 files / 630808 B (5.9%)
+    其中跨 CHG 限定路径命中: 2
+--- (B) 只在别的 CHG 出现同名 → 同名碰撞，不是引用 → 可删: 1 files / 1801 B (0.0%)
+    碰撞来源 CHG 去重: 1 个
+--- (C) 全无引用 → 可删: 41 files / 138755 B (1.3%)
+
+=== 可删合计: 42 files / 140556 B (1.3% of archive) ===
+
+=== 粗读 vs 细读 ===
+  粗读（全局 basename 匹配，不区分 CHG）: 可删 41 files / 138755 B
+  细读（同 CHG 限定）              : 可删 42 files / 140556 B
+  ⇒ 粗读把 1 个同名碰撞误判为「被引用」而留在保留侧
+
+=== 可删清单（按字节降序）===
+      46581 B  CHG-20260923-056/evidence/tools/__pycache__/ac05_desktop_launch.cpython-314.pyc
+      15261 B  CHG-20260923-055/evidence/raw/proxy-log-after-20260923T1627.log
+      11414 B  CHG-20260923-055/evidence/raw/probe-after-right-20260923T1627.json
+      11042 B  CHG-20260923-055/evidence/raw/probe-after-rowdetail-20260923T1627.json
+       9690 B  CHG-20260923-055/evidence/raw/probe-before-rowdetail-20260923T1553.json
+       8229 B  CHG-20260924-060/evidence/tools/__pycache__/t02_csp_shipped_value_launch.cpython-314.pyc
+       6660 B  CHG-20260923-055/evidence/raw/proxy-log-before-20260923T1553.log
+       4428 B  CHG-20260925-063/evidence/artifacts/t01-baseline-unittest.out
+       4301 B  CHG-20260925-062/evidence/artifacts/t03-unittest.out
+       3860 B  CHG-20260925-065/evidence/artifacts/t06-ownership.out
+       3539 B  CHG-20260925-064/evidence/artifacts/t07-gate-readings.out
+       1801 B  CHG-20260925-064/evidence/artifacts/t05-gate-readings.out
+       1505 B  CHG-20260925-063/evidence/artifacts/t03-mutation-control.out
+       1380 B  CHG-20260925-064/evidence/artifacts/t12-gate-readings-confirm.out
+       1220 B  CHG-20260925-063/evidence/artifacts/t02-scope-checks.out
+        930 B  CHG-20260925-063/evidence/artifacts/t01-milestone-status-vs-block.out
+        910 B  CHG-20260925-062/evidence/artifacts/t05-sweep-section13.out
+        859 B  CHG-20260925-063/evidence/artifacts/t03-postfix-test_verify_product_master_alignment.out
+        854 B  CHG-20260925-063/evidence/artifacts/t03-postfix-full-test-suite.out
+        836 B  CHG-20260925-065/evidence/artifacts/t02-gate-readings.out
+        692 B  CHG-20260925-062/evidence/artifacts/t03-verify_m2_acceptance.out
+        635 B  CHG-20260925-063/evidence/artifacts/t01-baseline-verify_product_master_alignment.out
+        502 B  CHG-20260925-063/evidence/artifacts/t04-mutation-control.out
+        498 B  CHG-20260925-062/evidence/artifacts/t03-verify_product_master_alignment.out
+        449 B  CHG-20260925-065/evidence/artifacts/t07-ac11.out
+        431 B  CHG-20260925-063/evidence/artifacts/t01-test-mutation-probes.out
+        407 B  CHG-20260925-062/evidence/artifacts/t03-verify_product_master_alignment-after.out
+        367 B  CHG-20260925-062/evidence/artifacts/t05-sweep-skill-pointer.out
+        215 B  CHG-20260925-062/evidence/artifacts/t03-verify_m0_config.out
+        174 B  CHG-20260925-063/evidence/artifacts/t01-postactivate-verify_agent_entry.out
+        136 B  CHG-20260925-062/evidence/artifacts/t01-verify-agent-entry.out
+        129 B  CHG-20260925-062/evidence/artifacts/t05-verify_agent_entry.out
+        119 B  CHG-20260925-063/evidence/artifacts/t01-postactivate-verify_delivery_governance.out
+         73 B  CHG-20260925-062/evidence/artifacts/t01-verify-governance.out
+         71 B  CHG-20260925-063/evidence/artifacts/t01-postactivate-verify_skills.out
+         66 B  CHG-20260925-062/evidence/artifacts/t05-verify_delivery_governance.out
+         65 B  CHG-20260925-063/evidence/artifacts/t01-baseline-status-wt-media-cloud.out
+         55 B  CHG-20260925-063/evidence/artifacts/t01-baseline-status-wt-media-desktop.out
+         53 B  CHG-20260925-063/evidence/artifacts/t01-baseline-status-wt-media-agent.out
+         50 B  CHG-20260925-063/evidence/artifacts/t03-postfix-verify_product_master_alignment.out
+         38 B  CHG-20260925-062/evidence/artifacts/t01-verify-skills.out
+         31 B  CHG-20260925-062/evidence/artifacts/t05-verify_skills.out

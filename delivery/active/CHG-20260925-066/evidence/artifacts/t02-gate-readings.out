@@ -1,0 +1,32 @@
+# T-02 gate readings — FINAL (after the last content change)
+# date: 2026-09-25 23:51:30 CST
+
+=== verify_delivery_governance exit=0 ===
+Delivery governance verification ok. Active CHG: CHG-20260925-066
+=== verify_product_master_alignment exit=0 ===
+Product and Master Plan alignment verification ok
+=== verify_agent_entry exit=0 ===
+execution snapshot: 1930 characters (~772 tokens, budget 8000 characters)
+rule-text duplication: compared 98 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+=== verify_m0_config exit=0 ===
+Workspace config verification ok
+=== verify_skills exit=0 ===
+verified 10 skill source files
+=== verify_m2_acceptance exit=0 ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+=== unittest ===
+Ran 94 tests in 0.509s
+
+OK
+=== sync_skills ===
+skill outputs are up to date
+exit=0
+
+=== 边界落点与标记串 ===
+  README.md 机读键命中: 1
+  阳性对照（不存在的串）: 0
+  指向 README 的落点数: AGENT-INDEX=1 MASTER=1
+  归档区改动文件数: 0
+  新建的未跟踪文件: 1
