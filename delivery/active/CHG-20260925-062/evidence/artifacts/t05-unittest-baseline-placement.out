@@ -1,0 +1,10 @@
+=== 兄弟位 worktree（../wt-baseline840ba38-tmp @ 840ba38）===
+Ran 73 tests in 0.286s
+FAILED (failures=4)
+
+=== 反例：/tmp 位 worktree（同名 commit）===
+Ran 69 tests in 0.246s
+FAILED (failures=2, skipped=3)
+成因：EXECUTION_ROOT=ROOT.parent=/tmp，三个运行仓兄弟目录不存在，
+test_skill_paths_resolve.SkillPathsResolveTests.setUpClass 抛 SkipTest，
+该类 4 条用例不执行、收敛成 1 条 setUpClass 跳过项。

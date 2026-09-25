@@ -1,0 +1,6 @@
+$ grep -rn "第 13 节" docs/
+分母: docs/ 下 66 个 .md 文件
+命中: 0
+阳性对照 $ grep -rn "第 10 节" docs/ → 命中 2（证明该 grep 非空转）
+  docs/engineering/specs/agent-workspace-conventions.md:3:本规范描述 WT Media 多仓库在 AI Agent（Claude Code、Codex 等）协作下的入口、上下文加载与校验约定。它补充 `AGENT-INDEX.md` 第 10 节「Agent 入口与执行快照」，并把散落在脚本与 skill 中的隐含约束显式化。
+  docs/engineering/specs/agent-workspace-conventions.md:72:已知张力：`delivery/active/` 当前只允许存在一个 CHG，而本节的并行诉求在语义上允许 N 个。当前通过「同一时刻只激活一个 CHG」维持两者相容。若将来确需两个真正并行的 active CHG，必须同时修改第 9 节登记的全部强制点，并同步修订 `AGENT-INDEX.md` 第 8 节与第 10 节的单数措辞。

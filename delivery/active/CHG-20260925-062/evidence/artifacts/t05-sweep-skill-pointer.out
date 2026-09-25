@@ -1,0 +1,5 @@
+$ grep -rni 'root `AGENTS.md`' skills/ .claude/skills .codex/skills ../.claude/skills ../.codex/skills
+分母: 5 个目录（skills/ 源 + 本仓 .claude/.codex + 执行根 .claude/.codex）
+命中: 0
+阳性对照 $ grep -rni 'root `AGENT-INDEX.md`' <同上 5 目录> → 命中 10
+  （= 2 个 skill × 5 个目录，证明新指针确实落在同一批位置上）

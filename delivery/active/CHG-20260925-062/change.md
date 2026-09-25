@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: S
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-09-25
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -75,12 +75,15 @@
   故修它**不会脏化** cloud/agent/desktop 三仓。
 - `2026-09-24-m4-m5-cloud-content-production.md` 当时也脏，但只多一个**尾部空行**，与本次重构无关 ⇒
   按用户 2026-09-25 裁定**还原**（见 §6 D-02），不并进本 CHG 的提交。
-- **三仓并非全空，但都不是本 CHG 造成的**（T-04 复验时发现，按 mtime 归属）：`wt-media-desktop`
-  的 `src-tauri/src/` 下 **13** 个 `.rs` 是脏的（11 个 mtime = 2026-09-24 22:32:20，另 3 个为
-  2026-09-25 09:57 / 10:34 / 10:38），`wt-media-cloud` 有一个未跟踪的 `dump.rdb`
-  （2026-09-24 17:19:16）。**全部早于本会话**（本会话约 13:5x 起，本 CHG 的写入为 14:08–14:09）。
-  `wt-media-agent` 干净。本 CHG 对三仓零读写；这些在途改动**不碰、不提交、不清理**。
+- **三仓并非全空，但都不是本 CHG 造成的**（T-04 复验时发现，收尾时逐文件 `stat` 重测）：
+  `wt-media-desktop` 的 `src-tauri/src/` 下 **13** 个 `.rs` 是脏的——**10** 个 mtime =
+  2026-09-24 22:32:20，另 3 个为 **09:57:13 / 10:34:48 / 10:38:13**；`wt-media-cloud` 有一个
+  未跟踪的 `dump.rdb`（2026-09-24 17:19:16）。**全部早于本会话**（本会话首个证据文件
+  `checkpoint.md` 的 mtime = **2026-09-25 14:05:43**，以上均早于它）。`wt-media-agent` 干净。
+  本 CHG 对三仓零读写；这些在途改动**不碰、不提交、不清理**。
   故 §10 AC-12 的判据按实测收窄为「本 CHG 对三仓零读写」，**不写「三仓工作区全空」**。
+  （**此处曾写错并已改正**：初稿记「11 个 22:32:20 + 3 个」，11+3=14 与本行总数 13 自相矛盾；
+  重测为 10+3。成因与同一 CHG 内另一处「8 处」写错同源——凭印象写数而未逐个量，见 T-05 证据。）
 - **`verify_agent_entry.py::check_entry_drift` 在 workspace 上早已空转**（**先于本次重构**，非本次引入）：
   它只从 `repo/AGENTS.md` 取「被禁止的路径」token，而禁止规则现在搬到了 `AGENT-INDEX.md`。
   复算 HEAD 版 `AGENTS.md`：`forbidden ∩ described` 同样为 **0**——即该臂在重构**之前**就是空的。
@@ -129,6 +132,10 @@
 - **不激活、不改动 CHG-20260924-061（M4-A）或 M4 任何记录**（用户明确「先不碰 M4」）。
 - **不碰任何运行时代码**：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop` 三仓**零改动**。
 - **不新立 ADR**：见 §6 D-03。
+- **不合并 `CLAUDE.md` 的 `## 高频红线` 与 `AGENT-INDEX.md` §2**：收尾复核（AC-01）发现前者是后者
+  8 条红线中**取 4 条**的改写复述，构成正文的局部第二份文本。该小节自带「完整规则与例外见
+  `AGENT-INDEX.md`」，是有意的常见错误速查；但属与本次重构同源的漂移风险。按「不还原、不改写
+  那次重构的任何内容」与用户裁定的范围，**只登记不改**，见 §14 遗留。
 
 ## 6. Confirmed Decisions
 
@@ -152,21 +159,21 @@ None.
 
 | Task | Goal | Status | Verification |
 |---|---|---|---|
-| T-01 | 建本 CHG 并激活（change.md/checkpoint.md/evidence/、LEDGER 裸 id 表行、快照重生成、两个验证器绿）。 | TODO | `prepare_ai_workspace.py --change CHG-20260925-062`；`verify_delivery_governance.py` 与 `verify_agent_entry.py` 绿。 |
-| T-02 | 提交入口重构本体（AGENT-INDEX/AGENTS/CLAUDE/README 四文件，一个 commit）。 | TODO | 提交前后行数与 `--numstat` 对照 §4 的实测表；diff 无夹带。 |
-| T-03 | 修 `agent-workspace-conventions.md` 三处陈旧引用（第 13 节 ×2、§10 WARN 读数）。 | TODO | **先** `grep -rn "第 13 节" docs/` 命中 2 处留证；**再**重跑 `verify_agent_entry.py` 得 0 warning 与表内文字对照；修后复扫 0 命中，且第 10 节标题真实存在。 |
-| T-04 | 修两个 workspace skill 的第 1 步指针并分发生成副本。 | TODO | **先** `sync_skills.py check` 红（源与副本已不一致）与 `grep` 命中留证；改源 → `sync_skills.py` → `check` 绿 + `verify_skills.py` 绿；并**读生成副本确认内容真的变了**（不只信 check）。 |
-| T-05 | 收尾：证据、验收矩阵、DONE Gate 签字、归档与失效指针扫描。 | TODO | 三个验证器 + `unittest` 读数；归档后快照 `none` 且三者互指一致；扫描带分母与阳性对照。 |
+| T-01 | 建本 CHG 并激活（change.md/checkpoint.md/evidence/、LEDGER 裸 id 表行、快照重生成、两个验证器绿）。 | DONE | `prepare_ai_workspace.py --change CHG-20260925-062`；`verify_delivery_governance.py` 与 `verify_agent_entry.py` 绿。 |
+| T-02 | 提交入口重构本体（AGENT-INDEX/AGENTS/CLAUDE/README 四文件，一个 commit）。 | DONE | 提交前后行数与 `--numstat` 对照 §4 的实测表；diff 无夹带。 |
+| T-03 | 修 `agent-workspace-conventions.md` 三处陈旧引用（第 13 节 ×2、§10 WARN 读数）。 | DONE | **先** `grep -rn "第 13 节" docs/` 命中 2 处留证；**再**重跑 `verify_agent_entry.py` 得 0 warning 与表内文字对照；修后复扫 0 命中，且第 10 节标题真实存在。 |
+| T-04 | 修两个 workspace skill 的第 1 步指针并分发生成副本。 | DONE | **先** `sync_skills.py check` 红（源与副本已不一致）与 `grep` 命中留证；改源 → `sync_skills.py` → `check` 绿 + `verify_skills.py` 绿；并**读生成副本确认内容真的变了**（不只信 check）。 |
+| T-05 | 收尾：证据、验收矩阵、DONE Gate 签字、归档与失效指针扫描。 | DONE | 三个验证器 + `unittest` 读数；归档后快照 `none` 且三者互指一致；扫描带分母与阳性对照。 |
 
 ## 9. Repository Checklist
 
 ### wt-media-workspace
 
-- [ ] 本记录 + `checkpoint.md` + `evidence/`。
-- [ ] `delivery/LEDGER.md` 加**裸 id** 表行（`| CHG-20260925-062 |`，不加 markdown 链接），关闭时移除。
-- [ ] `.ai/CURRENT_CONTEXT.md` 由脚本再生成（禁手改）。
-- [ ] 入口重构四文件提交；`agent-workspace-conventions.md` 三处引用修正；两个 skill 源 + 生成副本。
-- [ ] 归档后主动扫描并分类处置失效指针。
+- [x] 本记录 + `checkpoint.md` + `evidence/`。
+- [x] `delivery/LEDGER.md` 加**裸 id** 表行（`| CHG-20260925-062 |`，不加 markdown 链接），关闭时移除。
+- [x] `.ai/CURRENT_CONTEXT.md` 由脚本再生成（禁手改）。
+- [x] 入口重构四文件提交；`agent-workspace-conventions.md` 三处引用修正；两个 skill 源 + 生成副本。
+- [x] 归档后主动扫描并分类处置失效指针。
 
 ### wt-media-cloud
 
@@ -184,35 +191,34 @@ None.
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | 治理规范正文只存在于 `AGENT-INDEX.md`；两个入口文件不含正文副本。 | 读 `AGENTS.md`（30 行）与 `CLAUDE.md`：二者均只声明权威源、给指针，无职责边界表 / 无需求路由表 / 无上下文加载规则正文。 | TODO |
-| AC-02 | 两个入口文件都**真实指向** `AGENT-INDEX.md`，且路径可解析。 | 正向解析：两文件内的 `AGENT-INDEX.md` 链接在仓根确实存在（不是只做字符串 grep）。 | TODO |
-| AC-03 | `agent-workspace-conventions.md` 的「第 13 节」全部改为真实存在的第 10 节。 | 修前 `grep -rn "第 13 节" docs/` 命中 **2** 处；修后 **0** 命中；并核对 `AGENT-INDEX.md` §10 标题逐字为「Agent 入口与执行快照」。 | TODO |
-| AC-04 | §10 校验表里 `verify_agent_entry.py` 的 WARN 读数与实测一致。 | 实跑 `verify_agent_entry.py` 取数，与表内文字逐条比对；表内注明重测日期。 | TODO |
-| AC-05 | 两个 skill 的第 1 步指向 `AGENT-INDEX.md`，且**生成副本同步**。 | 源：`grep -rn "Root \`AGENTS.md\`" skills/` → 0 命中；副本：`.claude/skills` 与 `.codex/skills` 下同名文件内容与源一致；`sync_skills.py check` 绿。 | TODO |
-| AC-06 | 生成副本确实随源改变（不是「check 绿」就够）。 | 变异式对照：改源前记录副本第 1 步文本，同步后重读副本确认已变；并证明 `check` 在源改、副本未同步时**会红**。 | TODO |
-| AC-07 | 既有测试基线不回归。 | `python3 -m unittest discover -s tests -q`：变更前后均为 **73 tests / 4 红**，且 4 条红项**逐条同名**。 | TODO |
-| AC-08 | 三个验证器全绿。 | `verify_delivery_governance.py`（`Active CHG: CHG-20260925-062`）、`verify_agent_entry.py`（0 warning）、`verify_skills.py`（verified 10）。 | TODO |
-| AC-09 | 治理一致：快照、LEDGER、`delivery/active` 互指同一 CHG（关闭后同指 `none`）。 | 两个治理验证器 + 逐处读文件核对。 | TODO |
-| AC-10 | 无主脏文件已按裁定处置，工作区只含本 CHG 的预期改动。 | `git status --porcelain` 逐文件对照 §5 Scope；`2026-09-24-m4-m5-cloud-content-production.md` 与 HEAD 逐字一致。 | TODO |
-| AC-11 | 只登记的项**未被静默修掉**。 | 读 `verify_agent_entry.py:241` 与原样、`AGENT-INDEX.md` §12 校验清单原样；diff 显示二者未被改动。 | TODO |
-| AC-12 | **本 CHG 对三仓零读写**。注意判据已按实测收窄：不能写「三仓工作区全空」，因为 desktop 与 cloud **先于本会话**就已脏（见 §4 末条）。 | 逐仓 `git status --porcelain -uall` + **逐文件 mtime 归属**：三仓的 `.claude/skills`/`.codex/skills` 均未出现在 status 中；desktop 的 13 个 `.rs` 与 cloud 的 `dump.rdb` 的 mtime 全部早于本会话。 | TODO |
+| AC-01 | 治理规范正文只存在于 `AGENT-INDEX.md`；两个入口文件不含正文副本。 | 判别性判据：`AGENT-INDEX.md` 的 **12 个 `##` 正文标题**无一出现在两个入口文件里；`AGENTS.md` 30 行 2 节、`CLAUDE.md` 91 行 8 节，均无职责边界表 / 需求路由表 / 上下文加载规则正文。**判据已收窄**：`CLAUDE.md` 的 `## 高频红线` 是 §2 红线 8 条中取 4 条的**局部复述**，属既有重复，不在本 CHG 范围，见 §14 遗留。 | **PASS**（判据收窄，局部重复单列登记） |
+| AC-02 | 两个入口文件都**真实指向** `AGENT-INDEX.md`，且路径可解析。 | 正向解析：`AGENTS.md`→`AGENT-INDEX.md` ✓；`CLAUDE.md`→`AGENT-INDEX.md` / `README.md` / `agent-workspace-conventions.md` ✓。**4/4 存在，0 MISS**。 | PASS |
+| AC-03 | `agent-workspace-conventions.md` 的「第 13 节」全部改为真实存在的第 10 节。 | 修前命中 **2**（`:3`、`:72`，见 T-03 证据）；现在 **0**（分母 66 个 `.md`）。正向：`AGENT-INDEX.md:143 ## 10. Agent 入口与执行快照` 逐字吻合。 | PASS |
+| AC-04 | §10 校验表里 `verify_agent_entry.py` 的 WARN 读数与实测一致。 | 实跑得 `0 warning(s) need review`；§10 `:133` 现写「绿，**0 WARN**（快照 1923 字符）」，并注明重测日期 2026-09-25。 | PASS |
+| AC-05 | 两个 skill 的第 1 步指向 `AGENT-INDEX.md`，且**生成副本同步**。 | `grep -rni`（**大小写不敏感**，分母 5 个目录）→ **0 命中**；`sync_skills.py check` → up to date；`verify_skills.py` → verified 10。 | PASS |
+| AC-06 | 生成副本确实随源改变（不是「check 绿」就够）。 | 变异式对照：改源未同步时 `check` **红 8 行**（exit 1），同步后绿；逐文件读副本确认第 1 步已变。阳性对照 `root \`AGENT-INDEX.md\`` 现 **10** 处命中。 | PASS |
+| AC-07 | 既有测试基线不回归。 | 基线以 **840ba38 兄弟位 worktree** 实测（**不是 `/tmp`**，见 T-05 证据）：`Ran 73 / failures=4`；当前同为 `Ran 73 / failures=4`；红项名字 **diff 为空**。 | PASS |
+| AC-08 | 三个验证器全绿。 | `verify_delivery_governance.py` → ok / `Active CHG: CHG-20260925-062`；`verify_agent_entry.py` → ok / 0 warning；`verify_skills.py` → verified 10。均 exit 0。 | PASS |
+| AC-09 | 治理一致：快照、LEDGER、`delivery/active` 互指同一 CHG（关闭后同指 `none`）。 | 关闭前：三者同指 `CHG-20260925-062`。关闭后：快照 `Active CHG: none`、LEDGER 回占位行、`active/` 仅 `.gitkeep`——三者同指 `none`（读取数见 §14 关闭记录）。 | PASS |
+| AC-10 | 无主脏文件已按裁定处置，工作区只含本 CHG 的预期改动。 | `git status --porcelain -uall` 于 T-05 提交前仅 7 个 `t05-*` 未跟踪产物（本任务产物），无越界文件；`2026-09-24-m4-m5-cloud-content-production.md` 与 HEAD 的 `git diff` = **0 行**。 | PASS |
+| AC-11 | 只登记的项**未被静默修掉**。 | `scripts/verify_agent_entry.py` 在 `840ba38..HEAD` **diff 0 行**；`check_entry_drift` 仍在 `:240`、`:241` docstring 仍写 "forbidden by AGENTS.md"；`AGENT-INDEX.md` §12 对 `verify_delivery_governance` 命中 **0**。 | PASS |
+| AC-12 | **本 CHG 对三仓零读写**。注意判据已按实测收窄：不能写「三仓工作区全空」，因为 desktop 与 cloud **先于本会话**就已脏（见 §4 末条）。 | 三仓 status 中 `skills` 相关 **0 条**（本 CHG 的写入面不含三仓）；desktop 13 个 `.rs`、cloud `dump.rdb` **逐文件 `stat`**，mtime 全部早于本会话首个证据文件（`checkpoint.md` = 2026-09-25 14:05:43）。 | PASS |
 
 ## 11. Evidence
 
 Evidence files live in `evidence/` and must record facts, not repeat requirements.
 
-计划落盘的（建 CHG 时的清单，实际以本节末的最终清单为准）：
+最终落盘清单（T-05 收尾按实际改写）：
 
 - `evidence/task-01-governance.md`：建 CHG 与激活；LEDGER 表行、快照再生成、两个验证器读数。
 - `evidence/task-02-entry-refactor.md`：重构本体的逐文件差量、diff 无夹带的核对、还原尾部空行的复核。
 - `evidence/task-03-drift-sweep.md`：三处引用的**先红后绿**（含一次真实的「修前命中 2 / 修后 0」）、
-  §10 读数的重测对照。
+  §10 读数的重测对照，以及 §10 整表按实测重写的理由。
 - `evidence/task-04-skills-pointer.md`：源改前 `sync_skills.py check` 的红、同步后的绿、
-  生成副本内容确实改变的读数。
-- `evidence/task-05-close.md`：验收矩阵逐条判据、门禁读数、归档与指针扫描（分母 + 阳性对照）。
-- `evidence/artifacts/`：原始输出。
-
-（最终落盘清单在 T-05 收尾时按实际改写本节。）
+  生成副本内容确实改变的读数；**含我自己两处写错的计数及其更正**。
+- `evidence/task-05-close.md`：12 条 AC 的逐条判据、四支校验器 + `unittest` 的读数、
+  兄弟位 worktree 的基线测量、以及「基线不能建在 `/tmp`」那个坑。
+- `evidence/artifacts/`：原始输出（`t01-*`、`t03-*`、`t04-*`、`t05-*`）。
 
 ## 12. Current Checkpoint
 
@@ -220,32 +226,87 @@ Completed:
 - Start Gate：`active`/`LEDGER`/快照三者一致指向 `none`；无阻塞 `Q-xx`；Level S 不强制 Milestone。
   工作区 6 个脏文件已核实归属（其中 5 个是本 CHG 的对象，1 个是无关的尾部空行）。
 - D-02 已执行：`2026-09-24-m4-m5-cloud-content-production.md` 还原，与 HEAD 逐字一致。
+- T-01 建本记录并激活（`50b0c79`）：LEDGER 裸 id 表行 + 快照再生成 + 两个验证器绿。
+- T-02 入口重构本体入账（`a394ecf`）：`AGENT-INDEX.md`/`AGENTS.md`/`CLAUDE.md`/`README.md` 一个 commit，
+  逐文件差量对照 §4 实测表，diff 无夹带。
+- T-03 修 conventions 陈旧引用（`2f5fc53`）：「第 13 节」2 → 0，§10 整表按实测重写。
+- T-04 修两个 skill 第 1 步指针并分发副本（`087e440`）：源 + 4 处生成副本同步，check 绿。
+- T-05 收尾：12 条 AC 全部 PASS（AC-01 判据收窄并单列登记）、§13 九项签字、归档与两遍指针扫描。
 
 Current:
-- T-01 建本记录并激活。
+- 无。本 CHG 已完成，正在执行关闭序列（改 Status → 归档移动 → 快照 `--no-active`）。
 
 Next:
-- T-02 提交入口重构本体 → T-03 修 conventions 引用 → T-04 修 skill 指针 → T-05 收尾。
+- 无。完成后建议的下一项仍停在 `delivery/planned` 的 M4-A（`CHG-20260924-061`），按用户裁定本 CHG 不碰。
 
 Blocked:
 - None.
 
 Recent verification:
-- `git status --porcelain -uall` → 5 个修改文件（`AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`、`README.md`、
-  `agent-workspace-conventions.md`），无新增未跟踪文件。
-- `verify_agent_entry.py` / `verify_delivery_governance.py` / `verify_skills.py` 开工前均绿；
-  `unittest discover -s tests -q` → **Ran 73 tests / FAILED (failures=4)**（那 4 条既知红项，见 §10 AC-07）。
+- 四支校验器全绿：`verify_delivery_governance.py`（ok / `Active CHG: CHG-20260925-062`）、
+  `verify_agent_entry.py`（ok / 0 warning）、`verify_skills.py`（verified 10）、
+  `sync_skills.py check`（up to date）。
+- `unittest discover -s tests -q` → **Ran 73 tests / FAILED (failures=4)**；以 840ba38 兄弟位 worktree
+  实测的基线同为 73/4，红项名字 diff 为空（逐条同名）。
+- 漂移扫描两遍：`第 13 节` 在 66 个 `.md` 中 **0**；`root \`AGENTS.md\`` 在 5 个目录中 **0**（大小写不敏感），
+  阳性对照 `root \`AGENT-INDEX.md\`` **10** 处命中。
 
 ## 13. DONE Gate
 
 逐项签字（判据写在签字行里，勿只读勾）：
 
-- [ ] **Scope completed.**
-- [ ] **No blocking `Q-xx`.**
-- [ ] **Acceptance matrix all PASS.**
-- [ ] **Automated tests passed or justified.**
-- [ ] **Manual verification evidence recorded where required.**
-- [ ] **Diff checked for out-of-scope changes.**
-- [ ] **Runtime repositories touched only if listed in scope.**
-- [ ] **Required baselines updated.**
-- [ ] **Affected repositories committed independently.**
+- [x] **Scope completed.** —— §5 Add/Modify 逐条落地：记录与证据齐备（T-01/T-05）；重构四文件已入账
+  （T-02，`a394ecf`）；`agent-workspace-conventions.md` 引用已修（T-03，`2f5fc53`）；两个 skill 源与
+  4 处生成副本已同步（T-04，`087e440`）；LEDGER 与快照按脚本处理。Delete 为 `None`，无删除动作。
+- [x] **No blocking `Q-xx`.** —— §7 `Pending Questions: None.`；开工前需裁定的「尾部空行」已由用户
+  当场裁定并入 §6 D-02，未留 Q 编号；执行期间未出现新的裁定需求（无新增 Q）。
+- [x] **Acceptance matrix all PASS.** —— §10 的 AC-01…AC-12 **全部 PASS**。其中 **AC-01 的判据已收窄**
+  （`CLAUDE.md` 的高频红线对 §2 的局部复述单列登记，不计入掩盖），理由与登记见 T-05 证据。
+- [x] **Automated tests passed or justified.** —— `unittest` 为 **73 tests / 4 红**，**不绿但是既有基线**：
+  以 840ba38 兄弟位 worktree 实测同一读数与同名红项（diff 为空），即本 CHG 未引入新红、也未修掉旧红。
+  4 条红项的归属已在 §5「只登记」与 T-03 证据逐条说明（`verify_m0_config` ×2、`verify_m2_acceptance` ×1、
+  `verify_product_master_alignment` ×1）。
+- [x] **Manual verification evidence recorded where required.** —— 本 CHG 为纯治理仓改动、无业务闭环，
+  无「必须人工验证的外部副作用」。人工判据（正文字节、链接 resolve、节点标题）均以命令输出留证于
+  `evidence/artifacts/`；无凭印象的读数（两处曾凭印象写错者已在 T-04/T-05 证据登记并改为实测）。
+- [x] **Diff checked for out-of-scope changes.** —— 本仓 `git status --porcelain -uall` 逐文件对照 §5；
+  唯一未跟踪项是本任务自己的 7 个 `t05-*` 产物。T-02 提交前亦逐文件核对无夹带；被裁定还原的
+  `2026-09-24-m4-m5-cloud-content-production.md` 与 HEAD `git diff` 为 **0 行**。
+- [x] **Runtime repositories touched only if listed in scope.** —— §5 与 §9 均列为 `Not affected`；
+  本 CHG 对三仓**零读写**（写入面只有执行根与本仓）。三仓的脏文件先于本会话，见 §4 末条与 AC-12。
+- [x] **Required baselines updated.** —— `docs/engineering/specs/agent-workspace-conventions.md` 已更新
+  （「第 13 节」→「第 10 节」×2、§10 校验表按实测重写并注明重测日期、§9 登记表含「规范正文归口」行）。
+  入口重构把正文归口到 `AGENT-INDEX.md` 本身也属基线更新。无需新 ADR（§6 D-03）。
+- [x] **Affected repositories committed independently.** —— 一仓一 commit，纯移动与改逻辑分开：本 CHG
+  4 个 commit 全在 `wt-media-workspace`（`50b0c79` / `a394ecf` / `2f5fc53` / `087e440`），三仓零提交。
+
+## 14. Close Record
+
+- **关闭日期**：2026-09-25
+- **提交序列（均在 `wt-media-workspace`，分支 `main`）**：
+
+  | Commit | 内容 |
+  | --- | --- |
+  | `50b0c79` | T-01 激活本 CHG（记录 + LEDGER 裸 id 行 + 快照再生成） |
+  | `a394ecf` | T-02 入口重构本体入账（`AGENT-INDEX.md`/`AGENTS.md`/`CLAUDE.md`/`README.md`） |
+  | `2f5fc53` | T-03 修 `agent-workspace-conventions.md` 陈旧引用，§10 校验表按实测重写 |
+  | `087e440` | T-04 修两个 skill 第 1 步指针并分发生成副本（含一次 `--amend` 更正 commit message 里的计数） |
+  | 见 git log | T-05 证据、验收矩阵、关闭与归档移动 |
+
+- **关闭时的门禁读数**：`verify_delivery_governance.py` → `Active CHG: none`；
+  `verify_agent_entry.py` → ok / 0 warning；`verify_skills.py` → verified 10；
+  `sync_skills.py check` → up to date；`unittest` → 73 tests / failures=4（既有基线）。
+- **归档后失效指针扫描**（两遍，判据不同）：字符串扫描证明旧指针为 0；链接 resolve 证明新指针真通。
+  分母、阳性对照与命中数见 T-05 证据末节。
+
+### 遗留（只登记，未修）
+
+| # | 遗留项 | 为什么不在本 CHG | 处置去向 |
+| --- | --- | --- | --- |
+| 1 | `check_entry_drift` 的 workspace 臂早已空转（只从 `AGENTS.md` 取禁止路径，而禁止规则已搬到 `AGENT-INDEX.md`） | **先于本次重构**即如此（§4 已复算 HEAD 版证明），改它等于改校验器语义 | 需独立 CHG |
+| 2 | `AGENT-INDEX.md` §12 校验清单只列 `verify_agent_entry.py`，未列真正约束 CHG 的 `verify_delivery_governance.py` | 超出用户裁定的「修两处该修的」 | 需独立 CHG |
+| 3 | `verify_m2_acceptance.py` 的 4 条过期期望（以文件内容字面量为判据，而目标文件已被后续 CHG 合法重构） | 属跨仓校验器维护 | 需独立 CHG；准确内容已登记在 conventions §10 |
+| 4 | `CLAUDE.md` 的 `## 高频红线` 是 `AGENT-INDEX.md` §2 红线 8 条中取 4 条的局部复述 | 属本次重构内容，用户裁定不还原、不改写 | 需独立 CHG |
+| 5 | `executing-wt-media-change/SKILL.md` Authority Order 第 6 项仍写「Affected repository `AGENTS.md` files」 | 用户裁定的范围是「第 1 步读取指针」，第 6 项不在内（且该措辞不算错，层三本来就读该仓三件） | 需独立 CHG（措辞精确化） |
+| 6 | desktop 13 个 `.rs`、cloud `dump.rdb` 为**他人/他任务**的在途改动 | 先于本会话，非本 CHG 造成 | 不碰、不提交、不清理；后续 CHG 以它们为基线前需先确认归属 |
+| 7 | `verify_m0_config.py` 3 项、`verify_product_master_alignment.py` 的既知红项 | 与本 CHG 无关 | 保持红 |
