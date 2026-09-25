@@ -59,6 +59,15 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
             "# Test Skill\n",
             encoding="utf-8",
         )
+        # The fixture is compliant by default, including the archive boundary:
+        # `test_no_active_change_renders_none_snapshot` runs the delivery gate
+        # over this tree, so an archive that does not declare its boundary
+        # would surface here as an error unrelated to the snapshot being tested.
+        archive = self.workspace / "delivery" / "completed"
+        archive.mkdir(parents=True, exist_ok=True)
+        (archive / "README.md").write_text(
+            "# Archive\n\n- 归档边界：`READ-ONLY`\n", encoding="utf-8"
+        )
         self.module = load_module()
 
     def write_change(self, change_id: str, status: str = "IMPLEMENTING") -> Path:

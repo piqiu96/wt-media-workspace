@@ -1,0 +1,21 @@
+## check_archive_readonly 的阳性对照（锚：不变的基线提交 05c2045）
+日期：2026-09-26 00:03:06
+
+=== 旧版（基线提交 05c2045） ===
+archive readonly: scanned 1 script(s) under scripts/, 11 write(s) reaching delivery/completed/
+  archive readonly: scripts/verify_m3_acceptance.py:285 writes under delivery/completed/ (RAW_DIR)
+  archive readonly: scripts/verify_m3_acceptance.py:288 writes under delivery/completed/ (path)
+  archive readonly: scripts/verify_m3_acceptance.py:304 writes under delivery/completed/ (EVIDENCE)
+  archive readonly: scripts/verify_m3_acceptance.py:306 writes under delivery/completed/ (STATE_FILE)
+  archive readonly: scripts/verify_m3_acceptance.py:310 writes under delivery/completed/ (EVIDENCE)
+  archive readonly: scripts/verify_m3_acceptance.py:311 writes under delivery/completed/ (MANIFEST_FILE)
+  archive readonly: scripts/verify_m3_acceptance.py:385 writes under delivery/completed/ (log)
+  archive readonly: scripts/verify_m3_acceptance.py:524 writes under delivery/completed/ (target)
+  archive readonly: scripts/verify_m3_acceptance.py:1739 writes under delivery/completed/ (EVIDENCE)
+  archive readonly: scripts/verify_m3_acceptance.py:1740 writes under delivery/completed/ (RAW_DIR)
+  archive readonly: scripts/verify_m3_acceptance.py:1061 writes under delivery/completed/ (log_path)
+
+=== 现树（T-03 之后） ===
+archive readonly: scanned 1 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+
+exit=0

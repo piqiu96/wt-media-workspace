@@ -1,0 +1,16 @@
+# T-04 记录体量收尾读数
+# date: 2026-09-26 00:04:17 CST
+# 判据（CHG-065 记录成本第五版，按 Task 增量）:
+#   change.md 增量 <= 5120 B / Task ; checkpoint.md 增量 <= 4096 B ; evidence <= 9216 B / Task
+# 基线锚: 提交 7a0d884（T-03 的提交），非 HEAD
+
+change.md                            27235 -> 29937        2702  界   5120  OK
+checkpoint.md                         6546 -> 7859         1313  界   4096  OK
+evidence/task-04-gate-mutation.md        -                6249  界   9216  OK
+
+本 Task 的 artifacts/t04-*.out 合计       4400
+
+# 参照（非上限）: T-03 提交时 change.md = 27235 B；T-03 自身增量 5740 B（越界 +12%）
+# 勘误: T-03 的 t03-record-size.out 把"提交时"记作 26943 B，实测提交 7a0d884 的 blob 是
+#       27235 B——差的 292 B 是 T-03 取完读数之后、提交之前又写进去的。本轮锚取**提交后的
+#       blob**（27235），因为那才是下一个 Task 真正接手的起点。

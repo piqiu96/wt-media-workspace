@@ -2,7 +2,7 @@
 
 - CHG: `CHG-20260925-066`（归档边界冻结与纯过程产物清理）
 - Level: S
-- Updated: 2026-09-25
+- Updated: 2026-09-26
 
 ## 状态
 
@@ -20,15 +20,16 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 
 - **T-03 修掉唯一的写入者**：`scripts/verify_m3_acceptance.py` 的**读写两侧一并**移出归档（读点逐条核验后全部读的是本轮产物，§5 的条件不成立），产物改落 `.cache/m3-acceptance/`；P10 缺输入即 `BLOCKED` 而不回退读归档。三层判据：字面量 **0/1810**（阳性对照 2/1798）、19 个写点逐个归属**0 处写归档**、运行三读数（699/699、字节全等、`find -newer` **0**）＋ 影子树两臂对照（旧版写进归档 **2** 文件且 `.cache/` 不存在）。附带删掉 `own_artifacts` 里那个**从未存在过**的 `scripts/m3-acceptance.sh`（CHG-055:91 早已登记为未处理）。两处新实测：**归档区 15.6% 的字节不在版本控制内**（F-08）、**P10 从来不是可重跑的阶段**（F-09）。记录成本两处越界（+12%／+9.5%），已照报。
 
+- **T-04 两条 ERROR 门禁**：`verify_delivery_governance.py` 新增 `check_archive_readonly`／`check_completed_has_boundary`，两条分母由 `main()` 无条件打印（`scanned 12 script(s)`／`1 boundary marker(s)`）。判据**锚在字符串字面量**上再从字面量追一跳（不做函数内闭包——那一步会爆炸，§14 第 11 项）。**判据层**阳性对照锚不变的基线 `05c2045`：改前脚本报 **11 处**归档写、现树 **0 处**；这 11 处里有 4 处是函数内局部名，靠那一跳才追得上。**用例层**四条变异（关掉两条判定／改错 `open` 的 mode 位置／摘掉接线）全部红成 `FAIL`，`ImportError` 与 `ERROR` 各 **0**。`write_target` 初版有一处真错（方法形式 `open("rb")` 被读成写，14 处 vs 11 处），由该对照抓出。套件 **94 → 100 OK**，六门禁全 `exit=0`。见 `evidence/task-04-gate-mutation.md`。
+
 ## Current
 
-T-03 已完成（未提交）；下一项是 T-04（加两条 ERROR 门禁）。
+T-04 已完成（未提交）；下一项是 T-05（删 T-02 实测出的 42 个纯过程产物）。
 
 ## Next
 
-1. **T-04**：`verify_delivery_governance.py` 加 `check_archive_readonly`（ERROR）与 `check_completed_has_boundary`（ERROR），各做**变异对照**（`ImportError` 计数须为 0）。判据**锚在字符串字面量上**、不锚接收者变量名，且必须真的做「流向写操作」一步——T-03 已把两侧做法与负例（`own_artifacts` 那种过滤器串）实测登记在 §14 第 11 项。
-2. **T-05**：按 T-02 清单删这 42 个文件；**排除**全部 PNG、CHG-052 的 `m3-e3-acceptance-20260923/` 包、以及任何被归档 `.md` 引用的产物。注意清单里有 **2 个被忽略的 `.pyc` 与 2 个被忽略的 `.log`**——删它们时 `git diff` 是空的，**唯一记录就是那张清单**（§4 F-08）。
-3. **T-06**：归档、LEDGER 同步、快照 `--no-active`、两遍失效指针扫描。
+1. **T-05**：按 T-02 清单删这 42 个文件；**排除**全部 PNG、CHG-052 的 `m3-e3-acceptance-20260923/` 包、以及任何被归档 `.md` 引用的产物。注意清单里有 **2 个被忽略的 `.pyc` 与 2 个被忽略的 `.log`**——删它们时 `git diff` 是空的，**唯一记录就是那张清单**（§4 F-08）。
+2. **T-06**：归档、LEDGER 同步、快照 `--no-active`、两遍失效指针扫描。
 
 ## Blocked
 
@@ -57,5 +58,11 @@ T-03 已完成（未提交）；下一项是 T-04（加两条 ERROR 门禁）。
 | T-03 归档区跟踪面 | 已跟踪 **687** ＋ 被忽略 **12** ＝ 文件系统 **699**（三个分母闭合，F-08） |
 | T-03 记录体量 | `change.md` ＋5,740 B（界 5,120，**越界 +12%**）；本 Task evidence ＋10,095 B（界 9,216，**越界 +9.5%**）；见 `artifacts/t03-record-size.out` |
 | T-03 六门禁 ＋ 套件 | 全 `exit=0`／`Ran 94 OK`（`artifacts/t03-gate-readings.out`） |
+| T-04 判据层阳性对照（锚 `05c2045`） | 改前脚本 **11 处**归档写、现树 **0 处**（`artifacts/t04-readonly-oracle.out`） |
+| T-04 用例层变异对照 | 四条变异全红成 `FAIL`；`ImportError` **0**、`ERROR` **0**（`artifacts/t04-gate-mutation.out`） |
+| T-04 两条判据的分母 | `scanned 12 script(s)`／`0 write(s)`；`1 boundary marker(s)`（`artifacts/t04-gate-readings.out`） |
+| T-04 六门禁 ＋ 套件 | 全 `exit=0`／`Ran 100 OK`（同上文件；与 T-03 的 94 对照） |
+| T-04 修掉第二处 fixture | `test_prepare_ai_workspace.py` 的临时树补合规归档区；不是放宽判据（§14 第 13 项） |
+| T-04 记录体量 | 见 `artifacts/t04-record-size.out`——**不在此内联**，本表的字节数会随写入而改变 |
 
 读数取在**最后一次内容改动之后**；原始输出在 `evidence/artifacts/`。

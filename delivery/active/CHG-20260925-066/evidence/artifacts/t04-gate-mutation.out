@@ -1,0 +1,28 @@
+=== M1 readonly 判定关掉 ===
+  退出码 1；FAILED (failures=2)
+  FAIL test_archive_checks_report_their_denominators
+  FAIL test_archive_write_from_script_is_reported
+  ImportError 出现次数：0
+
+=== M2 boundary 判定关掉 ===
+  退出码 1；FAILED (failures=4)
+  FAIL test_archive_boundary_marker_is_required
+  FAIL test_archive_boundary_readme_is_required
+  FAIL test_archive_checks_report_their_denominators
+  FAIL test_missing_archive_is_reported
+  ImportError 出现次数：0
+
+=== M3 方法形式 open 的 mode 位置改错 ===
+  退出码 1；FAILED (failures=1)
+  FAIL test_archive_reads_and_filter_literals_are_not_reported
+  ImportError 出现次数：0
+
+=== M4 两条判据从接线里摘掉 ===
+  退出码 1；FAILED (failures=4)
+  FAIL test_archive_boundary_marker_is_required
+  FAIL test_archive_boundary_readme_is_required
+  FAIL test_archive_write_from_script_is_reported
+  FAIL test_missing_archive_is_reported
+  ImportError 出现次数：0
+
+变异对照结论：全部合格

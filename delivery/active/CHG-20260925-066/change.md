@@ -138,7 +138,7 @@ None.
 | T-01 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓 `git status` 基线；`MASTER` §3 读数列按 F-05 刷新 | DONE | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.` |
 | T-02 | 边界成文 ＋ 实测可删量：`completed/README.md`；`AGENT-INDEX.md` §8；`MASTER:132`；`README.md:51` 消歧；逐类实测可删量并落痕 | DONE | 判据串**先写后实现**（已写定，见 evidence §1）；可删量**42 files / 140,556 B ＝ 1.3%**，分母 ＝ F-01 的 698 文件 |
 | T-03 | 修掉唯一的写入者：`verify_m3_acceptance.py` 写入面移出归档；读取面只读且常量声明 | DONE | 判读为**读写两侧一并移出**（读点全是本轮产物）。三层判据：字面量 **0/1810**（阳性对照 2/1798）、19 个写点逐个归属 0 处写归档、运行三读数 ＋ 影子树两臂对照（臂 B 旧版写进归档 2 文件）。见 `evidence/task-03-writer-moved.md` |
-| T-04 | 门禁：`check_archive_readonly` ＋ `check_completed_has_boundary` | TODO | 两条各做**变异对照**（关掉判定则用例失败，`ImportError` 计数须为 0）；六门禁 ＋ unittest |
+| T-04 | 门禁：`check_archive_readonly` ＋ `check_completed_has_boundary` | DONE | 判据层阳性对照（锚 `05c2045`）**11 处／0 处**；用例层四条变异全红成 `FAIL`、`ImportError` **0**、`ERROR` **0**；两条分母由 `main()` 打印（`scanned 12 script(s)`／`1 boundary marker(s)`）；六门禁 `exit=0` ＋ 套件 **94 → 100 OK**。见 `evidence/task-04-gate-mutation.md` |
 | T-05 | 删纯过程产物：按 T-02 清单执行；排除 PNG 与 CHG-052 的 m3-e3 包 | TODO | 逐条删除清单 ＋ 删前删后总字节读数；删后六门禁 ＋ unittest 全绿 |
 | T-06 | 收尾：归档 → `completed/`；LEDGER 同步；快照 `--no-active`；两遍失效指针扫描 | TODO | 六门禁 `exit=0` ＋ unittest，**在最后一次改动之后**重测；四仓 `git status --porcelain` 对账 |
 
@@ -170,15 +170,15 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | 归档只读边界**落在唯一落点**且三处措辞不互相矛盾 | `completed/README.md` 存在且含标记串；`AGENT-INDEX.md` §8 与 `MASTER:132` 各指它；`README.md:51` 只剩一种读法 | **PASS**（T-02：标记串 1 处、阳性对照 0；两处指针各 1；`README.md:51` 已改写） |
-| AC-02 | `check_archive_readonly` **能失败** | 变异对照：把 T-03 的写入目标指回归档 → 报出；关掉判定 → 用例失败且非 `ImportError` | TODO |
-| AC-03 | `check_completed_has_boundary` **能失败** | 变异对照：删 `README.md` → 报出；去掉标记串 → 报出 | TODO |
+| AC-02 | `check_archive_readonly` **能失败** | 变异对照：把 T-03 的写入目标指回归档 → 报出；关掉判定 → 用例失败且非 `ImportError` | **PASS**（T-04：判据层跑改前脚本报 **11 处**、现树 **0 处**（锚 `05c2045`）；用例层 M1／M4 变异各红 2／4 条，`ImportError` **0**） |
+| AC-03 | `check_completed_has_boundary` **能失败** | 变异对照：删 `README.md` → 报出；去掉标记串 → 报出 | **PASS**（T-04：M2 变异红 4 条；删除 `README.md`、去掉标记串、整目录缺失三种形态各有用例，全部断言完整错误集合） |
 | AC-04 | 重跑 `verify_m3_acceptance.py` 的读写路径**不再写 `completed/`** | 跑前跑后对 `completed/` 做文件数 ＋ 字节数 ＋ `find -newer` 三读数；**阳性对照**：修改前的版本必须报出写入 | **PASS**（T-03：699/699、字节全等、`find -newer` **0** 个；对照臂旧版 `find -newer` **2** 个且 `.cache/` 不存在——全部写进归档；`artifacts/t03-write-surface.out`） |
 | AC-05 | 删除**只**落在可再生过程产物上，且逐条留痕 | 逐条删除清单（路径 ＋ 字节）；删前删后总字节读数；**PNG 与 CHG-052 m3-e3 包零删除**逐类枚举确认 | TODO |
 | AC-06 | `MASTER` §3 读数列与实测**逐词相等**（含本 CHG 激活后的分母） | 用与 `verify_product_master_alignment.py::status_word()` 同源的量法重测（先例：`re-measure-with-the-gates-own-function`） | TODO |
 | AC-07 | 归档区**从未被删过**这一事实在本 CHG 之后仍成立 | `git log --diff-filter=D -- delivery/completed` 的**净删除文件数**为 0（T-05 的删除须落在可再生的过程产物上，故本条按「记录文件」为分母重述） | TODO |
 | AC-08 | 六个静态门禁 `exit=0` ＋ `unittest` OK | 在**最后一次改动之后**重测，读数落 `evidence/artifacts/` | TODO |
 | AC-09 | 四仓零越界：workspace 只得治理文件改动，三仓零改动 | 逐仓 `git status --porcelain` ＋ `git diff --stat` 对账，锚 T-01 基线提交 | TODO |
-| AC-10 | 门禁**报出分母**，且读数不是空转 | `check_archive_readonly` 打印被扫描脚本数与前缀匹配数；`check_completed_has_boundary` 打印被检查的标记串数 | TODO |
+| AC-10 | 门禁**报出分母**，且读数不是空转 | `check_archive_readonly` 打印被扫描脚本数与前缀匹配数；`check_completed_has_boundary` 打印被检查的标记串数 | **PASS**（T-04：`scanned 12 script(s) … 0 write(s)`／`1 boundary marker(s)`，两条由 `main()` 无条件打印；用例 `test_archive_checks_report_their_denominators` 逐字断言这两行） |
 
 ## 11. Evidence
 
@@ -228,3 +228,11 @@ None.
 11. **AST 判据要锚在字符串字面量上，不能锚在接收者变量名上**（T-03 实测，供 T-04 用）。名字式判据对修改前的版本只报 **3/6** 处归档写（漏掉经 `EVIDENCE / "state.json"` 一跳间接的 `STATE_FILE`／`MANIFEST_FILE`／基线快照）；改成定点传播后又因名字空间跨函数共用而把污染集爆到约 180 个名字、命中数**高于**真值。⇒ 两头都不准，且**看不出来**。同时 T-04 须处理的负例：旧版 `own_artifacts` 里那个归档串是**过滤器**不是写目标，只判「字面量出现」会误报，故判据必须真的做「流向写操作」这一步。
 
 12. **T-03 的记录成本两处越界，照报不改界**：`change.md` ＋5,740 B（界 5,120，＋12%）、本 Task 的 evidence ＋10,095 B（界 9,216，＋9.5%）；`checkpoint.md` 0 B 增（本 Task 尚未更新）。读数见 `evidence/artifacts/t03-record-size.out`（**不内联**——本条自身的增补就会改变该读数，同第 4 项）。与第 4 项的区别：T-01 的越界 3.2 倍且**起因为结构性**（激活 Task 一次性写完整份计划），本 Task 的两处各约 10% 且内容全是实测新增——按「界不改、越界就报越界」照记，不调界也不删内容。
+
+13. **「fixture 默认合规」是一条要覆盖到**所有**调用该门禁的用例模块的规则，而它只在全量套件里才暴露**（T-04）。新判据给 `delivery/completed` 加了前置条件后，**两个**模块的 fixture 需要补：本 Task 正写的 `test_verify_delivery_governance.py` 是预料之中的，`test_prepare_ai_workspace.py` 则是**跑全量套件才冒出来**的——它的 `test_no_active_change_renders_none_snapshot` 也调 `validate_delivery_governance`。处置是把 fixture 补成合规，**不是**放宽判据（该用例验的是「关掉最后一个 CHG 时快照渲染为 `none`」，与归档无关）。⇒ 教训：给门禁加判据时，**受影响的 fixture 数要枚举**，不能只数自己正在改的那个模块。
+
+14. **判据自己的实现错误，是阳性对照抓出来的**（T-04）。`write_target` 初版把方法形式 `x.open(mode)` 的 mode 取成第 1 个实参（内建 `open(path, mode)` 的位置），于是 `path.open("rb")`（**读**）被判成写——改前脚本上报 14 处而非 11 处，多出的 `:88`／`:97`／`:438` 全是假阳性。修好后恰好 11 处。⇒ 这是「判据必须先拿**已知有判别力**的输入跑一遍」的又一实例，与 CHG-065 §14 第 3 项同源；也说明**同一函数在不同调用形式下参数位置不同**这类错，靠读代码看不出来，只能靠对照的**读数**看出来。
+
+15. **判据的覆盖面是明写的，不是暗示的**（T-04）。`check_archive_readonly` 只扫 `scripts/*.py` 顶层：`scripts/` 下另有 **6 个 shell 脚本**不在判据内，`tests/` 也不在内。人工读数（不是判据）：这 6 个文件提到 `delivery/completed` 的行数 **0**。⇒ 按「证据覆盖面要枚举」记：边界写成「脚本不写归档」，而不是「任何东西都写不了归档」。
+
+16. **T-04 的记录成本**：读数见 `evidence/artifacts/t04-record-size.out`（**不内联**，同第 4 项与第 12 项）。
