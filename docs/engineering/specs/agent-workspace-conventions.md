@@ -1,16 +1,17 @@
 # Agent Workspace 协作规范
 
-本规范描述 WT Media 多仓库在 AI Agent（Claude Code、Codex 等）协作下的入口、上下文加载与校验约定。它补充 `AGENTS.md` 第十二章，并把散落在脚本与 skill 中的隐含约束显式化。
+本规范描述 WT Media 多仓库在 AI Agent（Claude Code、Codex 等）协作下的入口、上下文加载与校验约定。它补充 `AGENT-INDEX.md` 第 10 节「Agent 入口与执行快照」，并把散落在脚本与 skill 中的隐含约束显式化。
 
-更新：2026-09-23。
+更新：2026-09-24（入口重构：治理规范正文归口 `AGENT-INDEX.md`，`AGENTS.md` 与 `CLAUDE.md` 收敛为薄入口）。
 
 ## 1. 不变量
 
 1. `wt-media-workspace` 是治理中心与唯一事实源，不是代码执行中心，也永远不能成为运行时依赖。
 2. 每个工程仓库自治：自己维护 `AGENTS.md`、`CLAUDE.md`、`AGENT-INDEX.md`。
-3. 执行状态快照全项目**只有一份**，位于 `wt-media-workspace/.ai/CURRENT_CONTEXT.md`。
-4. 关联工程路径以 `config/repository-map.yaml` 为准，脚本与文档不得另行硬编码，也不得与之漂移。
-5. 运行时改动只发生在对应工程仓库；治理仓库不存放业务代码、构建产物或临时文件。
+3. 治理规范正文归口 `AGENT-INDEX.md`；`AGENTS.md` 与 `CLAUDE.md` 只声明权威源与最小硬约束，不复制正文。
+4. 执行状态快照全项目**只有一份**，位于 `wt-media-workspace/.ai/CURRENT_CONTEXT.md`。
+5. 关联工程路径以 `config/repository-map.yaml` 为准，脚本与文档不得另行硬编码，也不得与之漂移。
+6. 运行时改动只发生在对应工程仓库；治理仓库不存放业务代码、构建产物或临时文件。
 
 ## 2. 父层定位
 
@@ -27,14 +28,14 @@
 
 | 文件 | 作用 | 强制 |
 |---|---|---|
-| `AGENTS.md` | Codex / OpenAI Harness 入口，同时是治理规范的规范文本 | 必须存在 |
-| `CLAUDE.md` | Claude Code 入口 | 必须存在 |
-| `AGENT-INDEX.md` | 统一路由：仓库职责、关联仓库、上下文加载规则 | 必须存在 |
+| `AGENT-INDEX.md` | 统一索引与治理规范正文：仓库职责、关联仓库、知识地图、需求路由、上下文加载、Delivery 与变更规则 | 必须存在，正文权威源 |
+| `AGENTS.md` | Codex / OpenAI Harness 薄入口：声明权威源与最小硬约束 | 必须存在 |
+| `CLAUDE.md` | Claude Code 薄入口：项目概览、权威源、常用命令与工作流 | 必须存在 |
 | `.ai/CURRENT_CONTEXT.md` | 执行状态快照 | 必须存在，且唯一 |
 
 `AGENTS.md` 与 `CLAUDE.md` 是**平级入口**，不允许互相软链或互相替代。
 
-平级不等于内容可以矛盾。当两者的规则冲突时，Agent 会按 Harness 各自加载到不同结论——这是本规范最需要防守的失败模式。工程仓库中若把 `CLAUDE.md` 写成 `AGENTS.md` 的过期副本，即属违规；正确做法是两者各自独立、内容一致、或由 `CLAUDE.md` 明确声明权威源并**不重复**内容。
+平级不等于内容可以矛盾。当两者的规则冲突时，Agent 会按 Harness 各自加载到不同结论——这是本规范最需要防守的失败模式。工程仓库中若把 `CLAUDE.md` 写成 `AGENTS.md` 的过期副本，即属违规；正确做法是两者各自独立、内容一致、或由 `CLAUDE.md` 明确声明权威源并**不重复**内容。`wt-media-workspace` 采用第三种做法：规范正文只存在于 `AGENT-INDEX.md`，两个入口文件都指向它并声明其权威性。
 
 `AGENT-INDEX.md` 的第三层要求进入工程后读取该仓 `AGENT-INDEX.md`。若目标仓尚无该文件：不得凭空创建，回退为「本文件 + 该仓 `AGENTS.md`」，并在当前 CHG 中登记该缺口。
 
@@ -54,7 +55,7 @@
 
 ## 5. 渐进式加载
 
-**第一层（固定）**：`AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md` → `.ai/CURRENT_CONTEXT.md`。
+**第一层（固定）**：`AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md` → `.ai/CURRENT_CONTEXT.md`。前两个在治理仓是薄入口，正文与权威仍在 `AGENT-INDEX.md`；顺序保持不变，是因为它同时约束 `.ai/CURRENT_CONTEXT.md` 生成器与三个工程仓，改动它需要三者同步。
 
 **第二层（当前任务）**：`delivery/LEDGER.md`、快照指明的 Milestone、`delivery/active/<change-id>/change.md` 及其 plan/spec/checkpoint。
 
@@ -68,7 +69,7 @@
 - **仅当同一个 CHG 需要多个工程并行实施时**，才建立 `delivery/active/<change-id>/status/`，按 `<repo>.md` 逐仓记录：当前状态、修改内容、验证结果。单仓实施的 CHG 不建该目录。
 - 由 workspace 统一汇总，不引入第二套任务管理系统。
 
-已知张力：`delivery/active/` 当前只允许存在一个 CHG，而本节的并行诉求在语义上允许 N 个。当前通过「同一时刻只激活一个 CHG」维持两者相容。若将来确需两个真正并行的 active CHG，必须同时修改第 9 节登记的全部强制点，并同步修订 `AGENTS.md` 第十二章的单数措辞。
+已知张力：`delivery/active/` 当前只允许存在一个 CHG，而本节的并行诉求在语义上允许 N 个。当前通过「同一时刻只激活一个 CHG」维持两者相容。若将来确需两个真正并行的 active CHG，必须同时修改第 9 节登记的全部强制点，并同步修订 `AGENT-INDEX.md` 第 8 节与第 10 节的单数措辞。
 
 ## 7. 配置一致性
 
@@ -114,6 +115,7 @@
 | 仓库路径 | `config/repository-map.yaml` | `init-agent-entry.sh::map_path`、`agent_config.py::read_section` | `verify_agent_entry.py` 双向强制与 `skills-distribution.yaml` 一致 |
 | 分发目标 | `config/skills-distribution.yaml` | `sync_skills.py::load_targets`（唯一消费方）、`verify_agent_entry.py::check_config_agreement` | 改目标只改 yaml；代码里不得再出现目标清单 |
 | 配置文件语法 | `scripts/agent_config.py` | `sync_skills.py`、`verify_agent_entry.py` 均 import 它 | 语法放宽必须同时改 `tests/test_agent_config.py` |
+| 规范正文归口 | `wt-media-workspace/AGENT-INDEX.md` | 无强制（`verify_agent_entry.py` 只强制入口文件存在性） | 改治理规范只改 `AGENT-INDEX.md`；`AGENTS.md` / `CLAUDE.md` 只保留指针，指针漂移靠人工复核 |
 | 入口文件平级 | 各仓 `AGENTS.md` / `CLAUDE.md` | 无强制 | `verify_agent_entry.py` 的漂移检查产出 WARN 供人工复核 |
 | skill 单一源 | `skills/<group>/<name>/SKILL.md` | `sync_skills.py` 分发到 `skills-distribution.yaml` 的 targets | `sync_skills.py check` / `diff`；分组认领由 `verify_agent_entry.py::check_group_coverage` 兜住 |
 | 快照由脚本生成 | `prepare_ai_workspace.py` | `planning-wt-media-delivery` skill 第 7 步 | 两者措辞需同时更新 |
@@ -122,17 +124,50 @@
 
 本地手工执行，本仓库当前**不设 CI**（`.github/workflows/` 已移除）。
 
-| 校验 | 状态 |
+下表所有计数为 **2026-09-25 实测**（`CHG-20260925-062` 期间逐条重跑）。此前记的是 2026-09-23 的读数；
+**红项集本身未变，变的是计数与组成**——凡与旧读数不同处，均在表下注明成因。
+
+| 校验 | 状态（2026-09-25 实测） |
 |---|---|
 | `scripts/verify_delivery_governance.py` | 绿 |
-| `scripts/verify_agent_entry.py` | 绿（0 ERROR；1 个 WARN 为待复核项，见下） |
+| `scripts/verify_agent_entry.py` | 绿，**0 WARN**（快照 1923 字符）。原记「1 个 WARN 为待复核项」已不成立，成因见下 |
 | `scripts/verify_skills.py` | 绿（10 个 skill 源文件） |
-| `scripts/verify_m0_config.py` | **红 3 项**：`cloud_api` 与 `local_agent_api` 的 `contract_revision` 期望值落后于 `config/contract-map.yaml`；缺失 `.github/workflows/m0-workspace.yml` |
-| `scripts/verify_product_master_alignment.py` | **红 9 项**：M2/M3 状态词漂移 2 项、M2/M3 候选关键词缺失 5 项、以及「active CHG 缺 current repository」「active CHG 不得有待决问题」各 1 项 |
-| `scripts/verify_m2_acceptance.py` | **红 1 项**：`wt-media-cloud/internal/modules/cloudagent/compatibility.go` 在云仓已不存在 |
-| `python3 -m unittest discover -s tests -q` | 4 项失败，全部来自上面三个脚本；修完即转绿（2026-09-23 计数：69 项中 4 项失败。此前本行记为「45 项中 4 项」，总数只因后续新增测试而变，**红项集未变**） |
+| `scripts/verify_m0_config.py` | **红 3 项**：`cloud_api` 与 `local_agent_api` 的 `contract_revision` 期望值落后于 `config/contract-map.yaml`；缺失 `.github/workflows/m0-workspace.yml`。（与旧读数一致） |
+| `scripts/verify_product_master_alignment.py` | **红 8 项**：M2/M3 状态词 2 项、M2/M3 候选关键词 5 项、M10 缺 `FFmpeg/FFprobe 分发` 1 项。**原记「红 9 项」不成立**，成因见下 |
+| `scripts/verify_m2_acceptance.py` | **红 5 项**。**原记「红 1 项」不成立**，成因见下 |
+| `python3 -m unittest discover -s tests -q` | **73 项中 4 项失败**，全部来自上面三个脚本。（原记「69 项中 4 项」；总数只因后续新增测试而变，**红项集未变**） |
 
 上述红项**不在 Agent 入口工作范围内**，需各自独立开 CHG 处理。在它们转绿之前，不要假定本仓库门禁整体是绿的。
+
+**三处计数变化的成因（已查明，均非入口工作引入）**：
+
+1. **`verify_agent_entry.py` 由 1 个 WARN 降为 0**——云仓自己修掉了。该 WARN 原为
+   「`wt-media-cloud` 的 `AGENTS.md` 禁止 `internal/runtime`，而 `CLAUDE.md` 仍把它描述为资源所有者」。
+   现状实测：云仓 `CLAUDE.md:31` 已把该提及写进**禁止句**（「禁止创建全局单例和 `internal/runtime`」），
+   而漂移检查正是「禁止句里的提及不算描述」，故命中消失。修它的是云仓提交
+   `f21bbcb docs: align Cloud agent boundary with ADR-0017`，**不是本规范或本仓的改动**。
+   逐仓实测（2026-09-25）：cloud 禁止 6 / 描述 7 / 交 0、desktop 2 / 1 / 0、agent 0 / 0 / 0、workspace 0 / 8 / 0。
+2. **`verify_product_master_alignment.py` 由 9 项降为 8 项**——组成也变了。旧读数的 9 项里含
+   「active CHG 缺 current repository」与「active CHG 不得有待决问题」各 1 项，这**两项只在存在
+   active CHG 时才会触发**；无 active CHG 时它们天然不出现。剩下的 8 项是 M2/M3 状态词 2 +
+   候选关键词 5 + M10 的 `FFmpeg/FFprobe 分发` 1。旧表把 M10 那项漏计、把两个 active-CHG 条件项计入，
+   故写着 9。
+3. **`verify_m2_acceptance.py` 由 1 项升为 5 项**——这是**校验器期望值过期**，不是代码缺陷。
+   逐条查证（2026-09-25）：
+
+   - `wt-media-cloud/internal/modules/cloudagent/compatibility.go` 不存在——该文件已移到
+     `.../cloudagent/service/compatibility.go`（旧读数即此一项，仍然成立）。
+   - `wt-media-agent/src/wt_media_agent/cloud_agent_contract.py` 里没有字面量
+     `REQUIRED_CONTRACT_REVISION = "2026.07.15.1"`——该常量已迁出，此文件只**导入再导出**
+     （`:10` 导入、`:18` 进 `__all__`）。
+   - `wt-media-desktop/src-tauri/src/main.rs` 里没有 `"wt-media-agent"`（实测 0 命中）——
+     `main.rs` 已由 CHG-056 拆分为分层模块，该字符串随之迁走。
+   - `wt-media-desktop/src-tauri/src/local_agent/mod.rs` 里没有 `consume_binding_ticket(` 与
+     `pub fn bind_session<T: BindingTransport>(`（实测各 0 命中）——函数已改名或迁走。
+
+   即：这是一个**静态**校验器（其 docstring 自述「must never turn fixture evidence into a
+   real-integration PASS」），期望值以文件内容字面量为判据，而这些文件内容已被后续 CHG 合法重构。
+   **本次只登记、不改**——改它属跨仓校验器维护，需独立开 CHG。
 
 其中两项与入口工作相邻，值得单独说明：
 
@@ -141,7 +176,13 @@
 
 当前已知 WARN：
 
-1. `wt-media-cloud`：`AGENTS.md` 明确不创建 `internal/runtime`，而 `CLAUDE.md` 仍把它描述为资源所有者。云仓自己的规范冲突，修正属于云仓范围，不在治理仓库代改。这是本校验脚本要长期盯住的唯一一条漂移。
+- **无（2026-09-25 实测 0 条）**。此前唯一一条云仓漂移已关闭，见下。规则不变：漂移只检测、报告，
+  修正由各仓自行决定（§11）。
+
+已关闭的 WARN（2026-09-25）：`wt-media-cloud`：`AGENTS.md` 明确不创建 `internal/runtime`，
+而 `CLAUDE.md` 仍把它描述为资源所有者。**由云仓自己关闭**——`CLAUDE.md:31` 已改写成禁止句
+（「禁止创建全局单例和 `internal/runtime`」），提交 `f21bbcb docs: align Cloud agent boundary
+with ADR-0017`。这正是本规范期望的处理路径（治理仓只报告、各仓自行修正）。逐仓实测见 §10 上方第 1 条。
 
 已关闭的 WARN（2026-09-23）：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop` 原先都没有 `AGENT-INDEX.md`，第三层加载规则处于降级状态。三个文件已由 `scripts/init-agent-entry.sh repo <name>` 生成并分别提交到各仓（各仓一次独立提交，只含该文件）；校验脚本的「无 AGENT-INDEX.md」WARN 随之消失。降级条款本身保留，用于将来新增仓库时的缺口登记。
 

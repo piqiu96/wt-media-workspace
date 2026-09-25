@@ -111,6 +111,12 @@
 - **不给 `AGENT-INDEX.md` §12 补 `verify_delivery_governance.py`**：该节校验清单只列了
   `verify_agent_entry.py`，未列真正约束 CHG 记录的那个脚本。是缺陷，但超出用户裁定的
   「修两处该修的」范围。**只登记。**
+- **不修 `verify_m2_acceptance.py` 的 4 条过期期望**：T-03 实跑该静态校验器得**红 5 项**
+  （旧读数记「红 1 项」），多出的 4 条是校验器以**文件内容字面量**为判据、而那些文件已被后续
+  CHG 合法重构（`compatibility.go` 迁到 `service/`、`REQUIRED_CONTRACT_REVISION` 改为导入再导出、
+  `main.rs` 随 CHG-056 拆分后不再含 `wt-media-agent`、`local_agent/mod.rs` 里两个函数名已不存在）。
+  改它属跨仓校验器维护，需独立开 CHG。准确内容已登记在
+  `docs/engineering/specs/agent-workspace-conventions.md` §10。
 - **不还原、不改写那次重构的任何内容**：只提交、只修它带出的指针，不重新设计入口文件结构。
 - **不动那 4 条既知红项**：`verify_product_master_alignment.py` 的 M2/M3 状态与能力对齐红项
   与本 CHG 无关，保持红。

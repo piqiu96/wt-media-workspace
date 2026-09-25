@@ -1,0 +1,17 @@
+=== 红：第 13 节 命中 ===
+docs/engineering/specs/agent-workspace-conventions.md:3:本规范描述 WT Media 多仓库在 AI Agent（Claude Code、Codex 等）协作下的入口、上下文加载与校验约定。它补充 `AGENT-INDEX.md` 第 13 节「Agent 入口与执行快照」，并把散落在脚本与 skill 中的隐含约束显式化。
+docs/engineering/specs/agent-workspace-conventions.md:72:已知张力：`delivery/active/` 当前只允许存在一个 CHG，而本节的并行诉求在语义上允许 N 个。当前通过「同一时刻只激活一个 CHG」维持两者相容。若将来确需两个真正并行的 active CHG，必须同时修改第 9 节登记的全部强制点，并同步修订 `AGENT-INDEX.md` 第 8 节与第 13 节的单数措辞。
+命中数: docs/engineering/specs/agent-workspace-conventions.md:2
+=== 对照：AGENT-INDEX.md 实际有哪些节 ===
+23:## 1. 本仓库定位
+33:## 2. 红线（不可协商）
+44:## 3. 知识地图与唯一可信来源
+60:## 4. 读取顺序与上下文加载
+80:## 5. 关联仓库与职责边界
+91:## 6. 需求路由
+115:## 7. 端到端工作流
+125:## 8. 交付治理
+131:## 9. 变更规则与完成检查
+143:## 10. Agent 入口与执行快照
+170:## 11. 多 Agent 并行
+176:## 12. 校验
