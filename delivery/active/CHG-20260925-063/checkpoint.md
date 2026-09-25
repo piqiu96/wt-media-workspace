@@ -65,16 +65,37 @@
   **M8/M9**（均 `NOT_STARTED` 且有非空块），并新增「清空 M9 块」用例把三族检查的不对称钉死。
   证据：`evidence/task-04-tests.md`。
 
+- 2026-09-25 T-05 完成（提交 `3204f91`）：三处文档与实测对齐——`README.md` §Verification 由 4 项补为
+  **6 个静态门禁 + unittest** 并**删掉「Known open failures」整段**（附显式禁令；该段的红项与清单本身互相矛盾：
+  清单只列 4 个脚本却在下一段讨论另外两个）；`conventions §10` 由「校验与已知红项」改写为
+  **实测绿表 + 四条硬约束**（判据稳定性分层、候选块属于未关闭里程碑、"报通过/0 命中前先证明检查能失败"、
+  已知 WARN 含一条结构性空转的如实登记）；`AGENT-INDEX.md` §12 由只列一个脚本改为**列全校验命令**、
+  并声明 `conventions §10` 为**校验状态的唯一落点**——**关闭 CHG-062 遗留第 2 项**（原先真正约束 CHG 的
+  `verify_delivery_governance.py` 根本没被列出）。
+  **两遍引用扫描**：字符串扫描 0 条现行断言（阳性对照：同模式在该文件另有 4 处命中）；相对引用 resolve
+  46 条 link 形态**全通、0 条指不到**（阳性对照：喂一个不存在的路径，解析器报 `False`）；另 264 条散名 /
+  兄弟仓路径 / 命令按形态排除。**一处自我纠正**（同类错第五次）：首版分类器把 27 个散文用名误判为链接并
+  全报 MISS，改为按「首段是否为仓内顶层目录」判定。**并纠正一处既有诊断**：先前说该臂恒空的成因是
+  「红线路径全带扩展名」——实测 `AGENT-INDEX.md` 17 个 path token 里 10 个**可以**通过点号规则，结论不变
+  而机制不同（真正原因是 `check_entry_drift` **只读 `AGENTS.md`**，不读 `AGENT-INDEX.md`）；`change.md` §14
+  第 2 项已按新机制改写并附更正说明。
+  **不提交他人工作区改动**：该文件开工前已有一处 `/doctor` 编辑（第 33 行），处置为「临时还原为 HEAD 文本 →
+  确认 diff 只剩本任务改动 → 提交 → 改回」，核对读数：提交前 `git diff --stat` = `2 +-`；`git show HEAD:<file>`
+  该模式计数 = 2（原有行 `:11`、`:32`），恢复后工作区 = 3 ⇒ 未进入任何提交。证据：`evidence/task-05-docs.md`。
+
 ## Current
 
-- T-05 开工：文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
+- T-06 收尾：AC-12 复测、AC-01…AC-14 终态、DONE Gate 签字、归档与两遍失效指针扫描。
 
 ## Next
 
-- T-05 文档同步。注意 `docs/engineering/specs/agent-workspace-conventions.md` **开工前已有一处
-  上一任务的工作区改动（第 33 行）**，本任务的 §10 改动会叠在它上面；该文件的归属问题见
-  `change.md` §14。
-- T-06 收尾：AC-12 复测、DONE Gate 签字、归档与失效指针扫描。
+- T-06 收尾（`evidence/task-06-close.md`）：
+  1. 在**本 CHG 最后一次改动之后**重跑六个门禁 + 整套 unittest，取关闭值（不能沿用 T-05 读数）；
+  2. `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 复测 AC-12；`config/release-matrix.yaml`
+     复测 AC-14 零改动；逐条给 AC-01…AC-14 终态；
+  3. §13 DONE Gate 逐条签字、§9 Repository Checklist 勾选；
+  4. `delivery/active/` → `completed/` 归档，同步 `LEDGER.md`；
+  5. 归档后**两遍**失效指针扫描（字符串扫描 + 相对链接从**引用者自身目录** resolve），并做阳性对照。
 
 ## Blockers
 

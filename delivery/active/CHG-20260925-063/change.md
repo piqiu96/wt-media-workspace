@@ -155,7 +155,7 @@ None.
 | T-02 | `verify_m2_acceptance.py` 转绿：移除 3 处源码字面量断言，新增 Cloud 原子单次使用断言（D-01/D-02） | DONE | 脚本 exit 0；**9 个被删 needle 经 AST 证明 0 个仍在断言集合内**；新增 migration schema 断言做**变异对照**（3 条变异各报 1 错 + 阳性对照证明读取器确在读假树）；六类契约层目标全部 present。见 `evidence/task-02-m2-acceptance.md` |
 | T-03 | `verify_product_master_alignment.py` 转绿：状态词对齐、候选块断言按状态分层、消除两处空转、新增未关闭里程碑缺块断言 | DONE | 脚本 exit 0，六个门禁全绿；**变异对照 7 臂**（含两条对照：空文本证明读的是传入文本、未变异文本 0 错证明基线干净），每臂产出恰好其预期错误集；**6 个被删 needle 经 AST 证明 0 个仍在断言集合内**，M3 标签断言组已无残留。另查明 T-04 那条假通过用例**绿的原因也是空转**（未变异文本已产出 4 条 `M3 candidate` 错，满足了「有该标签」的断言）。见 `evidence/task-03-product-master-alignment.md` |
 | T-04 | 修正测试套件的假通过与失效用例（4.4）；断言判定由「有某标签」改为「错误集合逐条相等」 | DONE | 5 条 → 7 条，该文件全绿；整套 unittest **Ran 75 / OK**（连跑两次一致）。**变异对照 5 臂**，其中**决定性一臂**把旧脚本命名的 M3 禁用判定整条关掉后，**旧用例依然通过**——证明它无法检测该检查被删除。断言一律比较完整错误集合。见 `evidence/task-04-tests.md` |
-| T-05 | 文档同步：README §Verification、conventions §10、`AGENT-INDEX.md` §12 | TODO | 三处读数与实测一致；`verify_agent_entry.py`、`verify_delivery_governance.py` 仍绿 |
+| T-05 | 文档同步：README §Verification、conventions §10、`AGENT-INDEX.md` §12 | DONE | 三处读数与实测一致（六门禁 exit 0、套件 Ran 75/OK、快照实测 1919 字符）；`git show HEAD` 逐处复核。**两遍引用扫描**：字符串扫描 0 条现行断言（含阳性对照），相对引用 resolve 46 条 link 形态全通、0 条指不到（含阳性对照）；散名/兄弟仓/命令共 264 条按形态排除。**并纠正一处自己的既有诊断**。见 `evidence/task-05-docs.md`，提交 `3204f91` |
 | T-06 | 收尾：全套门禁 + unittest 读数、归档指针扫描 | TODO | 见 §10 验收矩阵 |
 
 每个 Task 按 `executing-wt-media-change` 的协议执行：失败验证 → 最小实现 → 测试 → diff 检查 → 证据 → checkpoint → 独立提交。
@@ -196,7 +196,7 @@ None.
 | AC-10 | `python3 -m unittest discover -s tests -q` 全绿 | 登记进程数与失败数 | PASS（T-04）：**Ran 75 / OK**，连跑两次读数一致 |
 | AC-11 | `verify_delivery_governance.py`、`verify_agent_entry.py`、`verify_skills.py` 仍绿 | 实跑三者 | PASS（T-04，`artifacts/t04-gate-readings.out`） |
 | AC-12 | 三个运行仓工作区**零改动** | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 与开工前一致 | TODO（T-06 收尾复测） |
-| AC-13 | 文档三处读数与实测一致 | 逐处比对 | TODO（T-05） |
+| AC-13 | 文档三处读数与实测一致 | 逐处比对，并做失效指针两遍扫描 | PASS（T-05）：三处读数与 2026-09-25 实测逐项一致；两遍扫描均含阳性对照，0 条指不到东西 |
 | AC-14 | `config/release-matrix.yaml` 零改动 | `git diff --stat` 该文件 0 行 | PASS（T-03 实查 0 行；T-06 收尾复测） |
 
 ## 11. Evidence
@@ -221,13 +221,13 @@ Completed:
 - T-02 `verify_m2_acceptance.py` 转绿（`evidence/task-02-m2-acceptance.md`）。
 - T-03 `verify_product_master_alignment.py` 转绿（`evidence/task-03-product-master-alignment.md`）。
 - T-04 测试套件修正（`evidence/task-04-tests.md`）。
+- T-05 三处文档与实测对齐（`evidence/task-05-docs.md`，提交 `3204f91`）：`README.md` §Verification 补全 6 个静态门禁 + unittest 并删掉「Known open failures」段；`conventions §10` 由「校验与已知红项」改写为实测绿表 + 四条硬约束；`AGENT-INDEX.md` §12 列全校验命令并声明 conventions §10 为校验状态的唯一落点（**关闭 CHG-062 遗留第 2 项**）。T-05 记录更新见本 commit。
 
 Current:
-- T-05 开工：文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
+- T-06 收尾：AC-12 复测、AC-01…AC-14 终态、DONE Gate 签字、归档与两遍失效指针扫描。
 
 Next:
-- T-05 文档同步，三处读数与实测对齐。
-- T-06 收尾：验收矩阵 AC-12 复测、DONE Gate 签字、归档与失效指针扫描。
+- T-06 收尾（`evidence/task-06-close.md`）：跑全套门禁与 unittest 取**最后一次改动之后**的读数；`git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 复测 AC-12；`active/` → `completed/` 归档；归档后两遍扫描（字符串 + 相对链接 resolve）。
 
 Blocked:
 - None.
@@ -237,6 +237,8 @@ Recent verification:
 - **最后一次改动之后**重跑（`evidence/artifacts/t04-gate-readings.out`）：六个门禁全 `exit=0`；
   整套 unittest **Ran 75 / OK**，连跑两次读数一致（`t04-postfix-full-test-suite.out`）。
 - 测试文件 5 条 → 7 条（`tests/test_verify_product_master_alignment.py`）。
+- T-05 在**文档改动之后**再跑一次（`evidence/artifacts/t05-gate-readings.out`）：六个门禁仍全 `exit=0`，套件仍 `Ran 75 / OK`。
+  文档改动不改判据，故与 T-04 读数一致属预期；T-06 会在本 CHG 最后一次改动之后重测并作为关闭值。
 
 ## 13. DONE Gate
 
@@ -253,9 +255,11 @@ Recent verification:
 ## 14. 遗留（只登记，不在本 CHG 处置）
 
 1. **该仓不设 CI ⇒ 门禁只在手工执行时才会被发现已经红**（§4.5，原 Q-01）——僵尸门禁的结构成因。本 CHG 把三个脚本转绿，但**没有**引入任何自动强制点。待决：是否为此引入一个非 CI 的强制点（如 CHG 完成闸门必跑全套、或 pre-commit）。
-2. **`verify_agent_entry.py` 的 workspace 臂空转**（G-10，CHG-062 遗留第 1 项）：其正则要求末段不含点号，而该仓红线路径全带扩展名，该臂在唯一需要它的仓里永远为真。**独立 CHG。**
+2. **`verify_agent_entry.py` 的 workspace 臂在结构上不可能命中**（G-10，CHG-062 遗留第 1 项）。**机制经 T-05 重测后更正**（原诊断见文末「更正说明」）：`check_entry_drift` 只从各仓 **`AGENTS.md`** 取禁止路径词，**根本不读 `AGENT-INDEX.md`**；本仓红线正文已迁到后者，`AGENTS.md` 现为薄入口，其仅有的两条禁止句带的是含扩展名的路径（`config/repository-map.yaml`、`.ai/CURRENT_CONTEXT.md`），两条都被点号规则滤掉 ⇒ **本仓 forbidden 集合恒为空集**，其 `0` 是结构性的。逐仓实测：workspace forbidden=0 / cloud=6 / desktop=2 / agent=0。**独立 CHG。**已写入 `conventions §10` 的 WARN 段。
+
+   **更正说明**：原诊断称「该仓红线路径全带扩展名」故该臂恒空。实测 `AGENT-INDEX.md` 的 17 个 path token 中**10 个可通过**点号规则（`docs/engineering/specs` 等无点号目录路径），结论（恒空转）不变而机制不同——真正的原因是**读取对象就不是那份文件**。故「去掉点号规则」不是充分的修法。
 3. **G-9 的 8 条权威冲突**（ADR-0015/0017 的 FFmpeg 归属、读取顺序两版、`milestones/README.md:7` 的 M3 状态与事实相反、`MASTER:54` 的 `delivery/verifying/` 不存在等）。**独立 CHG。**
 4. **M0/M1 已 `DONE` 却仍保留候选 CHG 块**（§4.3）：与 M2/M3 的做法不一致。本 CHG 只让校验脚本不再依赖该块的存在，**不改 MASTER 内容**。
 5. **CHG-062 遗留第 4 项**（`CLAUDE.md` `## 高频红线` 与 `AGENT-INDEX.md` §2 的局部重复）与**第 8 项**（`LEDGER.md:21` 的「见上表」已不可达）仍未处置。
-6. **`README.md:78` 把 `verify_m0_config.py` 的红项描述为「the removed `m0-workspace.yml` workflow」**——本 CHG 会删掉该断言，故该句一并消失；但「红项被文档化后就地固化」这一机制本身（§4.6）没有对策。
+6. **「红项被文档化后就地固化」这一机制本身（§4.6）仍无通用对策。** T-05 已把 `README.md` 里那段「Known open failures / 已知红项」**整段删除**，并留一句显式禁令（不要加回这一段，因为「红项一旦写进文档就固定不动」正是它们红了数月的机制）；`conventions §10` 也从「已知红项」改写为实测绿表。但这是**对这一处**的处理，不是**对这类**的处理：仓里仍无任何东西会在别的文件里再次出现「已知红 + 成因」时报警。待决：是否需要一个可机检的规则（例如禁止在权威层文档里出现未附复查日期的红项断言）。
 7. **`verify_product_master_alignment.py::validate_active_change` 不接受「非阻塞」这个档位**：它要求 active CHG 的 §7 为字面 `None.`，只要该节存在待决问题表格即报错，无论是否阻塞。这使「登记一个非阻塞问题以便日后追溯」在 active 期间做不到，只能放进遗留节（本 CHG 即如此处理）。**本 CHG 不改此检查**——它属记录形状而非本 CHG 的判据分层范围；登记以免后人重提。
