@@ -1,0 +1,22 @@
+{
+  "workspace_root": "/Users/aqiuye/Develop/workspace/wt-media",
+  "mode": "workspace-governance-active",
+  "runtime_repositories": [
+    "wt-media-cloud",
+    "wt-media-agent",
+    "wt-media-desktop"
+  ],
+  "docs_location": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/docs",
+  "delivery_active": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/delivery/active",
+  "workspace_repository": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace",
+  "active_change": "CHG-20260925-062",
+  "active_change_status": "IMPLEMENTING",
+  "active_change_file": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/delivery/active/CHG-20260925-062/change.md",
+  "active_milestone": null,
+  "affected_repositories": [
+    "wt-media-workspace"
+  ],
+  "current_context": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/.ai/CURRENT_CONTEXT.md",
+  "generated_execution_skill": "/Users/aqiuye/Develop/workspace/wt-media/.agents/skills/executing-wt-media-change/SKILL.md"
+}
+prepare exit=0
