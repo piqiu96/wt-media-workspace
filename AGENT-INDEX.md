@@ -194,5 +194,5 @@ python3 -m unittest discover -s tests -q          # 上述脚本自身的判别�
 合法的跨仓重构不应能把门禁打红。**报「通过 / 0 命中」前必须先证明检查能失败**（附阳性对照、报出分母；
 变异式的「先红」必须是关掉该判定后用例失败，不能是 `ImportError`）。
 
-每个校验的当前读数、分层表、控制方法与已知限制（含一条结构性空转的如实登记）见
-`docs/engineering/specs/agent-workspace-conventions.md` §10——**该节是校验状态的唯一落点，本节只列命令**。
+每个校验的分层判据、控制方法与已知限制（含一条结构性空转的如实登记）见
+`docs/engineering/specs/agent-workspace-conventions.md` §10——**校验读数不作文档落点**：跑一下，读出什么就是什么，本节只列命令。

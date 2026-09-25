@@ -1,0 +1,72 @@
+# T-03 门禁读数  2026-09-25 19:38:56 CST
+pycache_prefix=/tmp/pyc-none.FrlkuR
+
+=== scripts/verify_delivery_governance.py ===
+Delivery governance verification ok. Active CHG: CHG-20260925-064
+exit=0
+
+=== scripts/verify_agent_entry.py ===
+execution snapshot: 1916 characters (~766 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+=== scripts/verify_skills.py ===
+verified 10 skill source files
+exit=0
+
+=== scripts/verify_m0_config.py ===
+Workspace config verification ok
+exit=0
+
+=== scripts/verify_product_master_alignment.py ===
+Product and Master Plan alignment verification ok
+exit=0
+
+=== scripts/verify_m2_acceptance.py ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+=== unittest discover -s tests -q ===
+----------------------------------------------------------------------
+Ran 75 tests in 0.296s
+
+OK
+exit=0
+
+
+# 复测（本 Task 最后一次改动之后：change.md / checkpoint.md / evidence 均已写入）  2026-09-25 19:40:25 CST
+pycache_prefix=/tmp/pyc-none.BlADDy
+
+=== scripts/verify_delivery_governance.py ===
+Delivery governance verification ok. Active CHG: CHG-20260925-064
+exit=0
+
+=== scripts/verify_agent_entry.py ===
+execution snapshot: 1916 characters (~766 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+=== scripts/verify_skills.py ===
+verified 10 skill source files
+exit=0
+
+=== scripts/verify_m0_config.py ===
+Workspace config verification ok
+exit=0
+
+=== scripts/verify_product_master_alignment.py ===
+Product and Master Plan alignment verification ok
+exit=0
+
+=== scripts/verify_m2_acceptance.py ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+=== unittest discover -s tests -q ===
+----------------------------------------------------------------------
+Ran 75 tests in 0.304s
+
+OK
+exit=0
