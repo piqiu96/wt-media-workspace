@@ -1,5 +1,5 @@
 == gates taken after the last T-05 record change ==
-2026-09-26 03:54:42
+2026-09-26 04:02:47
 
 verify_delivery_governance.py exit=0  Delivery governance verification ok. Active CHG: CHG-20260926-068
 verify_agent_entry.py exit=0  Agent entry verification ok. 0 warning(s) need review.
@@ -10,4 +10,6 @@ verify_m2_acceptance.py exit=0  NOTE: real MySQL and BitBrowser evidence must be
 
 sync_skills.py check exit=0  skill outputs are up to date
 
-unittest discover -s tests -q exit=0  Ran 106 tests in 0.748s  OK 
+unittest discover -s tests -q exit=0  Ran 106 tests in 0.726s  OK 
+
+worktree:        7 entries staged/unstaged (T-05 record only)

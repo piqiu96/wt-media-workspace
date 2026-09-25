@@ -125,7 +125,7 @@ None.
 | T-02 | **cloud**：新建 `scripts/verify/test-control.sh`＋`scripts/test.sh` 一行＋`scripts/README.md` 一行 | DONE | `bash scripts/test.sh` `exit=0`（`^ok\s` 56／`^FAIL` 0／vitest 25-166／`[control]` 12-0）；**变异红** 8 failed 与恰 1 failed；`[control]` 13 行对门禁两条正则各贡献 0 行。见 `evidence/task-02-cloud-entry.md` |
 | T-03 | **agent**：新建 `tests/test_control_sh.py` | DONE | 7 用例绿；**变异红** 4 failed 与恰 1 failed；`Ran 416`（基线 409，+7）；`.local/` 护栏未触发。见 `evidence/task-03-agent-entry.md` |
 | T-04 | **workspace**：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓） | DONE | 两条绿；**变异** `chmod -x` 兄弟仓 desktop → **恰 3 failed 全标 desktop**（本仓检查仍 0）／本仓 → 恰 3 failed＋本仓检查 `exit=1`；缺席路径 skip 并印分母 `3/4`；六门禁 `exit=0`、`Ran 106`（+5）。见 `evidence/task-04-workspace-entry.md` |
-| T-05 | **workspace**：四仓四动词**真跑**（16 格），先停实况，逐仓 `status → start → status → restart → status → stop → status`，原始读数落 `evidence/artifacts/t05-*-verbs.out`；收尾留在运行态 | TODO | **部分（8/16 端到端）**：agent 4/4 端到端（18765 真起真停，实况 54456 前后验活）；desktop `status` 端到端、`start`／`restart`／`stop` **止于既有前置**（`beforeDevCommand` 差一段路径，实测 cwd）；cloud `status` 端到端（**exit 1**，暴露 `alive=no health=ok` 不对称）、`stop` 真跑但对象为空；**cloud `start`／`restart` ＋ workspace `start`／`restart`／`stop` 未覆盖**——18080／8765 被 54420／54456 占用，按 pid 杀被权限分类器拒绝（见 §14 第 7 项）。见 `evidence/task-05-real-run.md` |
+| T-05 | **workspace**：四仓四动词**真跑**（16 格），先停实况，逐仓 `status → start → status → restart → status → stop → status`，原始读数落 `evidence/artifacts/t05-*-verbs.out`；收尾留在运行态 | DONE | **16 格：13 端到端／3 止于既有前置／0 未覆盖。** cloud 4/4（64839／64919 真起真停，pid 文件＋监听＋`healthz` 三路旁证）、agent 4/4（58703／58731）、workspace 4/4（真起 cloud 65668＋agent 65686 并跑完整条验收链：BitBrowser／DMG／登录冒烟全 `PASS`）；desktop `status` 端到端，`start`／`restart`／`stop` 止于 `beforeDevCommand` 既有缺陷（§14 第 6 项）。清场靠按 pid 杀（用户授权后 2 s 内清空），环境留在运行态（70220／70244）。见 `evidence/task-05-real-run.md` |
 | T-06 | **workspace**：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | TODO | 六门禁 ＋ `unittest` ＋ `sync_skills.py check`，取在最后一次改动之后；两遍指针扫描（各带对照与分母，锚取**不变基线**）；四仓 `git status` 对账 |
 
 ### 顺序与红窗（硬约束）
@@ -161,7 +161,7 @@ None.
 |---|---|---|---|
 | AC-01 | desktop `bin/control.sh` 可直接调用 | 改前 `help`=**126**／改后 **0**；index 与磁盘均 `100755` | PASS（T-01） |
 | AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PASS：desktop（T-01）／cloud（T-02）／agent（T-03）／workspace（T-04）各绿＋各两处变异 |
-| AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | **部分**：8 端到端／3 止于既有前置／5 未覆盖，逐格标注已落 `evidence/task-05-real-run.md`；5 格未覆盖待授权 |
+| AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | PASS（T-05）：13 端到端／3 止于既有前置／0 未覆盖，逐格标注落 `evidence/task-05-real-run.md`。desktop 那 3 格的「止于既有前置」是实测到的**既有**缺陷（§14 第 6 项），不是本 CHG 引入 |
 | AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PASS：四仓磁盘变异连带 3～8 项红、index 变异恰 1 项红；跨仓缺席路径有 skip 对照（分母 `3/4`） |
 | AC-05 | 跨仓回指与既有判据不被本 CHG 打红 | 六个静态门禁 `exit=0` ＋ `unittest` 套件 `OK` | TODO |
 | AC-06 | 改动逐条落在 §5；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 路径逐条归属；端口值 diff **0** | TODO |
@@ -176,7 +176,7 @@ None.
 - `evidence/task-02-cloud-entry.md` ＋ `artifacts/t02-cloud-control.out`、`t02-cloud-mutations.out`、`t02-cloud-prefix-control.out`、`t02-cloud-test-sh.out`
 - `evidence/task-03-agent-entry.md` ＋ `artifacts/t03-agent-control.out`、`t03-agent-mutations.out`、`t03-agent-test-sh.out`
 - `evidence/task-04-workspace-entry.md` ＋ `artifacts/t04-workspace-mutations.out`、`t04-workspace-gate.out`
-- `evidence/task-05-real-run.md` ＋ `artifacts/t05-agent-verbs.out`、`t05-desktop-verbs.out`、`t05-desktop-rootcause.out`、`t05-cloud-workspace-blocked.out`
+- `evidence/task-05-real-run.md` ＋ `artifacts/t05-cloud-verbs.out`、`t05-agent-verbs.out`、`t05-desktop-verbs.out`、`t05-desktop-rootcause.out`、`t05-workspace-verbs.out`、`t05-cloud-workspace-blocked.out`（清场前读数）、`t05-record-size.out`、`t05-gate.out`
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 ## 12. Current Checkpoint
@@ -239,12 +239,12 @@ None.
    又一处「判据与缺陷错开一格」，与本 CHG 起因同形。本 CHG **只登记不改**（§5 明列「不改 desktop 的 Tauri 配置」之外的
    业务文件；改它需另起 CHG）。
 
-7. **T-05：cloud／workspace 的 5 格被实况占用阻塞，且不能用 `bin/control.sh stop` 清场。**
-   18080＝**54420**、8765＝**54456** 不在本仓 pid 文件记录内（§14 第 4 项），两条 `stop` 都停不掉。
-   按 pid 杀被本会话自动权限分类器拒绝：那两个进程非本会话创建，「杀掉」的授权只存在于压缩摘要中，不构成用户同意。
-   ⇒ 5 格按计划口径登记为**未覆盖＋原因**，不静默省略、也不拿「绑不上端口」的失败读数冒充实验读数。
-   另外 cloud 的 `status` 顺带暴露：`start` 的 `exit=0` 与 `stop` 的 `exit=0` 都不是「起来了／停掉了」的证据，
-   两边都是探针与 pid 文件不同源所致（呼应 CHG-067 §14 第 19 项）。
+7. **T-05：实况必须按 pid 杀——`bin/control.sh stop` 停不掉；且按 pid 杀需要用户**明示**授权。**
+   清场前 cloud 读 `alive=no health=ok` exit **1**（探针答话而无 pid 文件认领），`stop` 印 "not running" exit 0 而
+   54420 **复查仍活**：两条 `stop` 都碰不到它们（§14 第 4 项）。按 pid 杀先被本会话权限分类器拒绝一次——
+   那两个进程非本会话创建，授权只存在于压缩摘要里，不构成用户同意；用户当场授权后 2 s 清空。
+   ⇒ `start`／`stop` 的 `exit=0` 都不是「起来了／停掉了」的证据（探针与 pid 文件不同源，呼应 CHG-067 §14 第 19 项）；
+   本轮 5 个格因此逐格验了 **pid 文件＋监听端口＋健康端点** 三路，不靠单个 `exit=` 下结论。
 
 8. **T-05：我第一版产物的 exit 读数取错了位置。** `out="$(cmd)"; echo "$out"; echo "exit=$?"` 中间那个 `echo`
    把 `$?` 重置为 0 ⇒ cloud `status` 被记成 `exit=0`（实为 **1**）。改用 rc 紧跟命令取值后重测并订正，

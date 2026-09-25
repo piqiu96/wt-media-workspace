@@ -1,0 +1,1455 @@
+== T-05 workspace: four verbs, end to end (its start really brings up cloud 18080 + agent 8765) ==
+2026-09-26 03:57:25
+default ports/paths; no isolation knobs set; nothing else holding 18080/8765
+
+-- pre-state --
+  [probe] 18080= 8765= cloudz=000 agentz=000
+
+### cell 1/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+
+== Local M2-B environment status ==
+cloud: pid=- alive=no health=down url=http://127.0.0.1:18080/api/v1/health
+agent: pid=- alive=no health=down url=http://127.0.0.1:8765/healthz
+exit=1
+
+### cell 2/7  start (migrations + cloud + agent)
+$ ./bin/control.sh start
+migration ok: 0 applied, 39 total
+=== 1. 清理旧的构建产物 ===
+=== 2. 构建 Desktop 前端 ===
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.68s
+=== 3. 复制构建产物到 Desktop ===
+=== 4. 记录前端构建版本 ===
+stamped=/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop/.generated/frontend/frontend-build.json version=0.1.0+339cc15 files=47 digest=74d4b003a74a1d334b66d4e3359677f7617e11557f45e80cce09dc860b54a541
+=== 5. 验证 ===
+  Desktop 前端文件数:       48
+  index.html:     1093 bytes
+
+=== Desktop 前端构建完成 ===
+  运行 cd /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop && cargo tauri build 以打包
+        Warn --no-sign flag detected: Signing will be skipped.
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `bash scripts/prepare-release-sidecar.sh && bash ../wt-media-workspace/scripts/build-desktop.sh`
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/libpython3.14.dylib: replacing existing signature
+106 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.7
+106 INFO: Python: 3.14.4
+118 INFO: Platform: macOS-26.4.1-arm64-arm-64bit-Mach-O
+118 INFO: Python environment: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv
+118 INFO: wrote /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-_em_s6x2/spec/wt-media-agent-aarch64-apple-darwin.spec
+123 INFO: Removing temporary files and cleaning cache in /Users/aqiuye/Library/Application Support/pyinstaller
+127 INFO: Module search paths (PYTHONPATH):
+['/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python314.zip',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/lib-dynload',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src']
+216 INFO: checking Analysis
+217 INFO: Building Analysis because Analysis-00.toc is non existent
+217 INFO: Looking for Python shared library...
+220 INFO: Using Python shared library: /Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/libpython3.14.dylib
+220 INFO: Running Analysis Analysis-00.toc
+220 INFO: Target bytecode optimization level: 0
+220 INFO: Initializing module dependency graph...
+221 INFO: Initializing module graph hook caches...
+228 INFO: Analyzing modules for base_library.zip ...
+917 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1125 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1267 INFO: Processing standard module hook 'hook-math.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1347 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1356 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+2915 INFO: Caching module dependency graph...
+2929 INFO: Analyzing /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/sidecar_main.py
+3001 INFO: Processing standard module hook 'hook-sqlite3.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3272 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3330 INFO: Processing standard module hook 'hook-xml.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3514 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3523 INFO: Processing standard module hook 'hook-_osx_support.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3526 INFO: Processing standard module hook 'hook-_ctypes.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3666 INFO: Processing standard module hook 'hook-platform.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3704 INFO: Processing module hooks (post-graph stage)...
+3767 INFO: Performing binary vs. data reclassification (1 entries)
+3770 INFO: Looking for ctypes DLLs
+3779 INFO: Analyzing run-time hooks ...
+3780 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3782 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3783 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3786 INFO: Creating base_library.zip...
+3797 INFO: Looking for dynamic libraries
+3803 INFO: Warnings written to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-_em_s6x2/work/wt-media-agent-aarch64-apple-darwin/warn-wt-media-agent-aarch64-apple-darwin.txt
+3810 INFO: Graph cross-reference written to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-_em_s6x2/work/wt-media-agent-aarch64-apple-darwin/xref-wt-media-agent-aarch64-apple-darwin.html
+3823 INFO: checking PYZ
+3823 INFO: Building PYZ because PYZ-00.toc is non existent
+3823 INFO: Building PYZ (ZlibArchive) /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-_em_s6x2/work/wt-media-agent-aarch64-apple-darwin/PYZ-00.pyz
+4000 INFO: Building PYZ (ZlibArchive) /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-_em_s6x2/work/wt-media-agent-aarch64-apple-darwin/PYZ-00.pyz completed successfully.
+4002 INFO: EXE target arch: arm64
+4002 INFO: Code signing identity: -
+4003 INFO: checking PKG
+4003 INFO: Building PKG because PKG-00.toc is non existent
+4003 INFO: Building PKG (CArchive) wt-media-agent-aarch64-apple-darwin.pkg
+5726 INFO: Building PKG (CArchive) wt-media-agent-aarch64-apple-darwin.pkg completed successfully.
+5726 INFO: Bootloader /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/bootloader/Darwin-64bit/run
+5726 INFO: checking EXE
+5727 INFO: Building EXE because EXE-00.toc is non existent
+5727 INFO: Building EXE from EXE-00.toc
+5727 INFO: Copying bootloader EXE to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-_em_s6x2/dist/wt-media-agent-aarch64-apple-darwin
+5728 INFO: Converting EXE to target arch (arm64)
+5741 INFO: Removing signature(s) from EXE
+5754 INFO: Modifying Mach-O image UUID(s) in EXE
+5761 INFO: Appending PKG archive to EXE
+5767 INFO: Fixing EXE headers for code signing
+5771 INFO: Rewriting the executable's macOS SDK version (26.2.0) to match the SDK version of the Python library (15.5.0) in order to avoid inconsistent behavior and potential UI issues in the frozen application.
+5772 INFO: Re-signing the EXE
+5799 INFO: Building EXE from EXE-00.toc completed successfully.
+5799 INFO: Build complete! The results are available in: /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-_em_s6x2/dist
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/binaries/wt-media-agent-aarch64-apple-darwin
+=== 1. 清理旧的构建产物 ===
+=== 2. 构建 Desktop 前端 ===
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.32s
+=== 3. 复制构建产物到 Desktop ===
+=== 4. 记录前端构建版本 ===
+stamped=/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop/.generated/frontend/frontend-build.json version=0.1.0+339cc15 files=47 digest=74d4b003a74a1d334b66d4e3359677f7617e11557f45e80cce09dc860b54a541
+=== 5. 验证 ===
+  Desktop 前端文件数:       48
+  index.html:     1093 bytes
+
+=== Desktop 前端构建完成 ===
+  运行 cd /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop && cargo tauri build 以打包
+   Compiling wt-media-desktop-shell v0.1.0 (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri)
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `DEFAULT_RETENTION_DAYS` is never used
+  --> src-tauri/src/logging/rolling.rs:85:11
+   |
+85 | pub const DEFAULT_RETENTION_DAYS: i64 = 14;
+   |           ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_MAX_RECORD_BYTES` is never used
+  --> src-tauri/src/logging/rolling.rs:94:11
+   |
+94 | pub const DEFAULT_MAX_RECORD_BYTES: u64 = 1024 * 1024;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `SHIPPED` is never used
+   --> src-tauri/src/logging/rolling.rs:118:15
+    |
+115 | impl Limits {
+    | ----------- associated constant in this implementation
+...
+118 |     pub const SHIPPED: Limits = Limits {
+    |               ^^^^^^^
+
+warning: field `directory` is never read
+   --> src-tauri/src/logging/rolling.rs:196:5
+    |
+195 | pub struct Writer {
+    |            ------ field in this struct
+196 |     directory: PathBuf,
+    |     ^^^^^^^^^
+
+warning: methods `directory` and `open_path` are never used
+   --> src-tauri/src/logging/rolling.rs:256:12
+    |
+202 | impl Writer {
+    | ----------- methods in this implementation
+...
+256 |     pub fn directory(&self) -> &Path {
+    |            ^^^^^^^^^
+...
+262 |     pub fn open_path(&self) -> Option<&Path> {
+    |            ^^^^^^^^^
+
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+
+warning: function `parse` is never used
+   --> src-tauri/src/settings.rs:254:8
+    |
+254 | pub fn parse(text: &str) -> Result<UserSettings, SettingsError> {
+    |        ^^^^^
+
+warning: variant `Unsupported` is never constructed
+  --> src-tauri/src/storage.rs:60:5
+   |
+53 | pub enum StorageError {
+   |          ------------ variant in this enum
+...
+60 |     Unsupported { reason: String },
+   |     ^^^^^^^^^^^
+   |
+   = note: `StorageError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `available_bytes` is never used
+   --> src-tauri/src/storage.rs:134:8
+    |
+134 | pub fn available_bytes(path: &Path) -> Result<u64, StorageError> {
+    |        ^^^^^^^^^^^^^^^
+
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell") generated 12 warnings
+    Finished `release` profile [optimized] target(s) in 20.46s
+       Built application at: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/wt-media-desktop-shell
+    Bundling WT Media.app (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos/WT Media.app)
+        Warn Skipping signing due to --no-sign flag.
+    Bundling WT Media_0.1.0_aarch64.dmg (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg)
+     Running bundle_dmg.sh
+    Cleaning /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos/WT Media.app
+    Finished 1 bundle at:
+        /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+
+正在检查“Protective Master Boot Record（MBR：0）”的校验和…
+Protective Master Boot Record（MBR：0）：已验证CRC32 $471C0C0D
+正在检查“GPT Header（Primary GPT Header：1）”的校验和…
+    GPT Header（Primary GPT Header：1）：已验证CRC32 $D53B1AA8
+正在检查“GPT Partition Data（Primary GPT Table：2）”的校验和…
+GPT Partition Data（Primary GPT Table：已验证CRC32 $87B27CE2
+正在检查“（Apple_Free：3）”的校验和…
+                      （Apple_Free：3）：已验证CRC32 $00000000
+正在检查“disk image（Apple_HFS：4）”的校验和…
+             disk image（Apple_HFS：4）：已验证CRC32 $B94F983C
+正在检查“（Apple_Free：5）”的校验和…
+                      （Apple_Free：5）：已验证CRC32 $00000000
+正在检查“GPT Partition Data（Backup GPT Table：6）”的校验和…
+GPT Partition Data（Backup GPT Table：：已验证CRC32 $87B27CE2
+正在检查“GPT Header（Backup GPT Header：7）”的校验和…
+     GPT Header（Backup GPT Header：7）：已验证CRC32 $316C86D0
+已验证CRC32 $63C5E1EB
+/dev/disk4          	GUID_partition_scheme          	
+/dev/disk4s1        	Apple_HFS                      	/Volumes/WT Media
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.81s
+
+== Stopping stale Cloud/Agent processes ==
+
+== Running Cloud migrations ==
++ scripts/migrate.sh
+
+== Starting Cloud on 127.0.0.1:18080 ==
+cloud: started pid 65662, log /Users/aqiuye/Develop/workspace/wt-media/.local/m2b/logs/cloud.log
+Cloud: PASS http://127.0.0.1:18080/api/v1/health
+
+== Starting Agent on 127.0.0.1:8765 ==
+agent: started pid 65686, log /Users/aqiuye/Develop/workspace/wt-media/.local/m2b/logs/agent.log
+Agent: PASS http://127.0.0.1:8765/healthz
+
+== Verifying BitBrowser through Agent ==
+BitBrowser via Agent: PASS
+
+== Cleaning generated Desktop artifacts ==
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/.generated/frontend
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos
+
+== Building Desktop DMG ==
++ bash /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/build-desktop.sh
++ cargo tauri build --bundles dmg --no-sign
+
+== Launching latest DMG ==
++ hdiutil attach /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
++ open /Volumes/WT Media/WT Media.app
+
+== Regenerating Cloud dist-desktop artifact copy ==
++ npm run build:desktop
+
+== Verifying local M2-B environment ==
+Cloud: PASS http://127.0.0.1:18080/api/v1/health
+Agent: PASS http://127.0.0.1:8765/healthz
+
+== Verifying BitBrowser through Agent ==
+BitBrowser via Agent: PASS
+
+== Verifying Desktop assets ==
+Desktop assets: fresh
+Desktop assets: PASS
+
+== Verifying DMG ==
+DMG: fresh
+DMG: PASS /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+
+== Verifying login smoke ==
+Login smoke: PASS user=admin
+exit=0
+
+  [probe] 18080=65668 8765=65686 cloudz=200 agentz=200
+### cell 3/7  status (expect: both alive and answering -> exit 0)
+$ ./bin/control.sh status
+
+== Local M2-B environment status ==
+cloud: pid=65662 alive=yes health=ok url=http://127.0.0.1:18080/api/v1/health
+agent: pid=65686 alive=yes health=ok url=http://127.0.0.1:8765/healthz
+exit=0
+
+### cell 4/7  restart (stop && start)
+$ ./bin/control.sh restart
+
+== Stopping stale Cloud/Agent processes ==
+cloud: stopped pid 65662 from pid file
+agent: stopped pid 65686 from pid file
+cloud: stopped pid 65668 on :18080
+agent: stopped pid 65686 on :8765
+migration ok: 0 applied, 39 total
+=== 1. 清理旧的构建产物 ===
+=== 2. 构建 Desktop 前端 ===
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.46s
+=== 3. 复制构建产物到 Desktop ===
+=== 4. 记录前端构建版本 ===
+stamped=/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop/.generated/frontend/frontend-build.json version=0.1.0+339cc15 files=47 digest=74d4b003a74a1d334b66d4e3359677f7617e11557f45e80cce09dc860b54a541
+=== 5. 验证 ===
+  Desktop 前端文件数:       48
+  index.html:     1093 bytes
+
+=== Desktop 前端构建完成 ===
+  运行 cd /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop && cargo tauri build 以打包
+        Warn --no-sign flag detected: Signing will be skipped.
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `bash scripts/prepare-release-sidecar.sh && bash ../wt-media-workspace/scripts/build-desktop.sh`
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/libpython3.14.dylib: replacing existing signature
+47 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.7
+48 INFO: Python: 3.14.4
+57 INFO: Platform: macOS-26.4.1-arm64-arm-64bit-Mach-O
+57 INFO: Python environment: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv
+57 INFO: wrote /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-rwurjpoz/spec/wt-media-agent-aarch64-apple-darwin.spec
+60 INFO: Removing temporary files and cleaning cache in /Users/aqiuye/Library/Application Support/pyinstaller
+65 INFO: Module search paths (PYTHONPATH):
+['/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python314.zip',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/lib-dynload',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src']
+152 INFO: checking Analysis
+152 INFO: Building Analysis because Analysis-00.toc is non existent
+152 INFO: Looking for Python shared library...
+155 INFO: Using Python shared library: /Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/libpython3.14.dylib
+155 INFO: Running Analysis Analysis-00.toc
+155 INFO: Target bytecode optimization level: 0
+155 INFO: Initializing module dependency graph...
+156 INFO: Initializing module graph hook caches...
+165 INFO: Analyzing modules for base_library.zip ...
+522 INFO: Processing standard module hook 'hook-math.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+969 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1132 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1269 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1277 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+2813 INFO: Caching module dependency graph...
+2827 INFO: Analyzing /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/sidecar_main.py
+2896 INFO: Processing standard module hook 'hook-sqlite3.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3150 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3205 INFO: Processing standard module hook 'hook-xml.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3376 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3385 INFO: Processing standard module hook 'hook-_osx_support.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3388 INFO: Processing standard module hook 'hook-_ctypes.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3526 INFO: Processing standard module hook 'hook-platform.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3561 INFO: Processing module hooks (post-graph stage)...
+3623 INFO: Performing binary vs. data reclassification (1 entries)
+3626 INFO: Looking for ctypes DLLs
+3634 INFO: Analyzing run-time hooks ...
+3635 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3637 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3638 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3641 INFO: Creating base_library.zip...
+3650 INFO: Looking for dynamic libraries
+3655 INFO: Warnings written to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-rwurjpoz/work/wt-media-agent-aarch64-apple-darwin/warn-wt-media-agent-aarch64-apple-darwin.txt
+3662 INFO: Graph cross-reference written to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-rwurjpoz/work/wt-media-agent-aarch64-apple-darwin/xref-wt-media-agent-aarch64-apple-darwin.html
+3674 INFO: checking PYZ
+3674 INFO: Building PYZ because PYZ-00.toc is non existent
+3674 INFO: Building PYZ (ZlibArchive) /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-rwurjpoz/work/wt-media-agent-aarch64-apple-darwin/PYZ-00.pyz
+3846 INFO: Building PYZ (ZlibArchive) /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-rwurjpoz/work/wt-media-agent-aarch64-apple-darwin/PYZ-00.pyz completed successfully.
+3849 INFO: EXE target arch: arm64
+3849 INFO: Code signing identity: -
+3850 INFO: checking PKG
+3850 INFO: Building PKG because PKG-00.toc is non existent
+3850 INFO: Building PKG (CArchive) wt-media-agent-aarch64-apple-darwin.pkg
+5531 INFO: Building PKG (CArchive) wt-media-agent-aarch64-apple-darwin.pkg completed successfully.
+5532 INFO: Bootloader /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/bootloader/Darwin-64bit/run
+5532 INFO: checking EXE
+5532 INFO: Building EXE because EXE-00.toc is non existent
+5532 INFO: Building EXE from EXE-00.toc
+5532 INFO: Copying bootloader EXE to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-rwurjpoz/dist/wt-media-agent-aarch64-apple-darwin
+5533 INFO: Converting EXE to target arch (arm64)
+5547 INFO: Removing signature(s) from EXE
+5559 INFO: Modifying Mach-O image UUID(s) in EXE
+5566 INFO: Appending PKG archive to EXE
+5570 INFO: Fixing EXE headers for code signing
+5574 INFO: Rewriting the executable's macOS SDK version (26.2.0) to match the SDK version of the Python library (15.5.0) in order to avoid inconsistent behavior and potential UI issues in the frozen application.
+5575 INFO: Re-signing the EXE
+5601 INFO: Building EXE from EXE-00.toc completed successfully.
+5602 INFO: Build complete! The results are available in: /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-rwurjpoz/dist
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/binaries/wt-media-agent-aarch64-apple-darwin
+=== 1. 清理旧的构建产物 ===
+=== 2. 构建 Desktop 前端 ===
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.26s
+=== 3. 复制构建产物到 Desktop ===
+=== 4. 记录前端构建版本 ===
+stamped=/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop/.generated/frontend/frontend-build.json version=0.1.0+339cc15 files=47 digest=74d4b003a74a1d334b66d4e3359677f7617e11557f45e80cce09dc860b54a541
+=== 5. 验证 ===
+  Desktop 前端文件数:       48
+  index.html:     1093 bytes
+
+=== Desktop 前端构建完成 ===
+  运行 cd /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop && cargo tauri build 以打包
+   Compiling wt-media-desktop-shell v0.1.0 (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri)
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `DEFAULT_RETENTION_DAYS` is never used
+  --> src-tauri/src/logging/rolling.rs:85:11
+   |
+85 | pub const DEFAULT_RETENTION_DAYS: i64 = 14;
+   |           ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_MAX_RECORD_BYTES` is never used
+  --> src-tauri/src/logging/rolling.rs:94:11
+   |
+94 | pub const DEFAULT_MAX_RECORD_BYTES: u64 = 1024 * 1024;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `SHIPPED` is never used
+   --> src-tauri/src/logging/rolling.rs:118:15
+    |
+115 | impl Limits {
+    | ----------- associated constant in this implementation
+...
+118 |     pub const SHIPPED: Limits = Limits {
+    |               ^^^^^^^
+
+warning: field `directory` is never read
+   --> src-tauri/src/logging/rolling.rs:196:5
+    |
+195 | pub struct Writer {
+    |            ------ field in this struct
+196 |     directory: PathBuf,
+    |     ^^^^^^^^^
+
+warning: methods `directory` and `open_path` are never used
+   --> src-tauri/src/logging/rolling.rs:256:12
+    |
+202 | impl Writer {
+    | ----------- methods in this implementation
+...
+256 |     pub fn directory(&self) -> &Path {
+    |            ^^^^^^^^^
+...
+262 |     pub fn open_path(&self) -> Option<&Path> {
+    |            ^^^^^^^^^
+
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+
+warning: function `parse` is never used
+   --> src-tauri/src/settings.rs:254:8
+    |
+254 | pub fn parse(text: &str) -> Result<UserSettings, SettingsError> {
+    |        ^^^^^
+
+warning: variant `Unsupported` is never constructed
+  --> src-tauri/src/storage.rs:60:5
+   |
+53 | pub enum StorageError {
+   |          ------------ variant in this enum
+...
+60 |     Unsupported { reason: String },
+   |     ^^^^^^^^^^^
+   |
+   = note: `StorageError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `available_bytes` is never used
+   --> src-tauri/src/storage.rs:134:8
+    |
+134 | pub fn available_bytes(path: &Path) -> Result<u64, StorageError> {
+    |        ^^^^^^^^^^^^^^^
+
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell") generated 12 warnings
+    Finished `release` profile [optimized] target(s) in 19.46s
+       Built application at: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/wt-media-desktop-shell
+    Bundling WT Media.app (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos/WT Media.app)
+        Warn Skipping signing due to --no-sign flag.
+    Bundling WT Media_0.1.0_aarch64.dmg (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg)
+     Running bundle_dmg.sh
+    Cleaning /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos/WT Media.app
+    Finished 1 bundle at:
+        /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+
+正在检查“Protective Master Boot Record（MBR：0）”的校验和…
+Protective Master Boot Record（MBR：0）：已验证CRC32 $471C0C0D
+正在检查“GPT Header（Primary GPT Header：1）”的校验和…
+    GPT Header（Primary GPT Header：1）：已验证CRC32 $5520C8EC
+正在检查“GPT Partition Data（Primary GPT Table：2）”的校验和…
+GPT Partition Data（Primary GPT Table：已验证CRC32 $10859E20
+正在检查“（Apple_Free：3）”的校验和…
+                      （Apple_Free：3）：已验证CRC32 $00000000
+正在检查“disk image（Apple_HFS：4）”的校验和…
+             disk image（Apple_HFS：4）：已验证CRC32 $3E07D01B
+正在检查“（Apple_Free：5）”的校验和…
+                      （Apple_Free：5）：已验证CRC32 $00000000
+正在检查“GPT Partition Data（Backup GPT Table：6）”的校验和…
+GPT Partition Data（Backup GPT Table：：已验证CRC32 $10859E20
+正在检查“GPT Header（Backup GPT Header：7）”的校验和…
+     GPT Header（Backup GPT Header：7）：已验证CRC32 $B1775494
+已验证CRC32 $2F06EFD1
+/dev/disk4          	GUID_partition_scheme          	
+/dev/disk4s1        	Apple_HFS                      	/Volumes/WT Media
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.77s
+
+== Stopping stale Cloud/Agent processes ==
+
+== Running Cloud migrations ==
++ scripts/migrate.sh
+
+== Starting Cloud on 127.0.0.1:18080 ==
+cloud: started pid 68055, log /Users/aqiuye/Develop/workspace/wt-media/.local/m2b/logs/cloud.log
+Cloud: PASS http://127.0.0.1:18080/api/v1/health
+
+== Starting Agent on 127.0.0.1:8765 ==
+agent: started pid 68079, log /Users/aqiuye/Develop/workspace/wt-media/.local/m2b/logs/agent.log
+Agent: PASS http://127.0.0.1:8765/healthz
+
+== Verifying BitBrowser through Agent ==
+BitBrowser via Agent: PASS
+
+== Cleaning generated Desktop artifacts ==
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/.generated/frontend
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/dist-desktop
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos
+
+== Building Desktop DMG ==
++ bash /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/build-desktop.sh
++ cargo tauri build --bundles dmg --no-sign
+
+== Launching latest DMG ==
++ hdiutil attach /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
++ open /Volumes/WT Media/WT Media.app
+
+== Regenerating Cloud dist-desktop artifact copy ==
++ npm run build:desktop
+
+== Verifying local M2-B environment ==
+Cloud: PASS http://127.0.0.1:18080/api/v1/health
+Agent: PASS http://127.0.0.1:8765/healthz
+
+== Verifying BitBrowser through Agent ==
+BitBrowser via Agent: PASS
+
+== Verifying Desktop assets ==
+Desktop assets: fresh
+Desktop assets: PASS
+
+== Verifying DMG ==
+DMG: fresh
+DMG: PASS /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+
+== Verifying login smoke ==
+Login smoke: PASS user=admin
+exit=0
+
+  [probe] 18080=68061 8765=68079 cloudz=200 agentz=200
+### cell 5/7  status (expect: both alive and answering -> exit 0)
+$ ./bin/control.sh status
+
+== Local M2-B environment status ==
+cloud: pid=68055 alive=yes health=ok url=http://127.0.0.1:18080/api/v1/health
+agent: pid=68079 alive=yes health=ok url=http://127.0.0.1:8765/healthz
+exit=0
+
+### cell 6/7  stop
+$ ./bin/control.sh stop
+
+== Stopping stale Cloud/Agent processes ==
+cloud: stopped pid 68055 from pid file
+agent: stopped pid 68079 from pid file
+cloud: stopped pid 68061 on :18080
+agent: stopped pid 68079 on :8765
+exit=0
+
+  [probe] 18080= 8765= cloudz=000 agentz=000
+### cell 7/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+
+== Local M2-B environment status ==
+cloud: pid=- alive=no health=down url=http://127.0.0.1:18080/api/v1/health
+agent: pid=- alive=no health=down url=http://127.0.0.1:8765/healthz
+exit=1
+
+== leave the environment running (plan T-05 closing requirement) ==
+### final  restart
+$ ./bin/control.sh restart
+
+== Stopping stale Cloud/Agent processes ==
+migration ok: 0 applied, 39 total
+=== 1. 清理旧的构建产物 ===
+=== 2. 构建 Desktop 前端 ===
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.38s
+=== 3. 复制构建产物到 Desktop ===
+=== 4. 记录前端构建版本 ===
+stamped=/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop/.generated/frontend/frontend-build.json version=0.1.0+339cc15 files=47 digest=74d4b003a74a1d334b66d4e3359677f7617e11557f45e80cce09dc860b54a541
+=== 5. 验证 ===
+  Desktop 前端文件数:       48
+  index.html:     1093 bytes
+
+=== Desktop 前端构建完成 ===
+  运行 cd /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop && cargo tauri build 以打包
+        Warn --no-sign flag detected: Signing will be skipped.
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `bash scripts/prepare-release-sidecar.sh && bash ../wt-media-workspace/scripts/build-desktop.sh`
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/libpython3.14.dylib: replacing existing signature
+42 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.7
+42 INFO: Python: 3.14.4
+51 INFO: Platform: macOS-26.4.1-arm64-arm-64bit-Mach-O
+51 INFO: Python environment: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv
+51 INFO: wrote /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-9k8487fl/spec/wt-media-agent-aarch64-apple-darwin.spec
+54 INFO: Removing temporary files and cleaning cache in /Users/aqiuye/Library/Application Support/pyinstaller
+56 INFO: Module search paths (PYTHONPATH):
+['/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python314.zip',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14',
+ '/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/lib-dynload',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src',
+ '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src']
+141 INFO: checking Analysis
+141 INFO: Building Analysis because Analysis-00.toc is non existent
+142 INFO: Looking for Python shared library...
+144 INFO: Using Python shared library: /Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/libpython3.14.dylib
+144 INFO: Running Analysis Analysis-00.toc
+144 INFO: Target bytecode optimization level: 0
+144 INFO: Initializing module dependency graph...
+145 INFO: Initializing module graph hook caches...
+151 INFO: Analyzing modules for base_library.zip ...
+836 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1008 INFO: Processing standard module hook 'hook-math.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1805 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1813 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+1877 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+2759 INFO: Caching module dependency graph...
+2772 INFO: Analyzing /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/sidecar_main.py
+2840 INFO: Processing standard module hook 'hook-sqlite3.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3095 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3150 INFO: Processing standard module hook 'hook-xml.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3320 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3330 INFO: Processing standard module hook 'hook-_osx_support.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3332 INFO: Processing standard module hook 'hook-_ctypes.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3466 INFO: Processing standard module hook 'hook-platform.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks'
+3500 INFO: Processing module hooks (post-graph stage)...
+3564 INFO: Performing binary vs. data reclassification (1 entries)
+3567 INFO: Looking for ctypes DLLs
+3575 INFO: Analyzing run-time hooks ...
+3575 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3577 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3578 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/hooks/rthooks'
+3581 INFO: Creating base_library.zip...
+3591 INFO: Looking for dynamic libraries
+3596 INFO: Warnings written to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-9k8487fl/work/wt-media-agent-aarch64-apple-darwin/warn-wt-media-agent-aarch64-apple-darwin.txt
+3603 INFO: Graph cross-reference written to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-9k8487fl/work/wt-media-agent-aarch64-apple-darwin/xref-wt-media-agent-aarch64-apple-darwin.html
+3615 INFO: checking PYZ
+3615 INFO: Building PYZ because PYZ-00.toc is non existent
+3615 INFO: Building PYZ (ZlibArchive) /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-9k8487fl/work/wt-media-agent-aarch64-apple-darwin/PYZ-00.pyz
+3788 INFO: Building PYZ (ZlibArchive) /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-9k8487fl/work/wt-media-agent-aarch64-apple-darwin/PYZ-00.pyz completed successfully.
+3791 INFO: EXE target arch: arm64
+3791 INFO: Code signing identity: -
+3792 INFO: checking PKG
+3792 INFO: Building PKG because PKG-00.toc is non existent
+3792 INFO: Building PKG (CArchive) wt-media-agent-aarch64-apple-darwin.pkg
+5470 INFO: Building PKG (CArchive) wt-media-agent-aarch64-apple-darwin.pkg completed successfully.
+5471 INFO: Bootloader /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/lib/python3.14/site-packages/PyInstaller/bootloader/Darwin-64bit/run
+5471 INFO: checking EXE
+5471 INFO: Building EXE because EXE-00.toc is non existent
+5471 INFO: Building EXE from EXE-00.toc
+5471 INFO: Copying bootloader EXE to /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-9k8487fl/dist/wt-media-agent-aarch64-apple-darwin
+5472 INFO: Converting EXE to target arch (arm64)
+5484 INFO: Removing signature(s) from EXE
+5496 INFO: Modifying Mach-O image UUID(s) in EXE
+5503 INFO: Appending PKG archive to EXE
+5506 INFO: Fixing EXE headers for code signing
+5514 INFO: Rewriting the executable's macOS SDK version (26.2.0) to match the SDK version of the Python library (15.5.0) in order to avoid inconsistent behavior and potential UI issues in the frozen application.
+5515 INFO: Re-signing the EXE
+5538 INFO: Building EXE from EXE-00.toc completed successfully.
+5539 INFO: Build complete! The results are available in: /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-sidecar-9k8487fl/dist
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/binaries/wt-media-agent-aarch64-apple-darwin
+=== 1. 清理旧的构建产物 ===
+=== 2. 构建 Desktop 前端 ===
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.38s
+=== 3. 复制构建产物到 Desktop ===
+=== 4. 记录前端构建版本 ===
+stamped=/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop/.generated/frontend/frontend-build.json version=0.1.0+339cc15 files=47 digest=74d4b003a74a1d334b66d4e3359677f7617e11557f45e80cce09dc860b54a541
+=== 5. 验证 ===
+  Desktop 前端文件数:       48
+  index.html:     1093 bytes
+
+=== Desktop 前端构建完成 ===
+  运行 cd /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/../../wt-media-desktop && cargo tauri build 以打包
+   Compiling wt-media-desktop-shell v0.1.0 (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri)
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `DEFAULT_RETENTION_DAYS` is never used
+  --> src-tauri/src/logging/rolling.rs:85:11
+   |
+85 | pub const DEFAULT_RETENTION_DAYS: i64 = 14;
+   |           ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_MAX_RECORD_BYTES` is never used
+  --> src-tauri/src/logging/rolling.rs:94:11
+   |
+94 | pub const DEFAULT_MAX_RECORD_BYTES: u64 = 1024 * 1024;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated constant `SHIPPED` is never used
+   --> src-tauri/src/logging/rolling.rs:118:15
+    |
+115 | impl Limits {
+    | ----------- associated constant in this implementation
+...
+118 |     pub const SHIPPED: Limits = Limits {
+    |               ^^^^^^^
+
+warning: field `directory` is never read
+   --> src-tauri/src/logging/rolling.rs:196:5
+    |
+195 | pub struct Writer {
+    |            ------ field in this struct
+196 |     directory: PathBuf,
+    |     ^^^^^^^^^
+
+warning: methods `directory` and `open_path` are never used
+   --> src-tauri/src/logging/rolling.rs:256:12
+    |
+202 | impl Writer {
+    | ----------- methods in this implementation
+...
+256 |     pub fn directory(&self) -> &Path {
+    |            ^^^^^^^^^
+...
+262 |     pub fn open_path(&self) -> Option<&Path> {
+    |            ^^^^^^^^^
+
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+
+warning: function `parse` is never used
+   --> src-tauri/src/settings.rs:254:8
+    |
+254 | pub fn parse(text: &str) -> Result<UserSettings, SettingsError> {
+    |        ^^^^^
+
+warning: variant `Unsupported` is never constructed
+  --> src-tauri/src/storage.rs:60:5
+   |
+53 | pub enum StorageError {
+   |          ------------ variant in this enum
+...
+60 |     Unsupported { reason: String },
+   |     ^^^^^^^^^^^
+   |
+   = note: `StorageError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `available_bytes` is never used
+   --> src-tauri/src/storage.rs:134:8
+    |
+134 | pub fn available_bytes(path: &Path) -> Result<u64, StorageError> {
+    |        ^^^^^^^^^^^^^^^
+
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell") generated 12 warnings
+    Finished `release` profile [optimized] target(s) in 18.47s
+       Built application at: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/wt-media-desktop-shell
+    Bundling WT Media.app (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos/WT Media.app)
+        Warn Skipping signing due to --no-sign flag.
+    Bundling WT Media_0.1.0_aarch64.dmg (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg)
+     Running bundle_dmg.sh
+    Cleaning /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos/WT Media.app
+    Finished 1 bundle at:
+        /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+
+正在检查“Protective Master Boot Record（MBR：0）”的校验和…
+Protective Master Boot Record（MBR：0）：已验证CRC32 $471C0C0D
+正在检查“GPT Header（Primary GPT Header：1）”的校验和…
+    GPT Header（Primary GPT Header：1）：已验证CRC32 $713C6A74
+正在检查“GPT Partition Data（Primary GPT Table：2）”的校验和…
+GPT Partition Data（Primary GPT Table：已验证CRC32 $9FDA93A3
+正在检查“（Apple_Free：3）”的校验和…
+                      （Apple_Free：3）：已验证CRC32 $00000000
+正在检查“disk image（Apple_HFS：4）”的校验和…
+             disk image（Apple_HFS：4）：已验证CRC32 $ECCE78D5
+正在检查“（Apple_Free：5）”的校验和…
+                      （Apple_Free：5）：已验证CRC32 $00000000
+正在检查“GPT Partition Data（Backup GPT Table：6）”的校验和…
+GPT Partition Data（Backup GPT Table：：已验证CRC32 $9FDA93A3
+正在检查“GPT Header（Backup GPT Header：7）”的校验和…
+     GPT Header（Backup GPT Header：7）：已验证CRC32 $956BF60C
+已验证CRC32 $A254B175
+/dev/disk4          	GUID_partition_scheme          	
+/dev/disk4s1        	Apple_HFS                      	/Volumes/WT Media
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3900 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/shared/api/session.js is dynamically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/main.ts but also statically imported by /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/apps/desktop/features/local-agent/init.js, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/layout/AppLayout.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/accounts/pages/AccountsPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/auth/pages/LoginPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/dashboard/pages/DashboardPage.vue, /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/src/modules/profiles/pages/ProfilesPage.vue, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-desktop/index.desktop.html                               1.09 kB │ gzip:   0.77 kB
+dist-desktop/assets/AccountOpeningPage-BlgSKrNz.css           0.08 kB │ gzip:   0.09 kB
+dist-desktop/assets/AgentStatusPage-D24QuPIb.css              0.11 kB │ gzip:   0.10 kB
+dist-desktop/assets/ProxyPage-BLtc3Hbz.css                    0.36 kB │ gzip:   0.23 kB
+dist-desktop/assets/BusinessStatus-BYFYFR0u.css               0.37 kB │ gzip:   0.23 kB
+dist-desktop/assets/datetime-DSZlXWe3.css                     0.39 kB │ gzip:   0.22 kB
+dist-desktop/assets/KeywordTags-gDQNaVaz.css                  0.62 kB │ gzip:   0.26 kB
+dist-desktop/assets/ProfilesPage-gaF7YYSr.css                 0.65 kB │ gzip:   0.31 kB
+dist-desktop/assets/LocalSettingsPage-DY4MZoHX.css            0.68 kB │ gzip:   0.31 kB
+dist-desktop/assets/LoginPage-B-R-I8fg.css                    0.93 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceStatGrid-Bx2YkAbe.css             0.99 kB │ gzip:   0.43 kB
+dist-desktop/assets/ResourceStatusBadge-XGxQCA9k.css          1.45 kB │ gzip:   0.54 kB
+dist-desktop/assets/LocalLogsPage-DqCfuxoR.css                1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/AppLayout-Csmd1rYz.css                    3.68 kB │ gzip:   1.11 kB
+dist-desktop/assets/CrawlTasksPage-DvvH_M2Y.css               3.87 kB │ gzip:   0.90 kB
+dist-desktop/assets/DiscoveryStrategiesPage-B_tK6ZUc.css      4.36 kB │ gzip:   0.92 kB
+dist-desktop/assets/AccountsPage-T7Eyz--R.css                 5.06 kB │ gzip:   1.25 kB
+dist-desktop/assets/ContentPoolPage-DDGBB1g0.css              7.32 kB │ gzip:   1.55 kB
+dist-desktop/assets/index-o03HRtYg.css                      451.76 kB │ gzip:  52.23 kB
+dist-desktop/assets/ComingSoon-Bj_akSRB.js                    0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatGrid-B-m53Cdy.js              0.58 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceStatusBadge-DO_9epxH.js           1.02 kB │ gzip:   0.54 kB
+dist-desktop/assets/usersApi-Bjt8SB-W.js                      1.42 kB │ gzip:   0.62 kB
+dist-desktop/assets/proxy-kEUZXZXh.js                         1.47 kB │ gzip:   0.53 kB
+dist-desktop/assets/datetime-BmhvIe5t.js                      1.70 kB │ gzip:   0.76 kB
+dist-desktop/assets/BusinessStatus-HOH9r49M.js                1.96 kB │ gzip:   0.83 kB
+dist-desktop/assets/DashboardPage-Bs9G8P3o.js                 2.28 kB │ gzip:   1.03 kB
+dist-desktop/assets/KeywordTags-CdgcFPlC.js                   2.69 kB │ gzip:   1.39 kB
+dist-desktop/assets/AgentStatusPage-D1OqXuq8.js               2.77 kB │ gzip:   1.22 kB
+dist-desktop/assets/mediaAccounts-B8hj5p0P.js                 2.94 kB │ gzip:   1.02 kB
+dist-desktop/assets/LoginPage-CekRfUwK.js                     3.47 kB │ gzip:   1.64 kB
+dist-desktop/assets/TasksPage-BaTc5AC8.js                     3.55 kB │ gzip:   1.68 kB
+dist-desktop/assets/AppLayout-NGAVq3ko.js                     5.57 kB │ gzip:   2.49 kB
+dist-desktop/assets/AccountOpeningPage-C0jab0tt.js            5.83 kB │ gzip:   2.29 kB
+dist-desktop/assets/LocalSettingsPage-gYyVkDYr.js             6.36 kB │ gzip:   2.75 kB
+dist-desktop/assets/LocalLogsPage-d7LcNePf.js                 7.08 kB │ gzip:   3.08 kB
+dist-desktop/assets/local-settings-view-Dal1dchO.js           7.66 kB │ gzip:   2.90 kB
+dist-desktop/assets/CrawlTasksPage-Cl4FhfSB.js               16.08 kB │ gzip:   5.49 kB
+dist-desktop/assets/DiscoveryStrategiesPage-FOmrsfD5.js      22.23 kB │ gzip:   6.89 kB
+dist-desktop/assets/ProxyPage-CSl59kIq.js                    22.52 kB │ gzip:   6.92 kB
+dist-desktop/assets/ContentPoolPage-D8gh9B3K.js              30.95 kB │ gzip:   9.19 kB
+dist-desktop/assets/AccountsPage-CbaUnj8v.js                 38.68 kB │ gzip:  11.76 kB
+dist-desktop/assets/ProfilesPage-DSwKlf5N.js                 41.95 kB │ gzip:  11.87 kB
+dist-desktop/assets/index.desktop-BDgQLqf2.js             1,389.13 kB │ gzip: 377.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.52s
+
+== Stopping stale Cloud/Agent processes ==
+
+== Running Cloud migrations ==
++ scripts/migrate.sh
+
+== Starting Cloud on 127.0.0.1:18080 ==
+cloud: started pid 70220, log /Users/aqiuye/Develop/workspace/wt-media/.local/m2b/logs/cloud.log
+Cloud: PASS http://127.0.0.1:18080/api/v1/health
+
+== Starting Agent on 127.0.0.1:8765 ==
+agent: started pid 70244, log /Users/aqiuye/Develop/workspace/wt-media/.local/m2b/logs/agent.log
+Agent: PASS http://127.0.0.1:8765/healthz
+
+== Verifying BitBrowser through Agent ==
+BitBrowser via Agent: PASS
+
+== Cleaning generated Desktop artifacts ==
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/.generated/frontend
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/dist-desktop
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg
++ rm -rf /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos
+
+== Building Desktop DMG ==
++ bash /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/scripts/build-desktop.sh
++ cargo tauri build --bundles dmg --no-sign
+
+== Launching latest DMG ==
++ hdiutil attach /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
++ open /Volumes/WT Media/WT Media.app
+
+== Regenerating Cloud dist-desktop artifact copy ==
++ npm run build:desktop
+
+== Verifying local M2-B environment ==
+Cloud: PASS http://127.0.0.1:18080/api/v1/health
+Agent: PASS http://127.0.0.1:8765/healthz
+
+== Verifying BitBrowser through Agent ==
+BitBrowser via Agent: PASS
+
+== Verifying Desktop assets ==
+Desktop assets: fresh
+Desktop assets: PASS
+
+== Verifying DMG ==
+DMG: fresh
+DMG: PASS /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+
+== Verifying login smoke ==
+Login smoke: PASS user=admin
+exit=0
+
+  [probe] 18080=70227 8765=70244 cloudz=200 agentz=200
+### final  status
+$ ./bin/control.sh status
+
+== Local M2-B environment status ==
+cloud: pid=70220 alive=yes health=ok url=http://127.0.0.1:18080/api/v1/health
+agent: pid=70244 alive=yes health=ok url=http://127.0.0.1:8765/healthz
+exit=0
+

@@ -1,15 +1,20 @@
-== T-05 record-cost measurement (per-Task increment; anchor = blob at 653fc3e, the T-04 commit) ==
-2026-09-26 03:54:38
+== T-05 record-cost measurement, final (per-Task increment; anchor = blob at 653fc3e, the T-04 commit) ==
+2026-09-26 04:02:38
 
-change.md: anchor 653fc3e =    18659 B ; now =    21573 B ; increment = 2914 B
-checkpoint.md: anchor 653fc3e =     8433 B ; now =    10920 B ; increment = 2487 B
+change.md: anchor 653fc3e =    18659 B ; final =    21805 B ; T-05 increment = 3146 B
+checkpoint.md: anchor 653fc3e =     8433 B ; final =    11503 B ; T-05 increment = 3070 B
 
-evidence md: task-05-real-run.md =     5923 B  (whole file; it is new in this Task)
+evidence md: task-05-real-run.md =     6256 B
 
 bounds (plan): change.md <= 5120 B/Task ; checkpoint.md <= 4096 B/Task ; evidence md <= 9216 B/Task
-artifacts are non-binding; the 4 t05-*.out are the raw readings:
+NOTE: this is the T-05 total increment across both T-05 commits (b9d033a partial + this one),
+      because the anchor is the previous Task's commit, not the previous commit.
+artifacts (non-binding), 8 files:
       1745 B  t05-agent-verbs.out
+      1607 B  t05-cloud-verbs.out
       2533 B  t05-cloud-workspace-blocked.out
       1961 B  t05-desktop-rootcause.out
       2221 B  t05-desktop-verbs.out
-       689 B  t05-record-size.out
+       700 B  t05-gate.out
+       877 B  t05-record-size.out
+     99609 B  t05-workspace-verbs.out

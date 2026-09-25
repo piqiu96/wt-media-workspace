@@ -1,0 +1,51 @@
+== T-05 cloud: four verbs, end to end (ports cleared first: 54420/54456 stopped by pid) ==
+2026-09-26 03:56:39
+default port/path: config/app.toml http_addr = 127.0.0.1:18080; no isolation knobs set
+
+-- pre-state --
+  [probe] pidfile=(absent)  listener18080=  healthz=000
+
+### cell 1/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+cloud: pid=- alive=no health=down url=http://127.0.0.1:18080/healthz
+exit=1
+
+  [probe] pidfile=(absent)  listener18080=  healthz=000
+### cell 2/7  start (go build + migrations + listen on 18080)
+$ ./bin/control.sh start
+wt-media-cloud started: 64839
+exit=0
+
+  [probe] pidfile=64839  listener18080=64839  healthz=200
+### cell 3/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+cloud: pid=64839 alive=yes health=ok url=http://127.0.0.1:18080/healthz
+exit=0
+
+### cell 4/7  restart
+$ ./bin/control.sh restart
+wt-media-cloud stopped
+wt-media-cloud started: 64919
+exit=0
+
+  [probe] pidfile=64919  listener18080=64919  healthz=200
+### cell 5/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+cloud: pid=64919 alive=yes health=ok url=http://127.0.0.1:18080/healthz
+exit=0
+
+### cell 6/7  stop
+$ ./bin/control.sh stop
+wt-media-cloud stopped
+exit=0
+
+  [probe] pidfile=(absent)  listener18080=  healthz=000
+### cell 7/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+cloud: pid=- alive=no health=down url=http://127.0.0.1:18080/healthz
+exit=1
+
+  [probe] pidfile=(absent)  listener18080=  healthz=000
+-- post-state --
+  [probe] pidfile=(absent)  listener18080=  healthz=000
+-- log tail --

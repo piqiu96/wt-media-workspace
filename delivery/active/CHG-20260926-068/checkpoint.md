@@ -44,25 +44,26 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   缺席路径对照 `ran=5 skipped=5`、skip 文案含 `3/4`。六门禁全 `exit=0`、`sync_skills` `exit=0`、`Ran 106`（+5）。
   自造缺陷一处（生成器式循环中断）已修并登记。详见 `evidence/task-04-workspace-entry.md`。
 
-- **T-05 四仓四动词真跑（部分，8/16 端到端）**：**agent 4/4 端到端**（18765 真起(58703)／真 restart(58731)／真停，
-  实况 54456 前后验活）；**desktop `status` 端到端、`start`／`restart`／`stop` 止于既有前置**——
-  `beforeDevCommand` 的 `cd ../../wt-media-cloud/web` 多一段（实测 tauri 的 cwd 是 `wt-media-desktop`，不是 `src-tauri`，
-  正确写法 `cd ../wt-media-cloud/web`），**CHG-067 用替身 cargo 掩盖了它**；
-  **cloud `status` 端到端（`alive=no health=ok` exit 1）、`stop` 真跑但对象为空**；
-  **cloud `start`／`restart` ＋ workspace `start`／`restart`／`stop` 共 5 格未覆盖**（18080／8765 被 54420／54456 占用，
-  按 pid 杀被权限分类器拒绝，等用户明示点名）。自纠一处：exit 读数曾因中间 `echo` 重置 `$?` 而错记（§14 第 8 项）。
-  详见 `evidence/task-05-real-run.md`。
+- **T-05 四仓四动词真跑（16 格：13 端到端／3 止于既有前置／0 未覆盖）**：cloud 4/4（64839／64919，
+  pid 文件＋监听＋`healthz` 三路旁证）、agent 4/4（58703／58731）、workspace 4/4（真起 cloud＋agent
+  并跑完整条验收链：BitBrowser／DMG／登录冒烟全 `PASS`）；**desktop 3 格止于既有缺陷**——
+  `beforeDevCommand` 的 `cd ../../wt-media-cloud/web` 多一段（实测 tauri 的 cwd 是 `wt-media-desktop`，
+  不是 `src-tauri`，正确写法 `cd ../wt-media-cloud/web`），**CHG-067 用替身 cargo 掩盖了它**。
+  清场靠按 pid 杀（`stop` 停不掉，§14 第 4／7 项；用户授权后 2 s 清空，比特浏览器未触碰）；
+  环境留在运行态（cloud 70220／agent 70244），Desktop 应用已由 DMG 启动（pid 72068）。
+  自纠一处：exit 读数曾因中间 `echo` 重置 `$?` 而错记（§14 第 8 项）。详见 `evidence/task-05-real-run.md`。
 
 ## Current
 
-T-05 **未完成**：5 格待授权后补跑；本轮记录已落（evidence＋§8／§10／§11／§14）。
+T-05 完成（16 格读数已落，环境留在运行态）。下一步 T-06 收尾。
 
 ## Next
 
-用户授权按 pid 停掉 **54420**／**54456** 后：补跑 cloud `start → status → restart → status` 与 workspace 的
-`start → status → restart → status → stop → status`（仓序 cloud → workspace，agent／desktop 已跑完不必重复），
-更新 `evidence/task-05-real-run.md` 与 `change.md` §8／§10 AC-03，收尾由 workspace 的 `restart` 把环境留在运行态
-（怎么停写清：`bin/control.sh stop`）。随后 T-06 收尾。
+T-06 workspace：归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字。
+六门禁 ＋ `unittest discover -s tests -q` ＋ `sync_skills.py check` **取在最后一次改动之后**；
+两遍失效指针扫描（各带阳性对照与分母，对照锚取**不变基线**）；四仓 `git status --porcelain` 对账。
+**另有两件待用户裁定**：① desktop `beforeDevCommand` 差一段路径只登记未修（§5 范围已在 T-00 封闭，
+改它是运行仓改动，须另起 CHG）；② 环境已留运行态，是否在收尾时停掉。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -77,9 +78,7 @@ T-05 **未完成**：5 格待授权后补跑；本轮记录已落（evidence＋�
 
 ## Blocked
 
-- **T-05 的 5 格（cloud `start`／`restart`，workspace `start`／`restart`／`stop`）待用户授权按 pid 停掉实况
-  54420／54456。** 自动权限分类器已拒绝一次，理由：非本会话创建、授权只在压缩摘要里。`bin/control.sh stop` 停不掉它们。
-  不授权则这 5 格维持「未覆盖＋原因」，AC-03 维持 `部分`。
+- None. （T-05 的 5 格已由用户授权按 pid 清场后补跑完毕。）
 
 ## Recent verification
 
@@ -105,5 +104,8 @@ T-05 **未完成**：5 格待授权后补跑；本轮记录已落（evidence＋�
 | agent 四动词（T-05） | 18765：`status` 空 exit 1 → `start` 58703 exit 0 → `status` alive=yes health=ok → `restart` 58731 → `status` → `stop` → `status` 空 exit 1；实况 54456 前后验活、18765 归零 |
 | desktop 四动词（T-05） | `status` ×3 一致（`alive=no health=down` exit 1）；`start`／`restart` 止于 `beforeDevCommand`（exit 1）；`stop` "not running" exit 0；无 stray 进程 |
 | desktop 根因（T-05） | 实测 tauri 的 `beforeDevCommand` cwd ＝ `wt-media-desktop`（非 `src-tauri`）⇒ `../../wt-media-cloud/web` 多一段；正确 `cd ../wt-media-cloud/web` |
-| cloud／workspace（T-05） | cloud `status` `alive=no health=ok` **exit 1**；`stop` "not running" exit 0 且 **54420 仍活**；workspace `status` 探两实例 `health=ok` **exit 1**；5 格未覆盖待授权 |
+| cloud 四动词（T-05） | 空 `exit 1` → `start` 64839 `exit 0`（18080 监听＋`healthz 200`）→ `status` alive=yes exit 0 → `restart` 64919 → `status` exit 0 → `stop` exit 0（监听归 0）→ `status` exit 1 |
+| workspace 四动词（T-05） | 空 `exit 1` → `start` `exit 0`（迁移 `0 applied, 39 total`；cloud 65668＋agent 65686；BitBrowser／DMG／登录冒烟全 `PASS`）→ `status` exit 0 → `restart` 68061／68079 → `status` exit 0 → `stop` → `status` exit 1；最后 `restart` 留运行态 |
+| 清场（T-05） | `stop` 停不掉实况（cloud `alive=no health=ok` exit 1；`stop` exit 0 而 54420 仍活）；用户授权 `kill 54420 54456` → 2 s 清空、两端口归 0、无残留；比特浏览器 13947 前后验活 |
+| 收尾读取（T-05） | `status` exit 0：cloud 70220／agent 70244 双 `health=ok`；18080 监听＝70227（`go run` 的子进程）；Desktop 应用 pid 72068（DMG 挂载态） |
 | 自纠（T-05） | 首版 exit 读数取在 `echo "$out"` 之后 ⇒ `$?` 被重置成 0（cloud `status` 错记 0／实为 1）；重测订正，错误读数未留档 |
