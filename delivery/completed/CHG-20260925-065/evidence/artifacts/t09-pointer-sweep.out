@@ -1,0 +1,55 @@
+=== T-09 dead-pointer sweep — PRE-ARCHIVE ===
+@ 2026-09-25T15:10:09Z
+extractor skips fenced blocks + inline code spans. Proven BOTH ways by --control:
+  a defect in prose -> reported ; the same defect inside a code span -> not reported.
+
+denominator: 477 tracked *.md, 48938 lines, 115 relative links
+PASS A  retired-string defects : 13
+        delivery/active/CHG-20260925-065/change.md: 'check_layer3_entries'
+        delivery/active/CHG-20260925-065/change.md: '../generated'
+        delivery/active/CHG-20260925-065/change.md: '## 上下文加载顺序'
+        delivery/active/CHG-20260925-065/checkpoint.md: 'check_layer3_entries'
+        delivery/active/CHG-20260925-065/checkpoint.md: '../generated'
+        delivery/active/CHG-20260925-065/evidence/task-01-baseline.md: '## 上下文加载顺序'
+        delivery/active/CHG-20260925-065/evidence/task-03-generator.md: '## 上下文加载顺序'
+        delivery/active/CHG-20260925-065/evidence/task-04-gate.md: 'check_layer3_entries'
+        delivery/active/CHG-20260925-065/evidence/task-04-gate.md: '## 上下文加载顺序'
+        delivery/active/CHG-20260925-065/evidence/task-05-cloud.md: '## 上下文加载顺序'
+        delivery/active/CHG-20260925-065/evidence/task-06-agent.md: '## 上下文加载顺序'
+        delivery/active/CHG-20260925-065/evidence/task-07-desktop.md: '../generated'
+        delivery/active/CHG-20260925-065/evidence/task-07-desktop.md: '## 上下文加载顺序'
+PASS A  retired-string narration (kept by policy): 35
+PASS B  unresolved relative links : 6
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/service/operations.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+exit=1
+
+=== PASS A — what the 13 is a count OF ===
+  13 = distinct (file, string) pairs over this CHG's own records. It is NOT an occurrence count:
+  the same string repeats within a file and the check records it once per file.
+  occurrences, measured per string (all inside delivery/active/CHG-20260925-065/):
+    check_layer3_entries   change.md 2, checkpoint.md 1, evidence/task-04-gate.md 2
+    templates/repo-entry   0  (never created -- decided against in T-02)
+    ../generated           change.md 2, checkpoint.md 1, task-07-desktop.md 2, artifacts/*.out 3
+    ## 上下文加载顺序        change.md 1, evidence/task-0{1,3,4,5,6,7}*.md 6, artifacts/*.out 6
+  LIVE docs (everything outside delivery/): 0 file(s)  <= the number that matters
+  => 0 live-doc hits. All 13 are this CHG describing what it retired, or the raw captures of
+     those descriptions. Policy: 路径判修、叙述判留 (CHG-064) -- narration stays.
+
+=== PASS B — the 6, and why ===
+  all 6 are real PROSE links, all in: delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md
+  cause: exactly one '..' too few --
+    5.. -> wt-media-cloud/internal/modules/contentpool/service/operations.go  exists=no
+    6.. -> ../wt-media-cloud/internal/modules/contentpool/service/operations.go  exists=YES
+  ownership: CHG-20260916-052 (archived). Dead links owned by CHG-20260925-065: 0.
+  disposition: MASTER:132 归档记录保持原样、不回改 => register only (see change.md §14 item 20).
+
+=== naive extractor, for comparison (NOT a correction of CHG-064) ===
+  without code-span stripping this sweep reports 14: these 6 + 3 CHG-065 code-span quotes
+  + 5 archived code-span quotes. CHG-20260925-064 reported 10 with an extractor that
+  evidently did not skip code spans. Different method and denominator -- this reading does
+  not supersede that one.

@@ -1,0 +1,34 @@
+=== T-09 dead-pointer sweep — POST-ARCHIVE (the move is itself a change; re-measured) ===
+@ 2026-09-25T15:11:51Z
+denominator: 477 tracked *.md, 48934 lines, 116 relative links
+PASS A  retired-string defects : 13
+        delivery/completed/CHG-20260925-065/change.md: 'check_layer3_entries'
+        delivery/completed/CHG-20260925-065/change.md: '../generated'
+        delivery/completed/CHG-20260925-065/change.md: '## 上下文加载顺序'
+        delivery/completed/CHG-20260925-065/checkpoint.md: 'check_layer3_entries'
+        delivery/completed/CHG-20260925-065/checkpoint.md: '../generated'
+        delivery/completed/CHG-20260925-065/evidence/task-01-baseline.md: '## 上下文加载顺序'
+        delivery/completed/CHG-20260925-065/evidence/task-03-generator.md: '## 上下文加载顺序'
+        delivery/completed/CHG-20260925-065/evidence/task-04-gate.md: 'check_layer3_entries'
+        delivery/completed/CHG-20260925-065/evidence/task-04-gate.md: '## 上下文加载顺序'
+        delivery/completed/CHG-20260925-065/evidence/task-05-cloud.md: '## 上下文加载顺序'
+        delivery/completed/CHG-20260925-065/evidence/task-06-agent.md: '## 上下文加载顺序'
+        delivery/completed/CHG-20260925-065/evidence/task-07-desktop.md: '../generated'
+        delivery/completed/CHG-20260925-065/evidence/task-07-desktop.md: '## 上下文加载顺序'
+PASS A  retired-string narration (kept by policy): 36
+PASS B  unresolved relative links : 6
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/service/operations.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+        delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+exit=1
+
+=== did the archive introduce any NEW dead link? (LEDGER now points into completed/) ===
+10:[CHG-20260925-065](completed/CHG-20260925-065/change.md)（三个运行仓入口文件形态统一——参考 workspace 的双指针 + 单一正文）已于 2026-09-25 关闭归档为 `DONE`。Level S，**跨四仓**，不锚 Milestone（`delivery/milestones/` 下 6 篇无一篇覆盖入口形态或治理卫生，与 CHG-063／064 同一读数）。**它与四条 S 级先例的唯一差别、也是最需要被审的一点：那四条都写明「三个运行仓只被读、不被写」，本 CHG 写了三仓的入口文件**——写入范围严格限于四类入口文件（`CLAUDE.md`／`AGENTS.md`／`AGENT-INDEX.md`／`DIRECTORY_MAP.md`），**零运行时代码、配置或测试**；逐仓对账：三仓各恰一个提交（cloud `0db02ab`、agent `6d740fc`、desktop `7c1b0ad`），各自 `diff --stat` 只落在四件入口文件上，**非入口文件改动 0**。交付面：三仓入口形态统一为「双指针（`CLAUDE.md` ＋ `AGENTS.md`）＋ 单一正文（`AGENT-INDEX.md`）」——正文迁入各仓 `AGENT-INDEX.md` 新增的 `## 本仓规则`，两个指针瘦身到 **11 行／656 B／1 H2** 并只声明权威源；`verify_agent_entry.py` 退役僵尸的 `check_entry_drift`，改为六条判据（存在性／指针三态／正文一致性／跨仓八节同序／规则句重复 WARN／本仓顺序作用域 WARN）；生成器 `init-agent-entry.sh` 由产 3 件改产 **4 件**并停止手写快照；判据落点写进 `conventions §3／§9–§11`、`AGENT-INDEX.md` §4／§10、`..._V1.md:769／:1801`。**门禁读数 71 → 22 → 11 → 3 → 0**（四仓 `0 ERROR / 0 WARN`），套件 `Ran 79 → 94 / OK`。**中间态必然见红**，收口路径逐 Task 记在 `checkpoint.md`；**红转绿不是靠收窄判据换来的**——T-08 在真树上另做活体阳性对照（删机读键 → 报出），T-04 的六条检查各做变异对照且 `ImportError` 计数为 **0**。**§13 DONE Gate 九项逐项签字**；**AC-01…AC-16 全 PASS**。**十三项实测推翻或补齐预想并如实登记**（§14），三条最值得单记：①**阳性对照的锚取 `HEAD` 会在提交瞬间变成镜子**——cloud 与 agent 两臂各发生一次，读数由「命中 1」变成 0，与「扫描无判别力」形状完全相同且不会自己冒出来，故一律改钉具体提交；②**记录成本界改到第五版才选对被限制的量**——前四版限的都是「存量」，而存量由任务数决定、不由人决定，必然在某个 Task 上被突破；③**「每 Task 增量」自身也有盲区**——替以前的 Task 还债的 Task（T-08 补齐 T-04～T-07 缺失的 `Completed` 条目）会独自越界，**界不改、越界就报越界**。**T-09 两遍失效指针扫描**（分母 **477 个已跟踪 `*.md`／48938 行／115 条相对链接**）读数：活跃文档命中 **0**，未解析链接 **6**——**全部在已归档的 CHG-052 记录里、少一级 `..`**（实测 5 级 `exists=no`、6 级 `exists=YES`），按 `MASTER:132`「归档记录保持原样、不回改」只登记（§14 第 20 项）；**本 CHG 自有死链 0**。扫描器跳过代码块与行内代码，该区分**双向**验证过（散文里的缺陷报出、同一缺陷放进代码块则不报），故读数 6 小于不做该区分时的 14（差 8 条是记录里引用被注入对照样本的**引文**）。**本 CHG 对三仓零改运行时代码。**
+  target exists: YES
+
+=== contrast with the PRE-ARCHIVE reading ===
+  pre-archive : PASS A 13 (all in the then-active record) | PASS B 6 (all in archived CHG-052)
+  post-archive: see above. Same 6 expected; the 13 stay 13 (record moved, content unchanged).

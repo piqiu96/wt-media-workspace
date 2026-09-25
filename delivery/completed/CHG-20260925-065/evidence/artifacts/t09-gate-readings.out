@@ -1,0 +1,41 @@
+=== T-09 closing readings — after the archive and ALL record changes ===
+@ 2026-09-25T15:12:20Z
+state: no active CHG (.ai/CURRENT_CONTEXT.md renders --no-active)
+
+  verify_m0_config                       exit=0  errors=0
+  verify_delivery_governance             exit=0  errors=0
+  verify_agent_entry                     exit=0  errors=0
+  verify_skills                          exit=0  errors=0
+  verify_product_master_alignment        exit=0  errors=0
+  verify_m2_acceptance                   exit=0  errors=0
+=== unittest / sync_skills ===
+Ran 94 tests in 0.506s
+
+OK
+  sync_skills exit=0
+=== agent entry detail ===
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+rule-text duplication: compared 97 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+=== workspace git status ===
+ M .ai/CURRENT_CONTEXT.md
+ M delivery/LEDGER.md
+RM delivery/active/CHG-20260925-065/change.md -> delivery/completed/CHG-20260925-065/change.md
+RM delivery/active/CHG-20260925-065/checkpoint.md -> delivery/completed/CHG-20260925-065/checkpoint.md
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t01-baseline.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t01-baseline.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t01-gate-readings.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t01-gate-readings.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t02-gate-readings.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t02-gate-readings.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t02-normative-strings.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t02-normative-strings.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t03-conformance.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t03-conformance.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t04-gate-readings.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t04-gate-readings.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t04-generator-vs-gate.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t04-generator-vs-gate.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t04-remeasure.sh -> delivery/completed/CHG-20260925-065/evidence/artifacts/t04-remeasure.sh
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t05-cloud-checks.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t05-cloud-checks.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t05-cloud-checks.sh -> delivery/completed/CHG-20260925-065/evidence/artifacts/t05-cloud-checks.sh
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t05-gate-after.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t05-gate-after.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t05-gate-before.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t05-gate-before.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t05-ownership.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t05-ownership.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t05-ownership.py -> delivery/completed/CHG-20260925-065/evidence/artifacts/t05-ownership.py
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t06-ac11.out -> delivery/completed/CHG-20260925-065/evidence/artifacts/t06-ac11.out
+R  delivery/active/CHG-20260925-065/evidence/artifacts/t06-ac11.py -> delivery/completed/CHG-20260925-065/evidence/artifacts/t06-ac11.py
+  (unstaged rename count: 38 )

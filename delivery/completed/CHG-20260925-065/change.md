@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: S
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-09-25
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -203,9 +203,9 @@ None.
 | AC-11 | 三仓 `AGENT-INDEX.md` 的禁止扫描区清单已换成指向 `DIRECTORY_MAP.md` 的指针 | 字符串扫描：命中 0（阳性对照锚**改前提交**，另注入 1 条 → 报出） | **三仓全 PASS**：cloud 命中 **0**（对 `0346edf` 命中 1）、agent 命中 **0**（对 `24da21b` 命中 1）、desktop 命中 **0**（对 `623583d` 命中 1）。**判据收窄过**：只查 `扫描` 在已修好的文件上报 2／3 条全假阳性，故「枚举构建路径」是承重构件（§14 第 15 项） |
 | AC-12 | F-06 两侧同时改：三仓小节改名＋作用域首行；workspace §4 作用域句 | 逐处复查；`check_local_order_scope` WARN 为 0 | **PASS**（T-07）：三仓小节均已改名 `## 本仓内加载顺序` 并带作用域首行；`AGENT-INDEX.md` §4 作用域句在 T-02 已落；门禁 WARN **0** |
 | AC-13 | F-08：`init-agent-entry.sh` 产出四件且形态相符；快照只有**一个**生成器 | tmpdir 实跑 ＋ 产出差异表；脚本内无 `.ai/CURRENT_CONTEXT.md` 写入 | **PASS**（T-03）：12 项形态判据 12 PASS；阳性对照 7 类变异全报出；`workspace --dry-run` 对快照只报 `exists:` 不再 `would create:`。读数 **不是门禁**（门禁在 T-04），届时调门禁自己的函数复测 |
-| AC-14 | 四仓零运行时代码／配置／测试改动 | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 逐仓对账；只允许四类入口文件与 `.claude/skills`／`.codex/skills` 副本 | TODO |
-| AC-15 | 六门禁 `exit=0` ＋ 套件全绿，且读数取于**最后一次改动之后** | `evidence/artifacts/t09-gate-readings.out` | TODO |
-| AC-16 | 两遍失效指针扫描（字符串 ＋ 相对链接 resolve），各带阳性对照与分母 | 扫描产物入 `evidence/artifacts/` | TODO |
+| AC-14 | 四仓零运行时代码／配置／测试改动 | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 逐仓对账；只允许四类入口文件与 `.claude/skills`／`.codex/skills` 副本 | **PASS**（T-09）：逐仓 `diff --stat <改前提交>..HEAD` 各只落在四件入口文件（cloud `0346edf..HEAD`＝4 文件、agent `24da21b..HEAD`＝4、desktop `623583d..HEAD`＝4），**每仓恰一个提交**；工作区 agent／desktop 净、cloud 仅既存 `?? dump.rdb`（他人在途，不碰）。四仓对账读数见 `t09-repo-reconcile.out` |
+| AC-15 | 六门禁 `exit=0` ＋ 套件全绿，且读数取于**最后一次改动之后** | `evidence/artifacts/t09-gate-readings.out` | **PASS**（T-09）：六门禁全 `exit=0` / 0 ERROR，`unittest` `Ran 94 / OK`，`sync_skills.py check` `exit=0`；**取于归档与全部记录改动之后** |
+| AC-16 | 两遍失效指针扫描（字符串 ＋ 相对链接 resolve），各带阳性对照与分母 | 扫描产物入 `evidence/artifacts/` | **PASS**（T-09）：分母 **477 个已跟踪 `*.md` / 48938 行 / 115 条相对链接**；Pass A 活跃文档命中 **0**（13 处全在本 CHG 自己的记录里，属过去时叙述）、Pass B 未解析 **6**（全在已归档的 CHG-052 记录，少一级 `..`，登记 §14 第 20 项）；**本 CHG 自有死链 0**。对照**双向**做：散文里的缺陷报出、同一缺陷放进代码块则不报（证明"跳过代码"不是把扫描器弄瞎） |
 
 ## 11. Evidence
 
@@ -245,15 +245,15 @@ None.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed. — §5 四小节逐项交付；T-01…T-09 全部 DONE（§8）。
+- [x] No blocking `Q-xx`. — §7 为字面 `None.`，全 CHG 未新增 `Q-xx`。
+- [x] Acceptance matrix all PASS. — §10 中 AC-01…AC-13 已 PASS；**AC-14／AC-15／AC-16 于 T-09 完成**（逐仓对账、收尾读数、两遍指针扫描），见 §10 与 `evidence/artifacts/t09-*`。
+- [x] Automated tests passed or justified. — 六门禁 `exit=0` / 0 ERROR；`unittest` `Ran 94 / OK`；`sync_skills.py check` `exit=0`。**读数取于本 CHG 最后一次改动之后**，见 `evidence/artifacts/t09-gate-readings.out`。
+- [x] Manual verification evidence recorded where required. — 三仓的逐条归属表（`task-05/06/07`）、T-08 的两条活体阳性对照、T-09 的双向对照（`t09-pointer-sweep.py --control`）。
+- [x] Diff checked for out-of-scope changes. — 四仓逐仓对账见 §9；三仓各自 `diff --stat` 只落在四件入口文件上（cloud 165+/278−、agent 49+/54−、desktop 45+/48−），**零运行时代码、配置、测试**。
+- [x] Runtime repositories touched only if listed in scope. — §1 已声明并逐仓对账：三仓各一个提交（cloud `0db02ab`、agent `6d740fc`、desktop `7c1b0ad`），只写四类入口文件。
+- [x] Required baselines updated. — 判据落在 `conventions §3／§9／§10／§11`（T-02）、`AGENT-INDEX.md` §4／§10、`..._V1.md:769／:1801`；生成器 `init-agent-entry.sh`（T-03）与门禁 `verify_agent_entry.py`（T-04）与判据同步。
+- [x] Affected repositories committed independently. — 四仓各自提交：cloud `0db02ab`、agent `6d740fc`、desktop `7c1b0ad`；workspace 的 T-08 入口文件 `50a2417` 与记录分开提交。
 
 ## 14. 遗留（只登记、未修，需独立 CHG）
 
@@ -270,9 +270,10 @@ None.
 11. **AC-09 的判据不是门禁**：全仓无任何脚本读 cloud 的 `internal/infra` 列表（`grep -rn 'internal/infra' scripts/ tests/ config/` 零命中），故 T-05 的 infra 相符性判据是**证据期临时构造的扫描**（可重放命令 ＋ 阳性对照）。⇒ 「规则行枚举的目录必须在磁盘存在」这件事**不会在将来失效时报警**。是否值得升为门禁，交后续 CHG 裁；本 CHG 不新增（会与「ERROR 只判存在／声明／计数／相等」的分层结论相抵）。
 12. **生成器对非兄弟仓路径产出坏链接**：`init-agent-entry.sh repo <绝对路径>` 把工作区相对路径按 `os.path.relpath` 算出，目标若不在执行根下就写出 `../../../../../../../Users/…` 这样的链接（T-04 复测时实测，见 `artifacts/t04-remeasure.sh` 的产出）。本仓实际用法是 `repo cloud|agent|desktop`，不受影响；**只登记**。
 13. **本 CHG 两次「两个分母混用」**（T-05 归属表把总行数与非空行数当同一个分母；§11 引自 CHG-064 的「94 KB」漏算 evidence，实为 213739 B）。两次都不是算错，是**没当场说明在量哪一个分母**——与「计数必须当场量」是同一件事的两面。登记以免后续 Task 重复：**凡报数字，同一句里写清分母是什么。**
-14. **阳性对照的锚取 `HEAD` 会在提交瞬间变成镜子**（T-05 cloud 臂、T-06 agent 臂各发生一次）：取证时 `HEAD` 指向改前提交、读数正确为「命中 1」；修复一提交，`HEAD` 就是修复后的文件，**同一命令读数也变成 0——与「扫描无判别力」形状完全相同**，且不会自己冒出来。已在两个脚本里钉为常量（`BASE=0346edf`／`24da21b`）。⇒ **凡以改前状态为对照的可重放命令，一律指向具体提交，不指向 `HEAD`、不指向分支名。** 本 CHG 自身的 T-09 收尾扫描与他人复核同受此约束。
+14. **阳性对照的锚取 `HEAD` 会在提交瞬间变成镜子**（T-05 cloud 臂、T-06 agent 臂各发生一次）：取证时 `HEAD` 指向改前提交、读数正确为「命中 1」；修复一提交，`HEAD` 就是修复后的文件，**同一命令读数也变成 0——与「扫描无判别力」形状完全相同**，且不会自己冒出来。已在两个脚本里钉为常量（`BASE=0346edf`／`24da21b`）。⇒ **凡以改前状态为对照的可重放命令，一律指向具体提交，不指向 `HEAD`、不指向分支名。** 本 CHG 自身的 T-09 收尾扫描与他人复核同受此约束。**同一族的第三种形态（T-09 实测）：记录本身会改变被记录的量。** 我先把扫描分母（477 个 `*.md`／48938 行／**115** 条相对链接）写进 `LEDGER.md` 的关闭段，而**写这段本身就往 `LEDGER.md` 加了一条链接**——分母随即变成 **116**，前一段落连同它引用的读数一起过期。⇒ **凡「记录行为会改变其读数」的量，一律只报方向与结论、指向产物文件，不内联数字**：本 CHG 的 §11 与 `LEDGER.md` 关闭段据此都改为指向 `artifacts/*.out`。
 15. **AC-11 的判据收窄过一次，且收窄是必需的**（T-06）：初版误命中 agent 的锁文件**规则**（`禁止手改`——禁的是手改不是扫描）；收紧为「**扫描** ∧ 枚举具体构建路径」后，松判据在**已修好的**文件上仍报 2（agent）／3（cloud）行，**全为假阳性**（两条指针行含「禁止扫描区」四字、一条是 `go vet` 行）。⇒ **路径词表是承重构件**，去掉它「0 命中」会被污染成噪声。读数见 `evidence/task-06-agent.md` §4。
 16. **`initial` 骨架与「按代码回写」的边界**：T-05 改了 cloud 的 infra 列表（两份文档都列了磁盘上不存在的 `redis`／`cache`／`storage`），T-06 改了 agent 的「文件与 FFmpeg 运行时」（代码里只有探测，无运行时）。两处都是**按代码写文档**，属 §5 允许的例外（「A 与 B 列举的事实错误除外」），**不是「只搬家不改义」的破例**。登记此条以明确该例外的实际适用范围仅到「事实错误」为止，不含措辞偏好。
 17. **记录成本界改到第五版才选对被限制的量**（T-07）：前三版限单篇、第四版限总量，**四次限的都是「存量」**；而存量由任务数决定、不由我决定，故必然在某个 Task 上被突破（第四版在 T-07 上被突破：`change.md` 37701 B ＞ 35 KB、`checkpoint.md` 15418 B ＞ 15 KB）。第五版改为**每 Task 增量**（`change.md` ≤ 5 KB、`checkpoint.md` ≤ 4 KB、单 Task evidence ≤ 9 KB），实测六段增量最大 4601／3015 B，全部在界内（连续三个 Task）。**登记以免下一轮又去调那个绝对数字**——该调的是被限制的量，不是界的值。
 18. **用一份样本的读数去推断另一份样本该多大**（T-08）：开工时我据「三仓指针各 11 行／656 B／1 H2」推断 workspace 的两个指针**也应**同量级，进而以为 T-08 只需补两行机读键。实测不成立——workspace 的指针**本就**是 30／24 行、各 2–3 个 H2，因为它们要解释一件运行仓不存在的事实（同一个 `AGENT-INDEX.md` 在 workspace 是治理正文、在运行仓是三层索引，**同名两角色**）。⇒ T-03 定的形态约束的是**角色**（谁承载正文、谁只做指针），不是**章节结构**；三仓的读数**不是** workspace 的标尺。**登记以免下一轮把「其他仓长这样」当成 workspace 的合规标准**——那正是本 CHG 要消灭的「多落点互相推断」。
 19. **「每 Task 增量」这个界有一个已知盲区：替以前的 Task 还债的 Task 会独自越界**（T-08 实测）。`checkpoint.md` 的 `Completed` 一节自 T-04 起就只列到 T-03——T-04～T-07 四个 Task 完成时都没补，缺口是**累积**出来的。T-08 顺手补齐这五行后，它的增量越了 4 KB 界，而这笔字节**不属于 T-08 的内容**，属于前四个 Task 各自欠的。⇒ **界不改**（§14 第 17 项：该调的是被限制的量，不是界的值；越界就报越界）。登记两点：①这是**第五版界仍未覆盖的形态**——它假设每个 Task 只承担自己的记录成本，而一个**补记录**的 Task 会一次性承担多个；②**真正的错在四节记录没在各自的 Task 里写完**，T-08 只是把它暴露出来。修法是**每个 Task 收尾时把 `Completed` 写全**，不是把界放宽到 6 KB。
+20. **归档记录里 6 条相对链接少了一级 `..`**（T-09 扫描实测）：全部在 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md`，目标是 `wt-media-cloud` 的三个源文件（`discovery_store_mysql.go` ×4 处、`operations.go`、`ContentPoolPage.vue`）。**成因实测**：该文件在 `delivery/completed/<CHG>/evidence/<pkg>/` 下，从它出发**要 6 级 `..`** 才能到达执行根，写成 5 级即落在 `wt-media-workspace/` 之内——逐级验证：5 级 `exists=no`、6 级 `exists=YES`。**本 CHG 不改**：`MASTER:132`「归档记录保持原样、不回改」，且这属于**已归档记录的历史叙述**（同 CHG-059 Q-08「登记不改」的先例）。**本 CHG 自己拥有的死链：0**。⇒ 登记，供将来若采纳「归档可修链」的政策时一次性处置。**同一类也在本 CHG 自己的记录里**：归档后 `delivery/active/CHG-20260925-065/…` 不再存在，而本记录保留 7 处该串（`change.md:84` 的 §5 范围陈述、`checkpoint.md:13` 与 `task-01-baseline.md:9` 的过去时叙述、`task-01-baseline.md:21` 与 `t01-baseline.out:7` 与 `t08-gate-readings.out` 8 行**原始 `git status` 捕获**）——**一律不改**：原始捕获改了就不是证据，叙述改了就不是当时的事实。**另注**：本 CHG 的扫描器**跳过代码块与行内代码**，故读数（6）小于不做该区分时的读数（14，其中 8 条是记录里引用被注入对照样本的**引文**，不是指针）——见 `artifacts/t09-pointer-sweep.out`。

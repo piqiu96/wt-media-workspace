@@ -20,14 +20,15 @@
 - **T-06 agent 收口**（`6d740fc`）：同上四件 ＋ E。门禁 agent **10 → 0**，四仓合计 **71 → 11**；13 行模块树迁入 `DIRECTORY_MAP.md`（**该图本就有更精确版本**）；「文件与 FFmpeg 运行时」按代码回写为「尚无实现」。
 - **T-07 desktop 收口**（`7c1b0ad`）：同上四件 ＋ E ＋ D-04 的范围限定句（**只改措辞**，政策冲突另立 CHG）。门禁 desktop **8 → 0**，四仓合计 **11 → 3**；**跨仓八节相等判据自 T-04 起红至此刻转绿**（该红只能由三仓齐备消，设计如此）。
 - **T-08 workspace 入口对齐**（`50a2417`）：两件入口文件各加机读键 ＋ `CLAUDE.md:9` 由复述句改为指针句（该事实的唯一落点本就在 `AGENT-INDEX.md` §1，故是**改指针而非搬家**）。门禁 **3 → 0**，**四仓合计 0 ERROR / 0 WARN**——本 CHG 的中心验收条件达成。
+- **T-09 收尾**：`Status` 置 `DONE`；**§13 DONE Gate 九项逐项签字**；§10 的 AC-14／AC-15／AC-16 补齐为 PASS；两遍失效指针扫描（分母与读数见 `evidence/artifacts/t09-sweep-post-archive.out`，**正文不内联分母**——见 §14 第 14 项的第三形态）；四仓逐仓对账（`t09-repo-reconcile.out`，三仓各恰一个提交、非入口文件改动 **0**）；归档 `git mv` 至 `delivery/completed/CHG-20260925-065/`（38 个 rename）；`LEDGER.md` 表行移除并补关闭段；快照以 `--no-active` 重生成（`Active CHG: none`／`Status: NONE`，原 3 处指向 `delivery/active/…` 的引用归 0）；§14 补第 19／20 项。
 
 ## Current
 
-T-08 已完成（workspace 入口两件；**四仓 0 ERROR / 0 WARN**）；下一项是 T-09（收尾）。
+**T-09 已完成，本 CHG 已关闭归档**（记录在 `delivery/completed/CHG-20260925-065/`）。无进行中的 Task。
 
 ## Next
 
-1. **T-09**：收尾归档与对账。**T-08 已完成，T-09 的前置条件满足**（T-09 不得早于 T-07，且不得在红的状态下归档——**此刻已无红**）：两遍失效指针扫描（字符串 ＋ 相对链接 resolve，各带阳性对照与分母，**锚取具体提交不取 `HEAD`**）、归档 → `completed/`、LEDGER 同步、快照 `--no-active`、四仓对账、六门禁 ＋ 套件在最后一次改动之后重测。
+无。后续工作是 **CHG-20260925-066**（归档边界冻结与纯过程产物清理，仅 workspace），**须待本 CHG 归档后另立**——本 CHG 已完成归档，前置条件满足。它处置用户 `/doctor` 追加指令 1（`delivery/completed/` 是否整合清除）。**本 CHG 不自动启动它。**
 
 ## Blocked
 

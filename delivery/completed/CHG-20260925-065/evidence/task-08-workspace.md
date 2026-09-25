@@ -28,7 +28,11 @@ ERROR workspace: CLAUDE.md:9 restates a rule without naming AGENT-INDEX.md: 本�
 1. **两个文件各加一行机读键**，位置与三仓一致（H1 之下、第一个 H2 之前）：`- 正文：\`AGENT-INDEX.md\``。
 2. **`CLAUDE.md:9` 由规则句改为指针句**。原句同时是一条规则（`不存放`／`不得`）和一条事实，而**该事实的唯一落点早就在 `AGENT-INDEX.md` §1**——实测 `AGENT-INDEX.md:23` `## 1. 本仓库定位` 的第 6 行即 `- **不拥有**：运行时代码、服务运行代码、构建产物、临时文件。`，第 9 行即三仓路径。故这是**改写为指针，不是搬家**：内容没有移动到新地方，它本来就在那里，被删的是第二份。
 
-改后：`本仓库**不拥有**运行时代码、服务运行代码、构建产物或临时文件；运行时代码位于 `../wt-media-cloud`、`../wt-media-agent`、`../wt-media-desktop`。仓库职责边界的唯一落点是 [`AGENT-INDEX.md`](AGENT-INDEX.md) §1。`
+改后（引 `CLAUDE.md:9` 全文，用代码块括起——它的链接是相对 `CLAUDE.md` 的位置，在本文件里**不是**指针）：
+
+```
+本仓库**不拥有**运行时代码、服务运行代码、构建产物或临时文件；运行时代码位于 `../wt-media-cloud`、`../wt-media-agent`、`../wt-media-desktop`。仓库职责边界的唯一落点是 [`AGENT-INDEX.md`](AGENT-INDEX.md) §1。
+```
 
 **`AGENTS.md` 只增不减**——它的对应内容（`## 红线` 段）本来就是指针写法，未复述任何规则。
 

@@ -1,0 +1,48 @@
+=== AC-14 four-repo reconciliation ===
+@ 2026-09-25T15:11:08Z
+claim: each runtime repo changed ONLY the four entry files, one commit each, zero runtime code.
+bases are the commits that were HEAD when CHG-065 started (from T-01 baseline), not HEAD-as-moving-target.
+
+--- wt-media-cloud (pre-CHG-065 base 0346edf) ---
+    commits since base:
+      0db02ab docs(chg-065): T-05 入口文件收口为「双指针 + 单一正文」
+    diff --stat since base:
+       AGENT-INDEX.md   | 159 ++++++++++++++++++++++++++++++++++++++++++++++++---
+       AGENTS.md        | 114 ++-----------------------------------
+       CLAUDE.md        | 169 ++-----------------------------------------------------
+       DIRECTORY_MAP.md |   1 +
+       4 files changed, 165 insertions(+), 278 deletions(-)
+    working tree status:
+      ?? dump.rdb
+    non-entry files touched: 0
+
+--- wt-media-agent (pre-CHG-065 base 24da21b) ---
+    commits since base:
+      6d740fc docs(chg-065): T-06 入口文件收口——双指针 + 单一正文，正文迁入 AGENT-INDEX.md
+    diff --stat since base:
+       AGENT-INDEX.md   | 41 ++++++++++++++++++++++++++++++++++-------
+       AGENTS.md        | 46 ++++++----------------------------------------
+       CLAUDE.md        | 13 +++++++------
+       DIRECTORY_MAP.md |  3 ++-
+       4 files changed, 49 insertions(+), 54 deletions(-)
+    working tree status:
+    non-entry files touched: 0
+
+--- wt-media-desktop (pre-CHG-065 base 623583d) ---
+    commits since base:
+      7c1b0ad docs(chg-065): T-07 入口文件收口——双指针 + 单一正文，正文迁入 AGENT-INDEX.md
+    diff --stat since base:
+       AGENT-INDEX.md   | 38 +++++++++++++++++++++++++++++++-------
+       AGENTS.md        | 40 ++++++----------------------------------
+       CLAUDE.md        | 13 ++++++-------
+       DIRECTORY_MAP.md |  2 ++
+       4 files changed, 45 insertions(+), 48 deletions(-)
+    working tree status:
+    non-entry files touched: 0
+
+--- workspace (this repo) ---
+       M delivery/active/CHG-20260925-065/change.md
+       M delivery/active/CHG-20260925-065/evidence/task-08-workspace.md
+      ?? delivery/active/CHG-20260925-065/evidence/artifacts/t09-pointer-sweep.out
+      ?? delivery/active/CHG-20260925-065/evidence/artifacts/t09-pointer-sweep.py
+      ?? delivery/active/CHG-20260925-065/evidence/artifacts/t09-repo-reconcile.out
