@@ -30,14 +30,17 @@
 
 - **T-11 前端源码根 ＋ 两篇视觉规范合并**：先出逐节清单（存活件 28 节、待并入件 24 节，各判为视觉／架构／功能），再合并。**判据 A**：`wt-media-cloud/frontend` 在 `docs/` 下 **8 → 0**（全仓工作区余命中落在**恰好两个文件**——`change.md` 9 行、`checkpoint.md` 5 行，都是本 CHG 自己的记录，属过去时叙述；阳性对照读 `HEAD` 报全仓 11／`docs/` 8）。**判据 B**：同一脚本同时报出 `EXISTS ../wt-media-cloud/web` 与 `ABSENT ../wt-media-cloud/frontend`，故那个 ABSENT 不是空转。**判据 C**：源取 `git show HEAD:<v2>`（合并后工作区已无该文件），v2 的 541 行非空非标题行里 **514 行在合并件中逐字命中、27 行未命中**——27 条逐条判过，**无一条是丢规则**（7 条是「列表变段落」，10 条是引导句／措辞改写，1 条是节号由「第 2 章」变「第 3.3 节」，3 条是 §2.6 与 §17 两份同义清单合并后取其一，5 条是 §3.3 五色清单并进 §3.5.3 唯一一张表，1 条是 §9.2 抽屉分区改为指向 §4.2.4）；另有 103 条「必须保留」＋ 35 条「必须删除」的双向探针，**实测 0 失败**，两个方向各带 1 条注入阳性对照。**首轮跑出的 4 条 MISS 是脚本自己的假阳性**（引号体／`**` 强调标记插在短语中间／行尾标点／全角斜杠），修正归一化后 25 → 21，再经自查去重成 27；**方向二首轮报出 1 条真失败**——我写「无 pnpm／yarn lock」时**用了被禁的词去说明它不存在**，探针无法与违规区分，改为「包管理器为 npm…」后归零。**自查又咬出合并自己造的三处重复落点**（正是本 CHG 要处置的那类问题）：§3.5.3 与 §3.8.4 两张颜色语义表且「蓝色」含义冲突 → 合成唯一一张；§4.1 与 §4.2.1 两套列表页结构 → 后者指向前者；§4.4.2 与 §4.2.4 两份抽屉分区 → 以后者为唯一落点。**计划与实测不符处**：计划写「`frontendDist`／`beforeDevCommand`／`frontendCommit` 是字段名／脚本名，不得改」——实测前两个是真字段（`tauri.conf.json`），**`frontendCommit` 是假的**，它只存在于本文那段示例 JSON 里（`HEAD:407`），真实键是 `frontend-build.json` 的 `source_commit`、发布键是 `release-versions.sh` 写出的 `frontend_build_version`；按原意把示例改成实测形态。**判据 D**：索引 4 条 ↔ 目录 4 篇双向一致，各带 1 条注入阳性对照，8 次判定 0 失败（改前只列 1 篇）。删除前先确认全仓只有本 CHG 的记录引用它（工作区 2 命中＝HEAD 2 命中），故删除不产生死指针。合并件 **1728 行／42,821 B**（两篇原合计 **2103 行／44,390 B**，净减 **375 行／1,569 B**）——此处是**最后一次改动之后**的实测，非中间读数。
 
+- **T-12 收尾：归档、两遍失效指针扫描、三仓对账**：①**归档**——`git mv active/… → completed/…`（43 个文件全 `R`，无内容改动），`change.md` 状态改 `DONE`，`LEDGER.md` 表行改成与先例同形的占位行 ＋ 本 CHG 归档说明段，快照以 `--no-active` 重生成（`Active CHG: none`／`Status: NONE`／**1668** 字符）。**顺序有意**：先搬目录后改状态，避开「`Status: DONE` 但仍在 `active/`」那个会让 `verify_product_master_alignment.py` 多报 1 条的中间态。②**归档当场量到一处机制**：`MASTER` §3 状态词表的**读数列**在这一 CHG 自己归档的同一刻就过期了（`IMPLEMENTING` 活 1→0、`DONE` 归档 28→29、活列 20→19、归档列 30→31、合计 38→39），已按归档后口径重测并就地刷新；复算用**门禁自己的** `status_word()`（自写正则读到 `CHG-058` 的词是 `DONE（2026-09-24 由 …`——因它那条注**跨行**、闭括号在第 7 行；门禁从首个开括号删到行尾，读作 `DONE`。**是我的量法弱，不是记录坏了**，换门禁函数后 39 篇全部读出词）。③**两遍失效指针扫描**（分母 466 个已跟踪 `*.md`，见 `task-12-close.md` §2）：遍一字符串 13 → **10**（消失的 3 条是 `.ai/CURRENT_CONTEXT.md` 里的 active 目录行，随快照重生成而消失；余 10 条全在本记录自己的 `completed/` 之内，是启动命令、范围声明、阳性对照与扫描产物，判留——先例 CHG-062／CHG-063 归档后同样保留其 active 自述）；遍二相对链接 **122** 条不可达 **10** 条，**归档前后逐条相同**、全部落在 CHG-052／057／058／060 的既有归档记录里，**本 CHG 未新增任何一条**（新增的 1 条是 `LEDGER.md` 指向本记录的新链接，可 resolve）。两遍各注入 1 条必然失效的指针，**均报出**。④**归档后复测两条早期判据**：判据 A 全仓 45 行、**`docs/` 下 0**（本记录 44 ＋ `LEDGER.md` 1）；**阳性对照必须换锚**——T-11 时读 `HEAD` 有效（那时 `HEAD` 还是合并前那版），T-11 一提交 `HEAD` 就变成合并后、读它得 `docs/` 0 那是**结果**不是对照，故改锚成**开工基线 `0148c34~1`**：它在 `docs/` 下报 **22 行且全落在同一个文件** `web-desktop-visual-system.md` 里（判别力检验通过）。FFmpeg 复扫候选 **20** 条（9＋11），判给 Agent／Desktop 的仍是 **0**。⑤**三仓对账（AC-15）**：三仓工作区与开工基线**逐条相同**（cloud `?? dump.rdb`、agent／desktop 全空），已跟踪改动各 **0**；本 CHG 期间三仓各只有一个提交（cloud `0346edf`／agent `24da21b`／desktop `623583d`），文件清单**全部只在 `.claude/skills/` 与 `.codex/skills/` 之下**，desktop 那 4 行逐行看过就是删掉 `description` 里的 `FFmpeg, `。⑥**收尾读数**（归档之后取，`artifacts/t12-gate-readings.out`）：六门禁全 `exit=0`、`Ran 79 tests / OK`、`sync_skills check` 绿。⑦**DONE Gate 九项逐项签字**，**AC-01～AC-15 全 PASS**（AC-04 由 T-12 复算收口；AC-09 按权威面口径判 PASS 并写明判据为何必须收窄）。
+
 ## Current
 
-- T-11 已落。只剩 T-12 收尾。
+- 本 CHG 已关闭归档为 `DONE`。归档后 `delivery/active/` 只剩 `.gitkeep`，`LEDGER.md` 表行改为占位行，快照 `Active CHG: none`。
 
 ## Next
 
-1. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描；并按 AC-15 与开工基线对账三仓（只应多出 `skills/` 分发副本）。
-   - 归档后那 **14 行**余命中（`change.md` 9 ＋ `checkpoint.md` 5）会随本 CHG 记录进 `completed/`；`artifacts/t11-*.out` 入库后会再加一批（它们逐字含这些模式，且 `git grep` 只扫已跟踪文件，故当前读数不含）。**届时要按归档后口径复测**，判据仍是 `docs/` 下 0。
+1. **本 CHG 无后续 Task。** 后续计划只从 `delivery/MASTER_IMPLEMENTATION_PLAN.md` 与当前真实代码状态提出，不自动实施。
+   - §14 的 **18 项遗留**需独立 CHG 处置；其中三条被本 CHG 现场证明是活的：`check_entry_drift` 的 workspace 臂恒空、`AGENT-INDEX.md` §4「唯一落点」无任何机检点、§5 表未写前端源码根。
+   - §14 第 8 项里**需用户裁定**的那一类仍在等待：`045`～`051` 七份草案的状态词是 `DISCUSSION`，而 `planned/README.md` 的程序进度列写「已实施／暂停／已签收」——T-07 已把两个轴写成可分辨，但**不改判这七份**。
 
 ## Blocked
 
@@ -87,8 +90,13 @@
 | `specs/README.md` 索引一致性（T-11） | 索引 **4** 条 ↔ 目录 **4** 篇，双向 0 失败（8 次判定）；两向各注入 1 条，均报 FAIL（改前只列 **1** 篇） |
 | 删除前该文件是否被别处引用（T-11） | 工作区 **2** 命中 ＝ `HEAD` **2** 命中，且**两条都在本 CHG 的 `change.md` 里** ⇒ 删除不产生死指针 |
 
-取数时间与逐次读数见 `evidence/artifacts/t11-gate-readings.out`——本 Task 只有**一段**收盘读数（段首带生成时刻），因为它的**每一行都在最后一次改动之后**取。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①各段的读数记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故本段正文的措辞不影响任何判据。
+| 收尾六门禁 ＋ 套件（T-12，归档之后取） | 六门禁全 `exit=0`；`Ran 79 tests / OK`；`sync_skills check` → `skill outputs are up to date`；快照 **1668** 字符／`Active CHG: none`（`artifacts/t12-gate-readings.out`） |
+| 两遍失效指针扫描（T-12，分母 466 个已跟踪 `*.md`） | 遍一：13 → **10** 命中（全在本记录自己的 `completed/` 内，判留）；遍二：站内链接 **122** 条、不可达 **10** 条，**归档前后逐条相同**、全在既有归档记录里；两遍各注入 1 条必然失效的，**均报出** |
+| 判据 A 归档后复测（T-12） | 全仓 45 行、**`docs/` 下 0**；判别力检验用**开工基线 `0148c34~1`**（`docs/` 下 **22 行且全落在同一文件**）——T-11 时读 `HEAD` 有效，T-11 提交后 `HEAD` 变成合并后，故**换锚** |
+| FFmpeg 归属归档后复扫（T-12） | 候选 **20** 条（9 candidate ＋ 11 negated），判给 Agent／Desktop 的仍 **0**；分母：含 `ffmpeg` 的 **95 行／22 文件** |
+| 三仓对账（T-12，AC-15） | 三仓工作区与开工基线**逐条相同**（cloud `?? dump.rdb`／agent 空／desktop 空），已跟踪改动各 **0**；期间各一个提交（`0346edf`／`24da21b`／`623583d`），文件清单**全在 `.claude/skills`／`.codex/skills` 之下** |
+| `MASTER` §3 词表读数（T-12，归档后重测） | 活 19 篇＝`SUPERSEDED` 9 ＋ `DISCUSSION` 7 ＋ `PLANNED` 3（**表外词 0、读不出 0**）；归档 39 篇＝`DONE` 29 ＋ `IN_PROGRESS` 4 ＋ `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `VERIFYING` 1 ＋ `IMPLEMENTING` 1；与成文表**逐词逐格相等** |
 
-T-11 的原始输出：`evidence/artifacts/t11-frontend-path-sweep.out`（判据 A）、`t11-source-root-check.out`（判据 B）、`t11-merge-loss.out`（判据 C1）、`t11-probe-check.out`（判据 C2）、`t11-specs-index-check.out`（判据 D）；脚本 `t11-merge-loss-check.py`／`t11-probe-check.py`／`t11-specs-index-check.py`；逐条明细见 `evidence/task-11-spec-merge.md`。T-10 的对应产物为 `t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out`（＋脚本 `t10-tree-entries-check.py`）与 `evidence/task-10-tree-dead-pointer-execution-root.md`；T-09／T-08 为 `t09-*`／`t08-*`。
+**本 CHG 的关闭读数是 `evidence/artifacts/t12-gate-readings.out`**（归档之后取）。早先几版 `t01-`／`t03-`～`t11-gate-readings.out` 均已被后续 Task **覆盖**：每个 Task 都改了门禁读入的文档，那些数字不再是关闭值；但各版的**判据行逐行相同**（T-05 之后只改文档文本，不碰判据的输入面，`unittest` 始终 79）。为什么读数行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①各段的读数记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后（时序说明见 `change.md` §12）。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故本段正文的措辞不影响任何判据。
 
-早先几版读数（`t06-`～`t10-gate-readings.out`）均已被后续 Task **覆盖**：每个 Task 都改了门禁读入的文档，那些数字不再是关闭值。但各版的**判据行逐行相同**（T-08～T-11 只改文档文本，不碰任何判据的输入面，`unittest` 仍 79）。
+各 Task 的原始输出：**T-12** `t12-pointer-sweep.py` ＋ `t12-pointer-sweep-pre-archive.out`／`t12-pointer-sweep-post-archive.out`、`t12-frontend-path-resweep.py` ＋ `t12-frontend-path-resweep.out`、`t12-ffmpeg-resweep.out`、`t12-gate-readings.out`，逐条明细见 `evidence/task-12-close.md`；**T-11** `t11-frontend-path-sweep.out`（判据 A）、`t11-source-root-check.out`（判据 B）、`t11-merge-loss.out`（判据 C1）、`t11-probe-check.out`（判据 C2）、`t11-specs-index-check.out`（判据 D）＋ 三个脚本，见 `evidence/task-11-spec-merge.md`；**T-10** `t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out` ＋ `t10-tree-entries-check.py`；**T-09／T-08** 为 `t09-*`／`t08-*`。

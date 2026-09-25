@@ -1,0 +1,29 @@
+# T-08 FFmpeg 归属扫描 —— 工作区（.）
+# 范围：git ls-files，排除 delivery/completed/, delivery/reports/, .claude/, .codex/
+# 分母：含 ffmpeg 的行 95 行，分布在 22 个文件
+
+### candidate（子句内无否定词） —— 9 条
+delivery/LEDGER.md:11 | 距离 17 | ADR-0015 与两处 skill 的 FFmpeg 归属从句重写（判给 Agent 的活落点 **4 → 0**）
+delivery/MASTER_IMPLEMENTATION_PLAN.md:473 | 距离 22 | - M4-C8 通过真实 FFmpeg、对象存储、Cloud Web/Desktop WebView、Local Agent 下载和独立提交验收
+delivery/milestones/M4-content-production.md:11 | 距离 20 | Cloud 在运营电脑离线时仍能准备源视频、执行真实 FFmpeg、上传对象存储并生成成片
+delivery/milestones/M5-automatic-production.md:175 | 距离 19 | - 从策略启用到成片下载的整条链路使用真实时间、数据库、FFmpeg、对象存储和 Local Agent
+docs/decisions/0016-agent-runtime-layering-and-dependency-boundaries.md:13 | 距离 46 | 架构基线 §5.4 把 Runtime 定义为「文件、FFmpeg、浏览器、比特浏览器、子进程、下载和对象存储」，与 `runtime` 一词在 Agent 自身能力上的通常含义冲突
+docs/decisions/0017-m4-m5-cloud-owned-content-production.md:7 | 距离 11 | - `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` 中“Agent 统一承担 FFmpeg、文件下载和合成”、Local Agent 本地合成、Cloud Agent 云端合成的 M4-M5 约束
+docs/decisions/0017-m4-m5-cloud-owned-content-production.md:14 | 距离 8 | 旧 M4-M5 设计把视频生产拆为两套执行路径：运营电脑由 Local Agent + FFmpeg 合成，自动生产由 Cloud Agent + FFmpeg 合成
+docs/superpowers/plans/2026-07-23-m2-account-runtime-detailed-implementation-plan.md:132 | 距离 7 | - FFmpeg、本地业务目录、发布或互动
+docs/superpowers/plans/2026-09-24-m4-m5-cloud-content-production-docs.md:81 | 距离 3 | Run: `rg -n '本地 FFmpeg|云端 FFmpeg|Cloud Agent.*生产|本地合成|Agent 负责.*合成' docs/engineering/architecture`
+
+### negated（子句内含否定词） —— 11 条
+delivery/MASTER_IMPLEMENTATION_PLAN.md:454 | 距离 10 | Desktop / Local Agent 不执行 FFmpeg
+delivery/MASTER_IMPLEMENTATION_PLAN.md:471 | 距离 25 | - 取消、输入损坏、FFmpeg 失败、上传失败、Worker 崩溃和本地下载失败均无假成功
+delivery/MASTER_IMPLEMENTATION_PLAN.md:757 | 距离 7 | - Cloud Compose Worker 不依赖系统 PATH 中的 FFmpeg，Desktop / Agent 不打包或执行视频合成
+delivery/milestones/M2-account-runtime.md:120 | 距离 9 | - M2-A只检测Cloud、Local Agent、BitBrowser和主账号匹配，不检测FFmpeg或管理本地业务目录
+delivery/planned/CHG-20260924-061/change.md:69 | 距离 16 | - Agent 合同和实现不得出现 FFmpeg、合成策略、模板或成片生成
+delivery/planned/CHG-20260924-061/change.md:135 | 距离 12 | Agent 边界扫描无 FFmpeg/compose 执行
+docs/decisions/0015-m3-cloud-owned-discovery-execution.md:10 | 距离 27 | M3 的内容挖掘只需要访问公开/已授权的内容数据接口，不涉及用户本机、BitBrowser、Cookie 注入、文件、FFmpeg 或浏览器自动化
+docs/decisions/0017-m4-m5-cloud-owned-content-production.md:24 | 距离 36 | 视频合成同样不依赖运营电脑环境，适合复用这一职责分离原则，但必须使用独立的生产领域对象和 FFmpeg 运行隔离
+docs/decisions/0017-m4-m5-cloud-owned-content-production.md:55 | 距离 27 | - Local Agent 原有/规划中的合成 Executor 与 FFmpeg 打包工作不再复用
+docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md:242 | 距离 13 | Agent 合同不得出现 FFmpeg、策略快照或合成步骤
+docs/superpowers/plans/2026-09-24-m4-m5-cloud-content-production-docs.md:28 | 距离 9 | - Agent 移除 FFmpeg 后，发布/互动/本机文件能力仍保持，不得误删 Agent 整体执行边界
+
+# 候选合计 20 条。两列都不是结论——判定见 task-08-*.md。

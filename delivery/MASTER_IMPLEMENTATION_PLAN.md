@@ -103,7 +103,7 @@ wt-media-workspace/
 
 状态词只有下表这些；写记录时从表里取，不造新词。读数列是**实测**值，两种写入形式（`- Status:` 与更早的 `> 状态：`）各自计数后相加。
 
-两张表加历史词汇应凑齐分母：活列 **20**（退役词在活记录里已归零）；归档列 30 ＋ 退役 `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **38**。对不上就说明有词没被登记。
+两张表加历史词汇应凑齐分母：活列 **19**（退役词在活记录里已归零）；归档列 31 ＋ 退役 `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **39**。对不上就说明有词没被登记。
 
 **CHG**，变迁为 `DISCUSSION → PLANNED → IMPLEMENTING → VERIFYING → DONE`（`SUPERSEDED` 可从除 `DONE` 外的任何状态进入）：
 
@@ -111,12 +111,12 @@ wt-media-workspace/
 |---|---|---|---|
 | `DISCUSSION` | 草案，方向待裁定；不激活 | 7 | 0 |
 | `PLANNED` | 方向已定、已拆分，可激活 | 3 | 0 |
-| `IMPLEMENTING` | 实施中 | 1 | 1 |
+| `IMPLEMENTING` | 实施中 | 0 | 1 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 28 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 29 |
 | `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 9 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` 19 篇 ＋ `delivery/active/*/change.md` 1 篇；归档记录＝`delivery/completed/*/change.md` 38 篇。
+分母：活记录＝`delivery/planned/*/change.md` 19 篇 ＋ `delivery/active/*/change.md` 0 篇；归档记录＝`delivery/completed/*/change.md` 39 篇。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 

@@ -1,0 +1,35 @@
+### T-12 AC-14 两遍失效指针扫描
+分母：git ls-files '*.md' = 466 个已跟踪 markdown 文件
+
+--- 遍一 字符串扫描（查 466 文件 × 3 个落点 = 1398 次比对）---
+  [delivery/active/CHG-20260925-064] 8 命中
+      delivery/completed/CHG-20260925-064/change.md:85
+      delivery/completed/CHG-20260925-064/evidence/task-01-activate.md:19
+      delivery/completed/CHG-20260925-064/evidence/task-01-activate.md:88
+      delivery/completed/CHG-20260925-064/evidence/task-03-conventions-slim.md:148
+      delivery/completed/CHG-20260925-064/evidence/task-06-script-template-checkpoint.md:28
+      delivery/completed/CHG-20260925-064/evidence/task-08-ffmpeg-ownership.md:60
+      delivery/completed/CHG-20260925-064/evidence/task-11-spec-merge.md:124
+      delivery/completed/CHG-20260925-064/evidence/task-11-spec-merge.md:125
+  [docs/engineering/specs/前端框架视觉规范v2.md] 2 命中
+      delivery/completed/CHG-20260925-064/change.md:108
+      delivery/completed/CHG-20260925-064/evidence/task-11-spec-merge.md:150
+
+--- 遍一 阳性对照：注入 1 条 → 报出 1 条 ✓ ---
+
+--- 遍二 相对链接 resolve（466 文件，122 条站内相对链接）---
+  不可达 10 条
+      delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L27
+      delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L278
+      delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/service/operations.go#L49
+      delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue#L251
+      delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L167
+      delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L280
+      delivery/completed/CHG-20260923-057/evidence/task-18-writeback-and-archive.md -> CHG-20260923-059/change.md
+      delivery/completed/CHG-20260923-058/evidence/task-09-writeback-and-archive.md -> active/…
+      delivery/completed/CHG-20260923-058/evidence/task-09-writeback-and-archive.md -> ../completed/CHG-20260923-057/change.md
+      delivery/completed/CHG-20260924-060/evidence/task-01-governance.md -> active/…
+
+--- 遍二 阳性对照：注入 1 条必然不可达的链接 → 报出 1 条 ✓ ---
+
+结论：遍一命中 10；遍二不可达 10。

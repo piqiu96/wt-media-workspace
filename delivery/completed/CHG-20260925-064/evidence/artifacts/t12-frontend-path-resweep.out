@@ -1,0 +1,29 @@
+### T-12 归档后复测：判据 A（前端源码根 `wt-media-cloud/frontend` 与六个旧名）
+口径：git grep -nE（只扫已跟踪文件）；对照 = 开工基线 0148c34~1
+
+模式                              ws全仓  ws/docs      基线全仓
+wt-media-cloud/frontend           19        0         8
+cloud/frontend                    21        0         8
+pnpm                              16        0         6
+dist-web                           9        0         2
+build:web                         13        0         4
+dev:web                            9        0         1
+frontendCommit                    13        0         1
+localhost:5173                     7        0         2
+
+--- 工作区全仓，七模式合并（记录落点） ---
+   18  delivery/completed/CHG-20260925-064/evidence/task-11-spec-merge.md
+   10  delivery/completed/CHG-20260925-064/change.md
+    8  delivery/completed/CHG-20260925-064/evidence/artifacts/t11-frontend-path-sweep.out
+    4  delivery/completed/CHG-20260925-064/checkpoint.md
+    3  delivery/completed/CHG-20260925-064/evidence/artifacts/t11-probe-check.py
+    1  delivery/LEDGER.md
+    1  delivery/completed/CHG-20260925-064/evidence/artifacts/t11-source-root-check.out
+  合计行数: 45；其中 docs/ 下: 0
+--- 开工基线 0148c34~1 全仓（阳性对照） ---
+   22  docs/engineering/specs/web-desktop-visual-system.md
+  合计行数: 22；其中 docs/ 下: 22
+
+对照判别力：基线 docs/ 22 行 > 0 且工作区 docs/ 0 行 == 0 → ✓ 有判别力
+
+口径提醒：`HEAD` 现在已是 T-11 之后，读 `HEAD` 会得到 docs/ 0 —— 那是**结果**不是对照。

@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: S
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-09-25
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -341,19 +341,20 @@ None.
 
 - [x] 本 CHG 的全部改动都落在本仓
 - [x] `AGENT-INDEX.md` 与两个入口文件在 T-04 后只剩单落点
-- [ ] 六个静态门禁 + `unittest discover -s tests -q` 在收尾后全绿（T-12）
+- [x] 六个静态门禁 + `unittest discover -s tests -q` 在收尾后全绿（T-12：六门禁 `exit=0`、`Ran 79 tests / OK`，在归档之后重测，见 `artifacts/t12-gate-readings.out`）
+- [x] 归档：记录已由 `delivery/active/` 移入 `delivery/completed/`，`LEDGER.md` 表行改为占位行、并在下方补归档说明；`.ai/CURRENT_CONTEXT.md` 以 `--no-active` 重生成（`Active CHG: none`／`Status: NONE`，1668 字符）
 
 ### wt-media-cloud
 
-- [x] 不改代码（只被读：源码根与构建脚本作为事实依据）；T-08 收到 `.claude/skills`／`.codex/skills` 下的 `common-architecture-review` 生成副本（2 文件，各 1 行），提交 `0346edf`，提交后 `git status` 回到开工基线
+- [x] 不改代码（只被读：源码根与构建脚本作为事实依据）；T-08 收到 `.claude/skills`／`.codex/skills` 下的 `common-architecture-review` 生成副本（2 文件，各 1 行），提交 `0346edf`，提交后 `git status` 回到开工基线（T-12 复测：`?? dump.rdb`，已跟踪改动 0）
 
 ### wt-media-agent
 
-- [x] 不改代码；T-08 收到同名生成副本（2 文件，各 1 行），提交 `24da21b`，提交后 `git status` 回到开工基线
+- [x] 不改代码；T-08 收到同名生成副本（2 文件，各 1 行），提交 `24da21b`，提交后 `git status` 回到开工基线（T-12 复测：全空，已跟踪改动 0）
 
 ### wt-media-desktop
 
-- [x] 不改代码（只被读：`src-tauri/tauri.conf.json` 作为事实依据）；T-08 收到 `common-architecture-review` 与 `desktop-sidecar-update` 两份生成副本（4 文件，各 1 行），提交 `623583d`。**附带发现**：本仓 `.gitignore:10-11` 忽略 `.claude`／`.codex`，已有副本因已 tracked 才可提交 ⇒ 与 `commit_generated: true` 相冲，登记 §14 第 16 项
+- [x] 不改代码（只被读：`src-tauri/tauri.conf.json` 作为事实依据）；T-08 收到 `common-architecture-review` 与 `desktop-sidecar-update` 两份生成副本（4 文件，各 1 行），提交 `623583d`。T-12 逐行核对该提交的改动内容：就是删掉 `description` 里的 `FFmpeg, `，即 T-08 的判定落到分发副本上。**附带发现**：本仓 `.gitignore:10-11` 忽略 `.claude`／`.codex`，已有副本因已 tracked 才可提交 ⇒ 与 `commit_generated: true` 相冲，登记 §14 第 16 项
 
 ## 10. Acceptance Matrix
 
@@ -362,7 +363,7 @@ None.
 | AC-01 | 读取顺序在全仓只剩 1 个落点（`AGENT-INDEX.md`）＋生成物；两个入口文件与 `MASTER` 的第三版都改为指回它 | T-04 的 grep 读数（含阳性对照） | **PASS** |
 | AC-02 | 两个入口文件不再逐字复述 `AGENT-INDEX.md` §2 的红线；每条被删条目都有归属依据 | T-04 的逐条归属表 | **PASS** |
 | AC-03 | 被削薄弄丢的两条提交约定在 `AGENT-INDEX.md` 有活落点 | T-04 的 grep（改前 0 命中留证） | **PASS** |
-| AC-04 | CHG／里程碑状态词汇只剩一套，且**实测在用的每个词都被定义**；脚本接受集与成文一致 | T-05＋T-06＋T-07 的词汇统计逐词相等 | TODO（T-05 成文、T-06 接受集已收口；T-07 后逐词复算） |
+| AC-04 | CHG／里程碑状态词汇只剩一套，且**实测在用的每个词都被定义**；脚本接受集与成文一致 | T-12 收尾用**门禁自己的** `status_word()` 逐文件复算（避免自写正则与门禁判据不一致）。**归档后**：活记录（分母 19＝`planned/*/change.md` 19 ＋ `active/*/change.md` 0）＝`SUPERSEDED` 9 ＋ `DISCUSSION` 7 ＋ `PLANNED` 3，**表外词 0、读不出 0**；归档记录（分母 39）＝`DONE` 29 ＋ `IN_PROGRESS` 4 ＋ `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `VERIFYING` 1 ＋ `IMPLEMENTING` 1。与 `MASTER` §3 成文表**逐词逐格相等**；接受集一致（`validate_active_change` 只认 `IMPLEMENTING`／`VERIFYING`，而 `active/` 本期为空）。**归档使读数移动，已就地刷新成文表**：`IMPLEMENTING` 活 1→0、`DONE` 归档 28→29、活列合计 20→19、归档列合计 30→31（＋退役词 2＋2＋4 ⇒ 38→39）——这是「易失读数作文档落点」的第二个实例，登记 §14 第 7 项 | **PASS** |
 | AC-05 | `checkpoint.md` 有唯一权威落点、有模板、且有强制点（缺失会红） | T-06 的变异对照 | **PASS**（落点＝`AGENT-INDEX.md` §8／§9；模板＝`templates/delivery/checkpoint.md`；强制点＝`verify_delivery_governance.py`，失红并经活树阳性对照） |
 | AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的判据串：活文件（分母 174）改前 3 → 改后 0；放宽关键词补充扫剩 1 条，判为过去时叙述 | **PASS** |
 | AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`：四棵树 **94** 条实测缺失 **0**（阳性对照注入 4 报 4）；`verifying/` 在活文件里剔掉本记录后 **0**（余 1 条历史归档 ＋ 6 条本记录自述） | **PASS** |
@@ -371,9 +372,9 @@ None.
 | AC-10 | 视觉规范只剩一篇，且它自述为当前基线；其功能描述已去除、视觉与架构描述保留 | T-11：`前端框架视觉规范v2.md` 已删（删除前确认除本 CHG 记录外无引用者）；存活件抬头声明为「项目级前端架构与视觉交互基线」。逐节对照：v2 的 **541** 行非空非标题行里 **514 命中／27 未命中**，27 条逐条判为措辞／节号／列表变段落／自查去重，**无一条丢规则**；双向探针必保留 **103** 条与必删除 **35** 条，实测 **0 失败**，各带注入阳性对照 | **PASS** |
 | AC-11 | `conventions` 只剩规则与「为什么」，无一次性读数（6 类读数／叙述模式改前 1–7 命中、改后全 0）；两处活引用者**逐个复核**——改 1 处、留 1 处并给出留的理由 | T-03 的阳性对照读数（`evidence/task-03-conventions-slim.md`） | **PASS** |
 | AC-12 | `specs/README.md` 的索引条目数与该目录实际篇数一致 | T-11：索引 **4** 条 ↔ 目录 **4** 篇（不含本索引），双向各 0 失败，共 **8** 次判定；两个方向各注入 1 条必然违反的，**均报 FAIL**。改前只列 1 篇 | **PASS** |
-| AC-13 | 六个静态门禁 `exit=0`、`unittest` 全绿，且在**本 CHG 最后一次改动之后**重测 | T-12 的收尾读数 | TODO |
-| AC-14 | 归档后无失效指针（字符串扫描＋相对链接 resolve，各带阳性对照与分母） | T-12 的两遍扫描 | TODO |
-| AC-15 | 本 CHG **不改三个运行仓的任何运行时代码、配置或测试**；三仓相对开工基线的净增量只有 `skills/` 的分发副本，且 `sync_skills.py check` 绿 | 收尾 `git status --porcelain` 与开工基线逐条对账，逐份改动都属 `.claude/skills`／`.codex/skills` | TODO |
+| AC-13 | 六个静态门禁 `exit=0`、`unittest` 全绿，且在**本 CHG 最后一次改动之后**重测 | T-12：归档后（记录已在 `completed/`、LEDGER 表行已移除、快照 `Active CHG: none`）实测六门禁全 `exit=0`、`Ran 79 tests / OK`、`sync_skills check` 绿（`artifacts/t12-gate-readings.out`）。**「最后一次改动之后」的落点说明**：该段读数取自本次记录正文定稿之后；此后只再写入了本 AC 表自身的读数与检查清单（门禁不读 `delivery/completed/`、也不读 evidence），且收尾又复跑一次核对（两次逐行相同），见 §12 | **PASS** |
+| AC-14 | 归档后无失效指针（字符串扫描＋相对链接 resolve，各带阳性对照与分母） | T-12：两遍扫描，**分母 466 个已跟踪 `*.md`**。**遍一（字符串）**：本 CHG 动过的落点（删掉的 `前端框架视觉规范v2.md`、挪走的 `delivery/active/CHG-20260925-064`）在**归档前** 13 命中、**归档后** 10 命中；消失的 3 条是 `.ai/CURRENT_CONTEXT.md` 里指向 active 目录的行，随快照重生成（`Active CHG: none`）而消失；余 10 条（8 条 active 路径 ＋ 2 条 v2 文件名）**全部落在本记录自己的 `completed/CHG-20260925-064/` 之内**，逐条看过，是启动命令、范围声明、阳性对照记录与自述引用——**过去时叙述，判留**（先例：CHG-062、CHG-063 归档后同样保留其 `delivery/active/…` 自述，见 `completed/CHG-20260925-062/evidence/artifacts/t05-postarchive-sweep.out`）。**遍二（相对链接 resolve）**：站内相对链接 **122** 条，不可达 **10** 条，**归档前后集合逐条相同**（新增的 1 条是 `LEDGER.md` 指向本记录的新链接，可 resolve）——10 条全部落在 `delivery/completed/` 里的**既有**归档记录中（CHG-052 的 6 条跨仓源码指针、CHG-057/058/060 的 4 条相对路径写法），**本 CHG 未新增任何一条**。两遍各注入 1 条必然失效的指针，**均报出**见 `artifacts/t12-pointer-sweep-pre-archive.out`／`t12-pointer-sweep-post-archive.out`（脚本 `t12-pointer-sweep.py`） | **PASS** |
+| AC-15 | 本 CHG **不改三个运行仓的任何运行时代码、配置或测试**；三仓相对开工基线的净增量只有 `skills/` 的分发副本，且 `sync_skills.py check` 绿 | T-12：三仓**工作区与开工基线逐条相同**——cloud `?? dump.rdb`（未跟踪、88 字节、mtime `2026-09-24 17:19:16`，早于本 CHG 一天）、agent 与 desktop 全空；三仓**已跟踪改动各 0 项**。本 CHG 期间三仓各只有**一个**提交，逐份核对文件清单与改动内容：cloud `0346edf`（`.claude/skills/common-architecture-review/SKILL.md` ＋ `.codex/skills/…`，各 1 行）、agent `24da21b`（同前，2 文件各 1 行）、desktop `623583d`（`common-architecture-review` ＋ `desktop-sidecar-update` 两侧副本，4 文件各 1 行；改动内容实测就是删掉 `description` 里的 `FFmpeg, `——即 T-08 的判定落到分发副本上），**全部只在 `.claude/skills/` 与 `.codex/skills/` 之下，无一处在运行时代码、配置或测试**。`sync_skills.py check` → `skill outputs are up to date` | **PASS** |
 
 ## 11. Evidence
 
@@ -389,7 +390,9 @@ Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期�
 - `evidence/task-08-ffmpeg-ownership.md`
 - `evidence/task-09-milestone-delivery-facts.md`
 - `evidence/task-10-tree-dead-pointer-execution-root.md`
-- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`、`t08-ffmpeg-ownership-sweep.py` ＋ `t08-sweep-head.out`／`t08-sweep-worktree.out`／`t08-sweep-positive-control.out`、`t09-stale-m3-sweep.out`／`t09-canonical-alignment.out`、`t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out` ＋ `t10-tree-entries-check.py`）
+- `evidence/task-11-spec-merge.md`
+- `evidence/task-12-close.md`（收尾：归档、两遍失效指针扫描、三仓对账、DONE Gate）
+- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`、`t08-ffmpeg-ownership-sweep.py` ＋ `t08-sweep-head.out`／`t08-sweep-worktree.out`／`t08-sweep-positive-control.out`、`t09-stale-m3-sweep.out`／`t09-canonical-alignment.out`、`t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out` ＋ `t10-tree-entries-check.py`、`t11-frontend-path-sweep.out`／`t11-source-root-check.out`／`t11-merge-loss-check.py`／`t11-merge-loss.out`／`t11-probe-check.py`／`t11-probe-check.out`／`t11-specs-index-check.py`／`t11-specs-index-check.out`、`t12-pointer-sweep.py` ＋ `t12-pointer-sweep-pre-archive.out`／`t12-pointer-sweep-post-archive.out`／`t12-frontend-path-resweep.py` ＋ `t12-frontend-path-resweep.out`／`t12-ffmpeg-resweep.out`／`t12-gate-readings.out`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
 **开工三仓基线**（T-01 记录，收尾按同一命令复测）：
@@ -407,17 +410,21 @@ $ git -C ../wt-media-desktop status --porcelain
 
 见同目录 `checkpoint.md`（本 CHG 起，活动状态以该文件为唯一落点）。
 
+**收尾读数的时序**（AC-13 的口径说明）：归档后先取一次读数（`artifacts/t12-gate-readings.out`），再把它写进 §10 的 AC-13／AC-14／AC-15 三行与 §13 的九项签字。此后本记录只被写入**本记录自身的措辞**，而门禁读的输入面是 `delivery/active/`、`LEDGER.md`、`MASTER`、`AGENT-INDEX.md`、两个入口文件、`config/`、`skills/`、`templates/`、`tests/`——**不含 `delivery/completed/`，也不含 `evidence/`**（`git grep -i checkpoint -- scripts/` 的唯一命中是 `verify_delivery_governance.py` 的 `is_file()`）。故这些写入不改变任何判据的读数。收尾另复跑一次核对，两次逐行相同。
+
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+九项逐项签字（2026-09-25）：
+
+- [x] **Scope completed.** §5 的 Add／Modify／Delete 全部落地；T-01…T-12 全部 `DONE`。§5 Explicitly Not Doing 的四条（不为里程碑文件头新增一致性判据、不把 `conventions` 并入 `AGENT-INDEX.md`、不引 Milestone、不改三个运行仓）**一条未犯**。
+- [x] **No blocking `Q-xx`.** §7 `Pending Questions` 为字面 `None.`；全程未新开 `Q-xx`——六处「计划与实测不符」都按计划原意就地改文档，无需回问用户（用户已授权「其余自行判断」）。
+- [x] **Acceptance matrix all PASS.** AC-01…AC-15 **全部 PASS**；AC-09 按权威面口径判 PASS 并写明判据为何必须收窄（见 §10）。
+- [x] **Automated tests passed or justified.** 六门禁 `exit=0`；`Ran 79 tests / OK`；`sync_skills.py check` → `skill outputs are up to date`。均在归档之后重测（`artifacts/t12-gate-readings.out`）。
+- [x] **Manual verification evidence recorded where required.** 本 CHG 全部判据都是**可重放的扫描**，每个都有原始输出落在 `evidence/artifacts/`，且每个方向都有阳性对照＋分母；无「只能目视」的验收项。
+- [x] **Diff checked for out-of-scope changes.** 十二个 Task 各自的 diff 只含该 Task 的文件；归档提交的 diff 只含记录搬迁、`LEDGER.md`、`MASTER` §3 词表读数、`.ai/CURRENT_CONTEXT.md`（生成物）。三仓各一个提交，只含生成副本。
+- [x] **Runtime repositories touched only if listed in scope.** §1 声明三仓「只被读、不被写」；实测三仓已跟踪改动各 0、工作区与开工基线逐条相同，唯一提交是 `skills/` 分发副本（机制要求）。见 AC-15。
+- [x] **Required baselines updated.** `MASTER` §3 词表读数按归档后口径刷新；`AGENT-INDEX.md`（读取顺序、状态词汇、提交约定）；`docs/engineering/specs/`（合并后的前端基线 ＋ 索引）；三处 ADR／里程碑／目录树／死指针均按实况就地改写，无一留下取代注记（用户政策）。
+- [x] **Affected repositories committed independently.** workspace 一仓十二个提交（一 Task 一提交：`0148c34`→`9e9bf39`→`fe79891`→`5022914`→`17bff0d`→`3e94444`→`42349ee`→`523895d`→`bf1dfb5`→`9e390b4`→`dd1688a`，T-12 为归档提交）；cloud `0346edf`、agent `24da21b`、desktop `623583d` 各自单独提交。（T-12 的提交 hash 无法写进本文——它提交的正是本文自身。）
 
 ## 14. 遗留（只登记，需独立 CHG 处置）
 
@@ -429,7 +436,7 @@ $ git -C ../wt-media-desktop status --porcelain
 | 4 | 架构文档 `_V1.md` **其余**未扫的陈旧点（该文的 FFmpeg 切片已由 T-08 扫过：24 行全部判给 Cloud 或为排除句） | 该文 2000+ 行，全篇审计会使本 CHG 范围失控 |
 | 5 | M0／M1 已 `DONE` 却仍留候选 CHG 块 | CHG-063 已登记 |
 | 6 | `LEDGER.md:21` 的「见上表」不可达 | CHG-062 遗留第 8 项；属 LEDGER 的历史叙述 |
-| 7 | `AGENT-INDEX.md:198` 曾把 `conventions §10` 定为「校验状态的唯一落点」，而 §10 承载的是易失读数 | **T-03 已取消该落点**（改为「校验读数不作文档落点」）；但「易失内容该不该有文档落点」这一机制尚无可机检的通用对策，登记 |
+| 7 | **「易失读数作文档落点」**：①`AGENT-INDEX.md:198` 曾把 `conventions §10` 定为「校验状态的唯一落点」，而 §10 承载的是易失读数；②**本 CHG 归档时现场证实的第二个实例**——`MASTER` §3 状态词汇表的**读数列**（活／归档各词计数、分母行），在这一 CHG 自己归档的**同一刻**就过期了（`IMPLEMENTING` 活 1→0、`DONE` 归档 28→29、活列 20→19、归档列 30→31、合计 38→39），T-12 已按归档后口径重测并就地刷新 | **T-03 已取消第①处落点**（改为「校验读数不作文档落点」）。第②处**不能照搬同一处置**：那张表的**词与含义**是规范（要留），只有**计数列**是读数（会漂）。已把「读数列是实测值」写进表头、并让分母行显式写出各目录的篇数，使漂移**可被复算**；但「每次归档都得手工回来改这几个数」这一机制仍无对策——**没有任何门禁读这几列**（`verify_product_master_alignment.py` 只读 §3 的 `\| 状态 \|` 字段，不读词表计数），所以它漏了不会红。要机检就得让门禁去数 `delivery/**/change.md` 的状态词并与表比对——会把这张表的每个格子变成契约值、且与 §5「不为里程碑文件头新增一致性判据」同一理由相悖，须独立裁定 |
 | 8 | B-6⑨ 余项：`docs/superpowers/`（23 篇中 21 篇无人引用）、`delivery/planned/` 的 **9** 个 `SUPERSEDED`（T-07 前为 8，023 由 `IN_PROGRESS` 改入）、`completed/CHG-20260916-052` 单条占归档 74%。**另有一类需用户裁定**：`045`／`046`／`047`／`048`／`049`／`050`／`051` 七份草案的状态词是 `DISCUSSION`、而 `planned/README.md` 的程序进度列写「已实施／暂停／已签收」——T-07 已把两个轴写成可分辨（§8.5），**但不改判这七份**：给未激活的草案补 `DONE`／`SUPERSEDED` 是治理口径裁定 | 属诊断 G-5／G-6，需独立 CHG 与用户裁定 |
 | 9 | `conventions §1`（6 条不变量）与 `§7` 开头同 `AGENT-INDEX.md` §2／§10 局部重叠：T-03 按用户裁定的保留清单**未去重** | 去重须先裁定「规范文件可否复述红线」，属用户取舍。本 CHG 只登记「落点未减」这一事实 |
 | 10 | `AGENT-INDEX.md` §4 作为读取顺序的**唯一**落点，**没有机检点**（`conventions` §9 耦表已如实登记「入口文件与 `MASTER` 不得再列清单」靠人工复核） | T-04 把落点降下来了，但「唯一」目前只由本 CHG 的一次性扫描证明。为它新增机检点会把 §4 的条目文本冻成契约（措辞一变就红），与 CHG-063 的判据分层结论相悖，须独立裁定 |

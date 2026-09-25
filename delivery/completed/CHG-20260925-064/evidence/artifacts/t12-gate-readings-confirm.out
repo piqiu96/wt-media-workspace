@@ -1,0 +1,17 @@
+=== T-12 收尾：记录定稿后复跑（生成于 2026-09-25 20:36:00） ===
+说明：本段是 T-12 记录正文（AC 表、DONE Gate、checkpoint）定稿之后的复跑，用于核对与 t12-gate-readings.out 逐行相同。
+      门禁不读 delivery/completed/ 与 evidence/，故此后只写入本记录措辞不改变任何读数。
+verify_m0_config: exit=0 | Workspace config verification ok
+verify_delivery_governance: exit=0 | Delivery governance verification ok. Active CHG: none
+verify_agent_entry: exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills: exit=0 | verified 10 skill source files
+verify_product_master_alignment: exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance: exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest: exit=0 | Ran 79 tests in 0.321s OK 
+sync_skills check: exit=0 | skill outputs are up to date
+
+--- 与 t12-gate-readings.out 的逐行比对（只比判据行，不比时间戳） ---
+唯一差异是 unittest 的耗时（in 0.286s → in 0.321s），属墙钟噪声；
+其余每一行逐字相同（六门禁文案＋exit 码、Ran 79 tests、sync_skills 文案）。
+比对命令：diff <(grep -E "^(verify_|unittest|sync_skills)" t12-gate-readings.out) \
+              <(grep -E "^(verify_|unittest|sync_skills)" t12-gate-readings-confirm.out)
