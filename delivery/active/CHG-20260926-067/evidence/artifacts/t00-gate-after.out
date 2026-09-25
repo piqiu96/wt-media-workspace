@@ -1,0 +1,35 @@
+# 六门禁 —— 激活后（取在 T-00 最后一次改动之后）
+# 取数时刻: 2026-09-25T17:41:12Z
+
+--- verify_delivery_governance.py  exit=0 ---
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-067
+
+--- verify_agent_entry.py  exit=0 ---
+execution snapshot: 2048 characters (~819 tokens, budget 8000 characters)
+rule-text duplication: compared 98 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+
+--- verify_skills.py  exit=0 ---
+verified 10 skill source files
+
+--- verify_m0_config.py  exit=0 ---
+Workspace config verification ok
+
+--- verify_product_master_alignment.py  exit=0 ---
+Product and Master Plan alignment verification ok
+
+--- verify_m2_acceptance.py  exit=0 ---
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+--- sync_skills.py check ---
+skill outputs are up to date
+exit=0
+
+--- unittest discover ---
+----------------------------------------------------------------------
+Ran 100 tests in 0.567s
+
+OK

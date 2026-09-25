@@ -1,0 +1,15 @@
+# T-00 记录体量（界：change.md 5,120 B／Task；evidence 9,216 B／Task —— 沿用 CHG-065/066 的 v5 判据）
+# 取数时刻: 2026-09-25T17:41:07Z
+
+delivery/active/CHG-20260926-067/change.md                      24095 B
+delivery/active/CHG-20260926-067/checkpoint.md                   3720 B
+delivery/active/CHG-20260926-067/evidence/task-00-activation.md     5281 B
+
+--- 归档区同类记录体量（参考基线，不当作上限） ---
+CHG-20260925-066/change.md（收尾时）                                 40284 B
+CHG-20260925-065/change.md（收尾时）                                 47422 B
+
+--- 判据 ---
+change.md 增量 =    24095 B，界 5120 → 越界 +370%
+evidence  增量 =     5281 B，界 9216 → 界内
+注: T-00 是激活 Task，change.md 一次性写完整份计划——同 CHG-066 §14 第 4 项的结构性越界，照报不改界。

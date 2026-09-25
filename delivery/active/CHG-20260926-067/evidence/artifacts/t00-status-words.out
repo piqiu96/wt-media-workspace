@@ -1,0 +1,24 @@
+# MASTER §3 状态词读数 —— 激活前
+# 取数时刻: 2026-09-25T17:38:30Z
+
+量法: 直接 import 门禁 verify_product_master_alignment.status_word()
+STATUS_LINE_RE: ^(?:- Status:|> 状态[：:])\s*(.+?)\s*$
+
+--- 活记录 planned: 19 篇 (glob=delivery/planned/*/change.md) ---
+  DISCUSSION: 7
+  PLANNED: 3
+  SUPERSEDED: 9
+
+--- 活记录 active: 0 篇 (glob=delivery/active/*/change.md) ---
+
+--- 归档记录: 41 篇 (glob=delivery/completed/*/change.md) ---
+  CLOSED: 2
+  DONE: 31
+  HANDOFF: 2
+  IMPLEMENTING: 1
+  IN_PROGRESS: 4
+  VERIFYING: 1
+
+活记录合计 = 19
+归档记录合计 = 41
+归档列（不含退役词 CLOSED/HANDOFF/IN_PROGRESS/ACTIVE/TODO/IMPLEMENTED/VERIFIED） = 33

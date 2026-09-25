@@ -1,0 +1,98 @@
+# 四仓脚本层清点 —— 开工前
+# 取数时刻: 2026-09-25T17:38:11Z
+# 取数方式: git ls-files（只看得见已跟踪/已暂存文件）
+
+=== wt-media-workspace ===
+scripts/ 已跟踪文件数: 18
+scripts/agent_config.py
+scripts/build-desktop.sh
+scripts/init-agent-entry.sh
+scripts/local-control.sh
+scripts/m2b-local-acceptance.sh
+scripts/m2b_local_acceptance.py
+scripts/prepare_ai_workspace.py
+scripts/sync_skills.py
+scripts/test-local-control.sh
+scripts/verify_agent_entry.py
+scripts/verify_delivery_governance.py
+scripts/verify_m0_config.py
+scripts/verify_m0_local.sh
+scripts/verify_m1_integration.py
+scripts/verify_m2_acceptance.py
+scripts/verify_m3_acceptance.py
+scripts/verify_product_master_alignment.py
+scripts/verify_skills.py
+--- bin/ 存在性 ---
+bin/ absent
+--- git check-ignore 探针 ---
+bin/control.sh NOT ignored
+--- .gitignore 中与 bin 相关的行 ---
+(none)
+
+=== wt-media-cloud ===
+scripts/ 已跟踪文件数: 10
+scripts/README.md
+scripts/bootstrap.sh
+scripts/build.sh
+scripts/health.sh
+scripts/local-env.sh
+scripts/migrate.sh
+scripts/start.sh
+scripts/stop.sh
+scripts/test.sh
+scripts/verify-health.sh
+--- bin/ 存在性 ---
+bin/ absent
+--- git check-ignore 探针 ---
+.gitignore:3:bin/	bin/control.sh
+--- .gitignore 中与 bin 相关的行 ---
+.gitignore:3:bin/
+
+=== wt-media-agent ===
+scripts/ 已跟踪文件数: 10
+scripts/README.md
+scripts/bootstrap.sh
+scripts/build.sh
+scripts/build_desktop_sidecar.py
+scripts/health.sh
+scripts/migrate-storage.sh
+scripts/start-health.sh
+scripts/stop-health.sh
+scripts/test.sh
+scripts/verify-health.sh
+--- bin/ 存在性 ---
+bin/ absent
+--- git check-ignore 探针 ---
+bin/control.sh NOT ignored
+--- .gitignore 中与 bin 相关的行 ---
+(none)
+
+=== wt-media-desktop ===
+scripts/ 已跟踪文件数: 20
+scripts/README.md
+scripts/bootstrap.sh
+scripts/build-release-macos.sh
+scripts/build.sh
+scripts/dev.sh
+scripts/health-check.mjs
+scripts/health-dev.mjs
+scripts/health.sh
+scripts/package-release-macos.sh
+scripts/prepare-release-sidecar.sh
+scripts/release-versions.sh
+scripts/repair-macos-signing.sh
+scripts/stage-release-config.sh
+scripts/start-dev.mjs
+scripts/start.sh
+scripts/stop-dev.mjs
+scripts/stop.sh
+scripts/test.sh
+scripts/verify-real-scripts.mjs
+scripts/verify-release-macos.sh
+--- bin/ 存在性 ---
+bin/ absent
+--- git check-ignore 探针 ---
+bin/control.sh NOT ignored
+--- .gitignore 中与 bin 相关的行 ---
+(none)
+

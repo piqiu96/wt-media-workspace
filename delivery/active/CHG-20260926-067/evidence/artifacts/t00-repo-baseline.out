@@ -1,0 +1,30 @@
+# 四仓基线 —— 激活前
+# 取数时刻: 2026-09-25T17:38:05Z
+
+=== wt-media-workspace ===
+HEAD: 71fd32f
+branch: main
+--- git status --porcelain ---
+?? delivery/active/CHG-20260926-067/
+--- (end) ---
+
+=== wt-media-cloud ===
+HEAD: 0db02ab
+branch: main
+--- git status --porcelain ---
+?? dump.rdb
+--- (end) ---
+
+=== wt-media-agent ===
+HEAD: 6d740fc
+branch: main
+--- git status --porcelain ---
+ M AGENT-INDEX.md
+--- (end) ---
+
+=== wt-media-desktop ===
+HEAD: 7c1b0ad
+branch: main
+--- git status --porcelain ---
+--- (end) ---
+
