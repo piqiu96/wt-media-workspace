@@ -1,0 +1,29 @@
+### T-11 判据 B：前端源码根存在性
+（同一脚本同时输出 EXISTS 与 ABSENT，说明它不是恒报一种结果）
+
+  EXISTS  ../wt-media-cloud/web
+  ABSENT  ../wt-media-cloud/frontend
+  EXISTS  ../wt-media-cloud/cmd
+  EXISTS  ../wt-media-cloud/pkg
+
+--- 决定性证据：web 下的实测清单 ---
+  README.md
+  dist
+  dist-cloud
+  index.cloud.html
+  index.desktop.html
+  index.html
+  node_modules
+  package-lock.json
+  package.json
+  public
+  src
+  vite.config.cloud.js
+  vite.config.desktop.js
+  vite.config.js
+
+--- web/dist 是否被跟踪（顺带核实：它是 ignore 的构建产物，不是治理问题） ---
+  git -C ../wt-media-cloud ls-files web/dist -> 0 个文件
+  .gitignore:5:web/dist/
+  .gitignore:6:web/dist-cloud/
+  .gitignore:7:web/dist-desktop/

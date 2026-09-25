@@ -1,0 +1,24 @@
+### T-11 判据 A：前端源码根路径与旧名清空（工作区 vs HEAD 阳性对照）
+生成于 2026-09-25 20:30:17；口径：git grep -nE，'.' 全仓（含未跟踪? 否——git grep 只扫已跟踪文件）
+
+--- A1 逐模式计数（工作区全仓 / 工作区 docs\/ 下 / HEAD 全仓阳性对照） ---
+模式                       ws全仓  ws/docs HEAD全仓
+wt-media-cloud/frontend             9        0       11
+cloud/frontend                      9        0       11
+pnpm                                7        0        7
+dist-web                            5        0        3
+build:web                           5        0        5
+dev:web                             5        0        2
+frontendCommit                      5        0        2
+localhost:5173                      3        0        2
+
+--- A2 七模式合并后，余命中落在哪些文件（工作区全仓） ---
+   9 delivery/active/CHG-20260925-064/change.md
+   5 delivery/active/CHG-20260925-064/checkpoint.md
+  合计行数: 14
+  docs/ 下: 0
+
+--- A3 同一模式的阳性对照（读 HEAD 全仓），落到哪些文件 ---
+  27 HEAD
+  合计行数: 27
+  其中 docs/ 下: 22

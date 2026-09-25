@@ -28,14 +28,16 @@
 
 - **T-10 目录树、死指针与执行根入口描述**：四组判据都带阳性对照。①**目录树**：脚本 `t10-tree-entries-check.py` 解析 MASTER §2／arch §3.1／A.1／A.2 四棵树的每个条目、按树根选基址后逐条判存在——**实际核对 94 条，缺失 0**；阳性对照每棵树注入 1 个必然不存在的条目，**注入 4 报 4**。**这个脚本自己先红过两次**（首轮根名多拼一个斜杠 → 四棵树全落进「未知根，跳过整棵树」并报 0；次轮没剥掉路径里的树根名 → 连 `wt-media-cloud` 都报 MISS），两次都是**脚本拒绝出结论**，修好后才有那个 0。②**死指针**：反引号字面 `` `../docs` ``（执行根的 `docs/`）改前 **3 → 0**、`垃圾桶` **1 → 0**、`docs/视觉` **3 → 2**（余下 2 处是本记录与 2026-07 历史归档的过去时叙述，判留）；三处的阳性对照都是读 `HEAD` 报出同样的数。**第一遍模式抄宽了**：`\.\./docs` 把 `delivery/*` 指向本仓 docs/ 的合法相对链接 `../../docs/product/…` 也算进去，得 9 条假命中，**该模式对目标没有判别力**，换掉后才有效。③**执行根入口描述**：实际勘定四个候选文件的分布——`AGENTS.md`／`CLAUDE.md` 执行根**无**、三仓各有；`.skill-sync.lock.json` 三仓各有、执行根与 workspace 仓都**无**；`wt-media.code-workspace` **只有执行根有**。架构文档 7 处按实况改写，§3.10 的启动流程由 5 步（含「生成根 `AGENTS.md` 和 `CLAUDE.md`」「生成 `wt-media.code-workspace`」「写入同步 Lock」「校验 Hash」）收敛为实际的两段式；`根 \`AGENTS.md\`` 活文件命中 **0**（阳性对照读 `HEAD` 报 1）。**三仓各自的树一律不动**（那些条目实测存在）。④**两处计划外落点**：`README.md:48` 与 `AGENT-INDEX.md:58` 的反引号 `` `../docs` `` 与本 Task 要修的 `docs/README.md:14` 逐字同义，一并收口。**计划落点 `conventions:18-20` 已是 verify-only**（T-03 已改，本 Task 只复测）。改动面 7 文件、`+28/-46`；快照重生成只有 `Generated:` 时间戳一行不同（已还原，不带噪声进提交）。新登记 §14 第 17／18 项：`wt-media.code-workspace` 无生成器；`.skill-sync.lock.json` 三仓各有一份却无任何脚本读写（分母 48 文件净 0 命中，阳性对照读全仓 14 命中）。
 
+- **T-11 前端源码根 ＋ 两篇视觉规范合并**：先出逐节清单（存活件 28 节、待并入件 24 节，各判为视觉／架构／功能），再合并。**判据 A**：`wt-media-cloud/frontend` 在 `docs/` 下 **8 → 0**（全仓工作区余命中落在**恰好两个文件**——`change.md` 9 行、`checkpoint.md` 5 行，都是本 CHG 自己的记录，属过去时叙述；阳性对照读 `HEAD` 报全仓 11／`docs/` 8）。**判据 B**：同一脚本同时报出 `EXISTS ../wt-media-cloud/web` 与 `ABSENT ../wt-media-cloud/frontend`，故那个 ABSENT 不是空转。**判据 C**：源取 `git show HEAD:<v2>`（合并后工作区已无该文件），v2 的 541 行非空非标题行里 **514 行在合并件中逐字命中、27 行未命中**——27 条逐条判过，**无一条是丢规则**（7 条是「列表变段落」，10 条是引导句／措辞改写，1 条是节号由「第 2 章」变「第 3.3 节」，3 条是 §2.6 与 §17 两份同义清单合并后取其一，5 条是 §3.3 五色清单并进 §3.5.3 唯一一张表，1 条是 §9.2 抽屉分区改为指向 §4.2.4）；另有 103 条「必须保留」＋ 35 条「必须删除」的双向探针，**实测 0 失败**，两个方向各带 1 条注入阳性对照。**首轮跑出的 4 条 MISS 是脚本自己的假阳性**（引号体／`**` 强调标记插在短语中间／行尾标点／全角斜杠），修正归一化后 25 → 21，再经自查去重成 27；**方向二首轮报出 1 条真失败**——我写「无 pnpm／yarn lock」时**用了被禁的词去说明它不存在**，探针无法与违规区分，改为「包管理器为 npm…」后归零。**自查又咬出合并自己造的三处重复落点**（正是本 CHG 要处置的那类问题）：§3.5.3 与 §3.8.4 两张颜色语义表且「蓝色」含义冲突 → 合成唯一一张；§4.1 与 §4.2.1 两套列表页结构 → 后者指向前者；§4.4.2 与 §4.2.4 两份抽屉分区 → 以后者为唯一落点。**计划与实测不符处**：计划写「`frontendDist`／`beforeDevCommand`／`frontendCommit` 是字段名／脚本名，不得改」——实测前两个是真字段（`tauri.conf.json`），**`frontendCommit` 是假的**，它只存在于本文那段示例 JSON 里（`HEAD:407`），真实键是 `frontend-build.json` 的 `source_commit`、发布键是 `release-versions.sh` 写出的 `frontend_build_version`；按原意把示例改成实测形态。**判据 D**：索引 4 条 ↔ 目录 4 篇双向一致，各带 1 条注入阳性对照，8 次判定 0 失败（改前只列 1 篇）。删除前先确认全仓只有本 CHG 的记录引用它（工作区 2 命中＝HEAD 2 命中），故删除不产生死指针。合并件 **1728 行／42,821 B**（两篇原合计 **2103 行／44,390 B**，净减 **375 行／1,569 B**）——此处是**最后一次改动之后**的实测，非中间读数。
+
 ## Current
 
-- T-10 已落。下一个是 T-11（前端源码根 ＋ 两篇视觉规范合并），随后 T-12 收尾。
+- T-11 已落。只剩 T-12 收尾。
 
 ## Next
 
-1. **T-11**：前端源码根 ＋ 两篇视觉规范合并（先出逐节清单；`web-desktop-visual-system.md` 存活、去功能描述；`frontendDist`／`beforeDevCommand`／`frontendCommit` 不得改）。
-2. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描；并按 AC-15 与开工基线对账三仓（只应多出 `skills/` 分发副本）。
+1. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描；并按 AC-15 与开工基线对账三仓（只应多出 `skills/` 分发副本）。
+   - 归档后那 **14 行**余命中（`change.md` 9 ＋ `checkpoint.md` 5）会随本 CHG 记录进 `completed/`；`artifacts/t11-*.out` 入库后会再加一批（它们逐字含这些模式，且 `git grep` 只扫已跟踪文件，故当前读数不含）。**届时要按归档后口径复测**，判据仍是 `docs/` 下 0。
 
 ## Blocked
 
@@ -76,6 +78,17 @@
 | 执行根入口文件描述（T-10） | `根 \`AGENTS.md\`` 活文件 **0**；阳性对照读 `HEAD` 版架构文档报 **1** |
 | 无脚本读写 `.skill-sync.lock.json`／`wt-media.code-workspace`（T-10，分母 `scripts/ tests/ config/ skills/ templates/` 共 48 文件） | 净 **0**（唯一 1 条是 `m2b_local_acceptance.py:361` 注释）；阳性对照读全仓 **14** |
 
-取数时间与逐次读数见 `evidence/artifacts/t10-gate-readings.out`——该文件**逐段追加，每段段首都有取数时间**；各段读数除 `unittest` 耗时外**逐行相同**。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①各段记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故末段正文的措辞不影响任何判据。T-10 的原始输出见 `evidence/artifacts/t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out`（＋脚本 `t10-tree-entries-check.py`）；逐条明细见 `evidence/task-10-tree-dead-pointer-execution-root.md`。T-09／T-08 的对应产物为 `t09-*`／`t08-*`。
+| `wt-media-cloud/frontend`（T-11，分母 = 全仓已跟踪文件） | `docs/` 下 **8 → 0**；全仓工作区余命中**落在恰好 2 个文件**：`change.md` 9 行、`checkpoint.md` 5 行——都是本 CHG 自己的记录（阳性对照读 `HEAD` 报 11，其中 `docs/` 8） |
+| 同批六个旧名（T-11，`docs/` 下 · 全仓 · `HEAD`） | `pnpm` 0·7·7、`dist-web` 0·5·3、`build:web` 0·5·5、`dev:web` 0·5·2、`frontendCommit` 0·5·2、`localhost:5173` 0·3·2——七模式合并余命中 14 行全在本记录；`HEAD` 的 27 行里 22 行在 `docs/` 下（阳性对照有判别力） |
+| 余命中为何从 8 涨到 14（T-11，自查记录） | 收尾时在本记录里写出了这些旧名本身（改写清单与去重说明），属过去时叙述；`docs/` 下始终 **0**。`git grep` 只扫已跟踪文件，故不含尚未入库的 `t11-*.out`——归档后按归档口径复测 |
+| 前端源码根存在性（T-11 阳性对照） | 同一脚本报 `EXISTS ../wt-media-cloud/web` 且 `ABSENT ../wt-media-cloud/frontend`，两种结果都出现 |
+| v2 → 合并件逐行留存量（T-11，分母 541 行） | 命中 **514**／未命中 **27**；注入 2 条必然不存在的行 **全部报 MISS**；27 条逐条判为措辞／节号／列表变段落／自查去重，无一条丢规则 |
+| 双向探针（T-11） | 必保留 **103** 条失败 **0**、必删除 **35** 条失败 **0**；两个方向各注入 1 条必然违反的，**均报 FAIL** |
+| `specs/README.md` 索引一致性（T-11） | 索引 **4** 条 ↔ 目录 **4** 篇，双向 0 失败（8 次判定）；两向各注入 1 条，均报 FAIL（改前只列 **1** 篇） |
+| 删除前该文件是否被别处引用（T-11） | 工作区 **2** 命中 ＝ `HEAD` **2** 命中，且**两条都在本 CHG 的 `change.md` 里** ⇒ 删除不产生死指针 |
 
-早先几版读数（`t06-`、`t07-`、`t08-`、`t09-gate-readings.out`）均已被后续 Task **覆盖**：每个 Task 都改了门禁读入的文档，那些数字不再是关闭值。但各版的**判据行逐行相同**（T-08～T-10 只改文档文本，不碰任何判据的输入面，`unittest` 仍 79）。
+取数时间与逐次读数见 `evidence/artifacts/t11-gate-readings.out`——本 Task 只有**一段**收盘读数（段首带生成时刻），因为它的**每一行都在最后一次改动之后**取。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①各段的读数记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故本段正文的措辞不影响任何判据。
+
+T-11 的原始输出：`evidence/artifacts/t11-frontend-path-sweep.out`（判据 A）、`t11-source-root-check.out`（判据 B）、`t11-merge-loss.out`（判据 C1）、`t11-probe-check.out`（判据 C2）、`t11-specs-index-check.out`（判据 D）；脚本 `t11-merge-loss-check.py`／`t11-probe-check.py`／`t11-specs-index-check.py`；逐条明细见 `evidence/task-11-spec-merge.md`。T-10 的对应产物为 `t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out`（＋脚本 `t10-tree-entries-check.py`）与 `evidence/task-10-tree-dead-pointer-execution-root.md`；T-09／T-08 为 `t09-*`／`t08-*`。
+
+早先几版读数（`t06-`～`t10-gate-readings.out`）均已被后续 Task **覆盖**：每个 Task 都改了门禁读入的文档，那些数字不再是关闭值。但各版的**判据行逐行相同**（T-08～T-11 只改文档文本，不碰任何判据的输入面，`unittest` 仍 79）。
