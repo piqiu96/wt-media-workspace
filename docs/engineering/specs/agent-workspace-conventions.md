@@ -2,13 +2,13 @@
 
 本规范描述 WT Media 多仓库在 AI Agent（Claude Code、Codex 等）协作下的入口、上下文加载与校验约定。它补充 `AGENT-INDEX.md` 第 10 节「Agent 入口与执行快照」，并把散落在脚本与 skill 中的隐含约束显式化。
 
-更新：2026-09-25（精简：删除一次性读数与历史叙述，读数改由实跑给出；父层一节按执行根现状改写。规则本身不变）。
+更新：2026-09-25（§1 把「规则正文归口」由治理仓推广到四仓——运行仓各长出一份正文副本正是这条不变量原先只管治理仓的结果；§3 由「并列两条性质」改写为完整的入口文件**形态**规定：角色与边界表、指针文件三条机检、重复的判别句「只允许生成物 ← 其唯一生成器」、运行仓八节模板；§9 新增五行强制点并去掉两处「无强制」；§10 退役 `check_entry_drift` 的恒空登记、改写已知限制；§11 补两条禁止项。载体 CHG-20260925-065）。
 
 ## 1. 不变量
 
 1. `wt-media-workspace` 是治理中心与唯一事实源，不是代码执行中心，也永远不能成为运行时依赖。
-2. 每个工程仓库自治：自己维护 `AGENTS.md`、`CLAUDE.md`、`AGENT-INDEX.md`。
-3. 治理规范正文归口 `AGENT-INDEX.md`；`AGENTS.md` 与 `CLAUDE.md` 只声明权威源与最小硬约束，不复制正文。
+2. 每个工程仓库自治：自己维护 `AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`、`DIRECTORY_MAP.md`（四者的角色见 §3）。
+3. **规则正文归口 `AGENT-INDEX.md`**——治理仓归的是治理规范正文，运行仓归的是本仓规则正文（`## 本仓规则`）。`AGENTS.md` 与 `CLAUDE.md` 只声明权威源与最小硬约束，**不复制正文**。这条不变量原先只写在治理仓上，运行仓因此各自长出了一份正文副本（`wt-media-cloud` 的两个入口文件就是同一套规则的两份互相矛盾且都已过期的副本，见 §3 末）；本版把它**推广到四仓**，不再是治理仓专用。
 4. 执行状态快照全项目**只有一份**，位于 `wt-media-workspace/.ai/CURRENT_CONTEXT.md`。
 5. 关联工程路径以 `config/repository-map.yaml` 为准，脚本与文档不得另行硬编码，也不得与之漂移。
 6. 运行时改动只发生在对应工程仓库；治理仓库不存放业务代码、构建产物或临时文件。
@@ -25,13 +25,46 @@
 
 不变量是「**不新增更多中间层**」，而不是「父层不得存在」。父层允许存在容器与分发产物，**不允许**存在第二份执行状态快照或任何治理事实源。
 
-## 3. 入口文件
+## 3. 入口文件形态
 
-入口文件清单、角色与强制项见 `AGENT-INDEX.md` 第 10 节「入口文件」（本节不重复该表）。此处只登记两条该表不表达的性质：
+强制项清单见 `AGENT-INDEX.md` 第 10 节「入口文件」（本节不重复该表）。此处规定该表**不表达**的部分：每类文件装什么、不装什么，以及这些性质怎样被机检。
 
-`AGENTS.md` 与 `CLAUDE.md` 是**平级入口**，不允许互相软链或互相替代。
+### 角色与边界
 
-平级不等于内容可以矛盾。当两者的规则冲突时，Agent 会按 Harness 各自加载到不同结论——**这是本规范最需要防守的失败模式**。工程仓库中若把 `CLAUDE.md` 写成 `AGENTS.md` 的过期副本，即属违规；正确做法是两者各自独立、内容一致、或由 `CLAUDE.md` 明确声明权威源并**不重复**内容。`wt-media-workspace` 采用第三种做法：规范正文只存在于 `AGENT-INDEX.md`，两个入口文件都指向它并声明其权威性。
+| 文件 | 装什么 | **不装什么** |
+|---|---|---|
+| `AGENT-INDEX.md` | 该仓**全部正式内容**的唯一落点（见下「两个角色」） | 目录树（→ `DIRECTORY_MAP.md`）；禁止扫描区清单（→ `DIRECTORY_MAP.md`）；工作区红线正文；他仓路由 |
+| `AGENTS.md` | 一行身份 ＋ 机读键 ＋ `## 权威源` 段（2–4 行，指向 `AGENT-INDEX.md` 与工作区 §2／§4） | **任何规则句**；目录清单；读取顺序清单；工作区红线 |
+| `CLAUDE.md` | 同 `AGENTS.md`（措辞按各自 Harness 的实况） | 同上 |
+| `DIRECTORY_MAP.md` | 分区目录树＋路径／职责／何时进入；**禁止扫描区及理由** | 规则、理由、未来规划、需求路由表 |
+| `README.md` | 职责、构建／测试／运行命令、人向目录概览 | 读取顺序、红线、`## Rules` 式禁令段——**它不得成为任何 Agent 援引的权威** |
+
+`AGENT-INDEX.md` 在四仓**同名两角色**，这是有意的：治理仓是治理规范正文，运行仓是三层索引（读工作区 §4 第 8 项）。运行仓的该文件**八节同序**：依赖 / 定位 / 本仓库拥有 / 本仓库不拥有 / 需求路由 / **本仓规则** / 禁止 / **本仓内加载顺序**。治理仓**豁免**八节检查——它的结构由 `AGENT-INDEX.md` 自己规定。
+
+`DIRECTORY_MAP.md` 是唯一被允许携带一类规则的导航文件（禁止扫描区），因为**排除项本身就是目录事实**，而探索者正是在这个文件里找它。这是**有界例外**，写在规范里正是为了让它可判、而不是模糊。
+
+### 指针文件的机检定义
+
+`AGENTS.md` 与 `CLAUDE.md` 是**指针**。三条 ERROR，逐条都能被变异点亮：
+
+1. **正文声明**：含且只含一行机读键 ``- 正文：`AGENT-INDEX.md` ``，且该目标在本仓存在、不是自身；同仓各指针声明的正文必须**同一**，且正文不再声明正文（杀 `A→B, B→A` 环）。
+2. **规则词判据**：**任何命中规则词的行，同一行内必须出现正文文件名**。这是「指针的指令」与「被复述的规则」的判别式——`必须先读 AGENT-INDEX.md` 是合法指针，`不创建 internal/runtime` 是复述的规则。
+3. **指针预算**：H2 ≤ 1 且文本属白名单（`权威源`）；行数 ≤ 30；字节 ≤ 2000。预算定在治理仓参照件（1755 B / 28 行）之上，余量留给措辞。
+
+### 重复何时合法
+
+**重复只在一个生成物与它唯一具名的生成器之间存在。** 这是把「像不像重复」变成可判问题的唯一判别句：
+
+- 合法的两种：`.ai/CURRENT_CONTEXT.md` 的读取顺序（生成器 `prepare_ai_workspace.py::build_context` 的 `reading_order` 常量）与它的 Stable Ownership Boundaries 块；`skills/<group>/<name>/SKILL.md` 与 `sync_skills.py` 分发出的副本。**排除在比较集之外，按构造即成立。**
+- 其余任何重复都是缺陷：一侧不是生成物，那就有一侧必须死。
+
+`verify_agent_entry.py` 的重复检查（WARN）按此比较各仓的规则承载文件，并**打印分母**（比较了多少条规则句 / 多少文件 / 多少仓）——0 命中不附分母就是「绿得没有证据」。
+
+### 为什么是两个指针
+
+Claude Code 原生只加载 `CLAUDE.md`；Codex 侧只读 `AGENTS.md`。**两个 Harness 各读一个文件，所以两个指针是必需的**——重复从来不出在「有两个入口」，只出在「正文被写了两遍」。平级不等于内容可以矛盾：当两者的规则冲突时，Agent 会按各自的 Harness 加载到不同结论——**这是本规范最需要防守的失败模式**。工程仓库中若把 `CLAUDE.md` 写成 `AGENTS.md` 的过期副本，即属**违规**（`wt-media-cloud` 在 CHG-20260925-065 之前正是此态）。
+
+**不用 `@` 导入实现指针**：它与「四仓同一形态」不能同时成立，每个会话白付 3–4k est. tokens，且导入在子代理里不展开——主会话与子代理行为不一致，比纯指针更不可预测。指针的确定性来自「正文就是会话本来要读的那个文件」，不来自 Harness 的导入。
 
 ## 4. CURRENT_CONTEXT 契约
 
@@ -97,8 +130,11 @@
 | 仓库路径 | `config/repository-map.yaml` | `init-agent-entry.sh::map_path`、`agent_config.py::read_section` | `verify_agent_entry.py` 双向强制与 `skills-distribution.yaml` 一致 |
 | 分发目标 | `config/skills-distribution.yaml` | `sync_skills.py::load_targets`（唯一消费方）、`verify_agent_entry.py::check_config_agreement` | 改目标只改 yaml；代码里不得再出现目标清单 |
 | 配置文件语法 | `scripts/agent_config.py` | `sync_skills.py`、`verify_agent_entry.py` 均 import 它 | 语法放宽必须同时改 `tests/test_agent_config.py` |
-| 规范正文归口 | `wt-media-workspace/AGENT-INDEX.md` | 无强制（`verify_agent_entry.py` 只强制入口文件存在性） | 改治理规范只改 `AGENT-INDEX.md`；`AGENTS.md` / `CLAUDE.md` 只保留指针，指针漂移靠人工复核 |
-| 入口文件平级 | 各仓 `AGENTS.md` / `CLAUDE.md` | 无强制 | `verify_agent_entry.py` 的漂移检查产出 WARN 供人工复核 |
+| 规则正文归口 | 各仓 `AGENT-INDEX.md`（治理仓＝治理规范正文；运行仓＝本仓索引 ＋ `## 本仓规则`） | `verify_agent_entry.py::check_pointer_shape`（ERROR：机读键／规则词判据／指针预算）、`::check_rule_body_consistency`（ERROR：正文同一且无环） | 改规则只改该仓 `AGENT-INDEX.md`；两个入口文件只保留指针。§3 是本条的唯一落点 |
+| 入口文件存在性 | 四类入口文件 | `verify_agent_entry.py::check_entry_files`（ERROR：治理仓三件＋快照）、`::check_repo_entry_files`（ERROR：运行仓四件皆存在且非空） | 新增一类入口文件必须同时改 §3／`AGENT-INDEX.md` §10 表与本检查 |
+| 入口文件形态 | 运行仓 `AGENT-INDEX.md` 八节同序 | `verify_agent_entry.py::check_layer3_shape`（ERROR：三仓 H2 序列互相相等且长度为 8） | 改节名或增删节必须**同时改三仓**；单仓自行改节即 ERROR。治理仓豁免（同名两角色，见 §3） |
+| 本仓内加载顺序 | 各仓 `AGENT-INDEX.md` | `verify_agent_entry.py::check_local_order_scope`（WARN：不得出现 `CURRENT_CONTEXT`／`LEDGER.md`／`delivery/`） | 该节只写本仓内顺序；跨仓顺序的唯一落点是 `AGENT-INDEX.md` §4 |
+| 规则句重复 | 各仓 `AGENT-INDEX.md`／`DIRECTORY_MAP.md`／`README.md` | `verify_agent_entry.py::check_rule_text_duplication`（WARN，打印分母） | 重复只允许「生成物 ← 其唯一具名的生成器」（§3）；其余重复要删掉一侧 |
 | 读取顺序 | `AGENT-INDEX.md` §4 | `prepare_ai_workspace.py::build_context` 的 `reading_order` 常量（生成物镜像）；`AGENTS.md`／`CLAUDE.md`／`MASTER` §5 只留指针 | 改 §4 必须同步该常量并重生成快照；反之亦然。入口文件与 `MASTER` **不得**再列清单 |
 | active 记录成对 | `AGENT-INDEX.md` §8「至少包含 `change.md` 与 `checkpoint.md`」 | `verify_delivery_governance.py::validate_delivery_governance`（active 目录缺 `checkpoint.md` 即报错）；`templates/delivery/checkpoint.md`；`skills/workspace/executing-wt-media-change/SKILL.md` 的 Checkpoints 节 | 改「active 目录至少包含哪些文件」必须同步该检查与模板；checkpoint 的内容**只写 `checkpoint.md`**，不得回写进 `change.md` §12 |
 | CHG 状态词 | `MASTER` §3「状态词汇」 | `verify_product_master_alignment.py::validate_active_change` 的接受集 `{IMPLEMENTING, VERIFYING}` 与 `:292` 文案；`templates/delivery/change.md` 的 `- Status:` | 改 §3 中**可处于 `delivery/active/`** 的词必须同步该接受集；该接受集只收这两个词，`DISCUSSION`／`PLANNED` 属 `planned/`，`DONE`／`SUPERSEDED` 是终态 |
@@ -141,11 +177,14 @@ MASTER 的 `候选 CHG：` 块是**未关闭**里程碑的字段。里程碑转 
 
 ### 已知限制（机制，不是读数）
 
-`verify_agent_entry.py::check_entry_drift` 只从各仓 **`AGENTS.md`** 取「被禁止的路径词」，而本仓红线正文在 `AGENT-INDEX.md`、`AGENTS.md` 是薄入口，且 `DRIFT_TOKEN_RE` 要求首段之后的每一段都不含点号 ⇒ **本仓的 forbidden 集合恒为空集**，它那条「0」是**结构性**的，不是「无漂移」的证据。三个工程仓不受此影响。**属既有实现缺口，需独立 CHG**（`CHG-20260925-063` §14）。规则不变：漂移只检测、报告，修正由各仓自行决定（§11）。
+入口形态判据只抓**结构性外溢**：①写在 `## 权威源` 段内的**散文式**规则不被抓；②`AGENT-INDEX.md` 与 `AGENTS.md` 之间的**语义**矛盾不被抓——机检得到的是行级重复（WARN）与结构判据，**不宣称更多**。跨仓源码字面量同理不作判据（见上「判据的稳定性分层」）。
+
+`CHG-20260925-063` §14 登记的 `check_entry_drift` 恒空问题已由本版**退役该检查**收口（原先四条臂中，治理仓那条结构性恒空，其余三臂在本版形态落地后也恒空——指针文件不承载路径事实）。它原有的意图由 `check_pointer_shape` 以更强的 ERROR 级判据顶替。规则不变：形态违规只检测、报告，修正由各仓自行决定（§11）。
 
 ## 11. 明确不做
 
 - 不引入 RAG 知识库、自动知识图谱、Agent 调度平台、自动代码路由系统；
 - 不引入第二套任务管理系统；
 - 不为 `templates/` 建立模板渲染框架；
-- 不以脚本自动改写运行时仓库的 `AGENTS.md` / `CLAUDE.md`：漂移只检测、报告，修正由各仓自行决定。
+- 不以脚本自动改写运行时仓库的入口文件（`AGENT-INDEX.md` / `AGENTS.md` / `CLAUDE.md` / `DIRECTORY_MAP.md`）：形态违规只检测、报告，修正由各仓自行决定。`scripts/init-agent-entry.sh` 只做「从零初始化」且**永不覆盖已有文件**，**不得加 `--fix`**；
+- 不把 Workspace 的规则**内容**覆盖到运行仓上——Workspace 只提供**形态**（文件角色、机检点、生成器），**内容**由各仓自治（`docs/engineering/architecture/…_V1.md:769`）。

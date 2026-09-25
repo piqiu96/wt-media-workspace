@@ -59,7 +59,7 @@
 
 ## 4. 读取顺序与上下文加载
 
-**读取顺序**（本节是全项目唯一落点；`.ai/CURRENT_CONTEXT.md` 的 Required Reading Order 是它的**生成物镜像**，由 `scripts/prepare_ai_workspace.py` 的 `reading_order` 渲染）：
+**读取顺序**（本节是**全项目**读取顺序的唯一落点；`.ai/CURRENT_CONTEXT.md` 的 Required Reading Order 是它的**生成物镜像**，由 `scripts/prepare_ai_workspace.py` 的 `reading_order` 渲染。各仓 `AGENT-INDEX.md` 另载**本仓内**的入口顺序——那属本仓局部事实，不在本清单内。两者是**两个层级**的顺序，不是同一事实的两个落点：改本清单不必改它们，反之亦然）：
 
 1. `AGENTS.md` —— Codex / OpenAI Harness 的薄入口；
 2. `CLAUDE.md` —— Claude Code 的薄入口；
@@ -155,14 +155,19 @@
 
 ### 入口文件
 
+四类入口文件的**角色、禁止项、指针预算与机读键语法**由 `docs/engineering/specs/agent-workspace-conventions.md` §3 规定（唯一落点）；本节只列**强制项**：
+
 | 文件 | 角色 | 强制 |
 | --- | --- | --- |
-| `AGENT-INDEX.md` | 统一索引与治理规范正文（权威源） | 必须存在 |
-| `AGENTS.md` | Codex / OpenAI Harness 薄入口，指向本文件 | 必须存在 |
-| `CLAUDE.md` | Claude Code 薄入口，指向本文件 | 必须存在 |
+| `AGENT-INDEX.md` | 该仓**全部正式内容**的唯一落点——本仓（治理仓）是治理规范正文；运行仓是「本仓索引 ＋ `## 本仓规则`」 | 四仓都必须存在 |
+| `AGENTS.md` | Codex / OpenAI Harness 的**薄指针**，指向 `AGENT-INDEX.md` | 四仓都必须存在 |
+| `CLAUDE.md` | Claude Code 的**薄指针**，指向 `AGENT-INDEX.md` | 四仓都必须存在 |
+| `DIRECTORY_MAP.md` | 该仓**目录事实与禁止扫描区**的唯一落点 | 运行仓必须存在；本仓不要求（本仓目录树在 §3 与 `README.md`） |
 | `.ai/CURRENT_CONTEXT.md` | 执行状态快照（生成物） | 必须存在且唯一 |
 
 `AGENTS.md` 与 `CLAUDE.md` 是**平级入口**，不允许互相软链或互相替代，也不与 `AGENT-INDEX.md` 矛盾。
+
+**两者都不得承载规则正文。** 同一份规则写在两个入口上，就是同一事实的两个落点：改一处不会带动另一处，两个 Harness 各自加载到不同结论。运行仓的规则正文归 `AGENT-INDEX.md` 的 `## 本仓规则`；目录事实归 `DIRECTORY_MAP.md`。由 `scripts/verify_agent_entry.py` 强制。
 
 ### 执行状态快照
 

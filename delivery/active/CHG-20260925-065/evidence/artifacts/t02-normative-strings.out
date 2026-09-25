@@ -1,0 +1,37 @@
+=== T-02 判据串落点：改前 vs 改后 @ 2026-09-25T14:38:07Z ===
+锚：bd5df2c（开工基线，T-01 的父提交）；被测：docs/engineering/specs/agent-workspace-conventions.md 与 AGENT-INDEX.md
+
+判据串                                          基线      工作区
+正文：                                           0        1
+check_pointer_shape                           0        2
+check_rule_body_consistency                   0        1
+check_layer3_shape                            0        1
+check_local_order_scope                       0        1
+check_rule_text_duplication                   0        1
+check_repo_entry_files                        0        1
+## 本仓规则                                       0        2
+本仓内加载顺序                                       0        2
+check_entry_drift                             1        2
+
+--- AGENT-INDEX.md（治理仓）同上 ---
+## 本仓规则                                       0        2
+本仓内加载顺序                                       0        0
+DIRECTORY_MAP.md                              0        4
+check_pointer_shape                           0        0
+
+--- 阳性对照：把全部判据串注入一份 fixture，确认上面的 grep 模式抓得住 ---
+阳性对照：10/10 判据串模式全部命中 ✓（分母 10）
+
+=== 「先写后实现」证明：规范里点名的检查此刻在代码里都还不存在 @ 2026-09-25T14:38:16Z ===
+分母：6 个新检查名 + 1 个对照（已在代码里的 check_entry_drift）
+检查名                                  scripts/verify_agent_entry.py 命中
+check_pointer_shape                  0
+check_rule_body_consistency          0
+check_layer3_shape                   0
+check_local_order_scope              0
+check_rule_text_duplication          0
+check_repo_entry_files               0
+check_entry_drift                    2  <= 阳性对照（已知存在，证明该 grep 抓得住代码里的定义）
+
+结论：6/6 新检查在代码里命中 0，而规范已点名并规定其判据 ⇒ 判据串先写、实现后补（T-04），
+      T-04 落地时应能对现状报红（三仓八节序列、四件文件、机读键、预算皆尚未满足）。
