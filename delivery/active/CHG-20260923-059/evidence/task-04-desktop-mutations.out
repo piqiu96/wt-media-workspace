@@ -1,0 +1,15 @@
+打掉 ✓  M1 不校验就启动（修复前的形状）  ->  a_tampered_sidecar_is_refused_and_an_intact_one_is_started
+打掉 ✓  M2 拒绝也能回退到 Python  ->  a_refusal_is_never_answered_with_the_python_path
+打掉 ✓  M3 摘要只算文件开头一段  ->  a_sidecar_that_matches_its_record_passes_and_one_changed_byte_does_not
+打掉 ✓  M4 字段缺失时兜底成空串  ->  a_record_that_cannot_be_compared_is_refused
+打掉 ✓  M5 不检查记录写的是不是这个文件  ->  a_record_that_cannot_be_compared_is_refused
+打掉 ✓  M6 一律当成「在包里」  ->  a_cargo_test_run_is_not_a_package
+打掉 ✓  M7 一律当成「不在包里」  ->  only_a_launch_from_inside_a_bundle_counts_as_one
+打掉 ✓  M8 解析时不做 deps 跳  ->  the_sidecar_is_resolved_beside_the_app_and_out_of_deps
+打掉 ✓  M9 没有 sidecar 时也去读记录  ->  no_sidecar_is_not_a_failure
+打掉 ✓  M10 启动时不给环境变量  ->  a_tampered_sidecar_is_refused_and_an_intact_one_is_started
+打掉 ✓  M11 启动的是名字而不是被校验过的那个路径  ->  a_tampered_sidecar_is_refused_and_an_intact_one_is_started
+打掉 ✓  M12 校验通过不写记录  ->  a_tampered_sidecar_is_refused_and_an_intact_one_is_started
+打掉 ✓  M13 比的是「记录非空」而不是摘要相等  ->  a_sidecar_that_matches_its_record_passes_and_one_changed_byte_does_not
+
+读数：13/13

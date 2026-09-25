@@ -1,0 +1,58 @@
+=== 夹具：把 scripts/repair-macos-signing.sh 真写出的 sidecar 与记录放进一个 .app 布局，
+    再把本次的测试二进制放在 Contents/MacOS 里，从那里运行（不用启动 GUI，
+    于是 current_exe() 与 resource_dir() 取到的是真实的包内值）
+/tmp/chg059/t04/WT Media.app
+/tmp/chg059/t04/WT Media.app/Contents
+/tmp/chg059/t04/WT Media.app/Contents/Info.plist
+/tmp/chg059/t04/WT Media.app/Contents/MacOS
+/tmp/chg059/t04/WT Media.app/Contents/MacOS/t04-under-test
+/tmp/chg059/t04/WT Media.app/Contents/MacOS/wt-media-agent
+/tmp/chg059/t04/WT Media.app/Contents/Resources
+/tmp/chg059/t04/WT Media.app/Contents/Resources/sidecar-manifest.json
+/tmp/chg059/t04/WT Media.app/Contents/Resources/sidecar-manifest.json.hold
+
+--- 包内记录（签名脚本写的）
+{
+  "component": "wt-media-agent",
+  "version": "0.2.2",
+  "target": "aarch64-apple-darwin",
+  "filename": "wt-media-agent",
+  "sha256": "f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87"
+}
+--- 对同一个文件独立测量
+f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87  /tmp/chg059/t04/WT Media.app/Contents/MacOS/wt-media-agent
+
+=== 从 Contents/MacOS 运行（--ignored bundled）===
+
+running 1 test
+test commands::agent::tests::the_bundled_sidecar_is_resolved_from_the_app_and_checked_against_its_record ... sidecar=/private/tmp/chg059/t04/WT Media.app/Contents/MacOS/wt-media-agent
+record=/private/tmp/chg059/t04/WT Media.app/Contents/Resources/sidecar-manifest.json
+arm 1 校验通过 version=0.2.2 target=aarch64-apple-darwin sha256=f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87
+arm 2 随应用的 Local Agent 校验失败：/private/tmp/chg059/t04/WT Media.app/Contents/MacOS/wt-media-agent 的 SHA-256 与包内记录不一致（记录 f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87，实际 8236dd644fdd324ebb76b2ce6a37784a14e65f03522e90b39a8de39fed3869b7）。这个文件已被替换或损坏，请重新安装完整的 WT Media 安装包。
+arm 3 随应用的 Local Agent 校验失败：包内缺少记录文件 /private/tmp/chg059/t04/WT Media.app/Contents/Resources/sidecar-manifest.json。这个安装包不完整，请重新安装完整的 WT Media 安装包。
+arm 4 复原后仍为「校验通过」
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 367 filtered out; finished in 2.12s
+
+=== exit=0 ===
+
+=== 对照：同一个用例从 target 目录运行（不是包）——它必须红，否则第一条断言等于没写 ===
+
+running 1 test
+test commands::agent::tests::the_bundled_sidecar_is_resolved_from_the_app_and_checked_against_its_record ... sidecar=/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/debug/wt-media-agent
+record=/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/debug/resources/sidecar-manifest.json
+
+thread 'commands::agent::tests::the_bundled_sidecar_is_resolved_from_the_app_and_checked_against_its_record' (1288318) panicked at src-tauri/src/commands/agent.rs:1662:9:
+this arm is only meaningful from inside a `.app`; run it from Contents/MacOS, per the procedure in this task's evidence
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    commands::agent::tests::the_bundled_sidecar_is_resolved_from_the_app_and_checked_against_its_record
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 367 filtered out; finished in 0.01s
+
+=== exit=101 ===

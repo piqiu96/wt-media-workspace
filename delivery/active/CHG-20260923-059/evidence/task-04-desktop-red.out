@@ -1,0 +1,26 @@
+== CHG-059 T-04 先红读数 ==
+tree = 本次全部新代码（integrity.rs、mod.rs 的 Attempt / spawn_verified、agent.rs 的用例）
+只把 spawn_verified 里那次校验去掉 ⇒ 回到修复前的形状：解析到路径就直接启动
+
+-- 同一条用例，变异后 --
+running 1 test
+test commands::agent::tests::a_tampered_sidecar_is_refused_and_an_intact_one_is_started ... FAILED
+thread 'commands::agent::tests::a_tampered_sidecar_is_refused_and_an_intact_one_is_started' (1202863) panicked at src-tauri/src/commands/agent.rs:1766:13:
+a changed byte has to be refused, not started
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 365 filtered out; finished in 0.21s
+3 | pub struct FileSystemBridge;
+195 | pub struct Writer {
+196 |     directory: PathBuf,
+202 | impl Writer {
+256 |     pub fn directory(&self) -> &Path {
+3 | pub struct SecureStore;
+53 | pub enum StorageError {
+60 |     Unsupported { reason: String },
+3 | pub struct SystemBridge;
+3 | pub struct Updater;
+error: test failed, to rerun pass `--bin wt-media-desktop-shell`
+
+变异前的同一条用例：1 passed（见 task-04-desktop-mutations.out 的 M1 控制行）
+
+（mod.rs 已还原为最终形状）

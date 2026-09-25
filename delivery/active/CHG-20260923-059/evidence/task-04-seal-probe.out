@@ -1,0 +1,35 @@
+== T-04 前提读数：外层签名与嵌套代码校验到底覆盖了什么
+   三份**互相独立**的副本，各自只做一件事。第一版把它们串在同一份副本上读，
+   于是第二条读到的其实是第一条留下的损坏——已按独立副本重测。
+
+-- 基线（不改）
+--prepared:/private.<probe>/WT Media.app/Contents/MacOS/wt-media-agent
+--validated:/private.<probe>/WT Media.app/Contents/MacOS/wt-media-agent
+.<probe>/WT Media.app: valid on disk
+.<probe>/WT Media.app: satisfies its Designated Requirement
+   codesign exit=0
+
+-- （一）只给 Contents/MacOS/wt-media-agent 追加一个字节
+--prepared:/private.<probe>/WT Media.app/Contents/MacOS/wt-media-agent
+.<probe>/WT Media.app: main executable failed strict validation
+In subcomponent: /private.<probe>/WT Media.app/Contents/MacOS/wt-media-agent
+   codesign exit=1
+
+-- （二）只改 Contents/Resources/sidecar-manifest.json 的 version
+--prepared:/private.<probe>/WT Media.app/Contents/MacOS/wt-media-agent
+--validated:/private.<probe>/WT Media.app/Contents/MacOS/wt-media-agent
+.<probe>/WT Media.app: a sealed resource is missing or invalid
+file modified: /private.<probe>/WT Media.app/Contents/Resources/sidecar-manifest.json
+   codesign exit=1
+
+== 合起来说明什么
+   · Contents/Resources 里的记录是被封装盖住的（改它 → a sealed resource is missing or invalid）；
+   · Contents/MacOS 里的 sidecar 是嵌套代码（改它 → main executable failed strict validation）；
+   · 所以「换掉被记录的那个文件」不是没人拦，但拦它的是签名验证，失败形态不指名是哪一个文件、
+     也不区分「被改坏」与「记录与文件来自不同构建」。
+   · 「两边各自都是合法签名、只是互不相符」（例如记录来自另一个构建）签名验证**不报**——
+     文件本身签名有效。这一类就是 scripts/package-release-macos.sh 的相等性判定
+     与运行期的 SHA-256 比对各自要抓的那一类。
+== 未测的那半（登记）
+   · 没有量「真实双击启动一个被篡改的包会怎样」：那需要 GUI 启动，且 macOS 在 exec 时的
+     行为（拒绝 / Killed: 9）与 codesign --verify 是两条不同的路径。本任务证的是校验逻辑本身。

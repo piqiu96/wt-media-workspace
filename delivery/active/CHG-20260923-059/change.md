@@ -246,7 +246,7 @@
 | T-01 | **就绪闸门**：解析 Agent 的 readiness 行作为第一信号，健康检查应答作为第二信号；`start_timeout_ms` 变成真超时且**真的会超时** | desktop + agent | **DONE** | 「打印了但不应答」与「不应答且不打印」两种形态各有用例；超时按配置值生效；变异打掉自己。**加一臂**：401（令牌漂移）致命且不等待——依据是 `/healthz` 在 `_check_auth` 之后（§4.1 实测补记） |
 | T-02 | **活性探针**：`already_running` 的判定改为问一次；sidecar 死后如实报「未在运行」并允许重启 | desktop | **DONE** | 先有一条**能红的**用例复现 CHG-057 登记的缺陷（杀掉 sidecar 后仍说已在运行）；修复后同一条转绿。变异 **8/8**；第一轮曾 6/8，两个存活变异各查出一处真洞（详见 `evidence/task-02-identity.md` §4.1） |
 | T-03 | **退出收尾**：Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与在飞任务收尾 | desktop + agent | **DONE** | 真机上两条读数**都拿到**（`--ignored real_agent`：Desktop 自己那条停路对上真 Agent 进程，`Some(0)`/518ms 与 `Some(9)`/1ms，5 次连跑 5/5）；先红是把 `stop` 还原成 HEAD 的硬杀形状，两条用例都红（日志不可区分、`(None, Some(9))`、窗口 900µs）；变异 agent 5/5 + desktop 9/9。**随包 onefile sidecar 那一臂做不到**（本机 `dlopen` 被签名拒），引导器是否转发 SIGTERM 未测——登记在证据 §7 |
-| T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | TODO | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖** |
+| T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | **DONE** | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖**。**加一臂**：`#[ignore]` 的用例外加一条**包内臂**——拿签名脚本真写出的 sidecar 与记录造 `.app` 布局，从 `Contents/MacOS` 里跑，四条读数（通过 / 追加一字节必拒 / 删记录必拒 / 复原仍通过）全在 `evidence/task-04-bundle.out`；该用例本身另有 **5/5** 变异（`evidence/task-04-bundle-mutations.out`）。打包侧一半同 commit：记录写在外层签名之前，且出包脚本做相等性判定 |
 | T-05 | **`config_online → 产物/config`**：打包步骤 + `bundle.resources` 补 Agent 配置 + `diff -r` 校验 | desktop + agent | TODO | 产物内配置与 `config_online/` `diff -r` 无差异；**产物里不含凭证**（D-05） |
 | T-06 | **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个来源；发布脚本加 Desktop ↔ sidecar 版本兼容校验 | desktop + workspace | TODO | 五类逐个有可得来源（每条附命令）；版本不匹配的包**必须被拒**（先造一个不匹配的，看它红）；Q-04 一并关闭 |
 | T-07 | **升级不覆盖**：用路径判据证明升级路径不写用户设置 / SQLite / 检查点 / 待回传结果 | desktop + agent | TODO | 先写一条会红的用例（把某条用户数据路径喂进升级写入集合）；按路径而非名字 |
@@ -271,14 +271,17 @@
 
 ### wt-media-desktop
 
-- [ ] `src-tauri/src/sidecar/`：完整性校验（T-04）
+- [x] `src-tauri/src/sidecar/integrity.rs`：完整性校验（T-04）——`04f46c3`；启动前读包内记录
+      比对要启动的那个文件，拒绝**不回退**到 Python 调试路径，没有记录时工程树容忍 / 包里拒绝
 - [x] `src-tauri/src/sidecar/`：就绪闸门（T-01）
 - [x] `src-tauri/src/sidecar/` + `commands/agent.rs` + `main.rs`：退出收尾（T-03）——`242f61e`；
       `ask`/`alive`/`force` 三个函数、`stop()` 的请停→宽限→强杀、`RunEvent::Exit` 钩子
 - [x] `src-tauri/src/commands/agent.rs`：活性探针（T-02）——`c54025a` 生产修复 + 4 条用例；
       `15951a4` 的 `tauri` `test` feature dev-dependency 与 `R: Runtime` 泛化是它的前置
 - [ ] `src-tauri/tauri.conf.json`：`bundle.resources` 补 Agent 配置（T-05）
-- [ ] `scripts/package-release-macos.sh`：相等性判定（T-04 的打包侧一半）与版本兼容校验（T-06）
+- [x] `scripts/repair-macos-signing.sh` + `scripts/package-release-macos.sh`：写包内记录（在 sidecar
+      的 ad-hoc 签名之后、外层签名之前）与相等性判定（T-04 的打包侧一半）——`04f46c3`
+- [ ] `scripts/package-release-macos.sh`：Desktop ↔ sidecar 版本兼容校验（T-06）
 - [ ] 五类版本中的 Desktop 与前端构建版本来源（T-06）
 
 ## 10. Acceptance Matrix
@@ -288,7 +291,7 @@
 | AC-01 | 就绪是确认过的：readiness 行 + 健康应答；超时真的会超时 | 两种失败形态各一条用例 + 真机读数 | TODO（T-01） |
 | AC-02 | 不会连上旧进程：sidecar 死后如实报「未在运行」 | 先红后绿的复现用例 + 真机读数 | **一半**（T-02）：先红后绿已成立（`evidence/task-02-red.out` / `task-02-green.out`，真 `CommandChild` + 真无人听的端口）；**真机读数未做**，按 T-02 证据 §7 第 1 条登记，不以文字充当证据 |
 | AC-03 | 退出是收尾过的：请停 → 宽限 → 强杀；报告能区分 | 真机两条读数 | **满足**（T-03）：两条读数都是真 Agent 进程给的（`task-03-desktop-real-agent.out`），请停/自行退出/宽限强杀三条记录互不重名。**一处例外**：随包 onefile sidecar 的引导器是否转发 SIGTERM **未测**（本机跑不起来，D-09 式登记，见 `evidence/task-03-exit.md` §7 第 1 条） |
-| AC-04 | 随包 sidecar 被验过：篡改必拒、完好必过 | 阳性对照 + 阴性对照各一条 | TODO（T-04） |
+| AC-04 | 随包 sidecar 被验过：篡改必拒、完好必过 | 阳性对照 + 阴性对照各一条 | **满足**（T-04）：三条阴性（追加一字节 / 删记录 / 记录字段不可比对）与一条阳性（真记录通过）都有，且**在真包布局下量过**——`task-04-bundle.out` 的四条读数取自 `Contents/MacOS` 里跑的进程（`current_exe()` 与 `resource_dir()` 是真实包内值），阳性那条的 sha256 与对同一文件的独立 `shasum` 一致。**一处例外**：没有「双击启动一个被篡改的包会怎样」的读数（需要 GUI），本任务证的是校验逻辑本身，见 `evidence/task-04-integrity.md` §9 第 1 条 |
 | AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | TODO（T-05） |
 | AC-06 | 五类版本可追溯；Desktop ↔ sidecar 版本不匹配必拒 | 五条来源命令 + 一条不匹配必红的用例 | TODO（T-06） |
 | AC-07 | 升级不覆盖用户设置 / SQLite / 检查点 / 待回传结果 | 路径判据的用例（先红） | TODO（T-07） |
@@ -312,7 +315,13 @@
   `evidence/task-03-agent-green.out`（agent 382 OK）、
   `evidence/task-03-agent-mutations.out`（5/5）、`evidence/task-03-desktop-mutations.out`（9/9）、
   `evidence/task-03-sidecar-bootloader-untested.out`（随包 onefile 在本机 `dlopen` 被拒，故该臂未测）
-- `evidence/task-04-integrity.md`——篡改必拒 / 完好必过 / 打包侧相等性判定
+- `evidence/task-04-integrity.md`——篡改必拒 / 完好必过 / 打包侧相等性判定。**已产出**，
+  另附原始转录 `evidence/task-04-desktop-red.out`（校验去掉后那条用例转红在「被篡改的 sidecar
+  真的被启动了」）、`evidence/task-04-desktop-mutations.out`（13/13）、
+  `evidence/task-04-bundle.out`（包内臂四条读数 + 从工程树跑必红的对照）、
+  `evidence/task-04-bundle-mutations.out`（包内臂 5/5）、
+  `evidence/task-04-packaging.out`（三条摘要读数：构建期 ≠ 随包、重复签名可复现、记录写在外层签名之前）、
+  `evidence/task-04-seal-probe.out`（外层签名与嵌套代码校验覆盖了什么，三份独立副本各测一件）
 - `evidence/task-05-shipped-config.md`——`diff -r` 输出、产物树、凭据扫描（带阳性对照与分母）
 - `evidence/task-06-versions.md`——五类版本的来源命令与不匹配必红
 - `evidence/task-07-upgrade.md`——路径判据的先红用例与结论
@@ -342,8 +351,17 @@
     （`Some(0)`/518ms、`Some(9)`/1ms，连跑 5 次 5/5）。详见 `evidence/task-03-exit.md`。
     **一处例外照 D-09 登记**：随包 onefile sidecar 在本机 `dlopen` 被签名拒，故「引导器是否
     转发 SIGTERM」未测；`RunEvent::Exit` 钩子本身只有阅读级覆盖。
-- **Current**：T-04 运行期完整性校验——尚未开工。
-- **Next**：T-04 → T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
+  - **T-04 运行期完整性校验**（desktop）。353→**363** passed / 0 failed（ignored 4→**5**，新增的
+    那条是包内臂）；警告 7→**7**；变异常规 **13/13** + 包内臂 **5/5**；先红是把校验去掉后
+    「被篡改的 sidecar 真的被启动了」。**AC-04 的阳性对照是在真包布局下量的**：
+    签名脚本真写出的 sidecar 与记录放进 `.app`，从 `Contents/MacOS` 跑，四条读数（通过 /
+    追加一字节必拒 / 删记录必拒 / 复原仍通过）齐全，且同一个用例从工程树跑**必红**（对照）。
+    三处过程订正留在证据里：M3 最初存活（摘要截断对 34 字节的文件是等价的，测试文件改成
+    4097 字节）、M6 最初存活且瞄错了用例（补 `bundled()` 与 `a_cargo_test_run_is_not_a_package`）、
+    封印探针第一版把三件事串在同一副本上读（第二条读的是第一条留下的损坏，已按独立副本重测）。
+    详见 `evidence/task-04-integrity.md`。
+- **Current**：T-04 已收尾；T-05 `config_online → 产物/config` 未开工。
+- **Next**：T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
 - **Blocked**：无。Q-04（「组件与资源版本」的口径）在 **T-06 内部**待定，若定不下则退回用户。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
   Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。
@@ -352,8 +370,10 @@
 
 - [ ] 每个 Task 有先失败的验证/测试、最小实现、测试、diff 检查、evidence、checkpoint、独立提交
 - [ ] AC-01…AC-11 逐条有判据；**AC-09 的例外按 D-09 登记，不以文字充当证据**
-- [ ] Manual verification evidence recorded where required.——**不完全满足，如实标注**：干净机那一臂**未做**；
-      其余真机臂（就绪、活性、退出、完整性、产物配置、版本）**都做**
+- [ ] Manual verification evidence recorded where required.——**不完全满足，如实标注**：干净机那一臂**未做**（D-09）；
+      **真机**（真进程/真应用）读数已拿到的是**就绪**（真 Agent 的 readiness 行）与**退出**（真 Agent 进程的
+      请停/强杀两条）；**完整性**是**真包布局**读数（进程真的跑在 `.app/Contents/MacOS` 里，但不是 GUI 双击）；
+      **活性**的真机读数按 AC-02 登记为未做；**产物配置与版本**未开工，届时一并按此表如实标注
 - [ ] 计数只增不减（desktop 336 / agent 377 为分母；例外先登记）
 - [ ] 一仓一 commit；「移动文件」与「改逻辑」不同 commit；desktop 只对单个文件跑 `rustfmt`
 - [ ] 关闭门禁：三个校验器 + `unittest discover`（**4 条既知红项**，判据是同集合阳性对照，不是「看着无关」）

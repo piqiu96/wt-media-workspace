@@ -1,0 +1,58 @@
+== T-04 打包侧：为什么摘要必须在「最后一次写之后」取
+
+-- (1) 构建期：脚本写出的 target/sidecar-manifest.json，以及它量的那个文件
+wt-media-agent-aarch64-apple-darwin  e37653fa2a432665560f3a1a42a883ce6bc28df5fa5a0e4ec220d5ea3f0eca6d
+e37653fa2a432665560f3a1a42a883ce6bc28df5fa5a0e4ec220d5ea3f0eca6d  /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/binaries/wt-media-agent-aarch64-apple-darwin
+     ^ 构建期摘要就是它的读数
+
+-- (2) 随包：上一次发布产物里的 sidecar（Tauri 装进 Contents/MacOS 后，旧版 repair 脚本对它做过 ad-hoc 签名）
+     output/ 只读，不修改：
+f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87  /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/../output/WT-Media_0.1.0_macos-aarch64/WT Media.app/Contents/MacOS/wt-media-agent
+     ^ 与 (1) 不同 ⇒ 签名改写了这个文件
+
+-- (3) 本次：把产物副本交给新的 scripts/repair-macos-signing.sh（ad-hoc 重签 → 记录 → 外层签名）
+f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87  /tmp/chg059/t04/packaged/WT Media.app/Contents/MacOS/wt-media-agent
+     而脚本写进包内的记录正是这一次的读数：
+{
+  "component": "wt-media-agent",
+  "version": "0.2.2",
+  "target": "aarch64-apple-darwin",
+  "filename": "wt-media-agent",
+  "sha256": "f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87"
+}
+
+-- 记录是在外层签名之前写的，外层签名仍然有效（Contents/Resources 被外层的封装盖住）
+--prepared:/private/tmp/chg059/t04/packaged/WT Media.app/Contents/MacOS/wt-media-agent
+--validated:/private/tmp/chg059/t04/packaged/WT Media.app/Contents/MacOS/wt-media-agent
+/tmp/chg059/t04/packaged/WT Media.app: valid on disk
+/tmp/chg059/t04/packaged/WT Media.app: satisfies its Designated Requirement
+codesign exit=0
+
+-- 包装的 sidecar 现在是什么签名（ad-hoc，不是 hardened-runtime）：
+Executable=/private/tmp/chg059/t04/packaged/WT Media.app/Contents/MacOS/wt-media-agent
+Identifier=wt-media-agent-55554944ef329102d2057dcd471c903e272935df
+Format=Mach-O thin (arm64)
+CodeDirectory v=20400 size=21200 flags=0x2(adhoc) hashes=656+2 location=embedded
+Signature=adhoc
+Info.plist=not bound
+TeamIdentifier=not set
+Sealed Resources=none
+
+-- 包装的外层：hardened runtime 仍在
+Identifier=com.wtmedia.desktop
+CodeDirectory v=20500 size=40820 flags=0x10002(adhoc,runtime) hashes=1269+3 location=embedded
+Signature=adhoc
+TeamIdentifier=not set
+Executable=/private/tmp/chg059/t04/packaged/WT Media.app/Contents/MacOS/wt-media-desktop-shell
+
+== 三条读数合起来说明什么
+
+1. (1) 与 (2) 不同：构建期量的文件与随包的文件不是同一份字节。差在签名上——
+   Tauri 把 externalBin 装进 Contents/MacOS 后，scripts/build-release-macos.sh:22 会调
+   repair-macos-signing.sh 对 sidecar 重新 ad-hoc 签名（先 remove 再 sign），这一步改写文件。
+   ⇒ 构建期写下的摘要描述的不是最终字节，拿它当校验目标每次发布都会拒。
+2. (2) 与 (3) 相同：对同一份输入重复 ad-hoc 签名得到同一份字节，所以「签名后量一次」
+   是可重放的，不是掷骰子。
+3. (3) 是脚本在 ad-hoc 签名之后、外层签名之前量的；上面 codesign --verify --deep --strict
+   对外层签名仍然 exit=0，说明这一步记下的文件在磁盘上没有被后面的动作改写。
+   bundle 臂在包内重新量了一次同一个文件，读数与记录一致（task-04-bundle.out 的 arm 1）。

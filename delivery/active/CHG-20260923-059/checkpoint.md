@@ -26,15 +26,16 @@
 
 ## Current
 
-- **T-04 运行期完整性校验未开工**（T-01、T-02、T-03 均已收尾，见下三节）。
+- **T-04 运行期完整性校验已收尾**（T-01、T-02、T-03、T-04 均已收尾，见下四节）；**T-05 未开工**。
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
   与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
-  T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`。
+  T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`；
+  T-04 见 `evidence/task-04-integrity.md` 与 desktop 的 `04f46c3`。
 
 ## Next
 
-- T-04 运行期完整性校验（启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动；
-  **`sha2 = "0.10"` 已是直接依赖**，不新增依赖；先造一个篡改一字节的必拒读数，再加完好的阳性对照），
+- T-05 **`config_online → 产物/config`**：`build_desktop_sidecar.py` 的整目录替换 + `tauri.conf.json`
+  的 `bundle.resources` 补 Agent 配置 + `diff -r` 校验（**不携带凭证**，D-05），
   按 `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
 
 ## T-01（已收尾，2026-09-25）
@@ -115,6 +116,54 @@
   `dlopen`），故「**引导器是否把 SIGTERM 转发给真正在服务的那进程**」**未测**；另两处：
   `RunEvent::Exit` 钩子本身只有阅读级覆盖；宽限内 pid 被复用是 `alive`/`force` 的已知窄极限。
 
+## T-04（已收尾，2026-09-25）
+
+- desktop（`04f46c3`，一个 commit 含打包侧一半）：新增 `src-tauri/src/sidecar/integrity.rs`——启动前
+  读 `Contents/Resources/sidecar-manifest.json`，按 SHA-256 比对**要启动的那个文件**；
+  `sidecar/mod.rs` 的 `start` 改为「求位置 → 校验 → 用**解析出的路径**启动」，`Attempt::Refused`
+  不许被 Python 调试路径答掉（`may_fall_back` 只放行 `Unavailable`）；没有记录时
+  **工程树容忍 / 包里拒绝**（`tauri-build` 会把 `externalBin` 拷进 `target/<profile>/`，
+  不这样区分 `cargo test` 出来的树就起不了 Agent）。不新增依赖（`sha2`/`hex`/`serde_json` 已在）。
+- **打包侧一半**：`repair-macos-signing.sh` 在 sidecar 的 ad-hoc 签名**之后**、外层签名**之前**
+  写这份记录——签名会改写文件（构建期 `e37653fa…` ≠ 随包 `f92cbdee…`，实测），而
+  `Contents/Resources` 被外层封装盖住（加在签名**之前**实测 `--verify --deep --strict` 仍 exit=0）；
+  `package-release-macos.sh` 加相等性判定（包内记录的摘要 vs 对随包 sidecar 的独立测量）。
+- **先红**：把 `spawn_verified` 里那次校验去掉（回到修复前形状）⇒ 那条用例红在
+  `a changed byte has to be refused, not started`，且**被篡改的 sidecar 真的被启动了**（脚本的标记
+  文件出现）。转录 `evidence/task-04-desktop-red.out`。
+- **包内臂（AC-04 的阳性对照所在）**：新增 `#[ignore]` 用例，只在 `<x>.app/Contents/MacOS` 里跑得动。
+  用签名脚本**真写出的** sidecar 与记录造 `.app` 布局后从那里运行，四条读数：真记录→通过
+  （version 0.2.2 / target aarch64-apple-darwin，sha256 与对同一文件的独立 `shasum` 一致）、
+  追加一字节→「SHA-256 与包内记录不一致」必拒、删记录→「包内缺少记录文件」必拒、复原→仍通过。
+  **对照**：同一个用例从 `target/debug/deps` 跑**必红**（并打印出工程树那两条路径）。
+  两条都在 `evidence/task-04-bundle.out`。*（`output/` 全程只读；副本与构造的包都在 `/tmp`。）*
+- 计数：desktop 353→**363** passed / 0 failed（ignored 4→**5**，多的那条就是包内臂）；警告 7→**7**。
+- 变异：常规表 **13/13**（`evidence/task-04-desktop-mutations.out`）+ 包内臂 **5/5**
+  （`evidence/task-04-bundle-mutations.out`）。常规表只能从 `target/` 里跑用例，而包内臂在那里
+  根本跑不起来，所以它的断言另用一张表验证。
+- **三处过程订正留在证据里**（不是调断言了事）：① M3 最初**存活**——把 `digest` 截到前 128 字节对
+  当时 34 字节的测试文件是**等价**的，测试文件改成 4097 字节后打掉；② M6 最初存活且**瞄错了用例**
+  （`inside_a_bundle` 恒真时，它指的那条用例根本不调用它）——补 `#[cfg(test)] bundled()` 与
+  `a_cargo_test_run_is_not_a_package` 把两半钉在一起；③ 封印探针**第一版把三件事串在同一份副本上读**，
+  第二条读到的其实是第一条留下的损坏（报的仍是 `In subcomponent: …/wt-media-agent`），已按
+  **三份独立副本**重测（`evidence/task-04-seal-probe.out`）。
+- **威胁模型如实写进模块头**：ad-hoc 签名没有信任锚 ⇒ 这是**包一致性检查，不是对抗能改包者的安全边界**；
+  且外层签名/嵌套校验虽能发现篡改，却不指名哪个文件对不上哪份记录，也不区分「被改坏」与
+  「记录来自另一个构建」——「两边各自都是合法签名、只是互不相符」这一类签名验证**不报**，
+  那正是本校验与打包侧相等性判定各自要抓的。
+- **churn 口径与 T-01/T-02/T-03 同**：两个混合文件（`commands/agent.rs`、`sidecar/mod.rs`）用三路合并
+  （HEAD / `rustfmt(HEAD)` / 工作区）反推掉重排后再提交，判据两条都报——`rustfmt(候选) == rustfmt(工作区)`，
+  且候选跑出同样的 `363 passed / 0 failed / 5 ignored`；提交后 13 个脏文件逐个复核为
+  `工作区 == rustfmt(HEAD)`（**13/13**）。**这次没有踩 T-03 那个坑**：临时文件用
+  `--config skip_children=true` 格式化（有效形式，与 T-03 记的 `--skip-children` 不同——那个不被认）；
+  且第一遍因忘了这个参数而**假绿**过一次（`rustfmt` 对 `mod.rs` 报 `failed to resolve mod drain`
+  并**不写文件**，于是「候选 == 工作区」的平坦比较其实什么都没比）——发现后重做，并改用
+  「候选 vs 工作区」「候选 vs HEAD」「工作区 vs HEAD」三个行数一起报。
+- 未覆盖项（写进 `evidence/task-04-integrity.md` §9）：没有「双击启动一个被篡改的包」的读数（需要 GUI）；
+  Windows/x86_64 未测（Q-03）；`Location::of` 两次系统调用失败那条分支无用例；`note` 的三条记录没有
+  用例（套件里没有装 subscriber 的读法）；`sha2` 每启动一次全文件读、未量代价；
+  `package-release-macos.sh` 的相等性判定没有真跑过一次完整出包。
+
 ## Blocked
 
 - 无硬阻塞。**T-06 内有一条待关闭的 Q-04**（「组件与资源版本」的**口径**——M-launch-engineering
@@ -123,6 +172,10 @@
 
 ## Recent verification
 
+- **T-04 之后**（2026-09-25，churn 还原后重跑）：desktop `cargo test`
+  **363 passed / 0 failed / 5 ignored**，汇总行 `generated 7 warnings`（与基线同）；
+  `git diff --name-only` = **13** 条，逐个核对为 `工作区 == rustfmt(HEAD)`（13/13）；
+  两张变异表在**最终树**上重跑：常规 **13/13**、包内臂 **5/5**（跑完后工作区仍恰好那 13 个文件）。
 - **T-03 之后**（2026-09-25，churn 还原后重跑）：desktop `cargo test`
   **353 passed / 0 failed / 4 ignored**，汇总行 `generated 7 warnings`（与基线同）；
   `git diff --name-only | wc -l` = **13**，逐个核对为 `工作区 == rustfmt(HEAD)`；
