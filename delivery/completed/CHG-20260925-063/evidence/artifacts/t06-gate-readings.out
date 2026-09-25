@@ -1,0 +1,40 @@
+=== T-06 关闭读数：本 CHG 最后一次改动之后（归档、LEDGER、快照重生成、§10 该行更正）===
+时间：2026-09-25 18:43:12 CST
+
+verify_delivery_governance.py         exit=0  1 行输出
+verify_agent_entry.py                 exit=0  2 行输出
+verify_skills.py                      exit=0  1 行输出
+verify_m0_config.py                   exit=0  1 行输出
+verify_product_master_alignment.py    exit=0  1 行输出
+verify_m2_acceptance.py               exit=0  2 行输出
+
+--- 六个门禁的完整 stdout/stderr ---
+### verify_delivery_governance.py
+Delivery governance verification ok. Active CHG: none
+
+### verify_agent_entry.py
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+
+### verify_skills.py
+verified 10 skill source files
+
+### verify_m0_config.py
+Workspace config verification ok
+
+### verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+
+### verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+=== unittest 全套 ===
+----------------------------------------------------------------------
+Ran 75 tests in 0.246s
+
+OK
+unittest exit=0
+
+=== 快照体积 ===
+    1668

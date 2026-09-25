@@ -63,7 +63,7 @@ M3 关闭后候选块为空，两组断言各自坏在不同的方向：
 ```bash
 python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_product_master_alignment.py
 python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest tests.test_verify_product_master_alignment -q
-python3 -B -X pycache_prefix=/tmp/pyc-none delivery/active/CHG-20260925-063/evidence/artifacts/t03-mutation-control.py .
+python3 -B -X pycache_prefix=/tmp/pyc-none delivery/completed/CHG-20260925-063/evidence/artifacts/t03-mutation-control.py .
 ```
 
 原始输出：`artifacts/t03-{baseline,postfix}-verify_product_master_alignment.out`、

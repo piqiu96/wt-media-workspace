@@ -57,7 +57,7 @@ M3 candidate missing 'source_content' / 'Scheduler' / '正式任务 Schema' / '�
 ```bash
 python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest tests.test_verify_product_master_alignment -v
 python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q
-python3 -B -X pycache_prefix=/tmp/pyc-none delivery/active/CHG-20260925-063/evidence/artifacts/t04-mutation-control.py .
+python3 -B -X pycache_prefix=/tmp/pyc-none delivery/completed/CHG-20260925-063/evidence/artifacts/t04-mutation-control.py .
 ```
 
 原始输出：`artifacts/t04-postfix-test_verify_product_master_alignment.out`（7 条逐条 ok）、

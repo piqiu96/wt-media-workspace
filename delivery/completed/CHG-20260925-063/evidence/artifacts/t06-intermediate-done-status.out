@@ -1,0 +1,13 @@
+=== 中间态：Status: DONE 但记录仍在 delivery/active/ ===
+（时间：2026-09-25 18:42:31；同日 CST）
+
+verify_delivery_governance.py           exit=0
+verify_agent_entry.py                   exit=0
+verify_skills.py                        exit=0
+verify_m0_config.py                     exit=0
+verify_product_master_alignment.py      exit=1
+verify_m2_acceptance.py                 exit=0
+
+--- verify_product_master_alignment.py 原始输出（预期多出 1 条 active-status 错）---
+ERROR: active CHG status must be IN_PROGRESS, IMPLEMENTING or VERIFYING, got 'DONE'
+ERROR: Ledger is not aligned with active CHG CHG-20260925-063 status 'DONE'

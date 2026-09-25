@@ -1,0 +1,16 @@
+=== AC-12: 三个运行仓工作区状态（2026-09-25 T-06 复测）===
+--- wt-media-cloud ---
+porcelain entries: 1
+?? dump.rdb
+--- wt-media-agent ---
+porcelain entries: 0
+--- wt-media-desktop ---
+porcelain entries: 0
+
+=== AC-14: config/release-matrix.yaml 改动行数 ===
+(空 = 0 行)
+
+=== 本仓工作区（应只有两处上一任务的工作区编辑）===
+ M CLAUDE.md
+ M docs/engineering/specs/agent-workspace-conventions.md
+?? delivery/active/CHG-20260925-063/evidence/artifacts/t06-ac12-runtime-worktrees.out

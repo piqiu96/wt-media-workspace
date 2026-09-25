@@ -127,13 +127,13 @@
 本节的旧版本曾以「已知红项」为核心，而三个脚本就在那张表里红了数月。故本节改以
 **判据的稳定性分层**为核心（D-01，2026-09-25 用户裁定）。
 
-下表为 **2026-09-25 实测**（`CHG-20260925-063` 收尾读数，原始输出见该 CHG
-`evidence/artifacts/t04-gate-readings.out`）：
+下表为 **2026-09-25 实测**（`CHG-20260925-063` **归档后的关闭读数**，原始输出见
+`delivery/completed/CHG-20260925-063/evidence/artifacts/t06-gate-readings.out`）：
 
 | 校验 | 状态（2026-09-25 实测） | 它守什么 |
 |---|---|---|
 | `scripts/verify_delivery_governance.py` | 绿 | delivery 指针与里程碑引用互相一致 |
-| `scripts/verify_agent_entry.py` | 绿，**0 WARN**（快照 1919 字符，预算 8000） | 入口文件存在性、快照唯一性与体积预算、快照↔LEDGER/active 一致、配置 path 一致、各仓入口漂移（启发式 WARN） |
+| `scripts/verify_agent_entry.py` | 绿，**0 WARN**（快照 1919 字符（有活动 CHG）/ 1668（无活动 CHG），预算 8000） | 入口文件存在性、快照唯一性与体积预算、快照↔LEDGER/active 一致、配置 path 一致、各仓入口漂移（启发式 WARN） |
 | `scripts/verify_skills.py` | 绿（10 个 skill 源文件） | skill 单一源与分发目标 |
 | `scripts/verify_m0_config.py` | 绿 | 工作区 `contract-map` / `release-matrix` 不变量，以及三个运行仓的 CI 工作流存在性 |
 | `scripts/verify_product_master_alignment.py` | 绿 | 产品基线与 MASTER 计划对齐：里程碑状态词、未关闭里程碑的候选块、契约层状态词 |

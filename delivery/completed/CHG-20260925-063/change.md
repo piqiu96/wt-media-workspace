@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: S
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-09-25
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -164,21 +164,24 @@ None.
 
 ### wt-media-workspace
 
-- [ ] 三个校验脚本转绿，且新增断言有变异对照留证
-- [ ] 测试套件由 73 项 4 红 → 全绿
-- [ ] README / conventions §10 / AGENT-INDEX §12 与实测一致
+- [x] 三个校验脚本转绿，且新增断言有变异对照留证（T-01 2 臂 / T-02 3 臂 + 阳性对照 / T-03 7 臂；见各 evidence）
+- [x] 测试套件由 73 项 4 红 → 全绿（73 → **75**，T-04 令该文件 5 条 → 7 条；`Ran 75 / OK`）
+- [x] README / conventions §10 / AGENT-INDEX §12 与实测一致（T-05，提交 `3204f91`）
 
 ### wt-media-cloud
 
-- [ ] Not affected（只读：`service/compatibility.go`、`runtimebinding/repository/store_mysql.go` 被断言读取，不修改）
+- [x] Not affected（只读：`service/compatibility.go`、`runtimebinding/repository/store_mysql.go` 被断言读取，不修改）
+- [x] 工作区已跟踪文件零改动（`status --porcelain -uno` = 0；唯一条目是**未跟踪**的 88 字节 `dump.rdb`，mtime `2026-09-24 17:19:16` 早于本 CHG 一天）
 
 ### wt-media-agent
 
-- [ ] Not affected（只读：`clients/cloud/contract.py` 被断言读取，不修改）
+- [x] Not affected（只读：`clients/cloud/contract.py` 被断言读取，不修改）
+- [x] 工作区零改动（`status --porcelain` = 0 条）
 
 ### wt-media-desktop
 
-- [ ] Not affected（只读：`contracts.lock.json` 被断言读取，不修改）
+- [x] Not affected（只读：`contracts.lock.json` 被断言读取，不修改）
+- [x] 工作区零改动（`status --porcelain` = 0 条）
 
 ## 10. Acceptance Matrix
 
@@ -195,7 +198,7 @@ None.
 | AC-09 | 4.4 的假通过用例已修正，且修正后**证明变异字符串真实存在** | 断言替换前后文本不同 | PASS（T-04）：`mutate()` 先 `assertIn` 再 `assertNotEqual`；**且已证明旧用例绿的原因本身是空转** |
 | AC-10 | `python3 -m unittest discover -s tests -q` 全绿 | 登记进程数与失败数 | PASS（T-04）：**Ran 75 / OK**，连跑两次读数一致 |
 | AC-11 | `verify_delivery_governance.py`、`verify_agent_entry.py`、`verify_skills.py` 仍绿 | 实跑三者 | PASS（T-04，`artifacts/t04-gate-readings.out`） |
-| AC-12 | 三个运行仓工作区**零改动** | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 与开工前一致 | TODO（T-06 收尾复测） |
+| AC-12 | 三个运行仓工作区**零改动** | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 与开工前一致 | **PASS（T-06），但判据的基线部分有缺口**：开工时**未记录**三仓工作区基线（本 CHG 记录缺口，非本轮引入）。可证的是：三仓**已跟踪文件**改动数各为 **0**；唯一偏离项是 cloud 下**未跟踪**的 88 字节 `dump.rdb`，mtime `2026-09-24 17:19:16`，早于本 CHG 一天，且 CHG-062 归档条目已登记过它。故「本 CHG 未写三仓」成立，「与开工前一致」这一半是靠 mtime 与既往前例推证，非基线对比 |
 | AC-13 | 文档三处读数与实测一致 | 逐处比对，并做失效指针两遍扫描 | PASS（T-05）：三处读数与 2026-09-25 实测逐项一致；两遍扫描均含阳性对照，0 条指不到东西 |
 | AC-14 | `config/release-matrix.yaml` 零改动 | `git diff --stat` 该文件 0 行 | PASS（T-03 实查 0 行；T-06 收尾复测） |
 
@@ -242,15 +245,15 @@ Recent verification:
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed. — 三个脚本全绿、两处空转改为会失败的检查、测试假通过修正、三处文档同步。**收窄处如实登记**：G-10（漂移臂恒空）未修，属独立 CHG（§14-2）。
+- [x] No blocking `Q-xx`. — §7 为 `None.`；六条遗留全部只登记（§14），无一阻塞收尾。
+- [x] Acceptance matrix all PASS. — AC-01…AC-11、AC-13、AC-14 全 PASS；**AC-12 PASS 但判据的基线部分有缺口**（开工时未记录三仓工作区基线，详见该行）。
+- [x] Automated tests passed or justified. — `Ran 75 / OK`，在**本 CHG 最后一次改动之后**重测（`evidence/artifacts/t06-gate-readings.out`），无例外项。
+- [x] Manual verification evidence recorded where required. — 本 CHG 无外部副作用、无 UI、无运行实例；不需要手工验收。全部判据为本地可重放命令，原始输出入 `evidence/artifacts/`。
+- [x] Diff checked for out-of-scope changes. — 逐次提交只暂存本任务文件；`config/release-matrix.yaml` 改动 **0 行**（AC-14）；`skills/` 及其生成副本未动；工作区仅剩两处**上一任务**的编辑（`CLAUDE.md`、`conventions §10` 第 33 行），**均不由本 CHG 提交**。
+- [x] Runtime repositories touched only if listed in scope. — 三仓**未写任何文件**（AC-12 逐仓复测；`verify_m2_acceptance.py` 只读它们）。
+- [x] Required baselines updated. — `docs/engineering/specs/agent-workspace-conventions.md` §10 与 `AGENT-INDEX.md` §12 已与实测对齐（T-05，`3204f91`）。
+- [x] Affected repositories committed independently. — 仅本仓；五个提交各自只含本任务文件（`9b249f5`、`1ce97d9`、`4bb3ef6`、`3204f91`、`20e58cd`）。
 
 ## 14. 遗留（只登记，不在本 CHG 处置）
 
