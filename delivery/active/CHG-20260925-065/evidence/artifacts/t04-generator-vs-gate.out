@@ -1,0 +1,22 @@
+generator exit=0 ; files:
+AGENT-INDEX.md
+AGENTS.md
+CLAUDE.md
+DIRECTORY_MAP.md
+
+=== gate functions on the generator's own output ===
+ROOT resolved to: /private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmp.fS0bM8PsaS
+check_repo_entry_files: ERROR 0 / WARN 0
+check_pointer_shape: 0 finding(s)
+check_rule_body_consistency: 0 finding(s)
+check_layer3_shape: 0 finding(s)
+check_rule_text_duplication: WARN 0 ; note: rule-text duplication: compared 1 rule sentence(s) across 2 file(s) in 1 repository
+check_local_order_scope: 0 finding(s)
+
+=== positive controls (same functions, deliberately broken tree) ===
+PC1 rm DIRECTORY_MAP.md -> check_repo_entry_files: ERROR 1 / WARN 0
+   E cloud: missing agent entry file: DIRECTORY_MAP.md
+PC2 rule line in CLAUDE.md -> check_pointer_shape: 1 finding(s)
+    cloud: CLAUDE.md:11 restates a rule without naming AGENT-INDEX.md: 不得新建 internal/runtime。
+PC3 CURRENT_CONTEXT in local order -> check_local_order_scope: 1 finding(s)
+    cloud: AGENT-INDEX.md section '本仓内加载顺序' names `CURRENT_CONTEXT` - the project-level order belongs to the workspace

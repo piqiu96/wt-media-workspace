@@ -18,13 +18,13 @@
 
 ## Current
 
-T-03 已完成；下一项是 T-04。
+T-04 已完成（**门禁现在对真实现状报红 71 条**，见下「预期中间态见红」）；下一项是 T-05。
 
 ## Next
 
-1. **T-04 门禁实现与退役**：`verify_agent_entry.py` 新六条 ＋ 退役 `check_entry_drift`；`tests/` fixture 重写为「默认合规」且断言**完整错误集合逐条相等**；`AGENT-INDEX.md` §12 里那句旧描述（按内容定位，T-02 后由 `:193` 漂到 `:198`）同 commit 改。**规则词表以 `conventions §3` 为准**（残余：该节只举例、未穷尽）。
-3. **T-04 门禁实现与退役**：`verify_agent_entry.py` 新六条 ＋ 退役 `check_entry_drift`；`tests/` fixture 重写为「默认合规」且断言**完整错误集合逐条相等**。
-4. **T-05／T-06／T-07**：cloud／agent／desktop 四件入口文件收口（正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`），**顺序实施**，各仓独立提交。5. **T-08**：workspace 入口文件补机读键过机检。**T-09**：收尾归档与对账。
+1. **T-05 cloud 收口**：四件入口文件重写为 §3 形态，正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`；落实 F-03／F-05／F-07（权威冲突 A／B、禁止扫描区 E、目录树 F）。**只搬家不改义**，逐条归属表以改前行数为分母。**门禁给 cloud 的分母是 51 条 ERROR**（含八节序列那 1 条），收口目标 0。
+2. **T-06 agent 收口**（分母 10）、**T-07 desktop 收口**（分母 7，含 D-04 的范围限定句）。各仓独立提交。
+3. **T-08**：workspace 入口文件补机读键 ＋ 修 `CLAUDE.md:9` 那行复述（分母 3）。**T-09**：收尾归档与对账。
 
 ## Blocked
 
@@ -32,7 +32,20 @@ T-03 已完成；下一项是 T-04。
 
 ## 预期中间态见红（不得静默容忍）
 
-T-04 落地后、T-07 完成前，**三个运行仓的门禁是红的**——新检查按设计就是先对现状报错，再由 T-05～T-07 逐个收口。这是**预期内的**，但必须显式说明：CHG-20260925-063 的教训是「意料外的红会训练读者忽略这个门禁」。**T-09 不得早于 T-07**；本 CHG 不得在红的状态下归档。
+**现状：`verify_agent_entry.py` exit=1，71 条 ERROR**（`evidence/artifacts/t04-gate-readings.out`）。这是 T-04 的**设计结果**，不是缺陷：新检查按构造先对现状报错，再由 T-05～T-07（三仓）与 T-08（治理仓）逐个收口。
+
+| 仓／面 | ERROR 条数（收口目标 0） |
+|---|---|
+| `cloud` | 51 |
+| `agent` | 10 |
+| `desktop` | 7 |
+| `workspace` | 3 |
+| ↳ 其中三仓八节序列（`H2 sections, expected 8`） | 3（**已含在上面各仓的数里**，不是第四项） |
+| **合计** | **71** |
+
+分判据：`declares no rule body` 8 ／ `restates a rule without naming` 56 ／ `exceeds the pointer budget` 4 ／ `H2 sections, expected 8` 3；`H2 sequence diverges`、`disagree on the rule body`、`declares itself`、`declares a pointer as the rule body`、`declares an unknown rule body` 均 **0**（这些只出现在 `tests/` 的变异用例里，属构造性，不是现状）。
+
+必须显式说明：CHG-20260925-063 的教训是「意料外的红会训练读者忽略这个门禁」，**已文档化的红同样会**（`conventions §10` 成文）。故本节的读数是**带收口计划的中间态**，不是「已知红项」：**T-09 不得早于 T-07**；本 CHG 不得在红的状态下归档。**其余五个门禁此时仍全绿**（本次改动未触及它们）。
 
 ## Recent verification
 
@@ -65,6 +78,21 @@ T-02 收尾读数（`evidence/artifacts/t02-normative-strings.out`，@ 2026-09-2
 | `sync_skills.py check` | `exit=0` |
 
 六门禁全绿是**预期**：T-02 只写规范与文档、未动脚本，而新判据尚未实现——故此刻的绿**不**说明现状合规（与 T-01 的 0 warning 同理）。**行号漂移**：T-02 给 `AGENT-INDEX.md` §10 加 3 行后，§12 里那句旧描述由 `:193` 漂到 **`:198`**；本 CHG 的记录自此**按内容定位、不按行号**（已登记 `change.md` §14 第 7 项）。
+
+T-04 收尾读数（@ 2026-09-25T22:47Z 前后）：
+
+| 判据 | 读数 |
+|---|---|
+| `verify_agent_entry` | **`exit=1`，71 ERROR / 0 WARN**（见上「预期中间态见红」） |
+| 其余五个门禁 | 全 `exit=0` |
+| `unittest discover -s tests -q` | `Ran 94 tests` / `OK`（原 79：−16 旧用例 ＋31 新用例） |
+| 变异对照（分母＝6 条新检查） | 禁用逐条 → 3／7／4／2／2／1 条用例失败；**`ImportError` 6 次全为 0** |
+| 生成器产出 vs **门禁自己的函数** | 六函数 0／0／0／0／`WARN 0`（分母 1 条规则句）／0；阳性对照 **3/3 命中**（`artifacts/t04-generator-vs-gate.out`） |
+| `sync_skills.py check` | `exit=0` |
+
+**两处不读成「全绿」**：`check_layer3_shape` 的跨仓比较在单仓树上分母为 1（未覆盖，交 T-05～T-07）；`check_rule_text_duplication` 的分母只有 1 条规则句（骨架无规则句）。另：`check_local_order_scope` 报 0 只因三仓小节**仍叫旧名**，**T-07 后必须重测**。
+
+**记录成本自纠**：§11 原有的「`change.md` ≤ 25 KB、单 Task evidence ≤ 3 KB」被 T-01～T-04 逐条突破（四篇 4559／4845／6314／6329 B；`change.md` 26477 B）。数字改为按实测定，并把界放在总量——见 `change.md` §11 与 §14 第 9 项。
 
 T-03 收尾读数（`evidence/artifacts/t03-conformance.out`，@ 2026-09-25T14:41:53Z）：
 

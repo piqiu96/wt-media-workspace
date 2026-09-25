@@ -195,7 +195,7 @@
 
 ```text
 python3 scripts/verify_delivery_governance.py      # delivery 指针与里程碑引用互相一致
-python3 scripts/verify_agent_entry.py             # 入口文件、执行快照唯一性与体积预算、各仓入口漂移 WARN
+python3 scripts/verify_agent_entry.py             # 入口文件形态（指针／正文／目录图）、执行快照唯一性与体积预算、配置一致性
 python3 scripts/verify_skills.py                  # skill 单一源与分发目标
 python3 scripts/verify_m0_config.py               # 工作区 contract-map / release-matrix 不变量、三仓 CI 工作流
 python3 scripts/verify_product_master_alignment.py  # 产品基线与 MASTER 计划对齐、未关闭里程碑的候选块

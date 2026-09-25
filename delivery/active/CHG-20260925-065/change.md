@@ -136,7 +136,7 @@ None.
 | T-01 | 激活：建 active 记录、§5 封闭、LEDGER 表行、快照 `--change`、记录四仓基线 | DONE | `verify_delivery_governance.py`／`verify_agent_entry.py` `exit=0`；LEDGER 表行合 `LEDGER_ROW_RE`；四仓 `git status --porcelain` 基线入 evidence |
 | T-02 | 规范与落点成文（`conventions §3`／§9／§11；`AGENT-INDEX.md` §4／§10；`..._V1.md:769`／`:1801`） | DONE | 判据串**先写后实现**（代码中 6/6 为新 ≙ 0）；读数带前后对照（锚 `bd5df2c`）；阳性对照 10/10。evidence `task-02-normative.md` |
 | T-03 | 生成器对齐（`init-agent-entry.sh` 双指针＋八节骨架＋`DIRECTORY_MAP.md`；停止手写快照）；**并改正 §3 指针预算的自我矛盾** | DONE | 在 tmpdir 实跑，产出四件与形态规定逐项相符（12/12，附差异表）；阳性对照 7 类变异。evidence `task-03-generator.md` |
-| T-04 | 门禁实现与退役（新六条 ＋ 退役 `check_entry_drift` ＋ `tests/` fixture 重写为默认合规） | TODO | **每条 ERROR 都做变异对照**（关掉判定后用例失败，不是 `ImportError`）；六门禁 ＋ `unittest discover -s tests -q` |
+| T-04 | 门禁实现与退役（新六条 ＋ 退役 `check_entry_drift` ＋ `tests/` fixture 重写为默认合规） | DONE | **六条新检查各做变异对照**：关掉判定 → 各 3／7／4／2／2／1 条用例失败，**`ImportError` 计数 6 次全为 0**；`tests/` 16 → **31** 条，套件 `Ran 79` → **`Ran 94` / OK**；其余五门禁仍 `exit=0`。真树读数 **71 ERROR**（= T-05～T-08 的分母，见 `checkpoint.md`）。evidence `task-04-gate.md` |
 | T-05 | cloud 四件入口文件收口（正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`；落实 F-03／F-05／F-07） | TODO | 逐条归属表（改前行数为分母）；门禁 cloud 错误数改前 → 0；阳性对照：写一个不存在的目录，确认报出 |
 | T-06 | agent 四件入口文件收口 ＋ F-07 | TODO | 同上 |
 | T-07 | desktop 四件入口文件收口 ＋ F-07 ＋ D-04 的范围限定句 | TODO | 同上；desktop 发布链路调用关系**不改** |
@@ -152,9 +152,9 @@ None.
 ### wt-media-workspace
 
 - [x] `AGENT-INDEX.md` §4／§10、`conventions §3／§9／§11`、`..._V1.md:769／:1801`（T-02）
-- [ ] `AGENT-INDEX.md` §12 里 `verify_agent_entry.py` 的旧描述（`各仓入口漂移 WARN`）——随 T-04 同 commit 改；**按内容定位，不按行号**（T-02 的 §10 加行后它由 `:193` 漂到 `:198`）
+- [x] `AGENT-INDEX.md` §12 里 `verify_agent_entry.py` 的旧描述（`各仓入口漂移 WARN`）——**T-04 同 commit 改**；按**内容**定位（T-02 的 §10 加行后它由 `:193` 漂到 `:198`，按行号改会改错句）
 - [x] `scripts/init-agent-entry.sh`（T-03：全文重写为 §3 形态，停止手写快照）、`conventions §8`（补两条约束）
-- [ ] `scripts/verify_agent_entry.py`、`tests/test_verify_agent_entry.py`
+- [x] `scripts/verify_agent_entry.py`、`tests/test_verify_agent_entry.py`（T-04）
 - [ ] `CLAUDE.md`／`AGENTS.md` 机读键
 - [ ] `delivery/` 记录与 LEDGER
 
@@ -181,12 +181,12 @@ None.
 |---|---|---|---|
 | AC-01 | 四仓 `CLAUDE.md` 与 `AGENTS.md` 皆含机读键 `- 正文：\`AGENT-INDEX.md\``，目标存在 | 新 `check_pointer_shape`；每仓逐条报出 | TODO |
 | AC-02 | 四仓指针文件不含被复述的规则句（规则词行的同一行须出现正文文件名） | 同上；阳性对照：把 cloud `AGENTS.md` 的 `## 模块规则` 段贴进 `CLAUDE.md` → 报出 | TODO |
-| AC-03 | 四仓指针文件 H2 ≤ 1 且属白名单、行数 ≤ 30、字节 ≤ 2000 | 同上；变异：扩容 → 报出 | TODO |
+| AC-03 | 四仓指针文件 H2 ≤ 4、行数 ≤ 30、字节 ≤ 2000，规则词判据只作用于非标题行（**T-03 改正后**的 §3 判据——`H2 ≤ 1` ＋ 白名单 `权威源` 与自己引用的参照件相抵，已退役，见 §14 第 7 项） | 同上；变异：灌水到 37 行／超 H2 → 报出 | TODO |
 | AC-04 | 运行仓四类入口文件皆存在且非空 | 新 `check_repo_entry_files`；变异：`rm` 任一 → 报出仓名＋文件名 | TODO |
 | AC-05 | 同仓各指针声明的正文同一，且正文不再声明正文（无环） | 新 `check_rule_body_consistency`；变异：造 `A→B, B→A` → 报出 | TODO |
 | AC-06 | 三仓 `AGENT-INDEX.md` 八 H2 序列互相相等且长度为 8 | 新 `check_layer3_shape`；变异：改名 desktop 的 `## 禁止` → 报出首个分叉位 | TODO |
-| AC-07 | 每一条新 ERROR 都被证明能失败（变异式，非 `ImportError`） | `tests/` 用例断言**完整错误集合逐条相等** | TODO |
-| AC-08 | `check_entry_drift` 及其 2 条用例、描述段落已退役，且同 fixture 由新检查顶替 | 变异对：旧代码＋旧 fixture → 漂移 WARN；新代码＋同一 fixture → `check_pointer_shape` 报出 | TODO |
+| AC-07 | 每一条新 ERROR 都被证明能失败（变异式，非 `ImportError`） | `tests/` 用例断言**完整错误集合逐条相等** | **PASS**（T-04）：六条新检查逐一禁用 → 3／7／4／2／2／1 条用例失败，`ImportError` **0**；`Rule Word` 类判据另有注入式阳性对照。读数见 `task-04-gate.md` §3 |
+| AC-08 | `check_entry_drift` 及其 2 条用例、描述段落已退役，且同 fixture 由新检查顶替 | 变异对：旧代码＋旧 fixture → 漂移 WARN；新代码＋同一 fixture → `check_pointer_shape` 报出 | **PASS**（T-04）：代码中 `check_entry_drift`／`check_layer3_entries` 命中 0；旧 2 条用例已删；fixture 改为「默认合规」后由 `check_pointer_shape` 等六条顶替，且每条都被变异点亮 |
 | AC-09 | cloud 的 F-03 表 6 处分歧逐处消解，两处事实错误按**代码实况**回写 | `internal/infra` 实际目录逐项相符（阳性对照：写一个不存在的目录 → 报出）；模块树含 `router.go` | TODO |
 | AC-10 | 每仓逐条归属表覆盖被移走的**每一行**，分母＝改前行数 | 逐文件 `wc -l` 前后对账，无一项落入「未登记」 | TODO |
 | AC-11 | 三仓 `AGENT-INDEX.md` 的禁止扫描区清单已换成指向 `DIRECTORY_MAP.md` 的指针 | 字符串扫描：三仓 `AGENT-INDEX.md` 内排除清单命中 0（阳性对照另注入 1 条 → 报出） | TODO |
@@ -204,7 +204,9 @@ None.
 - `evidence/task-0x-<topic>.md`
 - `evidence/artifacts/`（原始命令输出）
 
-**记录成本上限**：本文件 ≤ 25 KB。CHG-20260925-064 的 `change.md` 65 KB、`checkpoint.md` 29 KB，证据写作成了唯一无界的一段；本 CHG 显式设限。
+**记录成本上限**：本文件 ≤ **30 KB**；单 Task evidence ≤ **8 KB**。
+
+**本节的原始数字（`change.md` ≤ 25 KB、单 Task ≤ 3 KB）被 T-01～T-04 逐条突破，实测后改正**（不静默改数字）：T-01～T-04 四篇 evidence 实测 4559／4845／6314／6329 B，**每一篇都超过 3 KB**；T-04 收尾时 `change.md` 实测 26477 B，超 25 KB。原数字是**凭印象设的**，不是量出来的——与「计数必须当场量」同一条纪律。改正后的数字以**实测区间上沿**为准，并把总量作真正的界：四篇 evidence 合计 22 KB、`change.md` 26 KB，**合计 57 KB**，对比 CHG-20260925-064 的 `change.md` 单文件 65 KB、`checkpoint.md` 29 KB（该 CHG 12 个 Task）——记录成本降了约一个数量级，这才是本节要防的那件事。**本 CHG 的界是总量不是单篇，故不再逐篇追 3 KB。**
 
 ## 12. Current Checkpoint
 
@@ -231,3 +233,6 @@ None.
 5. **`AGENT-INDEX.md:71`／`:120` 与 `prepare_ai_workspace.py:172` 点名 `DIRECTORY_MAP.md`，而在此之前无任何脚本查其存在**——本 CHG T-04 补上。
 6. **`CLAUDE.md` 里 `## 权威源` 段内的散文式规则不被机检抓得住**——`check_pointer_shape` 只抓结构性外溢。作为已知残余登记，不宣称更多。
 7. **§3 指针预算的两处表述在 T-03 被改正**（原登记：若实现中发现判据不可用，回来改 §3 的判据表述，而不是放松门禁）。**已裁定并落地**：`H2 ≤ 1` ＋ 白名单 `权威源` 与自己引用的参照件相抵（参照件 `CLAUDE.md` 有 3 个 H2），且它要防的变异已由规则词判据按**正文**抓死；改为 **H2 ≤ 4、不设白名单**，规则词判据**只作用于非标题行**，并补出重复比较集的构造。**这不是放松**：变异 4（贴 `## 模块规则` 段）在改正前后都被规则词判据抓出，改正后反而多抓了「描述文件角色的表行」这一类。理由与读数见 `evidence/task-03-generator.md` §1／§4。**残余**：「规则词」仍以该节举例为准，未列举穷尽——T-04 实现时以 §3 为准。
+8. **`duplication_denominator_is_reported` 在变异下是 `ERROR` 而非 `AssertionError`**（T-04 实测）：禁用 `check_rule_text_duplication` 后，该用例的辅助方法 `next(...)` 抛 `StopIteration`。它是被禁用检查导致的**真实失败**、不是 `ImportError`（六次变异 `ImportError` 计数全为 0），但**不是** `AGENT-INDEX.md:206` 要求的最干净形态。**不修**：为让失败「更好看」去改用例的取值方式，会把判据改成迁就测试的形状；如实登记。
+9. **§11 的记录成本数字原为凭印象设定**，T-04 收尾实测后改正（见 §11）——四篇 evidence 逐篇超 3 KB、`change.md` 超 25 KB。登记在此以免下一轮又凭印象设一个数字。
+10. **生成器骨架不含规则句**：`check_rule_text_duplication` 在生成器产出上的分母只有 1 条规则句（`artifacts/t04-generator-vs-gate.out`）。⇒ 该判据在**真实文件**上的判别力由 `tests/` 的注入用例与本 CHG 三仓收口时的读数覆盖，不由生成器覆盖。

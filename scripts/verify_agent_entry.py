@@ -9,6 +9,12 @@ writes anything. It reports two severities:
 
 The heuristics are deliberately narrow. They must not turn into a second,
 unreviewed source of truth for repository rules.
+
+The entry-file shape is specified by
+``docs/engineering/specs/agent-workspace-conventions.md`` section 3. Every ERROR
+here judges existence, a declaration, a count, or an equality of counts - never
+the wording of a rule. Wording is only ever a WARN, because a gate that freezes
+prose turns every legitimate rewrite into a false failure.
 """
 
 from __future__ import annotations
@@ -30,15 +36,47 @@ CHARS_PER_TOKEN = 2.5
 REPOSITORY_MAP_RELATIVE = Path("config") / "repository-map.yaml"
 SKILLS_DISTRIBUTION_RELATIVE = Path("config") / "skills-distribution.yaml"
 
-FORBIDDEN_RE = re.compile(
-    r"禁止|不得|不创建|不新增|不允许|不应|不可|不要|不做|must not|do not|never",
+# Entry-file shape, specified by docs/engineering/specs/agent-workspace-conventions.md
+# section 3. The running repositories carry one more file than the workspace.
+WORKSPACE_REPOSITORY = "workspace"
+RUNNING_REPO_ENTRY_FILES = ("AGENT-INDEX.md", "AGENTS.md", "CLAUDE.md", "DIRECTORY_MAP.md")
+POINTER_FILES = ("AGENTS.md", "CLAUDE.md")
+BODY_FILE = "AGENT-INDEX.md"
+MACHINE_KEY_RE = re.compile(r"^-\s*正文：\s*`(?P<target>[^`]+)`\s*$")
+
+# Rule words mark a sentence as a claim, not a pointer. The criterion is
+# deliberately crude: a line that claims must also name the body file, so the
+# test is "is this line a pointer instruction or a restated rule?".
+RULE_WORD_RE = re.compile(
+    r"禁止|严禁|不得|必须|不允许|不应|不可|不要|不做|不创建|不新增|不存放|不修改|只能|只允许|应当"
+    r"|must not|do not|never",
     re.IGNORECASE,
 )
-# Path-like tokens are matched with or without backticks: rule files mark them
-# inconsistently, and a heading such as `## internal/runtime` is a real claim
-# even though nothing is quoting it.
-PATH_TOKEN_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.-]*(?:/[A-Za-z0-9_.-]+)+")
-DRIFT_TOKEN_RE = re.compile(r"^[a-z][A-Za-z0-9_-]*(?:/[A-Za-z0-9_-]+)+$")
+
+# Heading lines are naming, not claiming: `## 模块规则` is only a violation once
+# rule text lands underneath it, and that is caught line by line.
+POINTER_MAX_LINES = 30
+POINTER_MAX_BYTES = 2000
+POINTER_MAX_H2 = 4
+
+PROJECT_ORDER_SECTIONS = (
+    "依赖",
+    "定位",
+    "本仓库拥有",
+    "本仓库不拥有",
+    "需求路由",
+    "本仓规则",
+    "禁止",
+    "本仓内加载顺序",
+)
+# The running repositories keep their own in-repository reading order. That
+# list must not become a second copy of the project-level order.
+LOCAL_ORDER_HEADING = "本仓内加载顺序"
+LOCAL_ORDER_FORBIDDEN = ("CURRENT_CONTEXT", "LEDGER.md", "delivery/")
+
+DUPLICATION_FILES = ("AGENT-INDEX.md", "DIRECTORY_MAP.md", "README.md")
+EMPHASIS_RE = re.compile(r"[*_`]")
+WHITESPACE_RE = re.compile(r"\s+")
 
 GOVERNANCE_SCRIPT = "verify_delivery_governance.py"
 
@@ -229,55 +267,286 @@ def check_group_coverage(targets: dict[str, dict[str, object]]) -> list[str]:
     return errors
 
 
-def path_tokens(line: str) -> set[str]:
+def running_repositories(repository_paths: dict[str, str]) -> dict[str, str]:
+    """Repositories that must carry the four entry files, i.e. all but the workspace."""
     return {
-        token
-        for token in PATH_TOKEN_RE.findall(line)
-        if DRIFT_TOKEN_RE.match(token)
+        name: path
+        for name, path in repository_paths.items()
+        if name != WORKSPACE_REPOSITORY
     }
 
 
-def check_entry_drift(repository_paths: dict[str, str]) -> list[str]:
-    """Heuristic: a path forbidden by AGENTS.md must not be described as normal
-    in CLAUDE.md.
+def check_repo_entry_files(
+    repository_paths: dict[str, str],
+) -> tuple[list[str], list[str]]:
+    """Every running repository carries all four entry files, non-empty.
 
-    This is a review prompt, not a verdict. A hit means a human must read both
-    files; it does not prove the CLAUDE.md line is wrong.
+    A repository whose directory is not next to this one is skipped with a
+    warning rather than an error: the check must survive a checkout that does
+    not include the sibling repositories. That skip is a WARN, so a genuinely
+    absent directory never reads as a pass.
     """
+    errors: list[str] = []
     warnings: list[str] = []
+    for name, path in sorted(running_repositories(repository_paths).items()):
+        repo = ROOT / path
+        if not repo.is_dir():
+            warnings.append(
+                f"{name}: repository not present at {path}, entry files not checked"
+            )
+            continue
+        for filename in RUNNING_REPO_ENTRY_FILES:
+            target = repo / filename
+            if not target.is_file():
+                errors.append(f"{name}: missing agent entry file: {filename}")
+            elif target.stat().st_size == 0:
+                errors.append(f"{name}: empty agent entry file: {filename}")
+    return errors, warnings
+
+
+def pointer_body(repo: Path, filename: str) -> tuple[str | None, list[str]]:
+    """Read the body a pointer file declares, plus the errors in that declaration.
+
+    The declared target is returned even when it is rejected: the pointer-pair
+    check needs to see *what* each file claims, or a broken pair would report a
+    self-reference and hide the disagreement that made it broken.
+    """
+    text = (repo / filename).read_text(encoding="utf-8")
+    keys = [
+        match.group("target")
+        for line in text.splitlines()
+        if (match := MACHINE_KEY_RE.match(line))
+    ]
+    if not keys:
+        return None, [f"{filename} declares no rule body: expected `- 正文：`<file>``"]
+    if len(keys) > 1:
+        return None, [
+            f"{filename} declares more than one rule body: {', '.join(sorted(set(keys)))}"
+        ]
+    target = keys[0]
+    if target == filename:
+        return target, [f"{filename} declares itself as the rule body"]
+    if target not in ENTRY_FILES:
+        return target, [f"{filename} declares an unknown rule body: {target}"]
+    if not (repo / target).is_file():
+        return target, [f"{filename} declares a rule body that does not resolve: {target}"]
+    return target, []
+
+
+def check_pointer_shape(repository_paths: dict[str, str]) -> list[str]:
+    """A pointer file declares exactly one body, carries no rule text, and is small.
+
+    The three parts are independent: the declaration makes the pointer
+    followable, the rule-word criterion keeps restated rules out, and the
+    budget keeps the file from growing into a second body by accretion.
+    """
+    errors: list[str] = []
     for name, path in sorted(repository_paths.items()):
         repo = ROOT / path
-        agents = repo / "AGENTS.md"
-        claude = repo / "CLAUDE.md"
-        if not agents.is_file() or not claude.is_file():
-            continue
+        for filename in POINTER_FILES:
+            source = repo / filename
+            if not source.is_file():
+                continue
+            body, declaration_errors = pointer_body(repo, filename)
+            errors.extend(f"{name}: {error}" for error in declaration_errors)
+            text = source.read_text(encoding="utf-8")
+            lines = text.splitlines()
+            expected = body or BODY_FILE
+            for number, line in enumerate(lines, start=1):
+                if line.startswith("#"):
+                    continue
+                if RULE_WORD_RE.search(line) and expected not in line:
+                    errors.append(
+                        f"{name}: {filename}:{number} restates a rule without naming "
+                        f"{expected}: {line.strip()}"
+                    )
+            h2 = sum(1 for line in lines if line.startswith("## "))
+            over = [
+                label
+                for label, value, limit in (
+                    ("lines", len(lines), POINTER_MAX_LINES),
+                    ("bytes", len(text.encode("utf-8")), POINTER_MAX_BYTES),
+                    ("H2 headings", h2, POINTER_MAX_H2),
+                )
+                if value > limit
+            ]
+            if over:
+                errors.append(
+                    f"{name}: {filename} exceeds the pointer budget "
+                    f"({', '.join(over)}): {len(lines)} lines, "
+                    f"{len(text.encode('utf-8'))} bytes, {h2} H2 headings"
+                )
+    return errors
 
-        forbidden: set[str] = set()
-        for line in agents.read_text(encoding="utf-8").splitlines():
-            if FORBIDDEN_RE.search(line):
-                forbidden |= path_tokens(line)
 
-        described: set[str] = set()
-        for line in claude.read_text(encoding="utf-8").splitlines():
-            if not FORBIDDEN_RE.search(line):
-                described |= path_tokens(line)
+def check_rule_body_consistency(repository_paths: dict[str, str]) -> list[str]:
+    """All pointers in one repository name the same body, and the chain stops there.
 
-        for token in sorted(forbidden & described):
-            warnings.append(
-                f"{name}: AGENTS.md forbids `{token}` but CLAUDE.md mentions it "
-                "outside a forbidding sentence - review both files"
+    Two pointers that name different bodies give the two Harnesses different
+    answers, so the reader of a rule ends up with two. A body that forwards to
+    another body (`A -> B`, `B -> A`) resolves nowhere, which is the failure the
+    terminal-body rule exists to catch.
+    """
+    errors: list[str] = []
+    for name, path in sorted(repository_paths.items()):
+        repo = ROOT / path
+        declared: dict[str, str] = {}
+        for filename in POINTER_FILES:
+            if not (repo / filename).is_file():
+                continue
+            body, _ = pointer_body(repo, filename)
+            if body is not None:
+                declared[filename] = body
+        if len(set(declared.values())) > 1:
+            pairs = ", ".join(f"{k} -> {v}" for k, v in sorted(declared.items()))
+            errors.append(f"{name}: pointer files disagree on the rule body: {pairs}")
+        # One message per distinct defect: both pointers naming the same broken
+        # body is one problem to fix, not two.
+        for body in sorted(set(declared.values())):
+            declaring = sorted(
+                pointer for pointer, target in declared.items() if target == body
             )
-    return warnings
+            if body in POINTER_FILES:
+                errors.append(
+                    f"{name}: {', '.join(declaring)} declares a pointer as the rule body "
+                    f"({body}); the body must not itself be a pointer"
+                )
+            elif (repo / body).is_file() and any(
+                MACHINE_KEY_RE.match(line)
+                for line in (repo / body).read_text(encoding="utf-8").splitlines()
+            ):
+                errors.append(
+                    f"{name}: {body} is declared as the rule body but declares one "
+                    "itself; the chain must end at the body"
+                )
+    return errors
 
 
-def check_layer3_entries(repository_paths: dict[str, str]) -> list[str]:
+def check_layer3_shape(repository_paths: dict[str, str]) -> list[str]:
+    """The running repositories' AGENT-INDEX.md share one eight-section order.
+
+    The workspace is exempt: there the same filename is the governance body
+    itself, not a repository index.
+    """
+    errors: list[str] = []
+    sequences: dict[str, list[str]] = {}
+    for name, path in sorted(running_repositories(repository_paths).items()):
+        source = ROOT / path / BODY_FILE
+        if not source.is_file():
+            continue
+        headings = [
+            line[3:].strip()
+            for line in source.read_text(encoding="utf-8").splitlines()
+            if line.startswith("## ")
+        ]
+        sequences[name] = headings
+        if len(headings) != len(PROJECT_ORDER_SECTIONS):
+            errors.append(
+                f"{name}: {BODY_FILE} has {len(headings)} H2 sections, expected "
+                f"{len(PROJECT_ORDER_SECTIONS)}: {', '.join(headings)}"
+            )
+    ordered = sorted(sequences.items())
+    for (name, headings), (reference, expected) in zip(ordered[1:], ordered):
+        for position, (actual, want) in enumerate(zip(headings, expected), start=1):
+            if actual != want:
+                errors.append(
+                    f"{name}: {BODY_FILE} H2 sequence diverges from {reference} at "
+                    f"position {position}: '{actual}' != '{want}'"
+                )
+                break
+    return errors
+
+
+def rule_sentences(path: Path, body: str) -> list[str]:
+    """Lines that are rule claims: not headings, not pointers, not role tables.
+
+    A line naming the body file is the pointer's own machinery; a line naming any
+    entry file is describing a file's role. Neither is a rule, and both repeat by
+    design - two pointers to one body are supposed to overlap.
+    """
+    if not path.is_file():
+        return []
+    sentences: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("#"):
+            continue
+        if body in line or any(name in line for name in RUNNING_REPO_ENTRY_FILES):
+            continue
+        if not RULE_WORD_RE.search(line):
+            continue
+        normalized = WHITESPACE_RE.sub(" ", EMPHASIS_RE.sub("", line)).strip()
+        if normalized:
+            sentences.append(normalized)
+    return sentences
+
+
+def check_rule_text_duplication(
+    repository_paths: dict[str, str],
+) -> tuple[list[str], str]:
+    """The same rule sentence in two files of one repository is one landing point too many.
+
+    Reports the denominator on every run: a zero without a denominator is a
+    green with no evidence, since a comparator that matches nothing also
+    reports zero.
+    """
     warnings: list[str] = []
+    repositories = 0
+    files = 0
+    compared = 0
     for name, path in sorted(repository_paths.items()):
         repo = ROOT / path
         if not repo.is_dir():
             continue
-        if not (repo / "AGENT-INDEX.md").is_file():
-            warnings.append(f"{name}: no AGENT-INDEX.md (AGENT-INDEX.md Layer 3 is unresolved)")
+        repositories += 1
+        seen: dict[str, list[str]] = {}
+        body = BODY_FILE
+        for filename in DUPLICATION_FILES:
+            source = repo / filename
+            if not source.is_file():
+                continue
+            files += 1
+            for sentence in rule_sentences(source, body):
+                compared += 1
+                seen.setdefault(sentence, []).append(filename)
+        for sentence, where in sorted(seen.items()):
+            if len(set(where)) > 1:
+                warnings.append(
+                    f"{name}: rule sentence repeated in {', '.join(sorted(set(where)))}: "
+                    f"{sentence}"
+                )
+    note = (
+        f"rule-text duplication: compared {compared} rule sentence(s) across "
+        f"{files} file(s) in {repositories} repositor{'y' if repositories == 1 else 'ies'}"
+    )
+    return warnings, note
+
+
+def check_local_order_scope(repository_paths: dict[str, str]) -> list[str]:
+    """A repository's own reading order must not restate the project-level one.
+
+    The project-level order is the workspace's; a local list that names the
+    snapshot, the ledger, or `delivery/` is a second landing point for it.
+    """
+    warnings: list[str] = []
+    for name, path in sorted(running_repositories(repository_paths).items()):
+        source = ROOT / path / BODY_FILE
+        if not source.is_file():
+            continue
+        lines = source.read_text(encoding="utf-8").splitlines()
+        section: list[str] = []
+        inside = False
+        for line in lines:
+            if line.startswith("## "):
+                inside = line[3:].strip() == LOCAL_ORDER_HEADING
+                continue
+            if inside:
+                section.append(line)
+        for forbidden in LOCAL_ORDER_FORBIDDEN:
+            if any(forbidden in line for line in section):
+                warnings.append(
+                    f"{name}: {BODY_FILE} section '{LOCAL_ORDER_HEADING}' names "
+                    f"`{forbidden}` - the project-level order belongs to the workspace"
+                )
     return warnings
 
 
@@ -299,8 +568,17 @@ def validate_agent_entry() -> tuple[list[str], list[str], list[str]]:
     errors.extend(config_errors)
     warnings.extend(config_warnings)
 
-    warnings.extend(check_entry_drift(repository_paths))
-    warnings.extend(check_layer3_entries(repository_paths))
+    entry_errors, entry_warnings = check_repo_entry_files(repository_paths)
+    errors.extend(entry_errors)
+    warnings.extend(entry_warnings)
+    errors.extend(check_pointer_shape(repository_paths))
+    errors.extend(check_rule_body_consistency(repository_paths))
+    errors.extend(check_layer3_shape(repository_paths))
+
+    duplication_warnings, duplication_note = check_rule_text_duplication(repository_paths)
+    warnings.extend(duplication_warnings)
+    notes.append(duplication_note)
+    warnings.extend(check_local_order_scope(repository_paths))
     return errors, warnings, notes
 
 
