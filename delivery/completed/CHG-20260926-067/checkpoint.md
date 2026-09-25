@@ -6,7 +6,7 @@
 
 ## 状态
 
-`IMPLEMENTING`（2026-09-26 激活；跨四仓）
+`DONE`（2026-09-26 激活；2026-09-26 关闭归档；跨四仓）
 
 State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record in
 `delivery/active/` may only be `IMPLEMENTING` or `VERIFYING`.
@@ -23,14 +23,15 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 
 - **T-05 workspace 回指收口**：`verify_m3_acceptance.py` 三处改指 cloud `bin/control.sh`（`:561`／`:566`／`:1738`；计划只点名 2 处，实测 3 处）。**回改 T-04 的假阴性读数**（§14 第 24 项）：`t04-cloud-sweep.out` 加「更正一」、T-04 证据 §8 改为「已作废（假阴性）＋更正读数」、`change.md`／`checkpoint.md` 同步；预算在文件内部重新分配，收在 9211/9216。`foreign` 清单逐条重查落点后结论不变。`bin/control.sh`／`test-control.sh` 系 T-01 已建，本 Task 只复核。**跨仓红窗自此关闭。** 详见 `evidence/task-05-workspace-repoint.md`。
 - **T-06 agent 脚本层分层**：`bin/control.sh`（合并三脚本，`alive`／`health` 分列）；删 `start-health.sh`／`stop-health.sh`／`health.sh`（`scripts/` 分母 10 → 7）；三处 README 端口字面量去值、命令行改指 `bin/control.sh`；**三处**注释回指（计划点名 2 处，实测 3 处）。agent **`aa95332`**（13 文件，+221/−124）。12 臂落 `artifacts/t06-control-arms.out`。**本 Task 无红窗**——`scripts/verify-health.sh` 自内联启停，不调用被删的三个。详见 `evidence/task-06-agent-layout.md`。
+- **T-07 workspace 收尾**：**AC-01…AC-11 全 PASS**（三条缩减结论范围：AC-07 的「workspace 零命中」字面判据**不成立**——活跃面 3 行在 `release-matrix.yaml` 的历史证据行，按 §5 判留 ⇒ 报「3 行判留＋可解析 0」；AC-08 目前无真实被扫对象，唯一证据是 T-01 两臂；AC-05／AC-06 的变异由 T-02 提供）；归档 `git mv` **49 rename ＋ 1 新 artifact**；LEDGER 表行移出＋关闭段；`.ai/CURRENT_CONTEXT.md` `--no-active` 重生成（`Active CHG: none`）；`MASTER` §3 读数列刷新（活列 20→**19**、归档列 33→**34**、归档 `DONE` 31→**32**、归档记录 41→**42**，闭合式 34＋2＋2＋4＝42 ✓，量法**调门禁自己的 `status_word()`**）；两遍指针扫描（第一遍活跃面 3 行——**其中 `MASTER:119` 的旧 active 路径是真失效指针、由扫描自己找出并已修**；第二遍 496 篇／127 条，未解析 6 条＝CHG-065／066 已登记的同一批）；四仓对账越界 0。**三条如实登记**：阳性对照第一版选错锚（拿「应当有引用」的新路径作对照得 0，换成已归档的前一个 CHG 才有判别力）、反向对照被自己产物污染（`never-existed.sh` 全仓 4 行而非 0）、agent 套件是脏工作树上的绿。详见 `evidence/task-07-close-out.md`。
 
 ## Current
 
-无。T-06 已完成。四仓的运行仓改动**全部落地**（workspace／cloud／agent／desktop 各一次提交），下一步 T-07 只动 workspace 的收尾记录。
+无。**本 CHG 已收口归档**（`delivery/active/` → `delivery/completed/`，LEDGER 表行移出，快照 `--no-active`）。
 
 ## Next
 
-1. **T-07**（workspace 收尾）：归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描、四仓对账、AC 矩阵签字、DONE Gate。
+无。收口后不自动开始下一个 CHG；下一个候选只从 `delivery/MASTER_IMPLEMENTATION_PLAN.md` 与当前真实代码状态提出。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -90,6 +91,14 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 | 六门禁 + 套件（T-05 记录写完后复跑） | 见 `artifacts/t05-gate-final.out`——**不在此内联** |
 | agent `scripts/` 分母（T-06） | **10 → 7**（`git ls-tree --name-only HEAD scripts/` = 10；`git ls-files scripts/` = 7） |
 | agent `bin/control.sh`（T-06） | `bash -n`／`sh -n` 均 `exit=0`；**12 臂**全按预期：10 条功能臂对**真实健康台**跑（`status` 运行中 `alive=yes health=ok` `exit=0`／停止后 `alive=no health=down` `exit=1`、`restart` pid 86409→86446、重复 start 幂等、未知动词 `exit=2`）；2 条变异臂复现 §14 第 19 项 ⇒ **该危害三仓共有**（`artifacts/t06-control-arms.out`） |
-| agent 端口字面量（T-06，三形态） | 分母 57／17／16 行。改前：冒号两形态各命中 **2**（`:17` 的 54345、`:16` 的 18080）、裸数值形态命中 **7**；改后：冒号两形态 **0**、裸数值形态 **3**（全是同文件的历史 CHG 编号，非端口）。阳性对照：副本里放回两个数字 ⇒ 冒号形态 1、裸形态 5。**计划的模式抓不到 `VAR=18765` 形态（无冒号）**（`artifacts/t06-doc-port-literals.out`，§14 第 27 项） |
+| agent 端口字面量（T-06，三形态） | 分母（改前 57／17／16、改后 63／18／53＝**134** 行）。改前：冒号两形态各命中 **2**（`:17` 的 54345、`:16` 的 18080）、裸数值形态命中 **7**；改后：冒号两形态 **0**、裸数值形态 **3**（全是同文件的历史 CHG 编号，非端口）。阳性对照：副本里放回两个数字 ⇒ 冒号形态 1、裸形态 5。**计划的模式抓不到 `VAR=18765` 形态（无冒号）**（`artifacts/t06-doc-port-literals.out`，§14 第 27 项） |
 | agent 回指扫描（T-06，四形态） | 带边界精确形态：只读已跟踪 **0**、`--untracked` **2** 行（全在 `bin/control.sh:4-5` 表头的过去时叙述，判留）⇒ **可解析活指针 = 0**；带目录路径形态去重后同这 2 行；裸 `health\.sh` 形态 **10** 行全是子串重叠（8 行在幸存的 `verify-health.sh` 上）。阳性对照同命令同集合 `bin/control.sh` **6 文件／12 行**，反向对照 0。**当场复现 §14 第 24 项**：同一命令只差 `--untracked`，读数 0 → 2（`artifacts/t06-pointer-sweep.out`） |
 | agent 套件（T-06，最后一次改动之后） | `PYTHONPATH=src .venv/bin/python -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q` → `Ran 409 tests in 11.590s` / `OK`，rc=0，与激活前 `Ran 409 tests` / `OK` **逐字相同**。**归因声明**：工作树带一处开工前就存在的 `AGENT-INDEX.md` 未提交改动，未触碰 ⇒ 这是「脏工作树上的绿」 |
+| 归档只读扫描面分母（T-07） | `archive readonly: scanned 12 script(s)`——与 T-01 改递归后一致（`scripts/` 下 12 个 `.py`，子目录仍无 `.py`，因为本 CHG 按裁定不往 `scripts/verify/` 放脚本） |
+| AC 矩阵（T-07） | AC-01…AC-11 **全 PASS**；三条缩减结论范围（AC-07 字面判据不成立／AC-08 无真实被扫对象／AC-05·06 变异由 T-02 提供）（`artifacts/t07-ac-matrix.out`） |
+| 第一遍指针扫描（T-07） | 分母 944 已跟踪 ＋ 1 未跟踪；活跃面 **3 行**：`release-matrix.yaml:117`（判留）、`docs/superpowers/…:75`（判留）、`MASTER:119`（**真失效指针，已修**）。阳性对照 `CHG-20260925-066` 4 文件/154 行、`completed/README.md` 29/36、`bin/control.sh` 31/206；反向对照 0。**第一版阳性对照选错锚**（拿尚无引用的新路径得 0，无判别力）；**反向对照被自己产物污染**（`scripts/never-existed.sh` 全仓 4 行，排除 `delivery/completed/` 后 0）（`artifacts/t07-sweep.out`） |
+| 第二遍链接 resolve（T-07） | 分母 496 篇 `*.md`／127 条站内相对链接；**未解析 6 条**，与 CHG-065 T-09、CHG-066 T-06 的读数**逐条相同**（同一批、同一成因：少一级 `..`）⇒ 稳定状态，判留。**指向本 CHG 的未解析链接 0 条**；指向归档后 CHG-067 的链接 1 条 **resolve OK**（`LEDGER.md -> completed/CHG-20260926-067/change.md`）。三条对照全过（含「代码块/行内代码里的链接形状不被看见」）（同文件） |
+| `MASTER` §3 读数列（T-07，归档后） | 活列 **19**（`DISCUSSION` 7／`PLANNED` 3／`SUPERSEDED` 9，`IMPLEMENTING` 归 0）；归档记录 **42**（`DONE` **32**／`IMPLEMENTING` 1／`VERIFYING` 1／`CLOSED` 2／`HANDOFF` 2／`IN_PROGRESS` 4）；闭合式 34＋2＋2＋4＝**42** ✓（`artifacts/t07-status-words.out`） |
+| 四仓对账（T-07） | 锚 T-00 基线：workspace `71fd32f`→`9cef13b`／cloud `0db02ab`→`e2ba4d8`／agent `6d740fc`→`aa95332`／desktop `7c1b0ad`→`9ba5486`；改动路径逐条归属 §5，**越界 0**；三仓各恰一个提交。两条脏项先于本 CHG 存在、未触碰（`artifacts/t07-repo-reconcile.out`） |
+| 六门禁 + `sync_skills` + 套件（T-07，最后一次改动之后） | 见 `artifacts/t07-gate-final.out`——**不在此内联** |
+| 记录体量（T-07，**越界，如实登记**） | change.md 增量 **+7039**（界 5120，＋36%）——首测 +7935，做过一轮只删复述的压缩；checkpoint.md **+4051**（界 4096，界内）；evidence md 本 Task 新增 **8123**（界 9216，界内）。见 `artifacts/t07-record-size.out` 与 change.md §14 第 29 项 |

@@ -1,0 +1,54 @@
+# T-07 收尾读数：六门禁 ＋ sync_skills ＋ workspace 套件
+# 日期: 2026-09-26  取在**最后一次改动之后**（含 LEDGER 关闭段的定稿）、`git add -A` 之后
+
+## 分母
+#   已跟踪文件 = 951；未跟踪非忽略 = 0
+#   本次提交面：rename = 49；新增 = 7；修改 = 3；删除 = 0
+
+## 逐条（每条打印自己的退出码）
+=== verify_delivery_governance ===
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: none
+exit=0
+=== verify_agent_entry ===
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+=== verify_skills ===
+verified 10 skill source files
+exit=0
+=== verify_m0_config ===
+Workspace config verification ok
+exit=0
+=== verify_product_master_alignment ===
+Product and Master Plan alignment verification ok
+exit=0
+=== verify_m2_acceptance ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+=== sync_skills.py check ===
+exit=0
+skill outputs are up to date
+=== unittest discover -s tests -q ===
+exit=0
+Ran 101 tests in 0.564s
+OK
+
+## 复跑确认（本产物写完前再跑一遍）
+verify_delivery_governance         exit=0
+verify_agent_entry                 exit=0
+verify_skills                      exit=0
+verify_m0_config                   exit=0
+verify_product_master_alignment    exit=0
+verify_m2_acceptance               exit=0
+sync_skills.py check               exit=0
+unittest discover -s tests         exit=0  Ran 101 tests in 0.560s
+
+## 判读
+# 六门禁 6/6 exit=0；sync_skills exit=0；workspace 套件 Ran 101 / OK。
+# 本 Task 在 workspace 只动记录与生成物（无运行时代码），故这三组读数与 T-06 同形，是预期的。
+# **不代替** agent 侧的 Ran 409 / OK：两者是两个仓的量，互不代表；且后者是脏工作树上的绿（§14 第 1 项）。
+# 归档扫描面分母 `scanned 12 script(s)` 与 T-01 改递归后一致（scripts/ 下 12 个 .py，子目录仍无 .py）。

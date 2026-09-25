@@ -103,7 +103,7 @@ wt-media-workspace/
 
 状态词只有下表这些；写记录时从表里取，不造新词。读数列是**实测**值，两种写入形式（`- Status:` 与更早的 `> 状态：`）各自计数后相加。
 
-两张表加历史词汇应凑齐分母：活列 **20**（退役词在活记录里已归零）；归档列 33 ＋ 退役 `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **41**。对不上就说明有词没被登记。
+两张表加历史词汇应凑齐分母：活列 **19**（退役词在活记录里已归零）；归档列 **34** ＋ 退役 `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **42**。对不上就说明有词没被登记。
 
 **CHG**，变迁为 `DISCUSSION → PLANNED → IMPLEMENTING → VERIFYING → DONE`（`SUPERSEDED` 可从除 `DONE` 外的任何状态进入）：
 
@@ -111,12 +111,12 @@ wt-media-workspace/
 |---|---|---|---|
 | `DISCUSSION` | 草案，方向待裁定；不激活 | 7 | 0 |
 | `PLANNED` | 方向已定、已拆分，可激活 | 3 | 0 |
-| `IMPLEMENTING` | 实施中 | 1 | 1 |
+| `IMPLEMENTING` | 实施中 | 0 | 1 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 31 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 32 |
 | `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 9 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` 19 篇 ＋ `delivery/active/*/change.md` 1 篇；归档记录＝`delivery/completed/*/change.md` 41 篇。本行读数由 CHG-20260925-066 的 T-06 与 CHG-20260926-067 的 T-00 **各刷新一次**并逐词复测（后者的读数与分母见 `delivery/active/CHG-20260926-067/evidence/artifacts/t00-status-words.out`，量法**直接 import 门禁自己的 `status_word()`**）；该数列**每次归档即过期**的机制只登记不设通用对策（CHG-064 §14 第 7 项、CHG-20260925-066 §14 第 2 项）。
+分母：活记录＝`delivery/planned/*/change.md` 19 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **42** 篇。本行读数由 CHG-20260925-066 的 T-06、CHG-20260926-067 的 T-00 与 **CHG-20260926-067 的 T-07** 各刷新一次并逐词复测（读数与分母见 `delivery/completed/CHG-20260926-067/evidence/artifacts/t07-status-words.out`，量法**直接 import 门禁自己的 `status_word()`**）；该数列**每次归档即过期**的机制只登记不设通用对策（CHG-064 §14 第 7 项、CHG-20260925-066 §14 第 2 项）。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 

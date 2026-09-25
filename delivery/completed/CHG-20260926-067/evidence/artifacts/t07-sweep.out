@@ -1,0 +1,83 @@
+# T-07 两遍失效指针扫描
+# 日期: 2026-09-26  仓: wt-media-workspace  归档后: delivery/completed/CHG-20260926-067
+#
+## 分母（取在归档与全部记录改动之后、git add 之后）
+#   已跟踪文件（git ls-files）= 944
+#   未跟踪非忽略（git ls-files --others --exclude-standard）= 1（本 Task 的新 artifact）
+#   `git grep` 与 `git ls-files` 一样只看得见已跟踪/已暂存文件 ⇒ **取数在 git add 之后**（§14 第 24 项）
+
+## 第一遍：字符串扫描（三种形态，活跃面＝排除 delivery/completed/）
+```
+scripts/start-health\.sh                   1 行
+scripts/local-control\.sh                  1 行
+delivery/active/CHG-20260926-067           0 行
+```
+逐条：
+```
+-- scripts/start-health\.sh
+   config/release-matrix.yaml:117:        - "scripts/start-health.sh && scripts/health.sh && scripts/stop-health.sh"
+-- scripts/local-control\.sh
+   docs/superpowers/plans/2026-09-14-operation-resources-design-system-implementation.md:75:- [ ] Run `cd wt-media-workspace && ./scripts/local-control.sh start`; verify Cloud, Agent, BitBrowser, Desktop assets, DMG and login smoke all pass.
+-- delivery/active/CHG-20260926-067
+```
+判读：活跃面 3 行，**全部判留或已修**：
+1. `config/release-matrix.yaml:117`——同一文件 `:114/117/120` 是 §5 **Explicitly Not Doing** 明令不改的
+   **历史证据行**（`:2 planning_note` 声明 verified releases 是历史证据，写下时是真的）。判留。
+2. `docs/superpowers/plans/…:75` 的 `./scripts/local-control.sh start`——该目录被 `AGENT-INDEX.md:58`
+   声明为**非权威分析材料**，是 plan 里的可重放命令。与 T-01 的读数同一条（§14 第 9 项）。判留。
+3. `delivery/MASTER_IMPLEMENTATION_PLAN.md:119` 的 `delivery/active/CHG-20260926-067` —— **这是真失效指针，已修**：
+   归档后该路径不存在，本 Task 把它改成 `delivery/completed/CHG-20260926-067`（路径判修、叙述判留）。
+   **这条是本遍扫描自己找出来的**：不在任何 Task 的清单里，靠扫出来的。
+
+## 第一遍的对照
+```
+阳性对照 delivery/completed/CHG-20260925-066      4 文件 / 154 行
+阳性对照 delivery/completed/README.md             29 文件 / 36 行
+阳性对照 bin/control.sh                           31 文件 / 206 行
+反向对照 delivery/completed/CHG-19990101-999      0 行
+```
+**阳性对照的第一版选错了**：最初拿 `delivery/completed/CHG-20260926-067` 作对照，读数 0——
+因为**当时确实还没有任何文件引用归档后的新路径**（LEDGER 那段是这次才写的）。0 是真的，但
+**它证明不了检查能看见目录**。换成前一个已归档的 CHG（`CHG-20260925-066`，4 文件/154 行）后才有判别力。
+⇒ 「0」与「阳性对照的 0」要分开：前者的目标是**应当有引用**的新路径，后者是**换了锚**才成立。
+
+## 反向对照的一条污染（如实登记）
+```
+scripts/never-existed.sh 全仓（含 delivery/completed）= 4 行
+   delivery/completed/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out
+   delivery/completed/CHG-20260926-067/evidence/artifacts/t05-pointer-sweep.out
+   delivery/completed/CHG-20260926-067/evidence/artifacts/t07-ac-matrix.out
+   delivery/completed/CHG-20260926-067/evidence/artifacts/t07-sweep.out
+```
+**不是 0**：本 CHG 的 `t05-pointer-sweep.out`／`t06-pointer-sweep.out` 把这个对照名写进了自己的正文
+（「反向对照（证明扫的不是空转）」小节），于是那几个产物**进不了自己的分母就进别人的**。
+⇒ 排除 `delivery/completed/` 后为 0；上面那张表里的反向对照正是排除后的读数。
+**这条与 §14 第 24 项同源**：扫描产物的自指污染，只要产物里写了一个被扫的串就会发生。
+
+## 第二遍：相对链接 resolve
+# 检查器在 /private/tmp（不入库），剔除围栏代码块与行内代码后取 `](target)`。
+```
+分母: 496 篇已跟踪 *.md；站内相对链接 127 条
+未解析 6 条
+  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L27
+  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L278
+  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/service/operations.go#L49
+  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue#L251
+  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L167
+  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go#L280
+```
+判读：分母 **496** 篇已跟踪 `*.md`、站内相对链接 **127** 条，**未解析 6 条**——
+**是同一批、同一成因**：相对路径少一级 `..`，全部落在
+`delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md`，
+目标是跨仓的 `wt-media-cloud/…`。CHG-066 的 T-06 与 CHG-065 的 T-09 各独立量到**同一批 6 条**，
+三次读数逐条相同 ⇒ **稳定状态而非抖动**，按 `MASTER:132` 只登记不改（§14 第 23 项沿用）。
+**指向本 CHG 的未解析链接 0 条。**
+
+## 第二遍的对照（三条）
+```
+1. 存在的目标被看见 + 坏链接被报出 + 代码块/行内代码里的链接形状**不被看见**（证明剥离是选择性的，不是把检查器弄瞎）：
+   [ok](target.md) 见 / [bad](missing-real.md) 见 / `[no](missing-inline.md)` 不见 / 围栏里 `[no](missing-fence.md)` 不见
+2. 指向归档后 CHG-067 的链接 1 条：`delivery/LEDGER.md -> completed/CHG-20260926-067/change.md` **resolve OK**
+   ⇒ 检查器确实看见了归档后的目录（否则「0 条未解析」可能只是没扫到）。
+3. 反向：从不存在的归档目录 `CHG-19990101-999` 0 条。
+```

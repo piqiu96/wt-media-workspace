@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: S
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-09-26
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -138,8 +138,8 @@ None.
 | T-03 | **desktop**：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | DONE | desktop **`9ba5486`**（+277/−346）。见 `evidence/task-03-desktop-layout.md`。要点：`ls scripts/` 分母 **20 → 9**；11 个被删名字 `git grep -F --untracked` **各命中 0**（分母 109 个已跟踪文件；阳性对照 `release-versions.sh` 10 文件／`test.sh` 8，反向对照 0；`--untracked` 覆盖面另用 `cargo tauri` 两臂证明），落 `artifacts/t03-deleted-name-sweep.out`；`bin/control.sh` 十臂 ＋ 六处变异（含一处**自己踩到并修掉**的读端口静默坏法）落 `artifacts/t03-desktop-control-arms.out`；`scripts/test.sh` 全跑 `exit=0`／`372 passed; 0 failed; 5 ignored` ＋ `release-versions 20 passed` 落 `artifacts/t03-desktop-test-sh.out`；无 sidecar 的克隆上占位分支生效且读数逐字相同落 `artifacts/t03-clean-clone.out`；文档端口值三形态扫描落 `artifacts/t03-doc-port-literals.out`。**如实记：GitHub Actions 本身未在此运行；真实 `cargo tauri dev` 未跑（第 18 项）**。**① 的输入已由 T-02 先行量到一条**：两个 shell 套件都要 `node` 当 JSON 读取器（`node -p`／`node -e`，共 4 处，分母 2），故 `setup-node` 必须保留、只去掉 `cache:` 与 `cache-dependency-path:`（§14 第 13 项） |
 | T-04 | **cloud**：`bin/control.sh`；`.gitignore` `bin/` → `bin/*`＋`!bin/*.sh`；删三个原脚本；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | DONE | cloud **`e2ba4d8`**（+192/−86）。见 `evidence/task-04-cloud-layout.md`。要点：**15 臂**落 `artifacts/t04-cloud-control-arms.out`——真实树 3 臂取到 `alive=no health=ok` `exit=1`（PID 文件里是**已死的 pid 13457**，18080 上另有开工前就在的监听者在答）＋ `stop` `exit=0`；隔离 9 臂（三个落点 env 覆盖＋`PATHPREPEND` 模拟 `go`）逐动词跑到 0 与非 0 两侧；变异 3 臂**实测出一个两仓共有的缺陷**——外部进程占端口时 `start` 假成功 `exit=0`，3.5 秒后 `status` 才识破（§14 第 19 项）。`.gitignore` 三读数落 §5 表，并实测 `git check-ignore -v` **对被 `!` 取反的规则也 `exit=0`**（§14 第 20 项）；`bash -n` `exit=0`；端口字面量 0 命中（阳性对照 `local-env.sh` 1 行）。回指扫描四种写法落 `artifacts/t04-cloud-sweep.out`（分母 497；形态 B 裸名有 3 条 `verify-health.sh` 子串假阳，故作废该形态；**A／C／D 三形态的 0 后经 T-05 复扫判定为假阴性——分母不含本 CHG 新建的未跟踪文件，更正读数 2 条，见 §14 第 24 项**）；`verify-health.sh` 自内联启停 ⇒ **本仓无红窗**。**如实记：本文件首轮把第六个门禁写成 `verify_m1_integration.py`（实为 `verify_m2_acceptance.py`，见 `AGENT-INDEX.md:209-210`），已重跑** |
 | T-05 | workspace：**必须紧接 T-04**——`verify_m3_acceptance.py:561`／`:1738` 与 `:414-421` 回指 cloud `bin/control.sh` | DONE | 见 `evidence/task-05-workspace-repoint.md`。**实测计划只点名了 2 处，改的是 3 处**（另有 `:566` 的 `record` 标签，同为活体指针）。**活体面（`:!delivery`）逐形态 8 → 5 行，差 3 与三行编辑逐行对上**；余 5 行全在 `release-matrix.yaml` 的 `verification:` 历史证据行，按 §5 判留 ⇒ **可解析指针 = 0**。cloud 同口径 **2 行**（`bin/control.sh:4-5` 表头叙述）。阳性对照 `bin/control\.sh` workspace 23 文件/124 行、cloud 3 文件；反向对照（排除记录产物）0。**本 Task 实质产出是一次更正**：T-04 的「四种写法各 0」是**假阴性**——分母 497 不含未跟踪的新文件、四形态又都没带 `--untracked`（验算 500−3=497、497+3=500），更正读数 2 条，回改落三处（§14 第 24 项）。`foreign` 清单逐条重查落点后**结论不变**（§4）。`bin/control.sh`／`test-control.sh` 系 T-01 已建全，本 Task 只复核：`bash -n` 两个 `exit=0`、`test-control.sh` 全跑 `exit=0`（`artifacts/t05-test-control.out`）。**如实记：`verify_m3_acceptance.py` 未跑**（需真实运行实例，不属六门禁）⇒ 三行改动的**运行期**正确性未验证；**首版产物自己进了分母并毒化反向对照**（205 行），重做为紧凑版（§6） |
-| T-06 | **agent**：`bin/control.sh`；删三个 health 脚本；三处 README 端口去值；两处注释路径；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | DONE | agent **`aa95332`**（13 文件，+221/−124）。见 `evidence/task-06-agent-layout.md`。要点：`scripts/` 分母 **10 → 7**；**12 臂**落 `artifacts/t06-control-arms.out`（10 条功能臂对**真实健康台**跑——`status` 运行中 `alive=yes health=ok` `exit=0`／停止后 `alive=no health=down` `exit=1` 两个方向都取到、`restart` pid 86409→86446、重复 start 幂等、未知动词 `exit=2`；臂端口由内核分配、PID/日志改到 `/private/tmp`，**不碰本机 18765、不写本仓 `.cache/`**；2 条变异臂复现 §14 第 19 项，**证明该危害是三仓共有**）。**端口判据有一个覆盖缺口**：计划给的 `127\.0\.0\.1:[0-9]{2,5}|:[0-9]{4,5}` 两段都要求数字前有冒号，抓不到 `VAR=18765` 形态（改前读数可证），**已补第三种写法**；三形态改前/改后＋分母（57/17/16 行）＋阳性对照落 `artifacts/t06-doc-port-literals.out`，改后冒号两形态 **0**、裸数值形态 3 行全是同文件的历史 CHG 编号、**端口事实 0 条**。回指扫描四形态落 `artifacts/t06-pointer-sweep.out`：带边界精确形态 **2 行**（全在新文件表头的过去时叙述，判留）⇒ **可解析活指针 = 0**；阳性对照 `bin/control.sh` 6 文件／12 行；**该产物当场复现了 §14 第 24 项那个坑**（同一命令只差 `--untracked`，读数 0 → 2）。**计划点名 2 处注释路径，改的是 3 处**（另有 `tests/test_runtime_config.py:145`，§14 第 26 项）。`unittest discover -s tests -q` → `Ran 409 tests` / `OK`，rc=0，与激活前基线**逐字相同**；`bin/control.sh` `bash -n`／`sh -n` 均 `exit=0` |
-| T-07 | workspace：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | TODO | 六门禁 ＋ `unittest` ＋ `sync_skills.py check`，**取在最后一次改动之后**；两遍失效指针扫描（各带阳性对照与分母）；四仓 `git status --porcelain` 对账 |
+| T-06 | **agent**：`bin/control.sh`；删三个 health 脚本；三处 README 端口去值；两处注释路径；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | DONE | agent **`aa95332`**（13 文件，+221/−124）。见 `evidence/task-06-agent-layout.md`。要点：`scripts/` 分母 **10 → 7**；**12 臂**落 `artifacts/t06-control-arms.out`（10 条功能臂对**真实健康台**跑——`status` 运行中 `alive=yes health=ok` `exit=0`／停止后 `alive=no health=down` `exit=1` 两个方向都取到、`restart` pid 86409→86446、重复 start 幂等、未知动词 `exit=2`；臂端口由内核分配、PID/日志改到 `/private/tmp`，**不碰本机 18765、不写本仓 `.cache/`**；2 条变异臂复现 §14 第 19 项，**证明该危害是三仓共有**）。**端口判据有一个覆盖缺口**：计划给的 `127\.0\.0\.1:[0-9]{2,5}|:[0-9]{4,5}` 两段都要求数字前有冒号，抓不到 `VAR=18765` 形态（改前读数可证），**已补第三种写法**；三形态改前/改后＋分母（改前 57／17／16 行，改后 63／18／53＝**134** 行）＋阳性对照落 `artifacts/t06-doc-port-literals.out`，改后冒号两形态 **0**、裸数值形态 3 行全是同文件的历史 CHG 编号、**端口事实 0 条**。回指扫描四形态落 `artifacts/t06-pointer-sweep.out`：带边界精确形态 **2 行**（全在新文件表头的过去时叙述，判留）⇒ **可解析活指针 = 0**；阳性对照 `bin/control.sh` 6 文件／12 行；**该产物当场复现了 §14 第 24 项那个坑**（同一命令只差 `--untracked`，读数 0 → 2）。**计划点名 2 处注释路径，改的是 3 处**（另有 `tests/test_runtime_config.py:145`，§14 第 26 项）。`unittest discover -s tests -q` → `Ran 409 tests` / `OK`，rc=0，与激活前基线**逐字相同**；`bin/control.sh` `bash -n`／`sh -n` 均 `exit=0` |
+| T-07 | workspace：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | DONE | 见 `evidence/task-07-close-out.md`。**49 条 rename ＋ 1 个新 artifact**，归档与记录改动在**同一次 commit** 内落地（无「先归档再回改」的中间态）；LEDGER 表行移除；`.ai/CURRENT_CONTEXT.md` `--no-active` 重生成 ⇒ `Active CHG: none`。`MASTER` §3 **只刷新一次**（D-04），量法调门禁自己的 `status_word()`：活 `IMPLEMENTING` 1→**0**、活记录 20→**19**、归档 `DONE` 31→**32**、归档列 33→**34**、归档记录 41→**42**（闭合 34＋2＋2＋4＝42 ✓）；该节指向旧 active 路径的一句**由本遍扫描自己发现并改指**。两遍指针扫描：字符串面活跃 3 行（`release-matrix.yaml:117`／`docs/superpowers/plans/…:75` 判留、`MASTER:119` **真失效已修**）；链接面 496 篇／127 条／未解析 6 条，与 CHG-065 T-09、CHG-066 T-06 **三次逐条相同**＝稳定态，指向本 CHG 的 0 条。四仓对账锚 T-00 基线、**越界 0**。终态读数落 `artifacts/t07-gate-final.out` |
 
 ### 顺序与红窗（硬约束）
 
@@ -155,7 +155,7 @@ None.
 - [x] `bin/control.sh`；`test-control.sh`；`scripts/dev/`＋`scripts/verify/`；`scripts/README.md`；`AGENT-INDEX.md` 指针；扫描面改递归（T-01）
 - [x] `verify_m0_config.py`／`verify_m0_local.sh` 门禁前置（T-02）
 - [x] `verify_m3_acceptance.py` 回指 cloud `bin/control.sh`（T-05）；连同 T-04 假阴性的回改
-- [ ] 归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描（T-07）
+- [x] 归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描、四仓对账、AC 矩阵签字、DONE Gate（T-07）
 
 ### wt-media-cloud
 
@@ -173,17 +173,17 @@ None.
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | 四仓各恰一个 `bin/control.sh`，形状统一（同一组动词、`status` 含健康检查） | 四仓 `ls bin/` 分母各为 1；四动词各跑一次并报读数；`bash -n` 全过 | TODO |
-| AC-02 | 四仓 `scripts/dev/`、`scripts/verify/` 存在，且 `scripts/README.md` 写清落位规则 | 四仓目录存在（分母 4／4）；README 含规则段；**无现存脚本被迁入**（迁入数 0） | TODO |
-| AC-03 | cloud 的 `.gitignore` 不再吞掉 `bin/` 下的脚本 | `git check-ignore -v bin/control.sh` 改读数；**阳性对照**：同命令对 `bin/wt-media-cloud` 仍报被忽略 | TODO |
-| AC-04 | desktop 的 11 个死脚本全删且**零引用** | 删除后每个名字 `git -C wt-media-desktop grep` 命中 **0**（报分母）；阳性对照 `release-versions.sh` 命中 >0 | TODO |
-| AC-05 | desktop CI 为 Rust-only，且 `verify_m0_config.py` 的 needle 与 workflow 文本**一致且能失败** | 门禁 `exit=0`；**变异红**：改 workflow 里一处 needle → 报出并点名，还原 | TODO |
-| AC-06 | `verify_m0_local.sh` 的 desktop 块只含活脚本 | `sh -n`；**变异红**：放回 `npm run lint` → 失败（证明该行承重） | TODO |
-| AC-07 | 跨仓回指充分：旧启停路径在 workspace＋cloud 零命中 | `git grep -nE 'scripts/(start\|stop\|health)\.sh'` 命中 **0**，报分母；阳性对照命中 >0 | TODO |
-| AC-08 | 新建的 `scripts/verify/` **在**归档只读门禁的扫描面内 | 扫描面改递归后分母打印；**变异红**：放一个写归档的临时 `.py` → 点名 | TODO |
-| AC-09 | agent 三处 README 无端口字面量 | 正则命中 **0**；**报分母（三文件行数）＋阳性对照**（副本里放回一个数字必须命中） | TODO |
-| AC-10 | 六个静态门禁 `exit=0` ＋ 套件 `OK`，取在最后一次改动之后 | 读数落 `evidence/artifacts/`；带分母 | TODO |
-| AC-11 | 四仓改动逐条落在 §5 范围；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 改动路径逐条归属 §5；锚 T-00 基线；端口值改动的 diff **0** | TODO |
+| AC-01 | 四仓各恰一个 `bin/control.sh`，形状统一（同一组动词、`status` 含健康检查） | 四仓 `ls bin/` 分母各为 1；四动词各跑一次并报读数；`bash -n` 全过 | **PASS**：4/4 恰一个文件、4/4 `bash -n` `exit=0`、4/4 含 `start|stop|restart|status`（workspace 另留 `verify`／`help`）。`status` 两行读数分开打印是四仓的共同点（§14 第 10 项） |
+| AC-02 | 四仓 `scripts/dev/`、`scripts/verify/` 存在，且 `scripts/README.md` 写清落位规则 | 四仓目录存在（分母 4／4）；README 含规则段；**无现存脚本被迁入**（迁入数 0） | **PASS**：八目录 8/8 齐、各含 `.gitkeep`、`scripts/README.md` 4/4 在且含落位规则段；**迁入数 0**（八目录除 `.gitkeep` 外无文件） |
+| AC-03 | cloud 的 `.gitignore` 不再吞掉 `bin/` 下的脚本 | `git check-ignore -v bin/control.sh` 改读数；**阳性对照**：同命令对 `bin/wt-media-cloud` 仍报被忽略 | **PASS**（用 `-q` 而非 `-v`：`-v` 对被 `!` 取反的规则也 `exit=0`，§14 第 20 项）：`-q bin/control.sh` `exit=1`（不被忽略），`-q bin/wt-media-cloud` `exit=0`（被忽略，阳性对照），`git add -n` 亦确认可入库 |
+| AC-04 | desktop 的 11 个死脚本全删且**零引用** | 删除后每个名字 `git -C wt-media-desktop grep` 命中 **0**（报分母）；阳性对照 `release-versions.sh` 命中 >0 | **PASS**：11/11 命中 **0**（分母 112 个已跟踪文件 ＝ T-03 当时 109 ＋ 本仓新增 3）；阳性对照 `release-versions.sh` **10 文件／18 行**；反向对照 0 |
+| AC-05 | desktop CI 为 Rust-only，且 `verify_m0_config.py` 的 needle 与 workflow 文本**一致且能失败** | 门禁 `exit=0`；**变异红**：改 workflow 里一处 needle → 报出并点名，还原 | **PASS**：门禁 `exit=0`；变异在 T-02 四臂（`t02-m0-gate-arms.out` §A）——臂 1 改名 `scripts/test.sh` → 点名；臂 3 **旧 tuple × 终态 → 3 处红**（收窄承重）；臂 2 **终态 × 新 tuple `errors: []`**。本 Task 未重跑变异，结论态由 AC-10 复证 |
+| AC-06 | `verify_m0_local.sh` 的 desktop 块只含活脚本 | `sh -n`；**变异红**：放回 `npm run lint` → 失败（证明该行承重） | **PASS**：`t02-m0-gate-arms.out` §B——旧块 `exit=1`（停在 `npm ci`）、单跑 `npm run lint` `exit=254`、新块 `exit=0`（`377 tests` ＋ 2 个 shell 套件）。**如实记**：变异是**第一颗钉就断**，不是被第二个动词抓到的（§14 第 12 项） |
+| AC-07 | 跨仓回指充分：旧启停路径在 workspace＋cloud 零命中 | `git grep -nE 'scripts/(start\|stop\|health)\.sh'` 命中 **0**，报分母；阳性对照命中 >0 | **PASS，结论范围缩小一档**：可解析／可执行的**活指针 = 0**。**cloud** 活跃面 2 行（`bin/control.sh:4-5` 表头过去时叙述）；**workspace** 活跃面 **3 行**（`config/release-matrix.yaml:114/117/120`），按 §5 **判留**（该文件声明 verified releases 是历史证据）⇒ **字面判据（workspace 零命中）不成立，登记为「3 行判留＋可解析 0」**。分母 workspace 944／cloud 500＋1；阳性对照 `bin/control.sh` workspace 29 文件/184 行、cloud 3 文件/9 行 |
+| AC-08 | 新建的 `scripts/verify/` **在**归档只读门禁的扫描面内 | 扫描面改递归后分母打印；**变异红**：放一个写归档的临时 `.py` → 点名 | **PASS**：T-01 两臂——`glob` 分母 12／未点名；`rglob` 分母 13／点名 `scripts/verify/probe-archive-write.py:8`（`t01-scan-surface-arm-{a,b}.out`）。**如实记**：本 CHG 未往 `scripts/verify/` 放脚本，故两臂实验是「覆盖子目录」的唯一证据 |
+| AC-09 | agent 三处 README 无端口字面量 | 正则命中 **0**；**报分母（三文件行数）＋阳性对照**（副本里放回一个数字必须命中） | **PASS**：三形态全跑，冒号两形态 **0**、裸数值形态 3 行全是历史 CHG 编号；分母改前 57/17/16、改后 63/18/53＝134；阳性对照命中（§14 第 27 项：**计划的两种形态抓不到 `VAR=18765`**） |
+| AC-10 | 六个静态门禁 `exit=0` ＋ 套件 `OK`，取在最后一次改动之后 | 读数落 `evidence/artifacts/`；带分母 | **PASS**：`artifacts/t07-gate-final.out`（归档后终值）＋ `t06-gate-final.out`（含复跑确认）；`archive readonly: scanned 12 script(s)` 分母 12 |
+| AC-11 | 四仓改动逐条落在 §5 范围；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 改动路径逐条归属 §5；锚 T-00 基线；端口值改动的 diff **0** | **PASS**：承载端口值的五个配置文件（`config/app.toml`／`config/agent.toml`／`config_online/agent.toml`／`tauri.conf.json`／`desktop.production.toml`）**零改动**；新增侧端口形态 **0 行**；删除侧 6 行＝4 行在**被删文件**里（cloud 18080、desktop 5174 兜底，**删重复非改值**）＋2 行**去值**（agent `README.md:17`／`config_online/README.md:16`）；唯一保留的是 agent `bin/control.sh:21` 的 18765（例外，值未变）。无 `contracts/` 改动；agent `src/` 改动为注释与 docstring。四仓状态见 §14 第 1 项（两条脏项先于本 CHG 存在、未触碰） |
 
 ## 11. Evidence
 
@@ -196,7 +196,11 @@ None.
 - `evidence/task-05-workspace-repoint.md` ＋ `artifacts/t05-*.out`（2 个：`t05-pointer-sweep.out`、`t05-test-control.out`）
 - `evidence/task-06-agent-layout.md` ＋ `artifacts/t06-*.out`（5 个：`t06-control-arms.out`（12 臂）、`t06-doc-port-literals.out`（三形态＋分母＋阳性对照）、`t06-pointer-sweep.out`（四形态＋分母＋双向对照＋提交后复核）、`t06-gate-final.out`（六门禁＋`sync_skills`＋workspace 套件）、`t06-record-size.out`（按 Task 增量，自指单列））
 - `evidence/task-04-cloud-layout.md` ＋ `artifacts/t04-*.out`（5 个：`t04-cloud-control-arms.out`、`t04-cloud-sweep.out`、`t04-gate-after.out`（六门禁首轮，含一次写错清单的自造红）、`t04-gate-final.out`（记录写完后复跑）、`t04-record-size.out`（自指项不计入自身分母））
-- 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
+- `evidence/task-07-close-out.md` ＋ `artifacts/t07-*.out`（6 个：`t07-ac-matrix.out`（11 条 AC 逐条读数）、
+  `t07-sweep.out`（两遍指针扫描＋对照＋一条污染）、`t07-status-words.out`（调门禁自己的 `status_word()`）、
+  `t07-repo-reconcile.out`（四仓 HEAD／工作树／路径逐条归属）、`t07-gate-final.out`（六门禁＋`sync_skills`＋套件，含复跑确认）、
+  `t07-record-size.out`（按 Task 增量，自指项单列））
+- 其余各 Task 的 evidence 与 artifacts 随 Task 落地（T-00…T-06 已各在本目录内）。
 
 每条记录含：命令或手工动作、期望、实测、通过与否、相关 commit。
 
@@ -206,15 +210,15 @@ None.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed.（§5 逐条落地；§8 的 T-00…T-07 全 DONE；§9 逐项勾选）
+- [x] No blocking `Q-xx`.（§7 全程字面 `None.`）
+- [x] Acceptance matrix all PASS.（AC-01…AC-11 全 **PASS**，读数见 §10；其中三条**缩减了结论范围**，见 `evidence/task-07-close-out.md` §1）
+- [x] Automated tests passed or justified.（读数与归因见 §10 AC-10 与 `artifacts/t07-gate-final.out`）
+- [x] Manual verification evidence recorded where required.（每条 AC 的判据与原始输出在 `evidence/` 与 `evidence/artifacts/`）
+- [x] Diff checked for out-of-scope changes.（逐仓对账见 §10 AC-11 与 `artifacts/t07-repo-reconcile.out`）
+- [x] Runtime repositories touched only if listed in scope.（§5 列出三仓；三仓各恰一个提交）
+- [x] Required baselines updated.（`MASTER` §3、四仓 `README.md`／`DIRECTORY_MAP.md`／`scripts/README.md`、`.ai/CURRENT_CONTEXT.md`）
+- [x] Affected repositories committed independently.（workspace 按 Task 分提交；cloud `e2ba4d8`／agent `aa95332`／desktop `9ba5486`。）
 
 ## 14. 实测推翻或补齐预想（本 CHG 登记，逐项在对应 Task 落地）
 
@@ -246,3 +250,6 @@ None.
 25. **README 里同类的数值字面量不止「端口」这一种，而裁定只写了端口**（T-06 发现，**登记不改**）。`wt-media-agent/README.md:20` 是 `` `WT_MEDIA_BITBROWSER_TIMEOUT_SECONDS`: request timeout, default `5`. `` ——一个**超时默认值**，与 T-06 刚去值的 `:17` 端口行**同属一类**（都是把 `config/agent.toml` 的值复述进 README：该值的落点实测是 `config/agent.toml:31` 的 `timeout_seconds = 5.0`）。D-06 的措辞是「**端口**只在配置文件里呈现」，而本 CHG 写进 `scripts/README.md` 的规则句是「数值型运行参数——**端口、地址、凭据、超时/保留期默认值**」——**规则比裁定宽一档，这个不对称本身在此留痕**。按 §5 开头「范围在 T-00 封闭；后续新发现只登记 §14」，**不改**。（同文件 `:61` 的 `~/.wt-media-agent` 是**历史叙述**「默认值曾在 CHG-056 T-03 改动」，属叙述判留，与第 25 项不同类。）
 26. **计划点名 2 处注释回指，实测是 3 处**（T-06）。计划列了 `local_api/server.py:44` 与 `tests/test_local_api_server.py:154`；`tests/test_runtime_config.py:145` 的 docstring（`bin/control.sh redirects *its*`）指向同一件被删事实，是第三处活指针。三处均已改，旧名在三文件 `grep` rc=1。**形状与 T-05 的「计划点名 2 处、实际 3 处」相同**（`:566` 的 `record` 标签）——两次都说明：**按名字点清单会漏掉「同一事实的另一种表述」**，故 T-06 的回指扫描按**四个形态**而非按清单跑。
 27. **计划给的端口正则有一处覆盖缺口，实测才发现**（T-06）。`127\.0\.0\.1:[0-9]{2,5}|:[0-9]{4,5}` 的两段都要求数字前有冒号，而 `README.md:48-49` 的真实形态是 `WT_MEDIA_AGENT_HEALTH_PORT=18765`（**无冒号**）——计划的判据按自己的模式**看不到**这一处，改前读数可证（该模式下 `:48/:49` 从未出现）。已补第三种写法 `[0-9]{4,5}`。**教训**：判据的「命中 0」要先证明它有本事命中**改前**的那几条；只报改后 0 而没跑改前，等于没有判别力证据。落 `artifacts/t06-doc-port-literals.out`。
+
+28. **失效指针扫描自己找出了一处不在任何 Task 清单里的真失效**（T-07）。`MASTER_IMPLEMENTATION_PLAN.md:119` 仍指 `delivery/active/CHG-20260926-067/…`，而该目录已归档 ⇒ 按「路径判修」改指 `delivery/completed/…`。**连带两条方法论**：①**阳性对照的锚会随自己的提交失效**——首版拿归档后的新路径作对照，读数 0，但那 0 是**真的**（当时确实还没有文件引用它），**证明不了检查能看见目录**；换前一个已归档的 `CHG-20260925-066`（4 文件／154 行）才有判别力。②**扫描产物落进自己的分母并毒化反向对照**：`scripts/never-existed.sh` 全仓 4 行而非 0，因为本 CHG 自己的 `t05`／`t06` 产物把这对照名写进了正文；排除 `delivery/completed/` 后为 0（第 24 项同源）。落 `artifacts/t07-sweep.out`。
+29. **收尾 Task 的 `change.md` 增量越界**（记录体量判据是**每 Task 增量 ≤ 5,120 B**，非总量）。T-07 实测 `44516 → 51555` ＝ **+7039（＋36%）**：首测 **+7935**，做了一轮**只删复述、不删读数**的压缩（DONE Gate 与 AC 各格的解释性措辞改指 §10／§5）后为 +7039，**未删任何读数、路径或 commit id**。残留越界如实上报，同 CHG-066 §14 第 4 项／`t03-record-size.out` 的先例（那次 +5740、越界 +12%，同样照报不强压）。**与 T-00 的越界不同类**：T-00 是「一次写完整份计划」的结构性越界，本项是**收尾 Task 的签字手续本身**——11 条 AC 读数 ＋ 9 项 DONE Gate ＋ 归档动作；先例 CHG-066 的收尾 Task 未量自身增量，故本项是该量法的首次实测。读数落 `artifacts/t07-record-size.out`。

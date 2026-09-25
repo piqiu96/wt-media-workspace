@@ -1,0 +1,206 @@
+# T-07 AC 矩阵：11 条逐条读数
+# 日期: 2026-09-26  四仓 HEAD: workspace 9cef13b / cloud e2ba4d8 / agent aa95332 / desktop 9ba5486
+# 锚: T-00 基线 workspace 71fd32f / cloud 0db02ab / agent 6d740fc / desktop 7c1b0ad
+
+## AC-01 四仓各恰一个 bin/control.sh，形状统一
+```
+wt-media-workspace bin 文件数=1  bash -n=0  动词=restart,start,status,stop,verify,
+wt-media-cloud     bin 文件数=1  bash -n=0  动词=restart,start,status,stop,
+wt-media-agent     bin 文件数=1  bash -n=0  动词=restart,start,status,stop,
+wt-media-desktop   bin 文件数=1  bash -n=0  动词=restart,start,status,stop,
+```
+判读：4/4 恰一个文件、4/4 `bash -n` exit=0、4/4 都含 start|stop|restart|status。
+workspace 多 `verify`（D-03 的「等」）＋ `help`；其余三仓多 `help`（用法分派）——**形状统一指同一组动词语义，不是逐字同一份文件**。
+`status` 的健康语义：workspace 走 harness 的 `status` 动词（不得在 shell 里抄端口，§14 第 11 项），
+cloud/agent/desktop 在脚本内 curl／探针。四者共同点是**两行读数分开打印**（§14 第 10 项）。
+
+## AC-02 四仓 scripts/dev|verify 存在 ＋ README 写清落位规则 ＋ 迁入数 0
+```
+wt-media-workspace dev=ok verify=ok README=ok 落位规则段命中=2
+wt-media-cloud     dev=ok verify=ok README=ok 落位规则段命中=2
+wt-media-agent     dev=ok verify=ok README=ok 落位规则段命中=2
+wt-media-desktop   dev=ok verify=ok README=ok 落位规则段命中=2
+```
+迁入数：`ls -A <repo>/scripts/dev <repo>/scripts/verify` 四仓八目录，除 `.gitkeep` 外**无任何文件**（分母 8/8）⇒ 迁入数 = **0**。
+
+## AC-03 cloud .gitignore 不再吞 bin/ 下的脚本
+```
+check-ignore -q bin/control.sh     exit=1  (1 = 不被忽略)
+check-ignore -q bin/wt-media-cloud exit=0  (0 = 被忽略 = 阳性对照)
+git add -n bin/control.sh → 
+```
+判读：PASS。**注意 `-v` 不能用来判方向**——它对被 `!` 取反的规则也 exit=0（§14 第 20 项），故此处用 `-q`。
+
+## AC-04 desktop 11 个死脚本零引用
+```
+分母（已跟踪文件）= 112   （T-03 当时 109，+3 为本仓新增的 bin/control.sh 与两个 .gitkeep）
+  scripts/bootstrap.sh             0
+  scripts/build.sh                 0
+  scripts/dev.sh                   0
+  scripts/start.sh                 0
+  scripts/stop.sh                  0
+  scripts/health.sh                0
+  scripts/verify-real-scripts.mjs  0
+  scripts/health-check.mjs         0
+  scripts/start-dev.mjs            0
+  scripts/stop-dev.mjs             0
+  scripts/health-dev.mjs           0
+阳性对照 release-versions.sh = 10 文件 / 18 行
+反向对照 scripts/never-existed.sh = 0
+```
+判读：11/11 命中 0；阳性对照 10 文件/18 行 ⇒ 该 0 有判别力。
+
+## AC-05 / AC-06 desktop CI → Rust-only，且 needle 能失败
+读数在 T-02 的四臂／两臂对照里（`artifacts/t02-m0-gate-arms.out`）：
+- 臂 0（现状 workflow × 新 tuple）`errors: []`；臂 2（**T-03 终态 × 新 tuple**）`errors: []`
+- 臂 1（变异：改名 `scripts/test.sh`）→ 点名该 needle；臂 3（**旧 tuple × 终态**）→ **3 处红**，证明收窄承重
+- AC-06 变异：把 `npm run lint` 放回 → 失败（且 T-02 实测它是**第一颗钉就断**，见 §14 第 12 项）
+本 Task 不重跑这两组变异（会改文件再还原）；它们的**结论态**由本 Task 的门禁绿复证（AC-10）。
+
+## AC-07 跨仓回指充分（旧启停路径在 workspace＋cloud）
+```
+=== wt-media-workspace  分母 = 944 已跟踪 + 1 未跟踪
+-- 全仓:
+config/release-matrix.yaml:114:        - "WT_MEDIA_CLOUD_HTTP_ADDR=127.0.0.1:18080 scripts/health.sh"
+config/release-matrix.yaml:117:        - "scripts/start-health.sh && scripts/health.sh && scripts/stop-health.sh"
+config/release-matrix.yaml:120:        - "scripts/start.sh && scripts/health.sh && scripts/stop.sh"
+delivery/active/CHG-20260926-067/change.md:61:**F-10 被移入 `bin/` 的脚本有若干跨仓／跨文件调用点。** 逐条实测见 §8 各 Task；要点：`verify_m3_acceptance.py:561`（`bash scripts/start.sh`，`cwd=CLOUD_ROOT`）与 `:1738`（`scripts/stop.sh` 标签）是**跨仓**调用点；`test-local-control.sh:7` 用 `grep -Fqx` 逐字断言 `local-control.sh:6` 的 usage 串；cloud `start.sh:7` 与 `migrate.sh:7` 各 source 一次 `scripts/local-env.sh`；**agent 与 cloud 的 `verify-health.sh` 实测都不调用**被移的启停脚本（grep 空），各自内联。
+delivery/active/CHG-20260926-067/change.md:99:- cloud `scripts/start.sh`／`stop.sh`／`health.sh`（内容并入 `bin/control.sh`）。
+delivery/active/CHG-20260926-067/change.md:147:- **T-05 必须紧接 T-04，中间不插任何工作**：这是本 CHG **唯一的跨仓红窗**——`verify_m3_acceptance.py:561` 在 T-04 之后、T-05 之前指向一个已不存在的 `scripts/start.sh`。**如实记录**并说明可接受的理由：该脚本**不是六个静态门禁之一**、`release-matrix.yaml` 不驱动它、无 CI 消费它，全程六门禁与单元套件保持绿。备选的零红窗走法（先加 `bin/control.sh`、回指、再删原脚本，多两次提交）登记为**已考虑未采用**。
+delivery/active/CHG-20260926-067/evidence/artifacts/t00-script-inventory.out:37:scripts/health.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t00-script-inventory.out:40:scripts/start.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t00-script-inventory.out:41:scripts/stop.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t00-script-inventory.out:57:scripts/health.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t00-script-inventory.out:79:scripts/health.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t00-script-inventory.out:86:scripts/start.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t00-script-inventory.out:88:scripts/stop.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t03-deleted-name-sweep.out:34:D  scripts/health.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t03-deleted-name-sweep.out:36:D  scripts/start.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t03-deleted-name-sweep.out:38:D  scripts/stop.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t03-desktop-test-sh.out:16:  D  scripts/health.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t03-desktop-test-sh.out:18:  D  scripts/start.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t03-desktop-test-sh.out:20:  D  scripts/stop.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:8:#   git grep -nF -e 'scripts/start.sh'   -> README.md:64:scripts/start.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:9:#   git grep -nF -e 'scripts/stop.sh'    -> README.md:66:scripts/stop.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:10:#   git grep -nF -e 'scripts/health.sh'  -> README.md:65:scripts/health.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:18:$ git grep -nF -e 'scripts/start.sh' -e 'scripts/stop.sh' -e 'scripts/health.sh'
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:62:$ printf 'x scripts/health.sh y
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:65:1:x scripts/health.sh y
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:67:$ printf 'x scripts/health.sh y
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:70:1:x scripts/health.sh y
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:76:#     bin/control.sh:4:# restart and report on it. It merges what `scripts/start.sh`, `scripts/stop.sh`
+delivery/active/CHG-20260926-067/evidence/artifacts/t04-cloud-sweep.out:77:#     bin/control.sh:5:# and `scripts/health.sh` used to do, unchanged.
+delivery/active/CHG-20260926-067/evidence/artifacts/t05-pointer-sweep.out:51:$ git init; printf 'scripts/start.sh\n' > tracked.txt; 提交；同样内容写入 untracked.txt（不提交）
+delivery/active/CHG-20260926-067/evidence/artifacts/t05-pointer-sweep.out:52:$ git grep -nF -e 'scripts/start.sh'              => tracked.txt:1        （只有已跟踪的那个）
+delivery/active/CHG-20260926-067/evidence/artifacts/t05-pointer-sweep.out:53:$ git grep -nF --untracked -e 'scripts/start.sh'  => tracked.txt:1 + untracked.txt:1
+delivery/active/CHG-20260926-067/evidence/artifacts/t06-doc-port-literals.out:30:README.md:HEAD:49:WT_MEDIA_AGENT_HEALTH_PORT=18765 scripts/health.sh
+delivery/active/CHG-20260926-067/evidence/artifacts/t06-pointer-sweep.out:15:#     bin/control.sh:5:# `scripts/stop-health.sh` and `scripts/health.sh` used to do, unchanged.
+delivery/active/CHG-20260926-067/evidence/artifacts/t06-pointer-sweep.out:50:#     bin/control.sh:5:# `scripts/stop-health.sh` and `scripts/health.sh` used to do, unchanged.
+delivery/active/CHG-20260926-067/evidence/artifacts/t07-ac-matrix.out:40:  scripts/start.sh                 0
+delivery/active/CHG-20260926-067/evidence/artifacts/t07-ac-matrix.out:41:  scripts/stop.sh                  0
+delivery/active/CHG-20260926-067/evidence/artifacts/t07-ac-matrix.out:42:  scripts/health.sh                0
+delivery/active/CHG-20260926-067/evidence/task-04-cloud-layout.md:15:| `bin/control.sh` | **新建**（§2），合并 `scripts/start.sh`＋`stop.sh`＋`health.sh` |
+delivery/active/CHG-20260926-067/evidence/task-05-workspace-repoint.md:22::561  - subprocess.run(["bash", "scripts/start.sh"], cwd=str(CLOUD_ROOT), check=True,
+delivery/active/CHG-20260926-067/evidence/task-05-workspace-repoint.md:24::566  - record("G2.1", phase, "bringup", "scripts/start.sh -> cmd/server", …)
+delivery/active/CHG-20260926-067/evidence/task-05-workspace-repoint.md:26::1738 - record("11.4", phase, "teardown", "停止 scheduler/worker/Vite/代理 + scripts/stop.sh", …)
+delivery/active/CHG-20260926-067/evidence/task-06-agent-layout.md:11:| 删除 | `scripts/start-health.sh`、`scripts/stop-health.sh`、`scripts/health.sh` |
+delivery/completed/CHG-20260715-007/evidence/agent-checks.md:13:| initial `scripts/start-health.sh` + `scripts/health.sh` | FAIL: background process exited after start in current process manager |
+delivery/completed/CHG-20260715-007/evidence/agent-checks.md:15:| `scripts/health.sh` | PASS: `wt-media-agent health ok` |
+delivery/completed/CHG-20260715-007/evidence/cloud-checks.md:12:| `WT_MEDIA_CLOUD_HTTP_ADDR=127.0.0.1:18080 ... scripts/start.sh` | PASS: Cloud started |
+delivery/completed/CHG-20260715-007/evidence/cloud-checks.md:13:| `WT_MEDIA_CLOUD_HTTP_ADDR=127.0.0.1:18080 scripts/health.sh` | PASS: `wt-media-cloud health ok` |
+delivery/completed/CHG-20260715-007/evidence/cloud-checks.md:14:| `scripts/stop.sh` | PASS: Cloud stopped |
+delivery/completed/CHG-20260715-007/evidence/desktop-checks.md:9:| `scripts/start.sh` | PASS with local-port escalation: Vite dev server started on `127.0.0.1:5174` |
+delivery/completed/CHG-20260715-007/evidence/desktop-checks.md:10:| `scripts/health.sh` | PASS with local-port escalation: static and dev health OK |
+delivery/completed/CHG-20260715-007/evidence/desktop-checks.md:11:| `scripts/stop.sh` | PASS: dev server stopped |
+delivery/completed/CHG-20260715-007/evidence/verification-summary.md:27:3. Desktop local page at `http://127.0.0.1:5174/` while `scripts/start.sh` is running.
+delivery/completed/CHG-20260916-052/evidence/20260916-scheduler-worker-boundary.md:15:| 本地运行时 | `scripts/start.sh` 后请求 `GET /api/v1/health` | 返回 `{"status":"ok"}` | PASS |
+delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/01-freeze-and-preconditions.md:17:| G2.1 | PASS | scripts/start.sh -> cmd/server | 只有 API Server 在跑 | pid=27020 lstart=Wed Sep 23 05:50:16 2026 |
+delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/11-residue-teardown.md:17:| 11.4 | INFO | 停止 scheduler/worker/Vite/代理 + scripts/stop.sh | 进程退出、两端工作区干净 | 见 11-teardown 与 shell 收尾结果 |
+delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/run-manifest.json:119:    "request": "scripts/start.sh -> cmd/server",
+delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/run-manifest.json:1347:    "request": "停止 scheduler/worker/Vite/代理 + scripts/stop.sh",
+-- 活跃面（:!delivery）:
+config/release-matrix.yaml:114:        - "WT_MEDIA_CLOUD_HTTP_ADDR=127.0.0.1:18080 scripts/health.sh"
+config/release-matrix.yaml:117:        - "scripts/start-health.sh && scripts/health.sh && scripts/stop-health.sh"
+config/release-matrix.yaml:120:        - "scripts/start.sh && scripts/health.sh && scripts/stop.sh"
+-- 阳性对照 bin/control.sh: 30 文件 / 195 行
+=== wt-media-cloud  分母 = 500 已跟踪 + 1 未跟踪
+-- 全仓:
+bin/control.sh:4:# restart and report on it. It merges what `scripts/start.sh`, `scripts/stop.sh`
+bin/control.sh:5:# and `scripts/health.sh` used to do, unchanged.
+-- 活跃面（:!delivery）:
+bin/control.sh:4:# restart and report on it. It merges what `scripts/start.sh`, `scripts/stop.sh`
+bin/control.sh:5:# and `scripts/health.sh` used to do, unchanged.
+-- 阳性对照 bin/control.sh: 3 文件 / 9 行
+```
+判读：**PASS，但结论范围要缩小一档、如实说明**。
+- cloud：活跃面 2 行，全在 `bin/control.sh:4-5` 表头（过去时叙述「合并了这三个脚本」），**可解析指针 = 0**。
+- workspace：活跃面 **3 行**，全在 `config/release-matrix.yaml:114/117/120`。**这 3 行按 §5 Explicitly Not Doing 判留**
+  （该文件 `:2 planning_note` 声明 verified releases 是**历史证据**，写下时是真的；改写＝伪造历史）。
+  ⇒ **可解析／可执行的活指针 = 0**，与 T-05 的口径一致。
+- 其余全仓命中都在 `delivery/` 下，是本 CHG 自己的记录（含 `t00-script-inventory.out` 的原样清点、
+  `t04-cloud-sweep.out` 的转录、`change.md:61/99/147` 的实测叙述）与归档区的历史捕获，按「叙述判留」保留。
+- **故 AC-07 的字面判据（workspace 零命中）不成立**：报 **3 行判留 ＋ 可解析 0**，不写成「零命中」。
+
+## AC-08 新建的 scripts/verify 在归档只读门禁扫描面内
+T-01 两臂：`glob` 分母 12／探针未点名；`rglob` 分母 13／点名 `scripts/verify/probe-archive-write.py:8`（`artifacts/t01-scan-surface-arm-{a,b}.out`）。
+本 Task 的门禁读数复证分母仍为 **12**（`archive readonly: scanned 12 script(s)`），即子目录里仍无 `.py`。
+**如实记**：本 CHG 没有把任何脚本放进 `scripts/verify/`（用户裁定：只建骨架），所以「扫描面覆盖子目录」这条
+目前是**判据已改、尚无真实被扫对象**的状态——两臂实验是唯一的覆盖证据。
+
+## AC-09 agent 三处 README 无端口字面量
+```
+分母（改后三文件行数）= 134
+-- 127.0.0.1:NNNNN : 0 行
+-- :NNNNN        : 0 行
+-- 裸 NNNNN      : 3 行（全部是历史 CHG 编号，非端口）
+config_online/README.md:11:  file. ADR-0016 §7 permits credentials in this directory; the loader is
+config_online/README.md:12:  deliberately narrower today (recorded as a deviation in CHG-20260923-056), so
+config_online/README.md:15:  value: Q-01 was closed on 2026-09-25 (CHG-20260923-059, D-08) in favour of the
+```
+判读：PASS。三种形态全跑（**计划只给了前两种，而它们抓不到 `VAR=18765` 形态**，§14 第 27 项）；
+阳性对照（`/private/tmp` 副本里放回数字）见 `artifacts/t06-doc-port-literals.out`。
+
+## AC-11 四仓改动逐条落在 §5；业务代码／契约／端口值零改动
+```
+wt-media-cloud/config/app.toml                               无改动
+wt-media-agent/config/agent.toml                             无改动
+wt-media-agent/config_online/agent.toml                      无改动
+wt-media-desktop/src-tauri/tauri.conf.json                   无改动
+wt-media-desktop/src-tauri/resources/desktop.production.toml 无改动
+
+-- 新增侧含端口形态的行数（排除 delivery/；应为 0）
+   wt-media-workspace 0
+   wt-media-cloud     0
+   wt-media-agent     0
+   wt-media-desktop   0
+
+-- 删除侧含端口形态的行（逐条归属）
+   wt-media-cloud    
+     /dev/null-ADDR="${WT_MEDIA_CLOUD_HTTP_ADDR:-127.0.0.1:18080}"
+     /dev/null-ADDR="${WT_MEDIA_CLOUD_HTTP_ADDR:-127.0.0.1:18080}"
+   wt-media-agent    
+     b/config_online/README.md-  local Cloud service on `127.0.0.1:18080`. Nothing here is waiting on a
+   wt-media-desktop  
+     /dev/null-const url = process.env.WT_MEDIA_DESKTOP_DEV_URL ?? "http://127.0.0.1:5174/";
+     /dev/null-const url = process.env.WT_MEDIA_DESKTOP_DEV_URL ?? "http://127.0.0.1:5174/";
+```
+判读：PASS。
+- **承载端口值的五个配置文件零改动**（`config/app.toml`／`config/agent.toml`／`config_online/agent.toml`／`tauri.conf.json`／`desktop.production.toml`）。
+- **新增侧 0 行**含端口形态（四仓全 0）⇒ 没有任何**新值**被引入。
+- 删除侧 6 行，两类：4 行在**被删文件**里（cloud 的 `start.sh`／`health.sh` 各一条 18080 兜底、desktop 两个死 `.mjs` 各一条 5174 兜底）
+  ——**删的是重复字面量，不是改值**；2 行是**去值**（agent `README.md:17` 的 54345、`config_online/README.md:16` 的 18080）。
+- 唯一**保留**的端口字面量：agent `bin/control.sh:21` 的 `${WT_MEDIA_AGENT_HEALTH_PORT:-18765}`——裁定例外，值未变。
+- 业务代码／契约：四仓 diff 里无 `src/**` 逻辑改动（agent 两处是注释串、一处 docstring，已单独列在 §5 Modify），无 `contracts/` 改动。
+
+## AC-10 六门禁 ＋ 套件，取在最后一次改动之后
+读数落 `artifacts/t07-gate-final.out`（本 Task 归档后再跑一次）；T-06 的终值在 `artifacts/t06-gate-final.out`（含复跑确认）。
+
+## 更正一（AC-11 删除侧的 awk 归属漏了一行）
+# 上面那个 `awk '/^\+\+\+ /{f=$2}'` 只捕获 `+++` 行来记文件名，而**删除侧的行属于
+# `---` 那一侧**（`+++ /dev/null` 只覆盖整文件删除）。故 agent 的删除侧只打印出 1 行
+# （`config_online/README.md`），而计数是 2 行——同一个文件里两个数字自相矛盾。
+# 逐条重列 agent 的删除侧（`git diff 6d740fc..HEAD -- . ':!delivery' ':!docs'`）：
+#   23:-- `WT_MEDIA_BITBROWSER_API_URL`: local service base URL, default `http://127.0.0.1:54345`.   ← README.md
+#  216:-  local Cloud service on `127.0.0.1:18080`. Nothing here is waiting on a                       ← config_online/README.md
+# 2 行 ✓，与计数一致。**结论不变**（两个都是「去值」），但这行归属由本更正给出。
+# 「同句里两个数字自相矛盾是唯一会自己冒出来的线索」——此处正是它在起作用。

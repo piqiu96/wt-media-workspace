@@ -1,0 +1,25 @@
+# T-07 MASTER §3 读数列刷新：量法直接 import 门禁自己的 status_word()
+# 日期: 2026-09-26  调用: verify_product_master_alignment.status_word
+# 两轮：归档前（T-00 的读数，已作废）/ 归档后（本 Task）
+
+归档后读数（本 Task 实测）
+  活记录：分母 = 19 篇  → {'DISCUSSION': 7, 'PLANNED': 3, 'SUPERSEDED': 9}
+  归档记录：分母 = 42 篇  → {'CLOSED': 2, 'DONE': 32, 'HANDOFF': 2, 'IMPLEMENTING': 1, 'IN_PROGRESS': 4, 'VERIFYING': 1}
+  归档列 = DONE 32 + IMPLEMENTING 1 + VERIFYING 1 = 34
+  闭合式：归档列 34 ＋ CLOSED 2 ＋ HANDOFF 2 ＋ IN_PROGRESS 4 = 42
+  总分母 = 活 19 ＋ 归档 42 = 61
+
+## 与归档前（T-00 读数）的差
+| 量 | 归档前 | 归档后 | 差 |
+|---|---|---|---|
+| 活 `IMPLEMENTING` | 1 | **0** | −1（本 CHG 移出 active） |
+| 活记录合计 | 20 | **19** | −1 |
+| 归档 `DONE` | 31 | **32** | +1（本 CHG 由 IMPLEMENTING 转 DONE） |
+| 归档 `IMPLEMENTING` | 1 | **1** | 0（另一篇历史归档，本 CHG 不再记在这里） |
+| 归档列 | 33 | **34** | +1 |
+| 归档记录合计 | 41 | **42** | +1 |
+
+## 残余（沿用 CHG-066 §14 第 2 项，只登记不设对策）
+# 该数列**每次归档即过期**。本 CHG 按 D-04 只刷新一次；通用机制留独立 CHG。
+# 本 Task 已把 §3 里指向旧 active 路径的那句（`delivery/active/CHG-20260926-067/…t00-status-words.out`）
+# 改指 `delivery/completed/` —— 由第一遍指针扫描找出，见 `t07-sweep.out`。
