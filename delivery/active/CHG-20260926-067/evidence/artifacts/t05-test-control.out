@@ -1,0 +1,6 @@
+# T-05 workspace `scripts/test-control.sh` 全跑
+# 仓: wt-media-workspace  日期: 2026-09-26
+# 锚: 本 Task 的三处 verify_m3_acceptance.py 改动**已落地**（工作树里）
+
+PASS: bin/control.sh usage, dispatch, status wiring, and no-port-literal
+exit=0

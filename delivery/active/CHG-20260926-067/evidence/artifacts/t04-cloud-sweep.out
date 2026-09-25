@@ -11,11 +11,13 @@
 # 即三个引用**只有 README.md 一处**，而它就是本次要改写的那个块。
 
 ## 改写后重扫 —— 逐形态，含各自的假阳/假阴陷阱
+# 【警告】本节 A/C/D 三形态的 0 **全部作废**：分母少了三个未跟踪的新文件，见文末「更正一」。
+# 形态 B 的 3 条假阳与合成输入对照不受影响（那是判据形态本身的判别力问题，与分母无关）。
 
 ### 形态 A — 字面量全路径（-F）
 $ git grep -nF -e 'scripts/start.sh' -e 'scripts/stop.sh' -e 'scripts/health.sh'
   (0 hits)
-  => 真答案：0。
+  => **本行的 0 作废，见文末「更正一」。**
 
 ### 形态 B — 裸文件名（-F），**这一形态有假阳，不能用**
 $ git grep -nF -e 'start.sh' -e 'stop.sh' -e 'health.sh'
@@ -28,12 +30,13 @@ scripts/README.md:17:so it is both; `verify-health.sh` is a verification script 
 ### 形态 C — 正则 + 路径前缀 + \. 转义
 $ git grep -nE 'scripts/(start|stop|health)\.sh'
   (0 hits)
-  => 真答案：0。
+  => **0 作废（分母缺口），见「更正一」。**
 
 ### 形态 D — 带边界的裸名（正则），修掉形态 B 的假阳
 $ git grep -nE '([^-a-z]|^)(start|stop|health)\.sh'
   (0 hits)
-  => 真答案：0（与形态 B 的 3 条假阳对照，说明边界写法是必要的）。
+  => **0 作废（分母缺口），见「更正一」**；与形态 B 的 3 条假阳对照说明边界写法必要，但**判别力与分母是两件事**——
+     形态 D 挡得住子串假阳，却挡不住「文件不在被扫集合里」。
 
 ## 阳性对照与反向对照
 ### 阳性（确实存在的兄弟名）: git grep -c -F -e 'local-env.sh'
@@ -67,3 +70,27 @@ verify-health.sh
 1:x scripts/health.sh y
 2:verify-health.sh
   => 形态 B 两行都命中，假阳由此坐实。
+
+## 更正一（T-05 复扫发现；本条原读数**是假阴性**，非空转证明）
+# T-04 记录写完后，用同一条命令复扫 cloud，得到 **2 条**命中：
+#     bin/control.sh:4:# restart and report on it. It merges what `scripts/start.sh`, `scripts/stop.sh`
+#     bin/control.sh:5:# and `scripts/health.sh` used to do, unchanged.
+# 两条都在**本 CHG 新建的那个文件**的表头里，是「过去时叙述」（说明该文件合并了哪三个脚本），
+# 按「路径判修、叙述判留」判留，不改。
+#
+# 为什么本产物当时报了 0 —— **被扫集合里没有那个文件**：
+#   本次四形态（A/C/D 及 §阳性对照）全部用 `git grep`，**都没带 `--untracked`**。
+#   `git grep` 与 `git ls-files` 一样只看得见已跟踪/已暂存的文件，而取数时：
+#     - 三个删除已 `git rm` 进索引 ⇒ 立即从 ls-files 消失；
+#     - 三个新增（bin/control.sh、scripts/dev/.gitkeep、scripts/verify/.gitkeep）尚未跟踪 ⇒ 不在集合里。
+#   计数验算（判据不是推理，是可复算的差）：
+#     git ls-tree -r --name-only 0db02ab  = 500（开工前）
+#     git ls-files（扫描时刻，三个删除已入索引） = 500 - 3 = **497** ← 与产物自报的分母一致
+#     git ls-files（e2ba4d8 提交后） = 500 = 497 + 3（正是那三个新增）
+#   即本产物的分母少算了**恰好那三个新文件**，而命中的两条就在其中之一里。
+#
+# 归还的读数（e2ba4d8 提交后，工作树与提交内容一致）：
+#     $ git grep -nE 'scripts/(start|stop|health)\.sh'
+#     bin/control.sh:4 / bin/control.sh:5   => 2 条，全为叙述，判留
+#   结论修正：T-04 后 cloud 的「三个被删名字的引用」不是 0 而是 **2**，且都不是活体指针。
+#   登记 change.md §14；T-05 的活体指针判据另见 t05-pointer-sweep.out。

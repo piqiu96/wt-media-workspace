@@ -1,0 +1,56 @@
+# T-05 回指扫描：三个被移走的 cloud 启停脚本名
+# 仓: wt-media-workspace + wt-media-cloud  日期: 2026-09-26
+# 改动: scripts/verify_m3_acceptance.py:561/566/1738 改指 bin/control.sh（工作树里）
+# 口径: 一律带 --untracked —— T-04 的漏扫正是少了它（见 t04-cloud-sweep.out 文末「更正一」）
+
+## 分母
+workspace: git ls-files = 933 已跟踪；--others --exclude-standard = 2 未跟踪非忽略
+cloud:     git ls-files = 500 已跟踪
+模式: git grep -nE '([^-a-z]|^)(start|stop|health)\.sh'（形态 D：带边界，挡子串假阳）
+
+## 判据 1 —— 活体面（排除 delivery/**，即会被执行的引用所在面）
+$ git grep -nE '([^-a-z]|^)(start|stop|health)\.sh' -- ':!delivery'
+  config/release-matrix.yaml:114 / :117 / :120   <= 3 行，判留（见下）
+逐形态，改动前 → 改动后（同一命令、同一工作树，仅本 Task 的 3 行编辑之差）：
+  scripts/start\.sh   3 → 1     （verify_m3_acceptance.py:561、:566 已改；余 1 行在 release-matrix）
+  scripts/stop\.sh    2 → 1     （verify_m3_acceptance.py:1738 已改；余 1 行在 release-matrix）
+  scripts/health\.sh  3 → 3     （全在 release-matrix，本 Task 不涉）
+  合计                8 → 5     差 **3** ＝ 本 Task 改的 3 行，可逐行对上
+【活体面剩余 5 行的性质】全部是 config/release-matrix.yaml 的 `verification:` 历史证据行：
+  :120 是 cloud 的、:114 是 cloud 的、:117 的 start-health.sh/stop-health.sh 是 agent 的（T-06 才处置）。
+  validate_release_matrix()（:126-240）只查状态与契约版本，**不解析这些命令行**；计划明确「不改写」
+  ——改写等于伪造历史（:2 planning_note 声明其为已验证发布的历史证据）。故这 5 行判留。
+=> **可解析指针（会被某段代码拿去执行/查找的引用）= 0。**
+
+## 判据 2 —— cloud 同口径
+$ git -C ../wt-media-cloud grep -nE --untracked '([^-a-z]|^)(start|stop|health)\.sh'
+  bin/control.sh:4 / :5   => 2 行
+  两条都在本 CHG 新建文件的**表头**，是过去时叙述（「merges what … used to do, unchanged」），判留。
+  **这是对 T-04 那个「0」的更正**：T-04 取数时该文件尚未跟踪、四形态又都没带 --untracked，
+  被扫集合里没有它（验算：0db02ab 500 − 3 个已入索引的删除 = 497 = 产物自报分母；497 + 3 新增 = 500）。
+
+## 阳性对照（证明本条判据不是空转）
+$ git grep -lE 'bin/control\.sh' | wc -l                  => workspace **23** 个文件（124 行）
+$ git -C ../wt-media-cloud grep -lE 'bin/control\.sh'     => cloud **3** 个文件
+同一模式、同一仓、同一时刻能命中，故上面的 0 是「没有」，不是「搜不到」。
+
+## 反向对照（从未存在过的名字）
+$ git grep -nF --untracked -e 'scripts/never-existed.sh'
+  => 全仓 1 条：`t04-cloud-sweep.out:46` —— 那是 T-04 产物**自己引用**了对照名（它记录了这条对照怎么做）。
+$ git grep -nF --untracked -e 'scripts/never-existed.sh' -- ':!delivery'
+  => **0 条**。排除记录产物后为 0，判据成立。
+
+## 自指（本产物自己就在被扫树里）
+本文件按构造必然包含这三个名字；上面所有读数都取在它落盘**之前**。落盘后实测它自身命中
+  **3 行**——形态 D 与字面量（-F）两种口径**都是 3**：产物里多数写法是转义的 `start\.sh`
+  （常与 `\.` 一起写以免自身被扫中），两种口径都匹配不到它，故两条读数相同。
+故后续任何「全仓复扫」的分母都会包含本产物。**报数时把自指单列**，与轮次无关的子集（判据 1 的
+`:!delivery` 读数、cloud 读数）优先。
+
+## 机制演示（合成仓，证明「分母缺口」是真机制而非推断）
+$ git init; printf 'scripts/start.sh\n' > tracked.txt; 提交；同样内容写入 untracked.txt（不提交）
+$ git grep -nF -e 'scripts/start.sh'              => tracked.txt:1        （只有已跟踪的那个）
+$ git grep -nF --untracked -e 'scripts/start.sh'  => tracked.txt:1 + untracked.txt:1
+$ git ls-files                                    => tracked.txt
+$ git ls-files --others --exclude-standard        => untracked.txt
+=> 内容完全相同，差别只在跟踪状态；`--untracked` 是把后者纳入集合的唯一开关。

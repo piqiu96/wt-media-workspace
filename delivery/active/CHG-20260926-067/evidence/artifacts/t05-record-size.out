@@ -1,0 +1,27 @@
+# T-05 记录体量
+# 口径：整文件字节数，对**上一个 Task 的提交**（T-04 的 workspace 记录提交 cf148af）取差。
+# 上限：change.md 增量 ≤ 5120 B/Task；checkpoint.md 增量 ≤ 4096 B；evidence ≤ 9216 B/Task。
+# 注意：本 Task 还改了 T-04 的三个记录文件（假阴性更正），它们的「现在」列在此一并报，
+#       但其增量归属 T-04（见 t04-record-size.out 的更正）。
+
+文件                                                cf148af         现在         增量
+delivery/active/CHG-20260926-067/change.md          37100      39882       2782
+delivery/active/CHG-20260926-067/checkpoint.md      13153      15667       2514
+
+## evidence（本 Task 新增）
+delivery/active/CHG-20260926-067/evidence/task-05-workspace-repoint.md       7551
+
+## T-04 记录（本 Task 回改后的现值；上限 9216 只对 task-NN 生效）
+evidence/task-04-cloud-layout.md                     9211  (cf148af 时为 9169)
+
+## artifacts（非约束参考，自指项已排除）
+t05-pointer-sweep.out                                4376
+t05-test-control.out                                  265
+
+## 判据
+- change.md    增量 2782 / 5120
+- checkpoint.md 增量 2514 / 4096
+- evidence task-05-*.md 合计 7551 / 9216
+
+## 顺序说明
+# artifacts/t05-gate-final.out 是随后才产生的，故不在上节清单里。

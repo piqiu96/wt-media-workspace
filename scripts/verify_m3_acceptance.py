@@ -558,12 +558,12 @@ def phase_g2():
     server_pid = int(pid_file.read_text().strip()) if pid_file.exists() else 0
     server_up = server_pid and pid_alive(server_pid)
     if not server_up:
-        subprocess.run(["bash", "scripts/start.sh"], cwd=str(CLOUD_ROOT), check=True,
+        subprocess.run(["bash", "bin/control.sh", "start"], cwd=str(CLOUD_ROOT), check=True,
                        capture_output=True, text=True)
         server_pid = int(pid_file.read_text().strip())
     lstart = subprocess.run(["ps", "-o", "lstart=", "-p", str(server_pid)],
                             capture_output=True, text=True).stdout.strip()
-    record("G2.1", phase, "bringup", "scripts/start.sh -> cmd/server", "只有 API Server 在跑",
+    record("G2.1", phase, "bringup", "bin/control.sh start -> cmd/server", "只有 API Server 在跑",
            "pid=%d lstart=%s" % (server_pid, lstart), "PASS", {"server_pid": server_pid})
 
     runners = [p for p in pgrep("discovery-scheduler|discovery-worker") if p]
@@ -1735,7 +1735,7 @@ def phase_p11():
                "PASS" if still == int(b.get("count") or 0) else "FAIL")
 
     _state["residue"] = residue
-    record("11.4", phase, "teardown", "停止 scheduler/worker/Vite/代理 + scripts/stop.sh",
+    record("11.4", phase, "teardown", "停止 scheduler/worker/Vite/代理 + bin/control.sh stop",
            "进程退出、两端工作区干净", "见 11-teardown 与 shell 收尾结果", "INFO")
     save_state()
 
