@@ -1,0 +1,49 @@
+== cloud scripts/verify/test-control.sh -- mutations (each reverted) ==
+
+-- mutation 1: chmod -x bin/control.sh (disk only) --
+[control] PASS bin/control.sh exists
+[control] PASS bin/control.sh is tracked
+[control] PASS git index mode is 100755
+[control] FAIL working tree mode is executable
+[control]      -rw-r--r--
+[control] FAIL direct invocation: bin/control.sh help exits 0
+[control]      got exit=1; 'Permission denied' below means the entry is not executable: scripts/verify/test-control.sh: line 92: /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/bin/control.sh: Permission denied 
+[control] FAIL help lists 'start'
+[control]      no line matching '^  start\b' in: 
+[control] FAIL help lists 'stop'
+[control]      no line matching '^  stop\b' in: 
+[control] FAIL help lists 'restart'
+[control]      no line matching '^  restart\b' in: 
+[control] FAIL help lists 'status'
+[control]      no line matching '^  status\b' in: 
+[control] FAIL unknown verb exits 2
+[control]      got exit=1
+[control] PASS unknown verb writes nothing to stdout
+[control] FAIL unknown verb prints the usage on stderr
+[control]      stderr: scripts/verify/test-control.sh: line 119: /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/bin/control.sh: Permission denied 
+[control] control: 4 passed, 8 failed
+exit(mutation1)=?
+
+-- revert check --
+exit(after revert)=0
+
+-- mutation 2: git update-index --chmod=-x (index only; disk stays +x) --
+-rwxr-xr-x@ 1 aqiuye  staff  3669 Sep 26 02:11 bin/control.sh
+[control] PASS bin/control.sh exists
+[control] PASS bin/control.sh is tracked
+[control] FAIL git index mode is 100755
+[control]      got '100644' -- a fresh checkout would not be executable
+[control] PASS working tree mode is executable
+[control] PASS direct invocation: bin/control.sh help exits 0
+[control] PASS help lists 'start'
+[control] PASS help lists 'stop'
+[control] PASS help lists 'restart'
+[control] PASS help lists 'status'
+[control] PASS unknown verb exits 2
+[control] PASS unknown verb writes nothing to stdout
+[control] PASS unknown verb prints the usage on stderr
+[control] control: 11 passed, 1 failed
+
+-- revert check --
+100755 695a2dd225c475066fe60b7076e2747f0c1d6c5e 0	bin/control.sh
+exit(after round 2 revert)=0

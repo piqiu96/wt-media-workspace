@@ -1,0 +1,13 @@
+== T-02 record size (per-Task increment, anchor=9aca4f2) ==
+criterion: change.md <= 5120 B/Task, checkpoint.md <= 4096 B/Task, evidence md <= 9216 B/Task
+
+delivery/active/CHG-20260926-068/change.md               now= 16461 B  anchor= 15120 B  inc= +1341 B  limit= 5120  IN
+delivery/active/CHG-20260926-068/checkpoint.md           now=  5925 B  anchor=  4733 B  inc= +1192 B  limit= 4096  IN
+
+-- evidence md --
+delivery/active/CHG-20260926-068/evidence/task-00-activation.md now=  5732 B  anchor=  5732 B  inc=    +0 B  limit= 9216  IN
+delivery/active/CHG-20260926-068/evidence/task-01-desktop-entry.md now=  3924 B  anchor=  3924 B  inc=    +0 B  limit= 9216  IN
+delivery/active/CHG-20260926-068/evidence/task-02-cloud-entry.md now=  4252 B  anchor=     0 B  inc= +4252 B  limit= 9216  IN
+
+note: task-02-cloud-entry.md is NEW at this anchor (increment == size).
+artifacts/ are non-binding (not in the criterion).

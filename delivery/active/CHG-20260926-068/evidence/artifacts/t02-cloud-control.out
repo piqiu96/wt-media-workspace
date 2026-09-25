@@ -1,0 +1,15 @@
+== cloud scripts/verify/test-control.sh (post-write) ==
+[control] PASS bin/control.sh exists
+[control] PASS bin/control.sh is tracked
+[control] PASS git index mode is 100755
+[control] PASS working tree mode is executable
+[control] PASS direct invocation: bin/control.sh help exits 0
+[control] PASS help lists 'start'
+[control] PASS help lists 'stop'
+[control] PASS help lists 'restart'
+[control] PASS help lists 'status'
+[control] PASS unknown verb exits 2
+[control] PASS unknown verb writes nothing to stdout
+[control] PASS unknown verb prints the usage on stderr
+[control] control: 12 passed, 0 failed
+exit=0

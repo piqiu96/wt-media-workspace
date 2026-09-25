@@ -1,0 +1,117 @@
+== cloud scripts/test.sh full run (after last change) ==
+?   	github.com/wt-media/wt-media-cloud/cmd/discovery-scheduler	[no test files]
+?   	github.com/wt-media/wt-media-cloud/cmd/discovery-worker	[no test files]
+?   	github.com/wt-media/wt-media-cloud/cmd/migrate	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/cmd/server	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/bootstrap	0.667s
+ok  	github.com/wt-media/wt-media-cloud/internal/config	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/client/agent	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/client/observe	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/client/platforms/douyin	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/database	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/database/migration	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/logger	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/metrics	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/tracing	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/jobs	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/middleware	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/service	(cached)
+?   	github.com/wt-media/wt-media-cloud/internal/modules/contentpool	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/dto	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/model	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/service	1.099s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/scheduler	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/shared/api	(cached)
+?   	github.com/wt-media/wt-media-cloud/internal/shared/id	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/shared/identity	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/shared/requestctx	(cached)
+ok  	github.com/wt-media/wt-media-cloud/pkg/clients/http	(cached)
+ok  	github.com/wt-media/wt-media-cloud/pkg/config	(cached)
+ok  	github.com/wt-media/wt-media-cloud/pkg/logger	(cached)
+
+> wt-media-cloud-web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web
+
+ ✓ src/shared/ui/resource/resourceModule.test.js (3 tests) 4ms
+ ✓ src/localSettingsService.test.js (20 tests) 7ms
+ ✓ src/session.test.js (2 tests) 6ms
+ ✓ src/mediaAccounts.test.js (11 tests) 9ms
+ ✓ src/modules/contentpool/pages/ListPageConventions.test.js (6 tests) 45ms
+ ✓ src/localAgentService.test.js (10 tests) 29ms
+ ✓ src/localSettingsWiring.test.js (8 tests) 34ms
+ ✓ src/modules/contentpool/pages/ContentPoolPage.test.js (16 tests) 4ms
+ ✓ src/localSettingsView.test.js (19 tests) 5ms
+ ✓ src/modules/contentpool/pages/DiscoveryPages.test.js (3 tests) 3ms
+ ✓ src/apps/cloud/pages/users/usersApi.test.js (3 tests) 4ms
+ ✓ src/http.test.js (3 tests) 5ms
+ ✓ src/profileBindings.test.js (3 tests) 3ms
+ ✓ src/localLogsView.test.js (17 tests) 6ms
+ ✓ src/proxy.test.js (3 tests) 4ms
+ ✓ src/localAgentBoundary.test.js (4 tests) 2ms
+ ✓ src/apps/cloud/pages/users/UsersPage.test.js (6 tests) 5ms
+ ✓ src/modules/accounts/pages/AccountsPage.test.js (4 tests) 2ms
+ ✓ src/modules/profiles/pages/ProfilesPage.test.js (5 tests) 7ms
+ ✓ src/proxyOperationBoundary.test.js (4 tests) 2ms
+ ✓ src/apps/cloud/pages/users/TeamsAndGamesPage.test.js (3 tests) 2ms
+ ✓ src/modules/proxy/pages/ProxyPage.test.js (4 tests) 2ms
+ ✓ src/layout/AppLayout.test.js (5 tests) 2ms
+ ✓ src/localAgentStatus.test.js (2 tests) 2ms
+ ✓ src/apps/desktop/desktopRoleGuard.test.js (2 tests) 3ms
+
+ Test Files  25 passed (25)
+      Tests  166 passed (166)
+   Start at  03:43:24
+   Duration  916ms (transform 368ms, setup 0ms, collect 827ms, tests 198ms, environment 2ms, prepare 1.26s)
+
+[control] PASS bin/control.sh exists
+[control] PASS bin/control.sh is tracked
+[control] PASS git index mode is 100755
+[control] PASS working tree mode is executable
+[control] PASS direct invocation: bin/control.sh help exits 0
+[control] PASS help lists 'start'
+[control] PASS help lists 'stop'
+[control] PASS help lists 'restart'
+[control] PASS help lists 'status'
+[control] PASS unknown verb exits 2
+[control] PASS unknown verb writes nothing to stdout
+[control] PASS unknown verb prints the usage on stderr
+[control] control: 12 passed, 0 failed
+exit=0

@@ -1,0 +1,23 @@
+== control: is the `[control]` prefix load-bearing? ==
+comparator = verify_m3_acceptance.py's own regexes (^ok\s, ^FAIL.*$),
+the same two the phase-10.1 arm uses on scripts/test.sh's log.
+
+-- 0. does the comparator discriminate at all? (it must be able to fire) --
+   synthetic two-line text -> ^ok\s=1, ^FAIL=1  (expect 1/1)
+
+-- green log (scripts/test.sh exit=0) --
+   as written    : ^ok\s= 56  ^FAIL=  0  -> 10.1 PASS
+   prefix stripped: ^ok\s= 56  ^FAIL=  0  -> 10.1 PASS
+   delta          : ^ok\s +0  ^FAIL +0
+
+-- red log (mutation 1: chmod -x) --
+   as written    : ^ok\s=  0  ^FAIL=  0  -> 10.1 FAIL
+   prefix stripped: ^ok\s=  0  ^FAIL=  9  -> 10.1 FAIL
+   delta          : ^ok\s +0  ^FAIL +9
+
+note: the green-log arm is a NEGATIVE result -- stripping the prefix there
+      changes nothing, because a green run of this check writes no `FAIL`
+      line and no `ok` line at all. Reporting only that arm would have been
+      an empty comparator (0 delta either way). The red-log arm is the one
+      with discriminating power, and it is why the prefix is stated in the
+      file header as a requirement rather than as a style choice.

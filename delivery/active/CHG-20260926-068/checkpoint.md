@@ -26,13 +26,19 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   全跑 `scripts/test.sh` `exit=0`（cargo 372 passed／`control.test.sh` 12／`release-versions` 20）。
   并实测到新事实：同一 126 在 `set -e` 里读作 **1**（登记 `change.md` §14 第 1 项）。详见 `evidence/task-01-desktop-entry.md`。
 
+- **T-02 cloud**：新建 `scripts/verify/test-control.sh`（755，12 条判据／六类，**本仓 `scripts/verify/` 第一个真实文件**）；
+  `scripts/test.sh` 末尾加一行**直接调用**（不写 `bash`）；`scripts/README.md` 补该行并改掉「两个子目录各只有一个 `.gitkeep`」。
+  **每行带 `[control] ` 前缀**：`verify_m3_acceptance.py:1621-1632` 按 `^ok\s`／`^FAIL`／`Test Files N passed (N)`／`Tests N passed (N)` 解析本脚本日志。
+  变异 ① `chmod -x` → 4 passed／8 failed；② index-only → **恰 1 failed**（与 desktop 同数同分布）。
+  全跑 `exit=0`（`^ok\s` 56／`^FAIL` 0／vitest 25-166／`[control]` 12-0）。详见 `evidence/task-02-cloud-entry.md`。
+
 ## Current
 
-T-01 收尾：更新记录、量体量、在 desktop 提交。
+T-02 收尾：量体量、在 cloud 提交、在工作仓提交记录。
 
 ## Next
 
-T-02 cloud：新建 `scripts/verify/test-control.sh`（755，六条判据）＋ `scripts/test.sh` 末尾一行（前缀 `[control]`）＋ `scripts/README.md` 一行。
+T-03 agent：新建 `tests/test_control_sh.py`（unittest，六条判据，`subprocess` 直接调用）。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -61,3 +67,6 @@ T-02 cloud：新建 `scripts/verify/test-control.sh`（755，六条判据）＋ 
 | desktop 入口（T-01） | index `100644 → 100755`、磁盘 `-rw-r--r-- → -rwxr-xr-x`、5233 B 不变；`./bin/control.sh help` **126 → 0** |
 | desktop 机检（T-01） | 先红 3 passed／9 failed；变异 ① `chmod -x` → 8 failed、② index-only → **恰 1 failed**；还原后 12 passed／0 failed |
 | desktop 全跑（T-01） | `scripts/test.sh` `exit=0`：cargo 372 passed／0 failed／5 ignored、`control.test.sh` 12、`release-versions` 20 |
+| cloud 机检（T-02） | 绿 12 passed／0 failed；变异 ① `chmod -x` → 8 failed、② index-only → **恰 1 failed**；还原后复读 `100755` |
+| cloud 全跑（T-02） | `scripts/test.sh` `exit=0`：`go test` `^ok\s` 56／`^FAIL` 0、vitest `Test Files 25 passed (25)`／`Tests 166 passed (166)`、`[control]` 12 passed｜0 failed |
+| 前缀承重性（T-02） | 剥 `[control] ` 后：green 日志 delta 0（**空转，如实记**）、**red 日志 `^FAIL` 0 → 9**；比较器阳性对照 1/1 |
