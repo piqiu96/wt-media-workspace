@@ -6,10 +6,12 @@
 
 ## 状态
 
-`IMPLEMENTING`（2026-09-25 激活；仅 `wt-media-workspace` 一仓）
+`DONE`（2026-09-25 激活、2026-09-26 关闭归档；仅 `wt-media-workspace` 一仓，已移入
+`delivery/completed/`）
 
 State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record in
-`delivery/active/` may only be `IMPLEMENTING` or `VERIFYING`.
+`delivery/active/` may only be `IMPLEMENTING` or `VERIFYING`；本记录已不在
+`delivery/active/`，故取归档词 `DONE`。
 
 ## Completed
 
@@ -24,14 +26,28 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 
 - **T-05 删纯过程产物（复检后清单）**：T-02 的「42 files / 140,556 B ＝ 1.3%」是**高估**——它的入站引用仪器只认「精确文件名」一种写法，漏掉同 CHG 记录里的**带星 glob** 与**裸前缀**（`` `t01-` `` 这种一个 `*` 都没有的写法，任何基于 `*` 的扫描都够不着）。三形态复检：**37/42 其实被点名**，可删集 42 → 5。5 个里 3 个是 `probe-*.json`（**测量**，不是任何已跟踪源的确定性函数，且 M3 里程碑有活指针指向那个目录）判不删；**实删 2 个 `__pycache__/*.pyc`／54,810 B（0.51%）**。读数：699→697 文件、10,740,897→10,686,087 B、`.pyc` 分母 2→0；**git 侧零痕迹**（两个 `.pyc` 被 gitignore），唯一记录是 evidence ＋ `artifacts/t05-*`（§4 F-08 首次实际发生）。AC-07 两条读数已完成：净删除 **0**（阳性对照 `63092e8`）。删后六门禁 `exit=0` ＋ `Ran 100 OK`。见 `evidence/task-05-deletion-list.md`。
 
+- **T-06 收尾**：`git mv` 归档（**27 条 rename**）→ `delivery/completed/CHG-20260925-066/`；`LEDGER.md` 表行移除并补关闭段；`.ai/CURRENT_CONTEXT.md` 以 `--no-active` 重生成（`Active CHG: none`／`Status: NONE`）；`MASTER` §3 读数列按 D-04 **刷新一次**并**调门禁自己的 `status_word()`** 逐词复测（活列 20→**19**、归档列 32→**33**、归档 `DONE` 30→**31**、`IMPLEMENTING` 活 1→**0**、活记录 20→**19**、归档记录 40→**41**，闭合式 33＋退役 8＝41）；两遍扫描各带阳性对照与分母（字符串：分母 887 已跟踪文件，活跃面命中 **0**；相对链接 resolve：分母 474 篇 `*.md`／118 条链接，未解析 **6** 条全在 CHG-052 且与 CHG-065 读数逐条相同）；四仓对账（36 条改动路径逐条落在 §5 内、越界 **0**、运行时代码 **0**，三仓 HEAD 与基线逐字相同）。六门禁 `exit=0` ＋ `Ran 100 OK`，取在最后一次改动之后。见 `evidence/task-06-close-out.md`。
+
 ## Current
 
-T-05 已完成（未提交）；下一项是 T-06（收尾：归档、LEDGER、快照、两遍指针扫描）。
+无。T-01…T-06 全部完成，本 CHG 已归档为 `DONE`，`delivery/active/` 与
+`delivery/LEDGER.md` 均无本记录。
 
 ## Next
 
-1. **T-06**：归档 → `completed/`；LEDGER 同步；快照 `--no-active`；两遍失效指针扫描（字符串 ＋ 相对链接 resolve，各带阳性对照与分母）；`MASTER` §3 读数列按 D-04 再刷新一次；六门禁 ＋ unittest **在最后一次改动之后**重测；四仓 `git status --porcelain` 对账。
-2. **收尾时注意**：本轮 AC-05 的实删量（0.51%）低于 D-05 裁定的上限（1.3%），原因已登记 §14 第 17／18 项——**上限没用满不等于放宽了排除**，收尾结论文档要照这个口径写。
+1. **本 CHG 无后续 Task**。§13 DONE Gate 九项逐项签字；AC-01…AC-10 全 PASS。
+2. **收尾口径（照 §14 第 17／18 项写）**：AC-05 的实删量 **0.51%** 低于 D-05 裁定的
+   上限 1.3%——**这不是「放宽了排除换更小删除量」，而是 T-05 复检发现上限那个数本身
+   是高估**（T-02 的入站引用仪器只认三种写法里的一种，42 个候选里 37 个其实被点名）。
+   下一轮若有人重提「归档区有多少可删」，**先读 `artifacts/t05-reference-forms.out`
+   的三形态口径**，不要从 T-02 的 42/140,556 起算。
+3. **建议的下一项**（按 `MASTER_IMPLEMENTATION_PLAN.md` §2 完成清单与当前真实代码状态，
+   **不自动开工**）：`MASTER` §4 没有为归档区留下未完成的条目，本 CHG 也未打开新的
+   范围；`delivery/planned/` 下 3 篇 `PLANNED`（`CHG-20260924-061` 等）与 7 篇
+   `DISCUSSION` 是现成的候选，**取哪一篇需用户裁定**。本 CHG 只登记两条供选型参考的
+   现存事实：①`MASTER` §3 读数列**每次归档即过期**的机制仍无通用对策（§14 第 2 项，
+   下一任 Active CHG 归档时必须再刷一次）；②归档区现有 **6 条**少一级 `..` 的死链
+   （§14 第 23 项，可复现，按 `MASTER:132` 只登记不改）。
 
 ## Blocked
 
@@ -73,5 +89,12 @@ T-05 已完成（未提交）；下一项是 T-06（收尾：归档、LEDGER、�
 | T-05 六门禁 ＋ 套件 | 全 `exit=0`／`Ran 100 OK`（`artifacts/t05-gate-readings.out`） |
 | T-05 归档区新基线 | 697 文件 / 10,686,087 B |
 | T-05 记录体量 | 见 `artifacts/t05-record-size.out`——**不在此内联** |
+| T-06 `MASTER` §3 读数复测 | 归档后 活列 **19**／归档列 **33**／归档 `DONE` **31**／`IMPLEMENTING` 活 **0**／活记录 **19**／归档记录 **41**；闭合式 33＋退役 8＝41（`artifacts/t06-status-words.out`） |
+| T-06 第一遍扫描（字符串） | 分母 **891** 已跟踪／已暂存文件（**须 stage 之后取数**：未跟踪的产物不在分母里，第一版 887 对不上提交后的树）；**活跃面命中 0**；全仓命中数**不在此内联**，它有两个不稳定来源（本节复述的串、产物自指），确切读数与分解见 `artifacts/t06-sweep.out`——自指已实测 **43 → 87**（真实 43／自指 44／活跃面 0）。命中全在本 CHG 自己的已归档记录里，性质是**过去时叙述**＋**原始捕获回读**，按 `MASTER:132` 保留；**归档前**同一命令在本 CHG 目录外为 **3** 处（全在 `.ai/CURRENT_CONTEXT.md`，已由快照重生成归零） |
+| T-06 第二遍扫描（链接 resolve） | 分母 **474** 篇 `*.md`／**118** 条站内相对链接；未解析 **6** 条全在 `CHG-20260916-052`（少一级 `..`）；**指向本 CHG 的 0 条**；与 CHG-065 T-09 读数逐条相同 ⇒ 稳定状态（`artifacts/t06-sweep.out`） |
+| T-06 扫描的阳性对照 | 三条全过（存在/不存在/另一存在）；「跳过代码块与行内代码」**双向**验证（散文里的报出、围栏与行内代码里的不报） |
+| T-06 四仓对账 | workspace 36 条改动路径**越界 0**、运行时代码 **0**；三仓 HEAD ＝ 基线（`0db02ab`／`6d740fc`／`7c1b0ad`）、工作树仅 cloud 的既有 `dump.rdb`（`artifacts/t06-repo-reconcile.out`） |
+| T-06 六门禁 ＋ 套件 | 全 `exit=0`／`Ran 100 OK`／`sync_skills exit=0`，取在最后一次改动之后（`artifacts/t06-gate-readings.out`） |
+| 归档后本 CHG 体量 | 27 文件（归档前 27，逐条 rename） |
 
 读数取在**最后一次内容改动之后**；原始输出在 `evidence/artifacts/`。

@@ -1,0 +1,222 @@
+# T-06 两遍失效指针扫描（原始输出）
+# date: 2026-09-26 00:16:57 CST
+# 生成命令：python3 -B -X pycache_prefix=/tmp/pyc-none /tmp/t06_sweep.py
+# 取数时刻：本次提交的全部文件**已 staged**。原因：git grep 与 git ls-files 只看得见
+#           已跟踪与已暂存的文件，未跟踪的产物不在分母里——不先 stage 就量，
+#           读数对不上提交后的树（第一版正是这样量出 887 个文件）。
+# 两遍各带阳性对照与分母；第二遍另做「跳过代码块与行内代码」的双向对照。
+#
+# 报告口径（务必按这个读）：
+#   1. **活跃面命中 0** —— 稳定读数，与扫几轮无关。
+#   2. 全仓「共几处」**不稳定**：本扫描的产物文件一旦入库就落进自己的分母，
+#      且它逐条列出命中行，于是这个数成了扫描输出的函数、再多跑一轮还会涨。
+#      故逐文件报，并把自指那一档单列。
+
+############ 两遍扫描 ############
+========================================================================
+第一遍 字符串扫描：旧路径 `active/CHG-20260925-066`
+分母：891 个已跟踪文件（`git grep` 只扫已跟踪文件）
+命中 43 处：
+   delivery/completed/CHG-20260925-066/change.md:149:- [x] `delivery/active/CHG-20260925-066/` 三件齐备；LEDGER 表行；快照 `--change`（T-01）
+   delivery/completed/CHG-20260925-066/change.md:250:22. **「活跃文档命中 0」这个读数带一个时间戳，别读成「本 CHG 收尾时清理过指针」。** 两遍扫描**跑在归档之后**，于是本 CHG 自己记录里的每一处 `delivery/active/CHG-20260925-066` 都落在 `delivery/completed/` 之下，自然不算「活跃」。**归档前的同一命令读数**：本 CHG 目录之外只有 **3 处**，**全在 `.ai/CURRENT_CONTEXT.md`**（生成物，已由 `--no-active` 重生成后归零）。那些命中的性质逐条判定后全部是**过去时叙述**（T-01 的「建 active 目录三件」）或**原始捕获回读**（`git status --porcelain` 的读数原样留档），按「路径判修、叙述判留」与 `MASTER:132` **一律保留、不回改**。⇒ 若把扫描挪到归档前跑，读数会变成「十几处活跃命中」而结论一字不变——**同一个判据，两个时间点，两个数**；报数时必须带上「在哪个时间点量的」。**「活跃面 0」是稳定的，「全仓共几处」不是**：后者会被本节自己的文字改变（写第 22 项就要复述 `delivery/active/CHG-20260925-066` 这个串），故确切读数见 `artifacts/t06-sweep.out`、**不在此内联**（同第 4／12／16／20 项）——这是「记录改变被记录的量」在本 CHG 内部第二次出现。
+   delivery/completed/CHG-20260925-066/checkpoint.md:18:- **T-01 激活**：`delivery/active/CHG-20260925-066/` 三件齐备（`change.md`／`checkpoint.md`／`evidence/`）；§5 范围封闭；LEDGER 表行；`MASTER` §3 读数列按 §4 的 F-05 实测刷新（归档记录 39 → **40**、归档 `DONE` 29 → **30**、归档列 31 → **32**、活跃 `IMPLEMENTING` 0 → **1**、`active/` 0 → **1** 篇、活记录 19 → **20**）；快照 `--change`；四仓基线落 `artifacts/t01-repo-baseline.out`。逐词比对 15 项全部相等（`artifacts/t01-status-words.out`，量法调门禁自己的 `status_word()`）。
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out:8:?? delivery/active/CHG-20260925-066/
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:25:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:38:   M delivery/active/CHG-20260925-066/change.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:39:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:40:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:41:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-reference-forms.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:42:  ?? delivery/active/CHG-20260925-066/evidence/task-05-deletion-list.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:29:   [范围内] delivery/active/CHG-20260925-066/change.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:30:   [范围内] delivery/active/CHG-20260925-066/checkpoint.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:31:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-f07-completed-moved.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:32:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-gate-after.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:33:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-gate-before.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:34:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:35:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:36:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-status-words.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:37:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t02-deletable-measure.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:38:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t02-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:39:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:40:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:41:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-write-surface.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:42:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-gate-mutation.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:43:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:44:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-readonly-oracle.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:45:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:46:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:47:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:48:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:49:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-reference-forms.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:50:   [范围内] delivery/active/CHG-20260925-066/evidence/task-01-baseline.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:51:   [范围内] delivery/active/CHG-20260925-066/evidence/task-02-archive-inventory.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:52:   [范围内] delivery/active/CHG-20260925-066/evidence/task-03-writer-moved.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:53:   [范围内] delivery/active/CHG-20260925-066/evidence/task-04-gate-mutation.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:54:   [范围内] delivery/active/CHG-20260925-066/evidence/task-05-deletion-list.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:36:delivery/active/CHG-20260925-066 存在=yes
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:43:变更：delivery/active/CHG-20260925-066 → delivery/completed/CHG-20260925-066（27 文件 git mv）
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:74:delivery/active/CHG-20260925-066 存在=no
+   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:12:| 建 active 目录三件 | `delivery/active/CHG-20260925-066/{change.md,checkpoint.md,evidence/}` | 三件齐备 |
+   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:85:| `wt-media-workspace` | `5c1d98c` | 干净（除本 CHG 新建的 `delivery/active/CHG-20260925-066/`） |
+   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:95:新建：`delivery/active/CHG-20260925-066/` 下 `change.md`、`checkpoint.md`、`evidence/task-01-baseline.md`、
+   delivery/completed/CHG-20260925-066/evidence/task-06-close-out.md:103:| `delivery/active/CHG-20260925-066/` → `delivery/completed/CHG-20260925-066/` | `git mv`（27 条 rename） |
+
+逐文件命中数（自指与活跃面分开）：
+     26  delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out 
+      6  delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out 
+      3  delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out 
+      3  delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md 
+      2  delivery/completed/CHG-20260925-066/change.md 
+      1  delivery/completed/CHG-20260925-066/checkpoint.md 
+      1  delivery/completed/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out 
+      1  delivery/completed/CHG-20260925-066/evidence/task-06-close-out.md 
+   合计 43
+   其中**本扫描自己的产物**贡献 0 处（自指：再跑一轮会更多）
+   扣掉自指后 43 处
+   **活跃面**（不在 delivery/completed/ 之下）0 处
+
+阳性对照（证明这个命令在同一棵树上能命中）
+   [OK] 搜 `completed/CHG-20260925-066` → 5 个文件（期望 有）
+   [OK] 搜 `CHG-20260925-065` → 21 个文件（期望 有）
+   [OK] 搜 `completed/CHG-20260925-066/nope` → 0 个文件（期望 无）
+   ⇒ `git grep` 在这棵树上既能命中也能不命中；上面的 0 是判据的读数，不是命令空转。
+
+========================================================================
+第二遍 相对链接 resolve
+分母：475 个已跟踪 *.md，118 条站内相对链接
+未解析 6 条：
+   MISS  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:54  ->  ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+   MISS  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:55  ->  ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+   MISS  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:75  ->  ../../../../../wt-media-cloud/internal/modules/contentpool/service/operations.go
+   MISS  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:100  ->  ../../../../../wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue
+   MISS  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:112  ->  ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+   MISS  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md:113  ->  ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+   其中指向本 CHG 的：0 条
+
+阳性对照（证明解析器能分辨存在与不存在）
+   [OK] 存在的目标（本 CHG 归档后的 change.md） → exists=True（期望 True）
+   [OK] 不存在的目标（同目录下故意写错的名） → exists=False（期望 False）
+   [OK] 存在的目标（全仓 README） → exists=True（期望 True）
+
+「跳过代码块与行内代码」的双向对照
+   [OK] 散文里的链接被看见 → True（期望 True）
+   [OK] 围栏代码块里的不看见 → False（期望 False）
+   [OK] 行内代码里的不看见 → False（期望 False）
+   ⇒ 跳过代码不会隐藏散文里的真缺陷，读数因此不是被压低出来的。
+
+############ 自指的实测（紧接上一轮，同一命令、同一棵树）############
+# 上一轮跑完时本文件的正文里已逐条列出 43 处命中行，故这一轮它自己成了命中源。
+# 这不是「多跑几轮把它跑坏了」，而是把这个数的性质量出来：
+# 全仓计数 = f(扫描输出的内容)，活跃面计数 = 0（与扫几轮无关）。
+========================================================================
+第一遍 字符串扫描：旧路径 `active/CHG-20260925-066`
+分母：891 个已跟踪文件（`git grep` 只扫已跟踪文件）
+命中 87 处：
+   delivery/completed/CHG-20260925-066/change.md:149:- [x] `delivery/active/CHG-20260925-066/` 三件齐备；LEDGER 表行；快照 `--change`（T-01）
+   delivery/completed/CHG-20260925-066/change.md:250:22. **「活跃文档命中 0」这个读数带一个时间戳，别读成「本 CHG 收尾时清理过指针」。** 两遍扫描**跑在归档之后**，于是本 CHG 自己记录里的每一处 `delivery/active/CHG-20260925-066` 都落在 `delivery/completed/` 之下，自然不算「活跃」。**归档前的同一命令读数**：本 CHG 目录之外只有 **3 处**，**全在 `.ai/CURRENT_CONTEXT.md`**（生成物，已由 `--no-active` 重生成后归零）。那些命中的性质逐条判定后全部是**过去时叙述**（T-01 的「建 active 目录三件」）或**原始捕获回读**（`git status --porcelain` 的读数原样留档），按「路径判修、叙述判留」与 `MASTER:132` **一律保留、不回改**。⇒ 若把扫描挪到归档前跑，读数会变成「十几处活跃命中」而结论一字不变——**同一个判据，两个时间点，两个数**；报数时必须带上「在哪个时间点量的」。**「活跃面 0」是稳定的，「全仓共几处」不是**：后者会被本节自己的文字改变（写第 22 项就要复述 `delivery/active/CHG-20260925-066` 这个串），故确切读数见 `artifacts/t06-sweep.out`、**不在此内联**（同第 4／12／16／20 项）——这是「记录改变被记录的量」在本 CHG 内部第二次出现。
+   delivery/completed/CHG-20260925-066/checkpoint.md:18:- **T-01 激活**：`delivery/active/CHG-20260925-066/` 三件齐备（`change.md`／`checkpoint.md`／`evidence/`）；§5 范围封闭；LEDGER 表行；`MASTER` §3 读数列按 §4 的 F-05 实测刷新（归档记录 39 → **40**、归档 `DONE` 29 → **30**、归档列 31 → **32**、活跃 `IMPLEMENTING` 0 → **1**、`active/` 0 → **1** 篇、活记录 19 → **20**）；快照 `--change`；四仓基线落 `artifacts/t01-repo-baseline.out`。逐词比对 15 项全部相等（`artifacts/t01-status-words.out`，量法调门禁自己的 `status_word()`）。
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out:8:?? delivery/active/CHG-20260925-066/
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:25:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:38:   M delivery/active/CHG-20260925-066/change.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:39:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:40:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:41:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-reference-forms.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:42:  ?? delivery/active/CHG-20260925-066/evidence/task-05-deletion-list.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:29:   [范围内] delivery/active/CHG-20260925-066/change.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:30:   [范围内] delivery/active/CHG-20260925-066/checkpoint.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:31:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-f07-completed-moved.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:32:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-gate-after.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:33:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-gate-before.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:34:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:35:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:36:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-status-words.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:37:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t02-deletable-measure.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:38:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t02-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:39:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:40:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:41:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-write-surface.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:42:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-gate-mutation.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:43:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:44:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-readonly-oracle.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:45:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:46:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:47:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:48:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:49:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-reference-forms.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:50:   [范围内] delivery/active/CHG-20260925-066/evidence/task-01-baseline.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:51:   [范围内] delivery/active/CHG-20260925-066/evidence/task-02-archive-inventory.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:52:   [范围内] delivery/active/CHG-20260925-066/evidence/task-03-writer-moved.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:53:   [范围内] delivery/active/CHG-20260925-066/evidence/task-04-gate-mutation.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:54:   [范围内] delivery/active/CHG-20260925-066/evidence/task-05-deletion-list.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:36:delivery/active/CHG-20260925-066 存在=yes
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:43:变更：delivery/active/CHG-20260925-066 → delivery/completed/CHG-20260925-066（27 文件 git mv）
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:74:delivery/active/CHG-20260925-066 存在=no
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:17:第一遍 字符串扫描：旧路径 `active/CHG-20260925-066`
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:20:   delivery/completed/CHG-20260925-066/change.md:149:- [x] `delivery/active/CHG-20260925-066/` 三件齐备；LEDGER 表行；快照 `--change`（T-01）
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:21:   delivery/completed/CHG-20260925-066/change.md:250:22. **「活跃文档命中 0」这个读数带一个时间戳，别读成「本 CHG 收尾时清理过指针」。** 两遍扫描**跑在归档之后**，于是本 CHG 自己记录里的每一处 `delivery/active/CHG-20260925-066` 都落在 `delivery/completed/` 之下，自然不算「活跃」。**归档前的同一命令读数**：本 CHG 目录之外只有 **3 处**，**全在 `.ai/CURRENT_CONTEXT.md`**（生成物，已由 `--no-active` 重生成后归零）。那些命中的性质逐条判定后全部是**过去时叙述**（T-01 的「建 active 目录三件」）或**原始捕获回读**（`git status --porcelain` 的读数原样留档），按「路径判修、叙述判留」与 `MASTER:132` **一律保留、不回改**。⇒ 若把扫描挪到归档前跑，读数会变成「十几处活跃命中」而结论一字不变——**同一个判据，两个时间点，两个数**；报数时必须带上「在哪个时间点量的」。**「活跃面 0」是稳定的，「全仓共几处」不是**：后者会被本节自己的文字改变（写第 22 项就要复述 `delivery/active/CHG-20260925-066` 这个串），故确切读数见 `artifacts/t06-sweep.out`、**不在此内联**（同第 4／12／16／20 项）——这是「记录改变被记录的量」在本 CHG 内部第二次出现。
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:22:   delivery/completed/CHG-20260925-066/checkpoint.md:18:- **T-01 激活**：`delivery/active/CHG-20260925-066/` 三件齐备（`change.md`／`checkpoint.md`／`evidence/`）；§5 范围封闭；LEDGER 表行；`MASTER` §3 读数列按 §4 的 F-05 实测刷新（归档记录 39 → **40**、归档 `DONE` 29 → **30**、归档列 31 → **32**、活跃 `IMPLEMENTING` 0 → **1**、`active/` 0 → **1** 篇、活记录 19 → **20**）；快照 `--change`；四仓基线落 `artifacts/t01-repo-baseline.out`。逐词比对 15 项全部相等（`artifacts/t01-status-words.out`，量法调门禁自己的 `status_word()`）。
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:23:   delivery/completed/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out:8:?? delivery/active/CHG-20260925-066/
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:24:   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:25:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:25:   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:38:   M delivery/active/CHG-20260925-066/change.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:26:   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:39:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:27:   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:40:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:28:   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:41:  ?? delivery/active/CHG-20260925-066/evidence/artifacts/t05-reference-forms.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:29:   delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out:42:  ?? delivery/active/CHG-20260925-066/evidence/task-05-deletion-list.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:30:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:29:   [范围内] delivery/active/CHG-20260925-066/change.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:31:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:30:   [范围内] delivery/active/CHG-20260925-066/checkpoint.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:32:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:31:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-f07-completed-moved.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:33:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:32:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-gate-after.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:34:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:33:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-gate-before.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:35:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:34:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:36:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:35:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:37:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:36:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t01-status-words.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:38:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:37:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t02-deletable-measure.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:39:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:38:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t02-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:40:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:39:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:41:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:40:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:42:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:41:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t03-write-surface.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:43:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:42:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-gate-mutation.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:44:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:43:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:45:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:44:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-readonly-oracle.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:46:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:45:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t04-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:47:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:46:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:48:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:47:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-gate-readings.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:49:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:48:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-record-size.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:50:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:49:   [范围内] delivery/active/CHG-20260925-066/evidence/artifacts/t05-reference-forms.out
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:51:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:50:   [范围内] delivery/active/CHG-20260925-066/evidence/task-01-baseline.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:52:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:51:   [范围内] delivery/active/CHG-20260925-066/evidence/task-02-archive-inventory.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:53:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:52:   [范围内] delivery/active/CHG-20260925-066/evidence/task-03-writer-moved.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:54:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:53:   [范围内] delivery/active/CHG-20260925-066/evidence/task-04-gate-mutation.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:55:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out:54:   [范围内] delivery/active/CHG-20260925-066/evidence/task-05-deletion-list.md
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:56:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:36:delivery/active/CHG-20260925-066 存在=yes
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:57:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:43:变更：delivery/active/CHG-20260925-066 → delivery/completed/CHG-20260925-066（27 文件 git mv）
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:58:   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out:74:delivery/active/CHG-20260925-066 存在=no
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:59:   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:12:| 建 active 目录三件 | `delivery/active/CHG-20260925-066/{change.md,checkpoint.md,evidence/}` | 三件齐备 |
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:60:   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:85:| `wt-media-workspace` | `5c1d98c` | 干净（除本 CHG 新建的 `delivery/active/CHG-20260925-066/`） |
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:61:   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:95:新建：`delivery/active/CHG-20260925-066/` 下 `change.md`、`checkpoint.md`、`evidence/task-01-baseline.md`、
+   delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out:62:   delivery/completed/CHG-20260925-066/evidence/task-06-close-out.md:103:| `delivery/active/CHG-20260925-066/` → `delivery/completed/CHG-20260925-066/` | `git mv`（27 条 rename） |
+   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:12:| 建 active 目录三件 | `delivery/active/CHG-20260925-066/{change.md,checkpoint.md,evidence/}` | 三件齐备 |
+   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:85:| `wt-media-workspace` | `5c1d98c` | 干净（除本 CHG 新建的 `delivery/active/CHG-20260925-066/`） |
+   delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md:95:新建：`delivery/active/CHG-20260925-066/` 下 `change.md`、`checkpoint.md`、`evidence/task-01-baseline.md`、
+   delivery/completed/CHG-20260925-066/evidence/task-06-close-out.md:103:| `delivery/active/CHG-20260925-066/` → `delivery/completed/CHG-20260925-066/` | `git mv`（27 条 rename） |
+
+逐文件命中数（自指与活跃面分开）：
+     44  delivery/completed/CHG-20260925-066/evidence/artifacts/t06-sweep.out ← 本扫描自己的产物
+     26  delivery/completed/CHG-20260925-066/evidence/artifacts/t06-repo-reconcile.out 
+      6  delivery/completed/CHG-20260925-066/evidence/artifacts/t05-deletion-list.out 
+      3  delivery/completed/CHG-20260925-066/evidence/artifacts/t06-status-words.out 
+      3  delivery/completed/CHG-20260925-066/evidence/task-01-baseline.md 
+      2  delivery/completed/CHG-20260925-066/change.md 
+      1  delivery/completed/CHG-20260925-066/checkpoint.md 
+      1  delivery/completed/CHG-20260925-066/evidence/artifacts/t01-repo-baseline.out 
+      1  delivery/completed/CHG-20260925-066/evidence/task-06-close-out.md 
+   合计 87
+   其中**本扫描自己的产物**贡献 44 处（自指：再跑一轮会更多）
+   扣掉自指后 43 处
+   **活跃面**（不在 delivery/completed/ 之下）0 处
+
+阳性对照（证明这个命令在同一棵树上能命中）
+   [OK] 搜 `completed/CHG-20260925-066` → 6 个文件（期望 有）
+   [OK] 搜 `CHG-20260925-065` → 22 个文件（期望 有）
+   [!!] 搜 `completed/CHG-20260925-066/nope` → 1 个文件（期望 无）
+阳性对照失败，第一遍不成立

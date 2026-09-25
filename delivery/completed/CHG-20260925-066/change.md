@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: S
-- Status: IMPLEMENTING
+- Status: DONE
 - Created: 2026-09-25
 - Current repository: `wt-media-workspace`
 - Affected repositories:
@@ -140,18 +140,18 @@ None.
 | T-03 | 修掉唯一的写入者：`verify_m3_acceptance.py` 写入面移出归档；读取面只读且常量声明 | DONE | 判读为**读写两侧一并移出**（读点全是本轮产物）。三层判据：字面量 **0/1810**（阳性对照 2/1798）、19 个写点逐个归属 0 处写归档、运行三读数 ＋ 影子树两臂对照（臂 B 旧版写进归档 2 文件）。见 `evidence/task-03-writer-moved.md` |
 | T-04 | 门禁：`check_archive_readonly` ＋ `check_completed_has_boundary` | DONE | 判据层阳性对照（锚 `05c2045`）**11 处／0 处**；用例层四条变异全红成 `FAIL`、`ImportError` **0**、`ERROR` **0**；两条分母由 `main()` 打印（`scanned 12 script(s)`／`1 boundary marker(s)`）；六门禁 `exit=0` ＋ 套件 **94 → 100 OK**。见 `evidence/task-04-gate-mutation.md` |
 | T-05 | 删纯过程产物：按 T-02 清单执行；排除 PNG 与 CHG-052 的 m3-e3 包 | DONE | 复检后**实删 2 files / 54,810 B**（T-02 清单 42/140,556 是三形态里只认一种所致）：699→697 文件、10,740,897→10,686,087 B、`.pyc` 分母 2→0；仪器对照含「不存在的路径报不存在」；**git 侧零痕迹**（两个 `.pyc` 被 gitignore），唯一记录是 evidence ＋ `artifacts/t05-*`。删后六门禁 `exit=0` ＋ `Ran 100 OK` |
-| T-06 | 收尾：归档 → `completed/`；LEDGER 同步；快照 `--no-active`；两遍失效指针扫描 | TODO | 六门禁 `exit=0` ＋ unittest，**在最后一次改动之后**重测；四仓 `git status --porcelain` 对账 |
+| T-06 | 收尾：归档 → `completed/`；LEDGER 同步；快照 `--no-active`；两遍失效指针扫描 | DONE | 归档 `git mv`（27 文件）；两遍扫描各自带对照与分母（`artifacts/t06-sweep.out`）；`MASTER` §3 读数列按 D-04 刷新并逐词复测（`artifacts/t06-status-words.out`）；六门禁 `exit=0` ＋ `Ran 100 OK`，**在最后一次改动之后**重测（`artifacts/t06-gate-readings.out`）；四仓对账（`artifacts/t06-repo-reconcile.out`） |
 
 ## 9. Repository Checklist
 
 ### wt-media-workspace
 
-- [ ] `delivery/active/CHG-20260925-066/` 三件齐备；LEDGER 表行；快照 `--change`（T-01）
-- [ ] `completed/README.md` ＋ `AGENT-INDEX.md` §8 ＋ `MASTER:132` ＋ `README.md:51`（T-02）
-- [ ] `verify_m3_acceptance.py` 写入面移出归档（T-03）
-- [ ] `verify_delivery_governance.py` 两条新判据 ＋ 用例（T-04）
-- [ ] 删除清单执行并留痕（T-05）
-- [ ] 归档、LEDGER 同步、快照 `--no-active`、指针扫描（T-06）
+- [x] `delivery/active/CHG-20260925-066/` 三件齐备；LEDGER 表行；快照 `--change`（T-01）
+- [x] `completed/README.md` ＋ `AGENT-INDEX.md` §8 ＋ `MASTER:132` ＋ `README.md:51`（T-02）
+- [x] `verify_m3_acceptance.py` 写入面移出归档（T-03）
+- [x] `verify_delivery_governance.py` 两条新判据 ＋ 用例（T-04）
+- [x] 删除清单执行并留痕（T-05）
+- [x] 归档、LEDGER 同步、快照 `--no-active`、指针扫描（T-06）
 
 ### wt-media-cloud
 
@@ -174,10 +174,10 @@ None.
 | AC-03 | `check_completed_has_boundary` **能失败** | 变异对照：删 `README.md` → 报出；去掉标记串 → 报出 | **PASS**（T-04：M2 变异红 4 条；删除 `README.md`、去掉标记串、整目录缺失三种形态各有用例，全部断言完整错误集合） |
 | AC-04 | 重跑 `verify_m3_acceptance.py` 的读写路径**不再写 `completed/`** | 跑前跑后对 `completed/` 做文件数 ＋ 字节数 ＋ `find -newer` 三读数；**阳性对照**：修改前的版本必须报出写入 | **PASS**（T-03：699/699、字节全等、`find -newer` **0** 个；对照臂旧版 `find -newer` **2** 个且 `.cache/` 不存在——全部写进归档；`artifacts/t03-write-surface.out`） |
 | AC-05 | 删除**只**落在可再生过程产物上，且逐条留痕 | 逐条删除清单（路径 ＋ 字节）；删前删后总字节读数；**PNG 与 CHG-052 m3-e3 包零删除**逐类枚举确认 | **PASS**（T-05：只删 2 个 `__pycache__/*.pyc`——已跟踪源码的确定性派生；3 个 `probe-*.json` **是测量不是派生**故不删，见 §14 第 18 项。699→697 文件、差 **54,810 B** 与逐条读数相等；PNG 0 个、CHG-052 包 0 个） |
-| AC-06 | `MASTER` §3 读数列与实测**逐词相等**（含本 CHG 激活后的分母） | 用与 `verify_product_master_alignment.py::status_word()` 同源的量法重测（先例：`re-measure-with-the-gates-own-function`） | TODO |
+| AC-06 | `MASTER` §3 读数列与实测**逐词相等**（含本 CHG 归档后的分母） | 用与 `verify_product_master_alignment.py::status_word()` 同源的量法重测（先例：`re-measure-with-the-gates-own-function`） | **PASS**（T-06：量法**直接 import 门禁自己的 `status_word()`**，不是另写等价正则。归档后逐词：活列 20→**19**、归档列 32→**33**、归档 `DONE` 30→**31**、`IMPLEMENTING` 活 1→**0**、活记录 20→**19**、归档记录 40→**41**；闭合式 33＋退役 8＝41 成立。`MASTER` §3 就地刷新的五个数与实测逐词相等；前后两轮读数与分母见 `artifacts/t06-status-words.out`） |
 | AC-07 | 归档区**从未被删过**这一事实在本 CHG 之后仍成立 | `git log --diff-filter=D -- delivery/completed` 的**净删除文件数**为 0（T-05 的删除须落在可再生的过程产物上，故本条按「记录文件」为分母重述） | **PASS**（T-05：删的两个 `.pyc` 在 `.gitignore` 内，`git status --porcelain` **无删除项**，故 git 侧的净删除仍为 0；两条命令的读数见 §14 第 19 项） |
-| AC-08 | 六个静态门禁 `exit=0` ＋ `unittest` OK | 在**最后一次改动之后**重测，读数落 `evidence/artifacts/` | TODO |
-| AC-09 | 四仓零越界：workspace 只得治理文件改动，三仓零改动 | 逐仓 `git status --porcelain` ＋ `git diff --stat` 对账，锚 T-01 基线提交 | TODO |
+| AC-08 | 六个静态门禁 `exit=0` ＋ `unittest` OK | 在**最后一次改动之后**重测，读数落 `evidence/artifacts/` | **PASS**（T-06：六个门禁全 `exit=0`、`sync_skills.py check` `exit=0`、`unittest` **Ran 100 / OK**，读数取在归档、LEDGER、`MASTER` §3、快照与全部记录改动**之后**（`artifacts/t06-gate-readings.out`）） |
+| AC-09 | 四仓零越界：workspace 只得治理文件改动，三仓零改动 | 逐仓 `git status --porcelain` ＋ 改动路径逐条归属 §5 声明的范围；锚 T-01 基线提交 | **PASS**（T-06：workspace 自基线起 **36 条改动路径**逐条落在 §5 范围内（越界 **0**）、**运行时代码／配置改动 0**；三仓 HEAD 与基线**逐字相同**（cloud `0db02ab`／agent `6d740fc`／desktop `7c1b0ad`），工作树除开工即存在的未跟踪 `dump.rdb` 外为空。`artifacts/t06-repo-reconcile.out`） |
 | AC-10 | 门禁**报出分母**，且读数不是空转 | `check_archive_readonly` 打印被扫描脚本数与前缀匹配数；`check_completed_has_boundary` 打印被检查的标记串数 | **PASS**（T-04：`scanned 12 script(s) … 0 write(s)`／`1 boundary marker(s)`，两条由 `main()` 无条件打印；用例 `test_archive_checks_report_their_denominators` 逐字断言这两行） |
 
 ## 11. Evidence
@@ -199,15 +199,15 @@ None.
 
 ## 13. DONE Gate
 
-- [ ] Scope completed.
-- [ ] No blocking `Q-xx`.
-- [ ] Acceptance matrix all PASS.
-- [ ] Automated tests passed or justified.
-- [ ] Manual verification evidence recorded where required.
-- [ ] Diff checked for out-of-scope changes.
-- [ ] Runtime repositories touched only if listed in scope.
-- [ ] Required baselines updated.
-- [ ] Affected repositories committed independently.
+- [x] Scope completed.（§5 六项 Task 全部 DONE；§9 清单逐项勾选）
+- [x] No blocking `Q-xx`.（§7 为字面 `None.`，全程无新增）
+- [x] Acceptance matrix all PASS.（AC-01…AC-10 全 **PASS**，无一条记为部分或带例外）
+- [x] Automated tests passed or justified.（六门禁全 `exit=0`、`unittest` `Ran 100 / OK`、`sync_skills.py check` `exit=0`；读数取在最后一次改动之后）
+- [x] Manual verification evidence recorded where required.（每条 AC 的手工判据与原始输出在 `evidence/` 与 `evidence/artifacts/`；两遍指针扫描各带阳性对照与分母）
+- [x] Diff checked for out-of-scope changes.（36 条改动路径逐条归属 §5，越界 0；运行时代码 0）
+- [x] Runtime repositories touched only if listed in scope.（§5 只列 `wt-media-workspace`；三仓 HEAD 与基线逐字相同、工作树空）
+- [x] Required baselines updated.（`MASTER` §3 读数列按 D-04 刷新一次；`AGENT-INDEX.md` §8／`MASTER:132`／`completed/README.md` 三处边界落点；`.ai/CURRENT_CONTEXT.md` 以 `--no-active` 重生成）
+- [x] Affected repositories committed independently.（本 CHG 只影响一仓，逐 Task 一提交：`7e3c8c4`／`05c2045`／`7a0d884`／`f07142d`／`e730956` ＋ 收尾提交）
 
 ## 14. 实测推翻或补齐预想（本 CHG 登记，逐项在对应 Task 落地）
 
@@ -244,3 +244,11 @@ None.
 19. **AC-07 的两条读数**：`git log --diff-filter=D -- delivery/completed` 的净删除 **0**（阳性对照：同一命令对 `delivery/active/CHG-20260714-001/change.md` 报出 `63092e8`——证明该命令能报出删除，0 不是空转）；`git status --porcelain` 无删除项（删的两个 `.pyc` 本在 `.gitignore` 内）。⇒ **本 Task 在 git 侧零痕迹，唯一记录是 `evidence/task-05-deletion-list.md` 与 `artifacts/t05-*.out`**。这是 §4 F-08 预判形态的第一次实际发生。
 
 20. **T-05 的记录成本是四个 Task 里唯一一次三项皆不越界**：`change.md`／`checkpoint.md`／本 Task evidence 三个增量全部落在界内（T-01 越界 3.2 倍见第 4 项、T-03 两处约 +10% 见第 12 项、T-04 见第 16 项）。成因不是写得少，是**本 Task 有真实的负向面积**：原计划删 42 files / 140,556 B 而实删 2 files / 54,810 B，复检推翻清单这件事本身把记录压回了界内——**所以这条读数不该被读成「写作纪律变好了」**。确切数字见 `evidence/artifacts/t05-record-size.out`（**不内联**，同第 4／12／16 项）。
+
+21. **对账仪器比判据严一档，会凭空造出越界。** T-06 的对账脚本第一版把「越界」定义成**「路径不以 `delivery/` 或 `.ai/` 开头」**，于是 `AGENT-INDEX.md`／`README.md`／`scripts/verify_delivery_governance.py`／`scripts/verify_m3_acceptance.py`／`tests/*.py` 五类**明确写在 §5 范围内**的路径全被报成越界（读数「越界 6 条」）。判据其实不是路径前缀，是**§5 声明的范围**；改成逐条比对声明清单后为**越界 0 条**。⇒ 与「复核门禁管辖的量要调门禁自己的函数」同族，但方向相反的那一半：**那次是量法比判据松（漏报），这次是量法比判据严（虚报）**。两次的共同点是——**读数与判据的定义不是同一个东西时，读数无论偏哪边都不可信**。第一版的另一个毛病是同一脚本用 `sh` 跑出 UTF-8 乱码（`（本 CHG 范围内零改动）`），改用 Python 重写；**乱码本身不改变结论，但会让「这份读数是什么」变得不可核对**。
+
+22. **「活跃文档命中 0」这个读数带一个时间戳，别读成「本 CHG 收尾时清理过指针」。** 两遍扫描**跑在归档之后**，于是本 CHG 自己记录里的每一处 `delivery/active/CHG-20260925-066` 都落在 `delivery/completed/` 之下，自然不算「活跃」。**归档前的同一命令读数**：本 CHG 目录之外只有 **3 处**，**全在 `.ai/CURRENT_CONTEXT.md`**（生成物，已由 `--no-active` 重生成后归零）。那些命中的性质逐条判定后全部是**过去时叙述**（T-01 的「建 active 目录三件」）或**原始捕获回读**（`git status --porcelain` 的读数原样留档），按「路径判修、叙述判留」与 `MASTER:132` **一律保留、不回改**。⇒ 若把扫描挪到归档前跑，读数会变成「十几处活跃命中」而结论一字不变——**同一个判据，两个时间点，两个数**；报数时必须带上「在哪个时间点量的」。**「活跃面 0」是稳定的，「全仓共几处」不是**：后者会被本节自己的文字改变（写第 22 项就要复述 `delivery/active/CHG-20260925-066` 这个串），故确切读数见 `artifacts/t06-sweep.out`、**不在此内联**（同第 4／12／16／20 项）——这是「记录改变被记录的量」在本 CHG 内部第二次出现。**这一次把它量准了**：同一命令连跑两轮（第一轮时产物文件只有表头、第二轮时它已逐条列出上一轮的命中行），读数 **43 → 87**，逐文件分解给出**自指贡献 44 处、真实命中 43 处、活跃面 0 处** ⇒ **仪器把自指单列之后，两个数各自可复现**。这一条也顺带暴露了第一版扫描的另一个前提错误：`git grep`／`git ls-files` **只看得见已跟踪与已暂存的文件**，未跟踪的产物根本不在分母里，故必须在 **stage 之后**取数才对应提交后的树（第一版量到 887 个文件，stage 之后是 891）。
+
+23. **第二遍的 6 条未解析链接与本 CHG 无关，且是**可复现**的既有状态。** 分母 474 个已跟踪 `*.md`／118 条站内相对链接，未解析 **6** 条，**全部**在 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md`，成因是相对路径**少一级 `..`**（指向 `wt-media-cloud` 的源码文件）。CHG-065 的 T-09 独立量到同一批 6 条、同一成因（该记录 §14 第 20 项），**两次读数逐条相同 ⇒ 这是稳定状态而非抖动**，按 `MASTER:132` 只登记不改。**指向本 CHG 的未解析链接 0 条。**
+
+24. **归档这一步的提交形态要写清楚，否则「零痕迹」会被读成「没做」。** T-06 的提交里本 CHG 目录是 `git mv` 产生的 **27 条 rename**（其中 `change.md` 因同轮写入显示为 `RM`），而 T-05 删的两个 `.pyc` 因被 `.gitignore` 覆盖**在本提交里完全不可见**。⇒ 读者若只按 diff 判断「这个 CHG 删了什么」，会得到「什么都没删」——**删除的唯一凭据是 `evidence/task-05-deletion-list.md` 与 `artifacts/t05-deletion-list.out`**，这不是记录不全，是本 CHG §4 F-08 预判形态的第一次实际发生（同第 19 项）。

@@ -1,0 +1,49 @@
+## T-06 收尾读数（取在最后一次内容改动之后）
+日期：2026-09-26 00:17:28
+# 此刻的树：本 CHG 已归档、LEDGER 表行已移除并补关闭段、MASTER §3 已刷新、快照已以 --no-active 重生成、
+#            change.md／checkpoint.md／evidence 已全部写定。全部文件已 staged。
+# 用法：python3 -B -X pycache_prefix=/tmp/pyc-none（等长变异会被旧 .pyc 服务）
+
+--- scripts/verify_m0_config.py ---
+Workspace config verification ok
+exit=0
+--- scripts/verify_delivery_governance.py ---
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: none
+exit=0
+--- scripts/verify_agent_entry.py ---
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+rule-text duplication: compared 98 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+--- scripts/verify_skills.py ---
+verified 10 skill source files
+exit=0
+--- scripts/verify_product_master_alignment.py ---
+Product and Master Plan alignment verification ok
+exit=0
+--- scripts/verify_m2_acceptance.py ---
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+--- python3 -m unittest discover -s tests -q ---
+----------------------------------------------------------------------
+Ran 100 tests in 0.548s
+
+OK
+exit=0
+--- scripts/sync_skills.py check ---
+skill outputs are up to date
+exit=0
+
+--- 归档区总量（本 CHG 归档后的新基线）---
+文件数 728
+总字节 10860430
+
+--- 活动目录与台账 ---
+delivery/active/ 条目：.gitkeep 
+LEDGER 表行数（不含表头与分隔行）：0
+快照头两行：
+- Generated: 2026-09-25T16:14:10Z
+- Active CHG: `none`

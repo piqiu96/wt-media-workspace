@@ -1,0 +1,82 @@
+## T-06 收尾读数：归档前（锚：提交 e730956 ＝ T-05）
+日期：2026-09-26 00:12:54
+
+### MASTER §3 读数列复测（调门禁自己的 status_word()）
+### planned：19 篇 change.md
+    DISCUSSION     7
+    PLANNED        3
+    SUPERSEDED     9
+
+### active：1 篇 change.md
+    IMPLEMENTING   1
+
+### completed：40 篇 change.md
+    CLOSED         2
+    DONE           30
+    HANDOFF        2
+    IMPLEMENTING   1
+    IN_PROGRESS    4
+    VERIFYING      1
+    退役词合计（CLOSED+HANDOFF+IN_PROGRESS+ACTIVE）＝ 8
+
+分母核对
+  活记录 ＝ planned 19 ＋ active 1 ＝ 20
+  归档记录 ＝ completed 40
+  归档列闭合 ＝ 归档列 32 ＋ 退役 8 ＝ 40
+
+逐词：活列／归档列
+  DISCUSSION       7 /   0
+  PLANNED          3 /   0
+  IMPLEMENTING     1 /   1
+  VERIFYING        0 /   1
+  DONE             0 /  30
+  SUPERSEDED       9 /   0
+
+### 归档前：本 CHG 目录位置与体量
+delivery/active/CHG-20260925-066 存在=yes
+delivery/completed/CHG-20260925-066 存在=no
+本 CHG 文件数 27
+本 CHG 总字节 113837
+
+## T-06 收尾读数：归档后（同一天、同一脚本、同一次会话）
+日期：2026-09-26 00:13:51
+变更：delivery/active/CHG-20260925-066 → delivery/completed/CHG-20260925-066（27 文件 git mv）
+
+### planned：19 篇 change.md
+    DISCUSSION     7
+    PLANNED        3
+    SUPERSEDED     9
+
+### active：0 篇 change.md
+
+### completed：41 篇 change.md
+    CLOSED         2
+    DONE           31
+    HANDOFF        2
+    IMPLEMENTING   1
+    IN_PROGRESS    4
+    VERIFYING      1
+    退役词合计（CLOSED+HANDOFF+IN_PROGRESS+ACTIVE）＝ 8
+
+分母核对
+  活记录 ＝ planned 19 ＋ active 0 ＝ 19
+  归档记录 ＝ completed 41
+  归档列闭合 ＝ 归档列 33 ＋ 退役 8 ＝ 41
+
+逐词：活列／归档列
+  DISCUSSION       7 /   0
+  PLANNED          3 /   0
+  IMPLEMENTING     0 /   1
+  VERIFYING        0 /   1
+  DONE             0 /  31
+  SUPERSEDED       9 /   0
+### 归档后：本 CHG 目录位置与体量
+delivery/active/CHG-20260925-066 存在=no
+delivery/completed/CHG-20260925-066 存在=yes
+delivery/active/ 剩余条目：.gitkeep 
+
+### 前后差（逐词）
+  活列 20 → 19（active 1 → 0）
+  归档列 32 → 33；归档 DONE 30 → 31；归档记录 40 → 41
+  IMPLEMENTING 活 1 → 0（归档列不变，仍 1）
+  ⇒ 与 MASTER §3 就地刷新的五个数逐词相等
