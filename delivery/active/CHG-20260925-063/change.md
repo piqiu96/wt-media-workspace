@@ -149,7 +149,7 @@ None.
 
 | Task | Goal | Status | Verification |
 |---|---|---|---|
-| T-01 | `verify_m0_config.py` 转绿：两条 revision 期望值对齐 contract-map；移除 workspace CI 断言（D-03） | TODO | 脚本 exit 0；`tests/test_verify_m0_config.py` 4 条全绿；变异对照见证据 |
+| T-01 | `verify_m0_config.py` 转绿：两条 revision 期望值对齐 contract-map；移除 workspace CI 断言（D-03） | DONE | 脚本 exit 0；`tests/test_verify_m0_config.py` 4 条全绿；**两次变异对照**（改坏 contract-map 的 revision 必须报错；空 `OUTER_ROOT` 下三个运行仓工作流必须逐条报缺）见 `evidence/task-01-m0-config.md` |
 | T-02 | `verify_m2_acceptance.py` 转绿：移除 3 处源码字面量断言，新增 Cloud 原子单次使用断言（D-01/D-02） | TODO | 脚本 exit 0；新增断言做**变异对照**（改坏 SQL 必须报错） |
 | T-03 | `verify_product_master_alignment.py` 转绿：状态词对齐、候选块断言按状态分层、消除两处空转、新增未关闭里程碑缺块断言 | TODO | 脚本 exit 0；新断言做**变异对照**（抽掉一个非 DONE 里程碑的候选块必须报错） |
 | T-04 | 修正测试套件的假通过与失效用例（4.4） | TODO | 新用例先红后绿；证明变异字符串真实存在 |

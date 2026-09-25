@@ -21,13 +21,25 @@
 - 2026-09-25 T-01：建 `delivery/active/CHG-20260925-063/`（`change.md` 十四节、本 `checkpoint.md`、
   `evidence/artifacts/`）。单仓实施，**不建** `status/`。
 
+## Completed
+
+- 2026-09-25 Start Gate 收尾：LEDGER 加表行、快照经 `prepare_ai_workspace.py --change` 再生成
+  （`active_milestone=null`，Level S 预期）。`verify_delivery_governance.py` / `verify_agent_entry.py` /
+  `verify_skills.py` 三者 exit 0。**形状限制导致一处记录改动**：`verify_product_master_alignment.py`
+  要求 active CHG 的 §7 为字面 `None.`（不接受「非阻塞」档位），故原拟的 Q-01 移入 §14 遗留第 1 项。
+- 2026-09-25 T-01 完成：`verify_m0_config.py` 由 `exit=1`／3 红 转为 `exit=0`，
+  `tests.test_verify_m0_config` **Ran 4 tests / OK**。两次**变异对照**（改坏 contract-map 的
+  `cloud_api` revision → 报错；空 `OUTER_ROOT` → 三个运行仓工作流 3/3 报缺）证明未改成恒真、
+  亦未使 CI 检查器整体失去判别力。**纠正一处自我错误**：首轮基线用 `PY="…"` 变量拼接，
+  zsh 不做词分割致三个产物只含 `exit=127`，已用 shell 函数重跑替换（靠 `exit=` 码与体量交叉核对发现）。
+  证据：`evidence/task-01-m0-config.md`。
+
 ## Current
 
-- T-01 收尾：LEDGER 加表行、快照经 `prepare_ai_workspace.py --change` 再生成。
+- T-02 开工：`verify_m2_acceptance.py`。
 
 ## Next
 
-- T-01 `verify_m0_config.py` 转绿（两条 revision 对齐 + 删 workspace CI 断言，D-03）。
 - T-02 `verify_m2_acceptance.py` 转绿（删 3 处源码字面量断言 + 新增 Cloud 原子单次使用断言，D-01/D-02）。
 - T-03 `verify_product_master_alignment.py` 转绿（状态词对齐 + 候选块断言按状态分层 + 消除两处空转）。
 - T-04 修正测试套件的假通过与失效用例。

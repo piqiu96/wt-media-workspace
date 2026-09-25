@@ -1,0 +1,8 @@
+$ # mutation control: point OUTER_ROOT at an empty dir -> the 3 runtime workflows are 'missing'
+real OUTER_ROOT, allow_missing_repos=False -> []
+empty OUTER_ROOT, allow_missing_repos=False ->
+    missing CI workflow: wt-media-cloud/.github/workflows/m0-cloud.yml
+    missing CI workflow: wt-media-agent/.github/workflows/m0-agent.yml
+    missing CI workflow: wt-media-desktop/.github/workflows/m0-desktop.yml
+empty OUTER_ROOT, allow_missing_repos=True  -> []
+CONTROL OK: the CI checker still reports each missing runtime workflow (3/3).

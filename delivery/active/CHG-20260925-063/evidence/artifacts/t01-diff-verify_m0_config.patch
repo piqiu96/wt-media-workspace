@@ -1,0 +1,61 @@
+diff --git a/scripts/verify_m0_config.py b/scripts/verify_m0_config.py
+index eecb732..9efddb3 100755
+--- a/scripts/verify_m0_config.py
++++ b/scripts/verify_m0_config.py
+@@ -91,8 +91,11 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
+         if name == "cloud_api":
+             if actual.get("api_major_version") != "v1":
+                 errors.append("cloud_api: expected api_major_version 'v1'")
+-            if actual.get("contract_revision") != "2026.07.14.4":
+-                errors.append("cloud_api: expected contract_revision '2026.07.14.4'")
++            # 该值随 M4/M5 的两次合约前进由 2026.07.14.4 更新为 2026.09.06.1
++            # （CHG-20260925-063）。这是本脚本的有意设计：合约版本前进属需复核的变更，
++            # 故此处是钉子而非引用。但钉子过期会产生噪音红灯，见 change.md §4.6。
++            if actual.get("contract_revision") != "2026.09.06.1":
++                errors.append("cloud_api: expected contract_revision '2026.09.06.1'")
+         if name == "business_schemas" and actual.get("schema_revision") != "2026.07.14.4":
+             errors.append("business_schemas: expected schema_revision '2026.07.14.4'")
+         if name == "business_enums" and actual.get("enum_revision") != "2026.07.14.3":
+@@ -102,8 +105,9 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
+         if name == "local_agent_api":
+             if actual.get("api_major_version") != "v1":
+                 errors.append("local_agent_api: expected api_major_version 'v1'")
+-            if actual.get("contract_revision") != "2026.07.14.7":
+-                errors.append("local_agent_api: expected contract_revision '2026.07.14.7'")
++            # 同上：由 2026.07.14.7 更新为 2026.09.06.1（CHG-20260925-063）。
++            if actual.get("contract_revision") != "2026.09.06.1":
++                errors.append("local_agent_api: expected contract_revision '2026.09.06.1'")
+         if name == "local_event_schemas":
+             if actual.get("event_revision") != "2026.07.14.9":
+                 errors.append("local_event_schemas: expected event_revision '2026.07.14.9'")
+@@ -237,6 +241,16 @@ def validate_release_matrix() -> list[str]:
+ 
+ 
+ def validate_ci_workflows(allow_missing_repos: bool) -> list[str]:
++    """Validate the CI workflows of the three runtime repositories.
++
++    `wt-media-workspace` is deliberately NOT in this list. It carried an entry
++    requiring `.github/workflows/m0-workspace.yml` until CHG-20260925-063 removed
++    it: that repository has no `.github/` directory and both `AGENT-INDEX.md` §12
++    and `agent-workspace-conventions.md` §10 state that it intentionally runs
++    these checks locally instead of in CI. The assertion therefore contradicted
++    the governance authority and could never pass. Do not re-add it without first
++    changing those two governance statements.
++    """
+     errors: list[str] = []
+     expected = {
+         "wt-media-cloud/.github/workflows/m0-cloud.yml": (
+@@ -264,13 +278,6 @@ def validate_ci_workflows(allow_missing_repos: bool) -> list[str]:
+             "scripts/test.sh",
+             "scripts/build.sh",
+         ),
+-        "wt-media-workspace/.github/workflows/m0-workspace.yml": (
+-            "python -m unittest discover -s tests",
+-            "python scripts/verify_skills.py",
+-            "python scripts/verify_m0_config.py --allow-missing-repos",
+-            "python scripts/verify_product_master_alignment.py",
+-            "python scripts/prepare_ai_workspace.py --change \"$ACTIVE_CHANGE\" --no-write",
+-        ),
+     }
+     for rel_path, needles in expected.items():
+         path = OUTER_ROOT / rel_path

@@ -1,0 +1,6 @@
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest tests.test_verify_m0_config -q
+----------------------------------------------------------------------
+Ran 4 tests in 0.006s
+
+OK
+exit=0
