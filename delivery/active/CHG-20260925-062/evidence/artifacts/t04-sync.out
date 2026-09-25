@@ -1,0 +1,29 @@
+=== sync（正确子命令） ===
+synced root/codex
+synced root/claude
+synced cloud/codex
+synced cloud/claude
+synced agent/codex
+synced agent/claude
+synced desktop/codex
+synced desktop/claude
+synced workspace/codex
+synced workspace/claude
+exit=0
+
+=== 同步后 check ===
+skill outputs are up to date
+exit=0
+
+=== verify_skills ===
+verified 10 skill source files
+exit=0
+
+=== 大小写不敏感复扫：源 + 四个副本目录（条数，不是退出码） ===
+命中条数 = 0
+
+=== 正向 resolve：副本第 1 步现在写的是什么 ===
+.claude/skills/executing-wt-media-change/SKILL.md          17:1. Root `AGENT-INDEX.md` — the governance text and routing authority. `AGENTS.md` and `CLAUDE.md` are thin parallel pointers to it, not the text itself.
+.codex/skills/executing-wt-media-change/SKILL.md           17:1. Root `AGENT-INDEX.md` — the governance text and routing authority. `AGENTS.md` and `CLAUDE.md` are thin parallel pointers to it, not the text itself.
+.claude/skills/planning-wt-media-delivery/SKILL.md         17:1. root `AGENT-INDEX.md` (the governance text; `AGENTS.md`/`CLAUDE.md` are thin pointers to it) and `wt-media-workspace/.ai/CURRENT_CONTEXT.md`;
+../.claude/skills/planning-wt-media-delivery/SKILL.md      17:1. root `AGENT-INDEX.md` (the governance text; `AGENTS.md`/`CLAUDE.md` are thin pointers to it) and `wt-media-workspace/.ai/CURRENT_CONTEXT.md`;

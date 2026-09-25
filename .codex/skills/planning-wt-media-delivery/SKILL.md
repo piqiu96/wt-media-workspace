@@ -14,7 +14,7 @@ Maintain the path from stable project facts to one bounded executable CHG. This 
 
 Read in order:
 
-1. root `AGENTS.md` and `wt-media-workspace/.ai/CURRENT_CONTEXT.md`;
+1. root `AGENT-INDEX.md` (the governance text; `AGENTS.md`/`CLAUDE.md` are thin pointers to it) and `wt-media-workspace/.ai/CURRENT_CONTEXT.md`;
 2. `docs/product`, `docs/engineering`, `docs/contracts`, `docs/decisions`;
 3. `delivery/MASTER_IMPLEMENTATION_PLAN.md`;
 4. applicable `delivery/milestones/M*.md`;

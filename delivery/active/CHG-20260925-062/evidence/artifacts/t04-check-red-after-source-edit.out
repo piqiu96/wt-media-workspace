@@ -1,0 +1,10 @@
+=== 阳性对照：源已改、副本未同步，check 应当红 ===
+root/codex: out of date /Users/aqiuye/Develop/workspace/wt-media/.codex/skills/executing-wt-media-change/SKILL.md
+root/codex: out of date /Users/aqiuye/Develop/workspace/wt-media/.codex/skills/planning-wt-media-delivery/SKILL.md
+root/claude: out of date /Users/aqiuye/Develop/workspace/wt-media/.claude/skills/executing-wt-media-change/SKILL.md
+root/claude: out of date /Users/aqiuye/Develop/workspace/wt-media/.claude/skills/planning-wt-media-delivery/SKILL.md
+workspace/codex: out of date /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/.codex/skills/executing-wt-media-change/SKILL.md
+workspace/codex: out of date /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/.codex/skills/planning-wt-media-delivery/SKILL.md
+workspace/claude: out of date /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/.claude/skills/executing-wt-media-change/SKILL.md
+workspace/claude: out of date /Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/.claude/skills/planning-wt-media-delivery/SKILL.md
+exit=1

@@ -1,0 +1,10 @@
+=== 红：源文件里的 Root `AGENTS.md` ===
+skills/workspace/executing-wt-media-change/SKILL.md:14:1. Root `AGENTS.md`.
+
+=== 生成副本里的同一串 ===
+.claude/skills/executing-wt-media-change/SKILL.md:17:1. Root `AGENTS.md`.
+.codex/skills/executing-wt-media-change/SKILL.md:17:1. Root `AGENTS.md`.
+
+=== 执行根（非 git 仓）的副本 ===
+../.claude/skills/executing-wt-media-change/SKILL.md:17:1. Root `AGENTS.md`.
+../.codex/skills/executing-wt-media-change/SKILL.md:17:1. Root `AGENTS.md`.

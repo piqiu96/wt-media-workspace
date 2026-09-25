@@ -11,7 +11,7 @@ Use this Skill for any WT Media M/L CHG implementation, resume, review, or compl
 
 When facts conflict, resolve them in this order:
 
-1. Root `AGENTS.md`.
+1. Root `AGENT-INDEX.md` — the governance text and routing authority. `AGENTS.md` and `CLAUDE.md` are thin parallel pointers to it, not the text itself.
 2. `wt-media-workspace/.ai/CURRENT_CONTEXT.md` — the only execution snapshot; it never lives at the execution root.
 3. Active `wt-media-workspace/delivery/active/<CHG>/change.md`.
 4. The exact Milestone closure referenced by an M/L CHG, or the stable requirement referenced by a small Bug CHG.

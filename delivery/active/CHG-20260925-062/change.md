@@ -75,6 +75,12 @@
   故修它**不会脏化** cloud/agent/desktop 三仓。
 - `2026-09-24-m4-m5-cloud-content-production.md` 当时也脏，但只多一个**尾部空行**，与本次重构无关 ⇒
   按用户 2026-09-25 裁定**还原**（见 §6 D-02），不并进本 CHG 的提交。
+- **三仓并非全空，但都不是本 CHG 造成的**（T-04 复验时发现，按 mtime 归属）：`wt-media-desktop`
+  的 `src-tauri/src/` 下 **13** 个 `.rs` 是脏的（11 个 mtime = 2026-09-24 22:32:20，另 3 个为
+  2026-09-25 09:57 / 10:34 / 10:38），`wt-media-cloud` 有一个未跟踪的 `dump.rdb`
+  （2026-09-24 17:19:16）。**全部早于本会话**（本会话约 13:5x 起，本 CHG 的写入为 14:08–14:09）。
+  `wt-media-agent` 干净。本 CHG 对三仓零读写；这些在途改动**不碰、不提交、不清理**。
+  故 §10 AC-12 的判据按实测收窄为「本 CHG 对三仓零读写」，**不写「三仓工作区全空」**。
 - **`verify_agent_entry.py::check_entry_drift` 在 workspace 上早已空转**（**先于本次重构**，非本次引入）：
   它只从 `repo/AGENTS.md` 取「被禁止的路径」token，而禁止规则现在搬到了 `AGENT-INDEX.md`。
   复算 HEAD 版 `AGENTS.md`：`forbidden ∩ described` 同样为 **0**——即该臂在重构**之前**就是空的。
@@ -189,7 +195,7 @@ None.
 | AC-09 | 治理一致：快照、LEDGER、`delivery/active` 互指同一 CHG（关闭后同指 `none`）。 | 两个治理验证器 + 逐处读文件核对。 | TODO |
 | AC-10 | 无主脏文件已按裁定处置，工作区只含本 CHG 的预期改动。 | `git status --porcelain` 逐文件对照 §5 Scope；`2026-09-24-m4-m5-cloud-content-production.md` 与 HEAD 逐字一致。 | TODO |
 | AC-11 | 只登记的项**未被静默修掉**。 | 读 `verify_agent_entry.py:241` 与原样、`AGENT-INDEX.md` §12 校验清单原样；diff 显示二者未被改动。 | TODO |
-| AC-12 | 三仓零改动。 | `git -C ../wt-media-cloud|agent|desktop status --porcelain` 全空。 | TODO |
+| AC-12 | **本 CHG 对三仓零读写**。注意判据已按实测收窄：不能写「三仓工作区全空」，因为 desktop 与 cloud **先于本会话**就已脏（见 §4 末条）。 | 逐仓 `git status --porcelain -uall` + **逐文件 mtime 归属**：三仓的 `.claude/skills`/`.codex/skills` 均未出现在 status 中；desktop 的 13 个 `.rs` 与 cloud 的 `dump.rdb` 的 mtime 全部早于本会话。 | TODO |
 
 ## 11. Evidence
 
