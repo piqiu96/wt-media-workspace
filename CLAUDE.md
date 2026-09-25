@@ -1,12 +1,14 @@
 # CLAUDE.md
 
+- 正文：`AGENT-INDEX.md`
+
 Claude Code 在本仓库工作时的指引。本文件保持简短：只写项目概览、权威源与最小硬约束；治理规范正文与红线正文一律不在本文件重复。
 
 ## 项目概览
 
 WT Media 多项目系统的研发治理仓（Engineering Control Plane），承载产品需求、工程架构、跨仓库协议、技术决策、交付生命周期与 AI 协作规范。
 
-本仓库**不是**运行时代码仓：不存放业务代码、服务运行代码、构建产物或临时文件，也不得成为任何运行时的依赖。运行时代码位于 `../wt-media-cloud`、`../wt-media-agent`、`../wt-media-desktop`。
+本仓库**不拥有**运行时代码、服务运行代码、构建产物或临时文件；运行时代码位于 `../wt-media-cloud`、`../wt-media-agent`、`../wt-media-desktop`。仓库职责边界的唯一落点是 [`AGENT-INDEX.md`](AGENT-INDEX.md) §1。
 
 ## 权威源
 

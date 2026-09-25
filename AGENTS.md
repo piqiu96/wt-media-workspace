@@ -1,5 +1,7 @@
 # WT Media Workspace Agent Rules（Codex 入口）
 
+- 正文：`AGENT-INDEX.md`
+
 本文件是 Codex / OpenAI Harness 的入口，只声明权威源与读取入口，不承载治理规范正文。
 
 ## 权威源
