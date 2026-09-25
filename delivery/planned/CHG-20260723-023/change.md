@@ -3,7 +3,7 @@
 ## 1. Basic Information
 
 - Level: M
-- Status: IN_PROGRESS
+- Status: SUPERSEDED
 - Created: 2026-07-23
 - Affected repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-desktop`, `wt-media-workspace`
 - Current repository: `wt-media-workspace`

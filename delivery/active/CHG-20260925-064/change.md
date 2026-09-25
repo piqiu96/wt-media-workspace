@@ -144,7 +144,7 @@ None.
 | T-04 | 读取顺序单一化 + 入口文件只留指针 + 补回两条提交约定 | DONE | 见 §8.2；落点由 5 处手写＋1 常量收敛为 **1 处手写＋1 生成物**；入口红线 9/9 逐条归属；变异对照证明快照确由该常量派生 | T-03 |
 | T-05 | 状态词汇成文（`MASTER:105-128` 就地覆盖为实测在用词汇＋一行历史词汇） | DONE | 见 §8.3；CHG 六词、里程碑四词、退役词与分母逐项报出；阳性对照 `CLOSED` 2／`HANDOFF` 2 | T-04 |
 | T-06 | 脚本／模板／checkpoint 落点对齐（接受集、文案、模板、新增结构检查） | DONE | 见 §8.4；六门禁 `exit=0` ＋ `Ran 79 tests`；**新判据两条均做变异对照**（失红后还原经 `cmp` 逐字节）；**在本 CHG 仍 active 时复测**（接受集正打在自己的 LEDGER 表行上） | T-05 |
-| T-07 | `planned` 记录状态词就地改写 | TODO | 逐文件 `git diff` 只改状态词一行；两遍词汇统计 | T-06 |
+| T-07 | `planned` 记录状态词就地改写 | DONE | 见 §8.5；活记录 20 篇改前 19/20、改后 **20/20** 落在 §3 表内（阳性对照：同一脚本对归档仍报 8 处表外词）；023 的 diff 恰一行 | T-06 |
 | T-08 | FFmpeg 归属（ADR-0015 就地改写） | TODO | 全仓归属落点复扫＝Cloud；阳性对照 | 独立 |
 | T-09 | 里程碑与交付事实（C6／B-3／N1） | TODO | 该 grep 改前 ≥3、改后 0；四处逐字一致 | 独立 |
 | T-10 | 目录树、死指针、执行根入口描述、外层 `docs` 指针 | TODO | `verifying/` 只余历史归档；树内条目逐条 `ls`；`根 \`AGENTS.md\`` → 0 | 独立 |
@@ -219,6 +219,18 @@ None.
 
 细节见 `evidence/task-06-script-template-checkpoint.md`。
 
+### 8.5 活记录状态词就地改写（T-07）
+
+改前活记录（20 篇）里不在 §3 表中的词**恰有 1 个**：`CHG-20260723-023` 的 `IN_PROGRESS`。改后 **20/20 全部落在六个词内**。
+
+`023` 判为 `SUPERSEDED` 是**内容判断**，依据两个互相独立的已归档记录：`CHG-20260723-025` 的标题本身就是「M2-B1 浏览器窗口扫描与 Diff 只读闭环」（与 023 同标签），`CHG-20260725-031/evidence/m2-b-closure.md:8` 把 B1 归给 025；023 的三项 Task 分别由 025／`026`（窗口同步应用，收口矩阵 B2）／`022`（主账号确认，是 023 自己写的 inherited evidence）交付。023 从未进过 `active/`、无 `evidence/` ⇒ 不是 `DONE`（从未收口），也无可激活的剩余方向 ⇒ 不是 `PLANNED`。
+
+`planned/README.md` 两处：`023` 那条的旧理由（「状态整理不属于本次 M3 拆分范围」）已过期，就地覆盖为「草案、范围已由 022／025／026 交付、标记 `SUPERSEDED`」，并保留原句真正要守的结论（M2 完成与否看里程碑与 031 的收口矩阵）；M3 表加一段列说明——该列写**程序进度**、不是记录的**状态词**，故 `045` 的「已实施…由 CHG-052 承载」与它自己的 `DISCUSSION` 不矛盾（两者不同轴）。**只让两轴可分辨，不改判任何草案。**
+
+`MASTER` §3 的读数列连带更新（T-05 把它写成实测值，故必须跟着改）：`SUPERSEDED` 活列 8→**9**、`IN_PROGRESS` 活记录 1→**0**、分母对账句与历史词汇行的适用范围（原写「`planned` 记录保持原样」被本 Task 直接证伪）。
+
+细节见 `evidence/task-07-live-status-words.md`。
+
 ## 9. Repository Checklist
 
 ### wt-media-workspace
@@ -269,6 +281,7 @@ Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期�
 - `evidence/task-04-reading-order-single-landing.md`
 - `evidence/task-05-status-vocab.md`
 - `evidence/task-06-script-template-checkpoint.md`
+- `evidence/task-07-live-status-words.md`
 - `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
@@ -310,7 +323,7 @@ $ git -C ../wt-media-desktop status --porcelain
 | 5 | M0／M1 已 `DONE` 却仍留候选 CHG 块 | CHG-063 已登记 |
 | 6 | `LEDGER.md:21` 的「见上表」不可达 | CHG-062 遗留第 8 项；属 LEDGER 的历史叙述 |
 | 7 | `AGENT-INDEX.md:198` 曾把 `conventions §10` 定为「校验状态的唯一落点」，而 §10 承载的是易失读数 | **T-03 已取消该落点**（改为「校验读数不作文档落点」）；但「易失内容该不该有文档落点」这一机制尚无可机检的通用对策，登记 |
-| 8 | B-6⑨ 余项：`docs/superpowers/`（23 篇中 21 篇无人引用）、`delivery/planned/` 的 9 个 `SUPERSEDED` + 6 个「已实施却仍挂 planned」、`completed/CHG-20260916-052` 单条占归档 74% | 属诊断 G-5／G-6，需独立 CHG 与用户裁定 |
+| 8 | B-6⑨ 余项：`docs/superpowers/`（23 篇中 21 篇无人引用）、`delivery/planned/` 的 **9** 个 `SUPERSEDED`（T-07 前为 8，023 由 `IN_PROGRESS` 改入）、`completed/CHG-20260916-052` 单条占归档 74%。**另有一类需用户裁定**：`045`／`046`／`047`／`048`／`049`／`050`／`051` 七份草案的状态词是 `DISCUSSION`、而 `planned/README.md` 的程序进度列写「已实施／暂停／已签收」——T-07 已把两个轴写成可分辨（§8.5），**但不改判这七份**：给未激活的草案补 `DONE`／`SUPERSEDED` 是治理口径裁定 | 属诊断 G-5／G-6，需独立 CHG 与用户裁定 |
 | 9 | `conventions §1`（6 条不变量）与 `§7` 开头同 `AGENT-INDEX.md` §2／§10 局部重叠：T-03 按用户裁定的保留清单**未去重** | 去重须先裁定「规范文件可否复述红线」，属用户取舍。本 CHG 只登记「落点未减」这一事实 |
 | 10 | `AGENT-INDEX.md` §4 作为读取顺序的**唯一**落点，**没有机检点**（`conventions` §9 耦表已如实登记「入口文件与 `MASTER` 不得再列清单」靠人工复核） | T-04 把落点降下来了，但「唯一」目前只由本 CHG 的一次性扫描证明。为它新增机检点会把 §4 的条目文本冻成契约（措辞一变就红），与 CHG-063 的判据分层结论相悖，须独立裁定 |
 | 11 | 里程碑文件头的状态写法四种并存：`- Milestone status:`（M4／M5）、散文（M2）、`> 实施状态：`（M3）、`- 状态：**已完成**`（M-launch-engineering） | T-05 只成文**词表**、不统一**写法**：为四种既有格式新增一致性判据会把它们冻成契约，与 §5 Explicitly Not Doing 的既有声明相悖。现状如实登记在 `MASTER` §3 表下 |

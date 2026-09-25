@@ -20,15 +20,16 @@
 
 - **T-06 脚本／模板与 `checkpoint.md` 落点对齐**：**「active 目录必须有 `checkpoint.md`」这条规则早已写在 `AGENT-INDEX.md` §8、却无人执行**——`git grep -i checkpoint -- scripts tests` 命中 **0** 个文件（阳性对照 `change.md` 9 个）。新增结构检查（`verify_delivery_governance.py`），**变异对照**：`if not (…)` 改 `if False and not (…)` → 新用例复红、其余 4 条仍绿；**活树阳性对照**：把本 CHG 的 `checkpoint.md` 改名 → 真门禁 `exit=1` 报 `active CHG is missing checkpoint.md: CHG-20260925-064`，还原后 `sha256` 相同。接受集由 `{IN_PROGRESS, IMPLEMENTING, VERIFYING, ACTIVE}` 收为 **`{IMPLEMENTING, VERIFYING}`**（记录落在 `active/` 即意味着在执行；`DISCUSSION`／`PLANNED` 属 `planned/`，`DONE`／`SUPERSEDED` 是终态），加 6 非法词 × 2 合法词的用例，`HEAD` 版上 **6/6 非法 subTest 全红**（其中 `IN_PROGRESS`／`ACTIVE` 是被旧集**收下**）。**实测另发现一处既有误诊**：`:288` 的 `(\S+)\s*$` 要求状态行恰好只是那个词，58 篇里 **9 篇**带注 ⇒ `status=None`；`CHG-20260923-059` active 期正是带注形式，它自己的门禁输出里留着 `… got None`——**点了一个该记录从未有过的状态**。抽出 `status_word()` 先剥 `**`／`（…）`／`(…)`，新用例的红**是行为性的**（在测试里复现出 059 那条报文）。附带的收紧：剥注后 LEDGER 表行比对由**被跳过**变为**真的执行**。新增 `templates/delivery/checkpoint.md`、`change.md` §12 改指针、skill `:95` 与 `AGENT-INDEX.md:141` 点名 `checkpoint.md`、`sync_skills.py` 重生成并 `check` 通过、`conventions` §9 加两行耦合。**一次自我更正**：带注用例初稿同时断言 `status_word()`，红成了 `AttributeError`（**这种红什么都证明不了**），已拆成两个用例；夹具也修过一处（初版把带注串写进了 LEDGER 值）。
 
+- **T-07 活记录状态词就地改写**：改前活记录 20 篇里不在 `MASTER` §3 表中的词**恰有 1 个**（`023` 的 `IN_PROGRESS`），改后 **20/20 全部落表**（阳性对照：同一脚本对归档记录仍报出 8 处表外词 ⇒ 扫描能咬住）。`023` 判 `SUPERSEDED` 是**内容判断**，两个互相独立的依据：`CHG-20260723-025` 的标题本身就是「M2-B1 浏览器窗口扫描与 Diff 只读闭环」（与 023 同标签），且 `CHG-20260725-031` 的收口矩阵把 B1 归给 025；023 的三项 Task 分别由 025／`026`／`022` 交付，它自己从未进过 `active/`、无 `evidence/`。`planned/README.md` 两处：023 那条已过期的旧理由就地覆盖；M3 表加列说明——该列写**程序进度**，不是记录的**状态词**，故 `045` 的「已实施…由 CHG-052 承载」与它自己的 `DISCUSSION` 不矛盾（**只让两轴可分辨，不改判任何草案**，七份草案的终态词归 §14 第 8 项）。`MASTER` §3 的实测读数列连带更新：`SUPERSEDED` 活列 8→9、`IN_PROGRESS` 活记录 1→0，并改掉被本 Task 直接证伪的「`planned` 记录保持原样」这半句。
+
 ## Current
 
-- T-06 已落。下一个是 T-07（`planned/` 记录状态词就地改写）。
+- T-07 已落。下一个是 T-08（FFmpeg 归属）——T-08 起各 Task 相互独立，可换序。
 
 ## Next
 
-1. **T-07**：`delivery/planned/*` 的 `Status:` 行就地改写（`023` 的 `IN_PROGRESS` 与 `034` 的 `> 状态：` 形式是两个待处置项），`planned/README.md` 的状态列散文一并处置。
-2. **T-08／T-09／T-10／T-11**（相互独立，可换序）：FFmpeg 归属／里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
-3. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描。
+1. **T-08／T-09／T-10／T-11**（相互独立，可换序）：FFmpeg 归属（ADR-0015 整句重写）／里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
+2. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描。
 
 ## Blocked
 
@@ -49,10 +50,10 @@
 | 退役流水线串 `TODO → IMPLEMENTED`（活文件，排除本 CHG 自身记录） | 0 命中 |
 | 三仓工作区基线（AC-15） | `cloud` `?? dump.rdb`；`agent`、`desktop` 空——与 T-01 基线逐条一致 |
 
-| 词汇对账（逐文件提取，可复算） | 活 20 篇 `{IN_PROGRESS:1, PLANNED:3, SUPERSEDED:8, DISCUSSION:7, IMPLEMENTING:1}`；归档 38 篇 `{DONE:28, IN_PROGRESS:4, HANDOFF:2, CLOSED:2, VERIFYING:1, IMPLEMENTING:1}`——两列求和等于分母 |
+| 词汇对账（逐文件提取，可复算；T-07 后） | 活 20 篇 `{SUPERSEDED:9, PLANNED:3, DISCUSSION:7, IMPLEMENTING:1}`——**表外词 0**；归档 38 篇 `{DONE:28, IN_PROGRESS:4, HANDOFF:2, CLOSED:2, VERIFYING:1, IMPLEMENTING:1}`——表外 8（T-05 已声明归档不动） |
 | 带注状态行（T-06 新量，分母 58 篇 `change.md`） | **9 篇**用旧正则（`(\S+)\s*$`）匹配不上 ⇒ 旧代码把它们的 `status` 读成 `None`；新 `status_word()` 全部读出词 |
 | 现在解析 `checkpoint.md` 的门禁（分母 `scripts/` ＋ `tests/`） | 2 个文件：`scripts/verify_delivery_governance.py`、`tests/test_verify_delivery_governance.py`（T-06 之前是 0 个） |
 
-取数时间 **2026-09-25 19:57:36 CST**（T-06 的最后一次改动之后），原始输出 `evidence/artifacts/t06-gate-readings.out`（该文件内含**两遍**读数：19:56:25 的初遍与 19:57:36 的关闭遍——初遍记在本记录更新**之前**，而本记录本身被门禁读，故不作关闭值）；逐条明细见 `evidence/task-06-script-template-checkpoint.md`。
+取数时间 **2026-09-25 20:00:17 CST**（T-07 的最后一次改动之后），原始输出 `evidence/artifacts/t07-gate-readings.out`（该文件含**两遍**：20:00:07 的初遍与 20:00:17 的关闭遍——初遍记在本记录更新**之前**，而本记录本身被门禁读，故不作关闭值）；逐条明细见 `evidence/task-07-live-status-words.md`。
 
-上一版读数（19:51，`t05-gate-readings.out`）已被**覆盖**：T-06 改了脚本与测试，那些数字不再是关闭值。当时用来豁免它的那条理由——`git grep -l 'checkpoint' -- scripts tests` 命中 0 个文件 ⇒ 没有门禁解析 `checkpoint.md`——恰是 T-06 补掉的那个缺口；现在同一扫描命中 `scripts/verify_delivery_governance.py` 与 `tests/test_verify_delivery_governance.py`。
+上一版读数（`t06-gate-readings.out`，19:57）已被**覆盖**：T-07 改了 `planned/` 的记录与 `MASTER` §3 的读数列，那些数字不再是关闭值。T-06 那一版同理覆盖了 T-05 的 19:51 读数。

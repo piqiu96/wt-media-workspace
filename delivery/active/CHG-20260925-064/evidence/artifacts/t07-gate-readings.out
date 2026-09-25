@@ -1,0 +1,72 @@
+T-07 raw readings — taken 2026-09-25 20:00:07 CST
+Invocation: python3 -B -X pycache_prefix=/tmp/pyc-none <cmd>
+Working tree: 3e94444 + uncommitted T-07 edits
+
+===== status word tally (the gate's own extractor, both passes in one run) =====
+LIVE      20 files -> {'SUPERSEDED': 9, 'PLANNED': 3, 'DISCUSSION': 7, 'IMPLEMENTING': 1}
+          outside the §3 table: {}  (sum=20 == denominator 20)
+ARCHIVED  38 files -> {'VERIFYING': 1, 'IN_PROGRESS': 4, 'DONE': 28, 'CLOSED': 2, 'HANDOFF': 2, 'IMPLEMENTING': 1}
+          outside the §3 table: {'IN_PROGRESS': 4, 'CLOSED': 2, 'HANDOFF': 2}  (sum=38 == denominator 38)
+
+===== six static gates =====
+scripts/verify_delivery_governance.py    exit=0  | Delivery governance verification ok. Active CHG: CHG-20260925-064
+scripts/verify_agent_entry.py            exit=0  | Agent entry verification ok. 0 warning(s) need review.
+scripts/verify_skills.py                 exit=0  | verified 10 skill source files
+scripts/verify_m0_config.py              exit=0  | Workspace config verification ok
+scripts/verify_product_master_alignment.py exit=0  | Product and Master Plan alignment verification ok
+scripts/verify_m2_acceptance.py          exit=0  | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+===== unittest =====
+Ran 79 tests in 0.366s
+
+OK
+
+===== runtime repo baselines =====
+  cloud    ?? dump.rdb|
+  agent    
+  desktop  
+
+======================================================================
+CLOSING readings — taken 2026-09-25 20:00:17 CST
+Second pass because the CHG record itself (change.md §8.5, T-07 row,
+§14 item 8, checkpoint.md) was updated after the first pass, and those
+files are read by the gates.
+Working tree at this moment:
+   M delivery/MASTER_IMPLEMENTATION_PLAN.md
+   M delivery/active/CHG-20260925-064/change.md
+   M delivery/active/CHG-20260925-064/checkpoint.md
+   M delivery/planned/CHG-20260723-023/change.md
+   M delivery/planned/README.md
+  ?? delivery/active/CHG-20260925-064/evidence/artifacts/t07-gate-readings.out
+  ?? delivery/active/CHG-20260925-064/evidence/task-07-live-status-words.md
+
+scripts/verify_delivery_governance.py    exit=0  | Delivery governance verification ok. Active CHG: CHG-20260925-064
+scripts/verify_agent_entry.py            exit=0  | Agent entry verification ok. 0 warning(s) need review.
+scripts/verify_skills.py                 exit=0  | verified 10 skill source files
+scripts/verify_m0_config.py              exit=0  | Workspace config verification ok
+scripts/verify_product_master_alignment.py exit=0  | Product and Master Plan alignment verification ok
+scripts/verify_m2_acceptance.py          exit=0  | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+Ran 79 tests in 0.283s
+
+OK
+
+===== the one-line diff of CHG-20260723-023 =====
+1	1	delivery/planned/CHG-20260723-023/change.md
+-- Status: IN_PROGRESS
++- Status: SUPERSEDED
+
+===== runtime repo baselines =====
+  cloud    ?? dump.rdb|
+  agent    
+  desktop  
+
+===== why no third pass =====
+After the CLOSING pass the checkpoint.md text changed once more (the
+'取数时间' line).  That cannot move any reading, and this is checked
+rather than assumed: the ONLY use of checkpoint.md in scripts/ is
+  verify_delivery_governance.py:121  if not (... / "checkpoint.md").is_file():
+i.e. an existence test.  Its content is parsed by nothing, so a text edit
+to it is invisible to all six gates.  (Contrast T-06's exemption claim of
+the same shape, which was WRONG in the opposite direction: there the
+absence of any parser was the DEFECT.)
