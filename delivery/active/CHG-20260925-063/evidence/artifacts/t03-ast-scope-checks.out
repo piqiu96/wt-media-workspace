@@ -1,0 +1,29 @@
+A. needle sets passed to require_all / forbid_all (AST, not grep)
+   <computed label>                     ['同一个 `main_user_id` 可以绑定多个系统用户', 'Cloud 分配', 'profile_user_id']
+   M0 candidate                         ["<generated: tuple((f'M0-R{number} ' for number in range(1, 7>"]
+   M0 gate                              ['Cloud 和 Web 使用真实依赖', 'Agent 使用正式包入口', '真实 Vue/Tauri Rust', '空 MySQL 数据库', 'echo 脚本', 'Mock-only']
+   M1 candidate                         ["<generated: tuple((f'M1-R{number} ' for number in range(1, 9>"]
+   M1 gate                              ['MySQL', 'task_schemas', 'SQLite', '真实 Tauri', 'HTTP/SSE', '重启恢复', '无 Mock']
+   M10 capability                       ['HTTPS', 'MySQL/Object Storage 备份、恢复和回滚', 'Agent 正式打包', 'FFmpeg/FFprobe 镜像', 'Sidecar 生命周期', '签名和公证', '升级、回滚和用户数据保留', '日志脱敏和诊断包', '故障演练']
+   M2 candidate                         ['M2-A：', 'M2-B：', 'M2-C：', 'M2-D：', 'M2-E：']
+   M2 capability                        ['四条业务闭环顺序补齐', 'M2-A：用户与权限闭环', 'M2-B：媒体账号与 Profile 闭环', 'M2-C：代理与 Profile 闭环', 'M2-D：Cookie 与开户闭环', 'M2-E：Desktop 与安全闭环', '真实 MySQL', 'BitBrowser', 'Cookie', 'Desktop']
+   M6 tracked-object provider           ['pending_manual_submit', 'cancelled', 'published', 'tracked_object']
+   M8 candidate                         ['<generated: m8_candidates>']
+   M8 candidate                         ['外部 tracked_object', 'interaction_task', '账号级 task', '验证码接管']
+   M9 candidate                         ['<generated: m9_candidates>']
+   M9 candidate                         ['M9-C1 platform_metric_snapshot', '环境统计与新鲜度', 'Excel 导出']
+   M9 dependency                        ['`tracked_object` 已由 M6/M8 创建', '不可变快照']
+   common milestone acceptance          ['自动单元、Contract、集成和回归测试', '真实依赖证据', '角色/UI/人工链路验收', '中断、重启、幂等、恢复和敏感信息安全验收', '各仓库独立提交']
+   machine contract state               ['formal_definitions_active: true']
+   mixed contract state                 ['Current state is mixed.', '`task_schemas` is active']
+   release matrix planning state        ['Verified releases are historical scope evidence', 'revised milestone completion is determined by the current Master Plan', 'M0-R4 verified real Vue/Vite/Tauri Rust']
+   task_schemas machine state           ['state: active', 'formal_definition: active']
+
+B. M3 candidate-block needles removed by CHG-20260925-063
+   still asserted: []  -> 0/6
+
+C. M3-labelled assertion groups remaining
+   none
+
+NOTE: grep cannot answer B -- the removed needles still appear in the
+removal comments. Only the AST shows what is actually asserted.

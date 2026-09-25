@@ -68,7 +68,7 @@
 
 由此产生**两处静默空转**（这是本 CHG 要根治的部分，不只把值改新）：
 
-1. **`candidate_block()` 返回空串时不报错**。`require_all("", needles, …)` 于是变成**恒假**（needle 永远缺失），而 `forbidden in ""` 变成**恒真**（永远不触发）。同一个空串，两类断言一个永远红、一个永远绿，脚本却对「块没了」这件事一言不发。
+1. **`candidate_block()` 返回空串时不报错**，两类断言于是坏在两个相反方向：`require_all("", needles, …)` 的每条 needle 都「缺失」⇒ **每次运行必定报红**（恒定噪音）；`forbidden in ""` 恒为 `False` ⇒ 该检查**静默通过**。同一个空串，一个永远红、一个永远绿，脚本却对「块没了」这件事一言不发。
 2. **M3 的禁用对象检查今天恒真**。M3 是唯一**既无候选块、也无 `or sections[3]` 兜底**的段（M2 无块但有兜底）。实测 `crawl_result` 确实出现在 M3 段正文中，因此若照 M2 的样子补上兜底，该检查会从**恒真翻成恒假**——红项从 4 变 5。**任何「顺手把兜底补上」的改法都会踩这个坑。**
 
 ### 4.4 测试套件里的一处假通过（本轮实测发现）
@@ -79,6 +79,8 @@
 - 实测该**被替换的字符串在 MASTER 里根本不存在**（`False`），`str.replace` 是**空操作**，所谓「变异后的文本」与原文逐字相同。
 - 于是它断言的 `"M3 candidate"` 错误来自**另外 4 条**（候选块为空导致的 needle 缺失），**与它想测的禁用对象机制毫无关系**。
 - 结论：**这条测试从未验证过禁用对象检查**，该检查即便被整个删掉它也照样绿。
+- **T-03 补齐了另一半并实测证明**（`evidence/artifacts/t03-false-pass-proof.out`）：用 `HEAD` 版脚本对**未变异**的 MASTER 文本求值，已经产出 4 条 `M3 candidate missing …`。而该用例的断言是 `any("M3 candidate" in error for error in errors)` ⇒ **它在变异之前就成立**。所以两个错是互相掩盖的：空操作让用例看起来在测禁用对象机制，恒定噪音让断言看起来被变异触发。
+- 由此定下 **T-04 的修法边界**：只把变异字符串换成「存在的那个」不够。只要断言仍匹配 `M3 candidate` 这个**标签**，任何别的红项都能再次满足它。T-04 必须同时改**变异目标**（移到有非空候选块的里程碑上）与**断言的判定方式**（断错误条数与该条消息，而非「存在某标签」）。
 
 同类问题：`test_rejects_missing_m2_product_capability` 的变异字符串**存在**、机制**真的被跑到**，该测试有效；但它的有效性依赖 M2 的 `or sections[2]` 兜底，而这个兜底正是为 M2 无块打的补丁（见 4.3 第 2 条）。
 
@@ -151,7 +153,7 @@ None.
 |---|---|---|---|
 | T-01 | `verify_m0_config.py` 转绿：两条 revision 期望值对齐 contract-map；移除 workspace CI 断言（D-03） | DONE | 脚本 exit 0；`tests/test_verify_m0_config.py` 4 条全绿；**两次变异对照**（改坏 contract-map 的 revision 必须报错；空 `OUTER_ROOT` 下三个运行仓工作流必须逐条报缺）见 `evidence/task-01-m0-config.md` |
 | T-02 | `verify_m2_acceptance.py` 转绿：移除 3 处源码字面量断言，新增 Cloud 原子单次使用断言（D-01/D-02） | DONE | 脚本 exit 0；**9 个被删 needle 经 AST 证明 0 个仍在断言集合内**；新增 migration schema 断言做**变异对照**（3 条变异各报 1 错 + 阳性对照证明读取器确在读假树）；六类契约层目标全部 present。见 `evidence/task-02-m2-acceptance.md` |
-| T-03 | `verify_product_master_alignment.py` 转绿：状态词对齐、候选块断言按状态分层、消除两处空转、新增未关闭里程碑缺块断言 | TODO | 脚本 exit 0；新断言做**变异对照**（抽掉一个非 DONE 里程碑的候选块必须报错） |
+| T-03 | `verify_product_master_alignment.py` 转绿：状态词对齐、候选块断言按状态分层、消除两处空转、新增未关闭里程碑缺块断言 | DONE | 脚本 exit 0，六个门禁全绿；**变异对照 7 臂**（含两条对照：空文本证明读的是传入文本、未变异文本 0 错证明基线干净），每臂产出恰好其预期错误集；**6 个被删 needle 经 AST 证明 0 个仍在断言集合内**，M3 标签断言组已无残留。另查明 T-04 那条假通过用例**绿的原因也是空转**（未变异文本已产出 4 条 `M3 candidate` 错，满足了「有该标签」的断言）。见 `evidence/task-03-product-master-alignment.md` |
 | T-04 | 修正测试套件的假通过与失效用例（4.4） | TODO | 新用例先红后绿；证明变异字符串真实存在 |
 | T-05 | 文档同步：README §Verification、conventions §10、`AGENT-INDEX.md` §12 | TODO | 三处读数与实测一致；`verify_agent_entry.py`、`verify_delivery_governance.py` 仍绿 |
 | T-06 | 收尾：全套门禁 + unittest 读数、归档指针扫描 | TODO | 见 §10 验收矩阵 |
@@ -203,7 +205,7 @@ None.
 
 - `evidence/task-01-m0-config.md`
 - `evidence/task-02-m2-acceptance.md`
-- `evidence/task-03-master-alignment.md`
+- `evidence/task-03-product-master-alignment.md`
 - `evidence/task-04-tests.md`
 - `evidence/task-05-docs.md`
 - `evidence/task-06-close.md`
@@ -215,19 +217,24 @@ Completed:
 - 只读勘查与逐条根因定位：三个脚本的 16 条红项全部追到具体行与具体文件（§4）。
 - 两处静默空转（`candidate_block` 空串、M3 禁令检查恒真）与一处测试假通过（4.4）经实测确认。
 - 两个方向问题由用户裁定（D-01 判据分层、D-03 删 CI 断言）。
+- T-01 `verify_m0_config.py` 转绿（`evidence/task-01-m0-config.md`）。
+- T-02 `verify_m2_acceptance.py` 转绿（`evidence/task-02-m2-acceptance.md`）。
+- T-03 `verify_product_master_alignment.py` 转绿（`evidence/task-03-product-master-alignment.md`）。
 
 Current:
-- 记录建立，准备激活并进入 T-01。
+- T-04 开工：`tests/test_verify_product_master_alignment.py`。该文件当前 **1 条红**（§4.4 那条假通过用例）。
 
 Next:
-- 激活本 CHG 并写 checkpoint：`python3 scripts/prepare_ai_workspace.py --change CHG-20260925-063`。
-- 按 T-01 → T-06 逐个实施。
+- T-04 修假通过与失效用例；修法边界见 §4.4 末条（不可只换变异字符串）。
+- T-05 文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
+- T-06 收尾：验收矩阵、DONE Gate 签字、归档与失效指针扫描。
 
 Blocked:
 - None.
 
 Recent verification:
-- 三个脚本实跑读数见 §4.1（exit 1 / 3 条、5 条、8 条）；逐里程碑状态与候选块实测见 §4.3。
+- 改前读数：`verify_m0_config.py` 3 红、`verify_m2_acceptance.py` 5 红、`verify_product_master_alignment.py` 8 红（§4.1、`evidence/artifacts/`）。
+- T-03 后六个门禁全 `exit=0`（`evidence/artifacts/t03-gate-readings.out`）；整套 unittest **Ran 73 / 1 条 FAIL**，即 §4.4 那条，归 T-04。
 
 ## 13. DONE Gate
 

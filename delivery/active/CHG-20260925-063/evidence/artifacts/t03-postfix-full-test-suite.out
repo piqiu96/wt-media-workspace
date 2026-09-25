@@ -1,0 +1,13 @@
+======================================================================
+FAIL: test_rejects_stale_operational_object_in_candidate_chg (test_verify_product_master_alignment.ProductMasterAlignmentTests.test_rejects_stale_operational_object_in_candidate_chg)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/tests/test_verify_product_master_alignment.py", line 52, in test_rejects_stale_operational_object_in_candidate_chg
+    self.assertTrue(any("M3 candidate" in error for error in errors), errors)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+----------------------------------------------------------------------
+Ran 73 tests in 0.266s
+
+FAILED (failures=1)

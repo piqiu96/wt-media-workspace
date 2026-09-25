@@ -1,0 +1,6 @@
+verify_delivery_governance.py          exit=0  Delivery governance verification ok. Active CHG: CHG-20260925-063
+verify_agent_entry.py                  exit=0  execution snapshot: 1919 characters (~768 tokens, budget 8000 characters)
+verify_skills.py                       exit=0  verified 10 skill source files
+verify_product_master_alignment.py     exit=0  Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                exit=0  M2 static cross-repository acceptance matrix ok
+verify_m0_config.py                    exit=0  Workspace config verification ok

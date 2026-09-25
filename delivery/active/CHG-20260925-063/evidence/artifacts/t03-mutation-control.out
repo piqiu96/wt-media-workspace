@@ -1,0 +1,24 @@
+ok   control: empty text -> milestone set mismatch
+        Master milestone set mismatch: expected M0-M10, got none
+ok   control: unmutated real text -> 0 errors
+ok   M2 status DONE -> IN_PROGRESS
+        M2 status expected 'DONE', got 'IN_PROGRESS'
+        M2 is 'IN_PROGRESS' but carries no candidate CHG block; candidate assertions against an empty block would be vacuous
+ok   M2 record '四条业务闭环顺序补齐' -> '五条...'
+        M2 capability missing '四条业务闭环顺序补齐'
+ok   M3 status DONE -> NOT_STARTED with no candidate block
+        M3 status expected 'DONE', got 'NOT_STARTED'
+        M3 is 'NOT_STARTED' but carries no candidate CHG block; candidate assertions against an empty block would be vacuous
+ok   M8 block gains forbidden 'interaction_batch'
+        M8 candidate contains forbidden operational object 'interaction_batch'
+ok   M9 candidate block emptied (still NOT_STARTED)
+        M9 is 'NOT_STARTED' but carries no candidate CHG block; candidate assertions against an empty block would be vacuous
+        M9 candidate missing 'M9-C1 platform_metric_snapshot'
+        M9 candidate missing '环境统计与新鲜度'
+        M9 candidate missing 'Excel 导出'
+ok   M10 'FFmpeg/FFprobe 镜像' -> '分发'
+        M10 capability missing 'FFmpeg/FFprobe 镜像'
+ok   M0 gate wording 'Cloud 和 Web 使用真实依赖' -> mutated
+        M0 gate missing 'Cloud 和 Web 使用真实依赖'
+
+MUTATION CONTROL OK: every arm produced exactly its expected error set.

@@ -1,0 +1,19 @@
+Old script (HEAD) on UNMUTATED Master Plan text:
+    M2 status expected 'IN_PROGRESS', got 'DONE'
+    M3 status expected 'NOT_STARTED', got 'DONE'
+    M2 capability missing '按五条业务闭环顺序补齐'
+    M3 candidate missing 'source_content'
+    M3 candidate missing 'Scheduler'
+    M3 candidate missing '正式任务 Schema'
+    M3 candidate missing '真实抖音接口'
+    M10 capability missing 'FFmpeg/FFprobe 分发'
+
+-> 'M3 candidate' errors present BEFORE any mutation: 4
+
+The test that T-04 must fix asserts, after mutating a string that does not exist:
+    self.assertTrue(any('M3 candidate' in error for error in errors), errors)
+
+Since the unmutated run ALREADY satisfies that predicate, the mutation cannot
+have been what satisfied it. The test was green on a pre-existing labelled
+error, not on the behaviour it claimed to cover -- two wrongs masking each other:
+the mutation was a no-op, and the assertion was satisfied by permanent noise.

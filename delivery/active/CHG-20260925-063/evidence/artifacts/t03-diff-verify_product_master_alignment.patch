@@ -1,0 +1,151 @@
+diff --git a/scripts/verify_product_master_alignment.py b/scripts/verify_product_master_alignment.py
+index 3751a50..deca801 100644
+--- a/scripts/verify_product_master_alignment.py
++++ b/scripts/verify_product_master_alignment.py
+@@ -30,6 +30,22 @@ def require_all(text: str, needles: tuple[str, ...], label: str) -> list[str]:
+     return [f"{label} missing {needle!r}" for needle in needles if needle not in text]
+ 
+ 
++def forbid_all(errors: list[str], block: str, label: str, needles: tuple[str, ...]) -> None:
++    """Report forbidden operational objects inside a candidate block.
++
++    Guarded on a non-empty block deliberately. `needle in ""` is false for every
++    needle, so an empty or malformed block would make this check PASS
++    unconditionally -- silently certifying a milestone it never read. The
++    missing block is reported once by the required-block check in
++    `validate_master_text`; this guard only suppresses a check that cannot run.
++    """
++    if not block.strip():
++        return
++    for needle in needles:
++        if needle in block:
++            errors.append(f"{label} contains forbidden operational object {needle!r}")
++
++
+ def validate_master_text(text: str) -> list[str]:
+     errors: list[str] = []
+     sections = milestone_sections(text)
+@@ -40,13 +56,40 @@ def validate_master_text(text: str) -> list[str]:
+         )
+         return errors
+ 
+-    expected_statuses = {0: "DONE", 1: "DONE", 2: "IN_PROGRESS", **{number: "NOT_STARTED" for number in range(3, 11)}}
++    # Status words track the CURRENT Master Plan, not the plan as it stood when
++    # this script was written. M2 closed 2026-09-14 and M3 closed 2026-09-23
++    # (both user-signed); the expectations here were left behind at closure,
++    # which is why this gate reported them as errors for as long as they have
++    # been closed.
++    expected_statuses = {0: "DONE", 1: "DONE", 2: "DONE", 3: "DONE", **{number: "NOT_STARTED" for number in range(4, 11)}}
++    statuses: dict[int, str | None] = {}
+     for number, expected in expected_statuses.items():
+         status_match = re.search(r"\| 状态 \| `([^`]+)`", sections[number])
+         actual = status_match.group(1) if status_match else None
++        statuses[number] = actual
+         if actual != expected:
+             errors.append(f"M{number} status expected {expected!r}, got {actual!r}")
+ 
++    # A candidate block belongs to a milestone that is still open. A DONE
++    # milestone has retired its candidates into its closure record, so it is not
++    # required to carry one; an unfinished milestone MUST, because
++    # `candidate_block()` returns "" for an absent or malformed block, and every
++    # assertion made against "" is vacuous in one of two ways --
++    # `require_all("")` reports all of its needles missing (permanent noise that
++    # trains readers to ignore this gate), while `needle in ""` is never true (a
++    # silent PASS that certifies a milestone the check never read). Reporting
++    # the missing block is what turns that second silence into an error.
++    for number in sorted(sections):
++        if statuses[number] == "DONE":
++            continue
++        if not candidate_block(sections[number]).strip():
++            errors.append(
++                f"M{number} is {statuses[number]!r} but carries no candidate CHG block; "
++                "candidate assertions against an empty block would be vacuous"
++            )
++
++    # M0 and M1 are DONE but kept their candidate blocks as the closure record,
++    # so these assert the retired candidate list itself.
+     m0_candidates = candidate_block(sections[0])
+     errors.extend(
+         require_all(
+@@ -79,19 +122,24 @@ def validate_master_text(text: str) -> list[str]:
+         )
+     )
+ 
+-    m2_candidates = candidate_block(sections[2]) or sections[2]
++    # M2 is DONE and its candidate block was retired at closure, so its record
++    # is asserted against the section itself. The old form resolved this with
++    # `candidate_block(sections[2]) or sections[2]`, which silently redirected
++    # the assertion target whenever the block went missing -- that is why a
++    # stale needle showed up as "missing ..." rather than as a structural error.
++    m2_record = sections[2]
+     errors.extend(
+         require_all(
+-            m2_candidates,
++            m2_record,
+             ("M2-A：", "M2-B：", "M2-C：", "M2-D：", "M2-E："),
+             "M2 candidate",
+         )
+     )
+     errors.extend(
+         require_all(
+-            m2_candidates,
++            m2_record,
+             (
+-                "按五条业务闭环顺序补齐",
++                "四条业务闭环顺序补齐",
+                 "M2-A：用户与权限闭环",
+                 "M2-B：媒体账号与 Profile 闭环",
+                 "M2-C：代理与 Profile 闭环",
+@@ -106,22 +154,19 @@ def validate_master_text(text: str) -> list[str]:
+         )
+     )
+ 
+-    m3_candidates = candidate_block(sections[3])
+-    for forbidden in ("crawl_result", "content_lead"):
+-        if forbidden in m3_candidates:
+-            errors.append(f"M3 candidate contains forbidden operational object {forbidden!r}")
+-    errors.extend(
+-        require_all(
+-            m3_candidates,
+-            ("source_content", "Scheduler", "正式任务 Schema", "真实抖音接口"),
+-            "M3 candidate",
+-        )
+-    )
++    # Removed by CHG-20260925-063: M3's candidate-block assertions. M3 closed on
++    # 2026-09-23 and retired its candidate block, so `candidate_block(sections[3])`
++    # returned "" and the two groups fared differently -- the four content
++    # needles were PERMANENTLY missing (guaranteed red on every run, i.e. the
++    # noise that made this gate ignorable), while the forbidden-object loop was
++    # PERMANENTLY passing (`forbidden in ""` is never true, so it could not have
++    # caught `crawl_result` even if the block came back carrying it). Neither
++    # group covered anything, so nothing is lost by dropping them. M3 is now
++    # covered by its status word plus the common milestone acceptance needles,
++    # which is what D-04 prescribes for a DONE milestone.
+ 
+     m8_candidates = candidate_block(sections[8])
+-    for forbidden in ("interaction_batch", "interaction_item"):
+-        if forbidden in m8_candidates:
+-            errors.append(f"M8 candidate contains forbidden operational object {forbidden!r}")
++    forbid_all(errors, m8_candidates, "M8 candidate", ("interaction_batch", "interaction_item"))
+     errors.extend(
+         require_all(
+             m8_candidates,
+@@ -131,8 +176,7 @@ def validate_master_text(text: str) -> list[str]:
+     )
+ 
+     m9_candidates = candidate_block(sections[9])
+-    if "production_signal" in m9_candidates:
+-        errors.append("M9 candidate contains forbidden operational object 'production_signal'")
++    forbid_all(errors, m9_candidates, "M9 candidate", ("production_signal",))
+     errors.extend(
+         require_all(
+             m9_candidates,
+@@ -164,7 +208,7 @@ def validate_master_text(text: str) -> list[str]:
+                 "HTTPS",
+                 "MySQL/Object Storage 备份、恢复和回滚",
+                 "Agent 正式打包",
+-                "FFmpeg/FFprobe 分发",
++                "FFmpeg/FFprobe 镜像",
+                 "Sidecar 生命周期",
+                 "签名和公证",
+                 "升级、回滚和用户数据保留",

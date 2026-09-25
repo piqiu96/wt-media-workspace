@@ -42,15 +42,30 @@
   ②AC-04 用 `grep -c` 不具判别力（被删字符串出现在我写的删除说明注释里），改 **AST 枚举**
   证明 **9 个被删 needle 中 0 个仍在断言集合内**；③AC-05 首版判据把路径当 needle 找，误报 3 个 MISSING，
   修正后六类契约层目标全部 present。证据：`evidence/task-02-m2-acceptance.md`。
+- 2026-09-25 T-03 完成：`verify_product_master_alignment.py` 由 `exit=1`／8 红 转为 `exit=0`，
+  六个门禁全部 `exit=0`。按 D-04 分层：M2/M3 状态词对齐，**M3 的两组候选块断言整组删除**
+  （4 条 needle 恒缺 ⇒ 每次必报红；禁用循环 `forbidden in ""` 恒假 ⇒ 静默通过——**两组覆盖都是零**），
+  新增「非 `DONE` 里程碑必须带候选块」的**结构错误**把第二种沉默变响。**三条 needle 的根因各自落到决策**：
+  M2 的「五条」编码的是 **M2-D 暂缓（2026-09-12 已记录）之前**的计划；M10 的「分发」编码的是
+  **ADR-0015** 时代口径，而已被 **ADR-0017 第 1、10 条**取代（FFmpeg 属 Cloud 部署组件）。
+  **变异对照 7 臂**（两条对照先行：空文本证明函数读的是传入文本、未变异文本 0 错证明基线干净），
+  每臂产出恰好其预期错误集；**6 个被删 needle 经 AST 证明 0 个仍在断言集合内**。
+  **一处预期写错并纠正**：M2 状态变异实得 2 条错而非 1 条——重开已关闭里程碑**同时**触发新增的
+  缺块检查，这是该检查的意图，是预期写窄了。证据：`evidence/task-03-product-master-alignment.md`。
+- 2026-09-25 T-03 副产物：查明 §4.4 那条假通过用例**绿的原因也是空转**，并实测证明——
+  用 `HEAD` 版脚本对**未变异**文本求值已产出 4 条 `M3 candidate missing …`，而该用例断言的正是
+  「存在该标签」，故**在变异之前就成立**。两个错互相掩盖。因此 T-04 **不能只换变异字符串**。
+  证据：`evidence/artifacts/t03-false-pass-proof.out`。
 
 ## Current
 
-- T-03 开工：`verify_product_master_alignment.py`。
+- T-04 开工：`tests/test_verify_product_master_alignment.py`（该文件当前 **1 条红**）。
 
 ## Next
 
-- T-03 `verify_product_master_alignment.py` 转绿（状态词对齐 + 候选块断言按状态分层 + 消除两处空转）。
-- T-04 修正测试套件的假通过与失效用例。
+- T-04 修正测试套件的假通过与失效用例。**修法边界已实测定下**：不可只把变异字符串换成
+  「存在的那个」——只要断言仍匹配 `M3 candidate` 这个标签，任何别的红项都能再次满足它
+  （`change.md` §4.4 末两条）。
 - T-05 文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
 - T-06 收尾：验收矩阵、DONE Gate 签字、归档与失效指针扫描。
 
