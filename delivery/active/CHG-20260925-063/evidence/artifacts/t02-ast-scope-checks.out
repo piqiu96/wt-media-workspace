@@ -1,0 +1,68 @@
+$ # AC-04/AC-05 by AST: the set of needles this script ACTUALLY asserts
+$ # (grepping was not discriminating -- the removed strings are quoted in the removal comments)
+
+A. require_contains needles actually asserted (16):
+     'contract_state: m2_sensitive_profile_guard'
+     'cloud_agent_api:'
+     'contract_revision: "2026.07.14.7"'
+     'error_revision: "2026.07.14.5"'
+     'event_revision: "2026.07.14.9"'
+     'enum_revision: "2026.07.14.8"'
+     '<computed: tuple((f\'release: "{release}"\' for release in (\'0.2.0-m2-identity-access\', \'0.2.1-m2-media-accounts\', \'0.2.2-m2-bitbrowser-profile-binding\', \'0.2.3-m2-agent-runtime-binding\', \'0.2.4-m2-sensitive-profile-guard\')))>'
+     'version: 2026.07.14.6'
+     'review_required'
+     'X-Profile-Permit'
+     'version = "0.2.2"'
+     'revision: "2026.07.14.8"'
+     'result_uncertain'
+     'CREATE TABLE local_agent_binding_tickets'
+     'used_at DATETIME(6) NULL'
+     'UNIQUE KEY uq_local_agent_binding_ticket_hash (token_hash)'
+
+B. forbidden (must-not-appear) markers (5):
+     'binding_token varchar'
+     'node_credential varchar'
+     'permit_credential varchar'
+     'localstorage'
+     'sessionstorage'
+
+C. AC-04: of the 9 removed needles, how many are STILL asserted?
+     removed         'ContractRevision             = "2026.07.15.1"'
+     removed         'MinimumAgentContractRevision = "2026.07.14.7"'
+     removed         'REQUIRED_CONTRACT_REVISION = "2026.07.15.1"'
+     removed         'local_agent_start'
+     removed         'local_agent_status'
+     removed         '"wt-media-agent"'
+     removed         'pub struct BoundNodeFacts'
+     removed         'fn consume_binding_ticket('
+     removed         'pub fn bind_session<T: BindingTransport>('
+
+     -> 0/9 still asserted. AST check is semantic, not textual.
+
+D. AC-05: contract-layer classes present in the asserted set:
+     MISSING  contract-map revision map
+     MISSING  release-matrix pins
+     MISSING  published contract YAML
+     present  migration schema
+     present  Desktop contract lock consumes map (asserted by dict compare, not require_contains)
+     present  secret-persistence invariant (forbidden markers)
+
+E. AC-05 redo -- the ASSERTED TARGETS (arg[1] of each require_contains), i.e. which
+   artifacts this gate speaks about. Section D above was WRONG: it looked for path
+   names among the needles, but a path is arg[1], not a needle. Corrected:
+     WORKSPACE / 'config' / 'contract-map.yaml'
+     WORKSPACE / 'config' / 'release-matrix.yaml'
+     CLOUD / 'contracts' / 'cloud-agent-api' / 'v1' / 'sensitive-profile-guard.openapi.yaml'
+     AGENT / 'pyproject.toml'
+     AGENT / 'contracts' / 'local-event-schemas' / 'v1' / 'profile-guard.yaml'
+     CLOUD / 'migrations' / '20260714_004_agent_runtime.sql'
+   (plus the Desktop contract lock, compared as a dict: 6 require_contains targets total)
+
+F. AC-05: the six contract-layer classes, checked against the real target list:
+     present  contract-map revision map
+     present  release-matrix pins
+     present  published contract YAML
+     present  runtime-owned contract YAML
+     present  applied migration schema
+     present  Desktop contract lock consumes map (dict compare, not require_contains)
+     present  secret-persistence invariant (5 forbidden markers, section B)

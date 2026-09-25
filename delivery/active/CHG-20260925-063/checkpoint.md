@@ -33,14 +33,22 @@
   亦未使 CI 检查器整体失去判别力。**纠正一处自我错误**：首轮基线用 `PY="…"` 变量拼接，
   zsh 不做词分割致三个产物只含 `exit=127`，已用 shell 函数重跑替换（靠 `exit=` 码与体量交叉核对发现）。
   证据：`evidence/task-01-m0-config.md`。
+- 2026-09-25 T-02 完成：`verify_m2_acceptance.py` 由 `exit=1`／5 红 转为 `exit=0`，
+  `tests.test_verify_m2_acceptance` **Ran 1 test / OK**。**D-01/D-02 的张力经测量解开**——
+  真正的强制点在 Cloud，且行为覆盖已在 Cloud 自己的
+  `TestRegisterConsumesTicketOnceAndIssuesHashedCredential`；本仓改断**已应用 migration 的 schema**
+  （append-only ⇒ 文本冻结，故满足稳定性分层）。**三条自我纠正**（同源：判据自己写错时输出照样「像量过的」）：
+  ①首版变异对照**没有重定向 `m.CLOUD`**，三条变异全报 0 error，是空转；
+  ②AC-04 用 `grep -c` 不具判别力（被删字符串出现在我写的删除说明注释里），改 **AST 枚举**
+  证明 **9 个被删 needle 中 0 个仍在断言集合内**；③AC-05 首版判据把路径当 needle 找，误报 3 个 MISSING，
+  修正后六类契约层目标全部 present。证据：`evidence/task-02-m2-acceptance.md`。
 
 ## Current
 
-- T-02 开工：`verify_m2_acceptance.py`。
+- T-03 开工：`verify_product_master_alignment.py`。
 
 ## Next
 
-- T-02 `verify_m2_acceptance.py` 转绿（删 3 处源码字面量断言 + 新增 Cloud 原子单次使用断言，D-01/D-02）。
 - T-03 `verify_product_master_alignment.py` 转绿（状态词对齐 + 候选块断言按状态分层 + 消除两处空转）。
 - T-04 修正测试套件的假通过与失效用例。
 - T-05 文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。

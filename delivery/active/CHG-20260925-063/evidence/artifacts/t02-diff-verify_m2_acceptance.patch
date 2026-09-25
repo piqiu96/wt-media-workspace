@@ -1,0 +1,99 @@
+diff --git a/scripts/verify_m2_acceptance.py b/scripts/verify_m2_acceptance.py
+index 56e56c8..35ac27f 100644
+--- a/scripts/verify_m2_acceptance.py
++++ b/scripts/verify_m2_acceptance.py
+@@ -3,6 +3,23 @@
+ 
+ Real MySQL and BitBrowser checks are intentionally separate: this verifier
+ must never turn fixture evidence into a real-integration PASS.
++
++Assertion scope (set by CHG-20260925-063, do not widen without a CHG):
++
++Only DURABLE, contract-layer facts about the runtime repositories are asserted
++here: contract revision maps, release-matrix pins, migration files, published
++contract YAML, the Desktop contract lock's `consumes` map, and the
++secret-persistence invariant. Assertions on the TEXT OF A SOURCE FILE that a
++later refactor may legitimately move or rename are deliberately NOT made --
++that is what made this script red for months while nothing was actually wrong.
++A refactor moving a symbol between files must not be able to turn this gate
++red; a contract or schema change must.
++
++Each repository asserts its own implementation in its own test suite. For
++example the binding-ticket single-use rule is covered behaviourally by
++`wt-media-cloud/internal/modules/runtimebinding/service/service_test.go`
++(`TestRegisterConsumesTicketOnceAndIssuesHashedCredential`); this script only
++asserts the schema that makes it enforceable, in the applied migration.
+ """
+ 
+ from __future__ import annotations
+@@ -66,11 +83,12 @@ def validate_static_matrix() -> list[str]:
+             )
+         ),
+     )
+-    require_contains(
+-        errors,
+-        CLOUD / "internal" / "modules" / "cloudagent" / "compatibility.go",
+-        ('ContractRevision             = "2026.07.15.1"', 'MinimumAgentContractRevision = "2026.07.14.7"'),
+-    )
++    # Removed by CHG-20260925-063: asserted two Go constants in
++    # `cloudagent/compatibility.go`. The file moved to
++    # `cloudagent/service/compatibility.go` and both values are unchanged --
++    # i.e. the gate went red for a pure file move. The revision values are
++    # asserted at the contract layer instead (contract-map.yaml, the published
++    # contract YAML, and the Desktop contract lock below).
+     for migration in range(1, 6):
+         matches = list((CLOUD / "migrations").glob(f"20260714_00{migration}_*.sql"))
+         if len(matches) != 1:
+@@ -80,11 +98,12 @@ def validate_static_matrix() -> list[str]:
+         CLOUD / "contracts" / "cloud-agent-api" / "v1" / "sensitive-profile-guard.openapi.yaml",
+         ("version: 2026.07.14.6", "review_required", "X-Profile-Permit"),
+     )
+-    require_contains(
+-        errors,
+-        AGENT / "src" / "wt_media_agent" / "cloud_agent_contract.py",
+-        ('REQUIRED_CONTRACT_REVISION = "2026.07.15.1"',),
+-    )
++    # Removed by CHG-20260925-063: asserted the literal
++    # `REQUIRED_CONTRACT_REVISION = "2026.07.15.1"` in
++    # `wt_media_agent/cloud_agent_contract.py`. The constant still exists with
++    # that exact value; its definition moved to `clients/cloud/contract.py` and
++    # the old module now re-exports it. The revision is asserted at the contract
++    # layer instead (contract-map.yaml, and the contract YAML below).
+     require_contains(errors, AGENT / "pyproject.toml", ('version = "0.2.2"',))
+     require_contains(
+         errors,
+@@ -107,18 +126,25 @@ def validate_static_matrix() -> list[str]:
+         }
+         if lock.get("consumes") != expected:
+             errors.append(f"Desktop contract lock mismatch: {lock.get('consumes')!r}")
++    # Binding-ticket single use, asserted at the layer that can actually stay
++    # true. CHG-20260925-063 removed assertions on Desktop source text
++    # (`main.rs` carrying "wt-media-agent"; `local_agent/mod.rs` carrying
++    # `fn consume_binding_ticket(` and
++    # `pub fn bind_session<T: BindingTransport>(`). CHG-056 split `main.rs` into
++    # layered modules and the ticket consume path moved to `commands/bind.rs`
++    # as a `#[tauri::command]`; the enforcement itself moved ACROSS a repo
++    # boundary to Cloud, which consumes the ticket atomically. Desktop source
++    # text was the wrong place to assert that. An APPLIED MIGRATION is
++    # append-only, so its text is stable in a way a refactorable source file is
++    # not: `used_at` (nullable marker, set once on consume) plus a UNIQUE key on
++    # `token_hash` is the schema that makes single use enforceable at all.
+     require_contains(
+         errors,
+-        DESKTOP / "src-tauri" / "src" / "main.rs",
+-        ("local_agent_start", "local_agent_status", '"wt-media-agent"'),
+-    )
+-    require_contains(
+-        errors,
+-        DESKTOP / "src-tauri" / "src" / "local_agent" / "mod.rs",
++        CLOUD / "migrations" / "20260714_004_agent_runtime.sql",
+         (
+-            "pub struct BoundNodeFacts",
+-            "fn consume_binding_ticket(",
+-            "pub fn bind_session<T: BindingTransport>(",
++            "CREATE TABLE local_agent_binding_tickets",
++            "used_at DATETIME(6) NULL",
++            "UNIQUE KEY uq_local_agent_binding_ticket_hash (token_hash)",
+         ),
+     )
+ 

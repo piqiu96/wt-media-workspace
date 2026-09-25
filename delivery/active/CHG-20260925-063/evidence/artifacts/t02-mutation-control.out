@@ -1,0 +1,11 @@
+$ # mutation control v2: redirect m.CLOUD at a fake tree holding the REAL migrations/ dir
+$ # (v1 was hollow: it copied the repo but never redirected m.CLOUD, so 3/3 mutations showed 0 errors)
+baseline (real tree) -> []
+
+ label                            errors mentioning 20260714_004
+ unmutated (positive control)     0  []
+ drop used_at column              1  ["/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmp4dyz9v45/migrations/20260714_004_agent_runtime.sql: missing 'used_at DATETIME(6) NULL'"]
+ drop UNIQUE on token_hash        1  ["/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmph3m8yngv/migrations/20260714_004_agent_runtime.sql: missing 'UNIQUE KEY uq_local_agent_binding_ticket_hash (token_hash)'"]
+ rename the table                 1  ["/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpcs_j0imb/migrations/20260714_004_agent_runtime.sql: missing 'CREATE TABLE local_agent_binding_tickets'"]
+
+ real tree untouched -> []

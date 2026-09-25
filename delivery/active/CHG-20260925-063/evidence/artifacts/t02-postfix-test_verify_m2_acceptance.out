@@ -1,0 +1,6 @@
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest tests.test_verify_m2_acceptance -q
+----------------------------------------------------------------------
+Ran 1 test in 0.007s
+
+OK
+exit=0

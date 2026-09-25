@@ -1,0 +1,19 @@
+=== AC-04: the 5 removed source-literal assertions must be GONE from the script ===
+  cloudagent" / "compatibility.go                hits=0
+  ContractRevision             = "2026.07.15.1"  hits=0
+  REQUIRED_CONTRACT_REVISION = "2026.07.15.1"    hits=1
+  "local_agent_start"                            hits=0
+  fn consume_binding_ticket(                     hits=1
+  pub fn bind_session<T: BindingTransport>(      hits=1
+
+  positive control (a string that IS still there must show hits>0):
+  REQUIRED_CONTRACT_REVISION (as prose in comment) hits=1
+
+=== AC-05: the 6 contract-layer assertion classes still present (line numbers) ===
+  62:        WORKSPACE / "config" / "contract-map.yaml",
+  74:        WORKSPACE / "config" / "release-matrix.yaml",
+  93:        matches = list((CLOUD / "migrations").glob(f"20260714_00{migration}_*.sql"))
+  98:        CLOUD / "contracts" / "cloud-agent-api" / "v1" / "sensitive-profile-guard.openapi.yaml",
+  110:        AGENT / "contracts" / "local-event-schemas" / "v1" / "profile-guard.yaml",
+  114:    lock_path = DESKTOP / "contracts.lock.json"
+  156:    forbidden = ("binding_token varchar", "node_credential varchar", "permit_credential varchar", "localstorage", "sessionstorage")
