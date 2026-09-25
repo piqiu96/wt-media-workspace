@@ -1,0 +1,104 @@
++(eval):3> ls /Volumes/
+Macintosh HD
++(eval):4> ls -la /Users/aqiuye/Library/Logs/WTMedia/Desktop/
+total 32
+drwxr-xr-x@ 6 aqiuye  staff  192 Sep 25 11:55 .
+drwxr-xr-x@ 5 aqiuye  staff  160 Sep 25 00:44 ..
+-rw-r--r--@ 1 aqiuye  staff  336 Sep 24 19:49 desktop-20260924-1.log
+-rw-r--r--@ 1 aqiuye  staff  832 Sep 25 11:55 desktop.log
+-rw-r--r--@ 1 aqiuye  staff  948 Sep 24 23:36 desktop.log.2026-09-24-23
+-rw-r--r--@ 1 aqiuye  staff  334 Sep 25 00:36 desktop.log.2026-09-25-10
++(eval):5> hdiutil attach '/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg'
+预计CRC32 $1151F063
+/dev/disk4          	GUID_partition_scheme          	
+/dev/disk4s1        	Apple_APFS                     	
+/dev/disk5          	EF57347C-0000-11AA-AA11-0030654	
+/dev/disk5s1        	41504653-0000-11AA-AA11-0030654	/Volumes/WT Media
++(eval):6> sleep 2
++(eval):7> APP='/Volumes/WT Media/WT Media.app' 
++(eval):8> echo '=== bundle Resources (after) ==='
+=== bundle Resources (after) ===
++(eval):9> ls -la '/Volumes/WT Media/WT Media.app/Contents/Resources/'
+total 16
+drwxr-xr-x@ 6 aqiuye  staff   192 Sep 25 12:03 .
+drwxr-xr-x@ 6 aqiuye  staff   192 Sep 25 12:03 ..
+drwxr-xr-x@ 4 aqiuye  staff   128 Sep 25 12:03 config
+drwxr-xr-x@ 3 aqiuye  staff    96 Sep 25 12:03 resources
+-rw-r--r--@ 1 aqiuye  staff   206 Sep 25 12:03 sidecar-manifest.json
+-rw-r--r--@ 1 aqiuye  staff  1126 Sep 25 12:03 versions.json
++(eval):10> echo '=== sidecar flags (after) ==='
+=== sidecar flags (after) ===
++(eval):11> /usr/bin/codesign -dv '--verbose=4' '/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-agent'
++(eval):11> grep 'flags='
++grep:1> local _cc_a
++grep:2> _cc_a=flags=
++grep:3> case flags= (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' 'flags='
+CodeDirectory v=20400 size=21200 flags=0x2(adhoc) hashes=656+2 location=embedded
+Executable Segment flags=0x1
++(eval):12> echo '=== launch ==='
+=== launch ===
++(eval):13> open '/Volumes/WT Media/WT Media.app'
++(eval):14> sleep 15
++(eval):15> echo '=== processes ==='
+=== processes ===
++(eval):16> pgrep -fl wt-media-desktop-shell
+66413 /Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell
++(eval):17> pgrep -fl 'WT Media.app/Contents/MacOS/wt-media-agent'
++(eval):18> echo '=== desktop log dir (after launch) ==='
+=== desktop log dir (after launch) ===
++(eval):19> ls -la /Users/aqiuye/Library/Logs/WTMedia/Desktop/
+total 40
+drwxr-xr-x@ 7 aqiuye  staff   224 Sep 25 12:04 .
+drwxr-xr-x@ 5 aqiuye  staff   160 Sep 25 00:44 ..
+-rw-r--r--@ 1 aqiuye  staff   336 Sep 24 19:49 desktop-20260924-1.log
+-rw-r--r--@ 1 aqiuye  staff  1436 Sep 25 12:04 desktop.log
+-rw-r--r--@ 1 aqiuye  staff   948 Sep 24 23:36 desktop.log.2026-09-24-23
+-rw-r--r--@ 1 aqiuye  staff   334 Sep 25 00:36 desktop.log.2026-09-25-10
+-rw-r--r--@ 1 aqiuye  staff   832 Sep 25 11:55 desktop.log.2026-09-25-11
++zsh:19> pwd -P
++(eval):3> echo '=== DMG at the chain'\''s path now (release-packaged) ==='
+=== DMG at the chain's path now (release-packaged) ===
++(eval):4> ls -la '/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg'
+-rw-r--r--@ 1 aqiuye  staff  17125121 Sep 25 12:03 /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
++(eval):5> echo '=== who holds 8765 ==='
+=== who holds 8765 ===
++(eval):6> lsof -tiTCP:8765 -sTCP:LISTEN
+54456
++(eval):7> echo '=== the in-bundle records ==='
+=== the in-bundle records ===
++(eval):8> cat '/Volumes/WT Media/WT Media.app/Contents/Resources/sidecar-manifest.json'
+{
+  "component": "wt-media-agent",
+  "version": "0.2.2",
+  "target": "aarch64-apple-darwin",
+  "filename": "wt-media-agent",
+  "sha256": "355dc0da31e32ef0efe8731d5bdf7916f38290d892031dbe57bed2cd9fca9496"
+}
++(eval):9> ls -la '/Volumes/WT Media/WT Media.app/Contents/Resources/config/'
+total 16
+drwxr-xr-x@ 4 aqiuye  staff   128 Sep 25 12:03 .
+drwxr-xr-x@ 6 aqiuye  staff   192 Sep 25 12:03 ..
+-rw-r--r--@ 1 aqiuye  staff   994 Sep 25 12:03 README.md
+-rw-r--r--@ 1 aqiuye  staff  3003 Sep 25 12:03 agent.toml
++(eval):10> echo '=== shipped start_timeout_ms ==='
+=== shipped start_timeout_ms ===
++(eval):11> grep -n start_timeout_ms /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/resources/desktop.production.toml
++grep:1> local _cc_a
++grep:2> _cc_a=-n
++grep:3> case -n (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=start_timeout_ms
++grep:3> case start_timeout_ms (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/resources/desktop.production.toml
++grep:3> case /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/resources/desktop.production.toml (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' -n start_timeout_ms /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/resources/desktop.production.toml
+46:start_timeout_ms = 15000
++zsh:11> pwd -P

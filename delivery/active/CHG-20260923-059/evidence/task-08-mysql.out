@@ -1,0 +1,15 @@
++(eval):3> python3 -
+wrote defaults file (values not printed)
++(eval):11> MYSQL=/opt/homebrew/opt/mysql@8.4/bin/mysql 
++(eval):12> /opt/homebrew/opt/mysql@8.4/bin/mysql '--defaults-extra-file=/tmp/chg059/.mysql.cnf' -N -B -e $'\nselect \'tables_in_db\', count(*) from information_schema.tables where table_schema=\'wt_media_cloud\';\nselect \'migration_rows\', count(*) from wt_media_cloud.schema_migrations;\nselect \'latest_migration\', max(version) from wt_media_cloud.schema_migrations;\nselect \'source_contents\', count(*) from wt_media_cloud.source_contents;\nselect \'crawl_tasks\', count(*) from wt_media_cloud.crawl_tasks;\n'
+tables_in_db	26
+migration_rows	39
+latest_migration	20260922_038_audit_fields
+source_contents	570
+crawl_tasks	73
++(eval):19> echo 'EXIT=0'
+EXIT=0
++(eval):20> rm -f /tmp/chg059/.mysql.cnf
++(eval):21> echo 'defaults file removed'
+defaults file removed
++zsh:21> pwd -P

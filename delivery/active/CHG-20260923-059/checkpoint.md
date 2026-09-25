@@ -26,19 +26,22 @@
 
 ## Current
 
-- **T-07 升级不覆盖已收尾**（T-01…T-07 均已收尾，见下七节）；**T-08 未开工**。
+- **T-08 M2 业务回归已收尾**（T-01…T-08 均已收尾，见下八节）；**T-09 未开工**。
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
   与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
   T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`；
   T-04 见 `evidence/task-04-integrity.md` 与 desktop 的 `04f46c3`；
   T-05 见 `evidence/task-05-shipped-config.md` 与 agent / desktop 各一个提交；
   T-06 见 `evidence/task-06-versions.md` 与 desktop / workspace 各一个提交；
-  T-07 见 `evidence/task-07-upgrade.md` 与 desktop 的 `293806f`、agent 的 `feb532d`。
+  T-07 见 `evidence/task-07-upgrade.md` 与 desktop 的 `293806f`、agent 的 `feb532d`；
+  T-08 见 `evidence/task-08-m2-regression.md`——**本任务未改任何仓的运行时代码**，故无代码提交，
+  只有本仓的记录与证据（D-25、Q-05、AC-08 的例外）。
 
 ## Next
 
-- T-08 **M2 业务回归**：对 A/B/C/D 之后的树重跑 M2 链路（`m2b_local_acceptance.py`；
-  实网/实凭据部分逐条标注覆盖与否），按
+- T-09 **吸收项**：Agent 侧 `AGENTS.md`／`README.md`／`contracts/*/README.md` 同步；workspace skill
+  改指 `clients/<platform>` 并跑 `scripts/sync_skills.py`（判据是生成副本与源一致、且 skill 里的路径
+  **真的 resolve**，不只是字符串存在），按
   `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
 
 ## T-01（已收尾，2026-09-25）
@@ -284,11 +287,63 @@
   Agent 侧的用户设置/检查点/待回传结果**在库里的表**上（由加性臂逐行覆盖），
   「库旁的一切」由路径臂覆盖——两侧看起来不对称，是因为承载数据的方式本来就不同。
 
+## T-08（已收尾，2026-09-25）
+
+- **没有代码改动**：T-08 的交付是**读数与覆盖标注**（任务行的判据），`m2b_local_acceptance.py` 与
+  `verify_m2_acceptance.py` **都原样未改**（§5 Add 只列「重跑记录」，Not Doing 明写不重写稳定脚本）。
+- **链路自己全绿**：`m2b-local-acceptance.sh all` 的十三个阶段逐条 PASS，0 ERROR
+  （迁移 `0 applied, 39 total`；Cloud／Agent／BitBrowser via Agent／assets fresh／DMG fresh／
+  login smoke）。真 MySQL 另有一条独立读数（26 表／39 迁移／`source_contents` 570／`crawl_tasks` 73），
+  迁移目录最新一条正是 `20260922_038` ⇒ 这一步是**幂等空跑**，不是「有新迁移没应用」。
+- **三条链路够不到的读数**（这是本任务真正的产出）：
+  ① `verify_m2_acceptance.py` 的 5 条 ERROR **全部是指针过期**且逐条落到提交——移动 3 条
+  （`bf499d9`／`51f2ee4`（留 shim、值不变）／`3bcf2c7`）、**有意删除 2 条**（`30b9ebf`，
+  不是移动）。0 命中带分母与阳性对照（同两条模式对 `30b9ebf^` 命中 3／1）。repointed 副本
+  exit=0 **只作控制**（#4/#5 那两处是我换的 needle，是**替代**不是**复原**）。它是既知红项
+  （`test_verify_m2_acceptance` ×1），README 那句「a Cloud file that no longer exists」**只覆盖 5 条里的
+  1 条**——README 与 conventions 都在不得触碰的脏文件之列 ⇒ 只登记。
+  ② 链路的 DMG 腿只证「文件存在且新鲜」（`verify_dmg`：`is_file` + 非 0 + `check_fresh`），按 D 的契约
+  它造的包**不完整**（`Contents/Resources` 只有 `resources/`、sidecar `flags=0x10002(adhoc,runtime)`、
+  app 日志说「这个安装包不完整」）。在链路之外换成发布包（受控对照，`build-release-macos.sh` exit=0）
+  后拿到 **T-01／T-04 在真包上的首条读数**：校验**通过**（`sha256=355dc0da…`，与包内记录同值）、
+  sidecar 真的被拉起、就绪闸门按出货 `15000ms` **真的超时**并附末 10 行、`Local Agent 已停止`。
+  ③ 但 app 的 Local Agent **仍然**起不来——`OSError: [Errno 48] Address already in use`：8765 被
+  **链路自己**起的 Agent 占着（pid 54456），而 D-02 规定槽位为空时不发探针 ⇒ app 不知道端口有人。
+  **两条独立成因，只修一不够**；**这不是 D 造成的回归**（②旧有，①在 D 之前是「spawn 后立刻死」，
+  D 让它变成「启动前说清原因」——那一半是**读证**，未跑 D 之前的树）。
+- **覆盖情况逐条**：真 MySQL ✅、真 BitBrowser（54345，`profile_count=40`）✅、**实网 ❌**
+  （Cloud 的 `logs/external.log` 今天零写入，mtime 停在 2026-09-23，那是 CHG-052 的 M3 E3 留下的）、
+  **实凭据 ❌**（`wt-media-cloud/.env.local` 不存在 ⇒ 不注入 `WT_MEDIA_DOUYIN_*`；`config/credentials/douyin.toml`
+  存在且 Cloud 启动时读它，但没有任何一步用它发请求；其值未读取）、**GUI ❌**（只 `open`，无交互）。
+- **一处我造成的状态变化如实登记**：链路的 DMG 路径上现在是**发布流程**那份（17,125,121 字节，
+  对照链路那份 16,373,051）；重跑链路会换回去。环境照旧：Cloud 54410、Agent 54456、app 66413。
+- 新增的 9 份转录落盘前扫过凭据形态：0 命中，阳性对照 `primary.toml`／`douyin.toml` 分别 1／2 命中。
+- **本仓门禁**：三个校验器全绿 + `unittest discover -s tests -q` **Ran 69 / failures=4**，四条逐条同名于
+  T-06／T-07 ⇒ 无新增红、无意外转绿（`task-08-gate.out`）。
+
 ## Blocked
 
 - 无硬阻塞。Q-04 已由 D-17 关闭；AC-09「干净机」那一臂按 D-09 登记为未做（不以文字充当证据）。
+- **Q-05 按 D-25 登记为未裁定、不阻塞收尾**：M2 链路的 DMG 构建是否改走发布打包，以及 M2 环境里
+  8765 归谁。**在它关闭前，「app 端 Local Agent 在 M2 环境可用」这句话不成立**（AC-08 的例外）。
 
 ## Recent verification
+
+- **T-08 之后**（2026-09-25）：**未改任何仓的运行时代码 ⇒ 计数不变**（desktop 372 / agent 401 仍是
+  T-07 的读数，本次**未重跑**套件）。本任务重跑的是 **M2 链路**：`m2b-local-acceptance.sh all`
+  十三阶段全绿（`evidence/task-08-m2-all.out`，0 ERROR、无 Traceback），外加固态矩阵的两条读数
+  （`task-08-static-matrix.out` exit=1 的 5 条 ERROR 与 `task-08-static-matrix-repointed.out` exit=0 的
+  控制）与真 MySQL 读数（`task-08-mysql.out`）。**发布流程在链路之外真跑了一遍**
+  （`task-08-release-build.out`，`build-release-macos.sh` exit=0，产物判定「complete ad-hoc-signed app」），
+  由此得到链路 DMG 腿的 before/after 对照（`task-08-dmg-before.out` / `task-08-dmg-after.out`）。
+  **workspace 门禁跑了**（本任务的交付就是记录，门禁就是它的测试，`task-08-gate.out`）：
+  `verify_delivery_governance.py`（Active CHG: CHG-20260923-059）、`verify_agent_entry.py`
+  （快照 2144 字符 / 预算 8000，0 warning）、`verify_skills.py`（10 个 skill 源文件）三者全绿；
+  `unittest discover -s tests -q` **Ran 69 / failures=4**，四条**逐条同名**于 T-06／T-07 的读数
+  （`test_verify_m0_config` ×2、`test_verify_m2_acceptance` ×1、`test_verify_product_master_alignment` ×1）
+  ⇒ 无新增红、无意外转绿；其中 `test_verify_m2_acceptance` 那条就是 §2 的 5 条，成因已逐条落到提交上。
+  本次未重跑 `git archive HEAD` 的同集合阳性对照——本任务没碰 workspace 的测试与治理脚本，
+  读数与 T-07 那次带对照的读数完全一致（重跑对照的归档位置陷阱见 T-06 那条）。
 
 - **T-07 之后**（2026-09-25）：desktop `cargo test --workspace` **372 passed / 0 failed / 5 ignored**
   （363→372，+9 = 九条臂；编译警告 7→7）；agent `bash scripts/test.sh` **Ran 401 tests / OK**

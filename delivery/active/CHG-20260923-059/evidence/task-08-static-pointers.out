@@ -1,0 +1,149 @@
++(eval):3> cd /Users/aqiuye/Develop/workspace/wt-media
++(eval):4> echo '=== A. cloud: compatibility.go 在哪 ==='
+=== A. cloud: compatibility.go 在哪 ===
++(eval):5> find wt-media-cloud/internal -name compatibility.go -not -path '*/node_modules/*'
++find:1> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++find:2> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++find:3> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++find:4> [[ -n 5.9 ]]
++find:5> ARGV0=bfs bfs -S dfs -regextype findutils-default wt-media-cloud/internal -name compatibility.go -not -path '*/node_modules/*'
+wt-media-cloud/internal/modules/cloudagent/service/compatibility.go
++(eval):6> echo '--- 旧路径的 git 归属 ---'
+--- 旧路径的 git 归属 ---
++(eval):7> git -C wt-media-cloud log --oneline -1 -- internal/modules/cloudagent/compatibility.go
+bf499d9 refactor: migrate identity and cloudagent modules
++(eval):8> git -C wt-media-cloud log --oneline -1 -- internal/modules/cloudagent/service/compatibility.go
+bf499d9 refactor: migrate identity and cloudagent modules
++(eval):9> echo '=== B. agent: REQUIRED_CONTRACT_REVISION 的字面值在哪 ==='
+=== B. agent: REQUIRED_CONTRACT_REVISION 的字面值在哪 ===
++(eval):10> grep -rn REQUIRED_CONTRACT_REVISION wt-media-agent/src '--include=*.py'
++grep:1> local _cc_a
++grep:2> _cc_a=-rn
++grep:3> case -rn (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=REQUIRED_CONTRACT_REVISION
++grep:3> case REQUIRED_CONTRACT_REVISION (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=wt-media-agent/src
++grep:3> case wt-media-agent/src (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=--include=*.py
++grep:3> case --include=*.py (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' -rn REQUIRED_CONTRACT_REVISION wt-media-agent/src '--include=*.py'
+wt-media-agent/src/wt_media_agent/cloud_agent_contract.py:10:    REQUIRED_CONTRACT_REVISION,
+wt-media-agent/src/wt_media_agent/cloud_agent_contract.py:18:    "REQUIRED_CONTRACT_REVISION",
+wt-media-agent/src/wt_media_agent/clients/cloud/client.py:13:    REQUIRED_CONTRACT_REVISION,
+wt-media-agent/src/wt_media_agent/clients/cloud/client.py:57:            "contract_revision": REQUIRED_CONTRACT_REVISION,
+wt-media-agent/src/wt_media_agent/clients/cloud/client.py:119:            "contract_revision": REQUIRED_CONTRACT_REVISION,
+wt-media-agent/src/wt_media_agent/clients/cloud/contract.py:11:REQUIRED_CONTRACT_REVISION = "2026.07.15.1"  # task_schemas locked to revision 2026.07.15.1 (M1-R1)
+wt-media-agent/src/wt_media_agent/clients/cloud/contract.py:29:    return _compare_revision(revision, REQUIRED_CONTRACT_REVISION) >= 0
+wt-media-agent/src/wt_media_agent/clients/cloud/__init__.py:17:    REQUIRED_CONTRACT_REVISION,
+wt-media-agent/src/wt_media_agent/clients/cloud/__init__.py:27:    "REQUIRED_CONTRACT_REVISION",
++(eval):11> echo '--- 旧路径那个文件今天是什么 ---'
+--- 旧路径那个文件今天是什么 ---
++(eval):12> wc -l wt-media-agent/src/wt_media_agent/cloud_agent_contract.py
+      21 wt-media-agent/src/wt_media_agent/cloud_agent_contract.py
++(eval):13> grep -n 'import\|from' wt-media-agent/src/wt_media_agent/cloud_agent_contract.py
++grep:1> local _cc_a
++grep:2> _cc_a=-n
++grep:3> case -n (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=import\|from
++grep:3> case import\|from (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=wt-media-agent/src/wt_media_agent/cloud_agent_contract.py
++grep:3> case wt-media-agent/src/wt_media_agent/cloud_agent_contract.py (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' -n 'import\|from' wt-media-agent/src/wt_media_agent/cloud_agent_contract.py
++(eval):13> head -5
+1:"""Deprecated import path. Use `wt_media_agent.clients.cloud.contract`.
+7:from wt_media_agent.clients.cloud.contract import (
++(eval):14> echo '=== C. desktop: 三个 needle 今天在哪 ==='
+=== C. desktop: 三个 needle 今天在哪 ===
++(eval):15> grep -rn '"wt-media-agent"' wt-media-desktop/src-tauri/src '--include=*.rs'
++grep:1> local _cc_a
++grep:2> _cc_a=-rn
++grep:3> case -rn (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a="wt-media-agent"
++grep:3> case "wt-media-agent" (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=wt-media-desktop/src-tauri/src
++grep:3> case wt-media-desktop/src-tauri/src (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=--include=*.rs
++grep:3> case --include=*.rs (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++(eval):15> head -5
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' -rn '"wt-media-agent"' wt-media-desktop/src-tauri/src '--include=*.rs'
+wt-media-desktop/src-tauri/src/sidecar/integrity.rs:69:pub const SIDECAR_NAME: &str = "wt-media-agent";
+wt-media-desktop/src-tauri/src/sidecar/integrity.rs:75:const COMPONENT: &str = "wt-media-agent";
++(eval):16> grep -rn 'fn consume_binding_ticket(\|pub fn bind_session<T: BindingTransport>(' wt-media-desktop/src-tauri/src '--include=*.rs'
++grep:1> local _cc_a
++grep:2> _cc_a=-rn
++grep:3> case -rn (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=fn consume_binding_ticket(\|pub fn bind_session<T: BindingTransport>(
++grep:3> case fn consume_binding_ticket(\|pub fn bind_session<T: BindingTransport>( (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=wt-media-desktop/src-tauri/src
++grep:3> case wt-media-desktop/src-tauri/src (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=--include=*.rs
++grep:3> case --include=*.rs (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++(eval):16> head -5
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' -rn 'fn consume_binding_ticket(\|pub fn bind_session<T: BindingTransport>(' wt-media-desktop/src-tauri/src '--include=*.rs'
++(eval):17> echo '--- 一次性绑定票据当年的位置（HEAD 之前） ---'
+--- 一次性绑定票据当年的位置（HEAD 之前） ---
++(eval):18> git -C wt-media-desktop log --oneline -1 '-Sfn consume_binding_ticket(' -- src-tauri/src/local_agent/mod.rs
+30b9ebf refactor(desktop): 删除 local_agent/mod.rs 的死代码，只留 BoundNodeFacts
++(eval):19> git -C wt-media-desktop log --oneline -1 '-S"wt-media-agent"' -- src-tauri/src/main.rs
+3bcf2c7 refactor(desktop): 17 个 Tauri 命令迁出 main.rs（含 state.rs）
++(eval):20> echo '--- 那两个 needle 在 main.rs 里还在不在 ---'
+--- 那两个 needle 在 main.rs 里还在不在 ---
++(eval):21> grep -n 'local_agent_start\|local_agent_status' wt-media-desktop/src-tauri/src/main.rs
++grep:1> local _cc_a
++grep:2> _cc_a=-n
++grep:3> case -n (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=local_agent_start\|local_agent_status
++grep:3> case local_agent_start\|local_agent_status (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=wt-media-desktop/src-tauri/src/main.rs
++grep:3> case wt-media-desktop/src-tauri/src/main.rs (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++(eval):21> head
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' -n 'local_agent_start\|local_agent_status' wt-media-desktop/src-tauri/src/main.rs
+179:            commands::agent::local_agent_status,
+181:            commands::agent::local_agent_start,
++zsh:21> pwd -P
+=== D. agent: shim 是哪个提交立的 ===
+51f2ee4 refactor(agent): Cloud 客户端迁入 clients/cloud/，旧路径留 re-export shim
+=== E. desktop: 活着的那条绑定路在 commands/bind.rs ===
+38:pub async fn local_agent_bind_session(
+44:    let binding_ticket = args.binding_ticket.trim().to_string();
+45:    if binding_ticket.is_empty() {
+56:        binding_token: binding_ticket,
+--- 30b9ebf 删掉的是什么（只列被删的函数名） ---
+commit 30b9ebf684c4327c0f664043e8222016e1d7082e
+Author: 阿邱爷 <yong_qiu_ch@163.com>
+Date:   Wed Sep 23 23:50:05 2026 +0800
+
+    refactor(desktop): 删除 local_agent/mod.rs 的死代码，只留 BoundNodeFacts
+    
+    删掉的是「有契约、无实现者」的一层：`BindingTransport` / `LocalAgentBridge`
+    及其 `command_names()`、`BindSessionError`，加 5 个 `*_COMMAND` 常量，以及
+    为它们写的 2 个测试。**保留 `BoundNodeFacts`**——它不是死代码：它是
+    `local_agent_bind_session` 的返回类型，`commands/bind.rs` 真的在构造它。
+    
+    **先证「没有外部引用者」再删。** 第一次取证是错的：`grep -v
+=== F. 那两条 needle 今天在整个 desktop 仓的命中数（分母） ===
+0 命中
+0 命中
+=== G. 阳性对照：同一条模式对 30b9ebf 之前的文件能不能命中 ===
+3
+1

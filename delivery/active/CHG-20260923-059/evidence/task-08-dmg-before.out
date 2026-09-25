@@ -1,0 +1,50 @@
++(eval):3> APP='/Volumes/WT Media/WT Media.app' 
++(eval):4> echo '=== 1. bundle Resources ==='
+=== 1. bundle Resources ===
++(eval):5> ls -la '/Volumes/WT Media/WT Media.app/Contents/Resources/'
+total 0
+drwxr-xr-x@ 3 aqiuye  staff  102 Sep 25 11:55 .
+drwxr-xr-x@ 5 aqiuye  staff  170 Sep 25 11:55 ..
+drwxr-xr-x@ 3 aqiuye  staff  102 Sep 25 11:55 resources
++(eval):6> echo '=== 2. bundle MacOS ==='
+=== 2. bundle MacOS ===
++(eval):7> ls -la '/Volumes/WT Media/WT Media.app/Contents/MacOS/'
+total 63448
+drwxr-xr-x@ 4 aqiuye  staff       136 Sep 25 11:55 .
+drwxr-xr-x@ 5 aqiuye  staff       170 Sep 25 11:55 ..
+-rwxr-xr-x@ 1 aqiuye  staff  10784448 Sep 25 11:54 wt-media-agent
+-rwxr-xr-x@ 1 aqiuye  staff  21699792 Sep 25 11:55 wt-media-desktop-shell
++(eval):8> echo '=== 3. sidecar signature flags ==='
+=== 3. sidecar signature flags ===
++(eval):9> /usr/bin/codesign -dv '--verbose=4' '/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-agent'
++(eval):9> grep -E 'Identifier|TeamIdentifier|flags|Signature'
++grep:1> local _cc_a
++grep:2> _cc_a=-E
++grep:3> case -E (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:2> _cc_a=Identifier|TeamIdentifier|flags|Signature
++grep:3> case Identifier|TeamIdentifier|flags|Signature (-*-filter* | -*-pager* | -*-view* | -*-format-open* | -*-config* | ---* | -@* | -*-save-config* | -[Zz]* | -[!-]*[Zz]* | --null | --null-data)
++grep:5> local _cc_bin=/Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude
++grep:6> [[ -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:7> [[ ! -x /Users/aqiuye/.vscode/extensions/anthropic.claude-code-2.1.280-darwin-arm64/resources/native-binary/claude ]]
++grep:8> [[ -n 5.9 ]]
++grep:9> ARGV0=ugrep ugrep -G --ignore-files --hidden -I '--exclude-dir=.git' '--exclude-dir=.svn' '--exclude-dir=.hg' '--exclude-dir=.bzr' '--exclude-dir=.jj' '--exclude-dir=.sl' -E 'Identifier|TeamIdentifier|flags|Signature'
+Identifier=wt-media-agent-aarch64-apple-darwin-555549449fa76941bb23be47bb60832a9bd7d421
+CodeDirectory v=20500 size=21229 flags=0x10002(adhoc,runtime) hashes=656+2 location=embedded
+Executable Segment flags=0x1
+Signature=adhoc
+TeamIdentifier=not set
++(eval):10> echo '=== 4. build manifest next to the build output (outside the bundle) ==='
+=== 4. build manifest next to the build output (outside the bundle) ===
++(eval):11> ls -la /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/sidecar-manifest.json
+-rw-r--r--@ 1 aqiuye  staff  227 Sep 25 11:54 /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/sidecar-manifest.json
++(eval):12> echo '=== 5. desktop log ==='
+=== 5. desktop log ===
++(eval):13> cat /Users/aqiuye/Library/Logs/WTMedia/Desktop/desktop.log
+2026-09-25T11:55:41 [INFO] desktop.startup: 配置来自编译进二进制的默认值；日志目录 /Users/aqiuye/Library/Logs/WTMedia/Desktop；级别 INFO（配置 auto）；环境 production
+2026-09-25T11:55:43 [WARN] agent.supervisor: 随应用的 Local Agent 校验失败：包内缺少记录文件 /Volumes/WT Media/WT Media.app/Contents/Resources/sidecar-manifest.json。这个安装包不完整，请重新安装完整的 WT Media 安装包。 operation_id=26622aa5-db04-4a72-afb0-28460136aaee
+2026-09-25T11:55:43 [ERROR] webview: [console.warn] Local Agent startup failed; use the environment page to retry. 随应用的 Local Agent 校验失败：包内缺少记录文件 /Volumes/WT Media/WT Media.app/Contents/Resources/sidecar-manifest.json。这个安装包不完整，请重新安装完整的 WT Media 安装包。
++(eval):14> echo '=== 6. DMG mtime ==='
+=== 6. DMG mtime ===
++(eval):15> ls -la '/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg'
+-rw-r--r--@ 1 aqiuye  staff  16373051 Sep 25 11:55 /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
++zsh:15> pwd -P
