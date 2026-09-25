@@ -18,12 +18,12 @@
 
 ## Current
 
-T-06 已完成（`6d740fc`）；下一项是 T-07（desktop）。
+T-07 已完成（`7c1b0ad`）；下一项是 T-08（workspace 入口）。
 
 ## Next
 
-1. **T-07 desktop 收口**（分母 8，含 D-04 的范围限定句）。desktop 需新增 `## 本仓规则` 节（八节第 6 位）——cloud 与 agent 已就位，**跨仓序列相等判据要等 desktop 落地才转绿**。
-2. **T-08**：workspace 入口文件补机读键 ＋ 修 `CLAUDE.md:9` 那行复述（分母 3）。**T-09**：收尾归档与对账（**不得早于 T-07**）。
+1. **T-08**：workspace 入口文件补机读键 ＋ 修 `CLAUDE.md:9` 那行复述（分母 3）。这是**最后一片红**——收口后 `verify_agent_entry.py` 应转 `exit=0`。
+2. **T-09**：收尾归档与对账。**T-07 已完成，T-09 的前置条件满足**：两遍失效指针扫描（字符串 ＋ 相对链接 resolve，各带阳性对照与分母，**锚取具体提交不取 `HEAD`**）、四仓对账、六门禁 ＋ 套件在最后一次改动之后重测。
 
 ## Blocked
 
@@ -31,19 +31,19 @@ T-06 已完成（`6d740fc`）；下一项是 T-07（desktop）。
 
 ## 预期中间态见红（不得静默容忍）
 
-**现状：`verify_agent_entry.py` exit=1，11 条 ERROR**（`evidence/artifacts/t06-gate-after.out`；改前 71 条见 `t04-gate-readings.out`）。这是 T-04 的**设计结果**，不是缺陷：新检查按构造先对现状报错，再由 T-05～T-07（三仓）与 T-08（治理仓）逐个收口。
+**现状：`verify_agent_entry.py` exit=1，3 条 ERROR**（`evidence/artifacts/t07-gate-after.out`；改前 71 条见 `t04-gate-readings.out`）。这是 T-04 的**设计结果**，不是缺陷：新检查按构造先对现状报错，再由 T-05～T-07（三仓）与 T-08（治理仓）逐个收口。
 
-| 仓／面 | T-04（改前） | T-05 后 | 现在（T-06 后，收口目标 0） |
-|---|---|---|---|
-| `cloud` | 51 | 1 | **0** |
-| `agent` | 10 | 10 | **0** |
-| `desktop` | 7 | 8 | 8 |
-| `workspace` | 3 | 3 | 3 |
-| **合计** | **71** | 22 | **11** |
+| 仓／面 | T-04（改前） | T-05 后 | T-06 后 | 现在（T-07 后） |
+|---|---|---|---|---|
+| `cloud` | 51 | 1 | 0 | **0** |
+| `agent` | 10 | 10 | 0 | **0** |
+| `desktop` | 7 | 8 | 8 | **0** |
+| `workspace` | 3 | 3 | 3 | 3 |
+| **合计** | **71** | 22 | 11 | **3** |
 
-分判据（现在，分母＝11 条 ERROR）：`declares no rule body` **4** ／ `restates a rule without naming` **4** ／ `exceeds the pointer budget` 1 ／ `H2 sections, expected 8` 1 ／ `H2 sequence diverges` 1 ＝ 11。`disagree on the rule body`、`declares itself`、`declares a pointer as the rule body`、`declares an unknown rule body` 均 **0**（只出现在 `tests/` 的变异用例里，属构造性，不是现状）。
+分判据（现在，分母＝3 条 ERROR）：`declares no rule body` 2 ／ `restates a rule without naming` 1，**全部指向 workspace**。`H2 sections, expected 8`、`H2 sequence diverges`、`exceeds the pointer budget`、`disagree on the rule body`、`declares itself`、`declares a pointer as the rule body`、`declares an unknown rule body` 均 **0**。
 
-**剩余 11 条的归属必须写清**：desktop 8 ＋ workspace 3，**没有一条指向 cloud 或 agent**。唯一的 `H2 sequence diverges` 现在报 **desktop**——因为只有 desktop 还没有 `## 本仓规则` 节（位置 6 不同）；cloud 与 agent 已在位置 6 同为 `## 本仓规则`，**两仓互为对照**。⇒ 这 11 条只能由 T-07／T-08 消，**T-09 必须在那之后重测**。
+**三仓已全部收口，剩余 3 条只属 T-08。** 跨仓八节相等判据在 T-07 转绿——它自 T-04 起一直是红的，且**只能**由三仓齐备消（这是设计如此，不是缺陷）。⇒ **T-09 必须在 T-08 之后重测**；本 CHG 不得在红的状态下归档。
 
 必须显式说明：CHG-20260925-063 的教训是「意料外的红会训练读者忽略这个门禁」，**已文档化的红同样会**（`conventions §10` 成文）。故本节的读数是**带收口计划的中间态**，不是「已知红项」：**T-09 不得早于 T-07**；本 CHG 不得在红的状态下归档。**其余五个门禁此时仍全绿**（本次改动未触及它们）。
 
@@ -116,6 +116,22 @@ T-06 收尾读数（agent，@ 2026-09-25；`artifacts/t06-gate-after.out`）：
 | agent `git status --porcelain` | 仅 4 个 `M`（提交后净） |
 
 **两条如实登记的不足**：①AC-09′ 与 AC-11 的判据**不是门禁**（全仓无脚本读 infra 列表或排除清单，`change.md` §14 第 11 项）；②判据里的**路径词表是承重构件**——松判据（只查 `扫描`）在**已修好的**文件上仍报 agent 2 行／cloud 3 行，**全为假阳性**（两条指针行含「禁止扫描区」四字、一条是 `go vet` 行）。去掉词表，「0 命中」会被假阳性污染成噪声（`change.md` §14 第 15 项）。
+
+T-07 收尾读数（desktop，@ 2026-09-25；`artifacts/t07-gate-after.out`）：
+
+| 判据 | 读数 |
+|---|---|
+| `verify_agent_entry` | `exit=1`，**3 ERROR / 0 WARN**（desktop 8 → **0**，见上表） |
+| `check_rule_text_duplication` | WARN 0；**分母** `compared 97 rule sentence(s) across 11 file(s) in 4 repositories` |
+| 其余五个门禁 | 全 `exit=0` |
+| `unittest discover -s tests -q` | `Ran 94 tests` / `OK` |
+| 形态（总行数） | `AGENT-INDEX` 75→99、`AGENTS` 39→11、`CLAUDE` 12→11、`DIRECTORY_MAP` 90→92 |
+| 逐条归属表 | 分母＝改前非空行数 28／7／59／68，四列加总等于分母 |
+| AC-11 阳性对照 | 对 `623583d:AGENT-INDEX.md` 命中 **1**（`:75`）；本文件命中 **0** |
+| 指针链接 | 两个指针各 4 个链接（8/8 resolve） |
+| desktop `git status --porcelain` | 仅 4 个 `M`（提交后净） |
+
+**一处按磁盘复核**：`DIRECTORY_MAP.md:42` 的「四个占位模块目前是 3 行空壳」——实测四个 `mod.rs` 各 3 行、共 12 行，与地图一致，**不是陈旧断言**。**一处按代码回写**：排除清单里的 `../generated`（无点）全仓仅该行提到过，`frontendDist` 实为 `../.generated/frontend`，按实况删除（`change.md` §14 第 16 项）。
 
 T-04 收尾读数（@ 2026-09-25T22:47Z 前后）：
 

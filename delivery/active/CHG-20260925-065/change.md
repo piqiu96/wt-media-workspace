@@ -139,7 +139,7 @@ None.
 | T-04 | 门禁实现与退役（新六条 ＋ 退役 `check_entry_drift` ＋ `tests/` fixture 重写为默认合规） | DONE | **六条新检查各做变异对照**：关掉判定 → 各 3／7／4／2／2／1 条用例失败，**`ImportError` 计数 6 次全为 0**；`tests/` 16 → **31** 条，套件 `Ran 79` → **`Ran 94` / OK**；其余五门禁仍 `exit=0`。真树读数 **71 ERROR**（= T-05～T-08 的分母，见 `checkpoint.md`）。evidence `task-04-gate.md` |
 | T-05 | cloud 四件入口文件收口（正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`；落实 F-03／F-05／F-07） | DONE | 逐条归属表分母＝改前非空行数（86／99／45／75，各类加总等于分母）；门禁 cloud **51 → 1**（自身缺陷 0，剩余一条是跨仓序列，T-06／T-07 前不可满足）；阳性对照：注入 `cache` → infra 扫描报出、改前提交 `0346edf:AGENT-INDEX.md` → 排除清单扫描命中 1。提交 `0db02ab`。evidence `task-05-cloud.md` |
 | T-06 | agent 四件入口文件收口 ＋ F-07 | DONE | 逐条归属表分母＝改前非空行数（34／6／48／88，四列加总等于分母；`DIRECTORY_MAP.md` 纯增量）；门禁 agent **10 → 0**，四仓合计 **71 → 11**（余 desktop 8／workspace 3）；两处非机械判定已逐条归位（13 行模块树 → `DIRECTORY_MAP.md`；1 行「文件与 FFmpeg 运行时」按代码回写为「尚无实现」）；阳性对照：`24da21b:AGENT-INDEX.md` → 命中 1，**且未改动的 desktop 仍命中 1**；点名路径 25/25 存在（注入假路径 → 报出）；指针 8 链接全 resolve（注入 → 报出）。提交 `6d740fc`。evidence `task-06-agent.md` |
-| T-07 | desktop 四件入口文件收口 ＋ F-07 ＋ D-04 的范围限定句 | TODO | 同上；desktop 发布链路调用关系**不改** |
+| T-07 | desktop 四件入口文件收口 ＋ F-07 ＋ D-04 的范围限定句 | DONE | 逐条归属表分母＝改前非空行数（28／7／59／68，四列加总等于分母）；门禁 desktop **8 → 0**，四仓合计 **11 → 3**（余 workspace 3）；**跨仓八节相等判据本 Task 转绿**（三仓 `## 本仓规则` 同落位置 6）；12 行模块树迁入 `DIRECTORY_MAP.md`（该图本就有更精确版本，`3 行空壳` 一句另按磁盘复核为四个 `mod.rs` 各 3 行）；D-04 写成两条（工具依赖／产物与运行期不依赖 Workspace）；排除清单里不存在的 `../generated` 按代码回写删除；`tauri.conf.json` 与发布链路未动。提交 `7c1b0ad`。evidence `task-07-desktop.md` |
 | T-08 | workspace 入口文件补机读键过机检（二者已是纯指针，内容不动） | TODO | workspace 臂由红转绿 |
 | T-09 | 收尾：归档、LEDGER 同步、快照 `--no-active`、两遍失效指针扫描、§14 登记 | TODO | 六门禁 `exit=0` ＋ `unittest`，**在最后一次改动之后**重测；四仓对账 |
 
@@ -178,25 +178,30 @@ None.
 
 ### wt-media-desktop
 
-- [ ] 同上四类 ＋ D-04 的范围限定句
-- [ ] **不写**：`src-tauri/tauri.conf.json`、发布链路
+- [x] `AGENT-INDEX.md` 75 → 99 行（新增 `## 本仓规则` 三节；加载顺序改名＋作用域首行；排除清单换指针）
+- [x] `AGENTS.md` 39 → 11 行（指针，原 28 非空行正文迁出）
+- [x] `CLAUDE.md` 12 → 11 行（指针）
+- [x] `DIRECTORY_MAP.md` 90 → 92 行（禁止扫描区补「唯一落点」说明与 `../generated` 处置）
+- [x] D-04 的范围限定句落在 `### 前端产物与 Workspace 依赖`
+- [x] **不写**：`src-tauri/tauri.conf.json`、发布链路（实测取值已记入 evidence）
+- [x] **未写**：任何运行时代码、配置、测试（`git status --porcelain` 仅 4 个 `M`）
 
 ## 10. Acceptance Matrix
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | 四仓 `CLAUDE.md` 与 `AGENTS.md` 皆含机读键 `- 正文：\`AGENT-INDEX.md\``，目标存在 | 新 `check_pointer_shape`；每仓逐条报出 | TODO |
-| AC-02 | 四仓指针文件不含被复述的规则句（规则词行的同一行须出现正文文件名） | 同上；阳性对照：把 cloud `AGENTS.md` 的 `## 模块规则` 段贴进 `CLAUDE.md` → 报出 | TODO |
-| AC-03 | 四仓指针文件 H2 ≤ 4、行数 ≤ 30、字节 ≤ 2000，规则词判据只作用于非标题行（**T-03 改正后**的 §3 判据——`H2 ≤ 1` ＋ 白名单 `权威源` 与自己引用的参照件相抵，已退役，见 §14 第 7 项） | 同上；变异：灌水到 37 行／超 H2 → 报出 | TODO |
-| AC-04 | 运行仓四类入口文件皆存在且非空 | 新 `check_repo_entry_files`；变异：`rm` 任一 → 报出仓名＋文件名 | TODO |
-| AC-05 | 同仓各指针声明的正文同一，且正文不再声明正文（无环） | 新 `check_rule_body_consistency`；变异：造 `A→B, B→A` → 报出 | TODO |
-| AC-06 | 三仓 `AGENT-INDEX.md` 八 H2 序列互相相等且长度为 8 | 新 `check_layer3_shape`；变异：改名 desktop 的 `## 禁止` → 报出首个分叉位 | TODO |
+| AC-01 | 四仓 `CLAUDE.md` 与 `AGENTS.md` 皆含机读键 `- 正文：\`AGENT-INDEX.md\``，目标存在 | 新 `check_pointer_shape`；每仓逐条报出 | **三仓 PASS**（cloud／agent／desktop）：20 个组合全绿；**workspace 待 T-08**（`CLAUDE.md`／`AGENTS.md` 尚无机读键，门禁现报 2 条） |
+| AC-02 | 四仓指针文件不含被复述的规则句（规则词行的同一行须出现正文文件名） | 同上；阳性对照：把 cloud `AGENTS.md` 的 `## 模块规则` 段贴进 `CLAUDE.md` → 报出 | **三仓 PASS**；**workspace 待 T-08**（`CLAUDE.md:9` 复述一条规则，门禁现报 1 条） |
+| AC-03 | 四仓指针文件 H2 ≤ 4、行数 ≤ 30、字节 ≤ 2000，规则词判据只作用于非标题行（**T-03 改正后**的 §3 判据——`H2 ≤ 1` ＋ 白名单 `权威源` 与自己引用的参照件相抵，已退役，见 §14 第 7 项） | 同上；变异：灌水到 37 行／超 H2 → 报出 | **三仓 PASS**：三个指针各 11 行／656 B／1 H2，远在预算内；**workspace 待 T-08** |
+| AC-04 | 运行仓四类入口文件皆存在且非空 | 新 `check_repo_entry_files`；变异：`rm` 任一 → 报出仓名＋文件名 | **PASS**（T-07）：三仓四件齐备非空；T-04 已做变异对照（`rm` → 报出仓名＋文件名） |
+| AC-05 | 同仓各指针声明的正文同一，且正文不再声明正文（无环） | 新 `check_rule_body_consistency`；变异：造 `A→B, B→A` → 报出 | **PASS**（T-07）：门禁 `disagree on the rule body`／`declares itself`／`declares a pointer as the rule body`／`declares an unknown rule body` 四类现均为 0；T-04 已做变异对照 |
+| AC-06 | 三仓 `AGENT-INDEX.md` 八 H2 序列互相相等且长度为 8 | 新 `check_layer3_shape`；变异：改名 desktop 的 `## 禁止` → 报出首个分叉位 | **PASS**（T-07）：三仓八 H2 逐字同序、长度 8，门禁不再报分叉（该判据自 T-04 起红至 T-07，其红只能由三仓齐备消） |
 | AC-07 | 每一条新 ERROR 都被证明能失败（变异式，非 `ImportError`） | `tests/` 用例断言**完整错误集合逐条相等** | **PASS**（T-04）：六条新检查逐一禁用 → 3／7／4／2／2／1 条用例失败，`ImportError` **0**；`Rule Word` 类判据另有注入式阳性对照。读数见 `task-04-gate.md` §3 |
 | AC-08 | `check_entry_drift` 及其 2 条用例、描述段落已退役，且同 fixture 由新检查顶替 | 变异对：旧代码＋旧 fixture → 漂移 WARN；新代码＋同一 fixture → `check_pointer_shape` 报出 | **PASS**（T-04）：代码中 `check_entry_drift`／`check_layer3_entries` 命中 0；旧 2 条用例已删；fixture 改为「默认合规」后由 `check_pointer_shape` 等六条顶替，且每条都被变异点亮 |
 | AC-09 | cloud 的 F-03 表 6 处分歧逐处消解，两处事实错误按**代码实况**回写 | `internal/infra` 实际目录逐项相符（阳性对照：写一个不存在的目录 → 报出）；模块树含 `router.go` | **PASS**（T-05，cloud 臂）：infra 枚举 5 项与磁盘相符 missing **none**，注入 `cache` → 报出；模块树取 `AGENTS.md` 侧（已含 `router.go`／`handler.go`），`CLAUDE.md` 那份错误清单不迁移。**但见 §14 第 11 项：判据是我在证据期临时构造的扫描，非门禁** |
-| AC-10 | 每仓逐条归属表覆盖被移走的**每一行**，分母＝改前行数 | 逐文件 `wc -l` 前后对账，无一项落入「未登记」 | **T-05 cloud 臂 PASS**（86／99／45／75 非空行，各类加总等于分母，无「未登记」项）；**T-06 agent 臂 PASS**（34／6／48／88，四列加总等于分母；`DIRECTORY_MAP.md` 为纯增量 diff）；desktop 待 T-07 |
-| AC-11 | 三仓 `AGENT-INDEX.md` 的禁止扫描区清单已换成指向 `DIRECTORY_MAP.md` 的指针 | 字符串扫描：命中 0（阳性对照锚**改前提交**，另注入 1 条 → 报出） | **cloud PASS**：命中 **0**（205 行／非空 150），对 `0346edf` 命中 **1**（`:60`）；**agent PASS**：命中 **0**（92 行／非空 62），对 `24da21b` 命中 **1**（`:65`），且**未改动的 desktop 仍命中 1**（`:75`）为第三方对照；desktop 待 T-07。**判据收窄过**：只查 `扫描` 在已修好的文件上报 2／3 条全假阳性，故「枚举构建路径」是承重构件（§14 第 15 项） |
-| AC-12 | F-06 两侧同时改：三仓小节改名＋作用域首行；workspace §4 作用域句 | 逐处复查；`check_local_order_scope` WARN 为 0 | TODO |
+| AC-10 | 每仓逐条归属表覆盖被移走的**每一行**，分母＝改前行数 | 逐文件 `wc -l` 前后对账，无一项落入「未登记」 | **三仓全 PASS**：cloud（86／99／45／75）、agent（34／6／48／88，`DIRECTORY_MAP.md` 为纯增量 diff）、desktop（28／7／59／68）——每一列加总等于其分母，无「未登记」项 |
+| AC-11 | 三仓 `AGENT-INDEX.md` 的禁止扫描区清单已换成指向 `DIRECTORY_MAP.md` 的指针 | 字符串扫描：命中 0（阳性对照锚**改前提交**，另注入 1 条 → 报出） | **三仓全 PASS**：cloud 命中 **0**（对 `0346edf` 命中 1）、agent 命中 **0**（对 `24da21b` 命中 1）、desktop 命中 **0**（对 `623583d` 命中 1）。**判据收窄过**：只查 `扫描` 在已修好的文件上报 2／3 条全假阳性，故「枚举构建路径」是承重构件（§14 第 15 项） |
+| AC-12 | F-06 两侧同时改：三仓小节改名＋作用域首行；workspace §4 作用域句 | 逐处复查；`check_local_order_scope` WARN 为 0 | **PASS**（T-07）：三仓小节均已改名 `## 本仓内加载顺序` 并带作用域首行；`AGENT-INDEX.md` §4 作用域句在 T-02 已落；门禁 WARN **0** |
 | AC-13 | F-08：`init-agent-entry.sh` 产出四件且形态相符；快照只有**一个**生成器 | tmpdir 实跑 ＋ 产出差异表；脚本内无 `.ai/CURRENT_CONTEXT.md` 写入 | **PASS**（T-03）：12 项形态判据 12 PASS；阳性对照 7 类变异全报出；`workspace --dry-run` 对快照只报 `exists:` 不再 `would create:`。读数 **不是门禁**（门禁在 T-04），届时调门禁自己的函数复测 |
 | AC-14 | 四仓零运行时代码／配置／测试改动 | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 逐仓对账；只允许四类入口文件与 `.claude/skills`／`.codex/skills` 副本 | TODO |
 | AC-15 | 六门禁 `exit=0` ＋ 套件全绿，且读数取于**最后一次改动之后** | `evidence/artifacts/t09-gate-readings.out` | TODO |
@@ -219,7 +224,12 @@ None.
 | 初稿 | `change.md` ≤ 25 KB、单 Task evidence ≤ 3 KB | T-01～T-04 四篇 evidence 4559／4845／6314／6329 B，**逐篇突破**；T-04 收尾 `change.md` 26477 B，突破 |
 | T-04 改 | `change.md` ≤ 30 KB、单 Task ≤ 8 KB | T-05 后 `change.md` 30191 B、`task-04-gate.md` 8749 B，**两个都再次突破** |
 | 本轮 | **合计 ≤ 80 KB** | T-05 收尾实测 **75182 B**（≈ 73 KB）。**T-06 时该界已被证伪**：只剩 T-07／T-08／T-09 三篇证据，按实际单篇 4.5–8.7 KB 必然越过 80 KB——界设错了，见下 |
-| T-06 改 | **速率界**：`change.md` ≤ 35 KB、`checkpoint.md` ≤ 15 KB、单 Task evidence ≤ 9 KB；**总量只报不设顶**，以 `CHG-20260925-064` 实测的 **213739 B** 为对照基准 | T-06 收尾三条界**全部成立**，读数在 `artifacts/t06-record-size.out`（见本节末） |
+| T-06 改 | **速率界**：`change.md` ≤ 35 KB、`checkpoint.md` ≤ 15 KB、单 Task evidence ≤ 9 KB；**总量只报不设顶**，以 `CHG-20260925-064` 实测的 **213739 B** 为对照基准 | T-06 收尾三条界**全部成立**；**T-07 收尾时前两条被突破**（`change.md` 37701 B＞35840、`checkpoint.md` 15418 B＞15360）。**第五版见下** |
+| T-07 改 | **真速率界（增量）**：每个 Task 的记录增量 ≤ `change.md` 5 KB、`checkpoint.md` 4 KB、单 Task evidence 9 KB | 实测增量：T-06 `change.md` **+4601 B**、`checkpoint.md` **+3015 B**；T-07 **+1929 B**／**+1213 B**——**四段增量全部在界内**。绝对值**只报不设顶** |
+
+**第四版依然错了，而且错法与前三版是同一个：我限的都是「存量」。** 35 KB／15 KB 看起来像速率（它带单位、带时限感），实际仍是**对一份累积文档设的绝对上限**——`change.md` 每完成一个 Task 就加 §8 表行、§10 判据行、§14 登记项，`checkpoint.md` 每完成一个 Task 就加一张收尾读数表；**存量由任务数决定，不由我决定**。所以第四版和前三次一样，会在某个 Task 上被突破，而这一次我并不知道会在哪个 Task。**把界改小改大都不是修复；被限制的量选错了。**
+
+⇒ 第五版换成**真正的速率：每个 Task 的增量**。实测四段增量（T-06／T-07 各自的 `change.md` 与 `checkpoint.md`）最大值 `change.md` **4601 B**、`checkpoint.md` **3015 B**，故界设在 **5 KB／4 KB**——留约 8%／30% 余量，且**它是可长期成立的**（判据：连续三个 Task 的增量都不越界）。**存量只报不设顶**，T-09 收尾时报告最终值并与 064 的 213739 B 对比。**界从「文档多大」改成「每写一个 Task 涨多少」——这才是记录成本真正的驱动量。**
 
 前两版错在同一件事：**拿「单篇字节数」当界**。它既拦不住总量增长（每篇各超一点，合计照样膨胀），又会诱使我把证据写得比判据更短——**为迁就一个我自己发明的数字去削证据，比数字被突破更糟**。故第三版改设在**总量**上，且**同一命令量两侧**：`cat change.md checkpoint.md evidence/*.md | wc -c`。CHG-20260925-064 用同一条命令实测 **213739 B**（≈ 209 KB）——此前引用的「94 KB」只算了 `change.md` ＋ `checkpoint.md`，漏了 evidence——**本 CHG 第二次「两个分母混用」**（第一次在 T-05 归属表，把总行数与非空行数当同一个分母；见 `checkpoint.md` 的 T-05 自纠与 `evidence/task-05-cloud.md` §3）。⇒ 本 CHG 比 064 小约 **2.9 倍**（不是先前误写的「一个数量级」）。
 
@@ -227,7 +237,7 @@ None.
 
 ⇒ 第四版改成**速率**：`change.md` ≤ 35 KB、`checkpoint.md` ≤ 15 KB、单 Task evidence ≤ 9 KB；**总量只报不设顶**，以 064 的 213739 B 作基准。**这不是「再放宽一次」，是换了被限制的量**：前三版限存量，存量由任务数决定，不由我决定。
 
-**T-06 收尾读数移到 `evidence/artifacts/t06-record-size.out`**（`checkpoint.md` 与单 Task evidence 当场成立；`change.md` 首测超界 204 B，削平后成立）。**不写在本节**：本节里写的读数一出笔就是旧值（上方 75182 B 即此情形），**数字以产物文件为准**。
+**收尾读数不写在本节**：本节里写的读数一出笔就是旧值（上方 75182 B 即此情形）。四段增量的逐次实测在 `evidence/artifacts/t06-record-size.out` 与 `t07-record-size.out`，**数字以产物文件为准**。
 
 ## 12. Current Checkpoint
 
@@ -263,3 +273,4 @@ None.
 14. **阳性对照的锚取 `HEAD` 会在提交瞬间变成镜子**（T-05 cloud 臂、T-06 agent 臂各发生一次）：取证时 `HEAD` 指向改前提交、读数正确为「命中 1」；修复一提交，`HEAD` 就是修复后的文件，**同一命令读数也变成 0——与「扫描无判别力」形状完全相同**，且不会自己冒出来。已在两个脚本里钉为常量（`BASE=0346edf`／`24da21b`）。⇒ **凡以改前状态为对照的可重放命令，一律指向具体提交，不指向 `HEAD`、不指向分支名。** 本 CHG 自身的 T-09 收尾扫描与他人复核同受此约束。
 15. **AC-11 的判据收窄过一次，且收窄是必需的**（T-06）：初版误命中 agent 的锁文件**规则**（`禁止手改`——禁的是手改不是扫描）；收紧为「**扫描** ∧ 枚举具体构建路径」后，松判据在**已修好的**文件上仍报 2（agent）／3（cloud）行，**全为假阳性**（两条指针行含「禁止扫描区」四字、一条是 `go vet` 行）。⇒ **路径词表是承重构件**，去掉它「0 命中」会被污染成噪声。读数见 `evidence/task-06-agent.md` §4。
 16. **`initial` 骨架与「按代码回写」的边界**：T-05 改了 cloud 的 infra 列表（两份文档都列了磁盘上不存在的 `redis`／`cache`／`storage`），T-06 改了 agent 的「文件与 FFmpeg 运行时」（代码里只有探测，无运行时）。两处都是**按代码写文档**，属 §5 允许的例外（「A 与 B 列举的事实错误除外」），**不是「只搬家不改义」的破例**。登记此条以明确该例外的实际适用范围仅到「事实错误」为止，不含措辞偏好。
+17. **记录成本界改到第五版才选对被限制的量**（T-07）：前三版限单篇、第四版限总量，**四次限的都是「存量」**；而存量由任务数决定、不由我决定，故必然在某个 Task 上被突破（第四版在 T-07 上被突破：`change.md` 37701 B ＞ 35 KB、`checkpoint.md` 15418 B ＞ 15 KB）。第五版改为**每 Task 增量**（`change.md` ≤ 5 KB、`checkpoint.md` ≤ 4 KB、单 Task evidence ≤ 9 KB），实测四段增量最大 4601／3015 B，全部在界内。**登记以免下一轮又去调那个绝对数字**——该调的是被限制的量，不是界的值。

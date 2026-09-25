@@ -1,0 +1,6 @@
+### AC-11 -- desktop: pre-change anchor 623583d vs worktree
+desktop:AGENT-INDEX.md @ 623583d -- 75 line(s) scanned (59 non-empty), 1 hit(s)
+  75: 治理上下文（当前 CHG、契约）在 `../wt-media-workspace`，按其 `.ai/CURRENT_CONTEXT.md` 指引加载。禁止默认扫描 `target/`、`../.generated/`、`src-tauri/gen/`、`../generated`。
+  exit=1
+desktop:AGENT-INDEX.md @ WORKTREE -- 99 line(s) scanned (72 non-empty), 0 hit(s)
+  exit=0

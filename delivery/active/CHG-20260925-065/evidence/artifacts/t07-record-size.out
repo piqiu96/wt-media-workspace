@@ -1,0 +1,23 @@
+CHG-20260925-065 record size and DELTA at T-07 close
+instrument (v5): per-Task increment  change.md <= 5120, checkpoint.md <= 4096,
+                 per-Task evidence <= 9216.  Absolute sizes: reported, not capped.
+
+T-06 close:
+   change.md         35772 B   delta + 4601 / 5120  OK
+   checkpoint.md     14205 B   delta + 3015 / 4096  OK
+T-07 close:
+   change.md         39831 B   delta + 4059 / 5120  OK
+   checkpoint.md     15402 B   delta + 1197 / 4096  OK
+
+   change.md                               39831 B
+   checkpoint.md                           15402 B
+   evidence/task-01-baseline.md             4559 B
+   evidence/task-02-normative.md            4845 B
+   evidence/task-03-generator.md            6314 B
+   evidence/task-04-gate.md                 8749 B
+   evidence/task-05-cloud.md                8354 B
+   evidence/task-06-agent.md                8392 B
+   evidence/task-07-desktop.md              7939 B
+
+absolute total (9 files): 104385 B = 0.49x CHG-064's 213739 B
+largest single evidence file: 8749 B (evidence/task-04-gate.md) / 9216
