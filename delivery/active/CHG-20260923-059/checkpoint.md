@@ -18,22 +18,43 @@
   两份出货配置的值与 CSP 均不改，只回写过期注释）、**D-09**（「干净机」安装验收**登记为未做**，
   `0.2.5` 的 status 保持 `verifying`，D 的 DONE Gate 因此**带一条登记过的例外**）。
 - 本机环境：起改前已确认 18080 / 8765 空闲；54345 是用户自己的 BitBrowser，**全程不占用**。
+- **激活当天被本仓门禁抓过一次**：`LEDGER.md` 的活动行第一格我写成了 markdown 链接，而
+  `verify_delivery_governance.py:37` 的 `LEDGER_ROW_RE = ^\|\s*(CHG-\d{8}-\d{3})\s*\|` 要求第一格是**裸 id**，
+  报 `CHG-20260923-059 != none`。改成裸 id、把链接移进标题格后两个验证器转绿。**这条留着当阳性样本**：
+  门禁确实会红，不是摆设。
 
 ## Current
 
-- **激活（T-01 之前，不占任务号）已完成**：`git mv` + 十三节 `change.md` + 三份 `status/` + 本 `checkpoint.md`；
-  `LEDGER.md` 表行改回 CHG-059、`planned/README.md` 的 D 行改 ACTIVE、里程碑状态行注明 D 已激活、
-  程序总纲两行改「D 已激活」。快照经 `prepare_ai_workspace.py --change CHG-20260923-059` 再生成（2144 字符）。
-- **激活期间被自己的门禁抓过一次**：`verify_delivery_governance.py` 报
-  `current context and ledger disagree: CHG-20260923-059 != none` —— 起因是我把 LEDGER 首格写成了
-  markdown 链接，而 `LEDGER_ROW_RE`（`scripts/verify_delivery_governance.py:37`）要求首格是**裸 id**。
-  已按 CHG-058 的先例改回裸 id（链接移到标题格内），两个验证器随即转绿。
-  这是「先证明检查能失败」的正面样本：门禁不是空转的。
+- **T-02 未开工**（T-01 已收尾，见下节）。
+- 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
+  与对应的两个仓提交。
 
 ## Next
 
-- T-02 就绪闸门（两阶段：复用 Agent 自己那行 stdout + spawn 后真实健康探测），
+- T-02 活性探针（`already_running` 改读活性而非记录；先写一条能红的用例复现 CHG-057 登记的缺陷），
   按 `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
+
+## T-01（已收尾，2026-09-25）
+
+- desktop `sidecar/readiness.rs`（新，两段式闸门）+ `sidecar/mod.rs` 注册 + `commands/agent.rs` 接线；
+  agent `tests/test_sidecar_entry.py` 钉死就绪行的格式与顺序。
+- **实测推翻预想一条并改了设计**：`/healthz` 在 `_check_auth` 之后（`server.py:448`→`:451`），
+  故令牌漂移时它答 **401**。于是第二段闸门把应答分三态（2xx 就绪 / **401 致命立即失败** / 连不上继续等），
+  顺带覆盖 `sidecar/mod.rs:30-37` 那段注释担心、而**构建期无人检查**的漂移。见 §4.1 补记。
+- 计数：desktop 336→**344** passed / 0 failed（ignored 2→3）；agent 377→**378** OK；
+  编译警告 7→**7**（新增 0——基线是**把三个文件还原成 HEAD 版单独跑一次测出来的**，不是推的）。
+- 变异 **8/8**：desktop 6 条（前缀、端口判定、状态码、单次读缓冲、常量超时、到点返 Ok）+
+  agent 2 条（就绪行改词、**把打印挪到建服务器之前**）。A2 是这条用例的真价值：测的是顺序不是格式。
+- 真机臂：`cargo test -- --ignored real_agent` 通过——**本 crate 的 `gate` 对上真实的 Agent 进程**。
+  它太快（0.17s），故做了**阳性对照**（故意写错期望，读到真机那行
+  `…127.0.0.1:54606`）才算数。
+- **两次「验证工具本身出错」已记录**（都会把红读成绿）：脚本先写变异后读基线；以及
+  `python3` 字节码缓存——`on`→`at` 长度不变、`.pyc` 的源 mtime 只到秒，同秒写入的变异被上一轮缓存服务。
+- **workspace 4 条既知红项的控照这一次真的跑了**（§4.8 要求的方法）：用
+  `git stash push -- <那两个记录文件>` 把记录改回 HEAD（**只动这两个，其余 5 个无关脏文件未碰**），
+  在**真实 `wt-media/` 之内**的同一棵树上重跑 ⇒ **同样 4 条、逐条同名**。
+  同时**复现了 §4.8 预警的陷阱**：先把 `git archive HEAD` 解到 `/tmp` 再跑，路径敏感的用例
+  `skipTest`，读数变成 **2 红**——正是「4 红读成 2 红」的原样。故本条的控照**不能**在图外做。
 
 ## Blocked
 
@@ -43,6 +64,10 @@
 
 ## Recent verification
 
+- **T-01 之后**（2026-09-25，churn 还原后重跑）：desktop `cargo test` **344 passed / 0 failed / 3 ignored**；
+  `cargo check --tests` 汇总行 `generated 7 warnings`（与基线同）；agent `tests.test_sidecar_entry`
+  **Ran 5 tests / OK**（全仓 378 OK）。真机臂 `cargo test -- --ignored real_agent` 通过，
+  阳性对照见 `evidence/task-01-readiness.md` §3.3。
 - 激活时基线：agent **377 tests OK**；desktop **336 passed / 0 failed / 2 ignored**；
   workspace 三验证器绿 + `unittest discover` **69 tests / 4 failures**——**4 条红项为既知**
   （`test_verify_m0_config` ×2、`test_verify_m2_acceptance` ×1、`test_verify_product_master_alignment` ×1，

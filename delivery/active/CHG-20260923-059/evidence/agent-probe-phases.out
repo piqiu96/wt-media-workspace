@@ -1,0 +1,13 @@
+阶段一：真实进程的这一行是否与 Desktop 的常量逐字相同
+  日志器那行（带时间戳，Desktop 不认）与 print 那行（Desktop 认）都已在 agent-probe.out
+  期望行 = 'wt-media-agent local API listening on 127.0.0.1:18771'
+
+阶段一：此刻能不能连上（Desktop 看到该行后做的第一件事）
+  第 1 次 connect：成功
+  第 2 次 connect：成功
+
+阶段二：/healthz 带正确令牌
+  HTTP 200  body={"status":"ok","service":"wt-media-agent","mode":"m1"}
+
+阶段二：/healthz 带错误令牌（这条就是闸门认定「致命」的那条）
+  HTTP 401  body={"error":"unauthorized"}

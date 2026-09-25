@@ -66,9 +66,14 @@
 
 - Agent 在 `local_api/server.py:627` 打印
   `wt-media-agent local API listening on {host}:{port}`（`flush=True`），同一句也进 logger（`:626`）。
-- **这一行是可靠的**：`ThreadingHTTPServer((host, port), …)` 在 `:624` 构造（构造即 `bind`+`listen`），
+- **这一行是可靠的**：`ThreadingHTTPServer((host, port), …)` 在 `:625` 构造（构造即 `bind`+`listen`），
   `:627` 才打印，`:629` 才 `serve_forever()`。所以看到这行时套接字**已经在听**，内核 backlog 会接住
   紧接着到来的请求，只是要等 `serve_forever` 转起来才应答——**这正是一个「两段式闸门」该有的第一信号**。
+  （T-01 实施时更正：激活当天此条写的是 `:624`，实为 `:625`；T-01 的 Agent 侧用例把这行钉死了。）
+- **`/healthz` 在鉴权之后**（T-01 实施时实测）：`do_GET` 先调 `_check_auth()`（`:448`）再分发，
+  `:451` 才轮到 `/healthz`。所以**令牌不对时它答 401**——这正是 `sidecar/mod.rs:30-37` 那段注释
+  担心的漂移（「一个被告知 A 令牌、却被用 B 令牌质问的 sidecar 会对所有请求答 401」），
+  而它在第二段闸门上**当场可见**。这是把 401 定为「致命、不等待」的实测依据，不是推想。
 - **消费者为零**：`git grep -n listening -- src-tauri/src src-tauri/*.json` 在 desktop 侧的 4 处命中
   全是测试里的套接字注释（`commands/agent.rs:368`、`:545`、`http/mod.rs:266`、`:321`），**没有一处读 Agent 的输出**。
 - `[sidecar] start_timeout_ms = 15000`（`src-tauri/resources/desktop.production.toml:46`）被读进
@@ -146,8 +151,10 @@
 | `wt-media-agent` | `bash scripts/test.sh` | **377 tests OK** |
 | `wt-media-workspace` | `python3 -m unittest discover -s tests -q` | **69 tests / 4 failures（4 条为既知红项）** |
 
-四条既知红项的判定沿用 C 的**同集合阳性对照**（`git archive HEAD` 解包到真实 `wt-media/` 之内的兄弟目录，
+四条既知红项的判定沿用 C 的**同集合阳性对照**（必须在真实 `wt-media/` 之内的树上做，
 否则路径敏感的用例会静默 `skipTest`，把 4 红读成 2 红）。见 `CHG-20260923-058/evidence/task-09-writeback-and-archive.md` §3.1。
+**T-01 时实测确认了这两种读数**：把 `git archive HEAD` 解到 `/tmp` 再跑 ⇒ 2 红；
+在真实树内把两个记录文件 stash 回 HEAD 再跑 ⇒ 4 红、逐条同名。
 
 ### 4.9 本机环境事实（影响验证方式）
 
@@ -176,6 +183,8 @@
   （超时语义由 T-01 定义；键名不变）；
 - `src-tauri/src/sidecar/`（就绪、退出、完整性）、`commands/agent.rs`（活性判定）；
 - `wt-media-agent/src/wt_media_agent/local_api/server.py`（信号处理）；
+- `wt-media-agent/tests/test_sidecar_entry.py`：**T-01 已用**——就绪行的格式与顺序钉死。
+  Desktop 从 T-01 起解析这行，于是它成了跨仓契约，而两侧都没有构建期检查（§6 D-01）；
 - `wt-media-agent` 的入口文档：`AGENTS.md`、`README.md`、`contracts/*/README.md`（吸收项）；
 - `wt-media-workspace/skills/agent/agent-platform-adapter-change`：改指 `clients/<platform>`，
   并跑 `scripts/sync_skills.py` 同步生成副本；
@@ -225,7 +234,7 @@
 
 | Task | 内容 | 仓 | 状态 | 判据 |
 |---|---|---|---|---|
-| T-01 | **就绪闸门**：解析 Agent 的 readiness 行作为第一信号，健康检查应答作为第二信号；`start_timeout_ms` 变成真超时且**真的会超时** | desktop | TODO | 「打印了但不应答」与「不应答且不打印」两种形态各有用例；超时按配置值生效；变异打掉自己 |
+| T-01 | **就绪闸门**：解析 Agent 的 readiness 行作为第一信号，健康检查应答作为第二信号；`start_timeout_ms` 变成真超时且**真的会超时** | desktop + agent | **DONE** | 「打印了但不应答」与「不应答且不打印」两种形态各有用例；超时按配置值生效；变异打掉自己。**加一臂**：401（令牌漂移）致命且不等待——依据是 `/healthz` 在 `_check_auth` 之后（§4.1 实测补记） |
 | T-02 | **活性探针**：`already_running` 的判定改为问一次；sidecar 死后如实报「未在运行」并允许重启 | desktop | TODO | 先有一条**能红的**用例复现 CHG-057 登记的缺陷（杀掉 sidecar 后仍说已在运行）；修复后同一条转绿 |
 | T-03 | **退出收尾**：Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与在飞任务收尾 | desktop + agent | TODO | 真机上「请停后自己退出」与「宽限超时被强杀」两条读数；退出报告能区分二者 |
 | T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | TODO | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖** |
@@ -276,7 +285,8 @@
 
 ## 11. Evidence
 
-- `evidence/task-01-readiness.md`——就绪闸门：两种失败形态、超时读数、变异表
+- `evidence/task-01-readiness.md`——就绪闸门：两种失败形态、超时读数、变异表。**已产出**，
+  另附原始转录 `evidence/agent-probe.out`（真机起 Agent）与 `evidence/agent-probe-phases.out`（两段式探针）
 - `evidence/task-02-identity.md`——**先红**的复现（CHG-057 登记的缺陷）与修复后的绿
 - `evidence/task-03-exit.md`——请停/宽限/强杀三条真机读数与退出报告形状
 - `evidence/task-04-integrity.md`——篡改必拒 / 完好必过 / 打包侧相等性判定
@@ -289,10 +299,16 @@
 
 ## 12. Current Checkpoint
 
-- **Completed**：本 CHG 的激活（`git mv` 自 `planned/`，草案改写为十三节执行记录，§4 的每条事实都是
-  2026-09-25 实测）；Q-01 与 Q-02 由用户 2026-09-25 裁定关闭。
-- **Current**：T-01 就绪闸门——尚未开工。
-- **Next**：T-01 → T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
+- **Completed**：
+  - **激活**（`git mv` 自 `planned/`，草案改写为十三节执行记录，§4 的每条事实都是 2026-09-25 实测）；
+    Q-01 与 Q-02 由用户 2026-09-25 裁定关闭。
+  - **T-01 就绪闸门**（双侧）。desktop 336→**344** passed / 0 failed（2→3 ignored）；
+    agent 377→**378** OK；编译警告 7→**7**（新增 0，基线是还原三个文件后**测**出来的）；
+    变异 **8/8** 打掉自己的用例；真机臂是**本 crate 的 `gate` 对上真实的 Agent 进程**
+    （`--ignored real_agent` 通过，并用阳性对照证明它真的读到了真机那一行）。
+    详见 `evidence/task-01-readiness.md`。
+- **Current**：T-02 活性探针——尚未开工。
+- **Next**：T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
 - **Blocked**：无。Q-04（「组件与资源版本」的口径）在 **T-06 内部**待定，若定不下则退回用户。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
   Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。
