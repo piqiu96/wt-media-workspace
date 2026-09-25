@@ -236,6 +236,13 @@
   「改 pin 即评审」写进 pin 文件）、D-20（前端 version 的归因局限：记的是 stamp 时刻的源提交）、
   D-21（记录写在签名窗口内）、D-22（**不加** `version_classes:` 到 `release-matrix.yaml`：第二份没人
   校验的声明即漂移）、D-23（订正 `DMG_PATH` 里写死的 `0.1.0`；今日不可分辨，是读证不是跑证）。
+- **「13 个 rustfmt 变更文件仍是纯重排」这条核对本次换过判据，两种错法都登记**（原判据只说不出来）：
+  ① `rustfmt --emit stdout` 会在输出**前面加一行 `<路径>:` 加一个空行**——按「原样比对」用它会得出
+  **13/13 全是真改动**的假警报；② 把 HEAD 版本写到 `src-tauri/src/sidecar/mod.rs` **旁边**去格式化的做法，
+  rustfmt 会**顺着 `mod` 声明把自己的兄弟模块也格式化**，于是误改了工作区里的 `sidecar/readiness.rs`
+  （已用 `git show HEAD:… >` 还原，diff 归零）。最终判据：`git archive HEAD src-tauri/src` 镜像到
+  `/tmp` 后逐文件 `--emit files`，再与工作区比对 ⇒ **13/13 纯重排**，且工作区仍**恰好 13** 个脏文件。
+  教训是「验证手段自己会写进被验证的仓库」这一类错法要留档。
 - 未覆盖项（`evidence/task-06-versions.md` §9）：`DMG_PATH` 的订正今日不可分辨；前端 marker 的归因局限；
   第五类摘要不含 `Contents/MacOS`（那里的二进制由 T-04 的运行期校验负责，两条机制不重叠）；
   x86_64／Windows 未测；`--stamp-frontend` 对「`package.json` 无 version」的拒绝路径没有独立臂；
@@ -247,6 +254,16 @@
 
 ## Recent verification
 
+- **T-06 之后的 workspace 门禁**（2026-09-25）：`verify_delivery_governance.py`（Active CHG:
+  CHG-20260923-059）、`verify_agent_entry.py`（快照 2144 字符 / 预算 8000，0 warning）、`verify_skills.py`
+  （10 个 skill 源文件）三者全绿；`unittest discover -s tests -q` **Ran 69 / FAILED (failures=4)**。
+  对照：把 `107ffb6`（T-06 记录之前的树）`git archive` 出来跑同一套件，失败的**同集合**四条，
+  逐条同名（`test_verify_m0_config` ×2、`test_verify_m2_acceptance` ×1、
+  `test_verify_product_master_alignment` ×1，与 `README.md` 既有红项清单逐条同名）。**无新增红、无意外转绿。**
+  **对照本身有一处陷阱，登记在此免得后来者踩**：归档若放在 `../wt-media-*` 解析不到的位置，
+  其中两条会**skip**而不是失败，于是对照只剩 2 条失败——看上去像「多了 2 条红」。
+  归档必须放在与 `wt-media-workspace/` 同层能看见兄弟仓的位置（本次用 `wt-media/.t06main/`，
+  读完即删），才是同集合对照。分母：归档 2 条失败 + 2 条 skip，真仓 4 条失败。
 - **T-06 之后**（2026-09-25）：desktop `bash scripts/test.sh` **Rust 363 passed / 0 failed / 5 ignored**
   ＋ `tests/release-versions.test.sh` **20 passed / 0 failed** ＋ `tests/package-release-macos.test.sh` 绿
   （`evidence/task-06-desktop-suite.out`；本次未改任何 Rust 文件，读数与 T-05 相同，未重跑全仓）；
