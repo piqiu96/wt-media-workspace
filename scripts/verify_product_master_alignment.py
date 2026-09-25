@@ -61,7 +61,14 @@ def validate_master_text(text: str) -> list[str]:
     # (both user-signed); the expectations here were left behind at closure,
     # which is why this gate reported them as errors for as long as they have
     # been closed.
-    expected_statuses = {0: "DONE", 1: "DONE", 2: "DONE", 3: "DONE", **{number: "NOT_STARTED" for number in range(4, 11)}}
+    expected_statuses = {
+        0: "DONE",
+        1: "DONE",
+        2: "DONE",
+        3: "DONE",
+        4: "IN_PROGRESS",
+        **{number: "NOT_STARTED" for number in range(5, 11)},
+    }
     statuses: dict[int, str | None] = {}
     for number, expected in expected_statuses.items():
         status_match = re.search(r"\| 状态 \| `([^`]+)`", sections[number])

@@ -1,6 +1,6 @@
 # M4 Cloud 内容生产闭环
 
-- Milestone status: `NOT_STARTED`
+- Milestone status: `IN_PROGRESS`
 - Product baseline: `docs/product/prd/详细文档/第五章_素材生产.md`
 - Engineering baseline: `docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md`
 - Decision: `docs/decisions/0017-m4-m5-cloud-owned-content-production.md`
@@ -29,13 +29,13 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 - Cloud 模块化单体、MySQL、独立 Scheduler/Worker CMD 模式可复用；
 - M2 用户、业务范围、Desktop 和 Local Agent 基线保持可用；
 - ADR-0017 已接受；
-- 当前活动工程优化 CHG 完成后才能激活 M4 CHG，不抢占现有 active 名额。
+- 当前活动工程优化 CHG 已完成；M4-A 于 2026-09-26 激活，继续保持任一时刻仅一个 active CHG。
 
 ## 3. 闭环拆分与 CHG 顺序
 
 | 阶段 | 独立结果 | CHG | 状态 |
 | --- | --- | --- | --- |
-| M4-A | 素材库、“我的素材”和原素材懒加载准备/下载 | CHG-20260924-061 | `PLANNED` |
+| M4-A | 素材库、“我的素材”和原素材懒加载准备/下载 | CHG-20260924-061 | `IMPLEMENTING` |
 | M4-B | `compose_strategy` 模板、参数、版本、快照和人工选择 | M4-C2 | `NOT_STARTED` |
 | M4-C | `compose_task`、对象存储、Cloud Worker 与真实 FFmpeg | M4-C3～M4-C5 | `NOT_STARTED` |
 | M4-D | 我的成片、下载中心与 Local Agent 本地文件落地 | M4-C6～M4-C7 | `NOT_STARTED` |
@@ -91,7 +91,7 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 
 ### 对应 CHG
 
-- `delivery/planned/CHG-20260924-061/change.md`
+- `delivery/active/CHG-20260924-061/change.md`
 
 ## 5. 闭环卡 M4-B：人工 Cloud 合成
 
@@ -206,4 +206,3 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 ## 8. M4 DONE Gate
 
 M4 只有在 M4-AC-01～12 全部 PASS、自动测试与真实依赖验证完成，并经用户按真实操作链路签收后才能进入 `DONE`。页面存在、任务记录存在、API 200、Mock 视频或构建成功都不能单独证明 M4 完成。
-

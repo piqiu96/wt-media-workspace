@@ -1,16 +1,18 @@
 # CHG-20260924-061：M4-A 素材库、我的素材与原素材懒加载下载
 
-- Status: PLANNED
+- Status: IMPLEMENTING
 - Level: M
-- Milestone: `delivery/milestones/M4-content-production.md` §4「闭环卡 M4-A：素材库与我的素材」
+- Milestone: `delivery/milestones/M4-content-production.md`
+- Closure anchor: §4「闭环卡 M4-A：素材库与我的素材」
 - 日期：2026-09-24
 - 决策：`docs/decisions/0017-m4-m5-cloud-owned-content-production.md`
 - 产品基线：`docs/product/prd/详细文档/第五章_素材生产.md`
 - 工程基线：`docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md`
+- Current repository: `wt-media-cloud`
 - 当前仓库：`wt-media-cloud` 为业务事实、API、Cloud 文件准备和 Web 主仓；`wt-media-agent` 为本地下载执行；`wt-media-desktop` 为本机目录/打开文件能力；`wt-media-workspace` 为治理与 Evidence
-- 激活前置：M3 `DONE`；当前 active CHG 与其已批准后继顺序完成或由用户重新排期；任一时刻仍只允许一个 active CHG
+- 激活前置：M3 `DONE`；当前 active CHG 与其已批准后继顺序完成或由用户重新排期；任一时刻仍只允许一个 active CHG。2026-09-26 已逐项核验并激活本 CHG。
 
-> 本记录只登记 planned 工作，不激活、不修改 `delivery/LEDGER.md` 或 `.ai/CURRENT_CONTEXT.md`，也不替换当前 active CHG。
+> 本记录是 M4-A 的唯一 active 执行合同；进度和验证读数只记录在同目录 `checkpoint.md` 与 `evidence/`。
 
 ## 1. 独立目标
 
@@ -91,7 +93,7 @@ source_content
 
 ### Task 0：激活检查与合同冻结
 
-- 确认无其他 active CHG，并按治理命令把 061 从 `planned` 激活；本文件在 planned 阶段不执行该操作；
+- 确认无其他 active CHG，并按治理命令完成 061 激活；
 - 盘点 Cloud 当前 migration 最大编号、对象存储部署参数、各平台源链接有效期及 Local Agent 节点身份；
 - 先在 Cloud 正式 OpenAPI/contract 中冻结素材、`material_usage`、`file_transfer_task` 的 DTO、枚举、错误码和兼容规则；
 - 明确 Cloud 准备与本地下载是否串联复用同一已准备对象，禁止同一业务命令创建无界重复任务。
@@ -206,10 +208,14 @@ python3 scripts/verify_agent_entry.py
 
 凭据、Cookie、完整签名 URL、本机用户名和绝对路径不得进入 Evidence。Cloud 提供正式合同后，Agent 与 Desktop 才实现消费者；提供方与消费者分别提交，不跨仓混交。
 
-## 9. Checkpoint
+## 9. Initial planning record
 
 - Completed：M4-A 的独立目标、仓库边界、任务顺序和 12 项验收条件已规划。
-- Current：`PLANNED`；未激活、未修改运行时代码、无完成证据。
-- Next：等待当前 active CHG 和既定前置顺序完成；激活时先执行 Task 0，关闭外部下载授权与对象存储配置待决项。
-- Blockers：真实平台源文件获取方式、对象存储测试环境、Local Agent 下载授权和跨平台保存目录策略需在激活时验证。
+- Current：`IMPLEMENTING`；激活后的实时进度见同目录 `checkpoint.md`。
+- Next：执行 Task 0，冻结正式合同并验证外部下载授权、对象存储测试环境与跨平台保存目录策略。
+- Blockers：上述运行前提必须在其需要真实外部副作用的 Task 前验证；尚无阻止 Task 0 的待决业务选择。
 - Verification：本轮只验证治理文档完整性与交叉引用，不代表 M4-A 运行链路已交付。
+
+## 10. Pending Questions
+
+None.

@@ -122,8 +122,8 @@ wt-media-workspace/
 
 | 状态 | 含义 | 当前处于该态的里程碑 |
 |---|---|---|
-| `NOT_STARTED` | 未进入该里程碑 | M4、M5 |
-| `IN_PROGRESS` | 开发中 | 无 |
+| `NOT_STARTED` | 未进入该里程碑 | M5 |
+| `IN_PROGRESS` | 开发中 | M4 |
 | `VERIFYING` | 自动综合验收完成，等待人工整体验收 | 无 |
 | `DONE` | 人工整体验收通过 | M2、M3、M-launch-engineering |
 
@@ -159,7 +159,8 @@ wt-media-workspace/
 | M1 | `DONE` | M1 任务链路闭环复验通过。创建→领取→执行→上报→查询完整链路跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：router 连接、mysql_registry 时间格式。 | M1 冻结。不扩建通用任务系统。 |
 | M2 | `DONE` | 2026-09-14 用户完成本轮综合人工验收并确认完整通过。M2-A/B/C/E 的真实依赖、构建、Desktop 与人工走查证据均已归档；M2-D 保持 `DEFERRED`。 | M2 冻结为当前运行环境与账号管理基线；后续内容发现从 M3 开始，M2-D 或真实受限样本校准须以独立 CHG 恢复。 |
 | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
-| M4-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
+| M4 | `IN_PROGRESS` | M4-A（CHG-20260924-061）已激活，尚无达到 M4 退出条件的正式完成项。 | 仅执行 M4-A；M5-M10 仍按本计划顺序等待。 |
+| M5-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
 > 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的实际进度不一致，故拆为两行。各里程碑的当前状态以其在第 3 节的字段为准，本节只记这一行的拆分缘由，不重复断言任何状态。
 
@@ -415,13 +416,13 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `NOT_STARTED` |
+| 状态 | `IN_PROGRESS` |
 | 目标 | 打通素材库、我的素材、人工创建合成任务、Cloud Worker 生成成片和下载的完整闭环。 |
 | 依赖 | M3 `DONE` |
 | 闭环 | `delivery/milestones/M4-content-production.md` |
 | 产品/决策 | 第五章素材生产；ADR-0017；M4-M5 Cloud 内容生产工程设计 |
-| Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
+| Active CHG | `CHG-20260924-061`（M4-A） |
+| Evidence | 开工基线已记录；尚无功能验收证据。 |
 | 完成日期 | None |
 | Commit/Tag | None |
 
@@ -441,7 +442,7 @@ material
 候选 CHG：
 
 ```text
-M4-C1 / CHG-20260924-061 素材库、material_usage 与原素材懒加载准备/下载
+M4-C1 / CHG-20260924-061 素材库、material_usage 与原素材懒加载准备/下载（IMPLEMENTING）
 M4-C2 compose_strategy 模板、参数、版本和人工选择
 M4-C3 compose_task 模型、API、状态、策略快照、取消和重试
 M4-C4 对象存储、FFmpeg/FFprobe 与 Cloud Compose Worker 基础设施
