@@ -53,7 +53,8 @@
 | `docs/decisions` | 架构选择、技术取舍、ADR 记录 | 决策唯一可信来源 |
 | `config/` | repository-map、skills-distribution、contract-map、release-matrix | 配置事实 |
 | `skills/` | Codex / Claude skill 唯一源文件 | skill 唯一源 |
-| `scripts/` | 快照生成、skill 分发、入口与治理校验 | 治理工具 |
+| `bin/` | 本地开发环境的统一启停入口（`bin/control.sh`） | 运营入口 |
+| `scripts/` | 快照生成、skill 分发、入口与治理校验；分类与落位规则见 `scripts/README.md` | 治理工具 |
 
 其他历史文档（含 `docs/superpowers/` 下的分析材料）不作为新开发依据；分析材料必须经 Delivery 或 Decision 确认后才可驱动修改。执行根 `wt-media/` 不承载 `docs/`，不存在第二份文档树。
 

@@ -306,6 +306,39 @@ def verify_all() -> None:
     verify_dmg()
 
 
+def cmd_status() -> int:
+    """Report Cloud/Agent liveness and health without changing anything.
+
+    This is the reading behind `bin/control.sh status`. It is deliberately a
+    query: it never starts, stops, or waits on anything, so calling it is safe
+    on a machine where nothing is running. Prints one line per component and
+    returns 1 when any of them is not both alive and answering, so the exit
+    code is usable from a shell (the same verb in the other three repositories'
+    `bin/control.sh` has the same contract).
+    """
+    log("Local M2-B environment status")
+    all_healthy = True
+    for name, pid_file, url in (
+        ("cloud", PID_DIR / "cloud.pid", f"{CLOUD_BASE_URL}/api/v1/health"),
+        ("agent", PID_DIR / "agent.pid", f"{AGENT_BASE_URL}/healthz"),
+    ):
+        pid_text = (
+            pid_file.read_text(encoding="utf-8").strip() if pid_file.exists() else "-"
+        )
+        alive = pid_alive(pid_file)
+        try:
+            http_json(url, timeout=2.0)
+            health = "ok"
+        except Exception:  # noqa: BLE001 - a down probe is a reading, not a failure.
+            health = "down"
+        all_healthy = all_healthy and alive and health == "ok"
+        print(
+            f"{name}: pid={pid_text} alive={'yes' if alive else 'no'} "
+            f"health={health} url={url}"
+        )
+    return 0 if all_healthy else 1
+
+
 def lsof_listener_pids(port: str) -> list[str]:
     # `-tiTCP:<port>` and `-sTCP:LISTEN` must each stay a single argv element;
     # lsof otherwise treats `:port` as a file path and exits nonzero.
@@ -407,7 +440,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Prepare and verify WT Media M2-B local acceptance environment.")
     parser.add_argument(
         "command",
-        choices=["up", "verify", "build-dmg", "launch-dmg", "all", "stop"],
+        choices=["up", "verify", "status", "build-dmg", "launch-dmg", "all", "stop"],
         help="workflow command to execute",
     )
     parser.add_argument(
@@ -431,6 +464,8 @@ def main() -> int:
         elif args.command == "verify":
             verify_all()
             verify_login()
+        elif args.command == "status":
+            return cmd_status()
         elif args.command == "build-dmg":
             build_dmg()
             rebuild_cloud_dist()

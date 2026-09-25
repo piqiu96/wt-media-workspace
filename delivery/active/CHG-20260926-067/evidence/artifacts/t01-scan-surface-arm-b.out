@@ -1,0 +1,8 @@
+# T-01 扫描面变异 —— 臂 B：改之后（rglob 递归）
+# 取数时刻: 2026-09-25T17:42:19Z
+# 探针: scripts/verify/probe-archive-write.py（与臂 A 同一个文件）
+
+exit=1
+ERROR archive readonly: scripts/verify/probe-archive-write.py:8 writes under delivery/completed/ (ARCHIVE / 'probe.txt')
+archive readonly: scanned 13 script(s) under scripts/, 1 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)

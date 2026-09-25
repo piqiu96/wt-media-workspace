@@ -1,0 +1,26 @@
+# t01-control-status.out
+
+## 臂：bash bin/control.sh status（本地环境**已在跑**，但不是经 harness 起的）
+
+$ bash bin/control.sh status
+
+== Local M2-B environment status ==
+cloud: pid=- alive=no health=ok url=http://127.0.0.1:18080/api/v1/health
+agent: pid=- alive=no health=ok url=http://127.0.0.1:8765/healthz
+exit=1
+
+## 独立探针：status 的 health=ok 不是空转
+
+$ lsof -tiTCP:<cloud-port> -sTCP:LISTEN ; lsof -tiTCP:<agent-port> -sTCP:LISTEN
+:18080  54420 
+:8765   54456 
+
+$ ls <runtime>/pids
+ls: /Users/aqiuye/Develop/workspace/wt-media/.local/m2b/pids: No such file or directory
+
+## 读法
+
+- 两个字段是**互相独立**的信号：pid 文件说「是不是经 harness 起的」，health 探针说「现在有没有东西在答」。
+- 本例里两者**不一致**：alive=no（无 pid 文件，runtime 目录不存在）、health=ok（lsof 与 curl 各自独立证实 54420/54456 在答）。
+- 因此 exit=1 的含义是「本环境不是由 harness 起的」，不是「服务挂了」——两行读数分开打印正是为了不把这两件事混成一个 yes/no。
+- 该运行实例**先于本 CHG 存在**，本 Task 未启停它、也未触碰它。

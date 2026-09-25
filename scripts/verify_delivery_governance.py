@@ -125,9 +125,19 @@ def archive_tainted_names(tree: ast.AST) -> set[str]:
 
 
 def check_archive_readonly(workspace: Path) -> tuple[list[str], str]:
-    """归档区不得被 `scripts/` 下的脚本写入。"""
+    """归档区不得被 `scripts/` 下的脚本写入。
+
+    扫描面是**递归**的（`rglob`）：`scripts/verify/` 与 `scripts/dev/` 是
+    CHG-20260926-067 新设的落点，非递归的 glob 会让落在其中的脚本**静默滑出**
+    这条判据——门禁照绿、分母缩小，而报告里看不出来。同一份写归档的探针
+    放在 `scripts/verify/` 下的两臂对照见该 CHG 的
+    `evidence/artifacts/t01-scan-surface-arm-{a,b}.out`（臂 A 报 0 处、臂 B 点名）。
+
+    覆盖面仍然只到 `*.py`：`scripts/` 下的 shell 脚本与 `tests/` 不在判据内
+    （CHG-20260925-066 §14 第 15 项）。
+    """
     scripts_dir = workspace / "scripts"
-    scripts = sorted(scripts_dir.glob("*.py")) if scripts_dir.is_dir() else []
+    scripts = sorted(scripts_dir.rglob("*.py")) if scripts_dir.is_dir() else []
     errors: list[str] = []
     sites = 0
     for script in scripts:

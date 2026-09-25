@@ -45,6 +45,7 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
 
     def write_script(self, name: str, body: str) -> None:
         path = self.workspace / "scripts" / name
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(body, encoding="utf-8")
 
     def write_context(self, change_id: str) -> None:
@@ -197,6 +198,29 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
                 "archive readonly: scripts/writer.py:5 writes under "
                 "delivery/completed/ ((ARCHIVE / 'note.md').parent)",
                 "archive readonly: scripts/writer.py:6 writes under "
+                "delivery/completed/ (ARCHIVE / 'note.md')",
+            ],
+        )
+
+    def test_archive_write_from_subdirectory_script_is_reported(self) -> None:
+        """`scripts/` **子目录**里的脚本写归档区 → 同样报出。
+
+        `scripts/verify/` 与 `scripts/dev/` 是 CHG-20260926-067 新设的落点。
+        判据若用非递归 glob，落在其中的脚本会**静默滑出**扫描面——门禁照绿、
+        分母缩小，而报告里看不出来。变异对照（把 `rglob` 换回 `glob`）：
+        本用例红，实得为空错误集合。同形态的活体两臂对照见该 CHG 的
+        `evidence/artifacts/t01-scan-surface-arm-{a,b}.out`。
+        """
+        self.write_script("verify/writer.py", self.WRITER_SCRIPT)
+
+        errors = self.module.validate_delivery_governance(self.workspace)
+
+        self.assertEqual(
+            errors,
+            [
+                "archive readonly: scripts/verify/writer.py:5 writes under "
+                "delivery/completed/ ((ARCHIVE / 'note.md').parent)",
+                "archive readonly: scripts/verify/writer.py:6 writes under "
                 "delivery/completed/ (ARCHIVE / 'note.md')",
             ],
         )

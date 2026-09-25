@@ -1,0 +1,28 @@
+# t01-test-control-mutations.out
+
+变异式对照：每一行都是一次「关掉该判定后用例必须红」的实测。
+阴性臂（未变异）先跑，证明基线是绿的：
+  exit=0  PASS: bin/control.sh usage, dispatch, status wiring, and no-port-literal
+
+--- 变异：usage 里删掉 status 行
+    exit=1
+    FAIL: usage line missing:   status   Report whether those processes are alive and answering their health endpoint.
+
+--- 变异：status 分派被短路（不再指向 harness）
+    exit=1
+    FAIL: no cloud status line
+
+--- 变异：未知名词退出码 2 → 0
+    exit=1
+    FAIL: unknown verb exit=0, want 2
+
+--- 变异：control.sh 里写进端口字面量
+    exit=1
+    FAIL: bin/control.sh carries a port literal; it belongs to the harness config
+
+--- 变异：HARNESS 路径写错
+    exit=1
+    FAIL: status exit=127, want 0 or 1
+
+还原后复跑（证明变异被撤销、基线回到绿）：
+  exit=0  PASS: bin/control.sh usage, dispatch, status wiring, and no-port-literal

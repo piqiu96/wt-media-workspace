@@ -1,0 +1,11 @@
+# T-01 扫描面变异 —— 臂 A：改之前（非递归 glob）
+# 取数时刻: 2026-09-25T17:42:10Z
+# 探针: scripts/verify/probe-archive-write.py（真的写 delivery/completed/）
+
+exit=0
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-067
+
+--- 探针是否被点名 ---
+命中数: 0

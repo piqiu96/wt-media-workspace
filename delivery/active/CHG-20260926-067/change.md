@@ -84,6 +84,7 @@
 - `scripts/verify_m3_acceptance.py`：`:561` 与 `:1738` 的 cloud 启停路径改指 `bin/control.sh`；`:414-421` 的 `foreign` 清单逐条重算。
 - `scripts/local-control.sh` → `bin/control.sh`（workspace）：加 `restart`／`status`，保留 `verify`／`help`。
 - `scripts/test-local-control.sh` → `scripts/test-control.sh`：断言串与文件名同步（其**被断言的对象**移动了，属同一次移动的连带项，不是「迁移一个无关旧脚本」）。
+- `scripts/m2b_local_acceptance.py`：新增 `status` 动词（`cmd_status()` ＋ `choices`），作为 workspace `bin/control.sh status` 的读数来源。`local-control.sh` 原有的 `start`／`verify`／`stop` 三个动词都是 `exec harness <verb>`，`status` 沿用同一形状；**不写在 shell 里**的理由见 §14 第 11 项（端口字面量会造出第三份真相）。
 - **四仓** `README.md`／`DIRECTORY_MAP.md` 的脚本层段落；cloud／agent 的 `scripts/README.md` 按模板重写并补上各自缺失的行（cloud `local-env.sh`、agent `build_desktop_sidecar.py`）。
 - `AGENT-INDEX.md`：指针行（workspace 的 `scripts/README.md` 指向 §12 命令清单）。
 - **agent 两处注释性路径**（非逻辑）：`src/wt_media_agent/local_api/server.py:44` 与 `tests/test_local_api_server.py:154` 中指向被移脚本的注释串。
@@ -130,11 +131,11 @@ None.
 | Task | Goal | Status | Verification |
 |---|---|---|---|
 | T-00 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓 `git status` 基线；`MASTER` §3 读数列按 F-05 刷新（仅本 CHG 激活带来的三项） | DONE | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.`。见 `evidence/task-00-activation.md` |
-| T-01 | workspace：`scripts/dev/`＋`scripts/verify/`（各 `.gitkeep`）；`scripts/README.md`（首建）；`AGENT-INDEX.md` 指针行；`verify_delivery_governance.py` 扫描面改递归 | TODO | `verify_delivery_governance.py` `exit=0` 且**改前／改后分母都打印**（F-03 应同为 12，不等即停下查因）；**变异红**：在 `scripts/verify/` 放一个写归档的临时 `.py` → 必须点名它，删除还原 |
+| T-01 | **workspace 脚本层分层**：`bin/control.sh`（由 `scripts/local-control.sh` 改：加 `restart`／`status`，保留 `verify`／`help`）；`scripts/test-local-control.sh` → `scripts/test-control.sh`；`scripts/dev/`＋`scripts/verify/`（各 `.gitkeep`）；`scripts/README.md`（**首建，终态**）；`AGENT-INDEX.md` 指针行；`verify_delivery_governance.py` 扫描面改递归 | DONE | 见 `evidence/task-01-workspace-layout.md`。要点：扫描面两臂对照落 `artifacts/t01-scan-surface-arm-{a,b}.out`（臂 A 分母 12／0 处、臂 B 分母 13／点名）；`test-control.sh` 四条判据的**五处变异全红**（`artifacts/t01-test-control-mutations.out`）；`status` 实读落 `artifacts/t01-control-status.out`；六门禁 ＋ `Ran 101 / OK` 落 `artifacts/t01-gate-{after,final}.out` |
 | T-02 | workspace：**门禁前置（必须早于 T-03）**——`verify_m0_config.py:272-280` needle 收敛到 T-03 的终态、`:243-253` docstring 同步；`verify_m0_local.sh:39-45` desktop 块 → 只剩 `scripts/test.sh` | TODO | 两门禁 `exit=0`；**变异红**两处（改 workflow 里的 `scripts/test.sh` 名 → 门禁报出；把 `npm run lint` 放回 → `verify_m0_local.sh` 失败），各自还原 |
 | T-03 | **desktop**：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | `ls scripts/` 分母 **20 → 9**；**每个被删名字 `git -C … grep` 命中 0**，阳性对照 `release-versions.sh` 命中 >0（`git -C` 逐仓跑）；`scripts/test.sh` 全跑读数在最后一次改动之后；如实记录 **GitHub Actions 本身未在此运行** |
 | T-04 | **cloud**：`bin/control.sh`；`.gitignore` `bin/` → `bin/*`＋`!bin/*.sh`；删三个原脚本；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | `git check-ignore -v bin/control.sh` **改读数**（同命令对 `bin/wt-media-cloud` 仍报被忽略＝阳性对照）；`bash -n`；四动词各跑一次（`status` 未运行／运行中各一次） |
-| T-05 | workspace：**必须紧接 T-04**——`verify_m3_acceptance.py:561,1738` 与 `:414-421` 回指 cloud `bin/control.sh`；workspace `bin/control.sh`（由 `local-control.sh` 改）；`test-local-control.sh` → `test-control.sh` | TODO | `bash -n`；`test-control.sh` 全跑；**回指充分性**：`git grep -nE 'scripts/(start\|stop\|health)\.sh'` 在 workspace＋cloud 命中 **0**，阳性对照（搜 `bin/control.sh`）>0，报分母 |
+| T-05 | workspace：**必须紧接 T-04**——`verify_m3_acceptance.py:561`／`:1738` 与 `:414-421` 回指 cloud `bin/control.sh` | TODO | `bash -n` 无（Python，改常数）；**回指充分性**：`git grep -nE 'scripts/(start\|stop\|health)\.sh'` 在 workspace＋cloud 命中 **0**，阳性对照（搜 `bin/control.sh`）>0，报分母；`verify_m3_acceptance.py` 的 `--help`／语法可跑 |
 | T-06 | **agent**：`bin/control.sh`；删三个 health 脚本；三处 README 端口去值；两处注释路径；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | 端口正则命中 **0**，**报分母（三文件行数）＋阳性对照**；`unittest discover -s tests -q` 读数与 F-04 口径一致 |
 | T-07 | workspace：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | TODO | 六门禁 ＋ `unittest` ＋ `sync_skills.py check`，**取在最后一次改动之后**；两遍失效指针扫描（各带阳性对照与分母）；四仓 `git status --porcelain` 对账 |
 
@@ -148,10 +149,10 @@ None.
 
 ### wt-media-workspace
 
-- [ ] `delivery/active/CHG-20260926-067/` 三件齐备；LEDGER 表行；快照 `--change`（T-00）
-- [ ] `scripts/dev/`＋`scripts/verify/`；`scripts/README.md`；扫描面改递归（T-01）
+- [x] `delivery/active/CHG-20260926-067/` 三件齐备；LEDGER 表行；快照 `--change`（T-00）
+- [x] `bin/control.sh`；`test-control.sh`；`scripts/dev/`＋`scripts/verify/`；`scripts/README.md`；`AGENT-INDEX.md` 指针；扫描面改递归（T-01）
 - [ ] `verify_m0_config.py`／`verify_m0_local.sh` 门禁前置（T-02）
-- [ ] `verify_m3_acceptance.py` 回指；`bin/control.sh`；`test-control.sh`（T-05）
+- [ ] `verify_m3_acceptance.py` 回指 cloud `bin/control.sh`（T-05）
 - [ ] 归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描（T-07）
 
 ### wt-media-cloud
@@ -187,6 +188,7 @@ None.
 证据在 `evidence/`，只记事实、不复述需求。原始输出进 `evidence/artifacts/`。
 
 - `evidence/task-00-activation.md` ＋ `artifacts/t00-*.out`
+- `evidence/task-01-workspace-layout.md` ＋ `artifacts/t01-*.out`（7 个）
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 每条记录含：命令或手工动作、期望、实测、通过与否、相关 commit。
@@ -215,5 +217,8 @@ None.
 4. **架构基线 §7.5 的统一动词表**是 `bootstrap/dev/test/lint/generate/build/package/verify`，**不含 `start`/`stop`/`status`**；而 `MASTER:202-204` 的 M0 验收要求每仓有 `start`/`stop`。本 CHG 建的 `bin/control.sh` **使这个缺口更显**，但基线归 architecture 所有，不在本 CHG 处置。
 5. `contracts.lock.json` 在删除 `health-check.mjs` 后**失去唯一读取者**（仅剩两处叙述），且被删文件里那条断言本已过期（F-08）。
 6. `docs/engineering/architecture/…_V1.md` §6.3 与 A.5 仍写 desktop 有 `src/`、`package.json`、`packaging/`，三者实测自 `7aabb1a` 起不存在——独立 CHG。
-7. `m2b_local_acceptance.py:36` 的 `AGENT_PORT` 默认 `8765` 与 `config/agent.toml:27` 重复；`m2b_local_acceptance.py:48` 硬编码 DMG 版本 `0.1.0`；`verify_m0_local.sh:39-45` 与 `verify_m0_config.py:272-280` 是同一事实的两个落点（本 CHG 只各自缩小、不合并）。
+7. `m2b_local_acceptance.py:36` 的 `AGENT_PORT` 默认 `8765` 与 `config/agent.toml:27` 重复；`m2b_local_acceptance.py:48` 硬编码 DMG 版本 `0.1.0`；`verify_m0_local.sh:39-45` 与 `verify_m0_config.py:272-280` 是同一事实的两个落点（本 CHG 只各自缩小、不合并）。T-01 的 `status` 因此**没有**把端口抄进 shell，而是复用本文件的常量（第 11 项）。
 8. **LEDGER 表行的形态有两个硬约束，而第一条的报错措辞指向错误的方向**（T-00 自己踩到）。首轮激活后三条门禁红：`LEDGER_ROW_RE`（`^\|\s*(CHG-\d{8}-\d{3})\s*\|`）要求 `|` 后**紧跟** `CHG-`，写成 `| [CHG-…](…) |` 则**表行不被识别**，报错是 `current context and ledger disagree: … != none`——读起来像「台账为空」，与真实成因（表行形态）不是同一个说法；同时 `expected_row` 的 `title` 取自 H1，故 **H1 标题里出现 `|` 会把表行劈成 5 格**，子串比对不中，报错换成「Ledger is not aligned」。⇒ 两条约束（**表渲染**与**门禁比对**）都要满足：H1 无 `|`，表行为 `| CHG-… | 标题 | 状态 | 仓库 |` 四格、无反引号无链接。详见 `evidence/task-00-activation.md` §5。
+9. **`local-control.sh` 的失效引用只剩 `docs/superpowers/` 两处，判留不处理。** 一处是 plan 里的可重放命令（`./scripts/local-control.sh start`），一处是 spec 里的时序叙述；该目录被 `AGENT-INDEX.md:58` 声明为**非权威分析材料**（「不作为新开发依据」）。改它等于改写历史分析材料，且不在 §5 范围内 ⇒ **登记不处理**。同一次扫描里其余命中（`delivery/completed/` 各篇）都是过去时叙述，按判留保留。分母 902 个已跟踪文件，阳性对照 `bin/control.sh` 命中 >0。
+10. **`status` 的两个信号会不一致，退出码的含义要写死。** pid 文件回答「是不是**经 harness** 起的」，health 探针回答「现在**有没有东西在答**」。T-01 实测本地环境**在跑**（`lsof` 报 54420／54456，两个 health 端点各答 `{"status":"ok"}`）而 `<root>/.local/m2b/pids` **不存在** ⇒ 读数是 `alive=no health=ok`、`exit=1`。故 **`exit=1` 的含义是「本环境不是由 harness 起的」，不是「服务挂了」**——两行读数分开打印正是为了不把这两件事压成一个 yes/no。四仓的 `control.sh status` 必须沿用同一语义，否则同名动词在四仓不同义（AC-01 的「形状统一」含此条）。
+11. **`bin/control.sh` 不得承载端口字面量，并已机检。** `status` 若在 shell 里直接 curl，就会在 `config/agent.toml` 与 `m2b_local_acceptance.py:36` 之外造出**第三份**端口真相（第 7 项）。因此 workspace 的 `status` 是 harness 的新动词，读同一批常量。约束由 `scripts/test-control.sh` 第 4 条机检，变异红（`artifacts/t01-test-control-mutations.out`）。此机检落在 `test-control.sh` 而非六门禁之一，不违反「不加机检」——后者针对的是 `scripts/README.md` 的**规则句外溢**。
