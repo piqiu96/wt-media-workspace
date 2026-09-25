@@ -184,6 +184,11 @@
   `scripts/stage-release-config.sh`（配置**不进** `bundle.resources`，改在**产物**上暂存——
   那条路被实测否掉，见 §6 D-12 的依据）；
 - Desktop + workspace：**五类版本**的来源与发布脚本的 **Desktop ↔ sidecar 版本兼容校验**；
+  **新增** `wt-media-desktop/scripts/release-versions.sh`（五类各一个来源 + `--check` / `--record` /
+  `--verify` / `--stamp-frontend` 四种用法）与 `src-tauri/agent-compat.json`（Desktop → Agent 的
+  **pin**：不匹配必拒，改 pin 即评审——兼容是评审闸门，不是版本号相等，见 §6 D-19）；
+  前端构建版本的来源由 workspace 的 `build-desktop.sh` 在复制产物后 stamp（Desktop 仓看不到来源仓），
+  记录 `versions.json` 由发布流程写进产物内（§6 D-21）；
 - workspace：M2 回归的**重跑记录**（工具已有）。
 
 ### Modify
@@ -197,6 +202,11 @@
   整目录替换 + 读回比对）（T-05）；
 - Desktop 的 `scripts/build-release-macos.sh`（一行接线）、`scripts/verify-release-macos.sh`（产物配置校验）
   与 `scripts/repair-macos-signing.sh`（**只订正一处成因写错的注释**，行为不变）（T-05）；
+- Desktop 的发布脚本接线（T-06）：`build-release-macos.sh`（构建后跑 `--check`；`DMG_PATH` 里写死的
+  `0.1.0` 改为读 `tauri.conf.json`）、`repair-macos-signing.sh`（签名窗口内跑 `--record`）、
+  `verify-release-macos.sh`（挂载后跑 `--verify`）、`package-release-macos.sh`（记录复制进发布目录并进
+  `SHA256SUMS`）、`scripts/test.sh` + `tests/README.md`（把 `tests/*.test.sh` 接进套件——此前无人调用）；
+- `wt-media-workspace/scripts/build-desktop.sh`（复制产物后跑 `--stamp-frontend`，前端构建版本的唯一来源）；
 - `wt-media-agent/tests/test_sidecar_entry.py`：**T-01 已用**——就绪行的格式与顺序钉死。
   Desktop 从 T-01 起解析这行，于是它成了跨仓契约，而两侧都没有构建期检查（§6 D-01）；
 - `wt-media-agent` 的入口文档：`AGENTS.md`、`README.md`、`contracts/*/README.md`（吸收项）；
@@ -239,6 +249,14 @@
 | D-15 | **暂存顺序：`cargo tauri build` → 暂存配置 → `repair-macos-signing.sh`。** 与 T-04 写 sidecar 记录的位置、顺序同源（同一段理由：`Contents/Resources` 由外层签名封住，签后加进去会**弄坏外层签名**，不是「没封住」）。 | `evidence/task-05-gate.out` 的 `resealed` 臂；与 T-04 的 `task-04-packaging.out` 第 3 条一致 |
 | D-16 | **顺带订正一处成因写错的注释**：`repair-macos-signing.sh` 原写「Tauri 的硬运行时签名让 macOS 26 拒绝那个嵌套库」。实测：**未重签的构建产物**（Tauri 还没碰过）就已带 `flags=0x10002(adhoc,runtime)` 且起不来，而 PyInstaller 6.22.2 `utils/osx.py:413-421` 只在 identity 为假时才跳过硬运行时——我们传的字面量 `-` 是真值。⇒ 加这个标志的是**构建脚本自己的参数形态**。**只改注释，不改行为**：重签这一步今天仍然必要，且是让 sidecar 能起来的那一步。 | `evidence/task-05-packaging.out` 第 3 节；`evidence/task-05-frozen-reading.out` 的 `raw-build` 段 |
 
+| D-17 | **Q-04 的口径：「组件与资源版本」是内容摘要，不是被手工递增的号。** 它是产物 `Contents/Resources` 逐文件 sha256 的合并摘要（排除记录自身），故 ① 只在随包集合真的变了时才变；② 不可能过期，因为由字节算出；③ 没有「谁来 bump 它」这个问题——这正是 Q-04 问的「版本从哪算」的答案：**不从哪算，它是恒等式**。逐文件清单**不是它的输入而是它的产物**：清单的用途是把摘要差异翻译成「哪个文件变了」。 | 实测：`evidence/task-06-reals.out` 段 2 的清单与段 4 的点名拒绝；变异 M7／M12 |
+| D-18 | **摘要的边界是 `Contents/Resources`，不含 `Contents/MacOS`，也不含整个 `.app`。** 随包 sidecar 二进制的完整性由 T-04 的运行期校验负责（更强，且 app 启动前就拦），这里不重复；而**整包摘要永远不可复算**——外层签名会写 `Contents/_CodeSignature/`，签名前后全包字节必然不同。边界如实登记，不把「摘要没覆盖二进制」说成「二进制没被覆盖」。 | `evidence/task-06-release.out:279,299`（记录与挂载 DMG 复核出同一摘要 ⇒ 签名与 DMG 装配不动 `Resources`）；D-15 的同一条理由 |
+| D-19 | **Desktop ↔ sidecar 的规则是 pin，不是版本相等。** Desktop 与 Agent 是两个产品，让版本号相等是假语义；真正的兼容事实是「这个 Desktop 配得上这个 Agent 的本机 API」，没有机械判据。于是做成 `src-tauri/agent-compat.json`：不匹配必拒并点名两侧版本与 pin 路径，**改 pin 就是那次评审**（写在 pin 自己的 `note` 与脚本头注释里）。**它是评审闸门，不是证明**——这句话必须留着，否则后来者会以为它证明了什么。 | AC-06 的「不匹配必拒」；变异 M1／M15；真机红见 `evidence/task-06-reals.out` 段 5-6（含阳性对照） |
+| D-20 | **前端构建版本的来源只能是 workspace**：Desktop 仓没有 `package.json`，也看不到来源仓。`--stamp-frontend` 记「包版本 + 来源提交 [`+ .dirty`] + 产物逐文件摘要」，由 `build-desktop.sh` 在复制后立即 stamp（它正是 `tauri.conf.json` 的 `beforeBuildCommand`）。**已知局限**：marker 记的是 **stamp 时刻**的源提交，不是产物真正的构建提交；手工 stamp 一份旧产物会把它归因到当时的 HEAD。**这条局限写在证据里，不靠流程没说过来掩盖。** | 真机：发布流程内 stamp 的摘要与我手工 stamp 同一次构建的摘要**完全相同**（`74d4b003…`），且 `--check` 在构建后仍通过 ⇒ 位置与参数在真实流程里成立 |
+| D-21 | **记录写在签名窗口内**（`repair-macos-signing.sh` 的 sidecar manifest 之后、外层签名之前），与 D-15 同源：`Contents/Resources` 被外层签名封住，签后写入破坏封印；而记录要覆盖它描述的一切，就必须在所有被描述的文件写入之后再算。真机读数证明这条顺序成立：记录里的清单含 `sidecar-manifest.json` 自身。 | `evidence/task-06-release.out`；变异 M9／M13 |
+| D-22 | **不把 `version_classes:` 块加进 `config/release-matrix.yaml`。** 五类的来源已在 `release-versions.sh`（运行时唯一读法）与每份制品内的 `versions.json`（包自带）各声明一次；再抄一份到 yaml 就是**第二份没人校验的声明**，正是治理规范要避免的漂移。workspace 侧本任务的实际交付是 `build-desktop.sh` 的 stamp——没有它前端构建版本无来源。 | AGENT-INDEX 的单一权威源原则；`verify_m0_config.validate_release_matrix` 只做子串存在性检查，加块不会变红 ⇒ 「不会红」不是「该加」 |
+| D-23 | **订正一处真 bug**：`build-release-macos.sh` 的 `DMG_PATH` 原为写死的 `WT Media_0.1.0_${arch}.dmg`，而 `verify-release-macos.sh` 与 `package-release-macos.sh` 都按 `tauri.conf.json` 算名字——版本一升，构建出的 DMG 与验证要找的 DMG 就分叉。改为同一来源。**今日不可分辨**（`0.1.0` 恰好等于写死的那串），故这是**读证不是跑证**，登记于证据 §9。 | `evidence/task-06-versions.md` §9 第 1 条 |
+
 ## 7. Pending Questions
 
 | # | 问题 | 状态 | Blocking |
@@ -259,7 +277,7 @@
 | T-03 | **退出收尾**：Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与在飞任务收尾 | desktop + agent | **DONE** | 真机上两条读数**都拿到**（`--ignored real_agent`：Desktop 自己那条停路对上真 Agent 进程，`Some(0)`/518ms 与 `Some(9)`/1ms，5 次连跑 5/5）；先红是把 `stop` 还原成 HEAD 的硬杀形状，两条用例都红（日志不可区分、`(None, Some(9))`、窗口 900µs）；变异 agent 5/5 + desktop 9/9。**随包 onefile sidecar 那一臂做不到**（本机 `dlopen` 被签名拒），引导器是否转发 SIGTERM 未测——登记在证据 §7 |
 | T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | **DONE** | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖**。**加一臂**：`#[ignore]` 的用例外加一条**包内臂**——拿签名脚本真写出的 sidecar 与记录造 `.app` 布局，从 `Contents/MacOS` 里跑，四条读数（通过 / 追加一字节必拒 / 删记录必拒 / 复原仍通过）全在 `evidence/task-04-bundle.out`；该用例本身另有 **5/5** 变异（`evidence/task-04-bundle-mutations.out`）。打包侧一半同 commit：记录写在外层签名之前，且出包脚本做相等性判定 |
 | T-05 | **`config_online → 产物/config`**：产物上的暂存步骤（**不是** `bundle.resources`，见 D-12）+ 冻结侧由可执行文件推导配置目录 + `diff -r` 校验 | desktop + agent | **DONE** | 产物内配置与 `config_online/` `diff -r` 无差异（`green` 臂 exit 0）；**产物里不含凭证**（D-05）：`config_online/` 12 个叶子里 0 命中，且同一次运行里的阳性对照抓得住两种形态。**加五臂**：`changed`（两侧签名各自合法而内容不符 ⇒ 只有内容比对抓得住）、`absent`、`empty-source`（防「空集通过」）、`resealed`（封条盖住配置 ⇒ 定位置与顺序）。真机读数：同一条夹具同一条判据，修复前报 `127.0.0.1`、修复后报 `localhost`——**冻结侧真的读随包配置**。变异 agent **17/17**（M10 是为它补的用例）。详见 `evidence/task-05-shipped-config.md` |
-| T-06 | **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个来源；发布脚本加 Desktop ↔ sidecar 版本兼容校验 | desktop + workspace | TODO | 五类逐个有可得来源（每条附命令）；版本不匹配的包**必须被拒**（先造一个不匹配的，看它红）；Q-04 一并关闭 |
+| T-06 | **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个来源；发布脚本加 Desktop ↔ sidecar 版本兼容校验 | desktop + workspace | **DONE** | 五类各有来源且各有读数（`evidence/task-06-reals.out` 段 1：`0.1.0` / `0.2.2` / `0.1.0+f21bbcb` / `contracts=10` / `files=4, sha256:69f34a89…`）。**不匹配必拒拿到两条真机红**：改一个随包资源 → `--verify` 拒绝并**点名那个文件**；pin 改 `0.2.3` → `--check` 拒绝并点名 pin 路径与两侧版本，且同一条命令在 pin 还原后转绿（阳性对照，pin 文件 sha256 前后一致）。**发布流程真跑了一遍**（`build-release-macos.sh` exit=0，出 DMG）：构建后 `--check` 通过、签名窗口内 `--record`、挂载 DMG 的 `--verify` **复算出同一摘要** ⇒ 暂存 + 封条 + DMG 装配都不动 `Contents/Resources`。变异 **15/15**（20 条臂，M7 多打一个 A18 已记明）。Q-04 按 D-17 关闭。详见 `evidence/task-06-versions.md` |
 | T-07 | **升级不覆盖**：用路径判据证明升级路径不写用户设置 / SQLite / 检查点 / 待回传结果 | desktop + agent | TODO | 先写一条会红的用例（把某条用户数据路径喂进升级写入集合）；按路径而非名字 |
 | T-08 | **M2 业务回归**：对 A/B/C/D 之后的树重跑 M2 链路 | workspace + cloud | TODO | `m2b_local_acceptance.py` 读数；实网/实凭据部分按 §7 如实标注覆盖与否 |
 | T-09 | **吸收项**：Agent 侧 `AGENTS.md`/`README.md`/`contracts/*/README.md` 同步；workspace skill 改指 `clients/<platform>` 并跑 `sync_skills.py` | agent + workspace | TODO | `sync_skills.py` 后生成副本与源一致；skill 里的路径真的存在（resolve 判据，不只是字符串） |
@@ -269,7 +287,9 @@
 
 ### wt-media-workspace
 
-- [ ] `config/release-matrix.yaml`：五类版本相关字段与判定（**不改 `0.2.5` 的 status**）
+- [x] `scripts/build-desktop.sh`：复制产物后 `--stamp-frontend`（前端构建版本的唯一来源）（T-06）；
+      **刻意不加** `release-matrix.yaml` 的 `version_classes:` 块——第二份没人校验的声明即漂移（D-22）
+- [ ] `config/release-matrix.yaml`：仅在本 CHG 有可登记的结论时加行/加注（**不改 `0.2.5` 的 status**）（T-10）
 - [ ] `skills/agent/agent-platform-adapter-change` 改指 `clients/<platform>` + `python3 scripts/sync_skills.py`
 - [ ] 本 CHG 的记录与证据、`LEDGER.md`、里程碑回写、快照重生成、归档
 
@@ -298,8 +318,14 @@
 - [x] `scripts/repair-macos-signing.sh`：**只订正注释**（D-16，行为不变）
 - [x] `scripts/repair-macos-signing.sh` + `scripts/package-release-macos.sh`：写包内记录（在 sidecar
       的 ad-hoc 签名之后、外层签名之前）与相等性判定（T-04 的打包侧一半）——`04f46c3`
-- [ ] `scripts/package-release-macos.sh`：Desktop ↔ sidecar 版本兼容校验（T-06）
-- [ ] 五类版本中的 Desktop 与前端构建版本来源（T-06）
+- [x] `scripts/release-versions.sh`（**新增**）：五类版本的唯一读法 + 发布闸门——`--check`（前四类 +
+      Desktop↔sidecar pin 校验）、`--record`（写产物内 `versions.json`）、`--verify`（复算摘要 + 字段比对）、
+      `--stamp-frontend`（前端 marker）（T-06）
+- [x] `src-tauri/agent-compat.json`（**新增**）：Desktop → Agent 的 pin（D-19：「改 pin 即评审」写在文件里）（T-06）
+- [x] `tests/release-versions.test.sh`（**新增**，20 条臂，自造假树不依赖兄弟仓）+ `scripts/test.sh` 接线（T-06）
+- [x] `scripts/build-release-macos.sh`：构建后 `--check`；`DMG_PATH` 去掉写死的 `0.1.0`（D-23）（T-06）
+- [x] `scripts/repair-macos-signing.sh`：签名窗口内 `--record`（D-21）；`scripts/verify-release-macos.sh`：
+      挂载后 `--verify`；`scripts/package-release-macos.sh`：记录复制进发布目录并进 `SHA256SUMS`（T-06）
 
 ## 10. Acceptance Matrix
 
@@ -309,12 +335,12 @@
 | AC-02 | 不会连上旧进程：sidecar 死后如实报「未在运行」 | 先红后绿的复现用例 + 真机读数 | **一半**（T-02）：先红后绿已成立（`evidence/task-02-red.out` / `task-02-green.out`，真 `CommandChild` + 真无人听的端口）；**真机读数未做**，按 T-02 证据 §7 第 1 条登记，不以文字充当证据 |
 | AC-03 | 退出是收尾过的：请停 → 宽限 → 强杀；报告能区分 | 真机两条读数 | **满足**（T-03）：两条读数都是真 Agent 进程给的（`task-03-desktop-real-agent.out`），请停/自行退出/宽限强杀三条记录互不重名。**一处例外**：随包 onefile sidecar 的引导器是否转发 SIGTERM **未测**（本机跑不起来，D-09 式登记，见 `evidence/task-03-exit.md` §7 第 1 条） |
 | AC-04 | 随包 sidecar 被验过：篡改必拒、完好必过 | 阳性对照 + 阴性对照各一条 | **满足**（T-04）：三条阴性（追加一字节 / 删记录 / 记录字段不可比对）与一条阳性（真记录通过）都有，且**在真包布局下量过**——`task-04-bundle.out` 的四条读数取自 `Contents/MacOS` 里跑的进程（`current_exe()` 与 `resource_dir()` 是真实包内值），阳性那条的 sha256 与对同一文件的独立 `shasum` 一致。**一处例外**：没有「双击启动一个被篡改的包会怎样」的读数（需要 GUI），本任务证的是校验逻辑本身，见 `evidence/task-04-integrity.md` §9 第 1 条 |
-| AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | **满足**（T-05）：`green` 臂 `diff -r` 无输出、exit 0；凭据扫描分母 12 叶子 / 命中 0，**阳性对照在同一个运行里抓得住两种形态**（嵌套混合大小写的键名 + 值里的 userinfo）。**一处例外**：没有真跑过一次完整出包（`cargo tauri build` → 暂存 → 签名 → 打 DMG），五臂用的是真闸门脚本 + 真产物 app、DMG 手工造的；配置已不进 `bundle.resources`，所以未被量到的那一步在下单路径上不存在了，但「整条出包脚本连起来跑通」**未做**，见 `evidence/task-05-shipped-config.md` §9 第 1 条 |
-| AC-06 | 五类版本可追溯；Desktop ↔ sidecar 版本不匹配必拒 | 五条来源命令 + 一条不匹配必红的用例 | TODO（T-06） |
+| AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | **满足**（T-05）：`green` 臂 `diff -r` 无输出、exit 0；凭据扫描分母 12 叶子 / 命中 0，**阳性对照在同一个运行里抓得住两种形态**（嵌套混合大小写的键名 + 值里的 userinfo）。**一处例外**：没有真跑过一次完整出包（`cargo tauri build` → 暂存 → 签名 → 打 DMG），五臂用的是真闸门脚本 + 真产物 app、DMG 手工造的；配置已不进 `bundle.resources`，所以未被量到的那一步在下单路径上不存在了。**该例外已于 T-06 关闭**：发布流程真跑了一遍（`build-release-macos.sh` exit=0 → DMG），其中 T-05 的暂存步骤照跑，挂载后 `diff -r` 仍无差异（`evidence/task-06-release.out`）。T-05 当时的记录（`evidence/task-05-shipped-config.md` §9 第 1 条）不改写 |
+| AC-06 | 五类版本可追溯；Desktop ↔ sidecar 版本不匹配必拒 | 五条来源命令 + 一条不匹配必红的用例 | **满足**（T-06）：五类各有一条命令与真机读数（`evidence/task-06-reals.out` 段 1／段 2），其中第五类只能由 `--verify <app>` 得到——它是**产物的摘要**，产物完成前无从计算。**「不匹配必拒」有两条真机红**且各带阳性对照：① 改一个随包资源 → `--verify` 拒绝并点名 `resources/desktop.production.toml`（段 4，改前同一命令 exit=0）；② pin 改 `0.2.3` → `--check` 拒绝并点名 pin 路径与两侧版本（段 5），pin 还原后同一条命令转绿且 pin 文件 sha256 前后一致（段 6）。**一处如实登记**：真机只跑了 arm64 macOS，x86_64／Windows 目标本机做不到（既有登记） |
 | AC-07 | 升级不覆盖用户设置 / SQLite / 检查点 / 待回传结果 | 路径判据的用例（先红） | TODO（T-07） |
 | AC-08 | M2 业务回归对 A/B/C/D 之后的树通过 | `m2b_local_acceptance.py` 读数；实网部分按覆盖情况如实标注 | TODO（T-08） |
-| AC-09 | 正式安装包脱离开发源码 / venv / 开发机路径可运行 | **含一条登记过的例外**：干净机这一臂**未做**（D-09）——能证的是「产物不含 `config_online` 之外的开发态路径引用」与「sidecar 是随包原生二进制」；**不证**「在没有 Python 的机器上装过」 | **一半**（T-05 的那半）：配置的来源只有 `config_online/`，冻结侧的目标是**包内**的 `Contents/Resources/config`（`evidence/task-05-frozen-reading.out` 的 fixed 段就是包内布局下的真进程读数）；**版本那一半是 T-06**。D-09 的例外照旧登记 |
-| AC-10 | 发布可追溯五类版本 | 同 AC-06 | TODO（T-06） |
+| AC-09 | 正式安装包脱离开发源码 / venv / 开发机路径可运行 | **含一条登记过的例外**：干净机这一臂**未做**（D-09）——能证的是「产物不含 `config_online` 之外的开发态路径引用」与「sidecar 是随包原生二进制」；**不证**「在没有 Python 的机器上装过」 | **一半**（T-05 的那半）：配置的来源只有 `config_online/`，冻结侧的目标是**包内**的 `Contents/Resources/config`（`evidence/task-05-frozen-reading.out` 的 fixed 段就是包内布局下的真进程读数）；**版本那一半已在 T-06 交付**：包内 `versions.json` 使「这是哪个包」不再需要开发源码才能回答，且它的摘要覆盖了随包配置与 sidecar 记录（`evidence/task-06-reals.out` 段 2 的清单）。**但不宣布这一条满足**——AC-09 的判据是「脱离开发机可运行」，干净机那一臂未做（D-09），版本可追溯只是它的一半。D-09 的例外照旧登记 |
+| AC-10 | 发布可追溯五类版本 | 同 AC-06 | **满足**（T-06）：发布流程真跑了一遍（`build-release-macos.sh` exit=0，产出 `WT Media_0.1.0_aarch64.dmg` 17,129,049 字节），且五类版本**落在产物里**——包内 `Contents/Resources/versions.json` 记 `desktop_version` / `agent_version` / `frontend_build_version` / 10 条 `contract_versions` / `components_resources_version` + 逐文件清单，出包时另有一份复制到发布目录并进 `SHA256SUMS`。**可追溯的判据**是挂载 DMG 后 `--verify` 复算出同一摘要（`evidence/task-06-release.out:279,299`） |
 | AC-11 | 计数只增不减 | desktop 336 / agent 377 为分母，逐任务报增量；agent 若有例外**先登记再吸收** | 进行中 |
 
 ## 11. Evidence
@@ -346,7 +372,16 @@
   外加 `raw-build` 与 `alias` 两条辅助读数）、`evidence/task-05-packaging.out`（暂存读数、
   `diff -r` exit 0、hardened runtime 的真成因）、`evidence/task-05-gate.out`（五臂）、
   `evidence/task-05-suite.out`（agent 382→397）、`evidence/task-05-mutations.out`（17/17）
-- `evidence/task-06-versions.md`——五类版本的来源命令与不匹配必红
+- `evidence/task-06-versions.md`——五类版本的来源命令与不匹配必红：Q-04 的口径（D-17）、摘要边界（D-18）、
+  pin 是评审闸门而非证明（D-19）、前端版本的归因局限（D-20）、记录写在签名窗口内（D-21）、
+  变异 15/15、未覆盖项。**已产出**，另附原始转录
+  `evidence/task-06-reals.out`（真机五类 + 两条真机红 + 阳性对照 + 记录与挂载 DMG 同摘要）、
+  `evidence/task-06-release.out`（真跑一遍 `build-release-macos.sh`：构建后 `--check`、签名窗口内
+  `--record`、挂载后 `--verify`）、`evidence/task-06-green.out`（20 臂全绿）、
+  `evidence/task-06-mutations.out`（15/15，含被变异改掉的两条臂判据的登记）、
+  `evidence/task-06-red.out`（首轮 `exit=127` 的弱红，如实登记为「什么都不证明」）、
+  `evidence/task-06-desktop-suite.out`（363 passed / 0 failed / 5 ignored + 两个 shell 套件）、
+  `evidence/task-06-agent-suite.out`（397 OK）
 - `evidence/task-07-upgrade.md`——路径判据的先红用例与结论
 - `evidence/task-08-m2-regression.md`——M2 重跑读数与**覆盖情况**（实网/实凭据部分逐条标注）
 - `evidence/task-09-absorbed.md`——文档同步与 skill 路径 resolve
@@ -393,9 +428,21 @@
     凭据：12 叶子 / 0 命中，阳性对照可失败。**过程中被实测否掉一条路**：`bundle.resources: config/*`
     让 `cargo build` 直接失败（glob 匹配不到文件），故改为在**产物**上暂存。详见
     `evidence/task-05-shipped-config.md`。
-- **Current**：T-05 已收尾；T-06「五类版本」未开工。
-- **Next**：T-06 → T-07 → T-08 → T-09 → T-10。
-- **Blocked**：无。Q-04（「组件与资源版本」的口径）在 **T-06 内部**待定，若定不下则退回用户。
+  - **T-06 五类版本**（desktop + workspace）。五类各有来源与真机读数；Desktop ↔ sidecar 做成 pin
+    （D-19，不匹配必拒、改 pin 即评审）。**发布流程真跑了一遍**：`build-release-macos.sh` exit=0，
+    构建后 `--check` 通过、签名窗口内 `--record`、挂载 DMG 的 `--verify` **复算出同一摘要**
+    （`sha256:69f34a89…`，`evidence/task-06-release.out:279,299`）⇒ 暂存配置 + 外层封条 + DMG 装配
+    都不动 `Contents/Resources`。两条**真机红**各带阳性对照：改随包资源 → 拒绝并点名
+    `resources/desktop.production.toml`；pin 改 `0.2.3` → 拒绝并点名 pin 路径；pin 还原后转绿且
+    sha256 前后一致。shell 臂 **20 passed / 0 failed**（自造假树，不依赖兄弟仓），变异 **15/15**
+    （M7 多打一个 A18 已记明）。**被变异改掉的是两条臂的判据**：首轮 M1 打不掉 A3、M15 打不掉 A20——
+    两条 needle 会被**另一条**拒绝路径的报文满足（即臂会在错误的原因上变绿），收窄到只有目标守卫
+    会产出的措辞后才各自成立。desktop 套件 **363 passed / 0 failed / 5 ignored**（未改 Rust，计数不变）
+    + 两个 shell 套件（顺带把此前无人调用的 `tests/*.test.sh` 接进 `scripts/test.sh`）；
+    agent **397 OK**（未改）。Q-04 按 D-17 关闭。详见 `evidence/task-06-versions.md`。
+- **Current**：T-06 已收尾；T-07「升级不覆盖」未开工。
+- **Next**：T-07 → T-08 → T-09 → T-10。
+- **Blocked**：无。Q-04 已由 D-17 关闭（「组件与资源版本」= 内容摘要，不是被递增的号）。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
   Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。
 
@@ -407,8 +454,9 @@
       **真机**（真进程/真应用）读数已拿到的是**就绪**（真 Agent 的 readiness 行）与**退出**（真 Agent 进程的
       请停/强杀两条）；**完整性**是**真包布局**读数（进程真的跑在 `.app/Contents/MacOS` 里，但不是 GUI 双击）；
       **活性**的真机读数按 AC-02 登记为未做；**产物配置**已有真机读数（包内布局下冻结侧读到了随包文件，
-      修复前/修复后各一次），但**没有真跑过一次完整出包**（DMG 是手工造的）；**版本**未开工，
-      届时一并按此表如实标注
+      修复前/修复后各一次）；**版本**已有真机读数且**发布流程真跑了一遍**（`build-release-macos.sh`
+      exit=0，出 DMG 并在挂载后复核摘要）——T-05 那处「没有真跑过一次完整出包」的例外因此**已关闭**；
+      仍未做的是**干净机**安装（D-09）与随包 onefile sidecar 的引导器 SIGTERM（T-03 登记）
 - [ ] 计数只增不减（desktop 336 / agent 377 为分母；例外先登记）
 - [ ] 一仓一 commit；「移动文件」与「改逻辑」不同 commit；desktop 只对单个文件跑 `rustfmt`
 - [ ] 关闭门禁：三个校验器 + `unittest discover`（**4 条既知红项**，判据是同集合阳性对照，不是「看着无关」）

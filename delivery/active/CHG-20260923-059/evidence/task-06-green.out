@@ -1,0 +1,37 @@
+=== the five classes ===
+ok   A1 the five classes are answered, with a denominator
+
+=== Desktop <-> sidecar compatibility ===
+ok   A2 the pinned Agent version is accepted
+ok   A3 a sidecar reporting another version is refused
+
+=== the Agent's own declarations ===
+ok   A4 an Agent whose two declarations disagree is refused
+ok   A5 a sidecar built from another Agent revision is refused
+
+=== the frontend build marker ===
+ok   A6 a frontend with no build marker is refused
+ok   A7 a marker that no longer describes the build is refused
+ok   A8 a frontend built from a dirty source is marked, not refused
+
+=== the contract source ===
+ok   A9 a readable contract map passes and reports how many it read
+ok   A10 a contract map that yields no revision is refused
+
+=== the artifact record ===
+ok   A11 a record naming all five classes is written
+ok   A12 the record verifies against the app it describes
+ok   A13 re-recording does not change the digest (the record excludes itself)
+ok   A14 a resource changed after the record was written is refused
+ok   A15 an app carrying no record is refused
+
+=== stamping the frontend marker ===
+ok   A16 stamping a frontend with no files is refused
+
+=== the guards around the sources ===
+ok   A17 an artifact carrying no components or resources is refused
+ok   A18 a record that disagrees with the build is refused
+ok   A19 a frontend source that is not a git checkout is refused
+ok   A20 a Desktop release that pins no Agent build is refused
+
+release-versions tests: 20 passed, 0 failed

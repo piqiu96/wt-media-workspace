@@ -1,0 +1,90 @@
+### 0. the machine and the artifact
+Darwin arm64
+-rw-r--r--@ 1 aqiuye  staff  17129049 Sep 25 11:20 /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+--- Contents/Resources of the built app:
+config/README.md
+config/agent.toml
+resources/desktop.production.toml
+sidecar-manifest.json
+versions.json
+--- the workspace checkout the frontend was built from:
+f21bbcb
+0
+(the line above is the count of dirty files in wt-media-cloud/web, 0 = clean)
+
+### 1. the five classes, real trees (--check; the fifth is a digest of the artifact)
+desktop_version=0.1.0
+agent_version=0.2.2
+frontend_build_version=0.1.0+f21bbcb
+contract_versions=business_enums=2026.07.14.3,business_schemas=2026.07.14.4,cloud_agent_api=2026.07.14.7,cloud_api=2026.09.06.1,cloud_error_codes=2026.07.14.5,local_agent_api=2026.09.06.1,local_error_codes=2026.07.14.6,local_event_schemas=2026.07.14.9,local_status_enums=2026.07.14.8,task_schemas=2026.07.15.1
+components_resources_version=unavailable (pass --app: it is a digest of the artifact)
+contracts=10
+versions ok
+exit=0
+
+### 2. the record the release flow wrote into the app
+{
+  "schema_version": 1,
+  "desktop_version": "0.1.0",
+  "agent_version": "0.2.2",
+  "frontend_build_version": "0.1.0+f21bbcb",
+  "contract_versions": {
+    "business_enums": "2026.07.14.3",
+    "business_schemas": "2026.07.14.4",
+    "cloud_agent_api": "2026.07.14.7",
+    "cloud_api": "2026.09.06.1",
+    "cloud_error_codes": "2026.07.14.5",
+    "local_agent_api": "2026.09.06.1",
+    "local_error_codes": "2026.07.14.6",
+    "local_event_schemas": "2026.07.14.9",
+    "local_status_enums": "2026.07.14.8",
+    "task_schemas": "2026.07.15.1"
+  },
+  "components_resources_version": "sha256:69f34a89c55f4ffa39e47ee6ac123c2e4f1cdb40e1a6bed14dca78acb38d6721",
+  "components_resources_files": 4,
+  "components_resources_manifest": {
+    "config/README.md": "7779ce71044f70760b2ed988e9f5ef1ad8205b47ac1a7f73c88cdcd4cd5da639",
+    "config/agent.toml": "dde2275db0d34a2b349e4030470bd59064f0b65d614a1d225bd10340ba8a9e6e",
+    "resources/desktop.production.toml": "a7cdf2c6b3cc3b8343ce432f4cae94485e19bbe2eeeb406d852a21ad1e194a58",
+    "sidecar-manifest.json": "a7658ce8a03130d496d5bfcf2728eaee22121a93bb394d8c2e1f659349373473"
+  }
+}
+
+### 3. the record against the artifact it describes (--verify on the built app)
+desktop_version=0.1.0
+agent_version=0.2.2
+frontend_build_version=0.1.0+f21bbcb
+contract_versions=business_enums=2026.07.14.3,business_schemas=2026.07.14.4,cloud_agent_api=2026.07.14.7,cloud_api=2026.09.06.1,cloud_error_codes=2026.07.14.5,local_agent_api=2026.09.06.1,local_error_codes=2026.07.14.6,local_event_schemas=2026.07.14.9,local_status_enums=2026.07.14.8,task_schemas=2026.07.15.1
+components_resources_version=sha256:69f34a89c55f4ffa39e47ee6ac123c2e4f1cdb40e1a6bed14dca78acb38d6721
+components_resources_files=4
+contracts=10
+versions verified: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/macos/WT Media.app
+exit=0
+
+### 4. red: a resource changed after the record was written
+desktop_version=0.1.0
+agent_version=0.2.2
+frontend_build_version=0.1.0+f21bbcb
+contract_versions=business_enums=2026.07.14.3,business_schemas=2026.07.14.4,cloud_agent_api=2026.07.14.7,cloud_api=2026.09.06.1,cloud_error_codes=2026.07.14.5,local_agent_api=2026.09.06.1,local_error_codes=2026.07.14.6,local_event_schemas=2026.07.14.9,local_status_enums=2026.07.14.8,task_schemas=2026.07.15.1
+components_resources_version=sha256:6a940388a342713d9964f6f366ffcf090fa7195c7533f5f80f7230fbfb920d77
+components_resources_files=4
+contracts=10
+/tmp/chg059/t06-fresh-tamper/Contents/Resources/versions.json does not describe this artifact: resources/desktop.production.toml changed after the record was written (it records sha256:69f34a89c55f4ffa39e47ee6ac123c2e4f1cdb40e1a6bed14dca78acb38d6721 and the artifact now hashes to sha256:6a940388a342713d9964f6f366ffcf090fa7195c7533f5f80f7230fbfb920d77)
+exit=1
+
+### 5. red: the pin does not name the packaged Agent
+the packaged Agent is 0.2.2 but this Desktop release pins 0.2.3 (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/agent-compat.json): review the Agent's local API changes against this Desktop and update the pin, or build the pinned Agent
+exit=1
+
+### 6. positive control: with the pin restored, the same command is green again
+pin sha256 before=2f6076fa543122221609ff03fdcc603b902b3501bf26b41b0de80650b4c7b241
+pin sha256 after =2f6076fa543122221609ff03fdcc603b902b3501bf26b41b0de80650b4c7b241
+contracts=10
+versions ok
+exit=0
+
+### 7. the digest is the one the mounted DMG verified with
+occurrences of the digest in the release transcript (--record then --verify):
+2
+279:components_resources_version=sha256:69f34a89c55f4ffa39e47ee6ac123c2e4f1cdb40e1a6bed14dca78acb38d6721
+299:components_resources_version=sha256:69f34a89c55f4ffa39e47ee6ac123c2e4f1cdb40e1a6bed14dca78acb38d6721

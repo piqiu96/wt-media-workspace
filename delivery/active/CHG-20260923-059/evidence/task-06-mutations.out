@@ -1,0 +1,17 @@
+pristine=56f18c18f15238c5b696eeaa5998ecc996391fccd4c1cdc39927560e31c9160d (sha256 of scripts/release-versions.sh)
+M1 the pin is never compared: killed exactly -- expected A3; red: A3; exit=1; release-versions tests: 19 passed, 1 failed
+M2 the Agent's two declarations are not compared: killed exactly -- expected A4; red: A4; exit=1; release-versions tests: 19 passed, 1 failed
+M3 the manifest and the Agent source are not compared: killed exactly -- expected A5; red: A5; exit=1; release-versions tests: 19 passed, 1 failed
+M4 a missing frontend marker is tolerated: killed exactly -- expected A6; red: A6; exit=1; release-versions tests: 19 passed, 1 failed
+M5 the marker's digest is never compared: killed exactly -- expected A7; red: A7; exit=1; release-versions tests: 19 passed, 1 failed
+M6 a contract map that yields no revision is cited anyway: killed exactly -- expected A10; red: A10; exit=1; release-versions tests: 19 passed, 1 failed
+M7 the record's own file counts into the artifact digest: killed (plus others) -- expected A12, A13; red: A12, A13, A18; exit=1; release-versions tests: 17 passed, 3 failed
+M8 a refusal stops naming the file that moved: killed exactly -- expected A14, A7; red: A14, A7; exit=1; release-versions tests: 18 passed, 2 failed
+M9 an artifact with no record verifies anyway: killed exactly -- expected A15; red: A15; exit=1; release-versions tests: 19 passed, 1 failed
+M10 stamping an empty frontend is allowed: killed exactly -- expected A16; red: A16; exit=1; release-versions tests: 19 passed, 1 failed
+M11 a dirty frontend source is recorded as clean: killed exactly -- expected A8; red: A8; exit=1; release-versions tests: 19 passed, 1 failed
+M12 an artifact with no resources is digested anyway: killed exactly -- expected A17; red: A17; exit=1; release-versions tests: 19 passed, 1 failed
+M13 the record's own version fields are not compared: killed exactly -- expected A18; red: A18; exit=1; release-versions tests: 19 passed, 1 failed
+M14 a frontend source that is not a checkout is stamped anyway: killed exactly -- expected A19; red: A19; exit=1; release-versions tests: 19 passed, 1 failed
+M15 a missing pin is treated as nothing to compare: killed exactly -- expected A20; red: A20; exit=1; release-versions tests: 19 passed, 1 failed
+mutations=15 unproven=0

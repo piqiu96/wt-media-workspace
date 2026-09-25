@@ -26,19 +26,19 @@
 
 ## Current
 
-- **T-05 `config_online → 产物/config` 已收尾**（T-01…T-05 均已收尾，见下五节）；**T-06 未开工**。
+- **T-06 五类版本已收尾**（T-01…T-06 均已收尾，见下六节）；**T-07 未开工**。
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
   与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
   T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`；
   T-04 见 `evidence/task-04-integrity.md` 与 desktop 的 `04f46c3`；
-  T-05 见 `evidence/task-05-shipped-config.md` 与 agent / desktop 各一个提交。
+  T-05 见 `evidence/task-05-shipped-config.md` 与 agent / desktop 各一个提交；
+  T-06 见 `evidence/task-06-versions.md` 与 desktop / workspace 各一个提交。
 
 ## Next
 
-- T-06 **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个可得来源；发布脚本加
-  Desktop ↔ sidecar 版本兼容校验（**版本不匹配的包必须被拒**）。**Q-04**（「组件与资源版本」的口径）
-  在本任务内定，定不下则退回用户。按
-  `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
+- T-07 **升级不覆盖**：用**路径判据**（不是名字清单）证明升级路径不写用户设置 / SQLite / 检查点 /
+  待回传结果。先写一条会红的用例（把某条用户数据路径喂进升级写入集合），再最小实现。
+  按 `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
 
 ## T-01（已收尾，2026-09-25）
 
@@ -204,14 +204,57 @@
   只读文件系统/权限失败无用例；Windows/Linux 布局未测（Q-03）；开发树里的冻结 sidecar 未做真机读数；
   打包场景下 env > file 的三层优先级只被单测逐键覆盖。
 
+## T-06（已收尾，2026-09-25）
+
+- desktop 新增 `scripts/release-versions.sh`（五类的唯一读法：`--check` / `--record` / `--verify` /
+  `--stamp-frontend`）与 `src-tauri/agent-compat.json`（Desktop → Agent 的 **pin**）；新增
+  `tests/release-versions.test.sh`（20 条臂，自造假树）；发布脚本五处接线（`build-release-macos.sh`
+  构建后 `--check`、`repair-macos-signing.sh` 签名窗口内 `--record`、`verify-release-macos.sh` 挂载后
+  `--verify`、`package-release-macos.sh` 记录进发布目录与 `SHA256SUMS`、`scripts/test.sh` 跑
+  `tests/*.test.sh`——此前无人调用）。workspace 侧：`scripts/build-desktop.sh` 复制产物后
+  `--stamp-frontend`（前端构建版本的**唯一**来源，Desktop 仓看不到来源仓）。
+- **Q-04 关闭（D-17）**：「组件与资源版本」是**内容摘要**而非被人递增的号——它是产物
+  `Contents/Resources` 逐文件 sha256 的合并摘要（排除记录自身），只在随包集合真变了时才变，
+  不可能过期，也没有「谁来 bump」。逐文件清单是它的**产物**（用来把摘要差异翻译成文件名），不是输入。
+- **发布流程真跑了一遍**（`build-release-macos.sh` exit=0，产出 DMG 17,129,049 字节）：
+  前端由 workspace 脚本重建并 stamp（`74d4b003…`，与我手工 stamp 同一次构建**同值**）→ 构建后
+  `--check` 通过 → 签名窗口内 `--record` → 挂载 DMG 后 `--verify` **复算出同一摘要**
+  `sha256:69f34a89…`（`evidence/task-06-release.out:279,299`）。这一条同时证明暂存配置、写记录、
+  外层签名与 DMG 装配**都不改变** `Contents/Resources`。顺带**关闭了 T-05 登记的那处例外**
+  （「没有真跑过一次完整出包」），AC-05 行已加注。
+- **两条真机红，各带阳性对照**：① 改一个随包资源 → `--verify` 拒绝并点名
+  `resources/desktop.production.toml`（改前同一命令 exit=0）；② pin 改 `0.2.3` → `--check` 拒绝并点名
+  pin 路径与两侧版本，pin 还原后同一条命令转绿、pin 文件 sha256 前后一致（`2f6076fa…`）。
+- 计数：desktop **363 passed / 0 failed / 5 ignored**（未改 Rust 文件，与 T-04／T-05 相同）+ 两个 shell
+  套件各绿；agent **397 OK**（未改）；shell 臂 **20 passed / 0 failed**；变异 **15/15**。
+- **两条臂的判据被变异改掉**（如实登记）：首轮 M1 打不掉 A3、M15 打不掉 A20——两条 needle 会被
+  **另一条**拒绝路径的报文满足，即臂会在错误的原因上变绿。收窄到只有目标守卫会产出的措辞
+  （A3 → `agent-compat.json`、A15 → `carries no`、A20 → `nothing states`）后各自恰好成立。
+  M10/M12 首轮 `bash -n` 不过（`if…fi` 换成裸 `if false; then`），补成 `if false; then :; fi`。
+- 设计裁定：D-17（Q-04 口径）、D-18（摘要边界是 `Contents/Resources`，不含 `MacOS`／不含整包——整包
+  摘要因外层签名写 `_CodeSignature/` 而**永远不可复算**）、D-19（pin 是**评审闸门不是证明**，
+  「改 pin 即评审」写进 pin 文件）、D-20（前端 version 的归因局限：记的是 stamp 时刻的源提交）、
+  D-21（记录写在签名窗口内）、D-22（**不加** `version_classes:` 到 `release-matrix.yaml`：第二份没人
+  校验的声明即漂移）、D-23（订正 `DMG_PATH` 里写死的 `0.1.0`；今日不可分辨，是读证不是跑证）。
+- 未覆盖项（`evidence/task-06-versions.md` §9）：`DMG_PATH` 的订正今日不可分辨；前端 marker 的归因局限；
+  第五类摘要不含 `Contents/MacOS`（那里的二进制由 T-04 的运行期校验负责，两条机制不重叠）；
+  x86_64／Windows 未测；`--stamp-frontend` 对「`package.json` 无 version」的拒绝路径没有独立臂；
+  真机五类只有 arm64 macOS 一份。
+
 ## Blocked
 
-- 无硬阻塞。**T-06 内有一条待关闭的 Q-04**（「组件与资源版本」的**口径**——M-launch-engineering
-  成功事实 #7 要求「发布可追溯五类版本」，而前端构建版本与组件/资源版本至今**没有任何表示**，
-  是新建而非校验）。T-06 要么关闭它，要么如实退回给用户。
+- 无硬阻塞。Q-04 已由 D-17 关闭；AC-09「干净机」那一臂按 D-09 登记为未做（不以文字充当证据）。
 
 ## Recent verification
 
+- **T-06 之后**（2026-09-25）：desktop `bash scripts/test.sh` **Rust 363 passed / 0 failed / 5 ignored**
+  ＋ `tests/release-versions.test.sh` **20 passed / 0 failed** ＋ `tests/package-release-macos.test.sh` 绿
+  （`evidence/task-06-desktop-suite.out`；本次未改任何 Rust 文件，读数与 T-05 相同，未重跑全仓）；
+  agent `bash scripts/test.sh` **Ran 397 tests / OK**（`task-06-agent-suite.out`，未改）；
+  变异 **15/15、0 unproven**（`task-06-mutations.out`，首行是 pristine 摘要 `56f18c18…`，
+  每次跑完从 pristine 还原并校验）；真机五类与两条真红见 `task-06-reals.out`；
+  **完整发布流程真跑一遍**（`build-release-macos.sh` exit=0，DMG 17,129,049 字节）——
+  `--record` 与挂载 DMG 的 `--verify` 复算出**同一摘要**（`task-06-release.out:279,299`）。
 - **T-05 之后**（2026-09-25）：agent `bash scripts/test.sh` **Ran 397 tests / OK**（HEAD 的树
   `git archive` 到 `/tmp` 后跑同一套件是 **382 OK**，差 = 本次新增 15 条）；desktop `cargo test`
   **363 passed / 0 failed / 5 ignored**（**本次未改任何 Rust 文件**，读数与 T-04 相同，未重跑全仓）；

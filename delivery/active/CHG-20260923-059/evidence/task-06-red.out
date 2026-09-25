@@ -1,0 +1,44 @@
+=== the five classes ===
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A1 the five classes are printed
+     exit=127 : bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+FAIL A1 the five classes are printed
+     output was: 
+
+=== Desktop <-> sidecar compatibility ===
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A2 the pinned Agent version is accepted
+     expected success, got exit=127 : bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A3 a sidecar reporting another version is refused
+     refused (exit=127) but never named '0.2.3': bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+
+=== the Agent's own declarations ===
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A4 an Agent whose two declarations disagree is refused
+     refused (exit=127) but never named '0.2.3': bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+
+=== the frontend build marker ===
+FAIL A5 a frontend with no build marker is refused
+     refused (exit=127) but never named 'frontend-build.json': bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A6 a marker that no longer describes the build is refused
+     refused (exit=127) but never named 'index.html': bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+
+=== the contract source ===
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A7 a readable contract map passes and reports how many it read
+     bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A8 a contract map that yields no revision is refused
+     refused (exit=127) but never named 'contract': bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+
+=== the artifact record ===
+bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory
+FAIL A9 a record is written
+     exit=127 : bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+FAIL A9 a record naming all five classes is written
+     
+FAIL A10 the record verifies against the app it describes
+     expected success, got exit=127 : bash: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/scripts/release-versions.sh: No such file or directory 
+exit=127
