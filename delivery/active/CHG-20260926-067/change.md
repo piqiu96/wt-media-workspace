@@ -132,8 +132,8 @@ None.
 |---|---|---|---|
 | T-00 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓 `git status` 基线；`MASTER` §3 读数列按 F-05 刷新（仅本 CHG 激活带来的三项） | DONE | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.`。见 `evidence/task-00-activation.md` |
 | T-01 | **workspace 脚本层分层**：`bin/control.sh`（由 `scripts/local-control.sh` 改：加 `restart`／`status`，保留 `verify`／`help`）；`scripts/test-local-control.sh` → `scripts/test-control.sh`；`scripts/dev/`＋`scripts/verify/`（各 `.gitkeep`）；`scripts/README.md`（**首建，终态**）；`AGENT-INDEX.md` 指针行；`verify_delivery_governance.py` 扫描面改递归 | DONE | 见 `evidence/task-01-workspace-layout.md`。要点：扫描面两臂对照落 `artifacts/t01-scan-surface-arm-{a,b}.out`（臂 A 分母 12／0 处、臂 B 分母 13／点名）；`test-control.sh` 四条判据的**五处变异全红**（`artifacts/t01-test-control-mutations.out`）；`status` 实读落 `artifacts/t01-control-status.out`；六门禁 ＋ `Ran 101 / OK` 落 `artifacts/t01-gate-{after,final}.out` |
-| T-02 | workspace：**门禁前置（必须早于 T-03）**——`verify_m0_config.py:272-280` needle 收敛到 T-03 的终态、`:243-253` docstring 同步；`verify_m0_local.sh:39-45` desktop 块 → 只剩 `scripts/test.sh` | TODO | 两门禁 `exit=0`；**变异红**两处（改 workflow 里的 `scripts/test.sh` 名 → 门禁报出；把 `npm run lint` 放回 → `verify_m0_local.sh` 失败），各自还原 |
-| T-03 | **desktop**：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | `ls scripts/` 分母 **20 → 9**；**每个被删名字 `git -C … grep` 命中 0**，阳性对照 `release-versions.sh` 命中 >0（`git -C` 逐仓跑）；`scripts/test.sh` 全跑读数在最后一次改动之后；如实记录 **GitHub Actions 本身未在此运行** |
+| T-02 | workspace：**门禁前置（必须早于 T-03）**——`verify_m0_config.py:272-280` needle 收敛到 T-03 的终态、`:243-253` docstring 同步；`verify_m0_local.sh:39-45` desktop 块 → 只剩 `scripts/test.sh` | DONE | 见 `evidence/task-02-m0-gate-preamble.md`。要点：CI needle 判据**四臂**对照落 `artifacts/t02-m0-gate-arms.out` §A（臂 0 现状×新 tuple 绿／臂 1 变异点名／臂 2 **终态×新 tuple 绿**／臂 3 旧 tuple×终态 **3 处红**，证明收窄承重）；desktop 块两臂落同文件 §B（旧块 `exit=1` 停在 `npm ci`、单跑 `npm run lint` `exit=254`、新块 `exit=0` ＋ `377 tests`）；六门禁落 `artifacts/t02-gate-final.out` |
+| T-03 | **desktop**：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | `ls scripts/` 分母 **20 → 9**；**每个被删名字 `git -C … grep` 命中 0**，阳性对照 `release-versions.sh` 命中 >0（`git -C` 逐仓跑）；`scripts/test.sh` 全跑读数在最后一次改动之后；如实记录 **GitHub Actions 本身未在此运行**。**① 的输入已由 T-02 先行量到一条**：两个 shell 套件都要 `node` 当 JSON 读取器（`node -p`／`node -e`，共 4 处，分母 2），故 `setup-node` 必须保留、只去掉 `cache:` 与 `cache-dependency-path:`（§14 第 13 项） |
 | T-04 | **cloud**：`bin/control.sh`；`.gitignore` `bin/` → `bin/*`＋`!bin/*.sh`；删三个原脚本；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | `git check-ignore -v bin/control.sh` **改读数**（同命令对 `bin/wt-media-cloud` 仍报被忽略＝阳性对照）；`bash -n`；四动词各跑一次（`status` 未运行／运行中各一次） |
 | T-05 | workspace：**必须紧接 T-04**——`verify_m3_acceptance.py:561`／`:1738` 与 `:414-421` 回指 cloud `bin/control.sh` | TODO | `bash -n` 无（Python，改常数）；**回指充分性**：`git grep -nE 'scripts/(start\|stop\|health)\.sh'` 在 workspace＋cloud 命中 **0**，阳性对照（搜 `bin/control.sh`）>0，报分母；`verify_m3_acceptance.py` 的 `--help`／语法可跑 |
 | T-06 | **agent**：`bin/control.sh`；删三个 health 脚本；三处 README 端口去值；两处注释路径；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | 端口正则命中 **0**，**报分母（三文件行数）＋阳性对照**；`unittest discover -s tests -q` 读数与 F-04 口径一致 |
@@ -151,7 +151,7 @@ None.
 
 - [x] `delivery/active/CHG-20260926-067/` 三件齐备；LEDGER 表行；快照 `--change`（T-00）
 - [x] `bin/control.sh`；`test-control.sh`；`scripts/dev/`＋`scripts/verify/`；`scripts/README.md`；`AGENT-INDEX.md` 指针；扫描面改递归（T-01）
-- [ ] `verify_m0_config.py`／`verify_m0_local.sh` 门禁前置（T-02）
+- [x] `verify_m0_config.py`／`verify_m0_local.sh` 门禁前置（T-02）
 - [ ] `verify_m3_acceptance.py` 回指 cloud `bin/control.sh`（T-05）
 - [ ] 归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描（T-07）
 
@@ -189,6 +189,7 @@ None.
 
 - `evidence/task-00-activation.md` ＋ `artifacts/t00-*.out`
 - `evidence/task-01-workspace-layout.md` ＋ `artifacts/t01-*.out`（7 个）
+- `evidence/task-02-m0-gate-preamble.md` ＋ `artifacts/t02-*.out`
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 每条记录含：命令或手工动作、期望、实测、通过与否、相关 commit。
@@ -222,3 +223,6 @@ None.
 9. **`local-control.sh` 的失效引用只剩 `docs/superpowers/` 两处，判留不处理。** 一处是 plan 里的可重放命令（`./scripts/local-control.sh start`），一处是 spec 里的时序叙述；该目录被 `AGENT-INDEX.md:58` 声明为**非权威分析材料**（「不作为新开发依据」）。改它等于改写历史分析材料，且不在 §5 范围内 ⇒ **登记不处理**。同一次扫描里其余命中（`delivery/completed/` 各篇）都是过去时叙述，按判留保留。分母 902 个已跟踪文件，阳性对照 `bin/control.sh` 命中 >0。
 10. **`status` 的两个信号会不一致，退出码的含义要写死。** pid 文件回答「是不是**经 harness** 起的」，health 探针回答「现在**有没有东西在答**」。T-01 实测本地环境**在跑**（`lsof` 报 54420／54456，两个 health 端点各答 `{"status":"ok"}`）而 `<root>/.local/m2b/pids` **不存在** ⇒ 读数是 `alive=no health=ok`、`exit=1`。故 **`exit=1` 的含义是「本环境不是由 harness 起的」，不是「服务挂了」**——两行读数分开打印正是为了不把这两件事压成一个 yes/no。四仓的 `control.sh status` 必须沿用同一语义，否则同名动词在四仓不同义（AC-01 的「形状统一」含此条）。
 11. **`bin/control.sh` 不得承载端口字面量，并已机检。** `status` 若在 shell 里直接 curl，就会在 `config/agent.toml` 与 `m2b_local_acceptance.py:36` 之外造出**第三份**端口真相（第 7 项）。因此 workspace 的 `status` 是 harness 的新动词，读同一批常量。约束由 `scripts/test-control.sh` 第 4 条机检，变异红（`artifacts/t01-test-control-mutations.out`）。此机检落在 `test-control.sh` 而非六门禁之一，不违反「不加机检」——后者针对的是 `scripts/README.md` 的**规则句外溢**。
+12. **CI needle 是「workflow 文本里有这个字符串」，从不证明那一步能跑**（T-02 实测）。`m0-desktop.yml` 的 `npm run lint` 自 `7aabb1a`（`package.json` 在那次提交被删）起就已经坏了，而 needle 一直绿——**判据与它想保证的事之间差了一整层**。本案实测：`npm run lint` 在 desktop `exit=254`；旧 desktop 块的第一颗钉 `scripts/bootstrap.sh`（`npm ci`）`exit=1` 就停住，**根本走不到 lint**。故计划里写的变异（「把 `npm run lint` 放回 → 脚本失败」）成立但**降级**：它不是被第二个动词抓到的，是第一个动词就断了。⇒ 这一条不改任何判据（needle 的形态正是 CHG-065 D-01 要的稳定判据），只作**已知限制**登记。
+13. **「Rust-only」= 没有 Node 包工具链，不是没有 `node`**（T-02 实测，直接改写 T-03 ① 的待决项）。desktop 的两个 shell 套件都调 `node`，但只当 JSON 读取器：`tests/package-release-macos.test.sh:15` 与 `tests/release-versions.test.sh:168,267,314`（`node -p`／`node -e`，分母 2 个套件共 4 处）。⇒ `setup-node` **保留**，只去掉 `cache:` 与 `cache-dependency-path: package-lock.json`（锁文件不存在）。计划把这一项留给 T-03 ① 决定，现已提前量到并写进 T-03 行。
+14. **T-02 收窄的 4 条 needle 里只有 3 条是被迫的。** 臂 3（旧 tuple × T-03 终态 workflow）只报 3 处红：`scripts/bootstrap.sh`／`npm run lint`／`scripts/build.sh`。第 4 条 `node-version: "26"` 在终态文本里仍在（`setup-node` 保留），删它是**主动**决定——理由见第 13 项：node 已不是本仓工具链，把它当契约来卡会让判据的可满足性取决于一个尚未做的决定。**如实记：这一条不是被迫的。**

@@ -1,0 +1,51 @@
+# t02-m0-gate-arms.out
+# date: 2026-09-26 01:49:36 CST
+
+## A. CI needle 门禁（validate_ci_workflows，直接调门禁自己的函数，不另写正则）
+
+模拟树 /private/tmp/m0sim：cloud/agent 的 workflow 从真仓拷入，只替换 desktop 的那一份。
+调用法：importlib 载入 scripts/verify_m0_config.py，把 m.OUTER_ROOT 指到模拟树，再调 m.validate_ci_workflows(False)。
+
+臂 0  现状 desktop workflow（仍含 node/bootstrap/lint/build）× 收窄后的 tuple 3 条
+      errors: []                      ← 改后到 T-03 之间不产生红
+臂 1  变异：workflow 里 run: scripts/test.sh 改名
+      errors: ["wt-media-desktop/.github/workflows/m0-desktop.yml missing 'scripts/test.sh'"]
+臂 2  T-03 终态 workflow（checkout + setup-node 无 cache + rust-toolchain + scripts/test.sh）× 新 tuple
+      errors: []                      ← 前瞻：新 tuple 是终态文本的子集，T-03 落地后不会红
+臂 3  旧 tuple 7 条 × T-03 终态 workflow（证明收窄是承重的）
+      missing 'scripts/bootstrap.sh'
+      missing 'npm run lint'
+      missing 'scripts/build.sh'
+      → 3 处红；**只有 3 处**。
+
+臂 3 的读法（如实登记）：被删的 4 条 needle 里，只有这 3 条在终态下**必然**不可满足。
+第 4 条 node-version: "26" 在臂 2 的终态里仍然存在（setup-node 保留），它是**主动**删掉的、不是被迫：
+node 已不是本仓的工具链（只被两个 shell 套件当 JSON 读取器用），把它的版本号当 desktop 的契约来卡，
+等于让这条判据的可满足性取决于一个 T-03 尚未做的决定。
+
+## B. verify_m0_local.sh 的 desktop 块（两臂）
+
+臂 A1  旧块逐动词（scripts/bootstrap.sh; npm run lint; scripts/test.sh; scripts/build.sh）
+       exit=1，停在第一步：
+       npm error code EUSAGE
+       npm error
+       npm error The `npm ci` command can only install with an existing package-lock.json or
+臂 A2  只跑计划点名的那个变异 npm run lint
+       exit=254  (npm error enoent Could not read package.json)
+臂 B   新块（只剩 scripts/test.sh）
+       exit=0
+       running 377 tests
+       test result: ok. 372 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 3.06s
+       --- package-release-macos.test.sh   （静默通过：无输出、只有退出码）
+       --- release-versions.test.sh
+       release-versions tests: 20 passed, 0 failed
+
+⇒ 分母：Rust 377 个用例（372 passed／5 ignored／0 failed）＋ 2 个 shell 套件（各 exit=0）。
+  2 个套件里**只有 1 个自带计数**；package-release-macos.test.sh 不打印任何摘要，
+  它的通过证据只有退出码——「跑过了」与「有读数」不是同一件事。
+
+## C. 本次两臂的可信度边界
+
+- 臂 B 跑在**当前工作树**（脏树），不是干净克隆。clean-clone 读数是 T-03 ① 的交付物。
+- desktop 的 target/ 已有 18G 构建产物，故臂 B 的 3.06s 不是冷启动读数。
+- npm 的报错文本按原样摘录，未改写。

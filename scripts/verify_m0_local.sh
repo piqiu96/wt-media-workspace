@@ -36,12 +36,12 @@ AGENT_M0_DATA_DIR="${AGENT_M0_DATA_DIR:-/tmp/wt-media-agent-m0-local}"
   scripts/build.sh
 )
 
+# Desktop is the Tauri shell: no `package.json`, so there is no npm/vite surface
+# to bootstrap, lint, or build here. The live test entry is `scripts/test.sh`
+# (Rust workspace + the shell suites). CHG-20260926-067 T-02.
 (
   cd "$OUTER_ROOT/wt-media-desktop"
-  scripts/bootstrap.sh
-  npm run lint
   scripts/test.sh
-  scripts/build.sh
 )
 
 echo "WT Media M0 local verification ok"

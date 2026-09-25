@@ -1,0 +1,43 @@
+# t02-gate-final.out
+取数时刻：T-02 的全部改动与全部记录写入都已落地之后。
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_delivery_governance.py
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-067
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_agent_entry.py
+execution snapshot: 2048 characters (~819 tokens, budget 8000 characters)
+rule-text duplication: compared 98 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_skills.py
+verified 10 skill source files
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m0_config.py
+Workspace config verification ok
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/sync_skills.py check
+skill outputs are up to date
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q
+Ran 101 tests in 0.570s
+
+OK
+
+$ sh -n scripts/verify_m0_local.sh
+exit=0

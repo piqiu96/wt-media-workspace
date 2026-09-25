@@ -250,6 +250,21 @@ def validate_ci_workflows(allow_missing_repos: bool) -> list[str]:
     these checks locally instead of in CI. The assertion therefore contradicted
     the governance authority and could never pass. Do not re-add it without first
     changing those two governance statements.
+
+    The desktop entry is deliberately Rust-only (CHG-20260926-067 T-02). Until
+    then it also required `node-version: "26"`, `scripts/bootstrap.sh`,
+    `npm run lint`, and `scripts/build.sh`; none of those describe that
+    repository any more — it has no `package.json`, and those three scripts are
+    deleted in the same CHG. A needle tuple that cannot be satisfied is not a
+    stronger gate, it is an unreachable one.
+
+    Two caveats worth keeping in view before anyone narrows this further. These
+    needles are **string checks against the workflow text**: they never proved a
+    step actually ran. `npm run lint` had been broken since `7aabb1a` (the file
+    pinning it was deleted there) while the needle stayed green. And "Rust-only"
+    here means *no Node package toolchain*, not *no Node*: the two shell suites
+    under `wt-media-desktop/tests/` still call `node` to read JSON, so the
+    workflow keeps `setup-node` — it just no longer caches an npm lockfile.
     """
     errors: list[str] = []
     expected = {
@@ -269,14 +284,14 @@ def validate_ci_workflows(allow_missing_repos: bool) -> list[str]:
             "scripts/migrate-storage.sh",
             "scripts/build.sh",
         ),
+        # Rust-only terminal state (CHG-20260926-067 T-02). Kept minimal on
+        # purpose: every needle here must hold under any reasonable desktop
+        # workflow, so the entry stays a subset of the text T-03 lands. See the
+        # docstring for what was dropped and why.
         "wt-media-desktop/.github/workflows/m0-desktop.yml": (
             "runs-on: macos-latest",
-            "node-version: \"26\"",
             "dtolnay/rust-toolchain@stable",
-            "scripts/bootstrap.sh",
-            "npm run lint",
             "scripts/test.sh",
-            "scripts/build.sh",
         ),
     }
     for rel_path, needles in expected.items():

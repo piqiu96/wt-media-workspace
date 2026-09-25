@@ -1,0 +1,15 @@
+# T-02 记录体量收尾读数
+# date: 2026-09-26 01:50:33 CST
+# 判据（CHG-065 记录成本第五版，按 Task 增量）:
+#   change.md 增量 <= 5120 B / Task ; checkpoint.md 增量 <= 4096 B ; evidence <= 9216 B / Task
+# 基线锚: 提交 214d65a（T-01 提交），非 HEAD
+# 量法: 与 CHG-066 的 t03-record-size.out 同形——change.md/checkpoint.md 取**整文件字节差**，
+#       evidence 只计 evidence/task-02-*.md 本身（artifacts 单列，不算进 9216 的界）。
+
+change.md                                   26930 -> 29351        2421  界    5120  OK
+checkpoint.md                                6014 -> 7895         1881  界    4096  OK
+evidence/task-02-*.md（本 Task 新增）                -                    4467  界    9216  OK
+
+evidence/artifacts/ 本 Task 合计（参照，非上限）        9226
+
+# 说明: artifacts 的合计已扣掉本文件自身（自指），同 CHG-065／066 的处置。

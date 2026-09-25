@@ -17,20 +17,24 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 - **T-00 附带一条自造的红**：LEDGER 表行首版写成 `| [CHG-…](…) |` 且 H1 标题含 `|`，触发三条门禁红 + 套件 1 failure。两条约束（`LEDGER_ROW_RE` 要求 `|` 后紧跟 `CHG-`；`expected_row` 的标题取自 H1，故 H1 不得含 `|`）已登记 §14 第 8 项。
 - **T-01 workspace 脚本层分层**：`scripts/local-control.sh` → `bin/control.sh`（加 `restart`／`status`）；`scripts/test-local-control.sh` → `scripts/test-control.sh`（判据 1→4 条）；`scripts/dev/`＋`scripts/verify/`（各 `.gitkeep`）；`scripts/README.md` 首建；`AGENT-INDEX.md` §3 加 `bin/` 行；`verify_delivery_governance.py` 扫描面改 `rglob`（两臂对照落 `artifacts/t01-scan-surface-arm-{a,b}.out`）；`m2b_local_acceptance.py` 新增 `status` 动词。详见 `evidence/task-01-workspace-layout.md`。
 
+- **T-02 M0 门禁前置**：`verify_m0_config.py` 的 desktop needle 元组 7 → 3 条（docstring 同步）；`verify_m0_local.sh:39-45` desktop 块 4 → 1 条。四臂对照证明收窄承重（臂 3：旧 tuple × T-03 终态 workflow = 3 处红）且前瞻安全（臂 2：终态 × 新 tuple = 绿）。顺带量到两条改写 T-03 决策的读数：`npm run lint` 自 `7aabb1a` 起就坏而 needle 一直绿；两个 shell 套件都要 `node` 当 JSON 读取器 ⇒ `setup-node` 必须保留。详见 `evidence/task-02-m0-gate-preamble.md`。
+
 ## Current
 
-无。T-01 已完成，下一步是 T-02。
+无。T-02 已完成，下一步是 T-03。
 
 ## Next
 
-1. **T-02**（workspace，**必须早于 T-03**）：`verify_m0_config.py:272-280` needle 收敛到 T-03 的终态 ＋ `verify_m0_local.sh:39-45` desktop 块收敛。这一步是 desktop 删除的**硬前置**——不先做，desktop 一动这两个门禁当场红。
-2. **T-03 → T-04 → T-05 → T-06**：desktop、cloud、workspace 回指、agent，逐仓独立提交。**T-05 必须紧接 T-04**（本 CHG 唯一的跨仓红窗）。
+1. **T-03**（desktop）：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md`。① 的 `setup-node` 那一问已由 T-02 提前量到答案（§14 第 13 项）：**保留 `setup-node`，只去掉 `cache:` 与 `cache-dependency-path:`**。
+2. **T-04 → T-05 → T-06**：cloud、workspace 回指、agent，逐仓独立提交。**T-05 必须紧接 T-04**（本 CHG 唯一的跨仓红窗）。
 3. **T-07**：收尾。
 
-### 对后续 Task 直接适用的两条本 CHG 实测约束
+### 对后续 Task 直接适用的四条硬约束（本 CHG 已踩定）
 
-- **`change.md` 的 H1 标题里不得出现 `|`**；LEDGER 表行必须是 `| CHG-… | 标题 | 状态 | 仓库 |` 四格、无反引号无链接（§14 第 8 项）。
-- **`bin/control.sh` 不得承载端口字面量**——四仓的 `status` 一律读本仓既有运行台的常量，由各仓 `scripts/test-control.sh` 机检（§14 第 11 项）；四仓 `status` 的 `exit=1` 语义统一为「不是经本仓 harness 起的」（§14 第 10 项）。
+- **建 `bin/control.sh`**：不得承载端口字面量（读本仓既有运行台的常量，由各仓 `scripts/test-control.sh` 机检）；`status` 的 `exit=1` 语义统一为「不是经本仓 harness 起的」而非「服务挂了」，且 `alive` 与 `health` **分开打印**；`bin/control.sh` 只分派动词。（§14 第 10、11 项）
+- **写记录**：`change.md` 的 H1 标题里不得出现 `|`；LEDGER 表行必须是 `| CHG-… | 标题 | 状态 | 仓库 |` 四格、无反引号无链接。（§14 第 8 项）
+- **报「0 命中／已收口」**：做阳性对照、报出分母，锚取**不变的基线**而非 `HEAD`；枚举输入形态，不用一种推断其余。
+- **判据「绿」不等于那件事成立**：needle 是对文本的字符串检查（§14 第 12 项）。改判据前先问它实际保证的是什么。
 
 ## Blocked
 
@@ -57,3 +61,7 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 | 失效指针扫描（T-01，分母 902） | 三种写法：`scripts/local-control\.sh` 命中 1、裸名命中 2、`test-local-control` 命中 **0**；**阳性对照** `bin/control\.sh` 命中 7 ⇒ 否定读数非空转；两处残留均在 `docs/superpowers/`，判留并登记 §14 第 9 项 |
 | 六门禁 + 套件 + `sync_skills check`（T-01 后） | 六个全 `exit=0`；`sync_skills check` `exit=0`；`Ran 101 / OK`（激活前 100，+1 为本 Task 新增用例）（`artifacts/t01-gate-after.out`） |
 | 六门禁 + 套件（T-01 记录写完后复跑） | 见 `artifacts/t01-gate-final.out`——**不在此内联** |
+| CI needle 四臂（T-02） | 臂 0 现状×新 tuple `errors: []`；臂 1 变异点名 `missing 'scripts/test.sh'`；臂 2 **T-03 终态×新 tuple `errors: []`**；臂 3 旧 tuple×终态 **3 处红**（`scripts/bootstrap.sh`／`npm run lint`／`scripts/build.sh`）（`artifacts/t02-m0-gate-arms.out` §A） |
+| desktop 块两臂（T-02） | 旧块 `exit=1`（停在 `npm ci`）；单跑 `npm run lint` `exit=254`；新块 `exit=0` ＋ `running 377 tests`／`372 passed; 0 failed; 5 ignored` ＋ 2 个 shell 套件各 `exit=0`（同文件 §B） |
+| desktop 套件的读数缺口 | 2 个 shell 套件里**只有 1 个自带计数**（`release-versions` 20 passed）；`package-release-macos.test.sh` 静默通过，唯一证据是退出码 |
+| 六门禁 + 套件（T-02 记录写完后复跑） | 见 `artifacts/t02-gate-final.out`——**不在此内联** |
