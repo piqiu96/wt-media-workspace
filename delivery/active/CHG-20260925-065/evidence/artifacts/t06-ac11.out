@@ -1,0 +1,15 @@
+### AC-11 -- agent: pre-change anchor 24da21b vs worktree
+agent:AGENT-INDEX.md @ 24da21b -- 65 line(s) scanned (48 non-empty), 1 hit(s)
+  65: 治理上下文（当前 CHG、执行契约）在 `../wt-media-workspace`，按其 `.ai/CURRENT_CONTEXT.md` 指引加载。禁止默认扫描 `__pycache__`、锁文件。
+  exit=1 (0 for pre-change would mean the scan is blind)
+agent:AGENT-INDEX.md @ WORKTREE -- 92 line(s) scanned (62 non-empty), 0 hit(s)
+  exit=0
+
+### AC-11 -- cloud (regression, already T-05): 0346edf vs worktree
+cloud:AGENT-INDEX.md @ 0346edf -- 60 line(s) scanned (45 non-empty), 1 hit(s)
+  60: 治理上下文（当前 CHG、Spec、Contract）在 `../wt-media-workspace`，按其 `.ai/CURRENT_CONTEXT.md` 指引加载；本仓库不做运行时依赖。禁止默认扫描 `web/dist-*`、`node_modules`、`logs` 等产物目录。
+cloud:AGENT-INDEX.md @ WORKTREE -- 205 line(s) scanned (150 non-empty), 0 hit(s)
+
+### AC-11 -- desktop (not yet done, T-07): expect pre-change 1, worktree 1
+desktop:AGENT-INDEX.md @ WORKTREE -- 75 line(s) scanned (59 non-empty), 1 hit(s)
+  75: 治理上下文（当前 CHG、契约）在 `../wt-media-workspace`，按其 `.ai/CURRENT_CONTEXT.md` 指引加载。禁止默认扫描 `target/`、`../.generated/`、`src-tauri/gen/`、`../generated`。

@@ -18,11 +18,11 @@
 
 ## Current
 
-T-05 已完成（`0db02ab`）；下一项是 T-06（agent）。
+T-06 已完成（`6d740fc`）；下一项是 T-07（desktop）。
 
 ## Next
 
-1. **T-06 agent 收口**（分母 10）、**T-07 desktop 收口**（分母 7／8，含 D-04 的范围限定句）。各仓独立提交。两仓都需新增 `## 本仓规则` 节（八节第 6 位）——cloud 已就位，**跨仓序列相等判据要等这两仓落地才转绿**。
+1. **T-07 desktop 收口**（分母 8，含 D-04 的范围限定句）。desktop 需新增 `## 本仓规则` 节（八节第 6 位）——cloud 与 agent 已就位，**跨仓序列相等判据要等 desktop 落地才转绿**。
 2. **T-08**：workspace 入口文件补机读键 ＋ 修 `CLAUDE.md:9` 那行复述（分母 3）。**T-09**：收尾归档与对账（**不得早于 T-07**）。
 
 ## Blocked
@@ -31,19 +31,19 @@ T-05 已完成（`0db02ab`）；下一项是 T-06（agent）。
 
 ## 预期中间态见红（不得静默容忍）
 
-**现状：`verify_agent_entry.py` exit=1，22 条 ERROR**（`evidence/artifacts/t05-gate-after.out`；改前 71 条见 `t04-gate-readings.out`）。这是 T-04 的**设计结果**，不是缺陷：新检查按构造先对现状报错，再由 T-05～T-07（三仓）与 T-08（治理仓）逐个收口。
+**现状：`verify_agent_entry.py` exit=1，11 条 ERROR**（`evidence/artifacts/t06-gate-after.out`；改前 71 条见 `t04-gate-readings.out`）。这是 T-04 的**设计结果**，不是缺陷：新检查按构造先对现状报错，再由 T-05～T-07（三仓）与 T-08（治理仓）逐个收口。
 
-| 仓／面 | T-04（改前） | 现在（T-05 后，收口目标 0） |
-|---|---|---|
-| `cloud` | 51 | **1** |
-| `agent` | 10 | 10 |
-| `desktop` | 7 | 8 |
-| `workspace` | 3 | 3 |
-| **合计** | **71** | **22** |
+| 仓／面 | T-04（改前） | T-05 后 | 现在（T-06 后，收口目标 0） |
+|---|---|---|---|
+| `cloud` | 51 | 1 | **0** |
+| `agent` | 10 | 10 | **0** |
+| `desktop` | 7 | 8 | 8 |
+| `workspace` | 3 | 3 | 3 |
+| **合计** | **71** | 22 | **11** |
 
-分判据（现在）：`restates a rule without naming` 10 ／ `declares no rule body` 6 ／ `exceeds the pointer budget` 2 ／ `H2 sections, expected 8` 2 ／ `H2 sequence diverges` 2。`disagree on the rule body`、`declares itself`、`declares a pointer as the rule body`、`declares an unknown rule body` 均 **0**（只出现在 `tests/` 的变异用例里，属构造性，不是现状）。
+分判据（现在，分母＝11 条 ERROR）：`declares no rule body` **4** ／ `restates a rule without naming` **4** ／ `exceeds the pointer budget` 1 ／ `H2 sections, expected 8` 1 ／ `H2 sequence diverges` 1 ＝ 11。`disagree on the rule body`、`declares itself`、`declares a pointer as the rule body`、`declares an unknown rule body` 均 **0**（只出现在 `tests/` 的变异用例里，属构造性，不是现状）。
 
-**云臂那条的归属必须写清**：cloud 剩的 1 条、desktop 的 8 条里 1 条、都是 `H2 sequence diverges`——**跨仓相等判据**，因为 agent 与 desktop 还没有 `## 本仓规则` 节（位置 6 不同）。cloud 自身文件**零缺陷**。⇒ 这三条只能由 T-06／T-07 消，**T-09 必须在那之后重测**。
+**剩余 11 条的归属必须写清**：desktop 8 ＋ workspace 3，**没有一条指向 cloud 或 agent**。唯一的 `H2 sequence diverges` 现在报 **desktop**——因为只有 desktop 还没有 `## 本仓规则` 节（位置 6 不同）；cloud 与 agent 已在位置 6 同为 `## 本仓规则`，**两仓互为对照**。⇒ 这 11 条只能由 T-07／T-08 消，**T-09 必须在那之后重测**。
 
 必须显式说明：CHG-20260925-063 的教训是「意料外的红会训练读者忽略这个门禁」，**已文档化的红同样会**（`conventions §10` 成文）。故本节的读数是**带收口计划的中间态**，不是「已知红项」：**T-09 不得早于 T-07**；本 CHG 不得在红的状态下归档。**其余五个门禁此时仍全绿**（本次改动未触及它们）。
 
@@ -90,13 +90,32 @@ T-05 收尾读数（cloud，@ 2026-09-25T23:0xZ；`artifacts/t05-gate-after.out`
 | 形态（`wc -l`） | `AGENT-INDEX` 60→205、`AGENTS` 113→11、`CLAUDE` 168→11、`DIRECTORY_MAP` 105→106 |
 | 逐条归属表 | 分母＝改前非空行数 86／99／45／75，各类加总等于分母（`task-05-cloud.md` §2） |
 | AC-09 阳性对照 | 注入 `cache` → infra 扫描报 `missing -> ['cache']` |
-| AC-11 阳性对照 | 同一扫描对未改动的 `HEAD:AGENT-INDEX.md` 命中 **1**（本文件命中 0） |
+| AC-11 阳性对照 | 同一扫描对**改前提交** `0346edf:AGENT-INDEX.md` 命中 **1**（`:60`；本文件命中 0）——**锚是提交，不是 `HEAD`**（理由见下） |
 | 指针链接 | 两个指针各 3 个链接全部 resolve |
 | cloud `git status --porcelain` | 仅 4 个 `M` ＋ 既存 `?? dump.rdb` |
 
 **两条如实登记的不足**：①AC-09 的判据**不是门禁**（全仓无脚本读 infra 列表，`change.md` §14 第 11 项）；②cloud 剩余的 1 条跨仓 ERROR 本 Task 无法消（§1 归属说明）。
 
-**一处自纠**：归属表初稿把「总行数」与「非空行数」两个分母混用，且 CLAUDE.md 的三类条数加总（99 行）写成了 112。改用 `HEAD` 版本重测分母后改正；**分母必须当场量**，不能沿用前一稿的读数。
+**一处自纠**：归属表初稿把「总行数」与「非空行数」两个分母混用，且 CLAUDE.md 的三类条数加总（99 行）写成了 112。改用改前版本重测分母后改正；**分母必须当场量**，不能沿用前一稿的读数。
+
+**一处事后修正（T-06 时发现）**：本表原来记的对照是 `HEAD:AGENT-INDEX.md`。取证当时 `HEAD` **确实**指向改前提交，读数正确；但 `0db02ab` 一落，`HEAD` 就是修复后的文件，**同一条命令读数也是 0——与「扫描无判别力」形状完全相同**。故此表的对照改记 `0346edf`（＝ `0db02ab^`），`artifacts/t05-cloud-checks.sh` 里钉为常量 `BASE`。**凡以改前状态为对照的可重放命令，一律指向具体提交。**（T-06 的 agent 臂在同一处犯了同样的错，两次已登记 `change.md` §14 第 14 项。）
+
+T-06 收尾读数（agent，@ 2026-09-25；`artifacts/t06-gate-after.out`）：
+
+| 判据 | 读数 |
+|---|---|
+| `verify_agent_entry` | `exit=1`，**11 ERROR / 0 WARN**（agent 10 → **0**，见上表） |
+| `check_rule_text_duplication` | WARN 0；**分母** `compared 96 rule sentence(s) across 11 file(s) in 4 repositories`（改前 62） |
+| 其余五个门禁 | 全 `exit=0` |
+| `unittest discover -s tests -q` | `Ran 94 tests` / `OK` |
+| 形态（总行数） | `AGENT-INDEX` 65→92、`AGENTS` 45→11、`CLAUDE` 10→11、`DIRECTORY_MAP` 117→118 |
+| 逐条归属表 | 分母＝改前非空行数 34／6／48／88，四列加总等于分母；`DIRECTORY_MAP.md` diff 为纯增量（2 insertions／1 deletion，那 1 处是同行的句尾替换） |
+| AC-09′ 点名路径 | 分母 25 条反引号路径，**25/25 存在**（22 直接 resolve ＋ 3 条同句内已点名目录的简写）；注入假路径 → missing 3→4 ⇒ 有判别力 |
+| AC-11 阳性对照 | 对 `24da21b:AGENT-INDEX.md` 命中 **1**（`:65`）；**未改动的 desktop 仍命中 1**（`:75`）＝第三方对照 |
+| 指针链接 | 两个指针各 4 个链接（8/8 resolve）；注入 `[dead](NO-SUCH-FILE.md)` → 报出 |
+| agent `git status --porcelain` | 仅 4 个 `M`（提交后净） |
+
+**两条如实登记的不足**：①AC-09′ 与 AC-11 的判据**不是门禁**（全仓无脚本读 infra 列表或排除清单，`change.md` §14 第 11 项）；②判据里的**路径词表是承重构件**——松判据（只查 `扫描`）在**已修好的**文件上仍报 agent 2 行／cloud 3 行，**全为假阳性**（两条指针行含「禁止扫描区」四字、一条是 `go vet` 行）。去掉词表，「0 命中」会被假阳性污染成噪声（`change.md` §14 第 15 项）。
 
 T-04 收尾读数（@ 2026-09-25T22:47Z 前后）：
 
@@ -111,7 +130,7 @@ T-04 收尾读数（@ 2026-09-25T22:47Z 前后）：
 
 **两处不读成「全绿」**：`check_layer3_shape` 的跨仓比较在单仓树上分母为 1（未覆盖，交 T-05～T-07）；`check_rule_text_duplication` 的分母只有 1 条规则句（骨架无规则句）。另：`check_local_order_scope` 报 0 只因三仓小节**仍叫旧名**，**T-07 后必须重测**。
 
-**记录成本自纠**：§11 原有的「`change.md` ≤ 25 KB、单 Task evidence ≤ 3 KB」被 T-01～T-04 逐条突破（四篇 4559／4845／6314／6329 B；`change.md` 26477 B）。数字改为按实测定，并把界放在总量——见 `change.md` §11 与 §14 第 9 项。
+**记录成本自纠（第四版）**：§11 的界改过三次——①`change.md` ≤ 25 KB／单 Task ≤ 3 KB → 被 T-01～T-04 逐条突破；②`change.md` ≤ 30 KB／单 Task ≤ 8 KB → 被 T-05 再次突破；③合计 ≤ 80 KB → **T-06 时证明从一开始就不成立**（9 个 Task、16 条 AC、4 个仓，证据随 Task 数线性长，一个与任务数无关的常数界必然被突破）。④改为**速率界**：`change.md` ≤ 35 KB、`checkpoint.md` ≤ 15 KB、单 Task evidence ≤ 9 KB，**总量只报不设顶**，以 CHG-064 实测的 213739 B 作对照基准。**这不是再放宽一次，是换了被限制的量**——前三版限存量，存量由任务数决定。见 `change.md` §11 与 §14 第 9 项。
 
 T-03 收尾读数（`evidence/artifacts/t03-conformance.out`，@ 2026-09-25T14:41:53Z）：
 

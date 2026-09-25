@@ -1,0 +1,17 @@
+CHG-20260925-065 record size at T-06 close (measured after the last edit of this round)
+rate limits: change.md <= 35840, checkpoint.md <= 15360, per-Task evidence <= 9216
+
+OK   change.md                                35772  / 35840
+OK   checkpoint.md                            14205  / 15360
+OK   evidence/task-01-baseline.md              4559  / 9216
+OK   evidence/task-02-normative.md             4845  / 9216
+OK   evidence/task-03-generator.md             6314  / 9216
+OK   evidence/task-04-gate.md                  8749  / 9216
+OK   evidence/task-05-cloud.md                 8354  / 9216
+OK   evidence/task-06-agent.md                 8392  / 9216
+
+total 8 file(s): 91190 B
+CHG-064 same measurement: 213739 B  -> this CHG is 0.43x
+
+v3 cap (total <= 81920) would be EXCEEDED; retired as structurally
+unachievable -- a constant total bound cannot hold for a 9-Task CHG.

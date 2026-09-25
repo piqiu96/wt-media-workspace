@@ -3,6 +3,7 @@
 # AGENT-INDEX.md), each with a positive control proving the check can fail.
 set -uo pipefail
 CLOUD=/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud
+BASE=0346edf   # cloud pre-change commit (T-05 = 0db02ab); never HEAD
 T="$(mktemp -d)"
 trap 'rm -rf "$T"' EXIT
 
@@ -34,6 +35,9 @@ import sys
 from pathlib import Path
 repo = Path(sys.argv[1])
 name = "AGENT-INDEX.md"
+# Anchor on the pre-change commit, NOT HEAD: once T-05 commits, HEAD is the
+# fixed file and the control reads 0 - a mirror, not a control.
+BASE = "0346edf"
 text = (repo / name).read_text(encoding="utf-8")
 lines = text.splitlines()
 # An exclusion-list line names a build/artifact path AND a scan instruction.
@@ -47,21 +51,21 @@ print("RESULT:", "PASS" if not hits else "FAIL")
 
 # positive control: same scan against the pre-change file from git
 import subprocess
-old = subprocess.run(["git", "-C", str(repo), "show", "HEAD:" + name],
+old = subprocess.run(["git", "-C", str(repo), "show", BASE + ":" + name],
                      capture_output=True, text=True).stdout
 if not old:
-    print("PC unavailable: no HEAD version")
+    print("PC unavailable: no pre-change version")
 else:
     old_hits = [(i, l) for i, l in enumerate(old.splitlines(), 1)
                 if any(m in l for m in marks) and ("禁止" in l or "扫描" in l)]
-    print(f"PC (HEAD:{name}) exclusion-list line(s): {len(old_hits)} =>",
+    print(f"PC ({BASE}:{name}) exclusion-list line(s): {len(old_hits)} =>",
           "scan CAN see them" if old_hits else "CHECK IS BLIND")
 PY
 
 echo
-echo "=== AC-10: line counts, pre-change (HEAD) vs now ==="
+echo "=== AC-10: line counts, pre-change ($BASE) vs now ==="
 for f in AGENT-INDEX.md AGENTS.md CLAUDE.md DIRECTORY_MAP.md; do
-  before=$(git -C "$CLOUD" show "HEAD:$f" | wc -l | tr -d ' ')
+  before=$(git -C "$CLOUD" show "$BASE:$f" | wc -l | tr -d ' ')
   after=$(wc -l < "$CLOUD/$f" | tr -d ' ')
   printf '%-18s before=%-5s after=%-5s\n' "$f" "$before" "$after"
 done
