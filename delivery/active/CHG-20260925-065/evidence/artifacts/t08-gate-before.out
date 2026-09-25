@@ -1,0 +1,19 @@
+=== T-08 pre-change reading: workspace entry files restored from 23eeaa6 ===
+=== anchor is a concrete commit, NOT HEAD: once T-08 lands, HEAD is the fixed file ===
+--- gate on pre-change files ---
+ERROR workspace: AGENTS.md declares no rule body: expected `- 正文：`<file>``
+ERROR workspace: CLAUDE.md declares no rule body: expected `- 正文：`<file>``
+ERROR workspace: CLAUDE.md:9 restates a rule without naming AGENT-INDEX.md: 本仓库**不是**运行时代码仓：不存放业务代码、服务运行代码、构建产物或临时文件，也不得成为任何运行时的依赖。运行时代码位于 `../wt-media-cloud`、`../wt-media-agent`、`../wt-media-desktop`。
+execution snapshot: 2014 characters (~806 tokens, budget 8000 characters)
+rule-text duplication: compared 97 rule sentence(s) across 11 file(s) in 4 repositories
+exit=1
+
+--- gate restored (T-08 state) ---
+execution snapshot: 2014 characters (~806 tokens, budget 8000 characters)
+rule-text duplication: compared 97 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+--- restored files byte-identical to the T-08 working copy? ---
+  CLAUDE.md OK
+  AGENTS.md OK

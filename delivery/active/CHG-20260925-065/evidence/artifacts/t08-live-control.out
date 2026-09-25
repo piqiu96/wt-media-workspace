@@ -1,0 +1,5 @@
+=== live positive control on the real tree (not a fixture) ===
+ERROR workspace: AGENTS.md declares no rule body: expected `- 正文：`<file>``
+exit=1
+restored: OK
+Agent entry verification ok. 0 warning(s) need review.

@@ -1,0 +1,13 @@
+=== T-08 record-cost increment — FINAL ===
+baseline = T-07 close: change.md 39831 B, checkpoint.md 15402 B (fixed facts)
+v5 cap: change.md 5120 B / checkpoint.md 4096 B / per-Task evidence 9216 B
+
+change.md          42946  B   increment +3115 B   IN-BOUND
+checkpoint.md      21089  B   increment +5687 B   ** OVER (see change.md §14 item 19) **
+evidence/t08-*.md  5340   B   IN-BOUND
+
+--- running series (per-Task increments; v5 bound 5120 / 4096) ---
+T-06  +4601 / +3015     T-07  +1929 / +1213     T-08  3115 / 5687
+
+--- stock: reported, not capped ---
+change.md + checkpoint.md + evidence/*.md = 118527 B   (CHG-064 baseline 213739 B)

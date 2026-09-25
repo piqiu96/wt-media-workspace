@@ -1,0 +1,22 @@
+=== T-08 closing readings — FINAL (prose no longer inlines digits, so this cannot drift) ===
+@ 2026-09-25T15:08:08Z
+  verify_m0_config                       exit=0  errors=0
+  verify_delivery_governance             exit=0  errors=0
+  verify_agent_entry                     exit=0  errors=0
+  verify_skills                          exit=0  errors=0
+  verify_product_master_alignment        exit=0  errors=0
+  verify_m2_acceptance                   exit=0  errors=0
+=== unittest / sync_skills ===
+Ran 94 tests in 0.519s
+
+OK
+  sync_skills exit=0
+=== workspace git status ===
+ M delivery/active/CHG-20260925-065/change.md
+ M delivery/active/CHG-20260925-065/checkpoint.md
+?? delivery/active/CHG-20260925-065/evidence/artifacts/t08-gate-after.out
+?? delivery/active/CHG-20260925-065/evidence/artifacts/t08-gate-before.out
+?? delivery/active/CHG-20260925-065/evidence/artifacts/t08-gate-readings.out
+?? delivery/active/CHG-20260925-065/evidence/artifacts/t08-live-control.out
+?? delivery/active/CHG-20260925-065/evidence/artifacts/t08-record-size.out
+?? delivery/active/CHG-20260925-065/evidence/task-08-workspace.md
