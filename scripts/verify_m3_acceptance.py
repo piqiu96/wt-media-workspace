@@ -4,6 +4,7 @@
 本脚本按 `docs/product/M3-content-mining-v2.md` 第 8 节的验收项，对
 `wt-media-cloud` 的真实运行实例做端到端核验，并把每一步的请求、期望、实际与
 判定写入 `run-manifest.json`，原始响应脱敏后落在 `raw/`。
+产物一律写在本机 `.cache/m3-acceptance/` 下，**不进仓库**：归档区是只读的。
 
 约定（沿用 `scripts/m2b_local_acceptance.py`）：
 - 只读取 Cloud 仓库与配置，从不修改 Cloud 源码或配置；
@@ -41,17 +42,21 @@ WS_ROOT = SCRIPT_DIR.parent
 CLOUD_ROOT = Path(
     os.environ.get("WT_MEDIA_CLOUD_ROOT", str(WS_ROOT.parent / "wt-media-cloud"))
 )
-# CHG-20260916-052 已于 2026-09-23 归档为 HANDOFF，M3 亦于同日签收；证据随记录移入 completed/。
-# 这里必须指归档位置：EVIDENCE 既读旧运行产物（raw/*.log）也写新产物，
-# 若仍指 active/，重跑会（a）读不到旧日志而在 P10 崩掉，（b）在 active/ 下重新造出一个孤儿证据目录。
-EVIDENCE = WS_ROOT / "delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923"
-RAW_DIR = EVIDENCE / "raw"
-SHOT_DIR = EVIDENCE / "screenshots"
-# 会话 cookie 是活的凭据：绝不落在证据目录里（证据工件不得包含凭据值）。
+# 本脚本的产物（manifest／state／raw／截图／proc-*.log／基线快照）一律写这里。
+# 2026-09-23 那次 M3 全量验收的原始产物在
+# delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/ —— 那是**历史**，
+# 人可查阅，本脚本既不写也不读它（归档区只读；边界唯一落点 delivery/completed/README.md）。
+# 旧版本把产物直接写在归档包里（路径随记录从 active/ 移到 completed/），
+# 后果是「已归档记录」在事实层面仍可被重跑改写——CHG-20260925-066 把写入面移到了这里。
+# 产物落在 .cache/（本仓 .gitignore 第 1 行）下，故一次运行不可能脏化工作树。
+RUN_DIR = WS_ROOT / ".cache" / "m3-acceptance"
+RAW_DIR = RUN_DIR / "raw"
+SHOT_DIR = RUN_DIR / "screenshots"
+# 会话 cookie 是活的凭据：绝不落在产物目录里（产物不得包含凭据值）。
 # 放到 Cloud 仓库已被 .gitignore 覆盖的 .cache/ 下，只存在于本机。
 COOKIE_DIR = CLOUD_ROOT / ".cache" / "m3-acc"
-STATE_FILE = EVIDENCE / "state.json"
-MANIFEST_FILE = EVIDENCE / "run-manifest.json"
+STATE_FILE = RUN_DIR / "state.json"
+MANIFEST_FILE = RUN_DIR / "run-manifest.json"
 BASE = os.environ.get("WT_MEDIA_M3_BASE", "http://127.0.0.1:18080/api/v1")
 
 ADMIN = os.environ.get("WT_MEDIA_M3_ADMIN", "admin")
@@ -286,7 +291,7 @@ def raw_dump(name: str, payload) -> str:
     path = RAW_DIR / name
     text = payload if isinstance(payload, str) else json.dumps(payload, ensure_ascii=False, indent=2)
     path.write_text(redact(text), encoding="utf-8")
-    return str(path.relative_to(EVIDENCE))
+    return str(path.relative_to(RUN_DIR))
 
 
 def step_result(step_id, phase, kind, request, expected, status, parsed, verdict_map,
@@ -301,13 +306,13 @@ def step_result(step_id, phase, kind, request, expected, status, parsed, verdict
 
 
 def save_state() -> None:
-    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    RUN_DIR.mkdir(parents=True, exist_ok=True)
     serialisable = {k: v for k, v in _state.items() if not k.startswith("session_")}
     STATE_FILE.write_text(json.dumps(serialisable, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def flush_manifest() -> None:
-    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    RUN_DIR.mkdir(parents=True, exist_ok=True)
     MANIFEST_FILE.write_text(json.dumps(_manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
@@ -373,7 +378,7 @@ def pgrep(pattern: str) -> list[int]:
 
 def go_run(component: str) -> subprocess.Popen:
     """以后台进程启动一个 Cloud CMD（无 flag，间隔取 config/scheduler）。"""
-    log = EVIDENCE / ("proc-%s.log" % component)
+    log = RUN_DIR / ("proc-%s.log" % component)
     env = dict(os.environ)
     env.setdefault("GOCACHE", str(CLOUD_ROOT / ".cache/go-build"))
     env.setdefault("GOPATH", str(CLOUD_ROOT / ".cache/go-path"))
@@ -403,8 +408,10 @@ def phase_g0():
     ws_status = git(["git", "status", "--porcelain"], WS_ROOT)
     _state["cloud_head"], _state["ws_head"] = cloud_head, ws_head
 
-    own_artifacts = ("scripts/verify_m3_acceptance.py", "scripts/m3-acceptance.sh",
-                     "delivery/completed/CHG-20260916-052/")
+    # 本轮产物全部落在 .cache/（已忽略），故 `git status` 里唯一可能出现的就是本脚本自身。
+    # 原列表里的 `scripts/m3-acceptance.sh` **从未存在过**（已在 CHG-055 登记为「未处理的
+    # 空悬标记」），且旧列表还列过归档目录——写入面移出归档后那条也不可能再匹配，一并去掉。
+    own_artifacts = ("scripts/verify_m3_acceptance.py",)
     ws_lines = [line for line in ws_status.splitlines() if line.strip()]
     foreign = [line for line in ws_lines
                if not any(marker in line for marker in own_artifacts)]
@@ -519,8 +526,8 @@ def phase_g1():
     out.append("```")
     out += ["\t".join(r) for r in sql("SELECT status, COUNT(*) FROM source_contents GROUP BY status;")]
     out.append("```")
-    target = (EVIDENCE / "02-baseline-snapshot.md") if first_freeze else (
-        EVIDENCE / ("02-baseline-snapshot-rerun-%s.md" % datetime.now().strftime("%Y%m%dT%H%M%S")))
+    target = (RUN_DIR / "02-baseline-snapshot.md") if first_freeze else (
+        RUN_DIR / ("02-baseline-snapshot-rerun-%s.md" % datetime.now().strftime("%Y%m%dT%H%M%S")))
     target.write_text("\n".join(out) + "\n", encoding="utf-8")
 
     record("G1.3", phase, "precondition", "基线计数", "冻结既有行数",
@@ -1056,7 +1063,7 @@ def phase_p6():
         except OSError:
             pass
     time.sleep(2)
-    log_path = EVIDENCE / "proc-discovery-scheduler.log"
+    log_path = RUN_DIR / "proc-discovery-scheduler.log"
     if log_path.exists():
         log_path.unlink()
     proc = go_run("discovery-scheduler")
@@ -1593,7 +1600,23 @@ def phase_p9():
 
 def phase_p10():
     phase = "10"
-    log = (EVIDENCE / "raw/p10-cloud-test.log").read_text(encoding="utf-8", errors="replace")
+    # P10 是**转录**阶段：它自己不跑测试，只把本轮由 shell 产出的 raw/*.log 与截图
+    # 转成清单行。输入缺任一项就整体记 BLOCKED —— **不**回退去读归档包里 2026-09-23 的
+    # 同名旧产物顶替：旧版正是这么做的，于是「重跑 P10」并不重跑任何东西，只会把
+    # 上一次的结论重新盖一个今天的日期。
+    needs = ["p10-cloud-test.log", "p10-m2-regression.log",
+             "p10-m2-corrected.log", "p10-flowview-grep.txt"]
+    missing = [n for n in needs if not (RAW_DIR / n).exists()]
+    shots = sorted(p.name for p in SHOT_DIR.glob("*.png")) if SHOT_DIR.exists() else []
+    if missing or len(shots) < 4:
+        record("10.0", phase, "precondition", "本轮 P10 输入产物",
+               "本轮 shell 跑出 4 个 raw/*.log 与 ≥4 张截图",
+               "缺失 raw=%s；截图=%d 张" % (", ".join(missing) if missing else "无", len(shots)),
+               "BLOCKED",
+               note="产物目录 %s；本轮未产出输入时不判 P10" % RUN_DIR)
+        save_state()
+        return
+    log = (RAW_DIR / "p10-cloud-test.log").read_text(encoding="utf-8", errors="replace")
 
     # 10.1 Go 单元/集成测试
     ok_pkgs = len(re.findall(r"^ok\s", log, re.M))
@@ -1612,7 +1635,7 @@ def phase_p10():
            "PASS" if vitest and vtests else "FAIL")
 
     # 10.3 M2 静态矩阵：原样执行
-    m2 = (EVIDENCE / "raw/p10-m2-regression.log").read_text(encoding="utf-8", errors="replace")
+    m2 = (RAW_DIR / "p10-m2-regression.log").read_text(encoding="utf-8", errors="replace")
     stale = [l for l in m2.splitlines() if "missing file" in l and "compatibility.go" in l]
     record("10.3", phase, "regression", "python3 scripts/verify_m2_acceptance.py（原样）",
            "0 ERROR",
@@ -1621,7 +1644,7 @@ def phase_p10():
            note="缺陷 D10：compatibility.go 已于 2026-09-18 bf499d9 迁至 service/ 子目录，脚本路径未同步")
 
     # 10.4 M2 静态矩阵：仅修正该路径的临时副本（原脚本未改动）
-    corr = (EVIDENCE / "raw/p10-m2-corrected.log").read_text(encoding="utf-8", errors="replace")
+    corr = (RAW_DIR / "p10-m2-corrected.log").read_text(encoding="utf-8", errors="replace")
     record("10.4", phase, "regression",
            "python3 <仅改 compatibility.go 路径的临时副本>（用后即删）",
            "M2 静态跨仓矩阵 ok", corr.strip().splitlines()[0][:160] if corr.strip() else "无输出",
@@ -1641,8 +1664,7 @@ def phase_p10():
            "PASS",
            note="脚本那条 FAIL 是环境前置（dev Agent 指向 mock），非 M3 回归；未重启用户正在跑的 Agent")
 
-    # 10.7 视觉走查
-    shots = sorted(p.name for p in SHOT_DIR.glob("*.png"))
+    # 10.7 视觉走查（本轮截图目录；shots 已在阶段入口取好）
     record("10.7", phase, "walkthrough",
            "无头 Chrome 经 cookie 注入代理(5190 -> Vite 5180)逐页截图",
            "内容池 / 素材库 / 挖掘策略 / 挖掘任务 四页均可读回真实数据",
@@ -1653,7 +1675,7 @@ def phase_p10():
                 "以及 D2 的 schedule=garbage 被 UI 原样显示")
 
     # 10.8 只读业务流转视图：已裁定事项，用 grep 取证而非记 FAIL
-    grep_txt = (EVIDENCE / "raw/p10-flowview-grep.txt").read_text(encoding="utf-8", errors="replace")
+    grep_txt = (RAW_DIR / "p10-flowview-grep.txt").read_text(encoding="utf-8", errors="replace")
     hits = [l for l in grep_txt.splitlines()
             if l and not l.startswith("=") and not l.startswith("-") and not l.startswith("(")]
     record("10.8", phase, "adjudicated", "grep 流转/业务流转/工作流视图/全景 于 Cloud internal+web/docs",
@@ -1736,7 +1758,7 @@ def main(argv=None):
                         help="all 或其中一个：%s" % ",".join(PHASES))
     args = parser.parse_args(argv)
 
-    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    RUN_DIR.mkdir(parents=True, exist_ok=True)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     COOKIE_DIR.mkdir(parents=True, exist_ok=True)
     if MANIFEST_FILE.exists():

@@ -1,0 +1,20 @@
+=== 臂 A：本仓现树，新版脚本 ===
+跑前 : 文件数=699  字节=10740897  指纹=08cab13f04317dd18e21cf429c28fd7f71ce4dd6be76db4f36c6ba97fc11cb79  -
+exit=0
+跑后 : 文件数=699  字节=10740897  指纹=08cab13f04317dd18e21cf429c28fd7f71ce4dd6be76db4f36c6ba97fc11cb79  -
+find -newer 标记后的归档文件: 0 个
+文件数/字节/指纹三读数一致? 是
+本轮产物落点:
+  3439 B  .cache/m3-acceptance/run-manifest.json
+  119 B  .cache/m3-acceptance/state.json
+  29 B  .cache/m3-acceptance/raw/t03-probe.json
+
+=== 臂 B：影子树，修改前的脚本（基线提交 05c2045）——阳性对照 ===
+exit=1
+影子树归档: 0 → 2 个文件
+find -newer 标记后的文件:
+  2 B  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/state.json
+  2 B  delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/run-manifest.json
+影子树写入面（旧脚本的 EVIDENCE 之外）:
+  （无——旧版全部写进归档）
+TMP=/tmp/m3ctl-cUPwaq

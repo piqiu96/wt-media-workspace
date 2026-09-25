@@ -1,0 +1,16 @@
+# T-03 记录体量收尾读数
+# date: 2026-09-25 23:58:50 CST
+# 判据（CHG-065 记录成本第五版，按 Task 增量）:
+#   change.md 增量 <= 5120 B / Task ; checkpoint.md 增量 <= 4096 B ; evidence <= 9216 B / Task
+# 基线锚: 提交 05c2045（T-02 提交），非 HEAD
+
+change.md                         21203 -> 26943         5740  界  5120  BREACH
+checkpoint.md                      4748 -> 4748             0  界  4096  OK
+evidence/task-03-*.md（本 Task 新增）        -                 10095  界  9216  BREACH
+
+evidence/*.md 合计（三个 Task）         19883
+evidence/artifacts/ 合计            12962
+
+# 参照（非上限）: T-01 收尾时 change.md = 18156 B；T-02 提交时 = 21203 B
+# T-03 的两项越界幅度: change.md +12%（5740/5120）；evidence +9.5%（10095/9216）
+# 与 §14 第 4 项（T-01 越界 3.2 倍、起因为结构性）不同：本 Task 越界幅度小，内容均为实测新增
