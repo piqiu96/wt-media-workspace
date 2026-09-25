@@ -30,7 +30,7 @@
 |---|---|---|
 | `AGENT-INDEX.md` | 统一索引与治理规范正文：仓库职责、关联仓库、知识地图、需求路由、上下文加载、Delivery 与变更规则 | 必须存在，正文权威源 |
 | `AGENTS.md` | Codex / OpenAI Harness 薄入口：声明权威源与最小硬约束 | 必须存在 |
-| `CLAUDE.md` | Claude Code 薄入口：项目概览、权威源、常用命令与工作流 | 必须存在 |
+| `CLAUDE.md` | Claude Code 薄入口：项目概览、权威源与最小硬约束 | 必须存在 |
 | `.ai/CURRENT_CONTEXT.md` | 执行状态快照 | 必须存在，且唯一 |
 
 `AGENTS.md` 与 `CLAUDE.md` 是**平级入口**，不允许互相软链或互相替代。
