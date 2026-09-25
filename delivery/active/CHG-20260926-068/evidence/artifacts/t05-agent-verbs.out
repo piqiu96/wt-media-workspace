@@ -1,0 +1,54 @@
+== T-05 agent: four verbs, end to end (its own port is free; the live 8765 process is a different instance this repo's pid file does not own) ==
+2026-09-26 03:50:10
+
+-- pre-state --
+pid file: 75067  (dead 75067 or absent)
+listeners: 0 on 18765, 1 on 8765
+pid 54456 (live 8765 instance) alive before: yes
+
+### cell 1/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+agent: pid=- alive=no health=down url=http://127.0.0.1:18765/healthz
+exit=1
+
+### cell 2/7  start
+$ ./bin/control.sh start
+wt-media-agent health started: 58703
+exit=0
+
+### cell 3/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+agent: pid=58703 alive=yes health=ok url=http://127.0.0.1:18765/healthz
+exit=0
+
+### cell 4/7  restart
+$ ./bin/control.sh restart
+wt-media-agent health stopped
+wt-media-agent health started: 58731
+exit=0
+
+### cell 5/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+agent: pid=58731 alive=yes health=ok url=http://127.0.0.1:18765/healthz
+exit=0
+
+### cell 6/7  stop
+$ ./bin/control.sh stop
+wt-media-agent health stopped
+exit=0
+
+### cell 7/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+agent: pid=- alive=no health=down url=http://127.0.0.1:18765/healthz
+exit=1
+
+-- post-state --
+pid file: (none)
+listeners on 18765: 0
+pid 54456 (live 8765 instance) alive after: yes -- untouched
+
+-- log tail of the instance this repo started --
+2026-09-26T03:50:11 [INFO] wt_media_agent.local_api.server: wt-media-agent local API listening on 127.0.0.1:18765
+wt-media-agent local API listening on 127.0.0.1:18765
+2026-09-26T03:50:11 [INFO] wt_media_agent.local_api.server: 收到 SIGTERM，停止接受新请求并等在飞请求收尾
+wt-media-agent local API stopped

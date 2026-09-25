@@ -44,15 +44,25 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   缺席路径对照 `ran=5 skipped=5`、skip 文案含 `3/4`。六门禁全 `exit=0`、`sync_skills` `exit=0`、`Ran 106`（+5）。
   自造缺陷一处（生成器式循环中断）已修并登记。详见 `evidence/task-04-workspace-entry.md`。
 
+- **T-05 四仓四动词真跑（部分，8/16 端到端）**：**agent 4/4 端到端**（18765 真起(58703)／真 restart(58731)／真停，
+  实况 54456 前后验活）；**desktop `status` 端到端、`start`／`restart`／`stop` 止于既有前置**——
+  `beforeDevCommand` 的 `cd ../../wt-media-cloud/web` 多一段（实测 tauri 的 cwd 是 `wt-media-desktop`，不是 `src-tauri`，
+  正确写法 `cd ../wt-media-cloud/web`），**CHG-067 用替身 cargo 掩盖了它**；
+  **cloud `status` 端到端（`alive=no health=ok` exit 1）、`stop` 真跑但对象为空**；
+  **cloud `start`／`restart` ＋ workspace `start`／`restart`／`stop` 共 5 格未覆盖**（18080／8765 被 54420／54456 占用，
+  按 pid 杀被权限分类器拒绝，等用户明示点名）。自纠一处：exit 读数曾因中间 `echo` 重置 `$?` 而错记（§14 第 8 项）。
+  详见 `evidence/task-05-real-run.md`。
+
 ## Current
 
-T-04 收尾：量体量、提交；随后 T-05 四仓四动词真跑。
+T-05 **未完成**：5 格待授权后补跑；本轮记录已落（evidence＋§8／§10／§11／§14）。
 
 ## Next
 
-T-05 workspace：先按 **pid** 杀实况（54420／54456，**不是 `bin/control.sh stop`**，见 §14 第 4 项），
-再逐仓 `status → start → status → restart → status → stop → status`，顺序 cloud → agent → desktop → workspace，
-16 格逐格标注覆盖面，收尾留运行态。
+用户授权按 pid 停掉 **54420**／**54456** 后：补跑 cloud `start → status → restart → status` 与 workspace 的
+`start → status → restart → status → stop → status`（仓序 cloud → workspace，agent／desktop 已跑完不必重复），
+更新 `evidence/task-05-real-run.md` 与 `change.md` §8／§10 AC-03，收尾由 workspace 的 `restart` 把环境留在运行态
+（怎么停写清：`bin/control.sh stop`）。随后 T-06 收尾。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -67,7 +77,9 @@ T-05 workspace：先按 **pid** 杀实况（54420／54456，**不是 `bin/contro
 
 ## Blocked
 
-- None.
+- **T-05 的 5 格（cloud `start`／`restart`，workspace `start`／`restart`／`stop`）待用户授权按 pid 停掉实况
+  54420／54456。** 自动权限分类器已拒绝一次，理由：非本会话创建、授权只在压缩摘要里。`bin/control.sh stop` 停不掉它们。
+  不授权则这 5 格维持「未覆盖＋原因」，AC-03 维持 `部分`。
 
 ## Recent verification
 
@@ -90,3 +102,8 @@ T-05 workspace：先按 **pid** 杀实况（54420／54456，**不是 `bin/contro
 | workspace 两件（T-04） | `scripts/test-control.sh` 全跑 `exit=0`（判据 6 条）；跨仓 5 用例绿；缺席路径 `ran=5 skipped=5`、分母 `3/4` |
 | workspace 变异（T-04） | ① desktop `chmod -x` → 恰 3 failed（全 desktop），本仓检查仍 `exit=0`；② 本仓 `chmod -x` → 恰 3 failed（全 workspace）＋本仓检查 `exit=1` |
 | workspace 门禁（T-04） | 六门禁 `exit=0`、`sync_skills` `exit=0`、`Ran 106`／`OK`（基线 101，+5）；分母 `tracked=974 / untracked=3`，与 `e4e1587..HEAD` 的 `16 A／2 M` 对账闭合 |
+| agent 四动词（T-05） | 18765：`status` 空 exit 1 → `start` 58703 exit 0 → `status` alive=yes health=ok → `restart` 58731 → `status` → `stop` → `status` 空 exit 1；实况 54456 前后验活、18765 归零 |
+| desktop 四动词（T-05） | `status` ×3 一致（`alive=no health=down` exit 1）；`start`／`restart` 止于 `beforeDevCommand`（exit 1）；`stop` "not running" exit 0；无 stray 进程 |
+| desktop 根因（T-05） | 实测 tauri 的 `beforeDevCommand` cwd ＝ `wt-media-desktop`（非 `src-tauri`）⇒ `../../wt-media-cloud/web` 多一段；正确 `cd ../wt-media-cloud/web` |
+| cloud／workspace（T-05） | cloud `status` `alive=no health=ok` **exit 1**；`stop` "not running" exit 0 且 **54420 仍活**；workspace `status` 探两实例 `health=ok` **exit 1**；5 格未覆盖待授权 |
+| 自纠（T-05） | 首版 exit 读数取在 `echo "$out"` 之后 ⇒ `$?` 被重置成 0（cloud `status` 错记 0／实为 1）；重测订正，错误读数未留档 |

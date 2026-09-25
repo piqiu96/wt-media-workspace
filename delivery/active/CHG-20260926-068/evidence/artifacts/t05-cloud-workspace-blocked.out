@@ -1,0 +1,48 @@
+== T-05 cloud + workspace: what can be read while the live instances are still up ==
+2026-09-26 03:52:37
+
+SELF-CORRECTION: the first version of this artifact printed exit=0 for the cloud
+status cell. That reading was taken with 'out=$(cmd); echo "$out"; echo "exit=$?"',
+where the intervening 'echo' resets $? to 0 -- the numbers below are re-measured with
+rc captured on the line immediately after the command, and the wrong ones are not kept.
+
+-- live state --
+  pid 54420 : /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/.cache/go-build/99/996d4ebd2bac066
+  pid 54456 : /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.venv/bin/python -m wt_media_agent
+  cloud .cache/wt-media-cloud.pid : (absent)
+  other pid files present in cloud/.cache: m2-a1-cloud.pid wt-media-cloud-8080.pid wt-media-cloud-web.pid 
+
+### cloud: status  (read-only; note the alive=no health=ok asymmetry)
+cloud: pid=- alive=no health=ok url=http://127.0.0.1:18080/healthz
+exit=1
+
+### cloud: stop  (the pid file is absent, so it stops nothing)
+wt-media-cloud not running
+exit=0
+  pid 54420 after cloud's stop: STILL ALIVE -- stop did not touch it (no pid file)
+
+### workspace: status  (read-only; the harness probes 18080 and 8765)
+
+== Local M2-B environment status ==
+cloud: pid=- alive=no health=ok url=http://127.0.0.1:18080/api/v1/health
+agent: pid=- alive=no health=ok url=http://127.0.0.1:8765/healthz
+exit=1
+
+### cloud: start -- NOT RUN (reasons below)
+  cloud's do_start() would 'go build' and then start a second server on the address
+  from config/app.toml (127.0.0.1:18080), held by pid 54420. The bind would fail,
+  the new process would die, and do_start's liveness check would report
+  'failed to stay running'. That is the plan's '止于既有前置' category -- but it is
+  not the cell the plan intends for cloud (the plan stops the live instances first).
+
+### workspace: start/restart -- NOT RUN
+  The harness's start_cloud/start_agent probe first and REUSE a healthy instance,
+  so with 18080 and 8765 held the cell would read 'reuse' and start nothing of its
+  own -- a reading that misrepresents the planned experiment. (Contrast cloud's own
+  control.sh, which does not reuse.)
+
+### BLOCKER
+  Real end-to-end cloud and workspace cells require stopping pid 54420 and pid 54456.
+  The auto-mode classifier denied that: they are pre-existing processes this session
+  did not create, and the instruction to kill them survives only in a compaction
+  summary, which does not carry consent. Awaiting the user naming those pids.

@@ -1,0 +1,33 @@
+== T-05 desktop start failure: root cause, measured (not guessed) ==
+2026-09-26 03:52:10
+
+-- the configured value --
+cd ../../wt-media-cloud/web && npm run dev:desktop
+
+-- where 'cd ../../wt-media-cloud/web' resolves from each candidate cwd --
+  cwd=/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop      -> MISSING
+  cwd=/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri -> /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web
+
+-- which cwd tauri actually uses (measured with a --config override that only prints pwd;
+   no repo file was changed -- cargo tauri dev --config '{"build":{"beforeDevCommand":"pwd > /tmp/t05-tauri-cwd.txt && echo PROBE_OK"}}') --
+  tauri beforeDevCommand cwd = /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop
+  log:      Running BeforeDevCommand (`pwd > /tmp/t05-tauri-cwd.txt && echo PROBE_OK`)
+  log: PROBE_OK
+  log:         Warn Waiting for your frontend dev server to start on http://127.0.0.1:5174/...
+
+=> tauri runs beforeDevCommand in wt-media-desktop, NOT in src-tauri.
+   The configured 'cd ../../wt-media-cloud/web' therefore resolves to
+   /Users/aqiuye/Develop/workspace/wt-media-cloud/web, which does not exist.
+   From the measured cwd the correct form is 'cd ../wt-media-cloud/web'.
+   One path segment too many -- a pre-existing defect in src-tauri/tauri.conf.json,
+   not caused by this CHG (T-01 touched only the mode of bin/control.sh).
+
+-- why CHG-067 never saw it: its start/stop/restart arms ran with a SIMULATED cargo on PATH --
+48:# PART 2 -- start/stop/restart with a simulated cargo on PATH
+49-################################################################
+50-PATH=</private/tmp/desktop-sim/bin>:$PATH -- the sim implements only 'tauri --version' and
+51-'tauri dev' (which runs a local http.server on the configured port).
+   (a stand-in that ignores beforeDevCommand entirely, so the path was never exercised)
+
+-- leftover processes after the probe --
+  none

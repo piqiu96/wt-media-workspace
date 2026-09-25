@@ -1,0 +1,62 @@
+== T-05 desktop: four verbs, end to end (start really runs 'cargo tauri dev') ==
+2026-09-26 03:50:48
+HTTPS_PROXY=http://127.0.0.1:7897 (this invocation only)
+WT_MEDIA_DESKTOP_START_TIMEOUT=<unset, script default 300>
+
+-- pre-state --
+pid file: (none)
+listeners: 5174 = 0
+
+### cell 1/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+### cell 2/7  start (= cargo tauri dev; may take minutes on first compile)
+$ ./bin/control.sh start
+cargo tauri dev started: pid=59338 log=.runtime/desktop.log
+cargo tauri dev exited before the dev server answered
+     Running BeforeDevCommand (`cd ../../wt-media-cloud/web && npm run dev:desktop`)
+sh: line 0: cd: ../../wt-media-cloud/web: No such file or directory
+       Error The "beforeDevCommand" terminated with a non-zero status code.
+exit=1
+
+### cell 3/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+### cell 4/7  restart
+$ ./bin/control.sh restart
+cargo tauri dev not running
+cargo tauri dev started: pid=59396 log=.runtime/desktop.log
+cargo tauri dev exited before the dev server answered
+     Running BeforeDevCommand (`cd ../../wt-media-cloud/web && npm run dev:desktop`)
+sh: line 0: cd: ../../wt-media-cloud/web: No such file or directory
+       Error The "beforeDevCommand" terminated with a non-zero status code.
+exit=1
+
+### cell 5/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+### cell 6/7  stop
+$ ./bin/control.sh stop
+cargo tauri dev not running
+exit=0
+
+### cell 7/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+-- post-state --
+pid file: (none)
+listeners: 5174 = 0 5173 = 0
+stray cargo/tauri/vite processes:
+
+-- last 25 lines of .runtime/desktop.log --
+     Running BeforeDevCommand (`cd ../../wt-media-cloud/web && npm run dev:desktop`)
+sh: line 0: cd: ../../wt-media-cloud/web: No such file or directory
+       Error The "beforeDevCommand" terminated with a non-zero status code.
