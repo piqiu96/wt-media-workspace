@@ -20,13 +20,19 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   记录体量落 `artifacts/t00-record-size.out`（`change.md` 14149 B = **越界 +176%**，同 CHG-067 T-00 的结构性越界、读数小一档，照报）。
   详见 `evidence/task-00-activation.md`。
 
+- **T-01 desktop**：`bin/control.sh` 磁盘＋index → `100755`（**字节零改动**，`numstat` `0/0`；`help` **126 → 0**）；
+  新建 `tests/control.test.sh`（755，12 条判据／六类，被 `scripts/test.sh` 的 glob 自动拾取，不需要 cargo 或窗口）；
+  **先红**（真实缺陷）3 passed／9 failed；**两处变异**：`chmod -x` → 8 failed、`git update-index --chmod=-x` → **恰 1 failed = 判据 2**；
+  全跑 `scripts/test.sh` `exit=0`（cargo 372 passed／`control.test.sh` 12／`release-versions` 20）。
+  并实测到新事实：同一 126 在 `set -e` 里读作 **1**（登记 `change.md` §14 第 1 项）。详见 `evidence/task-01-desktop-entry.md`。
+
 ## Current
 
-T-00 收尾：写 evidence、跑六门禁、提交。
+T-01 收尾：更新记录、量体量、在 desktop 提交。
 
 ## Next
 
-T-01 desktop：`bin/control.sh` 模式 `100644 → 100755`（磁盘＋index）；新建 `tests/control.test.sh`（755，六条判据）。
+T-02 cloud：新建 `scripts/verify/test-control.sh`（755，六条判据）＋ `scripts/test.sh` 末尾一行（前缀 `[control]`）＋ `scripts/README.md` 一行。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -52,3 +58,6 @@ T-01 desktop：`bin/control.sh` 模式 `100644 → 100755`（磁盘＋index）�
 | 四仓 `bin/control.sh`（激活前） | index：另三仓 `100755`、desktop **`100644`**；`./bin/control.sh help` desktop **126**／另三仓 0 |
 | 四仓工作树（激活前） | cloud ` D internal/architecture/boundary_test.go`（用户操作，不追）、agent ` M AGENT-INDEX.md`、desktop 干净——**前两条先于本 CHG 存在，不触碰** |
 | 监听面（激活前） | 18080＝pid 54420、8765＝pid 54456、54345＝比特浏览器 pid 13947（**第三方，不杀**） |
+| desktop 入口（T-01） | index `100644 → 100755`、磁盘 `-rw-r--r-- → -rwxr-xr-x`、5233 B 不变；`./bin/control.sh help` **126 → 0** |
+| desktop 机检（T-01） | 先红 3 passed／9 failed；变异 ① `chmod -x` → 8 failed、② index-only → **恰 1 failed**；还原后 12 passed／0 failed |
+| desktop 全跑（T-01） | `scripts/test.sh` `exit=0`：cargo 372 passed／0 failed／5 ignored、`control.test.sh` 12、`release-versions` 20 |

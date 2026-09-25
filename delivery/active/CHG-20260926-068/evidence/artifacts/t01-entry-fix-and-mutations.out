@@ -1,0 +1,48 @@
+# CHG-20260926-068 T-01：desktop 入口修后的绿读数 ＋ 两处变异
+# 取数时刻: 2026-09-26 03:40:22
+
+## 修后形态
+index=100755  disk=-rwxr-xr-x  size=5233 B
+字节内容未改动：added=0 deleted=0  ← 0/0 即只改模式
+./bin/control.sh help exit=0
+
+## 机检全绿
+ok   bin/control.sh exists
+ok   bin/control.sh is tracked
+ok   git index mode is 100755
+ok   working tree mode is executable
+ok   direct invocation: ./bin/control.sh help exits 0
+ok   help lists 'start'
+ok   help lists 'stop'
+ok   help lists 'restart'
+ok   help lists 'status'
+ok   unknown verb exits 2
+ok   unknown verb writes nothing to stdout
+ok   unknown verb prints the usage on stderr
+control.test.sh: 12 passed, 0 failed
+exit=0
+
+## 变异 ①：磁盘执行位关掉（chmod -x）——判据 3／4／5／6 应红
+FAIL working tree mode is executable
+FAIL direct invocation: ./bin/control.sh help exits 0
+FAIL help lists 'start'
+FAIL help lists 'stop'
+FAIL help lists 'restart'
+FAIL help lists 'status'
+FAIL unknown verb exits 2
+FAIL unknown verb prints the usage on stderr
+control.test.sh: 4 passed, 8 failed
+变异 ① 套件 exit=1
+还原后：-rwxr-xr-x
+
+## 变异 ②：只关 index 模式（git update-index --chmod=-x）——磁盘仍可执行，判据 2 应单独红
+  这是「本地能跑、新克隆与 CI 跑不了」的那一类，判据 2 的存在理由就是它
+  变异中：index=100644  disk=-rwxr-xr-x
+FAIL git index mode is 100755
+control.test.sh: 11 passed, 1 failed
+  还原后：index=100755  disk=-rwxr-xr-x
+
+## 还原后复跑
+ok   unknown verb prints the usage on stderr
+control.test.sh: 12 passed, 0 failed
+exit=0

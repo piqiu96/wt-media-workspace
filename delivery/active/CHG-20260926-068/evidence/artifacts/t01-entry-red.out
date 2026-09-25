@@ -1,0 +1,40 @@
+# CHG-20260926-068 T-01：desktop 入口机检的**先红**（真实缺陷，不是合成变异）
+# 状态：bin/control.sh 仍是 100644 / -rw-r--r--（未修），tests/control.test.sh 已就位
+# 取数时刻: 2026-09-26 03:40:15
+
+## 修前形态读数（在 shell 外量，不在 set -e 脚本内）
+index=100644  disk=-rw-r--r--
+./bin/control.sh help exit=126
+
+## 机检先红（tests/control.test.sh 自带 set -euo pipefail）
+ok   bin/control.sh exists
+ok   bin/control.sh is tracked
+FAIL git index mode is 100755
+     got '100644' -- a fresh checkout would not be executable
+FAIL working tree mode is executable
+     -rw-r--r--
+FAIL direct invocation: ./bin/control.sh help exits 0
+     got exit=1; 'Permission denied' below means the entry is not executable: tests/control.test.sh: line 86: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/bin/control.sh: Permission denied 
+FAIL help lists 'start'
+     no line matching '^  start\b' in: 
+FAIL help lists 'stop'
+     no line matching '^  stop\b' in: 
+FAIL help lists 'restart'
+     no line matching '^  restart\b' in: 
+FAIL help lists 'status'
+     no line matching '^  status\b' in: 
+FAIL unknown verb exits 2
+     got exit=1
+ok   unknown verb writes nothing to stdout
+FAIL unknown verb prints the usage on stderr
+     stderr: tests/control.test.sh: line 113: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/bin/control.sh: Permission denied 
+control.test.sh: 3 passed, 9 failed
+exit=1
+
+## 同一个缺陷在两个上下文里的退出码不同（实测矩阵，本 Task 顺带量到）
+  [none] captured=126
+  [set -e] captured=1
+  [set -u] captured=126
+  [set -o pipefail] captured=126
+  [set -eu] captured=1
+  ⇒ 只有 set -e 改读数（126 → 1），其余选项无影响；故本套件的判据断言 exit=0 而非字面 126。

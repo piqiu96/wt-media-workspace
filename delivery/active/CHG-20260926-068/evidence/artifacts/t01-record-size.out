@@ -1,0 +1,12 @@
+== T-01 record size (per-Task increment, anchor=e4e1587) ==
+criterion: change.md <= 5120 B/Task, checkpoint.md <= 4096 B/Task, evidence md <= 9216 B/Task
+
+delivery/active/CHG-20260926-068/change.md               now= 15120 B  anchor= 14149 B  inc=  +971 B  limit= 5120  IN
+delivery/active/CHG-20260926-068/checkpoint.md           now=  4733 B  anchor=  3530 B  inc= +1203 B  limit= 4096  IN
+
+-- evidence md (excluding artifacts/) --
+delivery/active/CHG-20260926-068/evidence/task-00-activation.md now=  5732 B  anchor=  5732 B  inc=    +0 B  limit= 9216  IN
+delivery/active/CHG-20260926-068/evidence/task-01-desktop-entry.md now=  3924 B  anchor=     0 B  inc= +3924 B  limit= 9216  IN
+
+note: task-01-desktop-entry.md is NEW at this anchor, so its increment == its size.
+artifacts/ are non-binding (not in the criterion).

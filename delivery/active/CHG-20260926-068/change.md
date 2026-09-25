@@ -120,8 +120,8 @@ None.
 
 | Task | Goal | Status | Verification |
 |---|---|---|---|
-| T-00 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓基线与监听面读数；`MASTER` §3 按 F-06 刷新三项 | DOING | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.`。见 `evidence/task-00-activation.md` |
-| T-01 | **desktop**：`bin/control.sh` 模式 → `100755`（磁盘＋index）；新建 `tests/control.test.sh`（755，六条判据） | TODO | 改前 `./bin/control.sh help` **126**／改后 **0** 两个读数都留；套件绿；**变异红**（`chmod -x` → 红 → 还原）；`scripts/test.sh` 全跑读数取在最后一次改动之后 |
+| T-00 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓基线与监听面读数；`MASTER` §3 按 F-06 刷新三项 | DONE（`e4e1587`） | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.`。见 `evidence/task-00-activation.md` |
+| T-01 | **desktop**：`bin/control.sh` 模式 → `100755`（磁盘＋index）；新建 `tests/control.test.sh`（755，六条判据） | DONE | 改前 `./bin/control.sh help` **126**／改后 **0**；先红 3/9；**变异红** 8 failed（`chmod -x`）与恰 1 failed（`git update-index --chmod=-x`）；`scripts/test.sh` `exit=0`（372／12／20）。见 `evidence/task-01-desktop-entry.md` |
 | T-02 | **cloud**：新建 `scripts/verify/test-control.sh`＋`scripts/test.sh` 一行＋`scripts/README.md` 一行 | TODO | `bash scripts/test.sh` 全跑；**变异红**；`git ls-files -s` 仍 100755 |
 | T-03 | **agent**：新建 `tests/test_control_sh.py` | TODO | `unittest discover -s tests -q` 新基线；**变异红**；`.local/` 污染护栏仍绿 |
 | T-04 | **workspace**：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓） | TODO | 两条绿；**变异红**：`chmod -x wt-media-desktop/bin/control.sh` → 跨仓用例在 desktop 那格红（CHG-067 漏掉的缺陷类别）→ 还原；六门禁 `exit=0` |
@@ -153,16 +153,16 @@ None.
 
 ### wt-media-desktop
 
-- [ ] `bin/control.sh` 模式 `100644 → 100755`；`tests/control.test.sh`（T-01）
+- [x] `bin/control.sh` 模式 `100644 → 100755`；`tests/control.test.sh`（T-01）
 
 ## 10. Acceptance Matrix
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | desktop `bin/control.sh` 可直接调用 | 改前 `help`=**126**／改后 **0**；index 与磁盘均 `100755` | TODO |
-| AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | TODO |
+| AC-01 | desktop `bin/control.sh` 可直接调用 | 改前 `help`=**126**／改后 **0**；index 与磁盘均 `100755` | PASS（T-01） |
+| AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PARTIAL：desktop 已绿＋两处变异（T-01）；cloud／agent／workspace 待 T-02～T-04 |
 | AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | TODO |
-| AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | TODO |
+| AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PARTIAL：desktop 已证（磁盘变异 8 failed／index 变异恰 1 failed）；余三仓待 T-02～T-04 |
 | AC-05 | 跨仓回指与既有判据不被本 CHG 打红 | 六个静态门禁 `exit=0` ＋ `unittest` 套件 `OK` | TODO |
 | AC-06 | 改动逐条落在 §5；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 路径逐条归属；端口值 diff **0** | TODO |
 | AC-07 | 记录体量按**每 Task 增量**在界内 | `change.md` ≤ 5120 B／Task、`checkpoint.md` ≤ 4096、evidence md ≤ 9216；锚取上一 Task 提交后的 blob | TODO |
@@ -172,6 +172,7 @@ None.
 证据在 `evidence/`，只记事实、不复述需求。原始输出进 `evidence/artifacts/`。
 
 - `evidence/task-00-activation.md` ＋ `artifacts/t00-*.out`（`t00-baseline.out`、`t00-status-words.out`、`t00-gate-activation.out`、`t00-record-size.out`）
+- `evidence/task-01-desktop-entry.md` ＋ `artifacts/t01-entry-red.out`、`t01-entry-fix-and-mutations.out`、`t01-desktop-test-sh.out`
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 ## 12. Current Checkpoint
@@ -194,3 +195,8 @@ None.
 ## 14. 实测推翻或补齐预想（本 CHG 登记，逐项在对应 Task 落地）
 
 （T-00 无：激活期未发现与计划冲突的读数，F-01～F-06 均与计划一致。）
+
+1. **T-01：同一缺陷在两个上下文里退出码不同——只有 `set -e` 改读数（126 → 1）。** 矩阵实测（`artifacts/t01-entry-red.out` 末段）：
+   无选项／`set -u`／`set -o pipefail` → **126**；`set -e`／`set -eu` → **1**，且 `set -e` 同时改脚本自身退出码。
+   ⇒ 计划里「改前读数 126」只在非 `set -e` 上下文成立；本 Task 的机检因此断言**属性**（`exit=0`）而非字面码，
+   并把矩阵写进 `tests/control.test.sh` 的头注释。bash 内部机制未定位，只记可复现读数。
