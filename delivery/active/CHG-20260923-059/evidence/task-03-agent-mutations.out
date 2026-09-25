@@ -1,0 +1,7 @@
+打掉 ✓  A1 不安置处理器（`_answer_sigterm` 不接线）  ->  test_a_sigterm_is_answered_with_the_ordinary_exit_path
+打掉 ✓  A2 去掉 `daemon_threads = False`（`server_close` 的 join 变空转）  ->  test_a_request_in_flight_when_the_signal_arrives_is_waited_for
+打掉 ✓  A3 「stopped」那行挪到 join 之前  ->  test_a_request_in_flight_when_the_signal_arrives_is_waited_for
+打掉 ✓  A4 不还原被顶掉的那个处理器  ->  test_an_in_process_serve_restores_the_disposition_it_displaced
+打掉 ✓  A5 在处理器里直接调 `shutdown()`（不起线程）  ->  test_a_sigterm_is_answered_with_the_ordinary_exit_path
+
+读数：5/5

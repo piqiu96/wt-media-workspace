@@ -26,14 +26,15 @@
 
 ## Current
 
-- **T-03 退出收尾未开工**（T-01、T-02 均已收尾，见下两节）。
+- **T-04 运行期完整性校验未开工**（T-01、T-02、T-03 均已收尾，见下三节）。
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
-  与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`。
+  与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
+  T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`。
 
 ## Next
 
-- T-03 退出收尾（Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与
-  在飞任务收尾；**退出报告要能区分「请停后自己退出」与「被强杀」**），
+- T-04 运行期完整性校验（启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动；
+  **`sha2 = "0.10"` 已是直接依赖**，不新增依赖；先造一个篡改一字节的必拒读数，再加完好的阳性对照），
   按 `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
 
 ## T-01（已收尾，2026-09-25）
@@ -81,6 +82,39 @@
   与逐片段枚举一致——即没有一处纯重排混进提交），提交后再把重排原样放回。收尾时 13 个脏文件
   逐个核对为 `工作区 == rustfmt(HEAD)`，一并对 `sidecar/mod.rs` 补回了它此前丢掉的 churn。
 
+## T-03（已收尾，2026-09-25）
+
+- agent `local_api/server.py`（`70a1647`）：`serve()` 安置 SIGTERM 处理器并把 `shutdown()`
+  **派到自己的线程**（信号只投主线程，就地调用会死锁）；`httpd.daemon_threads = False`
+  ——实测出来的承重行，`ThreadingHTTPServer` 默认 `True` 时 `_Threads` **不登记守护线程**，
+  `server_close()` 的 join 是空转；「stopped」挪到 `server_close()` 之后；结束时还原被顶掉的处理器。
+- desktop（`242f61e`）：`sidecar::{ask,alive,force}`（`test_kill_process` + `Errno::PERM` 算「在」，
+  `Pid::from_raw(0)` 为 `None` 故 0 必拒）+ `commands::agent::stop()` 的请停→50ms 轮询→到点强杀
+  + `main.rs` 的 `RunEvent::Exit` 钩子 + 新键 `[sidecar] stop_timeout_ms`（出货 5000，`validate()` 拒 0）。
+- **先红**：保留全部新用例，把 `stop` 的函数体还原成 HEAD 的 `kill(process, session)` ⇒ 两条用例都红
+  （转录 `evidence/task-03-desktop-red.out`）：两条 arm 的日志**都只有**「Local Agent 已停止」（事后
+  读不出差别）；「答」的那条报 `(None, Some(9))`（SIGKILL，trap 从未跑到）；「不答」的那条报
+  `the kill came at 900.875µs`（窗口根本不存在）。
+- **真机两条读数**（`--ignored real_agent`，Desktop 自己的停路对上真 Agent 进程；不是替身）：
+  「答」= `已请（pid）→ 在宽限内自行退出（518 ms）→ 已停止`、退出码 `Some(0)`；
+  「杀」= `已请 → 宽限已到，强杀（1 ms）→ 已停止`、`signal: Some(9)`。杀的那条窗口**故意**短于
+  Agent 自己半秒的轮询，故读数由「截止时间到」决定而非两个时钟赛跑。连跑 **5 次 5/5**。
+- 计数：desktop 348→**353** passed / 0 failed（ignored 3→**4**，多的那条就是真机臂）；
+  agent 378→**382** OK；警告 7→**7**；变异 agent **5/5** + desktop **9/9**。
+- **两处订正落库**：`rustix` 的 `process` **不在**默认 feature 里（上一轮记录写反了）；
+  `sidecar.stop_timeout_ms` 补进 `validate()`。
+- **churn 口径与 T-01/T-02 同**：三个混合文件（`commands/agent.rs`、`sidecar/mod.rs`、`dto/config.rs`）
+  用**三路合并**（HEAD / `rustfmt(HEAD)` / 工作区）反推掉重排后再提交，两条判据都报——
+  `rustfmt(候选) == rustfmt(工作区)`，且候选内容跑出同样的 `353 passed; 0 failed`。
+  提交后 13 个脏文件逐个复核为 `工作区 == rustfmt(HEAD)`（**13/13**）。
+  **过程中踩到一个坑并已还原**：`rustfmt` 会**顺着 `mod` 声明递归**格式化子模块，我的探针文件
+  因此把当时**干净**的 `sidecar/readiness.rs` 也重排了；已 `git checkout` 还原，工作区回到
+  恰好那 13 个文件（这版 rustfmt 不认 `--skip-children`）。
+- **一条按 D-09 方式登记的例外**（不静默吸收，见 `evidence/task-03-exit.md` §7）：随包 onefile
+  sidecar 在本机**起不来**（引导器解出的 `libpython3.14.dylib` 被 macOS 以「Team IDs 不同」拒
+  `dlopen`），故「**引导器是否把 SIGTERM 转发给真正在服务的那进程**」**未测**；另两处：
+  `RunEvent::Exit` 钩子本身只有阅读级覆盖；宽限内 pid 被复用是 `alive`/`force` 的已知窄极限。
+
 ## Blocked
 
 - 无硬阻塞。**T-06 内有一条待关闭的 Q-04**（「组件与资源版本」的**口径**——M-launch-engineering
@@ -89,6 +123,10 @@
 
 ## Recent verification
 
+- **T-03 之后**（2026-09-25，churn 还原后重跑）：desktop `cargo test`
+  **353 passed / 0 failed / 4 ignored**，汇总行 `generated 7 warnings`（与基线同）；
+  `git diff --name-only | wc -l` = **13**，逐个核对为 `工作区 == rustfmt(HEAD)`；
+  agent `bash scripts/test.sh` **Ran 382 tests / OK**。
 - **T-02 之后**（2026-09-25，churn 还原后重跑）：desktop `cargo test --workspace`
   **348 passed / 0 failed / 3 ignored**，汇总行 `generated 7 warnings`（与基线同）；
   同一棵树上 `git diff --name-only | wc -l` = **13**，且逐个核对为 `工作区 == rustfmt(HEAD)`（纯重排）。

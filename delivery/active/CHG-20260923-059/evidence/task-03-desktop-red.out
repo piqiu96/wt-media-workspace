@@ -1,0 +1,94 @@
+   Compiling wt-media-desktop-shell v0.1.0 (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri)
+warning: constant `STOP_POLL` is never used
+   --> src-tauri/src/commands/agent.rs:444:7
+    |
+444 | const STOP_POLL: Duration = Duration::from_millis(50);
+    |       ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+
+warning: field `directory` is never read
+   --> src-tauri/src/logging/rolling.rs:196:5
+    |
+195 | pub struct Writer {
+    |            ------ field in this struct
+196 |     directory: PathBuf,
+    |     ^^^^^^^^^
+
+warning: method `directory` is never used
+   --> src-tauri/src/logging/rolling.rs:256:12
+    |
+202 | impl Writer {
+    | ----------- method in this implementation
+...
+256 |     pub fn directory(&self) -> &Path {
+    |            ^^^^^^^^^
+
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+
+warning: variant `Unsupported` is never constructed
+  --> src-tauri/src/storage.rs:60:5
+   |
+53 | pub enum StorageError {
+   |          ------------ variant in this enum
+...
+60 |     Unsupported { reason: String },
+   |     ^^^^^^^^^^^
+   |
+   = note: `StorageError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell" test) generated 8 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.88s
+     Running unittests src/main.rs (target/debug/deps/wt_media_desktop_shell-5a814c8fd84e893d)
+
+running 2 tests
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-ignored
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-answered
+test commands::agent::tests::a_stop_the_agent_answers_reads_as_it_leaving_on_its_own ... FAILED
+test commands::agent::tests::a_stop_the_agent_ignores_reads_as_killed_at_the_deadline ... FAILED
+
+failures:
+
+---- commands::agent::tests::a_stop_the_agent_answers_reads_as_it_leaving_on_its_own stdout ----
+
+thread 'commands::agent::tests::a_stop_the_agent_answers_reads_as_it_leaving_on_its_own' (1106464) panicked at src-tauri/src/commands/agent.rs:794:9:
+assertion `left == right` failed: a signal here would mean it was killed, whatever the records say
+  left: (None, Some(9))
+ right: (Some(0), None)
+
+---- commands::agent::tests::a_stop_the_agent_ignores_reads_as_killed_at_the_deadline stdout ----
+
+thread 'commands::agent::tests::a_stop_the_agent_ignores_reads_as_killed_at_the_deadline' (1106465) panicked at src-tauri/src/commands/agent.rs:846:9:
+the window is not decoration: the kill came at 900.875µs
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    commands::agent::tests::a_stop_the_agent_answers_reads_as_it_leaving_on_its_own
+    commands::agent::tests::a_stop_the_agent_ignores_reads_as_killed_at_the_deadline
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 354 filtered out; finished in 0.23s
+
+error: test failed, to rerun pass `--bin wt-media-desktop-shell`

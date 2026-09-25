@@ -1,0 +1,11 @@
+打掉 ✓  D1 不写「已请…停止」那条记录  ->  a_stop_the_agent_answers_reads_as_it_leaving_on_its_own
+打掉 ✓  D2 不写「宽限内自行退出」那条记录  ->  a_stop_the_agent_answers_reads_as_it_leaving_on_its_own
+打掉 ✓  D3 不写「宽限已到，强杀」那条记录  ->  a_stop_the_agent_ignores_reads_as_killed_at_the_deadline
+打掉 ✓  D4 窗口当零（截止时间不加上宽限）  ->  a_stop_the_agent_ignores_reads_as_killed_at_the_deadline
+打掉 ✓  D5 一次信号都不发（ask 变成空操作）  ->  a_stop_the_agent_answers_reads_as_it_leaving_on_its_own
+打掉 ✓  D6 「请」发的是 SIGKILL 而不是 SIGTERM  ->  an_ask_reaches_a_real_process_and_it_leaves
+打掉 ✓  D7 `alive` 永远说「有东西在」  ->  an_ask_reaches_a_real_process_and_it_leaves
+打掉 ✓  D8 `alive` 永远说「没东西」  ->  a_process_that_ignores_the_ask_is_still_alive
+打掉 ✓  D9 进程号解析失败时当成「有东西在」  ->  a_pid_of_zero_is_refused_rather_than_signalled
+
+读数：9/9

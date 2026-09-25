@@ -1,0 +1,70 @@
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `directory` is never read
+   --> src-tauri/src/logging/rolling.rs:196:5
+    |
+195 | pub struct Writer {
+    |            ------ field in this struct
+196 |     directory: PathBuf,
+    |     ^^^^^^^^^
+
+warning: method `directory` is never used
+   --> src-tauri/src/logging/rolling.rs:256:12
+    |
+202 | impl Writer {
+    | ----------- method in this implementation
+...
+256 |     pub fn directory(&self) -> &Path {
+    |            ^^^^^^^^^
+
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+
+warning: variant `Unsupported` is never constructed
+  --> src-tauri/src/storage.rs:60:5
+   |
+53 | pub enum StorageError {
+   |          ------------ variant in this enum
+...
+60 |     Unsupported { reason: String },
+   |     ^^^^^^^^^^^
+   |
+   = note: `StorageError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell" test) generated 7 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.25s
+     Running unittests src/main.rs (target/debug/deps/wt_media_desktop_shell-5a814c8fd84e893d)
+
+running 2 tests
+2026-09-24T10:11:12 [INFO] agent.supervisor: 已请 Local Agent（pid 71848）停止 operation_id=real-agent-answered
+test sidecar::readiness::tests::the_gate_waits_for_a_real_agent_process ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 在宽限内自行退出（518 ms） operation_id=real-agent-answered
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=real-agent-answered
+2026-09-24T10:11:12 [INFO] agent.supervisor: 已请 Local Agent（pid 71856）停止 operation_id=real-agent-killed
+2026-09-24T10:11:12 [WARN] agent.supervisor: 宽限已到，强杀 Local Agent（1 ms） operation_id=real-agent-killed
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=real-agent-killed
+test commands::agent::tests::the_real_agent_answers_the_ask_or_is_killed_at_the_deadline ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 355 filtered out; finished in 0.79s
+

@@ -1,0 +1,193 @@
+...................................................{"agent_id": "local-agent-dev", "cloud_base_url": "http://127.0.0.1:18080", "data_dir": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmptpb59vs7/.local/data", "database_path": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmptpb59vs7/.local/data/local-agent.sqlite3", "environment": "development", "log_file": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmptpb59vs7/.local/logs/agent.log", "mode": "cloud", "run_runner": false, "version": "0.2.2"}
+.{"agent_id": "local-agent-dev", "cloud_base_url": "http://127.0.0.1:18080", "data_dir": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmp939l7l7k/.local/data", "database_path": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmp939l7l7k/.local/data/local-agent.sqlite3", "environment": "development", "log_file": "/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmp939l7l7k/.local/logs/agent.log", "mode": "cloud", "run_runner": true, "version": "0.2.2"}
+.../Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 401: 'Unauthorized'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+.....................................................................local_api.status.failure duration_ms=28
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/local_api/server.py", line 128, in status
+    environment = RuntimeEnvironmentCollector(bitbrowser=self.bitbrowser).collect().to_dict()
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/runtime/environment.py", line 114, in collect
+    snapshot = self._bitbrowser.scan_profiles()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/support.py", line 33, in __getattr__
+    raise AssertionError(f"this test must not touch BitBrowser.{name}")
+AssertionError: this test must not touch BitBrowser.scan_profiles
+......................local_api.health.bitbrowser.degraded error=BitBrowser Local API request failed: [Errno 61] Connection refused
+.local_api.health.cloud.degraded error=refused
+.local_api.health.cloud.degraded error=timed out
+..local_api.health.bitbrowser.degraded error=BitBrowser Local API request failed: [Errno 61] Connection refused
+.local_api.health.storage.degraded error=no database at /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-test-4hm36frn/data/absent.db
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/local_api/health.py", line 207, in _storage_status
+    store.probe()
+    ~~~~~~~~~~~^^
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/storage/checkpoint_store.py", line 75, in probe
+    raise FileNotFoundError(f"no database at {self._db_path}")
+FileNotFoundError: no database at /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-test-4hm36frn/data/absent.db
+...local_api.health.cloud.degraded error=[Errno 61] Connection refused
+local_api.health.bitbrowser.degraded error=BitBrowser Local API request failed: [Errno 61] Connection refused
+local_api.health.storage.degraded error=no database at /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-test-6z9c7_i9/data/absent.db
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/local_api/health.py", line 207, in _storage_status
+    store.probe()
+    ~~~~~~~~~~~^^
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/storage/checkpoint_store.py", line 75, in probe
+    raise FileNotFoundError(f"no database at {self._db_path}")
+FileNotFoundError: no database at /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-agent-test-6z9c7_i9/data/absent.db
+......./Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c26b0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c22f0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..local_api.profile_open.failure profile_id=profile-1 duration_ms=0 error=BitBrowser request failed: 浏览器正在打开中
+........2026-09-25T09:59:33 [INFO] wt_media_agent.somewhere: local_api.status.start
+.2026-09-25T09:59:33 [INFO] wt_media_agent.somewhere: operation_id=aaaaaaaaaaaaaaaa outer before
+2026-09-25T09:59:33 [INFO] wt_media_agent.somewhere: operation_id=bbbbbbbbbbbbbbbb inner
+2026-09-25T09:59:33 [INFO] wt_media_agent.somewhere: operation_id=aaaaaaaaaaaaaaaa outer after
+2026-09-25T09:59:33 [INFO] wt_media_agent.somewhere: no request
+.2026-09-25T09:59:33 [ERROR] wt_media_agent.runner.task: operation_id=fedcba9876543210 executor gave up
+.2026-09-25T09:59:33 [ERROR] wt_media_agent.runner.task: no code on this one
+.2026-09-25T09:59:33 [INFO] wt_media_agent.somewhere: operation_id=0123456789abcdef local_api.status.start
+.2026-09-25T09:59:33 [WARNING] wt_media_agent.local_api.server: operation_id=ec6e517798abd13c local_api.profile_open.reject reason=profile_id_required
+2026-09-25T09:59:33 [INFO] wt_media_agent.somewhere: main thread, no request
+.2026-09-25T09:59:33 [WARNING] wt_media_agent.local_api.server: operation_id=6082cd1c068ada30 local_api.profile_open.reject reason=profile_id_required
+2026-09-25T09:59:33 [WARNING] wt_media_agent.local_api.server: operation_id=f9860bdcef935544 local_api.profile_open.reject reason=profile_id_required
+....2026-09-25T09:59:34 [ERROR] wt_media_agent.somewhere: upstream said: Authorization: ***
+.2026-09-25T09:59:34 [ERROR] wt_media_agent.somewhere: local api rejected the sidecar token ***
+2026-09-25T09:59:34 [INFO] wt_media_agent.somewhere: token was presented
+........................................no executor for task type demo_echo_task
+..../Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3e20>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3b50>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c1d50>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c1e40>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c15d0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c1300>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3d30>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c33d0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c36a0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c32e0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3100>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c35b0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3880>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3010>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3c40>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c34c0>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/ast.py:46: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c2c50>
+  return compile(source, filename, mode, flags,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...............................2026-09-25T09:59:36 [INFO] wt_media_agent.runner.runner: executing task t-1 (type=demo_echo_task)
+2026-09-25T09:59:36 [ERROR] wt_media_agent.runner.runner: task t-1 failed: the executor blew up
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.runner.runner: agent session invalidated; draining runner: revoked
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.runner.runner: a real error
+.2026-09-25T09:59:36 [INFO] wt_media_agent.runner.runner: executing task t-1 (type=demo_echo_task)
+2026-09-25T09:59:36 [ERROR] wt_media_agent.runner.runner: task t-1 result is uncertain after session invalidation: session revoked mid-task
+..../Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c1300>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c15d0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c1d50>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c32e0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c1e40>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c36a0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3b50>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3790>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c2d40>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c3970>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c2f20>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/aqiuye/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/lib/python3.14/unittest/mock.py:2259: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1070c2a70>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...no executor for task type cookie_read_task
+..no executor for task type cookie_read_task
+.agent session invalidated; draining runner: session invalid
+......ignoring sensitive key runtime_token from the config file; credentials are environment-only
+ignoring sensitive key cloud.password from the config file; credentials are environment-only
+...................................2026-09-25T09:59:36 [INFO] wt_media_agent.somewhere: a development run writes this
+.2026-09-25T09:59:36 [DEBUG] wt_media_agent.somewhere: verbose detail
+..2026-09-25T09:59:36 [INFO] wt_media_agent.somewhere: hello from the agent
+.2026-09-25T09:59:36 [INFO] wt_media_agent.somewhere: written through a new dir
+.....2026-09-25T09:59:36 [ERROR] wt_media_agent.somewhere: failed
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.runner.runner: task t-1 failed: boom
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.somewhere: plain failure
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.somewhere: offline delivery failed
+..2026-09-25T09:59:36 [ERROR] wt_media_agent.somewhere: plain failure
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.runner.runner: task t-1 failed: boom
+.2026-09-25T09:59:36 [INFO] wt_media_agent.local_api.server: local_api.status.start
+.2026-09-25T09:59:36 [INFO] wt_media_agent.runner_pool: not a task node
+..2026-09-25T09:59:36 [INFO] wt_media_agent.somewhere: ordinary progress
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.somewhere: could not write the file
+..2026-09-25T09:59:36 [INFO] wt_media_agent.runner.runner: executing task abc
+.2026-09-25T09:59:36 [ERROR] wt_media_agent.somewhere: failed to write the file
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/test_runtime_logging.py", line 342, in test_the_traceback_is_in_the_agent_log_and_not_the_error_log
+    raise ValueError("the reason it failed")
+ValueError: the reason it failed
+.....................wt-media-agent local API listening on 127.0.0.1:0
+wt-media-agent local API stopped
+...........................
+----------------------------------------------------------------------
+Ran 382 tests in 11.393s
+
+OK
+storage migration ok: 2 applied, 2 total
+database /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpwu2klc3e/local-agent.sqlite3
+applied 0001_base base
+applied 0002_task_checkpoints task_checkpoints
+storage migration ok: 2 applied, 2 total
+database /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpd3ineo_b/local-agent.sqlite3
+applied 0001_base base
+applied 0002_task_checkpoints task_checkpoints

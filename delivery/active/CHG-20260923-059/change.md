@@ -245,7 +245,7 @@
 |---|---|---|---|---|
 | T-01 | **就绪闸门**：解析 Agent 的 readiness 行作为第一信号，健康检查应答作为第二信号；`start_timeout_ms` 变成真超时且**真的会超时** | desktop + agent | **DONE** | 「打印了但不应答」与「不应答且不打印」两种形态各有用例；超时按配置值生效；变异打掉自己。**加一臂**：401（令牌漂移）致命且不等待——依据是 `/healthz` 在 `_check_auth` 之后（§4.1 实测补记） |
 | T-02 | **活性探针**：`already_running` 的判定改为问一次；sidecar 死后如实报「未在运行」并允许重启 | desktop | **DONE** | 先有一条**能红的**用例复现 CHG-057 登记的缺陷（杀掉 sidecar 后仍说已在运行）；修复后同一条转绿。变异 **8/8**；第一轮曾 6/8，两个存活变异各查出一处真洞（详见 `evidence/task-02-identity.md` §4.1） |
-| T-03 | **退出收尾**：Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与在飞任务收尾 | desktop + agent | TODO | 真机上「请停后自己退出」与「宽限超时被强杀」两条读数；退出报告能区分二者 |
+| T-03 | **退出收尾**：Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与在飞任务收尾 | desktop + agent | **DONE** | 真机上两条读数**都拿到**（`--ignored real_agent`：Desktop 自己那条停路对上真 Agent 进程，`Some(0)`/518ms 与 `Some(9)`/1ms，5 次连跑 5/5）；先红是把 `stop` 还原成 HEAD 的硬杀形状，两条用例都红（日志不可区分、`(None, Some(9))`、窗口 900µs）；变异 agent 5/5 + desktop 9/9。**随包 onefile sidecar 那一臂做不到**（本机 `dlopen` 被签名拒），引导器是否转发 SIGTERM 未测——登记在证据 §7 |
 | T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | TODO | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖** |
 | T-05 | **`config_online → 产物/config`**：打包步骤 + `bundle.resources` 补 Agent 配置 + `diff -r` 校验 | desktop + agent | TODO | 产物内配置与 `config_online/` `diff -r` 无差异；**产物里不含凭证**（D-05） |
 | T-06 | **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个来源；发布脚本加 Desktop ↔ sidecar 版本兼容校验 | desktop + workspace | TODO | 五类逐个有可得来源（每条附命令）；版本不匹配的包**必须被拒**（先造一个不匹配的，看它红）；Q-04 一并关闭 |
@@ -264,13 +264,17 @@
 
 ### wt-media-agent
 
-- [ ] `local_api/server.py`：SIGTERM 处理与在飞任务收尾（T-03）
+- [x] `local_api/server.py`：SIGTERM 处理与在飞任务收尾（T-03）——`70a1647`；
+      `daemon_threads = False` 与「stopped」的位置各有一条会红的用例钉着
 - [ ] `scripts/build_desktop_sidecar.py`：`config_online/ → 产物/config` 整目录替换（T-05）
 - [ ] 入口文档同步（`AGENTS.md`、`README.md`、`contracts/*/README.md`）（T-09）
 
 ### wt-media-desktop
 
-- [ ] `src-tauri/src/sidecar/`：就绪闸门（T-01）、退出收尾（T-03）、完整性校验（T-04）
+- [ ] `src-tauri/src/sidecar/`：完整性校验（T-04）
+- [x] `src-tauri/src/sidecar/`：就绪闸门（T-01）
+- [x] `src-tauri/src/sidecar/` + `commands/agent.rs` + `main.rs`：退出收尾（T-03）——`242f61e`；
+      `ask`/`alive`/`force` 三个函数、`stop()` 的请停→宽限→强杀、`RunEvent::Exit` 钩子
 - [x] `src-tauri/src/commands/agent.rs`：活性探针（T-02）——`c54025a` 生产修复 + 4 条用例；
       `15951a4` 的 `tauri` `test` feature dev-dependency 与 `R: Runtime` 泛化是它的前置
 - [ ] `src-tauri/tauri.conf.json`：`bundle.resources` 补 Agent 配置（T-05）
@@ -283,7 +287,7 @@
 |---|---|---|---|
 | AC-01 | 就绪是确认过的：readiness 行 + 健康应答；超时真的会超时 | 两种失败形态各一条用例 + 真机读数 | TODO（T-01） |
 | AC-02 | 不会连上旧进程：sidecar 死后如实报「未在运行」 | 先红后绿的复现用例 + 真机读数 | **一半**（T-02）：先红后绿已成立（`evidence/task-02-red.out` / `task-02-green.out`，真 `CommandChild` + 真无人听的端口）；**真机读数未做**，按 T-02 证据 §7 第 1 条登记，不以文字充当证据 |
-| AC-03 | 退出是收尾过的：请停 → 宽限 → 强杀；报告能区分 | 真机两条读数 | TODO（T-03） |
+| AC-03 | 退出是收尾过的：请停 → 宽限 → 强杀；报告能区分 | 真机两条读数 | **满足**（T-03）：两条读数都是真 Agent 进程给的（`task-03-desktop-real-agent.out`），请停/自行退出/宽限强杀三条记录互不重名。**一处例外**：随包 onefile sidecar 的引导器是否转发 SIGTERM **未测**（本机跑不起来，D-09 式登记，见 `evidence/task-03-exit.md` §7 第 1 条） |
 | AC-04 | 随包 sidecar 被验过：篡改必拒、完好必过 | 阳性对照 + 阴性对照各一条 | TODO（T-04） |
 | AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | TODO（T-05） |
 | AC-06 | 五类版本可追溯；Desktop ↔ sidecar 版本不匹配必拒 | 五条来源命令 + 一条不匹配必红的用例 | TODO（T-06） |
@@ -301,7 +305,13 @@
   另附原始转录 `evidence/task-02-red.out`（守卫还原成修复前形状后同一条用例转红）、
   `evidence/task-02-green.out`（修复后该过滤器下 16 passed）、
   `evidence/task-02-mutations.out`（8/8 变异表）
-- `evidence/task-03-exit.md`——请停/宽限/强杀三条真机读数与退出报告形状
+- `evidence/task-03-exit.md`——请停/宽限/强杀两侧的形态、先红读数、真机两条读数与退出报告形状。**已产出**，
+  另附原始转录 `evidence/task-03-desktop-red.out`（`stop` 还原成硬杀后两条用例转红）、
+  `evidence/task-03-desktop-green.out`（353 passed / 0 failed / 4 ignored）、
+  `evidence/task-03-desktop-real-agent.out`（`--ignored real_agent`，两条真机读数）、
+  `evidence/task-03-agent-green.out`（agent 382 OK）、
+  `evidence/task-03-agent-mutations.out`（5/5）、`evidence/task-03-desktop-mutations.out`（9/9）、
+  `evidence/task-03-sidecar-bootloader-untested.out`（随包 onefile 在本机 `dlopen` 被拒，故该臂未测）
 - `evidence/task-04-integrity.md`——篡改必拒 / 完好必过 / 打包侧相等性判定
 - `evidence/task-05-shipped-config.md`——`diff -r` 输出、产物树、凭据扫描（带阳性对照与分母）
 - `evidence/task-06-versions.md`——五类版本的来源命令与不匹配必红
@@ -325,8 +335,15 @@
     一条变异被错派给看不见它的用例——两处都已改，不是调断言了事）；
     先红读数见 `evidence/task-02-red.out`。**AC-02 只算一半**：真机读数未做，按 D-09 的登记方式
     如实标注。详见 `evidence/task-02-identity.md`。
-- **Current**：T-03 退出收尾——尚未开工。
-- **Next**：T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
+  - **T-03 退出收尾**（双侧）。desktop 348→**353** passed / 0 failed（ignored 3→**4**，新增的那条
+    就是真机臂）；agent 378→**382** OK；编译警告 7→**7**；变异 agent **5/5** + desktop **9/9**；
+    先红是把 `stop` 还原成 HEAD 的硬杀形状后两条用例都红（两条 arm 的日志**不可区分**、
+    `(None, Some(9))`、窗口 900µs）；真机两条读数由 Desktop 自己的停路对着真 Agent 进程取得
+    （`Some(0)`/518ms、`Some(9)`/1ms，连跑 5 次 5/5）。详见 `evidence/task-03-exit.md`。
+    **一处例外照 D-09 登记**：随包 onefile sidecar 在本机 `dlopen` 被签名拒，故「引导器是否
+    转发 SIGTERM」未测；`RunEvent::Exit` 钩子本身只有阅读级覆盖。
+- **Current**：T-04 运行期完整性校验——尚未开工。
+- **Next**：T-04 → T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
 - **Blocked**：无。Q-04（「组件与资源版本」的口径）在 **T-06 内部**待定，若定不下则退回用户。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
   Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。
