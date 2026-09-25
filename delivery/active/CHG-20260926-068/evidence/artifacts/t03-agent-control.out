@@ -1,0 +1,14 @@
+== agent tests/test_control_sh.py (post-write) ==
+test_direct_invocation_help_exits_zero (tests.test_control_sh.ControlEntryTest.test_direct_invocation_help_exits_zero) ... ok
+test_entry_exists (tests.test_control_sh.ControlEntryTest.test_entry_exists) ... ok
+test_entry_is_tracked_by_git (tests.test_control_sh.ControlEntryTest.test_entry_is_tracked_by_git) ... ok
+test_help_lists_every_verb (tests.test_control_sh.ControlEntryTest.test_help_lists_every_verb) ... ok
+test_index_mode_is_100755 (tests.test_control_sh.ControlEntryTest.test_index_mode_is_100755) ... ok
+test_unknown_verb_exits_two_with_usage_on_stderr (tests.test_control_sh.ControlEntryTest.test_unknown_verb_exits_two_with_usage_on_stderr) ... ok
+test_working_tree_mode_is_executable (tests.test_control_sh.ControlEntryTest.test_working_tree_mode_is_executable) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.060s
+
+OK
+exit=0

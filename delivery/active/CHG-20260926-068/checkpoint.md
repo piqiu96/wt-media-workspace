@@ -32,13 +32,18 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   变异 ① `chmod -x` → 4 passed／8 failed；② index-only → **恰 1 failed**（与 desktop 同数同分布）。
   全跑 `exit=0`（`^ok\s` 56／`^FAIL` 0／vitest 25-166／`[control]` 12-0）。详见 `evidence/task-02-cloud-entry.md`。
 
+- **T-03 agent**：新建 `tests/test_control_sh.py`（unittest，7 用例，`subprocess` **直接调用**；git 缺席时 `fail` 不 `skip`）。
+  变异 ① `chmod -x` → 3 passed／4 failed；② index-only → **恰 1 failed**。全跑 `exit=0`、**`Ran 416`／`OK`**（基线 409，**+7 = 新增用例数**）；
+  `.local/` 污染护栏未触发（该检出**有** `.local/`，护栏处于生效态；needle 在 `scripts/test.sh` 里命中 1 处）。
+  详见 `evidence/task-03-agent-entry.md`。
+
 ## Current
 
-T-02 收尾：量体量、在 cloud 提交、在工作仓提交记录。
+T-03 收尾：量体量、在 agent 提交、在工作仓提交记录。
 
 ## Next
 
-T-03 agent：新建 `tests/test_control_sh.py`（unittest，六条判据，`subprocess` 直接调用）。
+T-04 workspace：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓复证 1-4、6）。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -70,3 +75,6 @@ T-03 agent：新建 `tests/test_control_sh.py`（unittest，六条判据，`subp
 | cloud 机检（T-02） | 绿 12 passed／0 failed；变异 ① `chmod -x` → 8 failed、② index-only → **恰 1 failed**；还原后复读 `100755` |
 | cloud 全跑（T-02） | `scripts/test.sh` `exit=0`：`go test` `^ok\s` 56／`^FAIL` 0、vitest `Test Files 25 passed (25)`／`Tests 166 passed (166)`、`[control]` 12 passed｜0 failed |
 | 前缀承重性（T-02） | 剥 `[control] ` 后：green 日志 delta 0（**空转，如实记**）、**red 日志 `^FAIL` 0 → 9**；比较器阳性对照 1/1 |
+| agent 机检（T-03） | 绿 7/7；变异 ① `chmod -x` → 4 failed、② index-only → **恰 1 failed**；还原后复读 `100755` |
+| agent 全跑（T-03） | `scripts/test.sh` `exit=0`：`Ran 416`／`OK`（基线 409，+7）；`.local/` 护栏未触发 |
+| 实况进程归属（T-03） | 8765＝pid 54456 `local_api.server --port 8765`（ppid 1）、18080＝pid 54420（ppid 54410）；**两条 `stop` 都停不掉**（见 §14 第 4 项，T-05 必读） |

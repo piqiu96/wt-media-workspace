@@ -1,0 +1,72 @@
+== agent tests/test_control_sh.py -- mutations (each reverted) ==
+
+-- mutation 1: chmod -x bin/control.sh (disk only) --
+
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/test_control_sh.py", line 119, in test_unknown_verb_exits_two_with_usage_on_stderr
+    result = self.assert_invocable("no-such-verb")
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/test_control_sh.py", line 60, in assert_invocable
+    self.fail(
+    ~~~~~~~~~^
+        "bin/control.sh could not be invoked directly "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f"({' '.join(args)}): {exc}. A non-executable entry is the point "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "of this file -- run `chmod +x bin/control.sh`."
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: bin/control.sh could not be invoked directly (no-such-verb): [Errno 13] Permission denied: '/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/bin/control.sh'. A non-executable entry is the point of this file -- run `chmod +x bin/control.sh`.
+
+======================================================================
+FAIL: test_working_tree_mode_is_executable (tests.test_control_sh.ControlEntryTest.test_working_tree_mode_is_executable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/test_control_sh.py", line 96, in test_working_tree_mode_is_executable
+    self.assertTrue(os.access(CONTROL, os.X_OK), f"not executable: {CONTROL}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : not executable: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/bin/control.sh
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.042s
+
+FAILED (failures=4)
+
+-- revert check --
+Ran 7 tests in 0.181s
+
+OK
+
+-- mutation 2: git update-index --chmod=-x (index only; disk stays +x) --
+-rwxr-xr-x@ 1 aqiuye  staff  4445 Sep 26 02:34 bin/control.sh
+....F..
+======================================================================
+FAIL: test_index_mode_is_100755 (tests.test_control_sh.ControlEntryTest.test_index_mode_is_100755)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/test_control_sh.py", line 89, in test_index_mode_is_100755
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        mode,
+        ^^^^^
+        "100755",
+        ^^^^^^^^^
+        f"git index mode is {mode}; a fresh checkout would not be executable",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: '100644' != '100755'
+- 100644
++ 100755
+ : git index mode is 100644; a fresh checkout would not be executable
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.058s
+
+FAILED (failures=1)
+
+-- revert check --
+100755 32ffb497e9197172b872a89080292f83fb46e462 0	bin/control.sh
+Ran 7 tests in 0.055s
+
+OK

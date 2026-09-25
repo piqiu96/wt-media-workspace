@@ -123,7 +123,7 @@ None.
 | T-00 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓基线与监听面读数；`MASTER` §3 按 F-06 刷新三项 | DONE（`e4e1587`） | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.`。见 `evidence/task-00-activation.md` |
 | T-01 | **desktop**：`bin/control.sh` 模式 → `100755`（磁盘＋index）；新建 `tests/control.test.sh`（755，六条判据） | DONE | 改前 `./bin/control.sh help` **126**／改后 **0**；先红 3/9；**变异红** 8 failed（`chmod -x`）与恰 1 failed（`git update-index --chmod=-x`）；`scripts/test.sh` `exit=0`（372／12／20）。见 `evidence/task-01-desktop-entry.md` |
 | T-02 | **cloud**：新建 `scripts/verify/test-control.sh`＋`scripts/test.sh` 一行＋`scripts/README.md` 一行 | DONE | `bash scripts/test.sh` `exit=0`（`^ok\s` 56／`^FAIL` 0／vitest 25-166／`[control]` 12-0）；**变异红** 8 failed 与恰 1 failed；`[control]` 13 行对门禁两条正则各贡献 0 行。见 `evidence/task-02-cloud-entry.md` |
-| T-03 | **agent**：新建 `tests/test_control_sh.py` | TODO | `unittest discover -s tests -q` 新基线；**变异红**；`.local/` 污染护栏仍绿 |
+| T-03 | **agent**：新建 `tests/test_control_sh.py` | DONE | 7 用例绿；**变异红** 4 failed 与恰 1 failed；`Ran 416`（基线 409，+7）；`.local/` 护栏未触发。见 `evidence/task-03-agent-entry.md` |
 | T-04 | **workspace**：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓） | TODO | 两条绿；**变异红**：`chmod -x wt-media-desktop/bin/control.sh` → 跨仓用例在 desktop 那格红（CHG-067 漏掉的缺陷类别）→ 还原；六门禁 `exit=0` |
 | T-05 | **workspace**：四仓四动词**真跑**（16 格），先停实况，逐仓 `status → start → status → restart → status → stop → status`，原始读数落 `evidence/artifacts/t05-*-verbs.out`；收尾留在运行态 | TODO | 逐格标注「端到端／止于既有前置／未覆盖」；仓序 cloud → agent → desktop → workspace；副作用登记 |
 | T-06 | **workspace**：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | TODO | 六门禁 ＋ `unittest` ＋ `sync_skills.py check`，取在最后一次改动之后；两遍指针扫描（各带对照与分母，锚取**不变基线**）；四仓 `git status` 对账 |
@@ -149,7 +149,7 @@ None.
 
 ### wt-media-agent
 
-- [ ] `tests/test_control_sh.py`（T-03）
+- [x] `tests/test_control_sh.py`（T-03）
 
 ### wt-media-desktop
 
@@ -160,9 +160,9 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | desktop `bin/control.sh` 可直接调用 | 改前 `help`=**126**／改后 **0**；index 与磁盘均 `100755` | PASS（T-01） |
-| AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PARTIAL：desktop（T-01）与 cloud（T-02）已绿＋各两处变异；agent／workspace 待 T-03／T-04 |
+| AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PARTIAL：desktop（T-01）／cloud（T-02）／agent（T-03）已绿＋各两处变异；workspace 待 T-04 |
 | AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | TODO |
-| AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PARTIAL：desktop（T-01）／cloud（T-02）同数同分布（8／1）；agent／workspace 待 T-03／T-04 |
+| AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PARTIAL：三仓同形（磁盘变异连带 4～8 项红／index 变异恰 1 项红）；workspace 待 T-04 |
 | AC-05 | 跨仓回指与既有判据不被本 CHG 打红 | 六个静态门禁 `exit=0` ＋ `unittest` 套件 `OK` | TODO |
 | AC-06 | 改动逐条落在 §5；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 路径逐条归属；端口值 diff **0** | TODO |
 | AC-07 | 记录体量按**每 Task 增量**在界内 | `change.md` ≤ 5120 B／Task、`checkpoint.md` ≤ 4096、evidence md ≤ 9216；锚取上一 Task 提交后的 blob | TODO |
@@ -174,6 +174,7 @@ None.
 - `evidence/task-00-activation.md` ＋ `artifacts/t00-*.out`（`t00-baseline.out`、`t00-status-words.out`、`t00-gate-activation.out`、`t00-record-size.out`）
 - `evidence/task-01-desktop-entry.md` ＋ `artifacts/t01-entry-red.out`、`t01-entry-fix-and-mutations.out`、`t01-desktop-test-sh.out`
 - `evidence/task-02-cloud-entry.md` ＋ `artifacts/t02-cloud-control.out`、`t02-cloud-mutations.out`、`t02-cloud-prefix-control.out`、`t02-cloud-test-sh.out`
+- `evidence/task-03-agent-entry.md` ＋ `artifacts/t03-agent-control.out`、`t03-agent-mutations.out`、`t03-agent-test-sh.out`
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 ## 12. Current Checkpoint
@@ -211,3 +212,12 @@ None.
    「前缀是承重的」——绿跑根本不写 `FAIL` 行，两边都为 0 说明不了任何事。改用 red 日志（变异 ① 的输出）
    才拿到有分母的读数（+9），并把「比较器先证明自己能触发」（合成两行 → 1/1）补进产物。
    （同 CHG-067 的同类自踩；判据纪律要求「否定结论先证明检查能失败」。）
+
+4. **T-03：实况的两个进程，两条 `stop` 都停不掉它们——T-05 的「先停实况」不能靠 `bin/control.sh stop`。** 实测（T-03 收尾）：
+   8765 上是 pid 54456 `wt_media_agent.local_api.server --port 8765`（ppid 1，09-25 11:54 起）；而 agent `bin/control.sh`
+   的**默认端口是 18765**（`WT_MEDIA_AGENT_HEALTH_PORT`，本仓唯一把端口字面量留在脚本里的例外），
+   其 pid 文件 `.cache/wt-media-agent-health.pid` 里是**已死的 75067** ⇒ `stop` 只会打印 "stopped" 并删掉那个陈旧文件，
+   54456 照旧活着。cloud 同理：18080 上是 pid 54420（ppid 54410），而 `.cache/wt-media-cloud.pid` **不存在** ⇒ `stop` 报 "not running"。
+   ⇒ 这两个实况进程是**别处**（09-25 手工／harness）起的，不在本仓 pid 文件的记录内；
+   T-05 必须**按 pid 直接杀**（用户已裁定「直接全部杀掉重跑」），不能写成「用 `stop` 停掉」——
+   否则那两格会变成「`stop` 退 0 但进程仍在」的假绿。**这是 T-05 的必读前置。**
