@@ -1,0 +1,3 @@
+$ pyrun scripts/verify_delivery_governance.py
+Delivery governance verification ok. Active CHG: CHG-20260925-063
+exit=0

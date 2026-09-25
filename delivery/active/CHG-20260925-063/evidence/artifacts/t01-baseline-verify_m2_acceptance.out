@@ -1,0 +1,7 @@
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m2_acceptance.py
+ERROR: missing file: /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/internal/modules/cloudagent/compatibility.go
+ERROR: /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/src/wt_media_agent/cloud_agent_contract.py: missing 'REQUIRED_CONTRACT_REVISION = "2026.07.15.1"'
+ERROR: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/src/main.rs: missing '"wt-media-agent"'
+ERROR: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/src/local_agent/mod.rs: missing 'fn consume_binding_ticket('
+ERROR: /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri/src/local_agent/mod.rs: missing 'pub fn bind_session<T: BindingTransport>('
+exit=1

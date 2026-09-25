@@ -1,0 +1,4 @@
+$ pyrun scripts/verify_agent_entry.py
+execution snapshot: 1919 characters (~768 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+exit=0

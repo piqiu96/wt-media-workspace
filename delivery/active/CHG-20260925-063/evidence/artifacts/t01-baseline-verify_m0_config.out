@@ -1,0 +1,5 @@
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m0_config.py
+ERROR: cloud_api: expected contract_revision '2026.07.14.4'
+ERROR: local_agent_api: expected contract_revision '2026.07.14.7'
+ERROR: missing CI workflow: wt-media-workspace/.github/workflows/m0-workspace.yml
+exit=1

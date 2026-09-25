@@ -1,0 +1,80 @@
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q
+======================================================================
+FAIL: test_contract_map_matches_m1_cloud_agent_compatibility (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_matches_m1_cloud_agent_compatibility)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/tests/test_verify_m0_config.py", line 28, in test_contract_map_matches_m1_cloud_agent_compatibility
+    self.assertEqual(errors, [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: Lists differ: ["cloud_api: expected contract_revision '2[71 chars].7'"] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+"cloud_api: expected contract_revision '2026.07.14.4'"
+
++ []
+- ["cloud_api: expected contract_revision '2026.07.14.4'",
+-  "local_agent_api: expected contract_revision '2026.07.14.7'"]
+
+======================================================================
+FAIL: test_contract_map_provider_paths_exist_in_full_workspace (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_provider_paths_exist_in_full_workspace)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/tests/test_verify_m0_config.py", line 37, in test_contract_map_provider_paths_exist_in_full_workspace
+    self.assertEqual(errors, [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: Lists differ: ["cloud_api: expected contract_revision '2[71 chars].7'"] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+"cloud_api: expected contract_revision '2026.07.14.4'"
+
++ []
+- ["cloud_api: expected contract_revision '2026.07.14.4'",
+-  "local_agent_api: expected contract_revision '2026.07.14.7'"]
+
+======================================================================
+FAIL: test_static_cross_repo_contract_and_security_matrix (test_verify_m2_acceptance.VerifyM2AcceptanceTests.test_static_cross_repo_contract_and_security_matrix)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/tests/test_verify_m2_acceptance.py", line 28, in test_static_cross_repo_contract_and_security_matrix
+    self.assertEqual(module.validate_static_matrix(), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['missing file: /Users/aqiuye/Develop/work[622 chars]>('"] != []
+
+First list contains 5 additional elements.
+First extra element 0:
+'missing file: /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/internal/modules/cloudagent/compatibility.go'
+
+Diff is 719 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_current_product_master_and_governance_are_aligned (test_verify_product_master_alignment.ProductMasterAlignmentTests.test_current_product_master_and_governance_are_aligned)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/tests/test_verify_product_master_alignment.py", line 33, in test_current_product_master_and_governance_are_aligned
+    self.assertEqual(self.module.validate_alignment(ROOT), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["M2 status expected 'IN_PROGRESS', got 'D[407 chars]NG'"] != []
+
+First list contains 10 additional elements.
+First extra element 0:
+"M2 status expected 'IN_PROGRESS', got 'DONE'"
+
++ []
+- ["M2 status expected 'IN_PROGRESS', got 'DONE'",
+-  "M3 status expected 'NOT_STARTED', got 'DONE'",
+-  "M2 capability missing '按五条业务闭环顺序补齐'",
+-  "M3 candidate missing 'source_content'",
+-  "M3 candidate missing 'Scheduler'",
+-  "M3 candidate missing '正式任务 Schema'",
+-  "M3 candidate missing '真实抖音接口'",
+-  "M10 capability missing 'FFmpeg/FFprobe 分发'",
+-  'active CHG must have no pending questions',
+-  "Ledger is not aligned with active CHG CHG-20260925-063 status 'IMPLEMENTING'"]
+
+----------------------------------------------------------------------
+Ran 73 tests in 0.287s
+
+FAILED (failures=4)
+exit=1

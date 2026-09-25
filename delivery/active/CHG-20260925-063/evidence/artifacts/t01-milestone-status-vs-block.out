@@ -1,0 +1,12 @@
+milestone  status                                     cand_block_chars  fallback
+M0         DONE                                          267              -
+M1         DONE                                          320              -
+M2         DONE                                            0              or sections[2]
+M3         DONE                                            0              -
+M4         NOT_STARTED                                   338              -
+M5         NOT_STARTED                                   239              -
+M6         NOT_STARTED                                   357              -
+M7         NOT_STARTED                                   120              -
+M8         NOT_STARTED                                   270              -
+M9         NOT_STARTED                                   213              -
+M10        NOT_STARTED                                   400              -

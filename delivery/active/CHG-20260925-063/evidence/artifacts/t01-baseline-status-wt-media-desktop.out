@@ -1,0 +1,2 @@
+$ git -C ../wt-media-desktop status --porcelain
+exit=0

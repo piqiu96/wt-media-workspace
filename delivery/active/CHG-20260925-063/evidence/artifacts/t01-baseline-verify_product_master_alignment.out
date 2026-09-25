@@ -1,0 +1,12 @@
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_product_master_alignment.py
+ERROR: M2 status expected 'IN_PROGRESS', got 'DONE'
+ERROR: M3 status expected 'NOT_STARTED', got 'DONE'
+ERROR: M2 capability missing '按五条业务闭环顺序补齐'
+ERROR: M3 candidate missing 'source_content'
+ERROR: M3 candidate missing 'Scheduler'
+ERROR: M3 candidate missing '正式任务 Schema'
+ERROR: M3 candidate missing '真实抖音接口'
+ERROR: M10 capability missing 'FFmpeg/FFprobe 分发'
+ERROR: active CHG must have no pending questions
+ERROR: Ledger is not aligned with active CHG CHG-20260925-063 status 'IMPLEMENTING'
+exit=1

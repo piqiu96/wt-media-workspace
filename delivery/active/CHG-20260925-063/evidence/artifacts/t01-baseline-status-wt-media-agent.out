@@ -1,0 +1,2 @@
+$ git -C ../wt-media-agent status --porcelain
+exit=0

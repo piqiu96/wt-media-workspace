@@ -1,0 +1,3 @@
+$ pyrun scripts/verify_skills.py
+verified 10 skill source files
+exit=0

@@ -1,0 +1,5 @@
+test mutation / probe string                                       exists_in_MASTER
+'M3-C6 source_content 全局去重、状态和最新原始 JSON'                           False
+'### M2-C：代理与 Profile 闭环'                                          True
+'| 状态 | `DONE` |'                                                  True
+'M8-C2 interaction_task、账号级 task 和动作快照'                            True

@@ -1,0 +1,3 @@
+$ git -C ../wt-media-cloud status --porcelain
+?? dump.rdb
+exit=0
