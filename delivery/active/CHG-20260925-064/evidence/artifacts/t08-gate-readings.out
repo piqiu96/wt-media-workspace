@@ -1,0 +1,65 @@
+# T-08 gate readings
+
+## 初遍（checkpoint.md 更新之前；本记录与 checkpoint 是门禁读入的对象）
+
+2026-09-25 20:06:16 CST
+
+verify_delivery_governance.py            exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-064
+verify_agent_entry.py                    exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py                         exit=0 | verified 10 skill source files
+verify_m0_config.py                      exit=0 | Workspace config verification ok
+verify_product_master_alignment.py       exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                  exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                                 exit=0 | OK
+sync_skills.py check                     exit=0 | skill outputs are up to date
+## 关闭遍（记录最后一次内容改动之后）
+
+取数时间：2026-09-25 20:07:05 CST
+
+verify_delivery_governance.py            exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-064
+verify_agent_entry.py                    exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py                         exit=0 | verified 10 skill source files
+verify_m0_config.py                      exit=0 | Workspace config verification ok
+verify_product_master_alignment.py       exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                  exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                                 exit=0 | Ran 79 tests in 0.293s OK 
+sync_skills.py check                     exit=0 | skill outputs are up to date
+
+## 复核遍（本记录引用 20:07:05 那次读数、并改写该行之后重跑）
+
+三遍读数（除 `unittest` 的耗时）逐行相同即通过；checkpoint.md 的正文不被任何门禁解析（只查存在性），故此遍只为「收尾读数在最后一次改动之后」这条纪律而留。
+
+取数时间：2026-09-25 20:07:17 CST
+
+verify_delivery_governance.py            exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-064
+verify_agent_entry.py                    exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py                         exit=0 | verified 10 skill source files
+verify_m0_config.py                      exit=0 | Workspace config verification ok
+verify_product_master_alignment.py       exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                  exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                                 exit=0 | Ran 79 tests in 0.277s OK 
+sync_skills.py check                     exit=0 | skill outputs are up to date
+## 复核遍 2（三仓提交哈希与 §14 第 16 项登记之后；本记录的最后一次改动）
+
+取数时间：2026-09-25 20:08:20 CST
+
+verify_delivery_governance.py            exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-064
+verify_agent_entry.py                    exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py                         exit=0 | verified 10 skill source files
+verify_m0_config.py                      exit=0 | Workspace config verification ok
+verify_product_master_alignment.py       exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                  exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                                 exit=0 | Ran 79 tests in 0.284s OK 
+sync_skills.py check                     exit=0 | skill outputs are up to date
+## 末遍（本记录不再写死取数时间、改指本文件之后的最后一次重跑）
+
+取数时间：2026-09-25 20:08:36 CST
+
+verify_delivery_governance.py            exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-064
+verify_agent_entry.py                    exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py                         exit=0 | verified 10 skill source files
+verify_m0_config.py                      exit=0 | Workspace config verification ok
+verify_product_master_alignment.py       exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                  exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                                 exit=0 | Ran 79 tests in 0.276s OK 
+sync_skills.py check                     exit=0 | skill outputs are up to date

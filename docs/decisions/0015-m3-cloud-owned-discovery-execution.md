@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-09-16
 - Scope: M3 内容池、挖掘策略、挖掘任务及 Douyin 内容发现适配
-- Supersedes: ADR-0013 第 6 条中“Cloud Agent 查询外部平台”的 M3 具体实现约束；不改变 M2 浏览器、文件、FFmpeg、发布和互动自动化的 Agent 边界。
+- Supersedes: ADR-0013 第 6 条中“Cloud Agent 查询外部平台”的 M3 具体实现约束；不改变 M2 浏览器、文件、发布和互动自动化的 Agent 边界；M4-M5 视频合成的 FFmpeg 执行由 Cloud Compose Worker 承担（ADR-0017），不在该边界内。
 
 ## Context
 
@@ -24,7 +24,7 @@ M3 的内容挖掘只需要访问公开/已授权的内容数据接口，不涉�
 
 - M3 的最小闭环不依赖 Agent/桌面进程，任务事实集中在 Cloud；Scheduler 重启不会丢失已经创建的 `crawl_task`，Worker 可从数据库继续领取待执行任务。
 - Scheduler 与执行器可以在同一 Cloud 进程部署，但不能共享同一职责或同步调用链；独立 CMD 运行时必须通过数据库的原子领取和调度幂等避免重复执行。
-- Agent 仍是 M2 本地浏览器、文件、FFmpeg、发布和互动等外部执行能力的唯一入口；本 ADR 不是全局撤销 Agent 架构。
+- Agent 仍是 M2 本地浏览器、文件、发布和互动等外部执行能力的唯一入口；本 ADR 不是全局撤销 Agent 架构。M4-M5 视频合成的 FFmpeg 执行不在该边界内：它由 Cloud Compose Worker 调用 Cloud 运行环境中的 FFmpeg 完成（ADR-0017）。
 - 真实 Douyin 验收需要在 `config/clients/http/douyin.toml`（API 地址）与 `config/credentials/douyin.toml`（凭据）中提供有效值，并准备合法授权样本；缺少凭据只能验证接口契约和受控失败，不得宣称真实发现通过。（2026-09-23 更正：原文列的 `WT_MEDIA_DOUYIN_API_BASE` / `WT_MEDIA_DOUYIN_API_KEY` 环境变量对 Cloud 运行时无效。）
 
 ## 增补记录

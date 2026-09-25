@@ -47,7 +47,7 @@
 | 组 | 条目 | 现状 |
 |---|---|---|
 | C1 | 读取顺序 | **两版并存**：`AGENT-INDEX.md:7,:64`（入口 → 正文）与 `AGENTS.md:16-20`、`CLAUDE.md:22-26`（正文 → 快照 → CHG）；`MASTER:791-796` 还有第三版（Codex 专用，**整份不含 `AGENT-INDEX.md`**，第 1 项指向已被删除的根 `AGENTS.md`） |
-| C2 | FFmpeg 归属 | `docs/decisions/0015-*.md:6,:27` 判给 Agent；`0017-*.md:28,:40` 判给 Cloud（明确「均不执行视频合成」「FFmpeg 属于 Cloud 部署组件」），且 0017 的 `Supersedes` 清单**未含** FFmpeg。全仓其余落点（MASTER、架构文档、第二章、M2 里程碑）**一致判给 Cloud** |
+| C2 | FFmpeg 归属 | `docs/decisions/0015-*.md:6,:27` 判给 Agent；`0017-*.md:28,:40` 判给 Cloud（明确「均不执行视频合成」「FFmpeg 属于 Cloud 部署组件」），且 0017 的 `Supersedes` 清单**未含** FFmpeg。**T-08 复扫更正**：本行原写「全仓其余落点一致判给 Cloud」——**过宽**；同一口径下判给 Agent 的实为 **4 处**（`0015:6`、`0015:27` 与两个 skill：`skills/common/common-architecture-review/SKILL.md:13`、`skills/desktop/desktop-sidecar-update/SKILL.md:3`），其余落点（MASTER、架构文档、第二章、M2／M4／M5 里程碑）判给 Cloud 或为排除句。逐条判定见 `evidence/task-08-ffmpeg-ownership.md` |
 | C3 | CHG／里程碑状态词汇 | `MASTER:105-128` 写 `TODO → IMPLEMENTED → VERIFIED → CLOSED`；`verify_product_master_alignment.py:290` 只接受 `{IN_PROGRESS, IMPLEMENTING, VERIFYING, ACTIVE}`（**两套零重叠**）；模板 `templates/delivery/change.md:6` 用 `DISCUSSION`；实测在用的还有 `PLANNED`、`SUPERSEDED`，**两者在任何权威源里都没有定义** |
 | C4 | 前端源码根 | `docs/engineering/specs/web-desktop-visual-system.md` **9 处**写 `wt-media-cloud/frontend`（实测不存在），并称其为「唯一前端源码来源」；另行号 284-287、407 的 `frontend` 是 **JSON 字段名／脚本名**，不是目录名 |
 | C5 | 两个入口文件的硬约束集不一致 | `AGENTS.md:27` 的 `config/repository-map.yaml` 红线在 `CLAUDE.md` 里**没有**；`CLAUDE.md:35-38` 的红线在 `AGENTS.md` 里**没有** |
@@ -76,7 +76,7 @@
 
 ### 4.4 开工时的三仓基线（记下来，避免 CHG-063 AC-12 那样的缺口）
 
-`git status --porcelain` 于 T-01 记录，见 §11。本 CHG 对三仓零写，收尾时按同一命令复测。
+`git status --porcelain` 于 T-01 记录，见 §11。本 CHG **不改三个运行仓的任何运行时代码**；T-08 起，`skills/` 源件的改动按 `config/skills-distribution.yaml` 分发，三仓会收到 `.claude/skills`／`.codex/skills` 下的生成副本（`commit_generated: true`，随各自仓库提交）。收尾时按同一命令复测，并与「只多出分发副本」逐条对账（§8.6）。
 
 ## 5. Scope
 
@@ -99,6 +99,7 @@
 - `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md`（T-10 目录树与执行根段）
 - `docs/README.md`、`docs/product/README.md`（T-10 外层 `docs` 指针）
 - `scripts/verify_product_master_alignment.py`、`templates/delivery/change.md`、两个 workspace skill（T-06）
+- `skills/common/common-architecture-review/SKILL.md`、`skills/desktop/desktop-sidecar-update/SKILL.md`（T-08；并连带重生成 `.claude/skills`、`.codex/skills` 与三仓的副本）
 - `delivery/planned/*/change.md`、`delivery/planned/README.md`（T-07）
 - `docs/engineering/specs/web-desktop-visual-system.md`、`docs/engineering/specs/README.md`（T-11）
 
@@ -112,6 +113,7 @@
 - **不为「里程碑文件头的状态声明」新增一致性判据**：会把文件头格式冻成契约（M2 与 M3 的头格式已不同），与 CHG-063 的判据稳定性分层结论相悖。
 - **不删除 `agent-workspace-conventions.md`、不把它并入 `AGENT-INDEX.md`**（用户裁定「精简保留」）。
 - **不改 `0017` 的 `Supersedes` 清单**（用户政策：调整历史直接覆盖旧的，不留取代注记；变更理由记在本记录 §4.2 C2 与本记录内）。
+- **不改三个运行仓的任何运行时代码、配置或测试**。T-08 的复扫发现两处活落点在 skill 源件里（`skills/common/common-architecture-review/SKILL.md`、`skills/desktop/desktop-sidecar-update/SKILL.md`）——改源件必然经 `scripts/sync_skills.py` 分发到三仓的 `.claude/skills`／`.codex/skills`（`config/skills-distribution.yaml` 的 `commit_generated: true`），这些副本随各自仓库提交（`AGENT-INDEX.md` §9「一仓一 commit」）。这是分发机制的必然结果，不是跨仓代码改动；只改 ADR 而不改这两个 skill，则 AC-08 的「唯一结论＝Cloud」不成立。
 - **不动权限**（沿用用户 2026-09-25 早先的裁定）。
 - **不做架构文档 `_V1.md` 的全篇审计**：只处置被点名的三处（目录树 `verifying/`、执行根入口段、前端源码根），其余陈旧点登记为遗留。
 - **不碰 M4**（`CHG-20260924-061` 仍在 `planned`）。
@@ -145,7 +147,7 @@ None.
 | T-05 | 状态词汇成文（`MASTER:105-128` 就地覆盖为实测在用词汇＋一行历史词汇） | DONE | 见 §8.3；CHG 六词、里程碑四词、退役词与分母逐项报出；阳性对照 `CLOSED` 2／`HANDOFF` 2 | T-04 |
 | T-06 | 脚本／模板／checkpoint 落点对齐（接受集、文案、模板、新增结构检查） | DONE | 见 §8.4；六门禁 `exit=0` ＋ `Ran 79 tests`；**新判据两条均做变异对照**（失红后还原经 `cmp` 逐字节）；**在本 CHG 仍 active 时复测**（接受集正打在自己的 LEDGER 表行上） | T-05 |
 | T-07 | `planned` 记录状态词就地改写 | DONE | 见 §8.5；活记录 20 篇改前 19/20、改后 **20/20** 落在 §3 表内（阳性对照：同一脚本对归档仍报 8 处表外词）；023 的 diff 恰一行 | T-06 |
-| T-08 | FFmpeg 归属（ADR-0015 就地改写） | TODO | 全仓归属落点复扫＝Cloud；阳性对照 | 独立 |
+| T-08 | FFmpeg 归属（ADR-0015 就地改写 ＋ 复扫发现的两处 skill 落点） | DONE | 见 §8.6；活文件里判给 Agent 的落点 **4 → 0**（20 条候选逐条判定）；扫描器阳性对照 9→10 且还原经 `sha256` 证明 | 独立 |
 | T-09 | 里程碑与交付事实（C6／B-3／N1） | TODO | 该 grep 改前 ≥3、改后 0；四处逐字一致 | 独立 |
 | T-10 | 目录树、死指针、执行根入口描述、外层 `docs` 指针 | TODO | `verifying/` 只余历史归档；树内条目逐条 `ls`；`根 \`AGENTS.md\`` → 0 | 独立 |
 | T-11 | 前端源码根 + 两篇视觉规范合并 | TODO | `wt-media-cloud/frontend` → 0；索引数与实际篇数一致；删除前逐节对照 | 独立 |
@@ -231,6 +233,24 @@ None.
 
 细节见 `evidence/task-07-live-status-words.md`。
 
+### 8.6 FFmpeg 归属：就地改写与全仓复扫（T-08）
+
+计划点名的是 `0015:6`／`:27`；**复扫又咬出两处**，本 Task 一并处置（否则 AC-08 当场不成立）。
+
+| 项 | 读数 |
+|---|---|
+| 扫描口径 | `git ls-files` 排除 `delivery/completed|reports` 与生成副本目录，把「执行方词」与「ffmpeg 词」同子句（`。；;`）且相距 ≤80 字符的地方摊开；**候选两列都不是结论**，判定逐条做 |
+| 分母 | 改前 102 行／26 文件；改后 **100 行／24 文件**（两个 skill 整个不再含 `ffmpeg`） |
+| 判给 Agent 的活落点 | **4 → 0**：`0015:6`（藏在否定列——`不改变…的边界` 仍断言了边界的内容）、`0015:27`、`skills/common/common-architecture-review/SKILL.md:13`、`skills/desktop/desktop-sidecar-update/SKILL.md:3` |
+| 改写方式 | 按用户裁定**整句重写**：从 M2 的 Agent 边界清单里去掉 FFmpeg，并就地补明它的归属（Cloud Compose Worker，ADR-0017）。改写后这两行**整体退出候选集**（不是被挪进「已排除」列） |
+| 两个 skill | 源件改后经 `sync_skills.py sync` 分发；`check` → `skill outputs are up to date`，`exit=0` |
+| 阳性对照 | 把 `MASTER:454` 注入成 `- 视频合成由 Local Agent 执行 FFmpeg；` → candidate **9→10**，新条目正是该行；`git restore` 后 `sha256` 与注入前相同、`git status` 为空 ⇒ 逐字节还原 |
+| 未改 | `0017` 的 `Supersedes` 清单（用户政策）；`0016:13` 对旧 §5.4 的引述（ADR `Context` 的历史引述，但暴露「引述型落点」失效，登记 §14 第 15 项） |
+
+**记录更正**：§4.2 C2 原写「全仓其余落点一致判给 Cloud」过宽，已就地更正；§4.4／§9／AC-15 的「三仓零写」按分发机制改写为「不改运行时代码，只收分发副本」。
+
+细节见 `evidence/task-08-ffmpeg-ownership.md`。
+
 ## 9. Repository Checklist
 
 ### wt-media-workspace
@@ -241,15 +261,15 @@ None.
 
 ### wt-media-cloud
 
-- [ ] Not affected（只被读：源码根与构建脚本作为事实依据）
+- [x] 不改代码（只被读：源码根与构建脚本作为事实依据）；T-08 收到 `.claude/skills`／`.codex/skills` 下的 `common-architecture-review` 生成副本（2 文件，各 1 行），提交 `0346edf`，提交后 `git status` 回到开工基线
 
 ### wt-media-agent
 
-- [ ] Not affected
+- [x] 不改代码；T-08 收到同名生成副本（2 文件，各 1 行），提交 `24da21b`，提交后 `git status` 回到开工基线
 
 ### wt-media-desktop
 
-- [ ] Not affected（只被读：`src-tauri/tauri.conf.json` 作为事实依据）
+- [x] 不改代码（只被读：`src-tauri/tauri.conf.json` 作为事实依据）；T-08 收到 `common-architecture-review` 与 `desktop-sidecar-update` 两份生成副本（4 文件，各 1 行），提交 `623583d`。**附带发现**：本仓 `.gitignore:10-11` 忽略 `.claude`／`.codex`，已有副本因已 tracked 才可提交 ⇒ 与 `commit_generated: true` 相冲，登记 §14 第 16 项
 
 ## 10. Acceptance Matrix
 
@@ -262,14 +282,14 @@ None.
 | AC-05 | `checkpoint.md` 有唯一权威落点、有模板、且有强制点（缺失会红） | T-06 的变异对照 | **PASS**（落点＝`AGENT-INDEX.md` §8／§9；模板＝`templates/delivery/checkpoint.md`；强制点＝`verify_delivery_governance.py`，失红并经活树阳性对照） |
 | AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的 grep 改前 ≥3／改后 0 | TODO |
 | AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`（含阳性对照） | TODO |
-| AC-08 | ADR-0015 与 ADR-0017 不再对 FFmpeg 归属给出相反答案；全仓该归属只有 Cloud 一个结论 | T-08 的复扫（含阳性对照） | TODO |
+| AC-08 | ADR-0015 与 ADR-0017 不再对 FFmpeg 归属给出相反答案；**活文件里没有一处把 FFmpeg 判给 Agent／Desktop**，该归属只有 Cloud 一个结论 | T-08 的复扫：改前 4 处 → 改后 0（20 条候选逐条判定，含阳性对照） | **PASS** |
 | AC-09 | `wt-media-cloud/frontend` 全仓 0 命中；被改的 `frontend` 只限目录名（字段名／脚本名不动） | T-11 的 grep＋逐处分类表 | TODO |
 | AC-10 | 视觉规范只剩一篇，且它自述为当前基线；其功能描述已去除、视觉与架构描述保留 | T-11 的逐节对照表 | TODO |
 | AC-11 | `conventions` 只剩规则与「为什么」，无一次性读数（6 类读数／叙述模式改前 1–7 命中、改后全 0）；两处活引用者**逐个复核**——改 1 处、留 1 处并给出留的理由 | T-03 的阳性对照读数（`evidence/task-03-conventions-slim.md`） | **PASS** |
 | AC-12 | `specs/README.md` 的索引条目数与该目录实际篇数一致 | T-11 的计数比对 | TODO |
 | AC-13 | 六个静态门禁 `exit=0`、`unittest` 全绿，且在**本 CHG 最后一次改动之后**重测 | T-12 的收尾读数 | TODO |
 | AC-14 | 归档后无失效指针（字符串扫描＋相对链接 resolve，各带阳性对照与分母） | T-12 的两遍扫描 | TODO |
-| AC-15 | 本 CHG 对三个运行仓零写 | 收尾 `git status --porcelain` 与开工基线逐条一致 | TODO |
+| AC-15 | 本 CHG **不改三个运行仓的任何运行时代码、配置或测试**；三仓相对开工基线的净增量只有 `skills/` 的分发副本，且 `sync_skills.py check` 绿 | 收尾 `git status --porcelain` 与开工基线逐条对账，逐份改动都属 `.claude/skills`／`.codex/skills` | TODO |
 
 ## 11. Evidence
 
@@ -282,7 +302,8 @@ Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期�
 - `evidence/task-05-status-vocab.md`
 - `evidence/task-06-script-template-checkpoint.md`
 - `evidence/task-07-live-status-words.md`
-- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`）
+- `evidence/task-08-ffmpeg-ownership.md`
+- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`、`t08-ffmpeg-ownership-sweep.py` ＋ `t08-sweep-head.out`／`t08-sweep-worktree.out`／`t08-sweep-positive-control.out`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
 **开工三仓基线**（T-01 记录，收尾按同一命令复测）：
@@ -319,7 +340,7 @@ $ git -C ../wt-media-desktop status --porcelain
 | 1 | `verify_agent_entry.py` 的 `check_entry_drift` workspace 臂恒空 | 它不改变 exit code，只制造「绿得没有证据」；把它塞进 `errors` 会让启发式措辞变化打红门禁。CHG-063 已登记，独立 CHG |
 | 2 | `MASTER:155` 与 `:355` 的里程碑状态双落点 | 今天两处一致故无活冲突；让前者进判据属扩大判据，与 CHG-063 的判据分层结论相悖 |
 | 3 | `AGENT-INDEX.md` §5 表未写前端源码根 | 属「补落点」而非「消冲突」 |
-| 4 | 架构文档 `_V1.md` 其余未扫的陈旧点 | 该文 2000+ 行，全篇审计会使本 CHG 范围失控 |
+| 4 | 架构文档 `_V1.md` **其余**未扫的陈旧点（该文的 FFmpeg 切片已由 T-08 扫过：24 行全部判给 Cloud 或为排除句） | 该文 2000+ 行，全篇审计会使本 CHG 范围失控 |
 | 5 | M0／M1 已 `DONE` 却仍留候选 CHG 块 | CHG-063 已登记 |
 | 6 | `LEDGER.md:21` 的「见上表」不可达 | CHG-062 遗留第 8 项；属 LEDGER 的历史叙述 |
 | 7 | `AGENT-INDEX.md:198` 曾把 `conventions §10` 定为「校验状态的唯一落点」，而 §10 承载的是易失读数 | **T-03 已取消该落点**（改为「校验读数不作文档落点」）；但「易失内容该不该有文档落点」这一机制尚无可机检的通用对策，登记 |
@@ -330,3 +351,5 @@ $ git -C ../wt-media-desktop status --porcelain
 | 12 | `CHG-044`／`CHG-052` 归档写的 `HANDOFF` 是否改判 `DONE` | 该裁定已由 `LEDGER.md:31` 专段登记并写明「属治理口径决定，本次不动」。T-05 只把 `HANDOFF` 列为退役词，不回改归档记录 |
 | 13 | **任务表**状态词（`TODO`／`DONE`）无门禁、无成文词表 | 它是与 CHG 状态**不同的轴**（T-06 已把 `MASTER` §3 的措辞限定到 CHG 轴）。为任务表新增判据会把 `templates/delivery/change.md:76` 的那一列文本冻成契约，属「补落点」，须独立裁定 |
 | 14 | 58 篇记录里 **9 篇**的状态行带注（`（…）`／`(…)`／`**WORD（…）**`）；机器现已能读，但「状态行该不该带注」**无成文规则** | T-06 把脚本改成先剥注再判（不剥就会读成 `None`，`CHG-20260923-059` 实例），**属把已有的书写习惯接住，不是给它立规**；立规会与「就地覆盖、不追加注记」的用户政策相互牵扯，须用户裁定 |
+| 15 | **「引述型落点」失效**：ADR 里逐字引用**基线正文**的句子，在基线被就地覆盖后失去所指（`0016:13` 引述的架构基线 §5.4 定义「文件、FFmpeg、浏览器…」在活文档 §5.4 已不存在——T-08 判定其为 ADR `Context` 的历史引述、不改，因它正是「为什么 §5.4 要改名」的理由） | 本 CHG 的政策是「就地覆盖、不留注记」，两者天然相冲：被覆盖的正文在被引述处不会得到任何提示。要机检得把「引述必须与所指文本一致」做成判据——会把 ADR 的 `Context` 段冻成契约，属独立裁定 |
+| 16 | `wt-media-desktop/.gitignore:10-11` 忽略 `.claude`／`.codex`，而 `config/skills-distribution.yaml` 对该仓声明 `commit_generated: true`、`conventions` §7 写「这 5 处副本都随各自仓库提交」——**新增**一份分发到 desktop 的 skill 会被 ignore 静默吞掉（既有的 10 份因已 tracked 才不受影响，T-08 正因此才提交得上） | 修它要动运行仓的 `.gitignore`（`git add -f` 只是绕过），且要先裁定「desktop 的 `.claude`／`.codex` 到底该不该 tracked」——先有这一层，才谈得上把 `commit_generated` 变成可强制的事实 |

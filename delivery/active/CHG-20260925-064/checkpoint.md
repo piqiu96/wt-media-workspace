@@ -22,14 +22,16 @@
 
 - **T-07 活记录状态词就地改写**：改前活记录 20 篇里不在 `MASTER` §3 表中的词**恰有 1 个**（`023` 的 `IN_PROGRESS`），改后 **20/20 全部落表**（阳性对照：同一脚本对归档记录仍报出 8 处表外词 ⇒ 扫描能咬住）。`023` 判 `SUPERSEDED` 是**内容判断**，两个互相独立的依据：`CHG-20260723-025` 的标题本身就是「M2-B1 浏览器窗口扫描与 Diff 只读闭环」（与 023 同标签），且 `CHG-20260725-031` 的收口矩阵把 B1 归给 025；023 的三项 Task 分别由 025／`026`／`022` 交付，它自己从未进过 `active/`、无 `evidence/`。`planned/README.md` 两处：023 那条已过期的旧理由就地覆盖；M3 表加列说明——该列写**程序进度**，不是记录的**状态词**，故 `045` 的「已实施…由 CHG-052 承载」与它自己的 `DISCUSSION` 不矛盾（**只让两轴可分辨，不改判任何草案**，七份草案的终态词归 §14 第 8 项）。`MASTER` §3 的实测读数列连带更新：`SUPERSEDED` 活列 8→9、`IN_PROGRESS` 活记录 1→0，并改掉被本 Task 直接证伪的「`planned` 记录保持原样」这半句。
 
+- **T-08 FFmpeg 归属：就地改写 ＋ 全仓复扫**：按用户裁定把 `ADR-0015:6`／`:27` **整句重写**（不删词、不留取代注记），并从 M2 的 Agent 边界清单里去掉 FFmpeg、就地补明它属 Cloud Compose Worker（ADR-0017）。**复扫又咬出两处**计划没点名的活落点——`skills/common/common-architecture-review/SKILL.md:13` 与 `skills/desktop/desktop-sidecar-update/SKILL.md:3` 都直白断言 Agent 拥有 FFmpeg，只改 ADR 则 AC-08 当场不成立，故一并改。判给 Agent 的活落点 **4 → 0**（改后 20 条候选逐条判定：Cloud-owned／排除句／清单／历史引述／本记录自述，无一条判给 Agent）。扫描口径与分母：`git ls-files` 排除 `completed|reports` 与生成副本目录，同子句（`。；;`）内「执行方词」与「ffmpeg 词」相距 ≤80 字符即入候选，**两列都不是结论**（`0015:6` 的真冲突恰恰藏在否定列里）。阳性对照：把 `MASTER:454` 注入成「视频合成由 Local Agent 执行 FFmpeg」→ candidate **9→10** 且新条目正是该行，`git restore` 后 `sha256` 与注入前相同。**两处记录更正**：§4.2 C2 原写「全仓其余落点一致判给 Cloud」**过宽**（漏了两个 skill），就地更正；§4.4／§9／AC-15 的「三仓零写」按分发机制改写为「不改运行时代码，只收 `skills/` 的分发副本」。`sync_skills.py check` → `skill outputs are up to date`；三仓各自收到生成副本并随各自仓库单独提交（`commit_generated: true`，`AGENT-INDEX.md` §9）。
+
 ## Current
 
-- T-07 已落。下一个是 T-08（FFmpeg 归属）——T-08 起各 Task 相互独立，可换序。
+- T-08 已落。下一个是 T-09／T-10／T-11（相互独立，可换序）。
 
 ## Next
 
-1. **T-08／T-09／T-10／T-11**（相互独立，可换序）：FFmpeg 归属（ADR-0015 整句重写）／里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
-2. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描。
+1. **T-09／T-10／T-11**（相互独立，可换序）：里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
+2. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描；并按 AC-15 与开工基线对账三仓（只应多出 `skills/` 分发副本）。
 
 ## Blocked
 
@@ -45,15 +47,18 @@
 | `verify_m0_config.py` | `exit=0` |
 | `verify_product_master_alignment.py` | `exit=0` |
 | `verify_m2_acceptance.py` | `exit=0` |
-| `python3 -m unittest discover -s tests -q` | `Ran 79 tests` / `OK`，`exit=0`（T-05 收盘为 75；T-06 新增 4） |
-| `sync_skills.py check` | `skill outputs are up to date`，`exit=0`（`sync` 之后复测；三仓 `git status` 逐字未变） |
+| `python3 -m unittest discover -s tests -q` | `Ran 79 tests` / `OK`，`exit=0`（T-05 收盘为 75；T-06 新增 4；T-08 不新增用例） |
+| `sync_skills.py check` | `skill outputs are up to date`，`exit=0`（`sync` 之后复测） |
 | 退役流水线串 `TODO → IMPLEMENTED`（活文件，排除本 CHG 自身记录） | 0 命中 |
-| 三仓工作区基线（AC-15） | `cloud` `?? dump.rdb`；`agent`、`desktop` 空——与 T-01 基线逐条一致 |
+| 三仓工作区基线（AC-15） | `cloud` `?? dump.rdb`；`agent`、`desktop` 空——**T-08 起三仓各自多出 `skills/` 的分发副本**（不改代码），随各自仓库单独提交；逐份明细见 `evidence/task-08-ffmpeg-ownership.md` §6／§8 |
 
 | 词汇对账（逐文件提取，可复算；T-07 后） | 活 20 篇 `{SUPERSEDED:9, PLANNED:3, DISCUSSION:7, IMPLEMENTING:1}`——**表外词 0**；归档 38 篇 `{DONE:28, IN_PROGRESS:4, HANDOFF:2, CLOSED:2, VERIFYING:1, IMPLEMENTING:1}`——表外 8（T-05 已声明归档不动） |
 | 带注状态行（T-06 新量，分母 58 篇 `change.md`） | **9 篇**用旧正则（`(\S+)\s*$`）匹配不上 ⇒ 旧代码把它们的 `status` 读成 `None`；新 `status_word()` 全部读出词 |
 | 现在解析 `checkpoint.md` 的门禁（分母 `scripts/` ＋ `tests/`） | 2 个文件：`scripts/verify_delivery_governance.py`、`tests/test_verify_delivery_governance.py`（T-06 之前是 0 个） |
 
-取数时间 **2026-09-25 20:00:17 CST**（T-07 的最后一次改动之后），原始输出 `evidence/artifacts/t07-gate-readings.out`（该文件含**两遍**：20:00:07 的初遍与 20:00:17 的关闭遍——初遍记在本记录更新**之前**，而本记录本身被门禁读，故不作关闭值）；逐条明细见 `evidence/task-07-live-status-words.md`。
+| FFmpeg 归属（T-08，活文件） | 判给 Agent／Desktop 的落点 **4 → 0**；改后 20 条候选逐条判定；分母：含 `ffmpeg` 的 **100 行／24 文件**（改前 102／26） |
+| 同一扫描器可失败（T-08 阳性对照） | 注入 Agent-owned 句子 → candidate **9 → 10**，新条目即被注入的 `MASTER:454`；`git restore` 后 `sha256` 与注入前相同 |
+
+取数时间与逐次读数见 `evidence/artifacts/t08-gate-readings.out`——该文件**从初遍起逐次追加，每段段首都有取数时间**，各段读数除 `unittest` 耗时外**逐行相同**。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①初遍记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故末段正文的措辞不影响任何判据。FFmpeg 复扫的原始输出见 `evidence/artifacts/t08-sweep-*.out`；逐条明细见 `evidence/task-08-ffmpeg-ownership.md`。
 
 上一版读数（`t06-gate-readings.out`，19:57）已被**覆盖**：T-07 改了 `planned/` 的记录与 `MASTER` §3 的读数列，那些数字不再是关闭值。T-06 那一版同理覆盖了 T-05 的 19:51 读数。
