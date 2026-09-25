@@ -1,0 +1,62 @@
+=== T-10 关闭门禁 · 回写之后（同一对命令）· 2026-09-25 12:39:16 CST ===
+
+$ python3 scripts/verify_delivery_governance.py
+Delivery governance verification ok. Active CHG: none
+exit=0
+
+$ python3 scripts/verify_agent_entry.py
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+$ python3 scripts/verify_skills.py
+verified 10 skill source files
+exit=0
+
+$ python3 -m unittest discover -s tests -q
+----------------------------------------------------------------------
+Ran 73 tests in 0.211s
+
+FAILED (failures=4)
+
+=== 同集合阳性对照：`git archive HEAD 54c87b2` 的副本 ===
+
+########## 同集合阳性对照 ##########
+
+口径：本轮结束时的 4 条红不能被读成「看着无关」——必须证明它们**在归档之前的树上就已经是这 4 条**。
+对照落点必须在 wt-media/ 之内（兄弟仓 ../wt-media-* 才解析得到）；放到 /tmp 里，
+路径敏感的用例会静默 skipTest，把 4 条红读成 2 条（CHG-057 就是这么读错的）。
+
+控制副本 = $(git archive 54c87b2 | tar -x -C ../.t10-control)，即『已归档移动、未回写』的那棵树。
+
+$ cd ../.t10-control && python3 -m unittest discover -s tests -q
+  FAIL: test_contract_map_matches_m1_cloud_agent_compatibility (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_matches_m1_cloud_agent_compatibility)
+  FAIL: test_contract_map_provider_paths_exist_in_full_workspace (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_provider_paths_exist_in_full_workspace)
+  FAIL: test_static_cross_repo_contract_and_security_matrix (test_verify_m2_acceptance.VerifyM2AcceptanceTests.test_static_cross_repo_contract_and_security_matrix)
+  FAIL: test_current_product_master_and_governance_are_aligned (test_verify_product_master_alignment.ProductMasterAlignmentTests.test_current_product_master_and_governance_are_aligned)
+  Ran 73 tests in 0.293s
+  FAILED (failures=4)
+
+  对照树里的失败名单（逐条）：
+    FAIL: test_contract_map_matches_m1_cloud_agent_compatibility (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_matches_m1_cloud_agent_compatibility)
+    FAIL: test_contract_map_provider_paths_exist_in_full_workspace (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_provider_paths_exist_in_full_workspace)
+    FAIL: test_current_product_master_and_governance_are_aligned (test_verify_product_master_alignment.ProductMasterAlignmentTests.test_current_product_master_and_governance_are_aligned)
+    FAIL: test_static_cross_repo_contract_and_security_matrix (test_verify_m2_acceptance.VerifyM2AcceptanceTests.test_static_cross_repo_contract_and_security_matrix)
+
+  工作区（回写之后）里的失败名单（逐条）：
+    FAIL: test_contract_map_matches_m1_cloud_agent_compatibility (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_matches_m1_cloud_agent_compatibility)
+    FAIL: test_contract_map_provider_paths_exist_in_full_workspace (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_provider_paths_exist_in_full_workspace)
+    FAIL: test_current_product_master_and_governance_are_aligned (test_verify_product_master_alignment.ProductMasterAlignmentTests.test_current_product_master_and_governance_are_aligned)
+    FAIL: test_static_cross_repo_contract_and_security_matrix (test_verify_m2_acceptance.VerifyM2AcceptanceTests.test_static_cross_repo_contract_and_security_matrix)
+
+   集合比较：
+     控制树独有 = ∅
+     工作区独有 = ∅
+     同集合 = True （两边各 4 条）
+
+  兄弟仓可见性对照（证明上面这个对照树不是空转）：
+    控制树里**站在 ../wt-media-cloud 上**的两条用例确实红了：
+      test_contract_map_provider_paths_exist_in_full_workspace
+      test_static_cross_repo_contract_and_security_matrix
+    如果对照落点选在 /tmp，这两条会因兄弟仓不存在而 skipTest——那时
+    『4 条红』会缩成『2 条红』，而缩水本身不会报错。

@@ -604,3 +604,7 @@ releases:
     residual_risks:
       - "ad-hoc signature still requires user Gatekeeper first-run approval"
       - "Windows package is not present from this macOS host"
+    acceptance_notes:
+      - "manual_acceptance item 1 (macOS customer-machine install without system Python) adjudicated 2026-09-25 (CHG-20260923-059 D-09): registered as NOT DONE, and status stays `verifying` -- this host is a development machine carrying Python/Node/Rust and a `.local/` dev tree, so installing here cannot show a Python-free machine."
+      - "CHG-20260923-059 T-08 re-ran the M2 chain against the post-A/B/C/D tree: 13/13 stages green with a real MySQL and a real BitBrowser, and the release flow itself (`build-release-macos.sh`) ran to exit 0 with the DMG digest re-verified after mount. Coverage gaps stay stated: no real network, no real supplier credentials, no GUI click-through."
+      - "CHG-20260923-059 T-06 records where each of the five release version classes comes from. No `version_classes:` block is added here on purpose (D-22): the sources are declared once in `scripts/release-versions.sh` and once inside each artifact's own `versions.json`; a third copy in this file would be a declaration nothing validates."

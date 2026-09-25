@@ -1,0 +1,19 @@
+=== T-10 关闭门禁 · 回写之前（先失败的那一半）· 2026-09-25 12:36:40 CST ===
+
+$ python3 scripts/verify_delivery_governance.py
+ERROR current context references missing CHG: CHG-20260923-059
+ERROR ledger references missing active CHG: CHG-20260923-059
+exit=1
+
+$ python3 scripts/verify_agent_entry.py
+ERROR execution snapshot references missing CHG: CHG-20260923-059
+ERROR LEDGER references missing active CHG: CHG-20260923-059
+execution snapshot: 2144 characters (~858 tokens, budget 8000 characters)
+exit=1
+
+$ python3 scripts/verify_skills.py
+verified 10 skill source files
+exit=0
+
+=== 归档移动提交已在 HEAD 上（54c87b2），故两处报「missing CHG」===
+54c87b2 chore(delivery): CHG-20260923-059 归档移动——active/ → completed/，零改逻辑（CHG-20260923-059）

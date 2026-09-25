@@ -1,6 +1,6 @@
 # Planned delivery index
 
-更新：2026-09-25。**当前 active CHG 是 [CHG-20260923-059](../active/CHG-20260923-059/change.md)（联合工程优化 D——Sidecar、打包、升级与回归，Level M，2026-09-25 激活）**：[CHG-20260923-056](../completed/CHG-20260923-056/change.md)（联合工程优化 A——结构审计、Config 与 Client 解耦）、[CHG-20260923-057](../completed/CHG-20260923-057/change.md)（联合工程优化 B——Paths、Logger 和运行目录，Level M，2026-09-24 激活后同日归档）与 [CHG-20260923-058](../completed/CHG-20260923-058/change.md)（联合工程优化 C——Desktop 本机设置，Level M，2026-09-24 激活、2026-09-25 归档）均已归档 `DONE`，属上线前工程加固程序（`docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md`），不属 M2/M3 里程碑。本目录 DISCUSSION/PLANNED 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 的分层、依赖方向与配置目录约定已由 ADR-0016 确认；M4-M5 Cloud 视频生产边界已由 ADR-0017 确认。
+更新：2026-09-25。**当前没有 active CHG**：[CHG-20260923-056](../completed/CHG-20260923-056/change.md)（联合工程优化 A——结构审计、Config 与 Client 解耦）、[CHG-20260923-057](../completed/CHG-20260923-057/change.md)（联合工程优化 B——Paths、Logger 和运行目录，Level M，2026-09-24 激活后同日归档）、[CHG-20260923-058](../completed/CHG-20260923-058/change.md)（联合工程优化 C——Desktop 本机设置，Level M，2026-09-24 激活、2026-09-25 归档）与 [CHG-20260923-059](../completed/CHG-20260923-059/change.md)（联合工程优化 D——Sidecar、打包、升级与回归，Level M，2026-09-25 激活并同日归档）均已归档 `DONE`，属上线前工程加固程序（`docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md`），不属 M2/M3 里程碑。本目录 DISCUSSION/PLANNED 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 的分层、依赖方向与配置目录约定已由 ADR-0016 确认；M4-M5 Cloud 视频生产边界已由 ADR-0017 确认。
 
 ## 联合工程优化程序（2026-09-23 立项）
 
@@ -11,7 +11,7 @@
 | A 结构审计、Config 与 Client 解耦 | [CHG-20260923-056](../completed/CHG-20260923-056/change.md) | **DONE（2026-09-24 归档）** |
 | B Paths、Logger 和运行目录 | [CHG-20260923-057](../completed/CHG-20260923-057/change.md) | **DONE（2026-09-24 归档）** |
 | C Desktop 本机设置 | [CHG-20260923-058](../completed/CHG-20260923-058/change.md) | **DONE（2026-09-25 归档）** |
-| D Sidecar、打包、升级与回归 | [CHG-20260923-059](../active/CHG-20260923-059/change.md) | **ACTIVE（2026-09-25 激活）** |
+| D Sidecar、打包、升级与回归 | [CHG-20260923-059](../completed/CHG-20260923-059/change.md) | **DONE（2026-09-25 归档）** |
 
 ## M4 Cloud 内容生产
 

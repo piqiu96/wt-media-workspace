@@ -1,0 +1,27 @@
+=== T-10 关闭门禁 · workspace unittest · 2026-09-25 12:37:42 CST ===
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/tests/test_verify_product_master_alignment.py", line 33, in test_current_product_master_and_governance_are_aligned
+    self.assertEqual(self.module.validate_alignment(ROOT), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["M2 status expected 'IN_PROGRESS', got 'D[282 chars]分发'"] != []
+
+First list contains 8 additional elements.
+First extra element 0:
+"M2 status expected 'IN_PROGRESS', got 'DONE'"
+
++ []
+- ["M2 status expected 'IN_PROGRESS', got 'DONE'",
+-  "M3 status expected 'NOT_STARTED', got 'DONE'",
+-  "M2 capability missing '按五条业务闭环顺序补齐'",
+-  "M3 candidate missing 'source_content'",
+-  "M3 candidate missing 'Scheduler'",
+-  "M3 candidate missing '正式任务 Schema'",
+-  "M3 candidate missing '真实抖音接口'",
+-  "M10 capability missing 'FFmpeg/FFprobe 分发'"]
+
+----------------------------------------------------------------------
+Ran 73 tests in 0.264s
+
+FAILED (failures=4)
+exit=

@@ -26,7 +26,7 @@
 
 ## Current
 
-- **T-09 吸收项已收尾**（T-01…T-09 均已收尾，见下九节）；**T-10「回写基线 + 关闭收尾」未开工**。
+- **T-01…T-10 全部收尾；本 CHG 已于 2026-09-25 归档 `DONE`，联合工程优化程序四阶段全部关闭。**
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
   与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
   T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`；
@@ -38,15 +38,14 @@
   只有本仓的记录与证据（D-25、Q-05、AC-08 的例外）；
   T-09 见 `evidence/task-09-absorbed.md` 与 workspace 的 `dac853f`（skill 改指 + resolve 判据）、
   agent 的 `2b26808`（入口文档 + 契约文档判据 + 两份重生成的 skill 副本）——
-  **本任务同样未改运行时代码**，两个仓各新增一个测试文件。
+  **本任务同样未改运行时代码**，两个仓各新增一个测试文件；
+  T-10 见 `evidence/task-10-writeback-and-close.md` 与 workspace 的 `54c87b2`（归档移动，**纯移动**）
+  与写回提交、agent 的注释与判据提交——**本任务未改任何运行时代码**（agent 侧只改注释 + 新增判据）。
 
 ## Next
 
-- T-10 **回写基线 + 关闭收尾**：架构基线、里程碑、`config/release-matrix.yaml`（只加不改，
-  `0.2.5` 的 status 保持 `verifying`）、`LEDGER.md`、`planned/README.md`、快照重生成（`--no-active`）、
-  归档到 `delivery/completed/`；并把 `wt-media-agent/config_online/agent.toml:17-21` 那段**过期的
-  Q-01 注释**按 D-08 回写为「已裁定：保持回环」（改注释、不改配置值）。关闭门禁的判据是
-  **同集合阳性对照**（`git archive HEAD`），不是「看着无关」；归档前扫两遍（字符串 + 链接 resolve）。
+- 无。本 CHG 已关闭；程序层面剩两个未裁定项（Q-05 的 DMG 腿与 8765 归属、Q-07 那条间歇红的处置方向），
+  都已登记、都不阻塞任何已完成的事实。
 
 ## T-01（已收尾，2026-09-25）
 
@@ -371,6 +370,58 @@
   但不在本 CHG 的 Add 清单）。
 - 本次**没有跑真机**：产物全是文档与静态判据，没有需要真进程的部分。
 
+## T-10（已收尾，2026-09-25）
+
+- **先红不是我编的检查，是治理门禁自己给的**（`evidence/task-10-gate-red.out`）：`git mv` 归档之后、
+  回写之前，`verify_delivery_governance.py` 报 `ERROR current context references missing CHG:
+  CHG-20260923-059` + `ERROR ledger references missing active CHG`（exit=1），`verify_agent_entry.py`
+  报同名两条。「回写」这个任务因此不是顺手更文档，而是**逐条消掉这两条 ERROR**。
+- **回写清单**（每条都指到文件与位置）：架构基线**五处**——§2.7 退出（请停→宽限→强杀、报告要能区分）、
+  §6.5 启动/退出（包一致性校验**不回退**、两段式就绪 + 401 致命第三态、`daemon_threads = False`）、
+  §7.9 五类版本各一来源 + Desktop↔sidecar 是 **pin 不是等值**、§7.10 升级不覆盖是**路径判据**
+  （并写明本程序**不实现升级器**，故 #8 是判据不是读数）、§1244 配置随产物分发（补暂存发生在产物上、
+  不进 `bundle.resources`、冻结侧由可执行文件位置推导）；里程碑状态改 **已完成（2026-09-25）**
+  （四阶段链接 + 三处例外 + Q-05）；程序总纲的状态行与承载 CHG 列表改指 `completed/`；
+  `config/release-matrix.yaml` **只加** `acceptance_notes` 三条（`0.2.5` 的 status 与三条
+  `manual_acceptance` 一字未动）；`LEDGER.md` 撤活动行、加归档段、重写「后续阶段」段；
+  `planned/README.md` 两处（顶栏与阶段表）；`delivery/planned/CHG-20260923-053/change.md:9`
+  那条**CHG-057 归档时点名「等 059 自己关闭时处置」**的坏链按同一做法订正；快照 `--no-active`
+  重生成（`Active CHG: none`）。**回写后同一对命令 exit=0**（`evidence/task-10-gate-green.out`）。
+- **D-08 的落点（D-26）**：`config_online/agent.toml:17-21` 与 `config_online/README.md:14-16` 里那段
+  「still open … Resolve before release」改写为「已裁定（Q-01，2026-09-25 关闭）：保持回环」。
+  **判据是「解析后的文档相同」而不是「逐行相同」**：`tomllib` 解析前后**叶子 12 条全等**，
+  阳性对照（改一个值）报 False ⇒ 值、CSP、行为一个字节没动。先红是同一个文件里新加的
+  `tests/test_config_shipping.test_the_shipped_configuration_claims_no_open_question`
+  逐条点名三条措辞（`README.md:15 states 'still open'`、`agent.toml:18`、`agent.toml:21`）；
+  扫描的是**措辞不是问题号**——Q-01 被回答了，「Q-01」这三个字本身不再有害，出货包里不该有的是
+  「还没定」这个**断言**。`Ran 12 tests / OK`（`evidence/task-10-config-claims.out`）。
+- **归档两遍扫描**（`evidence/task-10-archive-scan.out`）：
+  ①**字符串扫描**：旧落点字面量在当前工作树 **0 命中 / 673 个被跟踪文件**，阳性对照打在 `54c87b2^`
+  上 **5 个文件命中**（`.ai/CURRENT_CONTEXT.md`、`LEDGER.md`、里程碑、`planned/README.md`、程序总纲）。
+  **第一遍曾命中 1 处，是本节自己的草稿**——写「0 命中」的那句话里把旧路径抄了一遍。这条留着：
+  扫描抓得住真东西，而我自己就是它抓到的一个。另一条口径：`delivery/active/` 这个**目录约定**
+  在 `AGENT-INDEX.md`／skills／MASTER_PLAN 里有 59 处正当引用，不属于要清的东西。
+  ②**链接 resolve**：把全部 423 个 md 里的 110 条相对链接逐条解析，对着 `54c87b2^` 的副本做**前后差集**：
+  **新弄坏 0 条**、**弄好 4 条**（三条上游 CHG 指针 + CHG-057 点名的那条 `planned/053`；此数由「5」订正为「4」，重测依据见证据 §4.2）；
+  另按 CHG-058 立下的先例（`../completed/X` → `../X`）订正 `change.md` §3 里三条**本来就少一层**的上游链接。
+  **剩 5 条坏链**：3 条是 CHG-052 证据里少一层 `../` 的（目标文件真的存在，按 **Q-08** 登记不改，
+  因为改的是 M3 时期另一个 CHG 的既有证据、不在 §5 清单内）、2 条是 CHG-057／058 归档证据里
+  **反引号内引用「这条链接坏掉了」这个历史事实**（叙述，按「路径判修、叙述判留」保留）。
+  **扫描自身的局限已写进证据**：正则不区分代码跨度与正文，引号里的历史链接会被算成坏链——这 5 条里 2 条如此。
+- **同集合阳性对照**（`evidence/task-10-gate-green.out`）：`git archive HEAD` 的副本放在
+  **`wt-media/.t10-control/`**（与 `wt-media-workspace/` 同层，能看见 `../wt-media-*`，避开 T-06 记的陷阱），
+  `Ran 73 / failures=4`，四条名字与工作区**逐条同名**；并另做一条**兄弟仓可见性**的对照
+  （按用例同样的相对路径读 `../wt-media-agent/src/wt_media_agent/local_api/server.py` 等三个文件，
+  全部 `OK`）——不然「同名」也可能只是两边都 skip 了。
+- **独立提交**：`54c87b2` 是**纯移动**（66 个文件 100% rename、`0 insertions / 0 deletions`，
+  另两个 `--shortstat` 都报 0），写回与记录是它之后的另一个提交；agent 侧的注释与判据一个提交。
+- **顺带发现一条既存的间歇红（D-27／Q-07）**：见下节。
+- **一条如实登记的观察**：6 个「与本 CHG 无关、不得触碰」的脏文件里，有 5 个的 mtime 停在
+  2026-09-24／09-25 00:44，只有 `docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md`
+  落在本 CHG 的工作窗口内（2026-09-25 09:10），而它的 diff 是**一个纯尾换行**。我没有对它做过有意的写入，
+  也拿不出「是谁写的」的证据；因为它是**不得触碰**的文件，既不提交也**不还原**（还原同样是一次写入）。
+  它对本次任何一条判据都没有影响。记在这里，免得下一个读 diff 的人怀疑是回写漏了这一处（证据 §8）。
+
 ## Blocked
 
 - 无硬阻塞。Q-04 已由 D-17 关闭；AC-09「干净机」那一臂按 D-09 登记为未做（不以文字充当证据）。
@@ -379,10 +430,45 @@
 - **Q-06 按 T-09 登记、不阻塞收尾**：契约声明的两处漂移（map vs 定义文件的版本号、OpenAPI 少列 7 条
   实际被服务的路由）+ 一处文档漏项。三处都在本 CHG 的 Add/Modify 清单之外，
   按「讨论不是需求」只登记不改——**包括那条已过期的 `contract_revision` 一个字都不动**。
+- **Q-07 按 D-27 登记、不阻塞收尾**：agent 套件里那条既存的间歇红（见下节）。在它关闭前
+  「agent 套件全绿」这句话不成立；它也会随机打红后续任何一次门禁 —— **正因为如此才要登记**，
+  免得下一个遇到它的人以为是自己刚改的东西弄红的。
+- **Q-08 按 T-10 登记、不阻塞收尾**：CHG-052 证据里三条少一层 `../` 的链接（目标文件真的存在）。
+
+## 既有间歇红（D-27／Q-07，如实登记，不在本 CHG 的修复范围）
+
+- **是什么**：`tests/test_sidecar_entry.py::SigtermTests::test_a_request_in_flight_when_the_signal_arrives_is_waited_for`
+  ——T-03 交付的那条「在飞请求要等」的用例。
+- **不是本 CHG 造成的**：在**未改动**的原树上量（`git stash push -- config_online tests/test_config_shipping.py`
+  之后跑 20 次）⇒ **1/20 失败**；`git stash pop` 还原。T-10 的改动只碰注释与一个新测试文件，
+  与它无关（`git stash` 前后两次读数都出现过）。
+- **机制只是假设，不是结论**：假设是「信号可能赶在连接被 accept、其处理线程登记之前到达」。
+  判别实验用一次性探针（**不是**提交内容，跑完即删）把同一场景加一个 `PROBE_WAIT` 旋钮：
+  最终读数（单进程串行、每次迭代 20s 上限的有界驱动）：真实例 **1/20**、探针不等 **6/40**、探针等 0.3s **11/40**。
+  **方向与假设相反，但两边都不显著**：A/B 之差 Fisher 双尾 p≈0.55，而同臂两次跑自己就差了 3 倍
+  （更早一次不等臂 2/40 ⇒ 同臂 2/40 vs 6/40，p≈0.53）；且三臂是**块状**跑的，块序与机器状态混在一起。
+  ⇒ **不宣称机制**。更早那轮 15 次小样本（2/15 vs 0/15）曾读成「方向一致」，**已被推翻、不作数**。
+  两次掉队的读数（一次输出没被捕获 0 字节、一次因重复执行只保下一臂）也如实记在证据里。
+- **为什么不修**：加一个 `sleep` 正好是「凭一次跑通接受显然的一行修法」——它会把这个窗口从视野里藏起来，
+  而不是解决它。按本 CHG 自己的规矩（先红要真红、否定结论要报分母），**登记 + 提 Q-07**，
+  把「改测试还是改实现」这个判断留给拿到根因的人。
 
 ## Recent verification
 
+- **T-10 之后（关闭门禁，2026-09-25）**：三个校验器**全绿**——`verify_delivery_governance.py`
+  （`Delivery governance verification ok. Active CHG: none`，exit=0）、`verify_agent_entry.py`
+  （快照 1668 字符 / 预算 8000，`Agent entry verification ok. 0 warning(s)`，exit=0）、
+  `verify_skills.py`（10 个 skill 源文件），**同一对命令在回写前是 exit=1**（`task-10-gate-red.out`）——
+  这条对照比「绿了」本身更有信息量。`unittest discover -s tests -q` **Ran 73 / failures=4**，
+  四条与 `git archive HEAD` 副本（放在 `wt-media/.t10-control/`，兄弟仓可见性另做对照）
+  **逐条同名** ⇒ 无新增红、无意外转绿（`task-10-gate-green.out`）。
+  agent 侧 `tests/test_config_shipping.py` **Ran 12 tests / OK**（D-08 的判据），
+  解析后叶子 12 条全等的阳性对照一并在此（`task-10-config-claims.out`）。
+  **一条既存间歇红**（D-27／Q-07）使 agent 全仓套件的单次读数不再稳定，量测与两臂见 `task-10-flake.md`。
 - **T-09 之后**（2026-09-25）：agent `bash scripts/test.sh` **Ran 407 tests / OK**（401→407，+6）；
+- **T-10 之后**（2026-09-25，关闭时）：agent **Ran 409 tests / OK**（407→409，+2 = D-08 的两条判据；
+  见 `evidence/task-10-agent-suite.out`）——**「这一次是 OK」不等于「agent 套件全绿」**，
+  那条既存间歇红见下节。**上面这行去重过一次**：原先同一行被写了两遍（同一件事写了两遍不是两件）。
   workspace `unittest discover -s tests -q` **Ran 73 / FAILED (failures=4)**（69→73，+4 = 新文件 4 条），
   四条**逐条同名**于 T-06／T-07／T-08（`test_verify_m0_config` ×2、`test_verify_m2_acceptance` ×1、
   `test_verify_product_master_alignment` ×1）⇒ 无新增红、无意外转绿；**+4 的来源做了对照**：

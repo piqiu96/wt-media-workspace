@@ -1,0 +1,34 @@
+=== T-10 关闭时 agent 套件读数 · 2026-09-25 13:11:13 CST ===
+
+$ bash scripts/test.sh
+
+    raise ValueError("the reason it failed")
+ValueError: the reason it failed
+.....................config-dir=/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpfr7uqswh/Contents/Resources/config files=2
+config-file=README.md
+config-file=agent.toml
+wt-media-agent local API listening on 127.0.0.1:0
+wt-media-agent local API stopped
+...............................
+----------------------------------------------------------------------
+Ran 409 tests in 12.259s
+
+OK
+storage migration ok: 2 applied, 2 total
+database /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpjjp5k9fk/local-agent.sqlite3
+applied 0001_base base
+applied 0002_task_checkpoints task_checkpoints
+storage migration ok: 2 applied, 2 total
+database /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpdbs759dn/local-agent.sqlite3
+applied 0001_base base
+applied 0002_task_checkpoints task_checkpoints
+
+口径：这是**T-10 的改动也在树上**之后的读数（原树上的读数是 407，见本目录 task-09-gate.out）。
+差额 +2 来自 T-10 为 D-08 新增的两条判据：
+  tests/test_config_shipping.py::ShippedConfigurationTest::test_the_shipped_configuration_claims_no_open_question
+  tests/test_config_shipping.py::ShippedConfigurationTest::test_the_pending_decision_scan_finds_its_markers
+⇒ agent 的分母是 377 → **409**（起点 377，只增不减）。
+
+这条读数**不等于「agent 套件全绿」**：同一条命令在别的次会因既存间歇红翻车
+（SigtermTests 那一条，见 evidence/task-10-flake.md，登记为 D-27／Q-07）。
+本次这一次 exit=0、OK——是「通过那一次」的读法。

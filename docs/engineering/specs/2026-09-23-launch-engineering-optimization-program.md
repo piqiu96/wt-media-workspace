@@ -1,9 +1,9 @@
 # Desktop × Agent 联合上线工程优化程序（Program）
 
 - 日期：2026-09-23
-- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）。A、B 两阶段已于 2026-09-24 归档 `DONE`；**C 已于 2026-09-25 归档 `DONE`**；**D 已于 2026-09-25 激活执行中**（程序的最后一段）
+- 状态：用户已批准执行（会话内裁定：融合方案一、先执行 CHG-A）。A、B 两阶段已于 2026-09-24 归档 `DONE`；**C 已于 2026-09-25 归档 `DONE`**；**D 已于 2026-09-25 归档 `DONE`**——四个阶段全部关闭，本程序结束
 - 性质：上线前工程加固程序，不属 M2/M3 里程碑范围（先例：CHG-20260923-055 里程碑外工程 CHG）
-- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、[CHG-20260923-057](../../../delivery/completed/CHG-20260923-057/change.md)（B，**2026-09-24 归档 DONE**）、[CHG-20260923-058](../../../delivery/completed/CHG-20260923-058/change.md)（C，**2026-09-25 归档 DONE**）、[CHG-20260923-059](../../../delivery/active/CHG-20260923-059/change.md)（D，**2026-09-25 激活执行中**）
+- 承载 CHG：[CHG-20260923-056](../../../delivery/completed/CHG-20260923-056/change.md)（A，**2026-09-24 归档 DONE**）、[CHG-20260923-057](../../../delivery/completed/CHG-20260923-057/change.md)（B，**2026-09-24 归档 DONE**）、[CHG-20260923-058](../../../delivery/completed/CHG-20260923-058/change.md)（C，**2026-09-25 归档 DONE**）、[CHG-20260923-059](../../../delivery/completed/CHG-20260923-059/change.md)（D，**2026-09-25 归档 DONE**）
 - 上游基线：ADR-0016（Agent 运行时分层的目录、依赖与配置边界）；架构基线 `docs/engineering/architecture/社媒运营平台工程架构与分层设计_V1.md` §5.8
 
 ## 1. 问题与目标
@@ -103,6 +103,43 @@ Desktop/Agent 独立运行目录、日志初始化、落盘、轮转、清理及
 ### CHG-D：Sidecar、打包、升级与回归
 
 端口就绪通知与实例身份验证、退出 draining、PyInstaller 产物完整性、`config_online → 产物/config` 打包步骤、版本兼容、正式安装包脱离开发环境验证、M2 业务回归。
+
+落定后的口径（本节是这些事实的**权威落点**；2026-09-25 CHG-D 归档时写入，取代立项时的一句话范围）：
+
+- **就绪是两段式**：第一信号是 Agent 在 `bind` + `listen` **之后**打印的 readiness 行，第二信号是 `/healthz`
+  真的应答。`[sidecar] start_timeout_ms`（出货 `15000`）从死配置变成这道闸门的真超时。
+  **认证失败是致命的第三态**：令牌漂移时 `/healthz` 在 `_check_auth` 之后，答 **401** ⇒ 立即失败，不等到超时。
+- **实例身份是活性探针**：`already_running` 只在受管槽位**非空**时才真的问一次 `/healthz`——
+  槽位为空时**一个请求都不发**（那个端口上可能是开发机上别人的 Agent）。句柄在而 Agent 不应答 ⇒
+  如实报「未在运行」，丢弃句柄并允许重启（这就是 CHG-057 登记的那条实缺陷的关闭）。
+- **退出是请停而不是硬杀**：Desktop 的 `RunEvent::Exit` → **SIGTERM** → 宽限（`[sidecar] stop_timeout_ms`，
+  出货 `5000`）→ 必要时强杀；**退出报告要能区分**「请停后自己退出」与「被强杀」。Agent 侧在 `serve()` 里
+  安置 SIGTERM 处理器并把 `shutdown()` 派到自己的线程，且 `httpd.daemon_threads = False`——
+  `ThreadingHTTPServer` 默认 `True` 时 `_Threads` **不登记守护线程**，`server_close()` 的 join 是空转。
+- **产物完整性在启动前校验**：读包内 `Contents/Resources/sidecar-manifest.json`，按 SHA-256 比对**要启动的
+  那个文件**；失败拒绝启动并说清原因，且**不回退**到 Python 调试路径。没有记录时**工程树容忍、包里拒绝**
+  （`cargo test` 的树里没有记录，不这样区分就起不了 Agent）。这份记录写在 sidecar 的 ad-hoc 签名**之后**、
+  外层签名**之前**——签名会改写文件，而签名之后写进去的字节不会再被封面盖住。这是**包一致性检查**，
+  不是对抗能改包者的安全边界（ad-hoc 签名没有信任锚）。
+- **`config_online → 产物/config` 发生在产物上**：由 `scripts/stage-release-config.sh` 整目录替换，
+  **不进 `tauri.conf.json` 的 `bundle.resources`**（Tauri 会拒绝匹配不到任何文件的 glob，于是任何还没跑过
+  发布步骤的检出都编译不过）。冻结侧的配置目录由**可执行文件的位置**推导（`.app` 里是
+  `Contents/Resources/config`，否则可执行文件旁边的 `config/`），命中不了先 WARNING 再回落内置默认值。
+- **五类版本各有来源**：Desktop（`tauri.conf.json`）、Agent（包版本）、**前端构建**（workspace 复制产物时
+  stamp）、Contract（`config/contract-map.yaml`）、**组件与资源**（`Contents/Resources` 逐文件 sha256 的合并
+  摘要，排除记录自身——它是**内容摘要**而不是被人递增的号，没有「谁来 bump」）。出包时写一份
+  `versions.json` 进产物、另复制一份到发布目录并进 `SHA256SUMS`；挂载 DMG 后 `--verify` 复算出同一摘要。
+  **Desktop ↔ sidecar 用 pin 而不是等值**：`src-tauri/agent-compat.json`，不匹配必拒，**改 pin 即评审**
+  （兼容是评审闸门，不是版本号相等）。
+- **升级不覆盖是路径判据**（本 CHG **不实现升级器**）：保护的是一组**路径**（数据根下除
+  `settings.toml` 与 `versions/` 之外的一切，含 SQLite、检查点、待回传结果），不是一张名字清单。
+- **M2 回归的覆盖边界**：链路十三个阶段全绿，其中真 MySQL 与真 BitBrowser 是真读数，
+  **实网／实凭据／GUI 三项没有**——不要把这句读成「M2 已在真外部环境重跑」。
+- **两条登记过的例外**：①「干净机」安装验收**未做**（D-09，本机是开发机）；
+  ②随包 onefile sidecar 的引导器是否把 SIGTERM 转发给真正在服务的进程**未测**（本机 `dlopen` 被签名拒）。
+  另有一条未裁定：**Q-05**——M2 链路的 DMG 构建是否改走发布打包、以及 M2 环境里 8765 归谁。
+
+详见 [CHG-20260923-059 change.md](../../../delivery/completed/CHG-20260923-059/change.md)。
 
 ## 4. 横切要求（各阶段通用）
 

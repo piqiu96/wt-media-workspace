@@ -1,0 +1,71 @@
+=== T-10 · D-08 的落点：出货配置里不得再有「还没定」这个断言 · 2026-09-25 12:40:44 CST ===
+
+--- 0. 改动前的两处过期陈述（HEAD 版，逐行） ---
+     1	
+     2	environment = "production"
+     3	
+     4	[cloud]
+     5	# Q-01 (CHG-20260923-056) is still open: whether the production deployment is a
+     6	# local Cloud service on 127.0.0.1:18080 or a remote Cloud host. Until it is
+     7	# decided this keeps the loopback value, which is the safe reading -- a loopback
+     8	# address cannot send credentials off the machine. Resolve before release.
+     9	base_url = "http://127.0.0.1:18080"
+    10	timeout_seconds = 10.0
+    11	
+
+--- 1. 先红：把 config_online/ 还原到 HEAD（测试文件保持新写的那两条） ---
+已还原 config_online/ 到 HEAD
+test_the_pending_decision_scan_finds_its_markers (tests.test_config_shipping.ShippedConfigurationTest.test_the_pending_decision_scan_finds_its_markers)
+test_the_shipped_configuration_claims_no_open_question (tests.test_config_shipping.ShippedConfigurationTest.test_the_shipped_configuration_claims_no_open_question)
+FAIL: test_the_shipped_configuration_claims_no_open_question (tests.test_config_shipping.ShippedConfigurationTest.test_the_shipped_configuration_claims_no_open_question)
+  File "/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/tests/test_config_shipping.py", line 295, in test_the_shipped_configuration_claims_no_open_question
+AssertionError: Lists differ: ["README.md:15 states 'still open'", "READ[110 chars]se'"] != []
+"README.md:15 states 'still open'"
+- ["README.md:15 states 'still open'",
+-  "README.md:15 states 'undecided'",
+-  "agent.toml:18 states 'still open'",
+-  "agent.toml:21 states 'resolve before release'"] : a shipped configuration states decisions as made, not as pending
+Ran 12 tests in 0.020s
+FAILED (failures=1)
+
+--- 2. 恢复改动 ---
+已恢复
+ M config_online/README.md
+ M config_online/agent.toml
+ M tests/test_config_shipping.py
+?? tests/zz_t10_race_probe.py
+
+--- 3. 转绿：改完注释后同一条用例 ---
+config-dir=/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmp6sxkvjht/Contents/Resources/config files=2
+config-file=README.md
+config-file=agent.toml
+
+--- 4. 判据二：值一个字节没动（tomllib 解析后的叶子全等 + 阳性对照） ---
+HEAD 叶子数 = 12  工作区叶子数 = 12
+解析后的文档完全相同: True
+阳性对照（把 base_url 改成一个不同的值）报相同: False （应为 False）
+
+--- 5. 改后的两处措辞 ---
+     1	
+     2	environment = "production"
+     3	
+     4	[cloud]
+     5	# Decided (Q-01, closed 2026-09-25): the production deployment is the local
+     6	# Cloud service on 127.0.0.1:18080, so the loopback value below is the release
+     7	# value rather than a placeholder. A loopback address cannot send credentials
+     8	# off the machine, and the desktop window's CSP allows this origin only.
+     9	base_url = "http://127.0.0.1:18080"
+    10	timeout_seconds = 10.0
+    11	
+…
+     1	  deliberately narrower today (recorded as a deviation in CHG-20260923-056), so
+     2	  a credential placed here would be ignored, not honoured.
+     3	- `cloud.base_url` holds the loopback value, and that is the decided production
+     4	  value: Q-01 was closed on 2026-09-25 (CHG-20260923-059, D-08) in favour of the
+     5	  local Cloud service on `127.0.0.1:18080`. Nothing here is waiting on a
+     6	  decision, so this directory can be copied over `config/` as it stands.
+
+--- 3b. 第 3 步的读数补正（上面 tail -3 抓到的是用例自己的 stdout，不是汇总行） ---
+Ran 12 tests in 0.020s
+OK
+exit=0

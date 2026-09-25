@@ -1,0 +1,49 @@
+=== T-10 归档两遍扫描 · 2026-09-25 12:41:03 CST ===
+移动提交 = 54c87b2（66 文件 100% rename）
+
+########## 第一遍：字符串扫描（旧落点是否还在被当路径用） ##########
+
+分母：工作区被跟踪文件数 = 673
+
+-- 模式 'delivery/active/CHG-20260923-059'
+   命中 = 0
+   命中文件数 = 0
+
+-- 模式 'active/CHG-20260923-059'
+   命中 = 0
+   命中文件数 = 0
+
+-- 阳性对照：同样两条模式打在移动之前的提交 54c87b2^ 上
+   'delivery/active/CHG-20260923-059' 命中文件数 = 2
+     54c87b2^:.ai/CURRENT_CONTEXT.md
+     54c87b2^:docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md
+   'active/CHG-20260923-059' 命中文件数 = 5
+     54c87b2^:.ai/CURRENT_CONTEXT.md
+     54c87b2^:delivery/LEDGER.md
+     54c87b2^:delivery/milestones/M-launch-engineering.md
+     54c87b2^:delivery/planned/README.md
+     54c87b2^:docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md
+
+-- 口径：'delivery/active/' 作为**目录约定**仍在 59 个文件里出现（AGENT-INDEX / skills / MASTER_PLAN 等），
+   那不是要清的东西；要清的是 CHG-059 这个具体落点。
+
+########## 第二遍：链接 resolve（前后差集） ##########
+
+   wt-media-workspace: 分母 423 个 md / 110 条相对链接，坏链 5
+   .t10-control-pre: 分母 423 个 md / 103 条相对链接，坏链 9
+
+   移动【新弄坏】的链接： 0
+   移动【弄好】的链接： 4
+     FIXED  delivery/active/CHG-20260923-059/change.md -> ../completed/CHG-20260923-056/change.md
+     FIXED  delivery/active/CHG-20260923-059/change.md -> ../completed/CHG-20260923-057/change.md
+     FIXED  delivery/active/CHG-20260923-059/change.md -> ../completed/CHG-20260923-058/change.md
+     FIXED  delivery/planned/CHG-20260923-053/change.md -> CHG-20260923-059/change.md
+
+   两次都坏（既存，按 Q-08 登记不改）： 5
+     STILL-BROKEN delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/repository/discovery_store_mysql.go
+     STILL-BROKEN delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/internal/modules/contentpool/service/operations.go
+     STILL-BROKEN delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/12-defects-and-security.md -> ../../../../../wt-media-cloud/web/src/modules/contentpool/pages/ContentPoolPage.vue
+     STILL-BROKEN delivery/completed/CHG-20260923-057/evidence/task-18-writeback-and-archive.md -> CHG-20260923-059/change.md
+     STILL-BROKEN delivery/completed/CHG-20260923-058/evidence/task-09-writeback-and-archive.md -> ../completed/CHG-20260923-057/change.md
+
+   扫描局限：正则不区分代码跨度与正文，**引号内引用的历史坏链会被算成坏链**——上面 5 条里 2 条如此。
