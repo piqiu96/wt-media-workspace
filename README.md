@@ -59,8 +59,14 @@ python3 scripts/verify_m0_config.py
 python3 scripts/verify_delivery_governance.py
 python3 scripts/verify_agent_entry.py
 python3 scripts/verify_skills.py
+python3 scripts/verify_product_master_alignment.py
+python3 scripts/verify_m2_acceptance.py
 python3 -m unittest discover -s tests -q
 ```
+
+All of these pass as of 2026-09-25. `verify_m2_acceptance.py` additionally needs the three
+sibling runtime repositories checked out, and `scripts/verify_m0_local.sh` runs the above
+plus the Cloud, Agent, and Desktop build and test suites.
 
 From the same directory, with sibling runtime repositories present:
 
@@ -74,9 +80,9 @@ Regenerate the execution snapshot after changing the active CHG:
 python3 scripts/prepare_ai_workspace.py --change <CHG>
 ```
 
-Known open failures: `verify_m0_config.py` (stale `contract_revision` expectations and
-the removed `m0-workspace.yml` workflow), `verify_product_master_alignment.py`
-(M2/M3 status wording drift plus the `CHG-20260916-052` record shape), and
-`verify_m2_acceptance.py` (a Cloud file that no longer exists). All three are
-recorded in `docs/engineering/specs/agent-workspace-conventions.md` and are out of
-scope for the agent-entry work.
+There is no known open failure. Until CHG-20260925-063 this section carried a "Known open
+failures" paragraph naming three red verifiers; all three were fixed at the expectation
+layer rather than by relaxing the checks. Do not reintroduce that paragraph: documenting a
+known red is what let these three sit red for months, because a red that has been written
+down reads as normal. (This repository sets no CI, so a stale verifier is only ever noticed
+when someone runs it by hand.)

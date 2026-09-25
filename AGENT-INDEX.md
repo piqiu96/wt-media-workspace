@@ -175,4 +175,24 @@
 
 ## 12. 校验
 
-本地手工执行，本仓库当前不设 CI。`scripts/verify_agent_entry.py` 校验：入口文件存在性、执行快照唯一性与体积预算（≤ 8000 字符）、快照与 LEDGER/active 的一致性、配置 path 一致、各工程入口漂移（启发式 WARN）。
+本地手工执行，本仓库当前不设 CI。全部校验命令：
+
+```text
+python3 scripts/verify_delivery_governance.py      # delivery 指针与里程碑引用互相一致
+python3 scripts/verify_agent_entry.py             # 入口文件、执行快照唯一性与体积预算、各仓入口漂移 WARN
+python3 scripts/verify_skills.py                  # skill 单一源与分发目标
+python3 scripts/verify_m0_config.py               # 工作区 contract-map / release-matrix 不变量、三仓 CI 工作流
+python3 scripts/verify_product_master_alignment.py  # 产品基线与 MASTER 计划对齐、未关闭里程碑的候选块
+python3 scripts/verify_m2_acceptance.py           # M2 的契约层与 schema 层跨仓验收矩阵（需兄弟仓在检出中）
+python3 -m unittest discover -s tests -q          # 上述脚本自身的判别力
+```
+
+需要真实运行实例、不属上表：`scripts/verify_m1_integration.py`、`scripts/verify_m3_acceptance.py`、
+`scripts/m2b_local_acceptance.py`；`scripts/verify_m0_local.sh` 在兄弟仓存在时跑上表加三仓构建与测试。
+
+**判据按稳定性分层**（D-01）：跨仓**源码字面量**不作门禁，**契约层与 schema 层**判据保留并加固——
+合法的跨仓重构不应能把门禁打红。**报「通过 / 0 命中」前必须先证明检查能失败**（附阳性对照、报出分母；
+变异式的「先红」必须是关掉该判定后用例失败，不能是 `ImportError`）。
+
+每个校验的当前读数、分层表、控制方法与已知限制（含一条结构性空转的如实登记）见
+`docs/engineering/specs/agent-workspace-conventions.md` §10——**该节是校验状态的唯一落点，本节只列命令**。

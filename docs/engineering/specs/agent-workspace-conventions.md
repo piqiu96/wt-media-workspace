@@ -120,69 +120,83 @@
 | skill 单一源 | `skills/<group>/<name>/SKILL.md` | `sync_skills.py` 分发到 `skills-distribution.yaml` 的 targets | `sync_skills.py check` / `diff`；分组认领由 `verify_agent_entry.py::check_group_coverage` 兜住 |
 | 快照由脚本生成 | `prepare_ai_workspace.py` | `planning-wt-media-delivery` skill 第 7 步 | 两者措辞需同时更新 |
 
-## 10. 校验与已知红项
+## 10. 校验
 
-本地手工执行，本仓库当前**不设 CI**（`.github/workflows/` 已移除）。
+本地手工执行，本仓库当前**不设 CI**（`.github/workflows/` 已移除）。这不只有一个直接后果：
+门禁只在有人手工跑时才会被发现已经红，于是「**把红项写进文档**」这种处理方式实际上把它固定了下来——
+本节的旧版本曾以「已知红项」为核心，而三个脚本就在那张表里红了数月。故本节改以
+**判据的稳定性分层**为核心（D-01，2026-09-25 用户裁定）。
 
-下表所有计数为 **2026-09-25 实测**（`CHG-20260925-062` 期间逐条重跑）。此前记的是 2026-09-23 的读数；
-**红项集本身未变，变的是计数与组成**——凡与旧读数不同处，均在表下注明成因。
+下表为 **2026-09-25 实测**（`CHG-20260925-063` 收尾读数，原始输出见该 CHG
+`evidence/artifacts/t04-gate-readings.out`）：
 
-| 校验 | 状态（2026-09-25 实测） |
-|---|---|
-| `scripts/verify_delivery_governance.py` | 绿 |
-| `scripts/verify_agent_entry.py` | 绿，**0 WARN**（快照 1923 字符）。原记「1 个 WARN 为待复核项」已不成立，成因见下 |
-| `scripts/verify_skills.py` | 绿（10 个 skill 源文件） |
-| `scripts/verify_m0_config.py` | **红 3 项**：`cloud_api` 与 `local_agent_api` 的 `contract_revision` 期望值落后于 `config/contract-map.yaml`；缺失 `.github/workflows/m0-workspace.yml`。（与旧读数一致） |
-| `scripts/verify_product_master_alignment.py` | **红 8 项**：M2/M3 状态词 2 项、M2/M3 候选关键词 5 项、M10 缺 `FFmpeg/FFprobe 分发` 1 项。**原记「红 9 项」不成立**，成因见下 |
-| `scripts/verify_m2_acceptance.py` | **红 5 项**。**原记「红 1 项」不成立**，成因见下 |
-| `python3 -m unittest discover -s tests -q` | **73 项中 4 项失败**，全部来自上面三个脚本。（原记「69 项中 4 项」；总数只因后续新增测试而变，**红项集未变**） |
+| 校验 | 状态（2026-09-25 实测） | 它守什么 |
+|---|---|---|
+| `scripts/verify_delivery_governance.py` | 绿 | delivery 指针与里程碑引用互相一致 |
+| `scripts/verify_agent_entry.py` | 绿，**0 WARN**（快照 1919 字符，预算 8000） | 入口文件存在性、快照唯一性与体积预算、快照↔LEDGER/active 一致、配置 path 一致、各仓入口漂移（启发式 WARN） |
+| `scripts/verify_skills.py` | 绿（10 个 skill 源文件） | skill 单一源与分发目标 |
+| `scripts/verify_m0_config.py` | 绿 | 工作区 `contract-map` / `release-matrix` 不变量，以及三个运行仓的 CI 工作流存在性 |
+| `scripts/verify_product_master_alignment.py` | 绿 | 产品基线与 MASTER 计划对齐：里程碑状态词、未关闭里程碑的候选块、契约层状态词 |
+| `scripts/verify_m2_acceptance.py` | 绿（**需三个兄弟仓在检出中**） | M2 的**契约层与 schema 层**跨仓验收矩阵 |
+| `python3 -m unittest discover -s tests -q` | 绿，**Ran 75 / OK** | 上述脚本**自身的判别力** |
 
-上述红项**不在 Agent 入口工作范围内**，需各自独立开 CHG 处理。在它们转绿之前，不要假定本仓库门禁整体是绿的。
+需要真实运行实例、不属上表的：`scripts/verify_m1_integration.py`、`scripts/verify_m3_acceptance.py`、
+`scripts/m2b_local_acceptance.py`；`scripts/verify_m0_local.sh` 在兄弟仓存在时跑上表加三仓的构建与测试。
 
-**三处计数变化的成因（已查明，均非入口工作引入）**：
+### 判据的稳定性分层（D-01）
 
-1. **`verify_agent_entry.py` 由 1 个 WARN 降为 0**——云仓自己修掉了。该 WARN 原为
-   「`wt-media-cloud` 的 `AGENTS.md` 禁止 `internal/runtime`，而 `CLAUDE.md` 仍把它描述为资源所有者」。
-   现状实测：云仓 `CLAUDE.md:31` 已把该提及写进**禁止句**（「禁止创建全局单例和 `internal/runtime`」），
-   而漂移检查正是「禁止句里的提及不算描述」，故命中消失。修它的是云仓提交
-   `f21bbcb docs: align Cloud agent boundary with ADR-0017`，**不是本规范或本仓的改动**。
-   逐仓实测（2026-09-25）：cloud 禁止 6 / 描述 7 / 交 0、desktop 2 / 1 / 0、agent 0 / 0 / 0、workspace 0 / 8 / 0。
-2. **`verify_product_master_alignment.py` 由 9 项降为 8 项**——组成也变了。旧读数的 9 项里含
-   「active CHG 缺 current repository」与「active CHG 不得有待决问题」各 1 项，这**两项只在存在
-   active CHG 时才会触发**；无 active CHG 时它们天然不出现。剩下的 8 项是 M2/M3 状态词 2 +
-   候选关键词 5 + M10 的 `FFmpeg/FFprobe 分发` 1。旧表把 M10 那项漏计、把两个 active-CHG 条件项计入，
-   故写着 9。
-3. **`verify_m2_acceptance.py` 由 1 项升为 5 项**——这是**校验器期望值过期**，不是代码缺陷。
-   逐条查证（2026-09-25）：
+**跨仓源码字面量不作门禁；契约层与 schema 层判据保留并加固。** 这是 `CHG-20260925-063` 查明的根因：
+三个脚本长期红，**红的原因不是代码坏了**，而是它们把「源码文本」当判据，而那些文本已被后续 CHG
+**合法重构**——文件跨目录、跨仓迁移（`compatibility.go` 移到 `cloudagent/service/`）、常量换文件再导出
+（`REQUIRED_CONTRACT_REVISION` 仍在、值未变）、`main.rs` 被拆成分层模块（CHG-056）。
+**合法的重构能把门禁打红，这种门禁就在训练读者忽略红灯**，真回归随之被同一个「反正是已知红」掩盖。
 
-   - `wt-media-cloud/internal/modules/cloudagent/compatibility.go` 不存在——该文件已移到
-     `.../cloudagent/service/compatibility.go`（旧读数即此一项，仍然成立）。
-   - `wt-media-agent/src/wt_media_agent/cloud_agent_contract.py` 里没有字面量
-     `REQUIRED_CONTRACT_REVISION = "2026.07.15.1"`——该常量已迁出，此文件只**导入再导出**
-     （`:10` 导入、`:18` 进 `__all__`）。
-   - `wt-media-desktop/src-tauri/src/main.rs` 里没有 `"wt-media-agent"`（实测 0 命中）——
-     `main.rs` 已由 CHG-056 拆分为分层模块，该字符串随之迁走。
-   - `wt-media-desktop/src-tauri/src/local_agent/mod.rs` 里没有 `consume_binding_ticket(` 与
-     `pub fn bind_session<T: BindingTransport>(`（实测各 0 命中）——函数已改名或迁走。
+| 层 | 例 | 可作为门禁吗 |
+|---|---|---|
+| 跨仓**源码文本** | `compatibility.go` 里的 Go 常量、`main.rs` 里的字符串 | **否**——重构即漂移。已全部移除，**不得加回** |
+| **契约层** | `config/contract-map.yaml`、已发布 openapi/yaml、Desktop `contracts.lock.json` 的 `consumes` | 是——变更本需复核，正是门禁该拦的事 |
+| **schema 层** | 已应用的 migration（`used_at` 列 + `token_hash` 唯一键） | **是**——已应用的 migration 是 append-only，其文本冻结 |
+| **行为** | 「票据只能消费一次」 | 由**各仓自己的套件**覆盖（Cloud `TestRegisterConsumesTicketOnceAndIssuesHashedCredential`）。本仓不跑别的仓的测试，也不复述其实现 |
 
-   即：这是一个**静态**校验器（其 docstring 自述「must never turn fixture evidence into a
-   real-integration PASS」），期望值以文件内容字面量为判据，而这些文件内容已被后续 CHG 合法重构。
-   **本次只登记、不改**——改它属跨仓校验器维护，需独立开 CHG。
+### 候选块属于未关闭的里程碑
 
-其中两项与入口工作相邻，值得单独说明：
+MASTER 的 `候选 CHG：` 块是**未关闭**里程碑的字段。里程碑转 `DONE` 时候选块随之下线、由闭环记录取代
+（M2 2026-09-14、M3 2026-09-23 如此；M0/M1 关闭更早，块作为闭环记录保留）。据此校验分层：
+**已 `DONE` 只校验状态词**（及其既有闭环记录断言），**未 `DONE` 必须有非空候选块**。
+后者是硬错误，因为**对空块求值会让两类断言坏在相反方向**：`require_all` 恒报缺项（恒定噪音红灯），
+而 `forbidden in ""` 恒为假 ⇒ 该检查**静默通过**、认证了一个它从未读过的里程碑。
 
-- `verify_product_master_alignment.py` 的「active CHG current repository is missing」和「must have no pending questions」来自 `CHG-20260916-052` 的记录形状：它使用中文 `- 当前仓库：` 而非 `- Current repository:`，且没有 Pending Questions 节。快照生成器已同时兼容两种仓库写法，但这个校验脚本没有。修正方向是统一记录形状或扩展该校验，未在本次范围内实施。
-- 该脚本的 M2/M3 状态词与关键词期望值同样写在脚本里、与当前产品基线脱节，属于同一类「校验脚本内嵌的期望值漂移」问题。这类漂移应通过把期望值迁到可读配置来根治，而不是继续硬编码。
+### 报「通过 / 0 命中」前必须证明检查能失败
+
+`CHG-20260925-063` 在同一类错上踩了四次，形态不同、成因相同——**判据自己写错时，输出看起来同样「像量过的」**：
+
+1. `grep -c` 数到了**自己写的删除注释**（被删字符串仍在散文里，命中 1）——改用 **AST** 枚举真断言集合；
+2. 变异对照**没有重定向读取路径**，假树从未被读，三条变异全报 0 error——补**阳性对照**证明读取器确在读假树；
+3. 测试断言「**存在某标签**」，而该标签由**恒定的噪音红**提供 ⇒ 用例在变异之前就已满足，
+   **它所命名的检查被整条删掉也照样绿**——改为比较**完整错误集合**；
+4. 一条 SQL 断言的**阳性对照**缺位时，「改绿」与「改成恒真」读数相同。
+
+故：凡报「0 命中 / 通过 / 无新增」，必须附**阳性对照**并报出**分母**。变异式的「先红」必须是
+**关掉该判定后用例失败**，不能是 `ImportError`——导入错误什么都证明不了。
 
 当前已知 WARN：
 
 - **无（2026-09-25 实测 0 条）**。此前唯一一条云仓漂移已关闭，见下。规则不变：漂移只检测、报告，
   修正由各仓自行决定（§11）。
 
+**但这份 0 有一条不算数的分项，如实登记**（属既有实现缺口，需独立 CHG，见 `CHG-20260925-063` §14）：
+`verify_agent_entry.py::check_entry_drift` 只从各仓 **`AGENTS.md`** 取「被禁止的路径词」，而本仓的
+红线正文已迁到 `AGENT-INDEX.md`，`AGENTS.md` 现为薄入口。本仓 `AGENTS.md` 仅有的两条禁止句
+带的是**含扩展名**的路径（`config/repository-map.yaml`、`.ai/CURRENT_CONTEXT.md`），而
+`DRIFT_TOKEN_RE` 要求首段之后的每一段都不含点号 ⇒ **本仓的 forbidden 集合恒为空集**，
+其 `0` 是**结构性**的，不是「无漂移」的证据。三个运行仓不受此影响（实测 forbidden：
+cloud 6、desktop 2、agent 0）。
+
 已关闭的 WARN（2026-09-25）：`wt-media-cloud`：`AGENTS.md` 明确不创建 `internal/runtime`，
 而 `CLAUDE.md` 仍把它描述为资源所有者。**由云仓自己关闭**——`CLAUDE.md:31` 已改写成禁止句
 （「禁止创建全局单例和 `internal/runtime`」），提交 `f21bbcb docs: align Cloud agent boundary
-with ADR-0017`。这正是本规范期望的处理路径（治理仓只报告、各仓自行修正）。逐仓实测见 §10 上方第 1 条。
+with ADR-0017`。这正是本规范期望的处理路径（治理仓只报告、各仓自行修正）。当时的逐仓实测
+（禁止 / 描述 / 交叉）：cloud 6 / 7 / 0、desktop 2 / 1 / 0、agent 0 / 0 / 0、workspace 0 / 8 / 0。
 
 已关闭的 WARN（2026-09-23）：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop` 原先都没有 `AGENT-INDEX.md`，第三层加载规则处于降级状态。三个文件已由 `scripts/init-agent-entry.sh repo <name>` 生成并分别提交到各仓（各仓一次独立提交，只含该文件）；校验脚本的「无 AGENT-INDEX.md」WARN 随之消失。降级条款本身保留，用于将来新增仓库时的缺口登记。
 
