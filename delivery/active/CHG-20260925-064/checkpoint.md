@@ -16,17 +16,18 @@
 
 - **T-04 读取顺序单一化**：读取顺序由 **5 处手写清单 + 1 个代码常量**（其中 3 处内容互不相同，`MASTER` 那版整份不含 `AGENT-INDEX.md`、第 1 项指向已删的执行根 `AGENTS.md`）收敛为 **1 处手写（`AGENT-INDEX.md` §4）＋ 1 处生成物**。§4 补齐第 6–8 项（T-03 发现的两版「第二层」不一致按 `AGENT-INDEX.md` 为准）；`AGENTS.md` 30→22 行、`CLAUDE.md` 37→28 行（删各自复述的红线与清单，只留指针）；`MASTER:791-796` 6 项清单删为 1 行；`MASTER:66` 的退休词「渐进式加载」就地改写；生成器常量加注释登记为「§4 的生成物镜像」。**变异对照**：常量第 1 项改探针 → 快照正好 2 行不同（时间戳＋第 1 项），还原后只剩时间戳且生成器逐字节相同。**入口红线 9/9 逐条归属**（删掉的 4+5 条全部在 `AGENT-INDEX.md` §2／§9 有落点，阳性对照：`HEAD` 两文件对应小节各命中 1–2）。**两条提交约定回迁**至 `AGENT-INDEX.md` §9「提交纪律」（改前活落点 0，阳性对照 `0de87e8:CLAUDE.md` 各命中 1）。
 
+- **T-05 状态词汇成文**：`MASTER` §3 由「两套词 ＋ 状态定义表」就地覆盖为 `### 状态词汇`——CHG 六词（`DISCUSSION`／`PLANNED`／`IMPLEMENTING`／`VERIFYING`／`DONE`／`SUPERSEDED`）与里程碑四词，读数列逐词给分母（活 20 篇／归档 38 篇／里程碑 6 篇）。**改前的实况是两套都不准**：`TODO`／`IMPLEMENTED`／状态值 `VERIFIED` **零记录使用**，而真在用的 `DISCUSSION`（7）／`PLANNED`（3）／`SUPERSEDED`（8）在文档里**无定义**；校验脚本的接受集与文档词表**交集为零**。阳性对照：同一扫描对 `CLOSED`／`HANDOFF` 各报 2。`MASTER` §6 的 `### CHG 门禁 — CLOSED` 及 `:289`／`:336` 两处一并改 `DONE`（`CLOSED` 退役后 §6 是它的第二落点）。实施中词取 `IMPLEMENTING`（模板／夹具／脚本接受集／056～064 全链在用），退 `IN_PROGRESS`（仅旧归档 4 处 ＋ 1 篇 `planned`），里程碑层不变——依据记在 evidence §3。
+
 ## Current
 
-- T-04 已落。下一个是 T-05（状态词汇成文）。
+- T-05 已落。下一个是 T-06（脚本／模板／checkpoint 落点对齐）。
 
 ## Next
 
-1. **T-05**：把 `MASTER:105-128` 的两套词汇就地覆盖为**实测在用**词汇（分母＝`delivery/planned`＋`active` 的 `Status:` 字段，逐文件提取），并一行声明历史词汇。
-2. **T-06**：`verify_product_master_alignment.py:290` 接受集与 `:292` 文案、`templates/delivery/change.md:6` 与 §12、**新增 `templates/delivery/checkpoint.md`**、skill 措辞、**新增「active 目录必须有 `checkpoint.md`」结构检查（带变异对照）**——须在本 CHG 仍 active 时复测（改接受集会打到自己的 LEDGER 表行）。
-3. **T-07**：`delivery/planned/*` 的 `Status:` 行就地改写。
-4. **T-08／T-09／T-10／T-11**（相互独立，可换序）：FFmpeg 归属／里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
-5. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描。
+1. **T-06**：`verify_product_master_alignment.py:290` 接受集与 `:292` 文案、`templates/delivery/change.md:6` 与 §12、**新增 `templates/delivery/checkpoint.md`**、skill 措辞、**新增「active 目录必须有 `checkpoint.md`」结构检查（带变异对照）**——须在本 CHG 仍 active 时复测（改接受集会打到自己的 LEDGER 表行）。
+2. **T-07**：`delivery/planned/*` 的 `Status:` 行就地改写（`023` 的 `IN_PROGRESS` 与 `034` 的 `> 状态：` 形式是主的两个待处置项）。
+3. **T-08／T-09／T-10／T-11**（相互独立，可换序）：FFmpeg 归属／里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
+4. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描。
 
 ## Blocked
 
@@ -43,8 +44,11 @@
 | `verify_product_master_alignment.py` | `exit=0` |
 | `verify_m2_acceptance.py` | `exit=0` |
 | `python3 -m unittest discover -s tests -q` | `Ran 75 tests` / `OK`，`exit=0` |
+| 退役流水线串 `TODO → IMPLEMENTED`（活文件，排除本 CHG 自身记录） | 0 命中 |
 | 三仓工作区基线（AC-15） | `cloud` `?? dump.rdb`；`agent`、`desktop` 空——与 T-01 基线逐条一致 |
 
-取数时间 2026-09-25 19:47:08 CST，原始输出 `evidence/artifacts/t04-gate-readings.out`；逐条明细见 `evidence/task-04-reading-order-single-landing.md`。
+| 词汇对账（逐文件提取，可复算） | 活 20 篇 `{IN_PROGRESS:1, PLANNED:3, SUPERSEDED:8, DISCUSSION:7, IMPLEMENTING:1}`；归档 38 篇 `{DONE:28, IN_PROGRESS:4, HANDOFF:2, CLOSED:2, VERIFYING:1, IMPLEMENTING:1}`——两列求和等于分母 |
+
+取数时间 2026-09-25 19:51:00 CST（T-05 最后一次内容改动之后），原始输出 `evidence/artifacts/t05-gate-readings.out`；逐条明细见 `evidence/task-05-status-vocab.md`。
 
 该组读数之后本文件又改动过一次。**这不影响它成立**，且此判断是证过的：`git grep -l 'checkpoint' -- scripts tests` 命中 **0** 个文件（同一扫描对 `change.md` 命中 9 个，构成阳性对照）⇒ 没有任何门禁解析 `checkpoint.md`。这也正是 T-06 要补的那条结构检查所针对的缺口。

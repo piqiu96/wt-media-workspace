@@ -142,7 +142,7 @@ None.
 | T-02 | 承接两处未入账工作区编辑（`CLAUDE.md`、`conventions:33`） | DONE | `git show --stat` 只含这两个文件；六门禁复测 | T-01 |
 | T-03 | `conventions` 精简保留（按用户裁定的保留清单：删读数与历史叙述；逐节复核 2 处引用） | DONE | 见 §8.1；208→148 行、节数 11→11；两处引用改 1 留 1（留的理由见 evidence §5） | T-02 |
 | T-04 | 读取顺序单一化 + 入口文件只留指针 + 补回两条提交约定 | DONE | 见 §8.2；落点由 5 处手写＋1 常量收敛为 **1 处手写＋1 生成物**；入口红线 9/9 逐条归属；变异对照证明快照确由该常量派生 | T-03 |
-| T-05 | 状态词汇成文（`MASTER:105-128` 就地覆盖为实测在用词汇＋一行历史词汇） | TODO | 词汇表与 T-07 改后的记录逐词对齐（报分母） | T-04 |
+| T-05 | 状态词汇成文（`MASTER:105-128` 就地覆盖为实测在用词汇＋一行历史词汇） | DONE | 见 §8.3；CHG 六词、里程碑四词、退役词与分母逐项报出；阳性对照 `CLOSED` 2／`HANDOFF` 2 | T-04 |
 | T-06 | 脚本／模板／checkpoint 落点对齐（接受集、文案、模板、新增结构检查） | TODO | 六门禁 + `unittest`；**新判据做变异对照**；**本 CHG 仍 active 时复测** | T-05 |
 | T-07 | `planned` 记录状态词就地改写 | TODO | 逐文件 `git diff` 只改状态词一行；两遍词汇统计 | T-06 |
 | T-08 | FFmpeg 归属（ADR-0015 就地改写） | TODO | 全仓归属落点复扫＝Cloud；阳性对照 | 独立 |
@@ -184,6 +184,26 @@ None.
 | 补回被瘦身丢掉的两条提交约定 | `AGENT-INDEX.md` §9「提交纪律」 |
 
 细节读数、变异对照与逐条归属表见 `evidence/task-04-reading-order-single-landing.md`。
+
+### 8.3 状态词汇成文（T-05）
+
+`MASTER` §3 由「两套词 ＋ 状态定义表」就地覆盖为 `### 状态词汇`：
+
+| 项 | 改前 | 改后 |
+|---|---|---|
+| CHG 词 | `TODO → IMPLEMENTED → VERIFIED → CLOSED` | `DISCUSSION → PLANNED → IMPLEMENTING → VERIFYING → DONE`（＋`SUPERSEDED`） |
+| 该组词与实测的关系 | `TODO`／`IMPLEMENTED`／状态值 `VERIFIED` **零记录使用**；真在用的 `DISCUSSION`／`PLANNED`／`SUPERSEDED` **一个字都没有** | 六个词全部为实测在用的值，读数列逐词给出 |
+| 里程碑词 | 四个词，无现状列 | 同四词，第三列直接写「当前处于该态的里程碑」 |
+| 与校验脚本接受集的关系 | 两套**交集为零** | 表成文；脚本接受集与文案的对齐是 **T-06** |
+| 子项状态 | 未区分 | 明写「里程碑内部子项（如 M2-D 的 `DEFERRED`）不占上表」 |
+
+`MASTER` §6 的 `### CHG 门禁 — CLOSED` 与正文、以及 `:289`／`:336` 两处 `CLOSED` 一并改为 `DONE`——
+`CLOSED` 退役后，§6 是它的第二个落点。
+
+**一次取舍已记依据**：实施中词取 `IMPLEMENTING`（模板教的词、测试夹具默认值、脚本接受集成员、
+056～064 全链在用），退 `IN_PROGRESS`（仅旧归档 4 处 ＋ 1 篇 `planned`）；里程碑层仍用 `IN_PROGRESS`。
+
+细节与分母见 `evidence/task-05-status-vocab.md`。
 
 ## 9. Repository Checklist
 
@@ -233,7 +253,8 @@ Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期�
 - `evidence/task-02-adopt-working-tree-edits.md`
 - `evidence/task-03-conventions-slim.md`
 - `evidence/task-04-reading-order-single-landing.md`
-- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-gate-readings.out`）
+- `evidence/task-05-status-vocab.md`
+- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-gate-readings.out`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
 **开工三仓基线**（T-01 记录，收尾按同一命令复测）：
@@ -277,3 +298,5 @@ $ git -C ../wt-media-desktop status --porcelain
 | 8 | B-6⑨ 余项：`docs/superpowers/`（23 篇中 21 篇无人引用）、`delivery/planned/` 的 9 个 `SUPERSEDED` + 6 个「已实施却仍挂 planned」、`completed/CHG-20260916-052` 单条占归档 74% | 属诊断 G-5／G-6，需独立 CHG 与用户裁定 |
 | 9 | `conventions §1`（6 条不变量）与 `§7` 开头同 `AGENT-INDEX.md` §2／§10 局部重叠：T-03 按用户裁定的保留清单**未去重** | 去重须先裁定「规范文件可否复述红线」，属用户取舍。本 CHG 只登记「落点未减」这一事实 |
 | 10 | `AGENT-INDEX.md` §4 作为读取顺序的**唯一**落点，**没有机检点**（`conventions` §9 耦表已如实登记「入口文件与 `MASTER` 不得再列清单」靠人工复核） | T-04 把落点降下来了，但「唯一」目前只由本 CHG 的一次性扫描证明。为它新增机检点会把 §4 的条目文本冻成契约（措辞一变就红），与 CHG-063 的判据分层结论相悖，须独立裁定 |
+| 11 | 里程碑文件头的状态写法四种并存：`- Milestone status:`（M4／M5）、散文（M2）、`> 实施状态：`（M3）、`- 状态：**已完成**`（M-launch-engineering） | T-05 只成文**词表**、不统一**写法**：为四种既有格式新增一致性判据会把它们冻成契约，与 §5 Explicitly Not Doing 的既有声明相悖。现状如实登记在 `MASTER` §3 表下 |
+| 12 | `CHG-044`／`CHG-052` 归档写的 `HANDOFF` 是否改判 `DONE` | 该裁定已由 `LEDGER.md:31` 专段登记并写明「属治理口径决定，本次不动」。T-05 只把 `HANDOFF` 列为退役词，不回改归档记录 |

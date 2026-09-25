@@ -99,33 +99,37 @@ wt-media-workspace/
 
 ## 3. 里程碑路线
 
-每个里程碑只允许以下状态：
+### 状态词汇
 
-```text
-NOT_STARTED
-IN_PROGRESS
-VERIFYING
-DONE
-```
+状态词只有下表这些；写记录时从表里取，不造新词。读数列是**实测**值，两种写入形式（`- Status:` 与更早的 `> 状态：`）各自计数后相加。
 
-CHG 只允许以下状态：
+两张表加历史词汇应凑齐分母：活列 19 ＋ 退役 `IN_PROGRESS` 1 ＝ **20**；归档列 30 ＋ 退役 `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **38**。对不上就说明有词没被登记。
 
-```text
-TODO → IMPLEMENTED → VERIFIED → CLOSED
-```
+**CHG**，变迁为 `DISCUSSION → PLANNED → IMPLEMENTING → VERIFYING → DONE`（`SUPERSEDED` 可从除 `DONE` 外的任何状态进入）：
 
-状态定义：
+| 状态 | 含义 | 活记录 | 归档记录 |
+|---|---|---|---|
+| `DISCUSSION` | 草案，方向待裁定；不激活 | 7 | 0 |
+| `PLANNED` | 方向已定、已拆分，可激活 | 3 | 0 |
+| `IMPLEMENTING` | 实施中 | 1 | 1 |
+| `VERIFYING` | 实施完成，待验收 | 0 | 1 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 28 |
+| `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 8 | 0 |
 
-| 级别 | 状态 | 含义 |
+分母：活记录＝`delivery/planned/*/change.md` 19 篇 ＋ `delivery/active/*/change.md` 1 篇；归档记录＝`delivery/completed/*/change.md` 38 篇。
+
+**里程碑**（现状见 `delivery/milestones/README.md`）：
+
+| 状态 | 含义 | 当前处于该态的里程碑 |
 |---|---|---|
-| CHG | TODO | 已规划，未开始 |
-| CHG | IMPLEMENTED | 代码完成，待自测 |
-| CHG | VERIFIED | 自测/集成/回归通过 |
-| CHG | CLOSED | 验证通过，evidence 就绪 |
-| 里程碑 | NOT_STARTED | 未进入该里程碑 |
-| 里程碑 | IN_PROGRESS | 开发中 |
-| 里程碑 | VERIFYING | Codex 完成自动综合验收，等待你人工整体验收 |
-| 里程碑 | DONE | 人工整体验收通过 |
+| `NOT_STARTED` | 未进入该里程碑 | M4、M5 |
+| `IN_PROGRESS` | 开发中 | 无 |
+| `VERIFYING` | 自动综合验收完成，等待人工整体验收 | 无 |
+| `DONE` | 人工整体验收通过 | M2、M3、M-launch-engineering |
+
+里程碑文件内部的子项状态（如 M2-D 的 `DEFERRED`）不是里程碑状态词，不占上表，只在其所属里程碑文件内自述。
+
+**历史词汇**（不再取用；归档记录与 `planned` 记录保持原样，不回改）：`TODO`、`IMPLEMENTED` 与作为状态值的 `VERIFIED` 在 58 篇记录中**零处使用**——它们只在本文档的旧版本里被列出过。`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 1 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处，只在 `scripts/verify_product_master_alignment.py` 的接受集里）为已退役写法。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
 
 里程碑不能因为代码目录已经存在而标记为 `DONE`。必须逐项核验代码、自动测试、Contract、Evidence、人工验证、跨仓库集成、Git 提交和退出条件。
 
@@ -284,7 +288,7 @@ CHG-20260716-012 架构迁移阶段四（继承证据）
 CHG-20260716-013 架构迁移阶段五+六（继承证据）
 ```
 
-实施方式：按 M2-A→M2-B→M2-C→M2-E 四条业务闭环顺序补齐。M2-D 账号上号与Cookie闭环暂缓，后续恢复时必须重新创建独立 CHG。每条闭环必须满足"用户可完成完整业务操作"方可标记 CLOSED。
+实施方式：按 M2-A→M2-B→M2-C→M2-E 四条业务闭环顺序补齐。M2-D 账号上号与Cookie闭环暂缓，后续恢复时必须重新创建独立 CHG。每条闭环必须满足"用户可完成完整业务操作"方可标记 `DONE`。
 
 ### M2-A：用户、权限、会话与运行环境可信闭环
 
@@ -331,7 +335,7 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 重新执行规则：
 
 - 每个新 CHG 先审计历史实现和 Contract，再决定复用、修正或补齐；
-- 历史 C1-C6 的自动测试和真实证据可以复用，但必须满足新 CHG 的完整范围和 UI/人工验收后才能标记 CLOSED；
+- 历史 C1-C6 的自动测试和真实证据可以复用，但必须满足新 CHG 的完整范围和 UI/人工验收后才能标记 `DONE`；
 - 不为重新编号而盲目重写已经正确的代码；
 - 任何代理、Cookie、Profile 修改都必须写入 BitBrowser 后读回验证；
 - 批量操作必须支持部分成功、失败项重试和明确错误反馈。
@@ -826,9 +830,9 @@ Codex 每次必须按 `AGENT-INDEX.md` §4 的**读取顺序**执行——该节
 
 ## 6. 完成门禁
 
-### CHG 门禁 — CLOSED
+### CHG 门禁 — DONE
 
-一个 CHG 只有满足以下条件才能标记为 `CLOSED`：
+一个 CHG 只有满足以下条件才能标记为 `DONE`（状态词见第 3 节）：
 
 - 范围内实现完成；
 - 自动测试通过；

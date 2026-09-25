@@ -1,0 +1,44 @@
+=== CHG-20260925-064 T-05 gate readings ===
+date: 2026-09-25 19:51:00 CST
+invocation: python3 -B -X pycache_prefix=<fresh tmpdir> <script>
+note: taken after T-05's LAST content change (delivery/MASTER_IMPLEMENTATION_PLAN.md);
+      only this CHG's change.md/checkpoint.md/evidence changed afterwards, and no gate parses those
+      (proof: git grep -l checkpoint -- scripts tests -> 0 files; same scan on change.md -> 9, positive control).
+
+verify_delivery_governance.py          exit=0
+    Delivery governance verification ok. Active CHG: CHG-20260925-064
+
+verify_agent_entry.py                  exit=0
+    execution snapshot: 1936 characters (~774 tokens, budget 8000 characters)
+    Agent entry verification ok. 0 warning(s) need review.
+
+verify_skills.py                       exit=0
+    verified 10 skill source files
+
+verify_m0_config.py                    exit=0
+    Workspace config verification ok
+
+verify_product_master_alignment.py     exit=0
+    Product and Master Plan alignment verification ok
+
+verify_m2_acceptance.py                exit=0
+    M2 static cross-repository acceptance matrix ok
+    NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+--- unittest discover -s tests -q (full output) ---
+  Ran 75 tests in 0.256s
+  
+  OK
+  exit=0
+
+--- retired CHG pipeline string, live files (excl. completed and this CHG's own record) ---
+  0 hits
+
+--- status-vocabulary reconciliation (re-measured) ---
+  LIVE: 20 files -> {'IN_PROGRESS': 1, 'PLANNED': 3, 'SUPERSEDED': 8, 'DISCUSSION': 7, 'IMPLEMENTING': 1}  sum=20
+  ARCHIVED: 38 files -> {'VERIFYING': 1, 'IN_PROGRESS': 4, 'DONE': 28, 'CLOSED': 2, 'HANDOFF': 2, 'IMPLEMENTING': 1}  sum=38
+
+--- three-runtime-repo baseline (AC-15) ---
+  wt-media-cloud       ?? dump.rdb 
+  wt-media-agent       
+  wt-media-desktop     
