@@ -1,0 +1,45 @@
+=== T-01 开工基线 @ 2026-09-25T14:35:54Z ===
+
+--- HEAD ---
+bd5df2c26dcb020eebafc9d0aafbdc71ec23586d
+
+--- 四仓 git status --porcelain ---
+wt-media-workspace     ?? delivery/active/CHG-20260925-065/;
+wt-media-cloud         ?? dump.rdb;
+wt-media-agent         (clean)
+
+wt-media-desktop       (clean)
+
+
+--- 入口文件 字节/行数（分母：四仓 × 四类） ---
+wt-media-workspace     CLAUDE.md          1755 B   28 行
+wt-media-workspace     AGENTS.md          1267 B   22 行
+wt-media-workspace     AGENT-INDEX.md    12736 B  209 行
+wt-media-workspace     DIRECTORY_MAP.md  (不存在)
+wt-media-cloud         CLAUDE.md          2715 B  168 行
+wt-media-cloud         AGENTS.md          6046 B  113 行
+wt-media-cloud         AGENT-INDEX.md     4357 B   60 行
+wt-media-cloud         DIRECTORY_MAP.md   7449 B  105 行
+wt-media-agent         CLAUDE.md           226 B   10 行
+wt-media-agent         AGENTS.md          3705 B   45 行
+wt-media-agent         AGENT-INDEX.md     4668 B   65 行
+wt-media-agent         DIRECTORY_MAP.md   9886 B  117 行
+wt-media-desktop       CLAUDE.md           283 B   12 行
+wt-media-desktop       AGENTS.md          3170 B   39 行
+wt-media-desktop       AGENT-INDEX.md     8193 B   75 行
+wt-media-desktop       DIRECTORY_MAP.md  12036 B   90 行
+
+--- 三仓 AGENT-INDEX.md 的 H2 序列 ---
+wt-media-cloud     7 节: ## 依赖|## 定位|## 本仓库拥有|## 本仓库不拥有|## 需求路由|## 禁止|## 上下文加载顺序|
+wt-media-agent     7 节: ## 依赖|## 定位|## 本仓库拥有|## 本仓库不拥有|## 需求路由|## 禁止|## 上下文加载顺序|
+wt-media-desktop   7 节: ## 依赖|## 定位|## 本仓库拥有|## 本仓库不拥有|## 需求路由|## 禁止|## 上下文加载顺序|
+
+--- 三仓 AGENT-INDEX.md H2 序列是否逐字相同 ---
+cloud == agent == desktop : YES
+
+--- 门禁读数（开工前） ---
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+verify_agent_entry exit=0
+Delivery governance verification ok. Active CHG: none
+verify_delivery_governance exit=0

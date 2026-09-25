@@ -1,0 +1,9 @@
+=== T-01 门禁读数 @ 2026-09-25T14:36:35Z ===
+verify_m0_config                   exit=0 | Workspace config verification ok
+verify_delivery_governance         exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-065
+verify_agent_entry                 exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills                      exit=0 | verified 10 skill source files
+verify_product_master_alignment    exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance               exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                           OK
+sync_skills check                  exit=0 | skill outputs are up to date
