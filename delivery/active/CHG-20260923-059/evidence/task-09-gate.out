@@ -1,0 +1,33 @@
+=== T-09 · 门禁（2026-09-25T12:23:10） ===
+树：workspace @ 7a22d7b / agent @ feb532d
+
+--- 1. 三个校验脚本 ---
+Delivery governance verification ok. Active CHG: CHG-20260923-059
+  exit=0
+execution snapshot: 2144 characters (~858 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+  exit=0
+verified 10 skill source files
+  exit=0
+
+--- 2. workspace 套件（对照 T-08 的读数：Ran 69 / failures=4）---
+Ran 73 tests in 0.223s
+
+FAILED (failures=4)
+
+--- 3. 四条红的逐条名字（必须与 T-06/T-07/T-08 逐条同名）---
+  FAIL: test_contract_map_matches_m1_cloud_agent_compatibility (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_matches_m1_cloud_agent_compatibility)
+  FAIL: test_contract_map_provider_paths_exist_in_full_workspace (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_provider_paths_exist_in_full_workspace)
+  FAIL: test_current_product_master_and_governance_are_aligned (test_verify_product_master_alignment.ProductMasterAlignmentTests.test_current_product_master_and_governance_are_aligned)
+  FAIL: test_static_cross_repo_contract_and_security_matrix (test_verify_m2_acceptance.VerifyM2AcceptanceTests.test_static_cross_repo_contract_and_security_matrix)
+
+--- 4. 增量来源：新增 tests/test_skill_paths_resolve.py 的 4 条 ---
+  移除新文件: Ran 69 tests in 0.199s
+FAILED (failures=4)
+  含新文件  : Ran 73 tests in 0.217s
+FAILED (failures=4)
+  ⇒ 69 → 73，正好 +4；失败数不变（4），名字不变
+
+--- 5. agent 套件（对照 T-07 的读数：Ran 401 OK）---
+  Ran 407 tests in 11.950s
+  OK

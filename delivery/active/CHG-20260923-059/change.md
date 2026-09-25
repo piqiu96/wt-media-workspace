@@ -268,6 +268,7 @@
 | Q-03 | Windows x64 与 macOS x86_64 构建 | 不在本 CHG 范围；`release-matrix` 已登记为 `residual_risks` | NO |
 | Q-04 | 「组件与资源版本」的**口径**（版本从哪算、资源清单算不算它的输入） | 待 T-06 实施时定；若定不下则退回用户 | **YES（T-06 内）** |
 | Q-05 | M2 链路的 DMG 构建是否改走发布打包（`build-release-macos.sh`）；以及 M2 环境里 8765 归谁（链路的 Agent 还是 app 自带的 sidecar） | **未裁定（T-08 的 D-25 登记项）**——本 CHG 不改脚本、按登记收尾 | **NO**（不阻塞 T-09/T-10；但「app 端 Local Agent 在 M2 环境可用」这句话在它关闭前不成立） |
+| Q-06 | 契约声明的**两处无人对账的漂移**：①`config/contract-map.yaml:72` 的 `local_agent_api.contract_revision` 是 `2026.09.06.1`，而它指向的定义文件 `v1/local-agent.openapi.yaml` 的 `info.version` 已是 `2026.09.24.1`（成因钉在 git 上：`87b1264` 改了文件没改 map）——T-06 又把 map 定为契约版本的**唯一权威**，于是发布记录如实引用了一份过期的声明；②`local-agent.openapi.yaml` 的 `paths:` 只有 10 条，而 `local_api/server.py` **实际提供的 `/api/v1/*` 有 16 条**（含冻结的 `/healthz` 共 17 条），差的 7 条里 **6 条在 Desktop 的 Rust 里有真实调用点**（`bind`／`cookie-read`／`profile-create|open|close|update`；阳性对照 `profile-scans` 1、`account-check` 3），**第 7 条 `profile-delete` 两个仓都没有消费方**（desktop 仓 0 命中，agent 仓只有它自己那一行 `server.py:486`，连同名测试都没有）——它既是文档缺口，也是没人用过的代码路径。另附一条文档漏项：`wt-media-agent/scripts/README.md` 未列 `build_desktop_sidecar.py`（它在 CHG-053 Task 7 的吸收来源里被点名，但不在本 CHG 的 Add 清单）。 | T-09 实测（`evidence/task-09-absorbed.md` §6）：**三处都不在 CHG-059 §5 的 Add/Modify 清单里**，按「讨论不是需求」只登记不改。①的处置建议是让「map 与定义文件相等」有一条守卫（今天的已知红项 #1 比的是「验证器 vs map」，不是这一对）；②建议由下一个碰 `local-agent-api` 的 CHG 补 `paths:`，并顺带判定 `profile-delete` 该留还是该删 | **NO**（三条都不阻塞本 CHG 收尾：①的发布记录引用的是当时生效的声明，②的 6 条路由在 Desktop 侧有真实调用点、剩下 1 条无人用，③纯文档漏项） |
 
 ## 8. Implementation Tasks
 
@@ -283,7 +284,7 @@
 | T-06 | **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个来源；发布脚本加 Desktop ↔ sidecar 版本兼容校验 | desktop + workspace | **DONE** | 五类各有来源且各有读数（`evidence/task-06-reals.out` 段 1：`0.1.0` / `0.2.2` / `0.1.0+f21bbcb` / `contracts=10` / `files=4, sha256:69f34a89…`）。**不匹配必拒拿到两条真机红**：改一个随包资源 → `--verify` 拒绝并**点名那个文件**；pin 改 `0.2.3` → `--check` 拒绝并点名 pin 路径与两侧版本，且同一条命令在 pin 还原后转绿（阳性对照，pin 文件 sha256 前后一致）。**发布流程真跑了一遍**（`build-release-macos.sh` exit=0，出 DMG）：构建后 `--check` 通过、签名窗口内 `--record`、挂载 DMG 的 `--verify` **复算出同一摘要** ⇒ 暂存 + 封条 + DMG 装配都不动 `Contents/Resources`。变异 **15/15**（20 条臂，M7 多打一个 A18 已记明）。Q-04 按 D-17 关闭。详见 `evidence/task-06-versions.md` |
 | T-07 | **升级不覆盖**：用路径判据证明升级路径不写用户设置 / SQLite / 检查点 / 待回传结果 | desktop + agent | **DONE** | **先红**：desktop 首轮把判据写成**名字清单** ⇒ 3 passed / 6 failed（六条失败臂正是「名字 vs 路径」的判别力：改名过的文件、目录、另一侧的位置、带点的兄弟目录、检出布局、以及它连自己该放行的 `settings.toml` 也拒掉）；**Agent 侧没有实现级的先红**（迁移本来加性、本来只写一个路径），红全部来自变异，如实登记。**变异 desktop 9/9**（首轮 7 条时两条臂无主——`the_two_roots_are_siblings_with_disjoint_sites` 与 `allows_a_path_outside_both_roots` 谁都到不了，补 M8/M9 后逐条有主）、**agent 6/6**（M6 = 里程碑那条「升级/清理删除业务数据」的形态，只打掉加性臂且报文是丢行不是异常）。计数：desktop 363→**372**（+9，警告 7→7）、agent 397→**401**（+4）。**两处过程订正**：agent M4 首轮打不掉任何用例，根因是臂自己有个真盲点（planting 先调一次 apply，故「每次 apply 都产生的路径」在 before 快照里已有）⇒ 补第二个比较（以用例动手之前的目录为基准）；M6 首版锚在循环之前，红在 `no such table` 这个**异常**上而不是那条禁止的写入 ⇒ 重锚到循环之后。详见 `evidence/task-07-upgrade.md`、D-24 |
 | T-08 | **M2 业务回归**：对 A/B/C/D 之后的树重跑 M2 链路 | workspace + cloud | **DONE** | 链路 13 个阶段的判据**全绿**（`evidence/task-08-m2-all.out`：迁移 `migration ok: 0 applied, 39 total`、Cloud／Agent／BitBrowser via Agent／assets fresh／DMG fresh／login smoke 各 PASS，0 ERROR）。**另加三条链路够不到的读数**：①**既知红项**（`test_verify_m2_acceptance` 那条）的 5 条 ERROR **全部是指针过期**，逐条落到提交（#1 `bf499d9` 移动、#2 `51f2ee4` 移动留 shim 且值不变、#3 `3bcf2c7` 移动、#4/5 `30b9ebf` **有意删除**）——全仓 0 命中，同两条模式对 `30b9ebf^` 命中 3／1（阳性对照），repointed 副本 exit=0 是**控制**不是提案；README 那句「a Cloud file that no longer exists」只覆盖 5 条里的 1 条（README 与 conventions 都在本 CHG 不得触碰的脏文件之列 ⇒ 只登记）；②链路的 DMG 腿只证「文件存在且新鲜」，按 D 的契约那份包**不完整**（`Contents/Resources` 只有 `resources/`），换发布包后拿到 **T-01／T-04 在真包上的首条读数**，app 的 sidecar 仍红在链路自己占着的 8765（真 MySQL ✅／真 BitBrowser ✅／实网 ❌／实凭据 ❌／GUI ❌ 逐条标注）。详见 `evidence/task-08-m2-regression.md`、D-25、Q-05 |
-| T-09 | **吸收项**：Agent 侧 `AGENTS.md`/`README.md`/`contracts/*/README.md` 同步；workspace skill 改指 `clients/<platform>` 并跑 `sync_skills.py` | agent + workspace | TODO | `sync_skills.py` 后生成副本与源一致；skill 里的路径真的存在（resolve 判据，不只是字符串） |
+| T-09 | **吸收项**：Agent 侧 `AGENTS.md`/`README.md`/`contracts/*/README.md` 同步；workspace skill 改指 `clients/<platform>` 并跑 `sync_skills.py` | agent + workspace | **DONE** | 两条判据都是**行为判据**，不是字符串比对。①**resolve**：新写的 `tests/test_skill_paths_resolve.py`（4 条）在全仓 **33 个候选路径 / 10 个 skill** 上量，先红点名 `skills/agent/agent-platform-adapter-change/SKILL.md: src/wt_media_agent/platforms`（该落点 `MISSING`，`git show HEAD:` 那一版有 1 处命中），改指 `clients/<platform>` 后转绿；被排除形态的基底目录逐条 `exists`（8 个目录 + `delivery/milestones/M*.md` 5 个文件），另有独立阳性对照与分母下界。②**副本与源一致**：`sync_skills.py check` 先红且**逐份点名 4 份**（含 agent 仓那两份，`git grep` 旧路径返回 2 正是「源改了、副本没跟上」本身）→ `sync` → `check` 绿；再用**剥掉生成头后的逐字节比对**独立复核，4/4 `IDENTICAL`。③**Agent 文档**：新写的 `tests/test_contract_docs.py`（6 条）先红点名 **3 条 dangling revision**（`2026.09.06.1` 全仓只出现在那份 README 自己）与**3 条漏列端点**，改完转绿；另清掉两句自相矛盾的「尚无正式定义」并补 `## Configuration` 段。计数：workspace 69→**73**（失败数 4 不变、名字逐条同名）、agent 401→**407 OK**；三个校验器绿。**三处顺手发现按 Q-06 登记不修改**（不在 §5 的 Add 清单内）。详见 `evidence/task-09-absorbed.md` |
 | T-10 | **回写基线 + 关闭收尾**：架构基线、里程碑、`release-matrix`、`LEDGER.md`、快照与归档；并把 `config_online/agent.toml:17-21` 那段过期的 Q-01 注释改成「已裁定：保持回环」（D-08） | workspace + agent | TODO | 先失败的检查钉着回写；关闭门禁同集合阳性对照；档案两遍扫描 |
 
 ## 9. Repository Checklist
@@ -293,7 +294,12 @@
 - [x] `scripts/build-desktop.sh`：复制产物后 `--stamp-frontend`（前端构建版本的唯一来源）（T-06）；
       **刻意不加** `release-matrix.yaml` 的 `version_classes:` 块——第二份没人校验的声明即漂移（D-22）
 - [ ] `config/release-matrix.yaml`：仅在本 CHG 有可登记的结论时加行/加注（**不改 `0.2.5` 的 status**）（T-10）
-- [ ] `skills/agent/agent-platform-adapter-change` 改指 `clients/<platform>` + `python3 scripts/sync_skills.py`
+- [x] `skills/agent/agent-platform-adapter-change` 改指 `clients/<platform>` + `python3 scripts/sync_skills.py`（T-09）；
+      旧落点 `src/wt_media_agent/platforms` 改为 `clients/<platform>`（＋ `clients/platform_identity.py`、
+      `clients/bilibili/identity.py` 两个可解析的例子）
+- [x] `tests/test_skill_paths_resolve.py`（**新增**，4 条）：skill 里的路径**真的能解析**——
+      分母 33 个候选 / 10 个 skill、被排除形态的基底逐条存在、独立阳性对照、
+      边界写进模块注释（首段拼错不在此检查的射程内）（T-09）
 - [ ] 本 CHG 的记录与证据、`LEDGER.md`、里程碑回写、快照重生成、归档
 
 ### wt-media-agent
@@ -306,7 +312,13 @@
 - [x] `tests/test_upgrade_preserves_data.py`（**新增**，4 条臂）：升级不覆盖的 Agent 侧判据——
       库是声明的那个路径、新增迁移不丢既有行、写入集只有一个路径、控制台入口是同一个操作。
       **本任务不改实现文件**：迁移本来就是加性的、本来也只写一个路径（T-07／D-24）
-- [ ] 入口文档同步（`AGENTS.md`、`README.md`、`contracts/*/README.md`）（T-09）
+- [x] 入口文档同步（T-09）：`AGENTS.md`（新增 `## Configuration` 段 + 补齐三处漏列）、`README.md`、
+      `contracts/README.md` 与 4 个领域 README（去掉两句自相矛盾的「尚无正式定义」、补齐 3 条过期 revision
+      与 3 条漏列端点）；`tests/test_contract_docs.py`（**新增**，6 条）把「README 说的 = 定义文件里的」
+      钉住（端点列表**双向相等**，不是子集），revision 一律从定义文件读（`revision:`／`info.version`），
+      **刻意不依赖 PyYAML**（本包 `dependencies = []`）
+- [x] `.claude/skills` 与 `.codex/skills` 的 `agent-platform-adapter-change`：由 `sync_skills.py` 重生成，
+      剥掉生成头后与源**逐字节相同**（4/4）；root 目标 `commit_generated: false`，不进仓（T-09）
 
 ### wt-media-desktop
 
@@ -409,7 +421,16 @@
   （`build-release-macos.sh` exit=0，产物判定「complete ad-hoc-signed app」）、
   `evidence/task-08-mysql.out`（真库：26 表 / 39 迁移 / 570 + 73 行；凭据不回显）、
   `evidence/task-08-gate.out`（三个校验器绿 + `Ran 69 / failures=4`，四条逐条同名于 T-06／T-07）
-- `evidence/task-09-absorbed.md`——文档同步与 skill 路径 resolve
+- `evidence/task-09-absorbed.md`——吸收项：两条**行为判据**（路径真的解析／副本剥头后逐字节相同）、
+  分母与阳性对照、判据**证不到什么**（首段拼错、符号级搬迁、写错仓）、三条 dangling revision 与三处漏列端点的逐条成因、
+  **三处顺手发现按 Q-06 登记不改**。**已产出**，另附原始转录
+  `evidence/task-09-skill-repoint.out`（旧路径命中数带分母、落点 resolve 与 `MISSING` 对照、
+  `check` 先红逐份点名 4 份 → `sync` → `check` 绿、4/4 剥头逐字节 `IDENTICAL`、root 目标不进仓）、
+  `evidence/task-09-skill-path-test.out`（A 先红 `exit=1` / B 绿 `exit=0` / C 分母 33 与逐文件分布 /
+  D 被排除形态的基底 8 目录 + 5 文件 / E 两种排除形态各一例）、
+  `evidence/task-09-agent-docs.out`（先红点名 3 条 dangling revision + 3 条漏列端点、逐领域对照表、
+  两个数字的分布分开量、401→407）、`evidence/task-09-gate.out`（三个校验器绿 +
+  `Ran 73 / failures=4` 逐条同名 + 新文件移除/放回的 +4 对照 + agent `Ran 407 OK`）
 - `evidence/task-10-writeback-and-close.md`、`evidence/test-summary.md`
 
 ## 12. Current Checkpoint
@@ -490,13 +511,35 @@
     （`logs/external.log` 今天零写入）、**实凭据 ❌**（`.env.local` 不存在；`config/credentials/douyin.toml`
     存在且被 Cloud 读，但没有任何一步用它发请求）、**GUI ❌**。**AC-08 按例外登记**，不宣布
     「app 端 Local Agent 在 M2 环境可用」。详见 `evidence/task-08-m2-regression.md`。
-- **Current**：T-08 已收尾；T-09「吸收项」未开工。
-- **Next**：T-09 → T-10。
+  - **T-09 吸收项**（agent + workspace，**未改运行时代码**）。两条判据都是**行为判据**：
+    ①**路径真的解析**——新写的 `tests/test_skill_paths_resolve.py`（4 条）在 **33 个候选 / 10 个 skill**
+    上量，先红点名 `src/wt_media_agent/platforms`（`MISSING`，HEAD 那一版有 1 处命中），改指
+    `clients/<platform>` 后绿；被排除形态的基底逐条 `exists`（8 目录 + `delivery/milestones/M*.md` 5 文件），
+    分母下界与独立阳性对照都在，**证不到的部分**（首段拼错、符号级搬迁、写错仓）写进模块注释与本任务证据 §2.5。
+    ②**副本与源一致**——`check` 先红**逐份点名 4 份**（agent 树那 2 个 `git grep` 命中正是「源改了、副本没跟上」），
+    `sync` 后 `check` 绿，再用**剥掉生成头后的逐字节比对**独立复核 4/4 `IDENTICAL`（不依赖 `sync_skills.py` 自述）。
+    ③**Agent 文档**——`tests/test_contract_docs.py`（6 条）先红点名 **3 条 dangling revision** 与 **3 条漏列端点**，
+    端点列表做成**双向相等**（首版写 `checked >= 10` 的下界把有用的报文吃掉了，改成相等 + 非空后才报出缺哪一条）；
+    另清掉 `contracts/README.md` 与 `local-event-schemas/README.md` 里两句自相矛盾的「尚无正式定义」，
+    并给 `AGENTS.md` 补 `## Configuration` 段与三处漏列。**两条过程订正**：skill 转录第一遍**先跑了 `sync` 再取
+    「同步前」读数**（那一次的表什么都不证明），把 4 份副本还原后按正确顺序重跑；`git grep` 旧路径返回 2 而不是 0
+    的成因也如实写进转录。计数：workspace 69→**73**（失败数 4 不变、四条名字与 T-06／T-07／T-08 逐条同名）、
+    agent 401→**407 OK**；三个校验器绿。**三处顺手发现（Q-06）不在 §5 的 Add/Modify 清单内，只登记不改**：
+    契约版本有两份声明且无人对账（map `local_agent_api` 停在 `2026.09.06.1`、定义文件已到 `2026.09.24.1`，
+    成因钉在 `87b1264`）、OpenAPI 少列 7 条**服务端真的提供**的路由（6 条 Desktop 有真实调用点，
+    `profile-delete` 两个仓都没有消费方）、`scripts/README.md` 漏列 `build_desktop_sidecar.py`。
+    详见 `evidence/task-09-absorbed.md`。代码提交：workspace `dac853f`（skill 源 + resolve 判据）、
+    agent `2b26808`（入口文档 + 契约文档判据 + 两份重生成的副本）；本仓的记录与证据随本提交落库。
+- **Current**：T-09 已收尾；T-10「回写基线 + 关闭收尾」未开工。
+- **Next**：T-10。
 - **Blocked**：无。Q-04 已由 D-17 关闭（「组件与资源版本」= 内容摘要，不是被递增的号）；
   Q-05（M2 链路的 DMG 腿与 M2 环境里 8765 的归属）按 D-25 **登记为未裁定**，不阻塞本 CHG 收尾，
-  但「app 端 Local Agent 在 M2 环境可用」这句话在它关闭前不成立。
+  但「app 端 Local Agent 在 M2 环境可用」这句话在它关闭前不成立；
+  Q-06（契约声明的两处漂移 + 一处文档漏项）按 T-09 登记，**三条都不阻塞收尾**。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
-  Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。
+  Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）、
+  `config/contract-map.yaml` 与 `docs/contracts/contract-map.md` 的字面值（Q-06 只登记，不改一行——
+  包括那条已过期的 `local_agent_api.contract_revision`）。
 
 ## 13. DONE Gate
 

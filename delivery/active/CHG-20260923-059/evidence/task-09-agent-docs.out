@@ -1,0 +1,45 @@
+=== T-09 · Agent 侧入口文档同步 + tests/test_contract_docs.py（2026-09-25T12:21:30） ===
+树：wt-media-agent @ feb532d test(chg-059): T-07 升级不覆盖——Agent 侧的路径判据与四条臂（CHG-20260923-059）
+被同步的文件：contracts/README.md、contracts/{local-agent-api,local-event-schemas,local-status-enums,local-error-codes}/README.md、AGENTS.md、README.md
+
+--- 1. 先红：7 个文档都放回 HEAD 那一版（本任务的真实起点），跑新用例 ---
+  FAIL: test_readme_lists_endpoints_the_definition_declares (tests.test_contract_docs.ContractDocsTests.test_readme_lists_endpoints_the_definition_declares)
+  FAIL: test_readme_revision_matches_the_definition (tests.test_contract_docs.ContractDocsTests.test_readme_revision_matches_the_definition)
+  Ran 6 tests in 0.005s
+  FAILED (failures=2)
+  --- 失败点逐条 ---
+  AssertionError: Lists differ: ['local-agent-api/README.md omits /api/v1/[184 chars]has'] != []
+  'local-agent-api/README.md omits /api/v1/account-check, which paths: has'
+  - ['local-agent-api/README.md omits /api/v1/account-check, which paths: has',
+  -  'local-agent-api/README.md omits /api/v1/bit-browser/profile-groups, which '
+  -  'local-agent-api/README.md omits /api/v1/health, which paths: has']
+  AssertionError: Lists differ: ["local-agent-api/README.md: revision 2026[313 chars]'])"] != []
+  "local-agent-api/README.md: revision 2026.09.06.1 is on no local-agent-api/v1/*.yaml (has ['2026.09.24.1'])"
+  - ['local-agent-api/README.md: revision 2026.09.06.1 is on no '
+  -  'local-event-schemas/README.md: revision 2026.07.14.6 is on no '
+  -  'local-status-enums/README.md: revision 2026.07.14.6 is on no '
+
+--- 2. 逐条成因：README 写的 revision vs 同一目录 v1/*.yaml 真正带的 ---
+  local-agent-api      README: 2026.09.06.1   v1/*.yaml: 2026.09.24.1
+  local-event-schemas  README: 2026.07.14.6   v1/*.yaml: 2026.07.14.9,2026.07.14.8,2026.07.14.8
+  local-status-enums   README: 2026.07.14.6   v1/*.yaml: 2026.07.14.8
+  local-error-codes    README: 2026.07.14.6   v1/*.yaml: 2026.07.14.6
+
+  2026.09.06.1 在 agent 仓全仓的出现次数（分母：tracked 文件）：1 —— 只有那一份 README，没有任何定义文件带它
+  2026.07.14.6 出现在 4 个文件里：local-error-codes 的 README 与它的定义文件（这一对是对的），
+  加 local-event-schemas 与 local-status-enums 的两份过期 README（它们的定义文件已到 .9/.8）
+
+--- 3. 换回修好的 7 个文档（= 本任务交付的那一版），同一条用例 ---
+  Ran 6 tests in 0.003s
+  OK
+
+--- 4. 计数只增不减：同一个套件跑两次，只差新增的这一个文件 ---
+  基线（无新文件）          : Ran 401 tests in 12.012s / OK
+  含新增 tests/test_contract_docs.py: Ran 407 tests in 11.831s / OK
+  ⇒ 401 → 407，正好 +6（新文件 6 条），零意外转绿、零新增红
+
+--- 5. 吸收项的不变量：config_online 在运行期零引用（分母 = src/ 全部文件） ---
+  grep -rn config_online src/                      -> 0 命中
+  阳性对照：同一模式打在 src/ 之外（tracked 文件里）-> 9 个文件命中
+  这条不变量有测试钉着：tests/test_dependency_boundaries.py:542（运行时文件里出现该值即失败）、
+  tests/test_config_shipping.py（整目录替换与它携带什么）

@@ -1,0 +1,68 @@
+=== T-09 · skill 改指 clients/<platform> + sync_skills.py（2026-09-25T12:16:58） ===
+唯一源：wt-media-workspace/skills/agent/agent-platform-adapter-change/SKILL.md
+生成副本 4 份：root（./.claude、./.codex）+ wt-media-agent（.claude、.codex）
+
+--- 1. 被改掉的那条 ---
+12:- Platform differences stay under `src/wt_media_agent/clients/<platform>/`; the shared
+13-  cookie-based path is `src/wt_media_agent/clients/platform_identity.py`, and
+14-  `src/wt_media_agent/clients/bilibili/identity.py` is what a platform with its own
+15-  in-page or server-side rules looks like.
+
+--- 2. 旧路径 src/wt_media_agent/platforms 的命中数 ---
+  改动前的这一版（git show HEAD:<源文件>） : 1
+  改动后的源                              : 0
+  4 份生成副本（未同步）                  : 1/1/1/1
+  agent 仓 tracked 树里命中的文件数       : 2
+  第 3、4 行非 0 正是「源改了、副本还没跟上」这件事本身
+
+--- 3. 落点 resolve（判据：真的存在，不只是字符串）---
+  resolves  src/wt_media_agent/clients
+  resolves  src/wt_media_agent/clients/platform_identity.py
+  resolves  src/wt_media_agent/clients/bilibili/identity.py
+  --- 对照：改之前那个落点 ---
+  MISSING   src/wt_media_agent/platforms
+
+--- 4. sync_skills.py check（源已改、副本未同步）---
+root/codex: out of date /Users/aqiuye/Develop/workspace/wt-media/.codex/skills/agent-platform-adapter-change/SKILL.md
+root/claude: out of date /Users/aqiuye/Develop/workspace/wt-media/.claude/skills/agent-platform-adapter-change/SKILL.md
+agent/codex: out of date /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.codex/skills/agent-platform-adapter-change/SKILL.md
+agent/claude: out of date /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/.claude/skills/agent-platform-adapter-change/SKILL.md
+  exit=1  ⇒ 4 份生成副本逐份点名，无漏项
+
+--- 5. sync_skills.py sync ---
+synced root/codex
+synced root/claude
+synced cloud/codex
+synced cloud/claude
+synced agent/codex
+synced agent/claude
+synced desktop/codex
+synced desktop/claude
+synced workspace/codex
+synced workspace/claude
+  exit=0
+
+--- 6. sync_skills.py check（同步之后）---
+skill outputs are up to date
+  exit=0
+
+--- 7. 同步之后，同第 2 步的分母再量一次 ---
+  源                        : 0
+  4 份生成副本              : 0/0/0/0
+  agent 仓 tracked 树命中文件数 : 0
+
+--- 8. 独立复核：剥掉 GENERATED 头，与源逐字节比（分母 4）---
+  IDENTICAL body  ../.claude/skills/agent-platform-adapter-change/SKILL.md
+  IDENTICAL body  ../.codex/skills/agent-platform-adapter-change/SKILL.md
+  IDENTICAL body  ../wt-media-agent/.claude/skills/agent-platform-adapter-change/SKILL.md
+  IDENTICAL body  ../wt-media-agent/.codex/skills/agent-platform-adapter-change/SKILL.md
+
+--- 9. 新路径在 4 份副本里逐份命中 ---
+  clients/<platform> ×1  ../.claude/skills/agent-platform-adapter-change/SKILL.md
+  clients/<platform> ×1  ../.codex/skills/agent-platform-adapter-change/SKILL.md
+  clients/<platform> ×1  ../wt-media-agent/.claude/skills/agent-platform-adapter-change/SKILL.md
+  clients/<platform> ×1  ../wt-media-agent/.codex/skills/agent-platform-adapter-change/SKILL.md
+
+--- 10. 同步只动了 agent 仓里预期的那两份（root 目标 commit_generated=false，不进仓）---
+ M .claude/skills/agent-platform-adapter-change/SKILL.md
+ M .codex/skills/agent-platform-adapter-change/SKILL.md

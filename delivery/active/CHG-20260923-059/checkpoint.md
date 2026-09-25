@@ -26,7 +26,7 @@
 
 ## Current
 
-- **T-08 M2 业务回归已收尾**（T-01…T-08 均已收尾，见下八节）；**T-09 未开工**。
+- **T-09 吸收项已收尾**（T-01…T-09 均已收尾，见下九节）；**T-10「回写基线 + 关闭收尾」未开工**。
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
   与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
   T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`；
@@ -35,14 +35,18 @@
   T-06 见 `evidence/task-06-versions.md` 与 desktop / workspace 各一个提交；
   T-07 见 `evidence/task-07-upgrade.md` 与 desktop 的 `293806f`、agent 的 `feb532d`；
   T-08 见 `evidence/task-08-m2-regression.md`——**本任务未改任何仓的运行时代码**，故无代码提交，
-  只有本仓的记录与证据（D-25、Q-05、AC-08 的例外）。
+  只有本仓的记录与证据（D-25、Q-05、AC-08 的例外）；
+  T-09 见 `evidence/task-09-absorbed.md` 与 workspace 的 `dac853f`（skill 改指 + resolve 判据）、
+  agent 的 `2b26808`（入口文档 + 契约文档判据 + 两份重生成的 skill 副本）——
+  **本任务同样未改运行时代码**，两个仓各新增一个测试文件。
 
 ## Next
 
-- T-09 **吸收项**：Agent 侧 `AGENTS.md`／`README.md`／`contracts/*/README.md` 同步；workspace skill
-  改指 `clients/<platform>` 并跑 `scripts/sync_skills.py`（判据是生成副本与源一致、且 skill 里的路径
-  **真的 resolve**，不只是字符串存在），按
-  `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
+- T-10 **回写基线 + 关闭收尾**：架构基线、里程碑、`config/release-matrix.yaml`（只加不改，
+  `0.2.5` 的 status 保持 `verifying`）、`LEDGER.md`、`planned/README.md`、快照重生成（`--no-active`）、
+  归档到 `delivery/completed/`；并把 `wt-media-agent/config_online/agent.toml:17-21` 那段**过期的
+  Q-01 注释**按 D-08 回写为「已裁定：保持回环」（改注释、不改配置值）。关闭门禁的判据是
+  **同集合阳性对照**（`git archive HEAD`），不是「看着无关」；归档前扫两遍（字符串 + 链接 resolve）。
 
 ## T-01（已收尾，2026-09-25）
 
@@ -321,14 +325,73 @@
 - **本仓门禁**：三个校验器全绿 + `unittest discover -s tests -q` **Ran 69 / failures=4**，四条逐条同名于
   T-06／T-07 ⇒ 无新增红、无意外转绿（`task-08-gate.out`）。
 
+## T-09（已收尾，2026-09-25）
+
+- **两条吸收项，两条判据都是行为判据**（不是字符串包含）：
+  ① **skill 路径真的 resolve**——`skills/agent/agent-platform-adapter-change/SKILL.md:12` 指着
+  `src/wt_media_agent/platforms`，那个目录**不存在**（平台代码早搬到 `clients/` 下了）。
+  新增 `tests/test_skill_paths_resolve.py`（4 条）先红点名它，改指 `clients/<platform>` 后转绿。
+  ② **生成副本与源一致**——`sync_skills.py check` 先红且**逐份点名 4 份**，`sync` 后绿；
+  再用**剥掉 3 行生成头后的逐字节比对**独立复核（**不采信 `sync_skills.py` 的自述**），4/4 `IDENTICAL`。
+- **分母与阳性对照都在案**：候选路径 **33 个 / 10 个 skill**（逐文件分布见转录段 C），
+  下界 `>=20` 使「一个候选都没匹配到还报绿」不可能；被排除形态的**基底逐条 `exists`**
+  （8 个目录 + `delivery/milestones/M*.md` 5 个文件）——反面论证的证据在这里，不然「筛掉真问题」无从排除；
+  解析步另有独立阳性对照（`skills/__definitely-not-here__/x` 必被报出）。
+- **判据证不到什么已写进模块注释与证据 §2.5**（三条）：首段拼错（`delvery/milestones`）会被当成
+  「不是路径」**静默跳过**，不是在报红；不检查符号级搬迁（文件在、函数搬走）；写错**仓**时
+  只要该仓里恰好同名也不会红。不要把它读成「skill 已经没问题了」。
+- **Agent 侧文档**：新增 `tests/test_contract_docs.py`（6 条）先红点名 **3 条 dangling revision**
+  （`local-agent-api` 写 `2026.09.06.1` 而定义文件是 `2026.09.24.1`；`local-event-schemas` 与
+  `local-status-enums` 写 `2026.07.14.6` 而定义文件已到 `.9`／`.8`；`local-error-codes` 那对**本来就对**）
+  与 **3 条漏列端点**。revision 一律**从定义文件读**（`revision:`／OpenAPI 的 `info.version`），
+  YAML 仍是唯一源；端点列表做成**双向相等**——首版写 `checked >= 10` 的下界**把有用的报文吃掉了**
+  （只报 `7 not greater than or equal to 10`），改成相等 + `assertGreater(checked, 0)` 后才报出
+  「omits `/api/v1/health`」。另清掉两句**自相矛盾**的「尚无正式定义」（而同一目录 `v1/*.yaml` 全是活的），
+  给 `AGENTS.md` 补 `## Configuration` 段（`config/` vs `config_online/`、冻结侧推导、凭证规则）
+  与三处漏列（`clients/platform_urls.py`、`local_api` 的 `health.py`/`reporting.py`、`utils`）。
+- **两处过程订正，都不静默**：① skill 转录**第一遍先跑了 `sync` 再取「同步前」读数**，
+  于是那张表显示 `up to date / exit=0`——**那一次的表什么都不证明**；把 4 份副本还原到任务起点后
+  按正确顺序重跑，才有 `out of date ×4 / exit=1`。② `git grep` 旧路径返回的是 **2 而不是 0**，
+  因为 agent 树里那两份**还没跟上的副本**也含它——**那正是「源改了、副本没跟上」这件事本身**，
+  不是判据坏了，转录里按这个说法标注。
+- 计数：workspace **Ran 73 / failures=4**（69→73，**+4** = 新文件 4 条，**失败数与四条名字都不变**，
+  与 T-06／T-07／T-08 逐条同名）；agent **Ran 407 / OK**（401→407，**+6**）；三个校验器绿。
+  **增量来源做了对照**：把新文件移走重跑 `Ran 69 / failures=4`，放回 `Ran 73 / failures=4`。
+- **三处顺手发现按 Q-06 登记、不修改**（`evidence/task-09-absorbed.md` §6，都不在 §5 的 Add/Modify 清单内）：
+  ① `config/contract-map.yaml:72` 的 `local_agent_api.contract_revision` 停在 `2026.09.06.1`，
+  而它指向的定义文件已是 `2026.09.24.1`——成因钉在 git 上（`87b1264` 改了文件没改 map），
+  而 T-06 又把 map 定为契约版本的**唯一权威**，于是发布记录如实引用了一份过期的声明。
+  **这与已知红项 #1 不是同一件事**：那条比的是「`verify_m0_config.py` 的 M0 期望值 vs map」，
+  「map vs 定义文件」这一对**今天没有任何守卫**。
+  ② OpenAPI 的 `paths:` 只有 10 条，而 `server.py` **实际提供 16 条 `/api/v1/*`**（含 `/healthz` 共 17），
+  差的 7 条里 **6 条在 Desktop 的 Rust 里有真实调用点**（阳性对照 `profile-scans` 1、`account-check` 3），
+  **第 7 条 `profile-delete` 两个仓都没有消费方**（desktop 仓 0 命中，agent 仓只有它自己那一行，
+  连同名测试都没有）——既是文档缺口，也是**没人用过的代码路径**。
+  ③ `wt-media-agent/scripts/README.md` 漏列 `build_desktop_sidecar.py`（CHG-053 Task 7 点名过，
+  但不在本 CHG 的 Add 清单）。
+- 本次**没有跑真机**：产物全是文档与静态判据，没有需要真进程的部分。
+
 ## Blocked
 
 - 无硬阻塞。Q-04 已由 D-17 关闭；AC-09「干净机」那一臂按 D-09 登记为未做（不以文字充当证据）。
 - **Q-05 按 D-25 登记为未裁定、不阻塞收尾**：M2 链路的 DMG 构建是否改走发布打包，以及 M2 环境里
   8765 归谁。**在它关闭前，「app 端 Local Agent 在 M2 环境可用」这句话不成立**（AC-08 的例外）。
+- **Q-06 按 T-09 登记、不阻塞收尾**：契约声明的两处漂移（map vs 定义文件的版本号、OpenAPI 少列 7 条
+  实际被服务的路由）+ 一处文档漏项。三处都在本 CHG 的 Add/Modify 清单之外，
+  按「讨论不是需求」只登记不改——**包括那条已过期的 `contract_revision` 一个字都不动**。
 
 ## Recent verification
 
+- **T-09 之后**（2026-09-25）：agent `bash scripts/test.sh` **Ran 407 tests / OK**（401→407，+6）；
+  workspace `unittest discover -s tests -q` **Ran 73 / FAILED (failures=4)**（69→73，+4 = 新文件 4 条），
+  四条**逐条同名**于 T-06／T-07／T-08（`test_verify_m0_config` ×2、`test_verify_m2_acceptance` ×1、
+  `test_verify_product_master_alignment` ×1）⇒ 无新增红、无意外转绿；**+4 的来源做了对照**：
+  新文件移走 `Ran 69 / failures=4`、放回 `Ran 73 / failures=4`（`task-09-gate.out` 段 4）。
+  三个校验器绿（`verify_delivery_governance.py` / `verify_agent_entry.py`（快照 2144 字符 / 预算 8000，
+  0 warning）/ `verify_skills.py`（10 个 skill 源文件））。skill 侧另有一个**不依赖 `sync_skills.py`
+  自述**的复核：剥掉 3 行生成头后 4 份副本与源**逐字节相同**（`task-09-skill-repoint.out` 段 8）。
+  本次未重跑 `git archive HEAD` 的同集合阳性对照——T-09 没碰 workspace 的测试与治理脚本，
+  四条红的读数与 T-08 那次完全一致（归档位置陷阱见 T-06 那条）。
 - **T-08 之后**（2026-09-25）：**未改任何仓的运行时代码 ⇒ 计数不变**（desktop 372 / agent 401 仍是
   T-07 的读数，本次**未重跑**套件）。本任务重跑的是 **M2 链路**：`m2b-local-acceptance.sh all`
   十三阶段全绿（`evidence/task-08-m2-all.out`，0 ERROR、无 Traceback），外加固态矩阵的两条读数
