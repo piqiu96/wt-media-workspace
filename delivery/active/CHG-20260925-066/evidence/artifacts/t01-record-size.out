@@ -1,0 +1,14 @@
+# T-01 记录体量收尾读数
+# date: 2026-09-25 23:41:40 CST
+# 判据（CHG-065 记录成本第五版，按 Task 增量）:
+#   change.md 增量 <= 5120 B / Task ; checkpoint.md 增量 <= 4096 B ; evidence <= 9216 B / Task
+# 说明: T-01 的 change.md 增量 = 整份计划（T-01 一次写成，其余 Task 只增补）
+
+change.md                             18156 B
+  -> 增量(=全文)                          18156 B  界=5120  BREACH
+checkpoint.md                          4006 B  界=4096  OK
+evidence/*.md                          5427 B  界=9216  OK
+
+evidence/artifacts/ (原文输出)             5719 B
+
+# 参照（非上限）: CHG-065 收尾时 change.md = 47422 B

@@ -1,0 +1,25 @@
+# T-01 baseline — four repos, taken before CHG-20260925-066 activation
+# date: 2026-09-25 23:38:37 CST
+
+=== wt-media-workspace ===
+--- HEAD ---
+5c1d98ca2408e87ad591bf479092e478f6eb3281 docs(chg-065): T-09 收尾——归档完成，四仓门禁全绿，无活动 CHG
+--- git status --porcelain (empty = clean) ---
+?? delivery/active/CHG-20260925-066/
+
+=== wt-media-cloud ===
+--- HEAD ---
+0db02abccc19160a564278fd26671be51d9df112 docs(chg-065): T-05 入口文件收口为「双指针 + 单一正文」
+--- git status --porcelain (empty = clean) ---
+?? dump.rdb
+
+=== wt-media-agent ===
+--- HEAD ---
+6d740fc03e0a30517d8652545ae4bf385a3626da docs(chg-065): T-06 入口文件收口——双指针 + 单一正文，正文迁入 AGENT-INDEX.md
+--- git status --porcelain (empty = clean) ---
+
+=== wt-media-desktop ===
+--- HEAD ---
+7c1b0add50171dd3baa762f4849ed1ee96f5fdd2 docs(chg-065): T-07 入口文件收口——双指针 + 单一正文，正文迁入 AGENT-INDEX.md
+--- git status --porcelain (empty = clean) ---
+

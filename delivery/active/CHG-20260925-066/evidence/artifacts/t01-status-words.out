@@ -1,0 +1,40 @@
+# T-01 status-word measurement — 量法 = verify_product_master_alignment.status_word()
+# date: 2026-09-25 23:40:45 CST
+
+活记录(planned): 19 篇
+    DISCUSSION     7
+    PLANNED        3
+    SUPERSEDED     9
+
+活记录(active): 1 篇
+    IMPLEMENTING   1
+
+归档记录(completed): 40 篇
+    CLOSED         2
+    DONE           30
+    HANDOFF        2
+    IMPLEMENTING   1
+    IN_PROGRESS    4
+    VERIFYING      1
+
+=== 与 MASTER §3 表格逐词比对 ===
+  活 DISCUSSION     doc=  7 live=  7 OK
+  活 DONE           doc=  0 live=  0 OK
+  活 IMPLEMENTING   doc=  1 live=  1 OK
+  活 PLANNED        doc=  3 live=  3 OK
+  活 SUPERSEDED     doc=  9 live=  9 OK
+  活 VERIFYING      doc=  0 live=  0 OK
+  归 CLOSED         doc=  2 live=  2 OK
+  归 DISCUSSION     doc=  0 live=  0 OK
+  归 DONE           doc= 30 live= 30 OK
+  归 HANDOFF        doc=  2 live=  2 OK
+  归 IMPLEMENTING   doc=  1 live=  1 OK
+  归 IN_PROGRESS    doc=  4 live=  4 OK
+  归 PLANNED        doc=  0 live=  0 OK
+  归 SUPERSEDED     doc=  0 live=  0 OK
+  归 VERIFYING      doc=  1 live=  1 OK
+
+  活列合计  doc=20 live=20
+  归档列合计 doc=40 live=40
+
+RESULT: ALL EQUAL

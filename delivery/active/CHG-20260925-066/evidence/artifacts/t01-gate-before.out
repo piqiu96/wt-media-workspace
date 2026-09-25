@@ -1,0 +1,25 @@
+# T-01 gate baseline — before activation (no active CHG)
+# date: 2026-09-25 23:38:46 CST
+
+=== verify_delivery_governance exit=0 ===
+Delivery governance verification ok. Active CHG: none
+=== verify_product_master_alignment exit=0 ===
+Product and Master Plan alignment verification ok
+=== verify_agent_entry exit=0 ===
+execution snapshot: 1668 characters (~667 tokens, budget 8000 characters)
+rule-text duplication: compared 97 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+=== verify_m0_config exit=0 ===
+Workspace config verification ok
+=== verify_skills exit=0 ===
+verified 10 skill source files
+=== verify_m2_acceptance exit=0 ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+=== unittest discover -s tests -q ===
+Ran 94 tests in 0.506s
+
+OK
+=== sync_skills.py check ===
+skill outputs are up to date
+exit=0
