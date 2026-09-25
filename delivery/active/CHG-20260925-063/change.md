@@ -154,7 +154,7 @@ None.
 | T-01 | `verify_m0_config.py` 转绿：两条 revision 期望值对齐 contract-map；移除 workspace CI 断言（D-03） | DONE | 脚本 exit 0；`tests/test_verify_m0_config.py` 4 条全绿；**两次变异对照**（改坏 contract-map 的 revision 必须报错；空 `OUTER_ROOT` 下三个运行仓工作流必须逐条报缺）见 `evidence/task-01-m0-config.md` |
 | T-02 | `verify_m2_acceptance.py` 转绿：移除 3 处源码字面量断言，新增 Cloud 原子单次使用断言（D-01/D-02） | DONE | 脚本 exit 0；**9 个被删 needle 经 AST 证明 0 个仍在断言集合内**；新增 migration schema 断言做**变异对照**（3 条变异各报 1 错 + 阳性对照证明读取器确在读假树）；六类契约层目标全部 present。见 `evidence/task-02-m2-acceptance.md` |
 | T-03 | `verify_product_master_alignment.py` 转绿：状态词对齐、候选块断言按状态分层、消除两处空转、新增未关闭里程碑缺块断言 | DONE | 脚本 exit 0，六个门禁全绿；**变异对照 7 臂**（含两条对照：空文本证明读的是传入文本、未变异文本 0 错证明基线干净），每臂产出恰好其预期错误集；**6 个被删 needle 经 AST 证明 0 个仍在断言集合内**，M3 标签断言组已无残留。另查明 T-04 那条假通过用例**绿的原因也是空转**（未变异文本已产出 4 条 `M3 candidate` 错，满足了「有该标签」的断言）。见 `evidence/task-03-product-master-alignment.md` |
-| T-04 | 修正测试套件的假通过与失效用例（4.4） | TODO | 新用例先红后绿；证明变异字符串真实存在 |
+| T-04 | 修正测试套件的假通过与失效用例（4.4）；断言判定由「有某标签」改为「错误集合逐条相等」 | DONE | 5 条 → 7 条，该文件全绿；整套 unittest **Ran 75 / OK**（连跑两次一致）。**变异对照 5 臂**，其中**决定性一臂**把旧脚本命名的 M3 禁用判定整条关掉后，**旧用例依然通过**——证明它无法检测该检查被删除。断言一律比较完整错误集合。见 `evidence/task-04-tests.md` |
 | T-05 | 文档同步：README §Verification、conventions §10、`AGENT-INDEX.md` §12 | TODO | 三处读数与实测一致；`verify_agent_entry.py`、`verify_delivery_governance.py` 仍绿 |
 | T-06 | 收尾：全套门禁 + unittest 读数、归档指针扫描 | TODO | 见 §10 验收矩阵 |
 
@@ -184,20 +184,20 @@ None.
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | `verify_m0_config.py` exit 0 | 实跑，原始输出入 evidence | TODO |
-| AC-02 | `verify_m2_acceptance.py` exit 0 | 实跑，原始输出入 evidence | TODO |
-| AC-03 | `verify_product_master_alignment.py` exit 0 | 实跑，原始输出入 evidence | TODO |
-| AC-04 | 跨仓源码字面量断言已移除，且**删除清单逐条留痕** | `git diff` 逐条对照 §4.2 的 5 条 | TODO |
-| AC-05 | 契约层判据**未被削弱**：contract-map、release-matrix、migrations、契约 yaml、desktop `contracts.lock.json` consumes、禁止持久化标记六类断言仍在 | 逐类在脚本中定位并在 evidence 中列出行号 | TODO |
-| AC-06 | 新增的 Cloud 原子单次使用断言**能失败**（变异对照） | 改坏被测 SQL 字符串 → 必须报错；改回 → 必须 exit 0 | TODO |
-| AC-07 | 新增的「未关闭里程碑必须有候选块」断言**能失败**（变异对照） | 抽掉一个非 DONE 里程碑的候选块 → 必须报错 | TODO |
-| AC-08 | M3 的禁令检查空转已消除，且**不因补兜底而翻成恒假** | 证明新逻辑下 M3 不跑候选块断言；`crawl_result` 在 M3 段正文中存在这一事实被记录 | TODO |
-| AC-09 | 4.4 的假通过用例已修正，且修正后**证明变异字符串真实存在** | 断言替换前后文本不同 | TODO |
-| AC-10 | `python3 -m unittest discover -s tests -q` 全绿 | 登记进程数与失败数 | TODO |
-| AC-11 | `verify_delivery_governance.py`、`verify_agent_entry.py`、`verify_skills.py` 仍绿 | 实跑三者 | TODO |
-| AC-12 | 三个运行仓工作区**零改动** | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 与开工前一致 | TODO |
-| AC-13 | 文档三处读数与实测一致 | 逐处比对 | TODO |
-| AC-14 | `config/release-matrix.yaml` 零改动 | `git diff --stat` 该文件 0 行 | TODO |
+| AC-01 | `verify_m0_config.py` exit 0 | 实跑，原始输出入 evidence | PASS（T-01） |
+| AC-02 | `verify_m2_acceptance.py` exit 0 | 实跑，原始输出入 evidence | PASS（T-02） |
+| AC-03 | `verify_product_master_alignment.py` exit 0 | 实跑，原始输出入 evidence | PASS（T-03） |
+| AC-04 | 跨仓源码字面量断言已移除，且**删除清单逐条留痕** | `git diff` 逐条对照 §4.2 的 5 条 | PASS（T-02）：9 个 needle，**AST 证明 0 个仍在断言集合内** |
+| AC-05 | 契约层判据**未被削弱**：contract-map、release-matrix、migrations、契约 yaml、desktop `contracts.lock.json` consumes、禁止持久化标记六类断言仍在 | 逐类在脚本中定位并在 evidence 中列出行号 | PASS（T-02）：六类逐条列出，全部 present |
+| AC-06 | 新增的 Cloud 原子单次使用断言**能失败**（变异对照） | 改坏被测 SQL 字符串 → 必须报错；改回 → 必须 exit 0 | PASS（T-02）：3 条变异各报 1 错，**含阳性对照**证明读取器确在读假树 |
+| AC-07 | 新增的「未关闭里程碑必须有候选块」断言**能失败**（变异对照） | 抽掉一个非 DONE 里程碑的候选块 → 必须报错 | PASS（T-03）：清空 M9 块 → 结构错 1 条；另 6 臂 |
+| AC-08 | M3 的禁令检查空转已消除，且**不因补兜底而翻成恒假** | 证明新逻辑下 M3 不跑候选块断言；`crawl_result` 在 M3 段正文中存在这一事实被记录 | PASS（T-03）：M3 标签断言组已无残留（AST），空转改为结构错误 |
+| AC-09 | 4.4 的假通过用例已修正，且修正后**证明变异字符串真实存在** | 断言替换前后文本不同 | PASS（T-04）：`mutate()` 先 `assertIn` 再 `assertNotEqual`；**且已证明旧用例绿的原因本身是空转** |
+| AC-10 | `python3 -m unittest discover -s tests -q` 全绿 | 登记进程数与失败数 | PASS（T-04）：**Ran 75 / OK**，连跑两次读数一致 |
+| AC-11 | `verify_delivery_governance.py`、`verify_agent_entry.py`、`verify_skills.py` 仍绿 | 实跑三者 | PASS（T-04，`artifacts/t04-gate-readings.out`） |
+| AC-12 | 三个运行仓工作区**零改动** | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 与开工前一致 | TODO（T-06 收尾复测） |
+| AC-13 | 文档三处读数与实测一致 | 逐处比对 | TODO（T-05） |
+| AC-14 | `config/release-matrix.yaml` 零改动 | `git diff --stat` 该文件 0 行 | PASS（T-03 实查 0 行；T-06 收尾复测） |
 
 ## 11. Evidence
 
@@ -220,21 +220,23 @@ Completed:
 - T-01 `verify_m0_config.py` 转绿（`evidence/task-01-m0-config.md`）。
 - T-02 `verify_m2_acceptance.py` 转绿（`evidence/task-02-m2-acceptance.md`）。
 - T-03 `verify_product_master_alignment.py` 转绿（`evidence/task-03-product-master-alignment.md`）。
+- T-04 测试套件修正（`evidence/task-04-tests.md`）。
 
 Current:
-- T-04 开工：`tests/test_verify_product_master_alignment.py`。该文件当前 **1 条红**（§4.4 那条假通过用例）。
+- T-05 开工：文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
 
 Next:
-- T-04 修假通过与失效用例；修法边界见 §4.4 末条（不可只换变异字符串）。
-- T-05 文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
-- T-06 收尾：验收矩阵、DONE Gate 签字、归档与失效指针扫描。
+- T-05 文档同步，三处读数与实测对齐。
+- T-06 收尾：验收矩阵 AC-12 复测、DONE Gate 签字、归档与失效指针扫描。
 
 Blocked:
 - None.
 
 Recent verification:
 - 改前读数：`verify_m0_config.py` 3 红、`verify_m2_acceptance.py` 5 红、`verify_product_master_alignment.py` 8 红（§4.1、`evidence/artifacts/`）。
-- T-03 后六个门禁全 `exit=0`（`evidence/artifacts/t03-gate-readings.out`）；整套 unittest **Ran 73 / 1 条 FAIL**，即 §4.4 那条，归 T-04。
+- **最后一次改动之后**重跑（`evidence/artifacts/t04-gate-readings.out`）：六个门禁全 `exit=0`；
+  整套 unittest **Ran 75 / OK**，连跑两次读数一致（`t04-postfix-full-test-suite.out`）。
+- 测试文件 5 条 → 7 条（`tests/test_verify_product_master_alignment.py`）。
 
 ## 13. DONE Gate
 

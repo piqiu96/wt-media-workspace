@@ -1,0 +1,7 @@
+ok   control: forbidden-object predicate holds on the real script  (expected PASS)
+ok   control: missing-block predicate holds on the real script  (expected PASS)
+ok   forbid_all() neutralised -> forbidden-object test goes red  (expected FAIL)
+ok   structural check disabled -> missing-block test goes red  (expected FAIL)
+ok   no-op mutation + silent M3 forbidden check -> old test STILL passed (hollow)  (expected PASS)
+
+MUTATION CONTROL OK: each rewritten test is coupled to the judgement it names.

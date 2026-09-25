@@ -1,0 +1,15 @@
+test_contract_governance_requires_mixed_state_and_active_task_schema (tests.test_verify_product_master_alignment.ProductMasterAlignmentTests.test_contract_governance_requires_mixed_state_and_active_task_schema) ... ok
+test_current_product_master_and_governance_are_aligned (tests.test_verify_product_master_alignment.ProductMasterAlignmentTests.test_current_product_master_and_governance_are_aligned) ... ok
+test_done_milestones_need_no_candidate_block (tests.test_verify_product_master_alignment.ProductMasterAlignmentTests.test_done_milestones_need_no_candidate_block)
+D-04: a closed milestone is asserted on its status word. ... ok
+test_rejects_forbidden_operational_object_in_candidate_chg (tests.test_verify_product_master_alignment.ProductMasterAlignmentTests.test_rejects_forbidden_operational_object_in_candidate_chg)
+Both forbidden-object arms, exercised on blocks that actually exist. ... ok
+test_rejects_missing_m2_product_capability (tests.test_verify_product_master_alignment.ProductMasterAlignmentTests.test_rejects_missing_m2_product_capability) ... ok
+test_rejects_reopened_milestone_status_regression (tests.test_verify_product_master_alignment.ProductMasterAlignmentTests.test_rejects_reopened_milestone_status_regression) ... ok
+test_rejects_unfinished_milestone_without_candidate_block (tests.test_verify_product_master_alignment.ProductMasterAlignmentTests.test_rejects_unfinished_milestone_without_candidate_block)
+An empty block on an unfinished milestone is now loud, not silent. ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.017s
+
+OK

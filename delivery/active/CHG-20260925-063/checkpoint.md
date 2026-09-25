@@ -56,18 +56,25 @@
   用 `HEAD` 版脚本对**未变异**文本求值已产出 4 条 `M3 candidate missing …`，而该用例断言的正是
   「存在该标签」，故**在变异之前就成立**。两个错互相掩盖。因此 T-04 **不能只换变异字符串**。
   证据：`evidence/artifacts/t03-false-pass-proof.out`。
+- 2026-09-25 T-04 完成：`tests/test_verify_product_master_alignment.py` 5 条 → **7 条全绿**，
+  整套 unittest **Ran 75 / OK**（连跑两次一致）。断言判定由「**有某标签**」改为
+  「**完整错误集合逐条相等**」——标签式断言可被同族任何错误满足，故会在它命名的判据坏掉时仍绿。
+  新增 `mutate()`：先 `assertIn` 再 `assertNotEqual`，正对病根（目标不存在时 `replace` 是静默空操作）。
+  **变异对照 5 臂**，其中**决定性一臂**：把**旧脚本**的 M3 禁用判定整条关掉后，
+  **旧用例依然通过** ⇒ 它**无法检测它所命名的那条检查被删除**。禁用对象用例重定目标到
+  **M8/M9**（均 `NOT_STARTED` 且有非空块），并新增「清空 M9 块」用例把三族检查的不对称钉死。
+  证据：`evidence/task-04-tests.md`。
 
 ## Current
 
-- T-04 开工：`tests/test_verify_product_master_alignment.py`（该文件当前 **1 条红**）。
+- T-05 开工：文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
 
 ## Next
 
-- T-04 修正测试套件的假通过与失效用例。**修法边界已实测定下**：不可只把变异字符串换成
-  「存在的那个」——只要断言仍匹配 `M3 candidate` 这个标签，任何别的红项都能再次满足它
-  （`change.md` §4.4 末两条）。
-- T-05 文档同步（README §Verification、conventions §10、`AGENT-INDEX.md` §12）。
-- T-06 收尾：验收矩阵、DONE Gate 签字、归档与失效指针扫描。
+- T-05 文档同步。注意 `docs/engineering/specs/agent-workspace-conventions.md` **开工前已有一处
+  上一任务的工作区改动（第 33 行）**，本任务的 §10 改动会叠在它上面；该文件的归属问题见
+  `change.md` §14。
+- T-06 收尾：AC-12 复测、DONE Gate 签字、归档与失效指针扫描。
 
 ## Blockers
 

@@ -74,7 +74,7 @@ python3 -B -X pycache_prefix=/tmp/pyc-none delivery/active/CHG-20260925-063/evid
 改后：`Product and Master Plan alignment verification ok` / `exit=0`。
 六个校验脚本全部 `exit=0`（`artifacts/t03-gate-readings.out`）。
 
-## Mutation control（AC-08）
+## Mutation control（AC-07）
 
 `artifacts/t03-mutation-control.py` 在**内存里**逐条变异真实 Master Plan 文本，
 要求每条变异产出**恰好**其预期错误集。**两条对照**先立：
@@ -108,7 +108,7 @@ forbidden 循环   -> 0 条            （`needle in ""` 恒假，静默通过�
 新增结构检查      -> 1 条，且只有它指出了真正的问题
 ```
 
-### AC-09：被删 needle 逐条经 AST 证明不再处于断言集合内
+### AC-08：M3 的禁令检查空转已消除 —— 附对全部被删 needle 的 AST 证明
 
 `artifacts/t03-ast-scope-checks.out` 用 **AST** 枚举全部 `require_all` / `forbid_all` 调用
 的 `(label, needle)` 集合：
