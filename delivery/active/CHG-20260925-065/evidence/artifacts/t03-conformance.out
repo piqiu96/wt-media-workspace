@@ -1,0 +1,63 @@
+=== T-03 生成器实跑与形态对账 @ 2026-09-25T14:41:53Z ===
+--- dry-run ---
+would create: /tmp/t03b-JZFoSf/fake-repo/AGENT-INDEX.md
+would create: /tmp/t03b-JZFoSf/fake-repo/CLAUDE.md
+would create: /tmp/t03b-JZFoSf/fake-repo/AGENTS.md
+would create: /tmp/t03b-JZFoSf/fake-repo/DIRECTORY_MAP.md
+--- 实跑 ---
+created: /tmp/t03b-JZFoSf/fake-repo/AGENT-INDEX.md
+created: /tmp/t03b-JZFoSf/fake-repo/CLAUDE.md
+created: /tmp/t03b-JZFoSf/fake-repo/AGENTS.md
+created: /tmp/t03b-JZFoSf/fake-repo/DIRECTORY_MAP.md
+--- 产出体量 ---
+  AGENT-INDEX.md       41 行 / 854 B
+  CLAUDE.md            9 行 / 567 B
+  AGENTS.md            9 行 / 583 B
+  DIRECTORY_MAP.md     15 行 / 465 B
+--- 形态对账 ---
+  存在且非空: AGENT-INDEX.md           PASS   854 B
+  存在且非空: AGENTS.md                PASS   583 B
+  存在且非空: CLAUDE.md                PASS   567 B
+  存在且非空: DIRECTORY_MAP.md         PASS   465 B
+  机读键唯一且目标存在: AGENTS.md           PASS   keys=1 target=AGENT-INDEX.md
+  规则词判据(非标题行): AGENTS.md          PASS   越界 0 行
+  预算 ≤30行/≤2000B/H2≤4: AGENTS.md  PASS   9 行 / 583 B / H2=1
+  机读键唯一且目标存在: CLAUDE.md           PASS   keys=1 target=AGENT-INDEX.md
+  规则词判据(非标题行): CLAUDE.md          PASS   越界 0 行
+  预算 ≤30行/≤2000B/H2≤4: CLAUDE.md  PASS   9 行 / 567 B / H2=1
+  AGENT-INDEX 八节同序且长度 8           PASS   实得 8 节
+  本仓内加载顺序不复述项目级顺序                 PASS   泄漏 无
+  合计 12 项：PASS 12 / FAIL 0
+
+=== 阳性对照：7 类变异（前 6 类一锅注入，第 7 类单独）===
+  变异 1-6 后：
+    机读键唯一且目标存在: AGENTS.md           FAIL   keys=1 target=RULES.md
+    规则词判据(非标题行): AGENTS.md          FAIL   越界 1 行
+    机读键唯一且目标存在: CLAUDE.md           FAIL   keys=0 target=None
+    规则词判据(非标题行): CLAUDE.md          FAIL   越界 1 行
+    AGENT-INDEX 八节同序且长度 8           FAIL   实得 8 节
+    本仓内加载顺序不复述项目级顺序                 FAIL   泄漏 ['CURRENT_CONTEXT', 'LEDGER.md', 'delivery/']
+    合计 12 项：PASS 6 / FAIL 6
+  变异 4 说明：'贴规则段' 由【规则词】抓出，不是 H2／预算；H2 白名单因此是冗余的。
+  变异 7（灌水，每行都带正文文件名）后：
+    预算 ≤30行/≤2000B/H2≤4: CLAUDE.md  FAIL   38 行 / 2211 B / H2=1
+    合计 12 项：PASS 11 / FAIL 1
+  ⇒ 前 6 类变异未让【预算】变红（预算当时中性）；变异 7 证明预算确有判别力。
+
+=== workspace 分支（手写快照路径已消失）===
+exists: AGENTS.md
+exists: CLAUDE.md
+exists: AGENT-INDEX.md
+exists: .ai/CURRENT_CONTEXT.md
+
+=== 门禁 ===
+verify_m0_config: exit=0
+verify_delivery_governance: exit=0
+verify_agent_entry: exit=0
+verify_skills: exit=0
+verify_product_master_alignment: exit=0
+verify_m2_acceptance: exit=0
+Ran 79 tests in 0.279s
+OK
+skill outputs are up to date
+bash -n: ok

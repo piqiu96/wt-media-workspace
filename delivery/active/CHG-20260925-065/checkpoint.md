@@ -13,15 +13,16 @@
 - **T-01 激活**：建 `delivery/active/CHG-20260925-065/`（`change.md`、`checkpoint.md`、`evidence/`）；§5 范围**封闭**；§7 `Pending Questions` = `None.`；`LEDGER.md` 表行与归档说明；快照以 `--change CHG-20260925-065` 重生成；四仓 `git status --porcelain` 基线记入 `evidence/task-01-baseline.md`（workspace 净、agent 净、desktop 净、cloud `?? dump.rdb`——他人在途产物，88 字节、mtime 2026-09-24 17:19:16，早于本 CHG 一天，不碰不提交不清理，沿用 CHG-063/064 处置）；开工基线 `bd5df2c`。
 - **为什么本 CHG 与四条 S 级先例不同**：那四条都写明「三仓只被读、不被写」，**本 CHG 会写三仓的入口文件**（仅四类入口文件，零运行时代码／配置／测试）。已在 `change.md` §1／§4／§5／§9 各落一次，收尾 T-09 逐仓对账。
 
+- **T-03 生成器对齐**：`scripts/init-agent-entry.sh` 全文重写——产出 3 件 → **4 件**（＋ `DIRECTORY_MAP.md`，目录节按生成时磁盘实况列顶层目录）、`AGENT-INDEX.md` 由 `## Workspace`／`## Rule` 改为**八节同序骨架**、两个指针带机读键、新增 `## 本仓内加载顺序` ＋ 作用域句、`:79-85` **停止手写** `.ai/CURRENT_CONTEXT.md`（改为打印 `prepare_ai_workspace.py --no-active`）。**并改正 §3 指针预算的自我矛盾**（`H2 ≤ 1` ＋ 白名单 `权威源` ⟷ 它自己引用的参照件有 3 个 H2；改为 `H2 ≤ 4`、不设白名单，规则词判据只作用于非标题行，补出重复比较集的构造）——**不是放松**：变异 4 在改正前后都被规则词判据抓出，改正后多抓一类。tmpdir 实跑 12/12 形态判据 PASS，阳性对照 7 类变异全报出。读数见 `evidence/task-03-generator.md`。
 - **T-02 规范与落点成文**：`conventions §3` 整节改写为「入口文件形态」（角色与边界表／`AGENT-INDEX.md` 同名两角色＋运行仓八节模板／**指针文件的机检定义**三条 ERROR／「重复只在生成物与其生成器之间存在」判别句／显式否决 `@` 导入）＋ §9 耦合表 2→5 行 ＋ §10 已知限制重写 ＋ §11 补两条禁令；`AGENT-INDEX.md` §4 `:62` 作用域句（**两个层级**而非两个落点）、§10 表加 `DIRECTORY_MAP.md` 行＋「两者都不得承载规则正文」段；`..._V1.md:769` 补自洽句、`:1801` 验收话扩写到五文件。节号未变（`verify_m0_config.py:249` 引 §10）。读数见 `evidence/task-02-normative.md`。
 
 ## Current
 
-T-02 已完成；下一项是 T-03。
+T-03 已完成；下一项是 T-04。
 
 ## Next
 
-1. **T-03 生成器对齐**：`init-agent-entry.sh` heredoc 改双指针 ＋ 八节骨架 ＋ 新增 `DIRECTORY_MAP.md`；`:79-85` 停止手写 `.ai/CURRENT_CONTEXT.md`。
+1. **T-04 门禁实现与退役**：`verify_agent_entry.py` 新六条 ＋ 退役 `check_entry_drift`；`tests/` fixture 重写为「默认合规」且断言**完整错误集合逐条相等**；`AGENT-INDEX.md` §12 里那句旧描述（按内容定位，T-02 后由 `:193` 漂到 `:198`）同 commit 改。**规则词表以 `conventions §3` 为准**（残余：该节只举例、未穷尽）。
 3. **T-04 门禁实现与退役**：`verify_agent_entry.py` 新六条 ＋ 退役 `check_entry_drift`；`tests/` fixture 重写为「默认合规」且断言**完整错误集合逐条相等**。
 4. **T-05／T-06／T-07**：cloud／agent／desktop 四件入口文件收口（正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`），**顺序实施**，各仓独立提交。5. **T-08**：workspace 入口文件补机读键过机检。**T-09**：收尾归档与对账。
 
@@ -64,3 +65,15 @@ T-02 收尾读数（`evidence/artifacts/t02-normative-strings.out`，@ 2026-09-2
 | `sync_skills.py check` | `exit=0` |
 
 六门禁全绿是**预期**：T-02 只写规范与文档、未动脚本，而新判据尚未实现——故此刻的绿**不**说明现状合规（与 T-01 的 0 warning 同理）。**行号漂移**：T-02 给 `AGENT-INDEX.md` §10 加 3 行后，§12 里那句旧描述由 `:193` 漂到 **`:198`**；本 CHG 的记录自此**按内容定位、不按行号**（已登记 `change.md` §14 第 7 项）。
+
+T-03 收尾读数（`evidence/artifacts/t03-conformance.out`，@ 2026-09-25T14:41:53Z）：
+
+| 判据 | 读数 |
+|---|---|
+| tmpdir 实跑产出 | `AGENT-INDEX.md` 41 行/854 B/H2=8；`CLAUDE.md` 9/567/1；`AGENTS.md` 9/583/1；`DIRECTORY_MAP.md` 15/465/2 |
+| 形态对账（分母 12 项） | **PASS 12 / FAIL 0**（**注意：这是我写的临时对账脚本，不是门禁**；T-04 后须调门禁自己的函数复测，不得沿用此读数） |
+| 阳性对照（分母 7 类变异） | 变异 1–6 → 12 项里 **FAIL 6**；变异 7（灌水 38 行/2211 B）→ **只**预算 FAIL。⇒ 前 6 类从未让预算变红，故补做变异 7 证明预算确有判别力 |
+| `workspace --dry-run` | 三件 `exists:`；快照 `exists:`——**不再** `would create:`（手写路径已消失） |
+| 六门禁 | 全 `exit=0` |
+| `unittest discover -s tests -q` | `Ran 79 tests` / `OK` |
+| `sync_skills.py check` / `bash -n` | `exit=0` / ok |
