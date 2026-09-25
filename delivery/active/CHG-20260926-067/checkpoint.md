@@ -19,16 +19,16 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 
 - **T-02 M0 门禁前置**：`verify_m0_config.py` 的 desktop needle 元组 7 → 3 条（docstring 同步）；`verify_m0_local.sh:39-45` desktop 块 4 → 1 条。四臂对照证明收窄承重（臂 3：旧 tuple × T-03 终态 workflow = 3 处红）且前瞻安全（臂 2：终态 × 新 tuple = 绿）。顺带量到两条改写 T-03 决策的读数：`npm run lint` 自 `7aabb1a` 起就坏而 needle 一直绿；两个 shell 套件都要 `node` 当 JSON 读取器 ⇒ `setup-node` 必须保留。详见 `evidence/task-02-m0-gate-preamble.md`。
 - **T-03 desktop 脚本层分层**：删 11 个死脚本（`scripts/` 分母 20 → 9）；`m0-desktop.yml` → Rust-only（`setup-node` 保留、去掉 `cache:`）；`scripts/test.sh` 重写（缺 sidecar 时写自报家门的占位符）；新建 `bin/control.sh`（`cargo tauri dev` 的 `start|stop|restart|status`，地址读 `tauri.conf.json` 的 `devUrl`，PID／日志落 `.runtime/`）；`.gitignore` 加 `.runtime/`；`scripts/dev/`＋`scripts/verify/`；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` 重写（含两处 `devUrl` 值去值留名）。详见 `evidence/task-03-desktop-layout.md`。
+- **T-04 cloud 脚本层分层**：`bin/control.sh`（合并三脚本，`alive`／`health` 分列）；`.gitignore` `bin/` → `bin/*` ＋ `!bin/*.sh`；删三脚本；`scripts/README.md` 重写并补 `local-env.sh` 行；`README.md`／`DIRECTORY_MAP.md` 改指。cloud `e2ba4d8`。15 臂落 `artifacts/t04-cloud-control-arms.out`。**一处自己写坏的读数留痕**（首轮把第六个门禁错写成 `verify_m1_integration.py`）。详见 `evidence/task-04-cloud-layout.md`。
 
 ## Current
 
-无。T-03 已完成，下一步是 T-04（cloud）。
+无。T-04 已完成，下一步是 T-05（workspace），且**必须紧接**——跨仓红窗此刻是开着的。
 
 ## Next
 
-1. **T-04**（cloud）：`bin/control.sh`（合并 `start.sh`／`stop.sh`／`health.sh`，source `../scripts/local-env.sh`）；`.gitignore:3` `bin/` → `bin/*` ＋ `!bin/*.sh`；删三个原脚本；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md`。`.gitignore` 的改法是**硬约束**：被排除的**目录**无法用 `!` 反向包含内容。
-2. **T-05 必须紧接 T-04**：workspace 的 `verify_m3_acceptance.py:561`／`:1738` 与 `:414-421` 回指 cloud `bin/control.sh`。这是本 CHG **唯一的跨仓红窗**，中间不插任何工作。
-3. **T-06**（agent）→ **T-07**（收尾）。
+1. **T-05 必须紧接 T-04**：workspace 的 `verify_m3_acceptance.py:561`／`:1738` 与 `:414-421` 回指 cloud `bin/control.sh`。这是本 CHG **唯一的跨仓红窗**，中间不插任何工作。
+2. **T-06**（agent）→ **T-07**（收尾）。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -37,6 +37,10 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 - **写记录**：`change.md` 的 H1 标题里不得出现 `|`；LEDGER 表行必须是 `| CHG-… | 标题 | 状态 | 仓库 |` 四格、无反引号无链接。（§14 第 8 项）
 - **报「0 命中／已收口」**：做阳性对照、报出分母，锚取**不变的基线**而非 `HEAD`；**枚举输入形态**——T-03 实测「端口值」有三种写法，只有其中一种抓得到 `devUrl 5174` 这种散文形态。**正文扫描用 `git grep -F`**：`-E` 里的 `\b` 会静默匹配不到，名字里的 `.` 在正则下是通配符（`build.sh` 命中过 `build_sha256`）；新文件是未跟踪的，要带 `--untracked`（并证明它真的覆盖到了）。
 - **判据「绿」不等于那件事成立**：needle 是对文本的字符串检查（§14 第 12 项）。改判据前先问它实际保证的是什么。
+- **六门禁的清单只在 `AGENT-INDEX.md:199-210`**：第六个是 `verify_m2_acceptance.py`，**不是** `verify_m1_integration.py`（后者与 `verify_m3_acceptance.py` 同属「需真实运行实例、不属上表」）。T-04 首轮写错过一次。
+- **`git check-ignore` 的退出码不表示方向**：`-v` 对被 `!` 取反的规则也 `exit=0`。判「是否被忽略」用 `-q`，或用 `git add -n`／`git status --porcelain -uall` 三读数并各带阳性对照。（§14 第 20 项）
+- **`start` 的探针不认领它探到的是谁**：端口上有别人的进程在答时，`start` 可能报 `exit=0` 而它起的那个人已经死了。**两仓共有，本次不修**；写记录时不得把 `start` 的 `exit=0` 当作「起来了」。（§14 第 19 项）
+- **替身/工具本身出错要有判据**：`PATH` 前置替身时必须先 `command -v <cmd>` 断言落点（`bash` 遇 `EACCES` 会跳过该条目继续往后找，静默落到真程序上）；被测对象的替身先自检它自己的前提（如「探针路径答 200」）。
 
 ## Blocked
 
@@ -71,4 +75,9 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 | desktop `bin/control.sh`（T-03） | `bash -n` `exit=0`；端口字面量 **0 命中**；十臂 ＋ 六处变异全按预期（`artifacts/t03-desktop-control-arms.out`）。**含一处自己踩到并修掉的缺陷**：`node -p` 对缺键打印 `undefined` 而 `exit=0`，首版把它当地址打了出来（§14 第 15 项） |
 | desktop `scripts/test.sh`（T-03，最后一次改动之后） | `exit=0`；`372 passed; 0 failed; 5 ignored` ＋ `release-versions 20 passed`；14.19s（`target/` 是热的，非冷启动）（`artifacts/t03-desktop-test-sh.out`） |
 | desktop 无 sidecar 的克隆（T-03） | 占位分支生效（`no sidecar at …; writing a placeholder`），读数与有 sidecar 时逐字相同：`372 passed; 0 failed; 5 ignored` ＋ `20 passed`，`exit=0`；占位符被 `.gitignore:10` 挡住（`artifacts/t03-clean-clone.out`） |
+| cloud `bin/control.sh`（T-04） | 真实树 `status` → `alive=no health=ok` `exit=1`（PID 文件里是**已死的 13457**，18080 上另有开工前就在的监听者）＋ `stop` `exit=0`；隔离 9 臂逐动词跑到 0 与非 0 两侧；`bash -n` `exit=0`；端口字面量 0 命中（`artifacts/t04-cloud-control-arms.out`） |
+| cloud `start` 的探针归属（T-04 变异臂） | 外部进程占端口 ＋ 替身 3 秒后自杀 ⇒ `start` **`exit=0` 假成功**；3.5 秒后 `status` → `alive=no health=ok` `exit=1`。desktop 同构（§14 第 19 项） |
+| cloud 回指扫描（T-04，分母 497） | 改写前三个名字各命中 1（全在 `README.md:64-66`）→ 改写后四种写法各 **0**；形态 B 裸名有 3 条 `verify-health.sh` 子串**假阳**故作废；阳性对照 `local-env.sh` 2 文件、反向对照 0（`artifacts/t04-cloud-sweep.out`） |
+| `git check-ignore` 陷阱（T-04） | `-v bin/control.sh` 打印 `!bin/*.sh` 且 **`exit=0`**（文件并不被忽略）；`-q` 才 `exit=1`；对照 `bin/wt-media-cloud` 两命令一致报被忽略（§14 第 20 项） |
+| 六门禁 + 套件（T-04 记录写完后复跑） | 见 `artifacts/t04-gate-final.out`——**不在此内联**；首轮（记录未写完时）那份含一次把第六个门禁写错的自造红，落 `t04-gate-after.out` |
 | desktop 文档端口值（T-03，三种写法） | 改前：写法 1 命中 0／写法 2 命中 **5**／写法 3 命中 0；改后写法 2 **5 → 3**（余下 3 条是契约版本号，非运行参数）；阳性对照：同模式在 `tauri.conf.json` 命中（`artifacts/t03-doc-port-literals.out`） |

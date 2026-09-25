@@ -1,0 +1,26 @@
+# T-04 记录体量
+# 口径：整文件字节数，对**上一个 Task 的提交**（T-03 的 workspace 记录提交 6dfe32b）取差。
+# 上限：change.md 增量 ≤ 5120 B/Task；checkpoint.md 增量 ≤ 4096 B；evidence ≤ 9216 B/Task。
+# evidence 只算 evidence/task-NN-*.md；artifacts 另列，作非约束参考。
+# 自指项：本文件自身不计入任何分母（它就是这张表）。
+
+文件                                                6dfe32b         现在         增量
+delivery/active/CHG-20260926-067/change.md          32781      37100       4319
+delivery/active/CHG-20260926-067/checkpoint.md      10567      13153       2586
+
+## evidence（本 Task 新增，故 6dfe32b 侧为 0）
+delivery/active/CHG-20260926-067/evidence/task-04-cloud-layout.md       9169
+
+## artifacts（非约束参考，自指项已排除）
+t04-cloud-control-arms.out                          23150
+t04-cloud-sweep.out                                  3191
+t04-gate-after.out                                   3536
+
+## 判据
+- change.md   增量 4319 / 5120
+- checkpoint.md 增量 2586 / 4096
+- evidence task-04-*.md 合计 9169 / 9216
+
+## 顺序说明
+# 本表取在 T-04 最后一次**记录**写入之后。`artifacts/t04-gate-final.out` 是随后才产生的，
+# 故不出现在上一节的清单里（它的字节数在本表取数时还不存在）。

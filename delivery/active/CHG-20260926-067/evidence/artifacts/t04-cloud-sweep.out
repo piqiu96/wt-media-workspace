@@ -1,0 +1,69 @@
+# T-04 cloud 回指扫描（三个被删脚本名的引用）
+# 仓: wt-media-cloud  锚: HEAD 0db02ab（T-04 改动在未提交的工作树里）
+# 分母: git ls-files = 497 个已跟踪文件；ls-files --cached --others --exclude-standard = 501
+
+## 改写前的读数（原样转录；**现在取不到了**）
+# 该读数取在 README.md:61-67 被改写**之前**。git grep 读的是工作树里已跟踪文件的内容，
+# 改写落地后旧文本不存在，故这一组无法重放——转录自同一会话的早先调用：
+#   git grep -nF -e 'scripts/start.sh'   -> README.md:64:scripts/start.sh
+#   git grep -nF -e 'scripts/stop.sh'    -> README.md:66:scripts/stop.sh
+#   git grep -nF -e 'scripts/health.sh'  -> README.md:65:scripts/health.sh
+# 即三个引用**只有 README.md 一处**，而它就是本次要改写的那个块。
+
+## 改写后重扫 —— 逐形态，含各自的假阳/假阴陷阱
+
+### 形态 A — 字面量全路径（-F）
+$ git grep -nF -e 'scripts/start.sh' -e 'scripts/stop.sh' -e 'scripts/health.sh'
+  (0 hits)
+  => 真答案：0。
+
+### 形态 B — 裸文件名（-F），**这一形态有假阳，不能用**
+$ git grep -nF -e 'start.sh' -e 'stop.sh' -e 'health.sh'
+README.md:58:scripts/verify-health.sh
+scripts/README.md:13:| Verification | Prove something holds, or does not | `test.sh`, `verify-health.sh` |
+scripts/README.md:17:so it is both; `verify-health.sh` is a verification script that happens to start
+  => 3 条命中**全是假阳**：'health.sh' 是 'verify-health.sh' 的子串。
+     裸名不带边界就会把兄弟名算进来，故本形态不作判据。
+
+### 形态 C — 正则 + 路径前缀 + \. 转义
+$ git grep -nE 'scripts/(start|stop|health)\.sh'
+  (0 hits)
+  => 真答案：0。
+
+### 形态 D — 带边界的裸名（正则），修掉形态 B 的假阳
+$ git grep -nE '([^-a-z]|^)(start|stop|health)\.sh'
+  (0 hits)
+  => 真答案：0（与形态 B 的 3 条假阳对照，说明边界写法是必要的）。
+
+## 阳性对照与反向对照
+### 阳性（确实存在的兄弟名）: git grep -c -F -e 'local-env.sh'
+scripts/README.md:3
+scripts/migrate.sh:1
+  => 2 个文件，判据有判别力。
+### 反向（从未存在过的名字）: git grep -c -F -e 'scripts/never-existed.sh'
+  (0 hits, exit=1)
+
+## scripts/ 的存量（分母）
+$ git ls-files scripts/
+scripts/README.md
+scripts/bootstrap.sh
+scripts/build.sh
+scripts/local-env.sh
+scripts/migrate.sh
+scripts/test.sh
+scripts/verify-health.sh
+  => 7 个已跟踪（改写前同口径 10 个：多出的三个就是 start.sh/stop.sh/health.sh）。
+     `dev/` 与 `verify/` 下各一枚 `.gitkeep` 此刻仍是未跟踪，故不在这个分母里。
+
+### 形态 B 与 D 的判别力对照（用合成的输入，不靠仓库）
+$ printf 'x scripts/health.sh y
+verify-health.sh
+' | grep -nE '([^-a-z]|^)(start|stop|health)\.sh'
+1:x scripts/health.sh y
+  => 只命中第 1 行（真引用），第 2 行（子串假阳）被边界挡掉 —— 故形态 D 的 0 不是空转。
+$ printf 'x scripts/health.sh y
+verify-health.sh
+' | grep -nF -e 'health.sh'
+1:x scripts/health.sh y
+2:verify-health.sh
+  => 形态 B 两行都命中，假阳由此坐实。

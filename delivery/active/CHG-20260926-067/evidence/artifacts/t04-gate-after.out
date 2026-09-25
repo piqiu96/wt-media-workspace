@@ -1,0 +1,67 @@
+# T-04 门禁读数（cloud bin/control.sh 落地后）
+# 取数时刻：cloud 的全部改动在工作树里（bin/ 未跟踪、.gitignore/README.md/DIRECTORY_MAP.md/
+#   scripts/README.md 已改、scripts/{start,stop,health}.sh 已 git rm），尚未提交。
+#
+# 本文件首轮写坏过两次，都留痕在此：
+#   一：首轮把 verify_m1_integration.py 当成第六个门禁，漏掉真正的 verify_m2_acceptance.py。
+#      门禁清单的唯一落点是 AGENT-INDEX.md §12（:199-210），:209-210 明写 verify_m1_integration.py
+#      与 verify_m3_acceptance.py『需真实运行实例、不属上表』。
+#   二：重跑时把解释器串写进 shell 变量再展开（out=$($PY ...)），zsh 不对未加引号的变量做
+#      分词，于是整串被当成一个命令名 -> exit=127。改为 "$@" 传参。本文件是最后一次的读数。
+
+## 六门禁（清单取自 AGENT-INDEX.md:199-208）
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_delivery_governance.py
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-067
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_agent_entry.py
+execution snapshot: 2048 characters (~819 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_skills.py
+verified 10 skill source files
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m0_config.py
+Workspace config verification ok
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+## 单元套件
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q
+----------------------------------------------------------------------
+Ran 101 tests in 0.576s
+
+OK
+exit=0
+
+## skills 同步
+$ python3 scripts/sync_skills.py check
+skill outputs are up to date
+exit=0
+
+## 附：非门禁脚本 verify_m1_integration.py 的实况（如实记，不属本 CHG 处置）
+# AGENT-INDEX.md:209-210 已把它排除在六门禁之外。它在**本环境**是红的，红因与本 CHG 无关：
+#   :153 cloud_port = free_port()
+#   :83  env["WT_MEDIA_CLOUD_HTTP_ADDR"] = "127.0.0.1:<那个空闲端口>"
+#   cloud 的 Go 侧**不读**这个变量（git grep -n WT_MEDIA_CLOUD_HTTP_ADDR -- '*.go' = 0 命中），
+#   服务端只从 config/app.toml 取监听地址；18080 被本 CHG 开工前就在的进程占着，故 panic。
+#   即使 18080 空闲，探针地址与监听地址也不相同 —— 该脚本的失败不是本 CHG 引入的。
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m1_integration.py
+    raise IntegrationError(f"service did not become ready at {url}: {last_error}")
+IntegrationError: service did not become ready at http://127.0.0.1:57543/api/v1/health: <urlopen error [Errno 61] Connection refused>
+    raise IntegrationError(f"{name} exited with {proc.returncode}\nstdout:\n{stdout}\nstderr:\n{stderr}")
+IntegrationError: cloud exited with 1
+exit=1

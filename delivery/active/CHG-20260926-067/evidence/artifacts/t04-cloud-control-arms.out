@@ -1,0 +1,434 @@
+# T-04 cloud bin/control.sh 读数
+# 仓: wt-media-cloud  日期: 2026-09-26
+# 取数时 bin/control.sh、scripts/dev|verify、.gitignore 改动都在工作树里，未提交
+
+## ARM 1 — status（真实树，未运行／或跑在别处）
+$ bash bin/control.sh status
+cloud: pid=- alive=no health=ok url=http://127.0.0.1:18080/healthz
+exit=1
+
+## 读数时的旁证
+$ cat .cache/wt-media-cloud.pid
+13457
+$ kill -0 $(cat .cache/wt-media-cloud.pid)
+(eval):kill:19: kill 13457 failed: no such process
+exit=1 (dead)
+$ lsof -nP -iTCP:18080 -sTCP:LISTEN
+COMMAND   PID   USER   FD   TYPE            DEVICE SIZE/OFF NODE NAME
+server  54420 aqiuye    8u  IPv4 0xe262d1cf13be4be      0t0  TCP 127.0.0.1:18080 (LISTEN)
+server  54420 aqiuye    9u  IPv4 0xe262d1cf13be4be      0t0  TCP 127.0.0.1:18080 (LISTEN)
+
+## ARM 2 — stop（真实树）
+$ bash bin/control.sh stop
+wt-media-cloud stopped
+exit=0
+
+## ARM 3 — status（stop 之后）
+$ bash bin/control.sh status
+cloud: pid=- alive=no health=ok url=http://127.0.0.1:18080/healthz
+exit=1
+
+## ARM 4-9 — 隔离全套：start|status|restart|status|stop|status
+# 覆盖三个 env 落点（PID/LOG/BINARY）到 /private/tmp/t04，地址覆盖到 :18999（仓内端口值未动）
+# PATH 前置模拟 go（/private/tmp/t04-sim/bin/go）：只实现 'go build -o <f> ./cmd/server'，
+# 产出的可执行体在 WT_MEDIA_CLOUD_HTTP_ADDR 的端口上起 python3 -m http.server（每路径 200）
+$ lsof -nP -iTCP:18999 -sTCP:LISTEN   # 前置：端口空闲
+(no listener — free)
+
+$ bash bin/control.sh start
+wt-media-cloud did not become healthy
+127.0.0.1 - - [26/Sep/2026 02:13:39] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:39] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:39] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:39] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:39] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:39] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:39] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:39] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:39] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:39] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:39] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:39] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:40] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:40] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:41] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:41] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:42] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:42] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:43] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:43] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:44] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:44] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:44] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:44] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:44] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:44] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:44] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:44] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:44] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:44] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:44] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:44] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:44] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:44] "GET /healthz HTTP/1.1" 404 -
+exit=1
+  [pid file] 66184
+
+$ bash bin/control.sh status
+cloud: pid=66184 alive=yes health=down url=http://127.0.0.1:18999/healthz
+exit=1
+  [pid file] 66184
+
+$ bash bin/control.sh status
+cloud: pid=66184 alive=yes health=down url=http://127.0.0.1:18999/healthz
+exit=1
+  [pid file] 66184
+
+$ bash bin/control.sh restart
+wt-media-cloud stopped
+wt-media-cloud did not become healthy
+127.0.0.1 - - [26/Sep/2026 02:13:45] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:45] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:45] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:45] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:45] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:45] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:45] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:45] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:45] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:45] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:45] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:45] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:45] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:45] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:46] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:46] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:47] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:47] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:48] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:48] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:49] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:49] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:49] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:49] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:49] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:49] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:49] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:49] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:49] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:49] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:49] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:49] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:49] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:49] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:50] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:50] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:51] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:51] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:51] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:51] "GET /healthz HTTP/1.1" 404 -
+127.0.0.1 - - [26/Sep/2026 02:13:51] code 404, message File not found
+127.0.0.1 - - [26/Sep/2026 02:13:51] "GET /healthz HTTP/1.1" 404 -
+exit=1
+  [pid file] 66484
+
+$ bash bin/control.sh status
+cloud: pid=66484 alive=yes health=down url=http://127.0.0.1:18999/healthz
+exit=1
+  [pid file] 66484
+
+$ bash bin/control.sh stop
+wt-media-cloud stopped
+exit=0
+  [pid file] absent
+
+$ bash bin/control.sh status
+cloud: pid=- alive=no health=down url=http://127.0.0.1:18999/healthz
+exit=1
+  [pid file] absent
+
+########## 更正：上一段（A4 之前的第一次尝试）的替身是 python3 -m http.server ##########
+# 它是文件服务器，'/healthz' 落到不存在的文件上答 404，于是 curl --fail 判失败、start 报
+# 'did not become healthy' 并 exit=1 —— 那不是 control.sh 的缺陷，是替身的缺陷。
+# 该段读数仍保留，因为它有两个真实用途：
+#   (1) 探针不会被 404 骗过（要求 2xx，不是「端口上有东西答话」）；
+#   (2) 'alive=yes health=down' 这一向独立读数在此自然出现（与 T-03 变异臂 M3 同形）。
+# 更正后的替身在 WT_MEDIA_CLOUD_HTTP_ADDR 上答 200（两个探针路径都答），
+# 且已先自检：/healthz -> 200、/api/v1/health -> 200，再交给下列臂使用。
+
+########## ARM 4-12 — 隔离全套（替身答 200） ##########
+# env 覆盖：PID/LOG/BINARY -> /private/tmp/t04，地址 -> :18999。仓内端口值一字未动。
+
+$ bash bin/control.sh start
+wt-media-cloud started: 67165
+exit=0
+  [pid file] 67165
+  [listener on 18999] Python 67165
+
+$ bash bin/control.sh start
+wt-media-cloud already running: 67165
+exit=0
+  [pid file] 67165
+
+$ bash bin/control.sh status
+cloud: pid=67165 alive=yes health=ok url=http://127.0.0.1:18999/healthz
+exit=0
+  [pid file] 67165
+
+$ bash bin/control.sh restart
+wt-media-cloud stopped
+wt-media-cloud started: 67342
+exit=0
+  [pid file] 67342
+
+$ bash bin/control.sh status
+cloud: pid=67342 alive=yes health=ok url=http://127.0.0.1:18999/healthz
+exit=0
+  [pid file] 67342
+
+$ bash bin/control.sh stop
+wt-media-cloud stopped
+exit=0
+  [pid file] absent
+  [listener on 18999 after stop] 
+
+$ bash bin/control.sh stop
+wt-media-cloud not running
+exit=0
+  [pid file] absent
+
+$ bash bin/control.sh status
+cloud: pid=- alive=no health=down url=http://127.0.0.1:18999/healthz
+exit=1
+  [pid file] absent
+
+$ bash bin/control.sh bogus-verb
+unknown command: bogus-verb
+Usage: bin/control.sh <start|stop|restart|status|help>
+
+  start    Build ./cmd/server, run it in the background, and wait for health.
+  stop     Stop the process recorded by the PID file.
+  restart  Stop it, then start it again.
+  status   Report whether that process is alive and whether Cloud answers.
+  help     Show this help.
+exit=2
+  [pid file] absent
+
+$ bash bin/control.sh help
+Usage: bin/control.sh <start|stop|restart|status|help>
+
+  start    Build ./cmd/server, run it in the background, and wait for health.
+  stop     Stop the process recorded by the PID file.
+  restart  Stop it, then start it again.
+  status   Report whether that process is alive and whether Cloud answers.
+  help     Show this help.
+exit=0
+  [pid file] absent
+
+########## ARM 13-15 — 探针归属：start 能不能分辨「健康的是我起的那个人」 ##########
+# 这是 desktop 与 cloud 两版 control.sh 共有的一个潜在缺陷，不是本仓特有。
+# 场景：端口上已经有别人的进程在答 200，而本脚本刚起的那一个根本没活下来。
+
+## ARM 13 — 对照臂：替身立刻退出（死在第一次探针之前）⇒ 应报失败
+$ bash bin/control.sh start   # PATH 前置 sim-C
+wt-media-cloud failed to stay running
+panic: create netpoll listener fail: listen tcp 127.0.0.1:18080: bind: address already in use
+
+goroutine 33 [running]:
+github.com/cloudwego/hertz/pkg/network/netpoll.(*transporter).ListenAndServe(0x658232f34090, 0x658232f29db0)
+	/Users/aqiuye/Develop/workspace/devenv/go26/gopath/pkg/mod/github.com/cloudwego/hertz@v0.10.5/pkg/network/netpoll/transport.go:100 +0x534
+github.com/cloudwego/hertz/pkg/route.(*Engine).listenAndServe(0x658232f3e008)
+	/Users/aqiuye/Develop/workspace/devenv/go26/gopath/pkg/mod/github.com/cloudwego/hertz@v0.10.5/pkg/route/engine.go:417 +0xfc
+github.com/cloudwego/hertz/pkg/route.(*Engine).Run(0x658232f3e008)
+	/Users/aqiuye/Develop/workspace/devenv/go26/gopath/pkg/mod/github.com/cloudwego/hertz@v0.10.5/pkg/route/engine.go:384 +0x154
+main.runServerLifecycle.func1()
+	/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/cmd/server/server.go:35 +0x28
+created by main.runServerLifecycle in goroutine 1
+	/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/cmd/server/server.go:35 +0xb4
+exit=1
+  [pid file] absent
+
+## ARM 14 — 变异臂：先起一个『外部』服务器占住 :18997，再让替身在 3 秒后死
+(eval):unset:41: not enough arguments
+(eval):41: no such file or directory: /private/tmp/t04/probe2
+
+########## 更正二：ARM 13 的第一次尝试测的不是替身 ##########
+# 症状：控件报 'failed to stay running'，但日志里是真 Cloud 的 Hertz panic。
+# 根因：第二次建替身目录时漏了 chmod +x。**bash 在 PATH 搜索中遇到 EACCES 会跳过该
+# 条目继续往后找**（它只对 ENOEXEC 停），于是落到真实的 devenv go 上：真 go 编译出真
+# server，真 server 读 config/app.toml 的 18080、撞上先前的监听者而 panic。
+# 该段读数作废，保留在此只作留痕；下面每臂都先打印 command -v go 作判据。
+
+########## ARM 13-15（重做）— 探针归属：start 能不能分辨「健康的是我起的那个人」 ##########
+# 这是 desktop 与 cloud 两版 control.sh 共有的潜在缺陷，不是本仓特有。
+# 场景：端口上已经有别人的进程在答 200，而本脚本刚起的那一个根本没活下来。
+
+## 前置判据
+$ PATH=/private/tmp/t04-sim-m/bin:$PATH command -v go
+/private/tmp/t04-sim-m/bin/go
+
+## ARM 13 — 对照臂：替身立刻退出（死在第一次探针之前）⇒ 应报失败
+$ rm -f /private/tmp/t04-m/cloud.pid; PATH=/private/tmp/t04-sim-m/bin:$PATH bash bin/control.sh start
+wt-media-cloud failed to stay running
+exit=1
+  [pid file] absent
+  [log bytes] 0
+
+## ARM 14 — 变异臂：先由外部占住 :18997（不写 pid 文件），再让替身 3 秒后死
+$ lsof -nP -iTCP:18997 -sTCP:LISTEN
+  [pid file 存在吗] no
+  [外部服务器对探针的回答] 000
+$ PATH=/private/tmp/t04-sim-m/bin:$PATH bash bin/control.sh start   # 替身 3 秒后自杀
+wt-media-cloud failed to stay running
+exit=1
+  ^^^ 这一行 exit=0 就是缺陷：脚本报「起好了」，但它起的那个人 3 秒后就没了
+  [pid file] absent
+
+## ARM 15 — 3 秒后再看：假成功是可以事后识破的，只是 start 那一刻不行
+$ bash bin/control.sh status   # 不前置替身，纯读状态
+cloud: pid=- alive=no health=down url=http://127.0.0.1:18997/healthz
+exit=1
+  [该 pid 还在吗] dead
+  [外部服务器仍在答] 000
+  [已收掉外部服务器]
+
+########## 更正三：上一段 ARM 14/15 没有拿到前提 ##########
+# 症状：自称 ARM 14 的变异臂读到了 exit=1，与它声明的预期（exit=0 假成功）相反。
+# 根因：外部替身 /private/tmp/t04/probe2 不在了 —— 更早一次 rm -rf 的落点 /private/tmp/t04
+# 正是它的所在目录。外部服务器没起来，于是 ARM 14 退化成又一个「死在探针之前」的对照臂。
+# 处置：外部替身改建在独立目录 /private/tmp/t04-foreign/，并在使用前先断言它答 200。
+# 该段读数作废，保留留痕。
+
+########## ARM 14-15（重做）— 探针归属 ##########
+# 前置判据（先证明前提成立，再取材）
+  [PATH 前置时 go 落在] /private/tmp/t04-sim-m/bin/go
+  [外部服务器 pid] 68554
+  [外部服务器答 /healthz] 200
+  [外部服务器答 /api/v1/health] 200
+  [pid 文件存在吗] no   # 必须 no：外部者不是经 control.sh 起的
+
+## ARM 14 — 变异臂：外部占住 :18997，替身 3 秒后自杀
+$ PATH=/private/tmp/t04-sim-m/bin:$PATH bash bin/control.sh start
+wt-media-cloud started: 68583
+exit=0   <-- 缺陷：报「起好了」，但它起的那个人 3 秒后就没了
+  [pid file] 68583
+
+## ARM 15 — 3.5 秒后：假成功事后可识破，start 那一刻不可
+$ bash bin/control.sh status
+cloud: pid=- alive=no health=ok url=http://127.0.0.1:18997/healthz
+exit=1
+  [那个 pid 还在吗] dead
+  [外部服务器仍在答] 200
+  [已收掉外部服务器]

@@ -1,0 +1,49 @@
+# T-04 六门禁 + 套件 + skills 检查（**记录全部写完之后**复跑）
+# 仓: wt-media-workspace  日期: 2026-09-26
+# 清单唯一落点: AGENT-INDEX.md:199-206；套件为同一表的第 7 行
+# 调用: python3 -B -X pycache_prefix=/tmp/pyc-none（空目录，防同秒等长变体被旧 .pyc 服务）
+
+## 更正一（本轮自己踩到的，与 T-04 证据 §6 第 4 条同坑）
+# 首版把解释器三个参数放进变量  再  "scripts/x.py" 调用 —— zsh **不对未加引号的变量做分词**，
+# 于是它去找一个名叫 "python3 -B -X pycache_prefix=/tmp/pyc-none" 的程序，八项全部 exit=127。
+# 那不是门禁的读数。下面重跑的每一条都用字面 token 调用。
+
+=== [1] scripts/verify_delivery_governance.py ===
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-067
+exit=0
+
+=== [2] scripts/verify_agent_entry.py ===
+execution snapshot: 2048 characters (~819 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+=== [3] scripts/verify_skills.py ===
+verified 10 skill source files
+exit=0
+
+=== [4] scripts/verify_m0_config.py ===
+Workspace config verification ok
+exit=0
+
+=== [5] scripts/verify_product_master_alignment.py ===
+Product and Master Plan alignment verification ok
+exit=0
+
+=== [6] scripts/verify_m2_acceptance.py ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+=== [7] -m unittest discover -s tests -q ===
+----------------------------------------------------------------------
+Ran 101 tests in 0.605s
+
+OK
+exit=0
+
+=== [8] scripts/sync_skills.py check ===
+skill outputs are up to date
+exit=0
