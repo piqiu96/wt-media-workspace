@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -25,6 +26,8 @@ def load_module():
 
 class ProductMasterAlignmentTests(unittest.TestCase):
     def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
         self.module = load_module()
         self.master = MASTER_PATH.read_text(encoding="utf-8")
 
@@ -141,6 +144,110 @@ class ProductMasterAlignmentTests(unittest.TestCase):
                 "M2 capability missing 'M2-C：代理与 Profile 闭环'",
             ],
         )
+
+    def _active_root(self, status: str, ledger_status: str | None = None) -> Path:
+        """A minimal, otherwise-valid active CHG whose status line is `status`.
+
+        Everything the other checks in `validate_active_change` look at is
+        filled in — title, repository, a `None.` Pending Questions section, and
+        a matching Ledger row — so the FULL error list under test is the status
+        one and nothing else. `status` may carry an annotation; `ledger_status`
+        is the bare word the Ledger carries, defaulting to `status` itself.
+        """
+        # One root per case: a shared root would make the second subTest fail
+        # on `mkdir` instead of on the judgement under test.
+        self._root_count = getattr(self, "_root_count", 0) + 1
+        root = Path(self.tmp.name) / f"case-{self._root_count}" / "wt-media-workspace"
+        change = root / "delivery" / "active" / "CHG-20260722-021" / "change.md"
+        change.parent.mkdir(parents=True)
+        change.write_text(
+            "# CHG-20260722-021: Test\n\n"
+            f"- Status: {status}\n"
+            "- Current repository: `wt-media-workspace`\n\n"
+            "## 7. Pending Questions\n\n"
+            "None.\n",
+            encoding="utf-8",
+        )
+        (root / "delivery" / "LEDGER.md").write_text(
+            "# Delivery Ledger\n\n"
+            "| Change | Title | Status | Current Repository |\n"
+            "|---|---|---|---|\n"
+            f"| CHG-20260722-021 | Test | {ledger_status or status} | wt-media-workspace |\n",
+            encoding="utf-8",
+        )
+        return root
+
+    def test_annotated_status_line_is_read_as_its_word(self) -> None:
+        """An annotated status line must be judged on its word, not on `None`.
+
+        Five consecutive CHGs (055–059) annotated the status line — three of
+        them while still in `delivery/active/`. A regex demanding the bare word
+        fails to match those at all, so the status came back as `None` and the
+        gate reported `got None` while the record was legitimately active
+        (CHG-20260923-059 own `evidence/task-08-gate.out`). Both directions are
+        asserted: the annotation must not manufacture an error on a good word,
+        and it must not smuggle a bad word past the accept-set.
+        """
+        # Verbatim from CHG-20260923-059, the record the gate misread as `None`.
+        annotated = "IMPLEMENTING（2026-09-25 由 `delivery/planned/` 激活并改写为十三节执行记录）"
+        self.assertEqual(
+            self.module.validate_active_change(
+                self._active_root(annotated, ledger_status="IMPLEMENTING")
+            ),
+            [],
+        )
+
+        # Verbatim from `delivery/planned/CHG-20260923-053/change.md`: bolded.
+        bold = "**SUPERSEDED（2026-09-23 并入联合工程优化程序，不再独立激活）**"
+        self.assertEqual(
+            self.module.validate_active_change(
+                self._active_root(bold, ledger_status="SUPERSEDED")
+            ),
+            ["active CHG status must be IMPLEMENTING or VERIFYING, got 'SUPERSEDED'"],
+        )
+
+    def test_status_word_strips_bold_and_annotation(self) -> None:
+        """The extraction helper, on every form the records actually use.
+
+        Kept separate from the validate test above so that test's red run is
+        a behavioural red (the judgement returns the wrong list) rather than an
+        `AttributeError` on a function that does not exist yet — which would
+        prove nothing about the behaviour.
+        """
+        cases = {
+            "- Status: IMPLEMENTING": "IMPLEMENTING",
+            "> 状态：DONE": "DONE",
+            "> 状态：DONE（2026-08-05 窗口收口完成）": "DONE",
+            "- Status: **SUPERSEDED（2026-09-23 并入联合工程优化程序，不再独立激活）**": "SUPERSEDED",
+            "- Status: DONE (closed at the 2026-08-05 window)": "DONE",
+        }
+        for line, expected in cases.items():
+            with self.subTest(line=line):
+                self.assertEqual(self.module.status_word(line), expected)
+        self.assertIsNone(self.module.status_word("# CHG-x: Test\n\nNo status line.\n"))
+        self.assertIsNone(self.module.status_word("- Status: （only an annotation）"))
+
+    def test_active_change_accepts_only_the_two_execution_words(self) -> None:
+        """The accept-set is exactly `IMPLEMENTING` / `VERIFYING`.
+
+        A record sits in `delivery/active/` only while it is being executed.
+        `DISCUSSION` and `PLANNED` are pre-activation states, `DONE` and
+        `SUPERSEDED` are terminal — accepting any of them accepts the state the
+        vocabulary forbids. Both halves are asserted: the two legal words pass
+        silently, and each illegal one produces exactly the status error.
+        """
+        for status in ("IMPLEMENTING", "VERIFYING"):
+            with self.subTest(status=status):
+                self.assertEqual(
+                    self.module.validate_active_change(self._active_root(status)), []
+                )
+
+        for status in ("DISCUSSION", "PLANNED", "DONE", "SUPERSEDED", "IN_PROGRESS", "ACTIVE"):
+            with self.subTest(status=status):
+                self.assertEqual(
+                    self.module.validate_active_change(self._active_root(status)),
+                    [f"active CHG status must be IMPLEMENTING or VERIFYING, got {status!r}"],
+                )
 
     def test_contract_governance_requires_mixed_state_and_active_task_schema(
         self,

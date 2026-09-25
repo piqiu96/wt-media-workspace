@@ -1,0 +1,95 @@
+T-06 raw readings — taken 2026-09-25 19:56:25 CST
+Invocation: python3 -B -X pycache_prefix=/tmp/pyc-none <cmd>
+Branch/HEAD: 17bff0d (all T-06 edits uncommitted when taken)
+
+===== six static gates =====
+--- scripts/verify_delivery_governance.py
+Delivery governance verification ok. Active CHG: CHG-20260925-064
+exit=0
+--- scripts/verify_agent_entry.py
+execution snapshot: 1936 characters (~774 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+--- scripts/verify_skills.py
+verified 10 skill source files
+exit=0
+--- scripts/verify_m0_config.py
+Workspace config verification ok
+exit=0
+--- scripts/verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+exit=0
+--- scripts/verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+===== unittest suite =====
+----------------------------------------------------------------------
+Ran 79 tests in 0.329s
+
+OK
+exit=0
+
+===== sync_skills.py check =====
+skill outputs are up to date
+exit=0
+
+===== non-plain Status lines across all 58 records (denominator stated) =====
+denominator: 58 change.md files; non-plain (old regex): 9
+
+===== runtime repo baselines (three repos, after sync) =====
+cloud    ?? dump.rdb|
+agent    
+desktop  
+
+======================================================================
+CLOSING readings — taken 2026-09-25 19:57:36 CST
+Reason for the second pass: the readings above were taken before the
+CHG record itself was updated (change.md T-06 row, AC-04/AC-05,
+checkpoint.md, evidence file).  Those files are read by the gates, so
+the first pass is not a closing value.
+Working tree at this moment:
+   M .claude/skills/executing-wt-media-change/SKILL.md
+   M .codex/skills/executing-wt-media-change/SKILL.md
+   M AGENT-INDEX.md
+   M README.md
+   M delivery/MASTER_IMPLEMENTATION_PLAN.md
+   M delivery/active/CHG-20260925-064/change.md
+   M delivery/active/CHG-20260925-064/checkpoint.md
+   M docs/engineering/specs/agent-workspace-conventions.md
+   M scripts/verify_delivery_governance.py
+   M scripts/verify_product_master_alignment.py
+   M skills/workspace/executing-wt-media-change/SKILL.md
+   M templates/delivery/change.md
+   M tests/test_verify_delivery_governance.py
+   M tests/test_verify_product_master_alignment.py
+  ?? delivery/active/CHG-20260925-064/evidence/artifacts/t06-gate-readings.out
+  ?? delivery/active/CHG-20260925-064/evidence/task-06-script-template-checkpoint.md
+  ?? templates/delivery/checkpoint.md
+
+===== six static gates =====
+scripts/verify_delivery_governance.py exit=0  | Delivery governance verification ok. Active CHG: CHG-20260925-064
+scripts/verify_agent_entry.py        exit=0  | Agent entry verification ok. 0 warning(s) need review.
+scripts/verify_skills.py             exit=0  | verified 10 skill source files
+scripts/verify_m0_config.py          exit=0  | Workspace config verification ok
+scripts/verify_product_master_alignment.py exit=0  | Product and Master Plan alignment verification ok
+scripts/verify_m2_acceptance.py      exit=0  | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+===== unittest suite =====
+Ran 79 tests in 0.294s
+
+OK
+
+===== sync_skills.py check =====
+skill outputs are up to date
+exit=0
+
+===== gates that now parse checkpoint.md (denominator = scripts/ + tests/) =====
+  scripts/verify_delivery_governance.py
+  tests/test_verify_delivery_governance.py
+
+===== runtime repo baselines =====
+  cloud    ?? dump.rdb|
+  agent    
+  desktop  

@@ -120,20 +120,12 @@ Each evidence record should include:
 
 ## 12. Current Checkpoint
 
-Completed:
-- None.
+Progress lives in `checkpoint.md`, beside this file — it is **not** inlined here.
+`scripts/verify_delivery_governance.py` requires the pair: an active CHG with no
+`checkpoint.md` is an active change nobody can resume.
 
-Current:
-- Initial discussion.
-
-Next:
-- Confirm scope and move to `IMPLEMENTING`.
-
-Blocked:
-- None.
-
-Recent verification:
-- None.
+See `checkpoint.md` for completed work, current work, next step, blockers, and
+recent verification.
 
 ## 13. DONE Gate
 

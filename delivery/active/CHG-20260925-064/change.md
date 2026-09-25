@@ -143,7 +143,7 @@ None.
 | T-03 | `conventions` 精简保留（按用户裁定的保留清单：删读数与历史叙述；逐节复核 2 处引用） | DONE | 见 §8.1；208→148 行、节数 11→11；两处引用改 1 留 1（留的理由见 evidence §5） | T-02 |
 | T-04 | 读取顺序单一化 + 入口文件只留指针 + 补回两条提交约定 | DONE | 见 §8.2；落点由 5 处手写＋1 常量收敛为 **1 处手写＋1 生成物**；入口红线 9/9 逐条归属；变异对照证明快照确由该常量派生 | T-03 |
 | T-05 | 状态词汇成文（`MASTER:105-128` 就地覆盖为实测在用词汇＋一行历史词汇） | DONE | 见 §8.3；CHG 六词、里程碑四词、退役词与分母逐项报出；阳性对照 `CLOSED` 2／`HANDOFF` 2 | T-04 |
-| T-06 | 脚本／模板／checkpoint 落点对齐（接受集、文案、模板、新增结构检查） | TODO | 六门禁 + `unittest`；**新判据做变异对照**；**本 CHG 仍 active 时复测** | T-05 |
+| T-06 | 脚本／模板／checkpoint 落点对齐（接受集、文案、模板、新增结构检查） | DONE | 见 §8.4；六门禁 `exit=0` ＋ `Ran 79 tests`；**新判据两条均做变异对照**（失红后还原经 `cmp` 逐字节）；**在本 CHG 仍 active 时复测**（接受集正打在自己的 LEDGER 表行上） | T-05 |
 | T-07 | `planned` 记录状态词就地改写 | TODO | 逐文件 `git diff` 只改状态词一行；两遍词汇统计 | T-06 |
 | T-08 | FFmpeg 归属（ADR-0015 就地改写） | TODO | 全仓归属落点复扫＝Cloud；阳性对照 | 独立 |
 | T-09 | 里程碑与交付事实（C6／B-3／N1） | TODO | 该 grep 改前 ≥3、改后 0；四处逐字一致 | 独立 |
@@ -205,6 +205,20 @@ None.
 
 细节与分母见 `evidence/task-05-status-vocab.md`。
 
+### 8.4 脚本／模板与 `checkpoint.md` 落点对齐（T-06）
+
+| 项 | 改前 | 改后 |
+|---|---|---|
+| 「active 目录必须有 `checkpoint.md`」 | 规则写在 `AGENT-INDEX.md` §8，但 `git grep -i checkpoint -- scripts tests` 命中 **0** 个文件（阳性对照 `change.md` 9 个）⇒ 只写成 `change.md` 的 active CHG 能过全部门禁 | `verify_delivery_governance.py` 报 `active CHG is missing checkpoint.md: <id>`；活树阳性对照：把本 CHG 的 `checkpoint.md` 改名 → 真门禁 `exit=1`，还原后 `sha256` 相同 |
+| 模板 | `templates/delivery/` 只有 `change.md`、`evidence-record.md`；checkpoint **内联**在 `change.md` §12 | 新增 `templates/delivery/checkpoint.md`；§12 改为指针 |
+| skill 落点 | `SKILL.md:95`「Update the active **`change.md`** checkpoint」 | 改为 `checkpoint.md`，并注明它是**必需文件** |
+| 状态接受集 | `{IN_PROGRESS, IMPLEMENTING, VERIFYING, ACTIVE}`（与 §3 交集为零；含已退役的 `IN_PROGRESS` 与幻影词 `ACTIVE`） | **`{IMPLEMENTING, VERIFYING}`**——记录落在 `active/` 即意味着在执行，其余四词均属别处或终态 |
+| 带注状态行 | `(\S+)\s*$` 要求整行只有那个词，带注行**一个都匹配不上** ⇒ `status=None`；`CHG-20260923-059` 的 active 期状态行正是带注形式，它自己的门禁输出里留着 `… got None`——**点了一个该记录从未有过的状态** | 抽出 `status_word()` 先剥 `**` 再剥 `（…）`／`(…)`；`HEAD` 版上的红**是行为性的**（在测试里复现出 059 那条 `got None` 报文），新脚本下 `OK` |
+
+连带：剥注后 LEDGER 表行比对由**被跳过**变为**真的执行**（口径收紧）；`MASTER` §3 的 `ACTIVE` 括号作废（改为「0 处」＋一句活态词）与 `TODO` 的轴限定（任务表仍在用，本 CHG §8 自己就有 18 行）；`conventions` §9 加「active 记录成对」「CHG 状态词」两行耦合。两个新用例各带变异对照，`unittest` 由 75 增至 **79**。
+
+细节见 `evidence/task-06-script-template-checkpoint.md`。
+
 ## 9. Repository Checklist
 
 ### wt-media-workspace
@@ -232,8 +246,8 @@ None.
 | AC-01 | 读取顺序在全仓只剩 1 个落点（`AGENT-INDEX.md`）＋生成物；两个入口文件与 `MASTER` 的第三版都改为指回它 | T-04 的 grep 读数（含阳性对照） | **PASS** |
 | AC-02 | 两个入口文件不再逐字复述 `AGENT-INDEX.md` §2 的红线；每条被删条目都有归属依据 | T-04 的逐条归属表 | **PASS** |
 | AC-03 | 被削薄弄丢的两条提交约定在 `AGENT-INDEX.md` 有活落点 | T-04 的 grep（改前 0 命中留证） | **PASS** |
-| AC-04 | CHG／里程碑状态词汇只剩一套，且**实测在用的每个词都被定义**；脚本接受集与成文一致 | T-05＋T-06＋T-07 的词汇统计逐词相等 | TODO |
-| AC-05 | `checkpoint.md` 有唯一权威落点、有模板、且有强制点（缺失会红） | T-06 的变异对照 | TODO |
+| AC-04 | CHG／里程碑状态词汇只剩一套，且**实测在用的每个词都被定义**；脚本接受集与成文一致 | T-05＋T-06＋T-07 的词汇统计逐词相等 | TODO（T-05 成文、T-06 接受集已收口；T-07 后逐词复算） |
+| AC-05 | `checkpoint.md` 有唯一权威落点、有模板、且有强制点（缺失会红） | T-06 的变异对照 | **PASS**（落点＝`AGENT-INDEX.md` §8／§9；模板＝`templates/delivery/checkpoint.md`；强制点＝`verify_delivery_governance.py`，失红并经活树阳性对照） |
 | AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的 grep 改前 ≥3／改后 0 | TODO |
 | AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`（含阳性对照） | TODO |
 | AC-08 | ADR-0015 与 ADR-0017 不再对 FFmpeg 归属给出相反答案；全仓该归属只有 Cloud 一个结论 | T-08 的复扫（含阳性对照） | TODO |
@@ -254,7 +268,8 @@ Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期�
 - `evidence/task-03-conventions-slim.md`
 - `evidence/task-04-reading-order-single-landing.md`
 - `evidence/task-05-status-vocab.md`
-- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-gate-readings.out`）
+- `evidence/task-06-script-template-checkpoint.md`
+- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
 **开工三仓基线**（T-01 记录，收尾按同一命令复测）：
@@ -300,3 +315,5 @@ $ git -C ../wt-media-desktop status --porcelain
 | 10 | `AGENT-INDEX.md` §4 作为读取顺序的**唯一**落点，**没有机检点**（`conventions` §9 耦表已如实登记「入口文件与 `MASTER` 不得再列清单」靠人工复核） | T-04 把落点降下来了，但「唯一」目前只由本 CHG 的一次性扫描证明。为它新增机检点会把 §4 的条目文本冻成契约（措辞一变就红），与 CHG-063 的判据分层结论相悖，须独立裁定 |
 | 11 | 里程碑文件头的状态写法四种并存：`- Milestone status:`（M4／M5）、散文（M2）、`> 实施状态：`（M3）、`- 状态：**已完成**`（M-launch-engineering） | T-05 只成文**词表**、不统一**写法**：为四种既有格式新增一致性判据会把它们冻成契约，与 §5 Explicitly Not Doing 的既有声明相悖。现状如实登记在 `MASTER` §3 表下 |
 | 12 | `CHG-044`／`CHG-052` 归档写的 `HANDOFF` 是否改判 `DONE` | 该裁定已由 `LEDGER.md:31` 专段登记并写明「属治理口径决定，本次不动」。T-05 只把 `HANDOFF` 列为退役词，不回改归档记录 |
+| 13 | **任务表**状态词（`TODO`／`DONE`）无门禁、无成文词表 | 它是与 CHG 状态**不同的轴**（T-06 已把 `MASTER` §3 的措辞限定到 CHG 轴）。为任务表新增判据会把 `templates/delivery/change.md:76` 的那一列文本冻成契约，属「补落点」，须独立裁定 |
+| 14 | 58 篇记录里 **9 篇**的状态行带注（`（…）`／`(…)`／`**WORD（…）**`）；机器现已能读，但「状态行该不该带注」**无成文规则** | T-06 把脚本改成先剥注再判（不剥就会读成 `None`，`CHG-20260923-059` 实例），**属把已有的书写习惯接住，不是给它立规**；立规会与「就地覆盖、不追加注记」的用户政策相互牵扯，须用户裁定 |

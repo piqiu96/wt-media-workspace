@@ -18,16 +18,17 @@
 
 - **T-05 状态词汇成文**：`MASTER` §3 由「两套词 ＋ 状态定义表」就地覆盖为 `### 状态词汇`——CHG 六词（`DISCUSSION`／`PLANNED`／`IMPLEMENTING`／`VERIFYING`／`DONE`／`SUPERSEDED`）与里程碑四词，读数列逐词给分母（活 20 篇／归档 38 篇／里程碑 6 篇）。**改前的实况是两套都不准**：`TODO`／`IMPLEMENTED`／状态值 `VERIFIED` **零记录使用**，而真在用的 `DISCUSSION`（7）／`PLANNED`（3）／`SUPERSEDED`（8）在文档里**无定义**；校验脚本的接受集与文档词表**交集为零**。阳性对照：同一扫描对 `CLOSED`／`HANDOFF` 各报 2。`MASTER` §6 的 `### CHG 门禁 — CLOSED` 及 `:289`／`:336` 两处一并改 `DONE`（`CLOSED` 退役后 §6 是它的第二落点）。实施中词取 `IMPLEMENTING`（模板／夹具／脚本接受集／056～064 全链在用），退 `IN_PROGRESS`（仅旧归档 4 处 ＋ 1 篇 `planned`），里程碑层不变——依据记在 evidence §3。
 
+- **T-06 脚本／模板与 `checkpoint.md` 落点对齐**：**「active 目录必须有 `checkpoint.md`」这条规则早已写在 `AGENT-INDEX.md` §8、却无人执行**——`git grep -i checkpoint -- scripts tests` 命中 **0** 个文件（阳性对照 `change.md` 9 个）。新增结构检查（`verify_delivery_governance.py`），**变异对照**：`if not (…)` 改 `if False and not (…)` → 新用例复红、其余 4 条仍绿；**活树阳性对照**：把本 CHG 的 `checkpoint.md` 改名 → 真门禁 `exit=1` 报 `active CHG is missing checkpoint.md: CHG-20260925-064`，还原后 `sha256` 相同。接受集由 `{IN_PROGRESS, IMPLEMENTING, VERIFYING, ACTIVE}` 收为 **`{IMPLEMENTING, VERIFYING}`**（记录落在 `active/` 即意味着在执行；`DISCUSSION`／`PLANNED` 属 `planned/`，`DONE`／`SUPERSEDED` 是终态），加 6 非法词 × 2 合法词的用例，`HEAD` 版上 **6/6 非法 subTest 全红**（其中 `IN_PROGRESS`／`ACTIVE` 是被旧集**收下**）。**实测另发现一处既有误诊**：`:288` 的 `(\S+)\s*$` 要求状态行恰好只是那个词，58 篇里 **9 篇**带注 ⇒ `status=None`；`CHG-20260923-059` active 期正是带注形式，它自己的门禁输出里留着 `… got None`——**点了一个该记录从未有过的状态**。抽出 `status_word()` 先剥 `**`／`（…）`／`(…)`，新用例的红**是行为性的**（在测试里复现出 059 那条报文）。附带的收紧：剥注后 LEDGER 表行比对由**被跳过**变为**真的执行**。新增 `templates/delivery/checkpoint.md`、`change.md` §12 改指针、skill `:95` 与 `AGENT-INDEX.md:141` 点名 `checkpoint.md`、`sync_skills.py` 重生成并 `check` 通过、`conventions` §9 加两行耦合。**一次自我更正**：带注用例初稿同时断言 `status_word()`，红成了 `AttributeError`（**这种红什么都证明不了**），已拆成两个用例；夹具也修过一处（初版把带注串写进了 LEDGER 值）。
+
 ## Current
 
-- T-05 已落。下一个是 T-06（脚本／模板／checkpoint 落点对齐）。
+- T-06 已落。下一个是 T-07（`planned/` 记录状态词就地改写）。
 
 ## Next
 
-1. **T-06**：`verify_product_master_alignment.py:290` 接受集与 `:292` 文案、`templates/delivery/change.md:6` 与 §12、**新增 `templates/delivery/checkpoint.md`**、skill 措辞、**新增「active 目录必须有 `checkpoint.md`」结构检查（带变异对照）**——须在本 CHG 仍 active 时复测（改接受集会打到自己的 LEDGER 表行）。
-2. **T-07**：`delivery/planned/*` 的 `Status:` 行就地改写（`023` 的 `IN_PROGRESS` 与 `034` 的 `> 状态：` 形式是主的两个待处置项）。
-3. **T-08／T-09／T-10／T-11**（相互独立，可换序）：FFmpeg 归属／里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
-4. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描。
+1. **T-07**：`delivery/planned/*` 的 `Status:` 行就地改写（`023` 的 `IN_PROGRESS` 与 `034` 的 `> 状态：` 形式是两个待处置项），`planned/README.md` 的状态列散文一并处置。
+2. **T-08／T-09／T-10／T-11**（相互独立，可换序）：FFmpeg 归属／里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
+3. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描。
 
 ## Blocked
 
@@ -43,12 +44,15 @@
 | `verify_m0_config.py` | `exit=0` |
 | `verify_product_master_alignment.py` | `exit=0` |
 | `verify_m2_acceptance.py` | `exit=0` |
-| `python3 -m unittest discover -s tests -q` | `Ran 75 tests` / `OK`，`exit=0` |
+| `python3 -m unittest discover -s tests -q` | `Ran 79 tests` / `OK`，`exit=0`（T-05 收盘为 75；T-06 新增 4） |
+| `sync_skills.py check` | `skill outputs are up to date`，`exit=0`（`sync` 之后复测；三仓 `git status` 逐字未变） |
 | 退役流水线串 `TODO → IMPLEMENTED`（活文件，排除本 CHG 自身记录） | 0 命中 |
 | 三仓工作区基线（AC-15） | `cloud` `?? dump.rdb`；`agent`、`desktop` 空——与 T-01 基线逐条一致 |
 
 | 词汇对账（逐文件提取，可复算） | 活 20 篇 `{IN_PROGRESS:1, PLANNED:3, SUPERSEDED:8, DISCUSSION:7, IMPLEMENTING:1}`；归档 38 篇 `{DONE:28, IN_PROGRESS:4, HANDOFF:2, CLOSED:2, VERIFYING:1, IMPLEMENTING:1}`——两列求和等于分母 |
+| 带注状态行（T-06 新量，分母 58 篇 `change.md`） | **9 篇**用旧正则（`(\S+)\s*$`）匹配不上 ⇒ 旧代码把它们的 `status` 读成 `None`；新 `status_word()` 全部读出词 |
+| 现在解析 `checkpoint.md` 的门禁（分母 `scripts/` ＋ `tests/`） | 2 个文件：`scripts/verify_delivery_governance.py`、`tests/test_verify_delivery_governance.py`（T-06 之前是 0 个） |
 
-取数时间 2026-09-25 19:51:00 CST（T-05 最后一次内容改动之后），原始输出 `evidence/artifacts/t05-gate-readings.out`；逐条明细见 `evidence/task-05-status-vocab.md`。
+取数时间 **2026-09-25 19:57:36 CST**（T-06 的最后一次改动之后），原始输出 `evidence/artifacts/t06-gate-readings.out`（该文件内含**两遍**读数：19:56:25 的初遍与 19:57:36 的关闭遍——初遍记在本记录更新**之前**，而本记录本身被门禁读，故不作关闭值）；逐条明细见 `evidence/task-06-script-template-checkpoint.md`。
 
-该组读数之后本文件又改动过一次。**这不影响它成立**，且此判断是证过的：`git grep -l 'checkpoint' -- scripts tests` 命中 **0** 个文件（同一扫描对 `change.md` 命中 9 个，构成阳性对照）⇒ 没有任何门禁解析 `checkpoint.md`。这也正是 T-06 要补的那条结构检查所针对的缺口。
+上一版读数（19:51，`t05-gate-readings.out`）已被**覆盖**：T-06 改了脚本与测试，那些数字不再是关闭值。当时用来豁免它的那条理由——`git grep -l 'checkpoint' -- scripts tests` 命中 0 个文件 ⇒ 没有门禁解析 `checkpoint.md`——恰是 T-06 补掉的那个缺口；现在同一扫描命中 `scripts/verify_delivery_governance.py` 与 `tests/test_verify_delivery_governance.py`。

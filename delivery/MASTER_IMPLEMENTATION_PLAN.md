@@ -129,7 +129,7 @@ wt-media-workspace/
 
 里程碑文件内部的子项状态（如 M2-D 的 `DEFERRED`）不是里程碑状态词，不占上表，只在其所属里程碑文件内自述。
 
-**历史词汇**（不再取用；归档记录与 `planned` 记录保持原样，不回改）：`TODO`、`IMPLEMENTED` 与作为状态值的 `VERIFIED` 在 58 篇记录中**零处使用**——它们只在本文档的旧版本里被列出过。`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 1 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处，只在 `scripts/verify_product_master_alignment.py` 的接受集里）为已退役写法。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
+**历史词汇**（不再取用；归档记录与 `planned` 记录保持原样，不回改）：作为 **CHG 状态值**的 `TODO`、`IMPLEMENTED` 与 `VERIFIED` 在 58 篇记录中**零处使用**——它们只在本文档的旧版本里被列出过。（`TODO` 在**任务表**的状态列仍是合法值，那是另一个轴，见 §8 的任务表。）`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 1 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处）为已退役写法。落到 `delivery/active/` 的记录只有一个合法状态：`IMPLEMENTING`（实施中）或 `VERIFYING`（待验收）——由 `scripts/verify_product_master_alignment.py::validate_active_change` 强制。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
 
 里程碑不能因为代码目录已经存在而标记为 `DONE`。必须逐项核验代码、自动测试、Contract、Evidence、人工验证、跨仓库集成、Git 提交和退出条件。
 

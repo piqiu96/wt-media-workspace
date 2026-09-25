@@ -44,7 +44,7 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
             "# Delivery Ledger\n\n"
             "| Change | Title | Status | Current Repository |\n"
             "|---|---|---|---|\n"
-            f"| {change_id} | Test | IN_PROGRESS | wt-media-workspace |\n",
+            f"| {change_id} | Test | IMPLEMENTING | wt-media-workspace |\n",
             encoding="utf-8",
         )
 
@@ -55,8 +55,15 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
         path.write_text(
             f"# {change_id}: Test\n\n"
             "- Level: M\n"
-            "- Status: IN_PROGRESS\n"
+            "- Status: IMPLEMENTING\n"
             f"{milestone_line}",
+            encoding="utf-8",
+        )
+        # The active directory holds a pair: `change.md` is the plan, and
+        # `checkpoint.md` is where progress is recorded.  A CHG that has only
+        # the first is an active change nobody can resume.
+        (path.parent / "checkpoint.md").write_text(
+            f"# Checkpoint: {change_id}\n\nCompleted:\n- None.\n",
             encoding="utf-8",
         )
 
@@ -115,7 +122,7 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
             "# Delivery Ledger\n\n"
             "| Change | Title | Status | Current Repository |\n"
             "|---|---|---|---|\n"
-            f"| {change_id} | Test | IN_PROGRESS | wt-media-workspace |\n"
+            f"| {change_id} | Test | IMPLEMENTING | wt-media-workspace |\n"
             "\nEarlier scope was folded into CHG-20260715-010, which is no longer active.\n",
             encoding="utf-8",
         )
@@ -123,6 +130,28 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
         errors = self.module.validate_delivery_governance(self.workspace)
 
         self.assertEqual(errors, [])
+
+    def test_active_change_without_checkpoint_is_reported(self) -> None:
+        """An active CHG directory holds a pair; only half of it is an error.
+
+        The check is turned off in the mutation control: with the check
+        removed from the script, this test fails, which is what makes it
+        evidence that the check exists rather than that the fixture is tidy.
+        """
+        change_id = "CHG-20260722-021"
+        milestone = "delivery/milestones/M2-account-runtime.md#m2-b"
+        self.write_context(change_id)
+        self.write_ledger(change_id)
+        self.write_active_change(change_id, milestone)
+        (self.workspace / "delivery" / "milestones" / "M2-account-runtime.md").write_text(
+            "# M2\n\n## M2-B\n",
+            encoding="utf-8",
+        )
+        (self.workspace / "delivery" / "active" / change_id / "checkpoint.md").unlink()
+
+        errors = self.module.validate_delivery_governance(self.workspace)
+
+        self.assertEqual(errors, [f"active CHG is missing checkpoint.md: {change_id}"])
 
 
 if __name__ == "__main__":

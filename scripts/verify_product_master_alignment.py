@@ -267,6 +267,31 @@ def validate_contract_texts(human: str, machine: str) -> list[str]:
     return errors
 
 
+STATUS_LINE_RE = re.compile(
+    r"^(?:- Status:|> 状态[：:])\s*(.+?)\s*$", flags=re.MULTILINE
+)
+
+
+def status_word(change_text: str) -> str | None:
+    """The bare status word of a `change.md`, with any annotation stripped.
+
+    Records habitually annotate the word — `- Status: IMPLEMENTING（2026-09-25
+    由 ... 激活）`, `- Status: **SUPERSEDED（...）**`. The annotation is a
+    note about the word, not part of it. A regex that demands the word alone
+    does not merely reject those records: it fails to match at all, so the
+    status reads as `None`. CHG-20260923-059 hit exactly that — it was
+    legitimately active, and its own gate output carried
+    `active CHG status must be ... got None` (`evidence/task-08-gate.out`),
+    which names a status the record never had. Strip first, then judge.
+    """
+    match = STATUS_LINE_RE.search(change_text)
+    if not match:
+        return None
+    word = match.group(1).strip().strip("*").strip()
+    word = re.sub(r"[（(].*$", "", word).strip()
+    return word or None
+
+
 def validate_active_change(root: Path) -> list[str]:
     errors: list[str] = []
     active_paths = sorted((root / "delivery" / "active").glob("*/change.md"))
@@ -279,17 +304,23 @@ def validate_active_change(root: Path) -> list[str]:
 
     active_change = active_ids[0]
     change_text = active_paths[0].read_text(encoding="utf-8")
-    # Canonical change.md records use a blockquote header (`# CHG-xxx：标题`,
-    # `> 状态：ACTIVE`, `> 当前仓库：`); accept both that form and the dash form.
+    # Canonical change.md records use the dash form (`- Status:`, `- Current
+    # repository:`); older records use a blockquote header (`> 状态：`,
+    # `> 当前仓库：`).  Accept both.  The status word itself must be one the
+    # vocabulary in `MASTER_IMPLEMENTATION_PLAN.md` §3 defines.
     title_match = re.search(rf"^# {re.escape(active_change)}[：:] ?(.+)$", change_text, flags=re.MULTILINE)
     title = title_match.group(1) if title_match else None
-    status_match = re.search(r"^(?:- Status:|> 状态[：:])\s*(\S+)\s*$", change_text, flags=re.MULTILINE)
-    status = status_match.group(1) if status_match else None
+    status = status_word(change_text)
     repo_match = re.search(r"^(?:- Current repository:|> 当前仓库[：:])\s*`([^`]+)`\s*$", change_text, flags=re.MULTILINE)
     current_repository = repo_match.group(1) if repo_match else None
-    if status not in {"IN_PROGRESS", "IMPLEMENTING", "VERIFYING", "ACTIVE"}:
+    # A CHG sits in `delivery/active/` only while it is being executed, so only
+    # the two non-terminal execution words are legal here.  `DISCUSSION` and
+    # `PLANNED` are pre-activation states (their home is `delivery/planned/`),
+    # and `DONE` / `SUPERSEDED` are terminal — accepting any of them would
+    # accept exactly the state §3 forbids.
+    if status not in {"IMPLEMENTING", "VERIFYING"}:
         errors.append(
-            "active CHG status must be IN_PROGRESS, IMPLEMENTING or VERIFYING, "
+            "active CHG status must be IMPLEMENTING or VERIFYING, "
             f"got {status!r}"
         )
     if not title:

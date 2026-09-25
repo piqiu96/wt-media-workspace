@@ -100,6 +100,8 @@
 | 规范正文归口 | `wt-media-workspace/AGENT-INDEX.md` | 无强制（`verify_agent_entry.py` 只强制入口文件存在性） | 改治理规范只改 `AGENT-INDEX.md`；`AGENTS.md` / `CLAUDE.md` 只保留指针，指针漂移靠人工复核 |
 | 入口文件平级 | 各仓 `AGENTS.md` / `CLAUDE.md` | 无强制 | `verify_agent_entry.py` 的漂移检查产出 WARN 供人工复核 |
 | 读取顺序 | `AGENT-INDEX.md` §4 | `prepare_ai_workspace.py::build_context` 的 `reading_order` 常量（生成物镜像）；`AGENTS.md`／`CLAUDE.md`／`MASTER` §5 只留指针 | 改 §4 必须同步该常量并重生成快照；反之亦然。入口文件与 `MASTER` **不得**再列清单 |
+| active 记录成对 | `AGENT-INDEX.md` §8「至少包含 `change.md` 与 `checkpoint.md`」 | `verify_delivery_governance.py::validate_delivery_governance`（active 目录缺 `checkpoint.md` 即报错）；`templates/delivery/checkpoint.md`；`skills/workspace/executing-wt-media-change/SKILL.md` 的 Checkpoints 节 | 改「active 目录至少包含哪些文件」必须同步该检查与模板；checkpoint 的内容**只写 `checkpoint.md`**，不得回写进 `change.md` §12 |
+| CHG 状态词 | `MASTER` §3「状态词汇」 | `verify_product_master_alignment.py::validate_active_change` 的接受集 `{IMPLEMENTING, VERIFYING}` 与 `:292` 文案；`templates/delivery/change.md` 的 `- Status:` | 改 §3 中**可处于 `delivery/active/`** 的词必须同步该接受集；该接受集只收这两个词，`DISCUSSION`／`PLANNED` 属 `planned/`，`DONE`／`SUPERSEDED` 是终态 |
 | skill 单一源 | `skills/<group>/<name>/SKILL.md` | `sync_skills.py` 分发到 `skills-distribution.yaml` 的 targets | `sync_skills.py check` / `diff`；分组认领由 `verify_agent_entry.py::check_group_coverage` 兜住 |
 | 快照由脚本生成 | `prepare_ai_workspace.py` | `planning-wt-media-delivery` skill 第 7 步 | 两者措辞需同时更新 |
 

@@ -138,7 +138,7 @@
 ## 9. 变更规则与完成检查
 
 - 只有记录在 Delivery 或 Decision 中的确认内容可以驱动代码修改。
-- 结束开发任务前必须更新 checkpoint，记录：已完成、未完成、阻塞、下一步。
+- 结束开发任务前必须更新 `checkpoint.md`（不是 `change.md`），记录：已完成、未完成、阻塞、下一步。
 - **提交纪律**（治理仓与三个工程仓一律适用）：
   - 提交信息用 Conventional Commits：`<type>(<scope>): <subject>`，例如 `docs(chg-064): T-03 …`。
   - **纯移动／重命名与改逻辑不放进同一个 commit**——混在一起 diff 不可审，review 只能看出「文件全变了」。

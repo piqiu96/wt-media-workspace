@@ -37,7 +37,7 @@ Runtime code lives in `../wt-media-cloud`, `../wt-media-agent`, and `../wt-media
 - `skills`: single source for Codex and Claude skills.
 - `config`: skill distribution, contract map, and release matrix.
 - `scripts`: workspace preparation and validation scripts.
-- `templates/delivery`: CHG and evidence record templates.
+- `templates/delivery`: CHG, checkpoint, and evidence record templates.
 
 ## Rules
 
