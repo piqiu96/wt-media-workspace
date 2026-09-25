@@ -1,0 +1,26 @@
+# 
+# 守卫还原为修复前形状后重跑同一条用例（T-02 的「先红」读数）
+
+     Running unittests src/main.rs (target/debug/deps/wt_media_desktop_shell-dcf3ade0930350a0)
+
+running 1 test
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已在运行，忽略本次启动请求
+test commands::agent::tests::a_start_after_the_agent_died_does_not_answer_already_running ... FAILED
+
+failures:
+
+---- commands::agent::tests::a_start_after_the_agent_died_does_not_answer_already_running stdout ----
+
+thread 'commands::agent::tests::a_start_after_the_agent_died_does_not_answer_already_running' (1078350) panicked at src-tauri/src/commands/agent.rs:865:9:
+assertion `left != right` failed: the slot holds a handle, not an Agent: Ok("already_running")
+  left: Ok("already_running")
+ right: Ok("already_running")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    commands::agent::tests::a_start_after_the_agent_died_does_not_answer_already_running
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 350 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `--bin wt-media-desktop-shell`

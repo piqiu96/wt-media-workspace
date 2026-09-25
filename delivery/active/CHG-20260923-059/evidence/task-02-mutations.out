@@ -1,0 +1,10 @@
+M1 丢掉陈句柄但不丢弃（留在槽里）: 变异前 a_start_after_the_agent_died_does_not_answer_already_running 绿 → 变异后 红 —— 打掉 ✓
+M2 探针永远说「有人应答」: 变异前 a_start_after_the_agent_died_does_not_answer_already_running 绿 → 变异后 红 —— 打掉 ✓
+M3 探针永远说「没人应答」: 变异前 an_agent_that_answers_is_left_alone 绿 → 变异后 红 —— 打掉 ✓
+M4 空槽也去问一次（丢掉先读槽位这一步）: 变异前 a_vacant_slot_is_decided_without_asking 绿 → 变异后 红 —— 打掉 ✓
+M5 陈句柄当成「在运行」: 变异前 a_start_after_the_agent_died_does_not_answer_already_running 绿 → 变异后 红 —— 打掉 ✓
+M6 丢弃时不清会话: 变异前 a_stale_handle_is_recorded_dropped_and_released_with_its_session 绿 → 变异后 红 —— 打掉 ✓
+M7 丢弃时只读不取（句柄留在槽里）: 变异前 a_stale_handle_is_recorded_dropped_and_released_with_its_session 绿 → 变异后 红 —— 打掉 ✓
+M8 丢弃时不写那条记录: 变异前 a_stale_handle_is_recorded_dropped_and_released_with_its_session 绿 → 变异后 红 —— 打掉 ✓
+已还原原始实现。
+全部 8 个变异都被它们各自的用例打掉。

@@ -81,10 +81,18 @@
   但 **`git grep -n timeout -- src-tauri/src/sidecar/` 命中 0**——`sidecar/` 里没有任何地方用它。
   **它是死配置**：写得出来、验得过、没人用。
 
-### 4.2 实例身份：`already_running` 看的是**记录**，不是**活性**
+### 4.2 实例身份：`already_running` 看的是**手里的句柄**，不是**对方还在不在**
 
-- 判定在 `commands/agent.rs:171-172`：`if session.current().is_some() { return "already_running" }`
-  ——读的是托管状态里记着的会话 id。
+（本节在 T-01 收尾时回改过一处措辞：激活时我把它写成「读的是托管状态里记着的会话 id」，
+与代码不符。判定读的一直是 `AgentProcess` 槽里的 `CommandChild` 句柄；**缺陷结论不变**，
+但机制说错了就会把后来人引到错的修法上，故按 `f1d1fba^:src-tauri/src/commands/agent.rs:163-168`
+的原文改回如下。）
+
+- 判定在 `commands/agent.rs:275`（T-01 之前是 `:163-168`）：读 `AgentProcess.0` 锁住后
+  `.is_some()`——**槽里有没有一个 `CommandChild` 句柄**。有就 `return Ok("already_running")`。
+- 关键在**这个句柄不会因为进程退出而消失**：`CommandChild` 是 spawn 的返回值，
+  子进程自己死掉时没有任何人把它从 `state.rs` 的 `AgentProcess(Mutex<Option<CommandChild>>)` 里取走。
+  ⇒ 判定问的是「**我还记着一个句柄吗**」，而不是「**那个 Agent 还活着吗**」。
 - `already_running()`（`commands/agent.rs:63`）本身只是**一条日志函数**，不参与判定。
 - ⇒ CHG-057 登记的实缺陷**今天仍然成立**（`CHG-20260923-057/checkpoint.md:55`、`:358-359` 原文）：
   「**`already_running` 在 sidecar 自己死掉之后仍会说「已在运行」**（托管状态里的 `CommandChild`
@@ -209,7 +217,7 @@
 | # | 决定 | 依据 |
 |---|---|---|
 | D-01 | **就绪用两段式闸门**：第一信号是 Agent 在 `bind`+`listen` 之后打印的 readiness 行（`server.py:624→627→629` 的顺序使它可靠），第二信号是健康检查**真的应答**。`start_timeout_ms` 从死配置变成这道闸门的超时。**不发明新协议**——复用 Agent 已经打印的东西。 | 用户裁定「尽量使用开源，尽可能不改轮子」；4.1 实测「宣告存在但无人听」+「超时键无人读」 |
-| D-02 | **实例身份改成活性探针**：判定不再读托管状态里的会话 id，而是真的问一次；sidecar 已死 ⇒ 如实报「未在运行」并允许重启。 | CHG-057 已登记的实缺陷（4.2） |
+| D-02 | **实例身份改成活性探针**：判定不再只看受管槽位里那个 `CommandChild` 句柄，而是**非空时才真的问一次** `/healthz`；句柄在而 Agent 不应答 ⇒ 如实报「未在运行」、丢弃句柄并允许重启。**槽位为空时一次请求都不发**——那个端口上可能是开发机上别人的 Agent。 | CHG-057 已登记的实缺陷（4.2） |
 | D-03 | **退出请停而非硬杀**：SIGTERM → 宽限窗口（在飞任务收尾）→ 必要时强杀；Desktop 经 `RunEvent::Exit` 触发。**退出报告要能区分「请停后自己退出」与「被强杀」**。 | 成功事实 #8 与失败行为「升级或清理删除业务数据」；4.3 实测一路硬杀 |
 | D-04 | **完整性校验放在启动前**，读 `sidecar-manifest.json` 验 sha256；**失败拒绝启动并说清原因**。**复用已有的 `sha2` 直接依赖，不新增依赖**。 | 成功事实 #7；4.4 实测「记录齐全、运行期零校验」+「`sha2` 已在」 |
 | D-05 | **`config_online/` 整目录替换进产物**，验收 `diff -r` 无差异。**不携带凭证**（CHG-056 D-07：凭证只走环境变量）⇒ **发布校验不得依赖该通路**。 | 吸收项验收判据；4.5 实测产物无 Agent 配置 |
@@ -218,6 +226,7 @@
 | D-08 | **Q-01 按用户 2026-09-25 裁定关闭**：生产 Cloud 地址**就是本机 `http://127.0.0.1:18080`**。两份出货配置的**值与 CSP 一个字都不改**（`wt-media-agent/config_online/agent.toml:22`、`src-tauri/resources/desktop.production.toml:24`、`csp_connect_src` `:35`）。**要改的是注释**：`agent.toml:17-21` 那段仍写着 Q-01「still open … Resolve before release」，它已成**过期陈述**，由 T-10 回写为「已裁定：保持回环」。**改注释不算改配置**——留一句「还没定」才是真错。 | 用户 2026-09-25 裁定「就按本机 18080 定稿」 |
 | D-09 | **「干净机」安装验收按用户 2026-09-25 裁定登记为未做**：本机是开发机，装了 Python/Node/Rust 与 `.local/` 开发树，装一次证不了「没有 Python 的机器」。`release-matrix` 的 `0.2.5` **status 不改**，D 的 DONE Gate **带一条登记过的例外**，不以文字充当证据。 | 用户 2026-09-25 裁定「登记为未做，不宣布发布验证通过」；skill 的 Stop Condition「实机验收需要未提供的权限/资源」 |
 | D-10 | **Agent 侧不改轮转与保留**：C 已定型的「有意不对称」（Desktop 由 `file-rotate` 按天删、Agent 由 `LogBudget` 按天删）在本 CHG **原样保留**。D 只动退出路径上写入者的生命周期。 | C 的 §6；避免在 D 内重开已关闭的口径 |
+| D-11 | **同一个 401，两道判定给出相反的处置**：T-01 的就绪闸门里 401 **致命**（凭据对不上 = 用不了，等待改不了一份凭据）；T-02 的活性探针里 401 **算活着**（谁在不在与人认不认我们是两个问题，把 401 当「没人应答」会去 `kill` 一个活着的进程）。两条都由同一次实测（`/healthz` 在 `_check_auth` 之后）推出，**不能合并成一条规则**。 | §4.1 实测；两处判定的问题不同，见 `evidence/task-02-identity.md` §3 |
 
 ## 7. Pending Questions
 
@@ -235,7 +244,7 @@
 | Task | 内容 | 仓 | 状态 | 判据 |
 |---|---|---|---|---|
 | T-01 | **就绪闸门**：解析 Agent 的 readiness 行作为第一信号，健康检查应答作为第二信号；`start_timeout_ms` 变成真超时且**真的会超时** | desktop + agent | **DONE** | 「打印了但不应答」与「不应答且不打印」两种形态各有用例；超时按配置值生效；变异打掉自己。**加一臂**：401（令牌漂移）致命且不等待——依据是 `/healthz` 在 `_check_auth` 之后（§4.1 实测补记） |
-| T-02 | **活性探针**：`already_running` 的判定改为问一次；sidecar 死后如实报「未在运行」并允许重启 | desktop | TODO | 先有一条**能红的**用例复现 CHG-057 登记的缺陷（杀掉 sidecar 后仍说已在运行）；修复后同一条转绿 |
+| T-02 | **活性探针**：`already_running` 的判定改为问一次；sidecar 死后如实报「未在运行」并允许重启 | desktop | **DONE** | 先有一条**能红的**用例复现 CHG-057 登记的缺陷（杀掉 sidecar 后仍说已在运行）；修复后同一条转绿。变异 **8/8**；第一轮曾 6/8，两个存活变异各查出一处真洞（详见 `evidence/task-02-identity.md` §4.1） |
 | T-03 | **退出收尾**：Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与在飞任务收尾 | desktop + agent | TODO | 真机上「请停后自己退出」与「宽限超时被强杀」两条读数；退出报告能区分二者 |
 | T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | TODO | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖** |
 | T-05 | **`config_online → 产物/config`**：打包步骤 + `bundle.resources` 补 Agent 配置 + `diff -r` 校验 | desktop + agent | TODO | 产物内配置与 `config_online/` `diff -r` 无差异；**产物里不含凭证**（D-05） |
@@ -262,7 +271,8 @@
 ### wt-media-desktop
 
 - [ ] `src-tauri/src/sidecar/`：就绪闸门（T-01）、退出收尾（T-03）、完整性校验（T-04）
-- [ ] `src-tauri/src/commands/agent.rs`：活性探针（T-02）
+- [x] `src-tauri/src/commands/agent.rs`：活性探针（T-02）——`c54025a` 生产修复 + 4 条用例；
+      `15951a4` 的 `tauri` `test` feature dev-dependency 与 `R: Runtime` 泛化是它的前置
 - [ ] `src-tauri/tauri.conf.json`：`bundle.resources` 补 Agent 配置（T-05）
 - [ ] `scripts/package-release-macos.sh`：相等性判定（T-04 的打包侧一半）与版本兼容校验（T-06）
 - [ ] 五类版本中的 Desktop 与前端构建版本来源（T-06）
@@ -272,7 +282,7 @@
 | AC | 内容 | 判据 | 状态 |
 |---|---|---|---|
 | AC-01 | 就绪是确认过的：readiness 行 + 健康应答；超时真的会超时 | 两种失败形态各一条用例 + 真机读数 | TODO（T-01） |
-| AC-02 | 不会连上旧进程：sidecar 死后如实报「未在运行」 | 先红后绿的复现用例 + 真机读数 | TODO（T-02） |
+| AC-02 | 不会连上旧进程：sidecar 死后如实报「未在运行」 | 先红后绿的复现用例 + 真机读数 | **一半**（T-02）：先红后绿已成立（`evidence/task-02-red.out` / `task-02-green.out`，真 `CommandChild` + 真无人听的端口）；**真机读数未做**，按 T-02 证据 §7 第 1 条登记，不以文字充当证据 |
 | AC-03 | 退出是收尾过的：请停 → 宽限 → 强杀；报告能区分 | 真机两条读数 | TODO（T-03） |
 | AC-04 | 随包 sidecar 被验过：篡改必拒、完好必过 | 阳性对照 + 阴性对照各一条 | TODO（T-04） |
 | AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | TODO（T-05） |
@@ -287,7 +297,10 @@
 
 - `evidence/task-01-readiness.md`——就绪闸门：两种失败形态、超时读数、变异表。**已产出**，
   另附原始转录 `evidence/agent-probe.out`（真机起 Agent）与 `evidence/agent-probe-phases.out`（两段式探针）
-- `evidence/task-02-identity.md`——**先红**的复现（CHG-057 登记的缺陷）与修复后的绿
+- `evidence/task-02-identity.md`——**先红**的复现（CHG-057 登记的缺陷）与修复后的绿。**已产出**，
+  另附原始转录 `evidence/task-02-red.out`（守卫还原成修复前形状后同一条用例转红）、
+  `evidence/task-02-green.out`（修复后该过滤器下 16 passed）、
+  `evidence/task-02-mutations.out`（8/8 变异表）
 - `evidence/task-03-exit.md`——请停/宽限/强杀三条真机读数与退出报告形状
 - `evidence/task-04-integrity.md`——篡改必拒 / 完好必过 / 打包侧相等性判定
 - `evidence/task-05-shipped-config.md`——`diff -r` 输出、产物树、凭据扫描（带阳性对照与分母）
@@ -307,8 +320,13 @@
     变异 **8/8** 打掉自己的用例；真机臂是**本 crate 的 `gate` 对上真实的 Agent 进程**
     （`--ignored real_agent` 通过，并用阳性对照证明它真的读到了真机那一行）。
     详见 `evidence/task-01-readiness.md`。
-- **Current**：T-02 活性探针——尚未开工。
-- **Next**：T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
+  - **T-02 活性探针**（desktop）。344→**348** passed / 0 failed（ignored 仍 3）；警告 7→**7**；
+    变异 **8/8**（第一轮 6/8，两个存活变异各查出一处真洞：一条断言在说自己证明不了的事、
+    一条变异被错派给看不见它的用例——两处都已改，不是调断言了事）；
+    先红读数见 `evidence/task-02-red.out`。**AC-02 只算一半**：真机读数未做，按 D-09 的登记方式
+    如实标注。详见 `evidence/task-02-identity.md`。
+- **Current**：T-03 退出收尾——尚未开工。
+- **Next**：T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
 - **Blocked**：无。Q-04（「组件与资源版本」的口径）在 **T-06 内部**待定，若定不下则退回用户。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
   Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。

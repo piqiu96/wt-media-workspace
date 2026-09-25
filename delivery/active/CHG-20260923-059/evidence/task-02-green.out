@@ -1,0 +1,56 @@
+#  —— 修复后（T-02 的绿）
+
+     Running unittests src/main.rs (target/debug/deps/wt_media_desktop_shell-dcf3ade0930350a0)
+
+running 16 tests
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started）
+2026-09-24T10:11:12 [WARN] agent.supervisor: read error: unexpected eof
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: connection refused
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"}
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started） operation_id=session-one
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: connection refused
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 未在运行，忽略本次停止请求
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-one
+test commands::agent::tests::a_record_outside_a_session_has_no_id_field ... ok
+test commands::agent::tests::a_failure_with_no_output_is_the_message_alone ... ok
+test commands::agent::tests::a_failure_keeps_the_tail_out_of_the_record ... ok
+test commands::agent::tests::a_session_is_held_and_released_around_its_two_records ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 未在运行，忽略本次停止请求
+test commands::agent::tests::a_stop_with_nothing_running_is_recorded ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started） operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已就绪：wt-media-agent local API listening on 127.0.0.1:8765 operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已在运行，忽略本次启动请求 operation_id=session-one
+test commands::agent::tests::a_vacant_slot_is_decided_without_asking ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理 operation_id=session-one
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"} operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-one
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent stop failed: no such process operation_id=session-one
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"}
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: connection refused operation_id=session-one
+test commands::agent::tests::every_record_a_session_can_make_names_that_session ... ok
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: error sending request for url (http://127.0.0.1:58853/healthz)
+test commands::agent::tests::an_unreachable_agent_keeps_the_tail_out_of_the_record ... ok
+test commands::agent::tests::the_health_body_is_development_only ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started）
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已就绪：wt-media-agent local API listening on 127.0.0.1:8765
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已在运行，忽略本次启动请求
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 未在运行，忽略本次停止请求
+test commands::agent::tests::the_lifecycle_records_are_desktops_own_and_survive_production ... ok
+test commands::agent::tests::the_session_id_never_reaches_the_request ... ok
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"} operation_id=session-one
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"}
+test commands::agent::tests::a_health_check_reports_the_session_it_was_asked_in ... ok
+test commands::agent::tests::a_health_answer_is_returned_and_recorded ... ok
+test commands::agent::tests::an_agent_that_answers_is_left_alone ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理 operation_id=session-one
+test commands::agent::tests::a_stale_handle_is_recorded_dropped_and_released_with_its_session ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started） operation_id=7b109a6d-7eba-402e-a924-be8ab926bcdf
+2026-09-24T10:11:12 [WARN] agent.supervisor: Local Agent 在 300ms 内没有报告就绪；它没有打印监听行，可能未能启动或已退出。 operation_id=7b109a6d-7eba-402e-a924-be8ab926bcdf
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=7b109a6d-7eba-402e-a924-be8ab926bcdf
+test commands::agent::tests::a_start_after_the_agent_died_does_not_answer_already_running ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 335 filtered out; finished in 0.36s
+
