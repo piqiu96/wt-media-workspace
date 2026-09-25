@@ -148,7 +148,7 @@ None.
 | T-06 | 脚本／模板／checkpoint 落点对齐（接受集、文案、模板、新增结构检查） | DONE | 见 §8.4；六门禁 `exit=0` ＋ `Ran 79 tests`；**新判据两条均做变异对照**（失红后还原经 `cmp` 逐字节）；**在本 CHG 仍 active 时复测**（接受集正打在自己的 LEDGER 表行上） | T-05 |
 | T-07 | `planned` 记录状态词就地改写 | DONE | 见 §8.5；活记录 20 篇改前 19/20、改后 **20/20** 落在 §3 表内（阳性对照：同一脚本对归档仍报 8 处表外词）；023 的 diff 恰一行 | T-06 |
 | T-08 | FFmpeg 归属（ADR-0015 就地改写 ＋ 复扫发现的两处 skill 落点） | DONE | 见 §8.6；活文件里判给 Agent 的落点 **4 → 0**（20 条候选逐条判定）；扫描器阳性对照 9→10 且还原经 `sha256` 证明 | 独立 |
-| T-09 | 里程碑与交付事实（C6／B-3／N1） | TODO | 该 grep 改前 ≥3、改后 0；四处逐字一致 | 独立 |
+| T-09 | 里程碑与交付事实（C6／B-3／N1） | DONE | 见 §8.7；判据串在活文件（分母 174）改前 3 → 改后 **0**；三处改写与四处权威源在状态／签收／验收矩阵三项事实上无一处相反；**计划落点 `MASTER:158` 与实况不符**（那行本来就是 `DONE`，真正陈旧的是 `:162` 的拆分注），已如实登记 | 独立 |
 | T-10 | 目录树、死指针、执行根入口描述、外层 `docs` 指针 | TODO | `verifying/` 只余历史归档；树内条目逐条 `ls`；`根 \`AGENTS.md\`` → 0 | 独立 |
 | T-11 | 前端源码根 + 两篇视觉规范合并 | TODO | `wt-media-cloud/frontend` → 0；索引数与实际篇数一致；删除前逐节对照 | 独立 |
 | T-12 | 收尾：归档、LEDGER 同步、快照重生成、evidence 汇总 | TODO | 六门禁 + `unittest` 在**最后一次改动之后**重测；两遍失效指针扫描（各带阳性对照与分母） | 全部 |
@@ -251,6 +251,24 @@ None.
 
 细节见 `evidence/task-08-ffmpeg-ownership.md`。
 
+### 8.7 里程碑与交付事实：三处陈旧结论就地改写（T-09）
+
+判据串 `E3 未开始` ｜ `仍为 IN_PROGRESS` ｜ `` 不标 `DONE` ``：改前活文件（分母 174）**3 处**，改后 **0**。
+
+| 落点 | 原句要害 | 改法 |
+|---|---|---|
+| `milestones/README.md:7` | 「实施中——…**E3 未开始**」 | 就地改写为「**M3 已于 2026-09-23 通过 E3 综合验收并由用户签收，状态为 `DONE`**（验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED）」，并补指第 2.2 节 |
+| `M3-content-discovery-v2.md:35` | 「用户最终验收前整体**仍为 IN_PROGRESS**」 | 把口径钉在时间上（「这是 2026-09-23 验收当轮的表内口径」）＋就地写明整体已是 `DONE`；**表内 5 处「暂时通过」保持原读数**（同 T-07 先例，不改判历史读数） |
+| `MASTER:162` | 「M3 为 `IN_PROGRESS`…**M3 未达退出条件，不标 `DONE`**」 | **删断言、留缘由**：只记「为什么 `M3-M10` 拆成两行」，明写「各里程碑的当前状态以其在第 3 节的字段为准，不重复断言任何状态」 |
+
+**计划与实际的一处差异**：计划的 T-09 落点写 `MASTER:158`；今天 `:159`（＝计划当天的 `:158`，T-05／T-07 改过 §3 行数）的 M3 行**本来就是 `DONE`**。MASTER 里真正陈旧的是紧邻下方 `:162` 的 2026-09-23 拆分注。落点按实况改，见 `evidence/task-09-milestone-delivery-facts.md` §2。
+
+**为什么三处会漂移（本轮新量到的机制读数）**：同一事实当时有 2 个有门禁落点与 3 个无门禁落点。`scripts/verify_product_master_alignment.py:64` 硬编码期望 `M3 → DONE` 并读 `MASTER` §3 的 `| 状态 |` 字段——**变异对照**：把 `:362` 临时改成 `IN_PROGRESS`，门禁 `exit=1` 报 `M3 status expected 'DONE', got 'IN_PROGRESS'`（并连带触发 T-03 新增的候选块结构检查，共 2 条），还原后 `sha256` 相同、`exit=0`。其余落点（`milestones/README.md`、`M3-*.md` 的散文、`MASTER` §2 表行）**没有任何门禁**：分母 `scripts/`＋`tests/` 共 30 个文件，对判据串 **0 命中**、对 `milestones/` 路径的 7 处命中**全部是测试夹具里的字符串字面量**，无一处读取它们。两处状态字段今天一致（§14 第 2 项已登记的遗留），本 Task 只补上「其中一处有门禁」。
+
+**对账**：三处改写与四处权威源（`M3-*.md:3-4`／其 §2.2、`MASTER:159`／`:362`、`LEDGER.md:27`）在状态词、签收日期、验收矩阵三项事实上**无一处相反**；逐处实际文本见 `artifacts/t09-canonical-alignment.out`。**没有新增任何机检点**——为里程碑散文加判据会把它的措辞冻成契约，与 §5 Explicitly Not Doing 的既有声明相悖。
+
+细节见 `evidence/task-09-milestone-delivery-facts.md`。
+
 ## 9. Repository Checklist
 
 ### wt-media-workspace
@@ -280,7 +298,7 @@ None.
 | AC-03 | 被削薄弄丢的两条提交约定在 `AGENT-INDEX.md` 有活落点 | T-04 的 grep（改前 0 命中留证） | **PASS** |
 | AC-04 | CHG／里程碑状态词汇只剩一套，且**实测在用的每个词都被定义**；脚本接受集与成文一致 | T-05＋T-06＋T-07 的词汇统计逐词相等 | TODO（T-05 成文、T-06 接受集已收口；T-07 后逐词复算） |
 | AC-05 | `checkpoint.md` 有唯一权威落点、有模板、且有强制点（缺失会红） | T-06 的变异对照 | **PASS**（落点＝`AGENT-INDEX.md` §8／§9；模板＝`templates/delivery/checkpoint.md`；强制点＝`verify_delivery_governance.py`，失红并经活树阳性对照） |
-| AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的 grep 改前 ≥3／改后 0 | TODO |
+| AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的判据串：活文件（分母 174）改前 3 → 改后 0；放宽关键词补充扫剩 1 条，判为过去时叙述 | **PASS** |
 | AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`（含阳性对照） | TODO |
 | AC-08 | ADR-0015 与 ADR-0017 不再对 FFmpeg 归属给出相反答案；**活文件里没有一处把 FFmpeg 判给 Agent／Desktop**，该归属只有 Cloud 一个结论 | T-08 的复扫：改前 4 处 → 改后 0（20 条候选逐条判定，含阳性对照） | **PASS** |
 | AC-09 | `wt-media-cloud/frontend` 全仓 0 命中；被改的 `frontend` 只限目录名（字段名／脚本名不动） | T-11 的 grep＋逐处分类表 | TODO |
@@ -303,7 +321,8 @@ Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期�
 - `evidence/task-06-script-template-checkpoint.md`
 - `evidence/task-07-live-status-words.md`
 - `evidence/task-08-ffmpeg-ownership.md`
-- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`、`t08-ffmpeg-ownership-sweep.py` ＋ `t08-sweep-head.out`／`t08-sweep-worktree.out`／`t08-sweep-positive-control.out`）
+- `evidence/task-09-milestone-delivery-facts.md`
+- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`、`t08-ffmpeg-ownership-sweep.py` ＋ `t08-sweep-head.out`／`t08-sweep-worktree.out`／`t08-sweep-positive-control.out`、`t09-stale-m3-sweep.out`／`t09-canonical-alignment.out`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
 **开工三仓基线**（T-01 记录，收尾按同一命令复测）：
@@ -338,7 +357,7 @@ $ git -C ../wt-media-desktop status --porcelain
 | # | 条目 | 为什么本 CHG 不处置 |
 |---|---|---|
 | 1 | `verify_agent_entry.py` 的 `check_entry_drift` workspace 臂恒空 | 它不改变 exit code，只制造「绿得没有证据」；把它塞进 `errors` 会让启发式措辞变化打红门禁。CHG-063 已登记，独立 CHG |
-| 2 | `MASTER:155` 与 `:355` 的里程碑状态双落点 | 今天两处一致故无活冲突；让前者进判据属扩大判据，与 CHG-063 的判据分层结论相悖 |
+| 2 | `MASTER` §2 表行与 §3 状态字段的里程碑状态双落点（T-09 复测的行号：M3 为 `:159` 与 `:362`，计划写的是 `:155`／`:355`，T-05／T-07 改过 §3 行数） | 今天两处一致故无活冲突。**T-09 量到一条实测事实**：其中 §3 的 `\| 状态 \|` 字段**有门禁**（`verify_product_master_alignment.py:64` 硬编码期望，变异对照：改成 `IN_PROGRESS` → `exit=1` 报 `M3 status expected 'DONE', got 'IN_PROGRESS'`），§2 表行**没有**——所以 M3 签收当天只有 §3 那处自动跟上。让 §2 表行也进判据属扩大判据，与 CHG-063 的判据分层结论相悖；**「双落点里只有一处被盯着」这一事实本身也无机制呈现**，一并登记 |
 | 3 | `AGENT-INDEX.md` §5 表未写前端源码根 | 属「补落点」而非「消冲突」 |
 | 4 | 架构文档 `_V1.md` **其余**未扫的陈旧点（该文的 FFmpeg 切片已由 T-08 扫过：24 行全部判给 Cloud 或为排除句） | 该文 2000+ 行，全篇审计会使本 CHG 范围失控 |
 | 5 | M0／M1 已 `DONE` 却仍留候选 CHG 块 | CHG-063 已登记 |

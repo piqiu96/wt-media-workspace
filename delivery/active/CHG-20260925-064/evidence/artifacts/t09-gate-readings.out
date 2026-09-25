@@ -1,0 +1,31 @@
+# T-09 gate readings
+
+初遍（改完三处文档、尚未改本 CHG 记录时跑）：六门禁与 `unittest` 全绿、`Ran 79 tests`、
+`sync_skills.py check` 绿，与下列关闭遍**逐行相同**；该次运行未同时写时间戳，
+按纪律**不作为关闭值**，故不列为独立一段。
+
+## 关闭遍（change.md 与 checkpoint.md 全部改完之后）
+
+取数时间：2026-09-25 20:12:30 CST
+
+verify_delivery_governance.py            exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-064
+verify_agent_entry.py                    exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py                         exit=0 | verified 10 skill source files
+verify_m0_config.py                      exit=0 | Workspace config verification ok
+verify_product_master_alignment.py       exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                  exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                                 exit=0 | Ran 79 tests in 0.293s OK
+sync_skills.py check                     exit=0 | skill outputs are up to date
+
+## 复核遍（本记录最后一次内容改动之后：调整上文对「逐段都有时间戳」的措辞）
+
+取数时间：2026-09-25 20:12:40 CST
+
+verify_delivery_governance.py            exit=0 | Delivery governance verification ok. Active CHG: CHG-20260925-064
+verify_agent_entry.py                    exit=0 | Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py                         exit=0 | verified 10 skill source files
+verify_m0_config.py                      exit=0 | Workspace config verification ok
+verify_product_master_alignment.py       exit=0 | Product and Master Plan alignment verification ok
+verify_m2_acceptance.py                  exit=0 | NOTE: real MySQL and BitBrowser evidence must be recorded separately
+unittest                                 exit=0 | Ran 79 tests in 0.333s OK
+sync_skills.py check                     exit=0 | skill outputs are up to date

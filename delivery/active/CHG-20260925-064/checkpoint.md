@@ -24,13 +24,15 @@
 
 - **T-08 FFmpeg 归属：就地改写 ＋ 全仓复扫**：按用户裁定把 `ADR-0015:6`／`:27` **整句重写**（不删词、不留取代注记），并从 M2 的 Agent 边界清单里去掉 FFmpeg、就地补明它属 Cloud Compose Worker（ADR-0017）。**复扫又咬出两处**计划没点名的活落点——`skills/common/common-architecture-review/SKILL.md:13` 与 `skills/desktop/desktop-sidecar-update/SKILL.md:3` 都直白断言 Agent 拥有 FFmpeg，只改 ADR 则 AC-08 当场不成立，故一并改。判给 Agent 的活落点 **4 → 0**（改后 20 条候选逐条判定：Cloud-owned／排除句／清单／历史引述／本记录自述，无一条判给 Agent）。扫描口径与分母：`git ls-files` 排除 `completed|reports` 与生成副本目录，同子句（`。；;`）内「执行方词」与「ffmpeg 词」相距 ≤80 字符即入候选，**两列都不是结论**（`0015:6` 的真冲突恰恰藏在否定列里）。阳性对照：把 `MASTER:454` 注入成「视频合成由 Local Agent 执行 FFmpeg」→ candidate **9→10** 且新条目正是该行，`git restore` 后 `sha256` 与注入前相同。**两处记录更正**：§4.2 C2 原写「全仓其余落点一致判给 Cloud」**过宽**（漏了两个 skill），就地更正；§4.4／§9／AC-15 的「三仓零写」按分发机制改写为「不改运行时代码，只收 `skills/` 的分发副本」。`sync_skills.py check` → `skill outputs are up to date`；三仓各自收到生成副本并随各自仓库单独提交（`commit_generated: true`，`AGENT-INDEX.md` §9）。
 
+- **T-09 里程碑与交付事实：三处陈旧结论就地改写**：判据串 `E3 未开始`／`仍为 IN_PROGRESS`／`` 不标 `DONE` `` 在**活文件（分母 174）改前 3 → 改后 0**；放宽关键词的补充扫（`未开始`／`进行中`／`尚未验收`／`待验收`／`待签收`／`签收前`／`IN_PROGRESS`／`NOT_STARTED`／`实施中` 与 `M3` 同现）剩 **1** 条，是 `MASTER:162` 里引述旧行标的**过去时叙述**，判留。三处：`milestones/README.md:7`（「实施中…E3 未开始」→ 写明 2026-09-23 通过 E3 并由用户签收、`DONE`）、`M3-content-discovery-v2.md:35`（把「暂时通过」的口径钉在时间上＋写明整体已 `DONE`；**表内 5 处读数不改**，同 T-07 先例）、`MASTER:162`（**删断言、留缘由**——只记「为什么 `M3-M10` 拆两行」，明写「不重复断言任何状态」）。**计划落点与实况不符并如实登记**：计划写 `MASTER:158`，那行（今 `:159`）本来就是 `DONE`，真正陈旧的是紧邻下方 `:162` 的 2026-09-23 拆分注。**为什么漂移（本轮新量的机制读数）**：同一事实当时 2 个有门禁落点、3 个无门禁落点——`verify_product_master_alignment.py:64` 硬编码期望并读 `MASTER` §3 的 `| 状态 |` 字段（**变异对照**：改成 `IN_PROGRESS` → `exit=1` 报 `M3 status expected 'DONE', got 'IN_PROGRESS'`，连带触发候选块结构检查共 2 条；还原后 `sha256` 相同），而 `milestones/README.md`、`M3-*.md` 的散文、`MASTER` §2 表行**没有任何门禁**（分母 `scripts/`＋`tests/` 共 30 文件：对判据串 0 命中，对 `milestones/` 路径的 7 处命中全是测试夹具的字面量）。**对账**：三处改写与四处权威源（`M3-*.md:3-4`／§2.2、`MASTER:159`／`:362`、`LEDGER:27`）在状态词／签收日期／验收矩阵三项事实上无一处相反。**不新增任何机检点**（为里程碑散文加判据会把措辞冻成契约）。§14 第 2 项就地补上「双落点里只有一处被盯着」这一实测事实与今日行号。
+
 ## Current
 
-- T-08 已落。下一个是 T-09／T-10／T-11（相互独立，可换序）。
+- T-09 已落。下一个是 T-10／T-11（相互独立，可换序）。
 
 ## Next
 
-1. **T-09／T-10／T-11**（相互独立，可换序）：里程碑与交付事实／目录树与死指针／前端源码根与视觉规范合并。
+1. **T-10／T-11**（相互独立，可换序）：目录树与死指针／前端源码根与视觉规范合并。
 2. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描；并按 AC-15 与开工基线对账三仓（只应多出 `skills/` 分发副本）。
 
 ## Blocked
@@ -59,6 +61,12 @@
 | FFmpeg 归属（T-08，活文件） | 判给 Agent／Desktop 的落点 **4 → 0**；改后 20 条候选逐条判定；分母：含 `ffmpeg` 的 **100 行／24 文件**（改前 102／26） |
 | 同一扫描器可失败（T-08 阳性对照） | 注入 Agent-owned 句子 → candidate **9 → 10**，新条目即被注入的 `MASTER:454`；`git restore` 后 `sha256` 与注入前相同 |
 
-取数时间与逐次读数见 `evidence/artifacts/t08-gate-readings.out`——该文件**从初遍起逐次追加，每段段首都有取数时间**，各段读数除 `unittest` 耗时外**逐行相同**。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①初遍记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故末段正文的措辞不影响任何判据。FFmpeg 复扫的原始输出见 `evidence/artifacts/t08-sweep-*.out`；逐条明细见 `evidence/task-08-ffmpeg-ownership.md`。
+| 陈旧 M3 结论（T-09，判据串，活文件） | 改前 **3** → 改后 **0**（分母 174 个活文件）；放宽关键词补充扫剩 1 条，判为过去时叙述 |
+| 同一判据串扫描器可失败（T-09 阳性对照） | 对**本 CHG 自身记录**报出 2 处（`change.md:54`／`:283`，逐字引用的原句） |
+| `MASTER` §3 状态字段有门禁（T-09 新量，阳性对照） | 改成 `IN_PROGRESS` → `exit=1` 报 `M3 status expected 'DONE', got 'IN_PROGRESS'`（＋候选块结构检查共 2 条）；还原后 `sha256` 与变异前相同（`54cdbb5f…`） |
+| 里程碑散文是否有门禁（T-09，分母 `scripts/`＋`tests/` 共 30 文件） | 判据串 **0 命中**；`milestones/` 路径 7 命中**全是测试夹具字面量**，无一处读取 ⇒ `milestones/README.md` 与 `M3-*.md` 的散文**无门禁** |
+| 与四处权威源对账（T-09） | `M3-*.md:3-4`／§2.2、`MASTER:159`／`:362`、`LEDGER:27` 与三处改写，在状态词／签收日期／验收矩阵三项事实上**无一处相反** |
 
-上一版读数（`t06-gate-readings.out`，19:57）已被**覆盖**：T-07 改了 `planned/` 的记录与 `MASTER` §3 的读数列，那些数字不再是关闭值。T-06 那一版同理覆盖了 T-05 的 19:51 读数。
+取数时间与逐次读数见 `evidence/artifacts/t09-gate-readings.out`——该文件**逐段追加，每段段首都有取数时间**（T-09 的初遍跑在该文件建立之前、未同时写时间戳，已在该文件开头如实注明、**不列为独立一段**）；各段读数除 `unittest` 耗时外**逐行相同**。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①初遍记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故末段正文的措辞不影响任何判据。T-09 的扫描与对账原始输出见 `evidence/artifacts/t09-stale-m3-sweep.out`／`t09-canonical-alignment.out`；逐条明细见 `evidence/task-09-milestone-delivery-facts.md`。T-08 的对应产物为 `t08-gate-readings.out`／`t08-sweep-*.out` 与 `task-08-ffmpeg-ownership.md`。
+
+上一版读数（`t06-gate-readings.out`，19:57）已被**覆盖**：T-07 改了 `planned/` 的记录与 `MASTER` §3 的读数列，那些数字不再是关闭值。T-06 那一版同理覆盖了 T-05 的 19:51 读数。`t08-gate-readings.out`（20:06–20:08）同理被 **T-09** 覆盖：T-09 改了 `MASTER:162`、两个里程碑文件，那些数字不再是关闭值——但两版的**判据行仍逐行相同**（T-09 只改文档文本，不碰任何判据的输入面，`unittest` 仍 79）。

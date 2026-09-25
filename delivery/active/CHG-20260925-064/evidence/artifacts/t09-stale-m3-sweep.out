@@ -1,0 +1,43 @@
+# T-09 陈旧 M3 结论扫描
+
+## 判据串（AC-06）：E3 未开始 | 仍为 IN_PROGRESS | 不标 「DONE」
+
+取数时间：2026-09-25 20:10:11 CST
+
+### 第一遍：全仓（含本 CHG 自身记录与历史归档）
+
+分母：git ls-files 全部文件 789 个
+
+delivery/MASTER_IMPLEMENTATION_PLAN.md:162:> 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的 `IN_PROGRESS` 自相矛盾。依据第 3 节 M3 字段、其闭环 `delivery/milestones/M3-content-discovery-v2.md` 与 active CHG-20260916-052，M3 为 `IN_PROGRESS`，M4～M10 为 `NOT_STARTED`，故拆为两行；M3 未达退出条件，不标 `DONE`。
+delivery/active/CHG-20260925-064/change.md:54:| C6 | `delivery/milestones/README.md:7` | 写「E3 未开始」，与 `M3-content-discovery-v2.md:3-4`（第 1～7 项全部通过、用户已于 2026-09-23 签收、M3 转 `DONE`）**结论相反** |
+delivery/active/CHG-20260925-064/change.md:283:| AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的 grep 改前 ≥3／改后 0 | TODO |
+delivery/milestones/M3-content-discovery-v2.md:35:「暂时通过」= 仓库内实现完成且有真实证据，但未完成 M3-E3 综合验收，也不等于用户已签收。用户最终验收前整体仍为 IN_PROGRESS。
+delivery/milestones/README.md:7:当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：用户方向已确认，A～E 与八个执行草案已拆分，实施中——A～E1 有真实证据，C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围，E3 未开始；逐阶段状态见该文件第 2.1 节。M3 产品事实源为 [Product M3 内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
+
+### 第二遍：活文件（排除 delivery/completed/、delivery/reports/、本 CHG 自身记录）
+
+分母：活文件 174 个
+
+delivery/MASTER_IMPLEMENTATION_PLAN.md:162:> 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的 `IN_PROGRESS` 自相矛盾。依据第 3 节 M3 字段、其闭环 `delivery/milestones/M3-content-discovery-v2.md` 与 active CHG-20260916-052，M3 为 `IN_PROGRESS`，M4～M10 为 `NOT_STARTED`，故拆为两行；M3 未达退出条件，不标 `DONE`。
+delivery/milestones/M3-content-discovery-v2.md:35:「暂时通过」= 仓库内实现完成且有真实证据，但未完成 M3-E3 综合验收，也不等于用户已签收。用户最终验收前整体仍为 IN_PROGRESS。
+delivery/milestones/README.md:7:当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：用户方向已确认，A～E 与八个执行草案已拆分，实施中——A～E1 有真实证据，C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围，E3 未开始；逐阶段状态见该文件第 2.1 节。M3 产品事实源为 [Product M3 内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
+
+### 阳性对照：同一扫描器对「本 CHG 自身记录」是否报出
+
+delivery/active/CHG-20260925-064/change.md:54:| C6 | `delivery/milestones/README.md:7` | 写「E3 未开始」，与 `M3-content-discovery-v2.md:3-4`（第 1～7 项全部通过、用户已于 2026-09-23 签收、M3 转 `DONE`）**结论相反** |
+delivery/active/CHG-20260925-064/change.md:283:| AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的 grep 改前 ≥3／改后 0 | TODO |
+
+### 第三遍：改后（同一判据串、同一分母口径）
+
+取数时间：2026-09-25 20:10:32 CST
+
+活文件分母 174 个：
+
+
+### 第四遍：放宽关键词的补充扫（活文件，分母同上）
+
+关键词：M3 同现 未开始｜进行中｜尚未验收｜待验收｜待签收｜签收前｜IN_PROGRESS｜NOT_STARTED｜实施中
+
+delivery/MASTER_IMPLEMENTATION_PLAN.md:162:> 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的实际进度不一致，故拆为两行。各里程碑的当前状态以其在第 3 节的字段为准，本节只记这一行的拆分缘由，不重复断言任何状态。
+
+（无输出＝0 命中）

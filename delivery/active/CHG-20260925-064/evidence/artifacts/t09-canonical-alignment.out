@@ -1,0 +1,52 @@
+# T-09 权威源对账（逐处取实际文本）
+# 取数时间：2026-09-25 20:11:24
+# 本表只报「该行是否含这些 token」；token 齐备不等于语义一致，语义逐条判定见
+# evidence/task-09-milestone-delivery-facts.md §4。
+
+| 落点 | 行 | DONE | 2026-09-23 | 第 1～7 项 | 签收 |
+|---|---|---|---|---|---|
+| M3 里程碑头:2-4（权威，未改） | 2–4 | ✓ | ✓ | ✓ | ✓ |
+| M3 §2.1 头部注:35（本次改） | 35–35 | ✓ | ✓ | — | ✓ |
+| M3 §2.2 签收记录:52-62（权威，未改） | 52–62 | ✓ | ✓ | ✓ | ✓ |
+| milestones/README.md:7（本次改） | 7–7 | ✓ | ✓ | ✓ | ✓ |
+| MASTER §2 表 M3 行:159（未改） | 159–159 | ✓ | ✓ | ✓ | ✓ |
+| MASTER §3 M3 状态字段:362（未改，有门禁） | 362–362 | ✓ | ✓ | ✓ | ✓ |
+| MASTER 拆分注:162（本次改） | 162–162 | — | ✓ | — | — |
+| LEDGER.md:27（未改） | 27–27 | ✓ | ✓ | ✓ | ✓ |
+
+### M3 里程碑头:2-4（权威，未改）
+delivery/milestones/M3-content-discovery-v2.md:2: 
+delivery/milestones/M3-content-discovery-v2.md:3: > 更新：2026-09-23。产品方向：CONFIRMED，依据用户明确提供的 M3 Milestone；A～E1 已实施并具备真实证据，C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停。E3 综合验收已于 2026-09-23 执行一轮并判**未通过**（硬阻断 D-scheduler）；D-scheduler 已于同日修复并按**无人值守**路径进程级复验通过，验收项 2 改判通过。同日另补证两处覆盖缺口：**Desktop 走查**与 **`material_failed` 受控故障注入**，验收项 6、7 的例外均已去除——**验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED**。**用户已于 2026-09-23 就此签收，M3 转 DONE。**
+delivery/milestones/M3-content-discovery-v2.md:4: > 实施状态：**DONE**（2026-09-23 用户签收，见第 2.1、2.2 节）；Active CHG：无；M2 保持 DONE。
+
+### M3 §2.1 头部注:35（本次改）
+delivery/milestones/M3-content-discovery-v2.md:35: 「暂时通过」= 仓库内实现完成且有真实证据，但未完成 M3-E3 综合验收，也不等于用户已签收——这是 2026-09-23 验收当轮的表内口径。M3-E3 综合验收已于同日通过并经用户签收，**M3 整体状态为 `DONE`**（见第 2.2 节）；下表各阶段的「暂时通过」记的是该轮读数，不再是待办项。
+
+### M3 §2.2 签收记录:52-62（权威，未改）
+delivery/milestones/M3-content-discovery-v2.md:52: ### 2.2 用户签收记录（M3 → DONE）
+delivery/milestones/M3-content-discovery-v2.md:53: 
+delivery/milestones/M3-content-discovery-v2.md:54: | 项 | 内容 |
+delivery/milestones/M3-content-discovery-v2.md:55: | --- | --- |
+delivery/milestones/M3-content-discovery-v2.md:56: | 签收日期 | 2026-09-23 |
+delivery/milestones/M3-content-discovery-v2.md:57: | 签收对象 | 上表「M3-E3 综合验收」的验收矩阵结果（第 1～7 项全 PASS），以及交付给用户的 DMG 原生应用实机复核 |
+delivery/milestones/M3-content-discovery-v2.md:58: | 用户原话 | 「收尾了，给 M3 优化完成」；就范围二选一裁定「关 CHG-055 + 记录 M3-E3 签收」 |
+delivery/milestones/M3-content-discovery-v2.md:59: | 依据证据 | `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`（判定 `14-verdict.md`，补验 `15-`～`17-`）；实机复核见 `delivery/completed/CHG-20260923-055/evidence/` |
+delivery/milestones/M3-content-discovery-v2.md:60: | 签收记录 | `delivery/completed/CHG-20260923-055/evidence/20260923-closeout-and-m3-signoff.md` |
+delivery/milestones/M3-content-discovery-v2.md:61: | 随签收作出的裁定 | **D3 不阻塞 M3**——D3（`POST /discovery-strategies/:id/run` 可重复排队）仍登记在 `CHG-20260923-054`，该记录正文标其为基线 §5 阻塞项，按其自身范围处置，不因 M3 关闭而消失；D1/D2/D6/D7/D8/D9/D10、D-scheduler-2、S-1 同样留在 054 |
+delivery/milestones/M3-content-discovery-v2.md:62: | 未随签收改变 | C2、E2 仍为暂停（本期不做）；`CHG-20260915-051` 仍为 DISCUSSION、未激活，E3 的验收与签收由 CHG-052 承载 |
+
+### milestones/README.md:7（本次改）
+delivery/milestones/README.md:7: 当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：**M3 已于 2026-09-23 通过 E3 综合验收并由用户签收，状态为 `DONE`**（验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED）。A～E1 有真实证据；C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围；逐阶段状态见该文件第 2.1 节，签收记录见第 2.2 节。M3 产品事实源为 [Product M3 内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
+
+### MASTER §2 表 M3 行:159（未改）
+delivery/MASTER_IMPLEMENTATION_PLAN.md:159: | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
+
+### MASTER §3 M3 状态字段:362（未改，有门禁）
+delivery/MASTER_IMPLEMENTATION_PLAN.md:362: | 状态 | `DONE`（2026-09-23 用户签收；A～E1 有真实证据；C2/E2 已暂停；E3 验收矩阵第 1～7 项全 PASS） |
+
+### MASTER 拆分注:162（本次改）
+delivery/MASTER_IMPLEMENTATION_PLAN.md:162: > 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的实际进度不一致，故拆为两行。各里程碑的当前状态以其在第 3 节的字段为准，本节只记这一行的拆分缘由，不重复断言任何状态。
+
+### LEDGER.md:27（未改）
+delivery/LEDGER.md:27: M3 当前阶段状态（2026-09-23 同步）：**M3 已由用户签收，状态为 `DONE`**。A～E1 有真实证据；C2、E2（博主搜索与作者策略）已暂停，本期不做、移出验收范围；E3 综合验收已在 CHG-052 内执行并经同日补验收口——验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED，**用户于 2026-09-23 就此签收**。独立验收草案 CHG-20260915-051 保持 DISCUSSION、不激活：E3 的验收与签收由 CHG-052 承载，不据此判定 CHG-051 已完成。逐阶段状态与证据指向见 [M3-content-discovery-v2.md](milestones/M3-content-discovery-v2.md) 第 2.1 节。
+
