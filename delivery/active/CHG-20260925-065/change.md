@@ -137,7 +137,7 @@ None.
 | T-02 | 规范与落点成文（`conventions §3`／§9／§11；`AGENT-INDEX.md` §4／§10；`..._V1.md:769`／`:1801`） | DONE | 判据串**先写后实现**（代码中 6/6 为新 ≙ 0）；读数带前后对照（锚 `bd5df2c`）；阳性对照 10/10。evidence `task-02-normative.md` |
 | T-03 | 生成器对齐（`init-agent-entry.sh` 双指针＋八节骨架＋`DIRECTORY_MAP.md`；停止手写快照）；**并改正 §3 指针预算的自我矛盾** | DONE | 在 tmpdir 实跑，产出四件与形态规定逐项相符（12/12，附差异表）；阳性对照 7 类变异。evidence `task-03-generator.md` |
 | T-04 | 门禁实现与退役（新六条 ＋ 退役 `check_entry_drift` ＋ `tests/` fixture 重写为默认合规） | DONE | **六条新检查各做变异对照**：关掉判定 → 各 3／7／4／2／2／1 条用例失败，**`ImportError` 计数 6 次全为 0**；`tests/` 16 → **31** 条，套件 `Ran 79` → **`Ran 94` / OK**；其余五门禁仍 `exit=0`。真树读数 **71 ERROR**（= T-05～T-08 的分母，见 `checkpoint.md`）。evidence `task-04-gate.md` |
-| T-05 | cloud 四件入口文件收口（正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`；落实 F-03／F-05／F-07） | TODO | 逐条归属表（改前行数为分母）；门禁 cloud 错误数改前 → 0；阳性对照：写一个不存在的目录，确认报出 |
+| T-05 | cloud 四件入口文件收口（正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`；落实 F-03／F-05／F-07） | DONE | 逐条归属表分母＝改前非空行数（86／99／45／75，各类加总等于分母）；门禁 cloud **51 → 1**（自身缺陷 0，剩余一条是跨仓序列，T-06／T-07 前不可满足）；阳性对照：注入 `cache` → infra 扫描报出、`HEAD:AGENT-INDEX.md` → 排除清单扫描命中 1。提交 `0db02ab`。evidence `task-05-cloud.md` |
 | T-06 | agent 四件入口文件收口 ＋ F-07 | TODO | 同上 |
 | T-07 | desktop 四件入口文件收口 ＋ F-07 ＋ D-04 的范围限定句 | TODO | 同上；desktop 发布链路调用关系**不改** |
 | T-08 | workspace 入口文件补机读键过机检（二者已是纯指针，内容不动） | TODO | workspace 臂由红转绿 |
@@ -160,11 +160,12 @@ None.
 
 ### wt-media-cloud
 
-- [ ] `AGENT-INDEX.md`（正文增长：吸收原 `AGENTS.md` 规则）
-- [ ] `AGENTS.md` → 指针
-- [ ] `CLAUDE.md` → 指针（原 168 行规则正文迁出）
-- [ ] `DIRECTORY_MAP.md`（接收原 `AGENTS.md` 的目录树）
-- [ ] **不写**：任何运行时代码、配置、测试
+- [x] `AGENT-INDEX.md` 60 → 205 行（新增 `## 本仓规则`，吸收原 `AGENTS.md`／`CLAUDE.md` 的规则正文）
+- [x] `AGENTS.md` 113 → 11 行（指针）
+- [x] `CLAUDE.md` 168 → 11 行（指针，原 168 行规则正文迁出）
+- [x] `DIRECTORY_MAP.md` 105 → 106 行（接收 `AGENTS.md` 的 `.gitignore` 扫描范围）
+- [x] **未写**：任何运行时代码、配置、测试（`git status --porcelain` 仅 4 个 `M` ＋ 既存 `?? dump.rdb`）
+- [x] 提交 `0db02ab`
 
 ### wt-media-agent
 
@@ -187,9 +188,9 @@ None.
 | AC-06 | 三仓 `AGENT-INDEX.md` 八 H2 序列互相相等且长度为 8 | 新 `check_layer3_shape`；变异：改名 desktop 的 `## 禁止` → 报出首个分叉位 | TODO |
 | AC-07 | 每一条新 ERROR 都被证明能失败（变异式，非 `ImportError`） | `tests/` 用例断言**完整错误集合逐条相等** | **PASS**（T-04）：六条新检查逐一禁用 → 3／7／4／2／2／1 条用例失败，`ImportError` **0**；`Rule Word` 类判据另有注入式阳性对照。读数见 `task-04-gate.md` §3 |
 | AC-08 | `check_entry_drift` 及其 2 条用例、描述段落已退役，且同 fixture 由新检查顶替 | 变异对：旧代码＋旧 fixture → 漂移 WARN；新代码＋同一 fixture → `check_pointer_shape` 报出 | **PASS**（T-04）：代码中 `check_entry_drift`／`check_layer3_entries` 命中 0；旧 2 条用例已删；fixture 改为「默认合规」后由 `check_pointer_shape` 等六条顶替，且每条都被变异点亮 |
-| AC-09 | cloud 的 F-03 表 6 处分歧逐处消解，两处事实错误按**代码实况**回写 | `internal/infra` 实际目录逐项相符（阳性对照：写一个不存在的目录 → 报出）；模块树含 `router.go` | TODO |
-| AC-10 | 每仓逐条归属表覆盖被移走的**每一行**，分母＝改前行数 | 逐文件 `wc -l` 前后对账，无一项落入「未登记」 | TODO |
-| AC-11 | 三仓 `AGENT-INDEX.md` 的禁止扫描区清单已换成指向 `DIRECTORY_MAP.md` 的指针 | 字符串扫描：三仓 `AGENT-INDEX.md` 内排除清单命中 0（阳性对照另注入 1 条 → 报出） | TODO |
+| AC-09 | cloud 的 F-03 表 6 处分歧逐处消解，两处事实错误按**代码实况**回写 | `internal/infra` 实际目录逐项相符（阳性对照：写一个不存在的目录 → 报出）；模块树含 `router.go` | **PASS**（T-05，cloud 臂）：infra 枚举 5 项与磁盘相符 missing **none**，注入 `cache` → 报出；模块树取 `AGENTS.md` 侧（已含 `router.go`／`handler.go`），`CLAUDE.md` 那份错误清单不迁移。**但见 §14 第 11 项：判据是我在证据期临时构造的扫描，非门禁** |
+| AC-10 | 每仓逐条归属表覆盖被移走的**每一行**，分母＝改前行数 | 逐文件 `wc -l` 前后对账，无一项落入「未登记」 | **T-05 cloud 臂 PASS**（86／99／45／75 非空行，各类加总等于分母，无「未登记」项）；agent／desktop 待 T-06／T-07 |
+| AC-11 | 三仓 `AGENT-INDEX.md` 的禁止扫描区清单已换成指向 `DIRECTORY_MAP.md` 的指针 | 字符串扫描：三仓 `AGENT-INDEX.md` 内排除清单命中 0（阳性对照另注入 1 条 → 报出） | **T-05 cloud 臂 PASS**：205 行命中 **0**，同一扫描对未改动的 `HEAD` 版本命中 **1**；agent／desktop 待 T-06／T-07 |
 | AC-12 | F-06 两侧同时改：三仓小节改名＋作用域首行；workspace §4 作用域句 | 逐处复查；`check_local_order_scope` WARN 为 0 | TODO |
 | AC-13 | F-08：`init-agent-entry.sh` 产出四件且形态相符；快照只有**一个**生成器 | tmpdir 实跑 ＋ 产出差异表；脚本内无 `.ai/CURRENT_CONTEXT.md` 写入 | **PASS**（T-03）：12 项形态判据 12 PASS；阳性对照 7 类变异全报出；`workspace --dry-run` 对快照只报 `exists:` 不再 `would create:`。读数 **不是门禁**（门禁在 T-04），届时调门禁自己的函数复测 |
 | AC-14 | 四仓零运行时代码／配置／测试改动 | `git -C ../wt-media-{cloud,agent,desktop} status --porcelain` 逐仓对账；只允许四类入口文件与 `.claude/skills`／`.codex/skills` 副本 | TODO |
@@ -204,9 +205,17 @@ None.
 - `evidence/task-0x-<topic>.md`
 - `evidence/artifacts/`（原始命令输出）
 
-**记录成本上限**：本文件 ≤ **30 KB**；单 Task evidence ≤ **8 KB**。
+**记录成本上限**：本 CHG 的**全部记录与证据合计 ≤ 80 KB**——`change.md` ＋ `checkpoint.md` ＋ `evidence/*.md` 三者之和，一条命令可量。
 
-**本节的原始数字（`change.md` ≤ 25 KB、单 Task ≤ 3 KB）被 T-01～T-04 逐条突破，实测后改正**（不静默改数字）：T-01～T-04 四篇 evidence 实测 4559／4845／6314／6329 B，**每一篇都超过 3 KB**；T-04 收尾时 `change.md` 实测 26477 B，超 25 KB。原数字是**凭印象设的**，不是量出来的——与「计数必须当场量」同一条纪律。改正后的数字以**实测区间上沿**为准，并把总量作真正的界：四篇 evidence 合计 22 KB、`change.md` 26 KB，**合计 57 KB**，对比 CHG-20260925-064 的 `change.md` 单文件 65 KB、`checkpoint.md` 29 KB（该 CHG 12 个 Task）——记录成本降了约一个数量级，这才是本节要防的那件事。**本 CHG 的界是总量不是单篇，故不再逐篇追 3 KB。**
+**本节曾两次凭印象设数，都被实测推翻，记在此以免第三次**（与「计数必须当场量」同一条纪律）：
+
+| 版本 | 数字 | 实测结果 |
+|---|---|---|
+| 初稿 | `change.md` ≤ 25 KB、单 Task evidence ≤ 3 KB | T-01～T-04 四篇 evidence 4559／4845／6314／6329 B，**逐篇突破**；T-04 收尾 `change.md` 26477 B，突破 |
+| T-04 改 | `change.md` ≤ 30 KB、单 Task ≤ 8 KB | T-05 后 `change.md` 30191 B、`task-04-gate.md` 8749 B，**两个都再次突破** |
+| 本轮 | **合计 ≤ 80 KB** | T-05 收尾实测 **≈ 73 KB**（精确值当场量：下表末的命令；本节自述数字会随本节改动漂移，**数字以命令为准**） |
+
+前两版错在同一件事：**拿「单篇字节数」当界**。它既拦不住总量增长（每篇各超一点，合计照样膨胀），又会诱使我把证据写得比判据更短——**为迁就一个我自己发明的数字去削证据，比数字被突破更糟**。故界改设在**总量**上，且**同一命令量两侧**：`cat change.md checkpoint.md evidence/*.md | wc -c`。CHG-20260925-064 用同一条命令实测 **213739 B**（≈ 209 KB）——此前引用的「94 KB」只算了 `change.md` ＋ `checkpoint.md`，漏了 evidence——**本 CHG 第二次「两个分母混用」**（第一次在 T-05 归属表，把总行数与非空行数当同一个分母；见 `checkpoint.md` 的 T-05 自纠与 `evidence/task-05-cloud.md` §3）。⇒ 本 CHG 比 064 小约 **2.9 倍**（不是先前误写的「一个数量级」）。
 
 ## 12. Current Checkpoint
 
@@ -226,13 +235,16 @@ None.
 
 ## 14. 遗留（只登记、未修，需独立 CHG）
 
-1. **F-09 的政策冲突**：`tauri.conf.json:10` 的 `beforeBuildCommand` 使 desktop 发布包依赖 workspace 检出，与 `..._V1.md:478`／`:1801` 相抵。两条候选：**(a)** 把 `AGENT-INDEX.md:35` 与两行 architecture 的作用域改为「运行期依赖」并记 ADR；**(b)** 把 43 行的 `build-desktop.sh` 移进 `wt-media-desktop/scripts/`（它已只调 desktop 自己的 `release-versions.sh`），红线与两行 architecture 一字不改即重新成立——但连带 `tauri.conf.json`、`m2b_local_acceptance.py:282`、`web-desktop-visual-system.md:326,374,410` 与两份 `environment-bring-up` skill 副本。**用户 2026-09-25 裁定：另立 CHG 裁定。**
+1. **F-09 的政策冲突**（事实面见 §4 F-09）：两条候选——**(a)** 把 `AGENT-INDEX.md:35` 与两行 architecture 的作用域改为「运行期依赖」并记 ADR；**(b)** 把 43 行 `build-desktop.sh` 移进 `wt-media-desktop/scripts/`（它已只调 desktop 自己的 `release-versions.sh`），红线与两行 architecture 一字不改即重新成立——连带 `tauri.conf.json`、`m2b_local_acceptance.py:282`、`web-desktop-visual-system.md:326,374,410` 与两份 `environment-bring-up` skill 副本。**用户 2026-09-25 裁定：另立 CHG 裁定。**
 2. **三仓拿不到 workspace 组 skill**（F-11）：`config/skills-distribution.yaml` 不分发，cwd 在运行仓的会话磁盘上没有 `executing-wt-media-change`。本 CHG 改善但不修。陷阱见 `delivery/completed/CHG-20260925-064/change.md` §14 第 16 项。
 3. **`wt-media-cloud/docs/arch/wt-media-cloud-arch.md:5`** 与 F-05 同类的主张写在非入口文件里，本 CHG 只登记。
 4. **workspace `README.md:42-51` 的 4 条独有规则**（无生产密钥；接口定义归提供方仓；不建 `changes/active`；「Remove completed delivery records」）与 `AGENT-INDEX.md` §2、`MASTER:132` 的关系未经裁定。最后一条与 `MASTER:132`「归档记录保持原样、不回改」相抵，且 `delivery/LEDGER.md:5`「Completed delivery records are removed…」是同一主张的第二个落点。**归 CHG-20260925-066 一并裁。**
 5. **`AGENT-INDEX.md:71`／`:120` 与 `prepare_ai_workspace.py:172` 点名 `DIRECTORY_MAP.md`，而在此之前无任何脚本查其存在**——本 CHG T-04 补上。
 6. **`CLAUDE.md` 里 `## 权威源` 段内的散文式规则不被机检抓得住**——`check_pointer_shape` 只抓结构性外溢。作为已知残余登记，不宣称更多。
-7. **§3 指针预算的两处表述在 T-03 被改正**（原登记：若实现中发现判据不可用，回来改 §3 的判据表述，而不是放松门禁）。**已裁定并落地**：`H2 ≤ 1` ＋ 白名单 `权威源` 与自己引用的参照件相抵（参照件 `CLAUDE.md` 有 3 个 H2），且它要防的变异已由规则词判据按**正文**抓死；改为 **H2 ≤ 4、不设白名单**，规则词判据**只作用于非标题行**，并补出重复比较集的构造。**这不是放松**：变异 4（贴 `## 模块规则` 段）在改正前后都被规则词判据抓出，改正后反而多抓了「描述文件角色的表行」这一类。理由与读数见 `evidence/task-03-generator.md` §1／§4。**残余**：「规则词」仍以该节举例为准，未列举穷尽——T-04 实现时以 §3 为准。
-8. **`duplication_denominator_is_reported` 在变异下是 `ERROR` 而非 `AssertionError`**（T-04 实测）：禁用 `check_rule_text_duplication` 后，该用例的辅助方法 `next(...)` 抛 `StopIteration`。它是被禁用检查导致的**真实失败**、不是 `ImportError`（六次变异 `ImportError` 计数全为 0），但**不是** `AGENT-INDEX.md:206` 要求的最干净形态。**不修**：为让失败「更好看」去改用例的取值方式，会把判据改成迁就测试的形状；如实登记。
-9. **§11 的记录成本数字原为凭印象设定**，T-04 收尾实测后改正（见 §11）——四篇 evidence 逐篇超 3 KB、`change.md` 超 25 KB。登记在此以免下一轮又凭印象设一个数字。
+7. **§3 指针预算的两处表述在 T-03 被改正**（原登记：若实现中发现判据不可用，回来改 §3 的判据表述，而不是放松门禁）。**已裁定并落地**：`H2 ≤ 1` ＋ 白名单 `权威源` 与自己引用的参照件相抵（参照件 `CLAUDE.md` 有 3 个 H2），且它要防的变异已由规则词判据按**正文**抓死；改为 **H2 ≤ 4、不设白名单**，规则词判据**只作用于非标题行**，并补出重复比较集的构造。**这不是放松**：变异 4（贴 `## 模块规则` 段）在改正前后都被规则词判据抓出，改正后反而多抓了「描述文件角色的表行」这一类。理由与读数见 `evidence/task-03-generator.md` §1／§4。**残余**：「规则词」以该节举例为准，未穷尽（T-04 已按 §3 落地）。
+8. **`duplication_denominator_is_reported` 在变异下是 `ERROR` 而非 `AssertionError`**（T-04 实测）：禁用该检查后，用例的辅助方法 `next(...)` 抛 `StopIteration`。它是被禁用检查导致的**真实失败**、不是 `ImportError`（六次变异计数全 0），但**不是** `AGENT-INDEX.md:206` 要求的最干净形态。**不修**：为让失败「更好看」去改用例的取值方式，会把判据改成迁就测试的形状。
+9. **§11 的记录成本数字原为凭印象设定**，T-04 收尾实测后改正（见 §11）。登记以免下一轮又凭印象设数。
 10. **生成器骨架不含规则句**：`check_rule_text_duplication` 在生成器产出上的分母只有 1 条规则句（`artifacts/t04-generator-vs-gate.out`）。⇒ 该判据在**真实文件**上的判别力由 `tests/` 的注入用例与本 CHG 三仓收口时的读数覆盖，不由生成器覆盖。
+11. **AC-09 的判据不是门禁**：全仓无任何脚本读 cloud 的 `internal/infra` 列表（`grep -rn 'internal/infra' scripts/ tests/ config/` 零命中），故 T-05 的 infra 相符性判据是**证据期临时构造的扫描**（可重放命令 ＋ 阳性对照）。⇒ 「规则行枚举的目录必须在磁盘存在」这件事**不会在将来失效时报警**。是否值得升为门禁，交后续 CHG 裁；本 CHG 不新增（会与「ERROR 只判存在／声明／计数／相等」的分层结论相抵）。
+12. **生成器对非兄弟仓路径产出坏链接**：`init-agent-entry.sh repo <绝对路径>` 把工作区相对路径按 `os.path.relpath` 算出，目标若不在执行根下就写出 `../../../../../../../Users/…` 这样的链接（T-04 复测时实测，见 `artifacts/t04-remeasure.sh` 的产出）。本仓实际用法是 `repo cloud|agent|desktop`，不受影响；**只登记**。
+13. **本 CHG 两次「两个分母混用」**（T-05 归属表把总行数与非空行数当同一个分母；§11 引自 CHG-064 的「94 KB」漏算 evidence，实为 213739 B）。两次都不是算错，是**没当场说明在量哪一个分母**——与「计数必须当场量」是同一件事的两面。登记以免后续 Task 重复：**凡报数字，同一句里写清分母是什么。**

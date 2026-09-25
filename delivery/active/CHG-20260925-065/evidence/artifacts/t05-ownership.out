@@ -1,0 +1,249 @@
+### reference: AGENTS.md lines vs AGENT-INDEX.md (rules the body already holds)
+
+=== AGENTS.md: 86 non-empty line(s) (denominator), 2 covered by AGENT-INDEX.md, DIRECTORY_MAP.md, 84 without an equivalent ===
+  :1 # WT Media Cloud AI Development Rules
+  :3 ## 必须遵守
+  :4 Follow `AGENT-INDEX.md` for repository boundaries.
+  :6 ## 项目定位
+  :8 本项目使用 Go、CloudWeGo Hertz 和模块化单体架构。禁止提前拆分微服务，禁止未经决策引入 MQ、动态插件或工作流引擎。
+  :10 完整设计基线：`docs/superpowers/specs/2026-09-18-cloud-foundation-convergence-design.md`。
+  :12 ## 进程与目录
+  :14 - `cmd/server/main.go` 只调用同包运行函数；`cmd/server/server.go` 管理 HTTP 启动、信号和优雅关闭。
+  :15 - `internal/bootstrap` 是生产初始化的唯一发起方。
+  :16 - `bootstrap.go` 管进程初始化顺序，`resource.go` 管资源初始化和回滚，`routes.go` 只注册路由，`jobs.go` 只连接任务。
+  :17 - 不创建 `internal/runtime`、`internal/app`、`internal/server` 或 `bootstrap/modules.go`。
+  :18 - `internal/infra` 保存 database、cache、logger、client、metrics、tracing、storage 等基础能力。
+  :19 - `internal/modules` 只保存业务模块。
+  :20 - `internal/shared` 只允许职责明确的公共定义，例如 `shared/api` 和 `shared/id`；禁止万能 `common`、`utils` 或 `resource` 包。
+  :22 ## 受控全局基础资源
+  :24 - Database、Logger、Client、Metrics、Tracing 和只读 Config 由各自包私有保存，通过公有只读 Getter 使用。
+  :25 - 禁止导出可变资源变量，禁止 `runtime.Current`、万能 Service Locator 或动态资源注册表。
+  :26 - Bootstrap 是唯一允许初始化和关闭基础资源的生产代码。
+  :27 - 业务请求状态、用户状态和领域数据不得保存为全局变量。
+  :28 - Module、Handler、Service、Repository 不得初始化基础资源。
+  :30 ## 配置规则
+  :32 - 配置文件只允许位于 `/config` 和 `/config_online`。
+  :33 - 运行时代码始终读取 `./config`；`config_online` 仅在发布打包时替换产物中的 `config`。
+  :34 - 禁止在 `internal` 存放 YAML 或 JSON 配置。
+  :35 - `internal/config` 只负责 Loader、Schema、Validation 和只读 Getter。
+  :36 - HTTP Server 配置属于 `app.yaml`，不创建独立 `server.yaml`。
+  :37 - Scheduler/Worker 配置位于 `config/scheduler`，不绑定 App 名称。
+  :38 - 每个数据库使用独立 YAML；默认数据库名称在代码中固定为 `primary`，配置不使用 `default` 或 `enabled`。
+  :39 - Client 连接配置与 Cookie、API Key、固定 Header 等认证配置必须分离。
+  :41 ## Database 与 Repository
+  :43 - 数据库资源统一为 `*gorm.DB`。
+  :44 - 保留显式 SQL：查询使用 `Raw`，写入使用 `Exec`，事务使用 `Transaction`；不得批量改写为 GORM ORM CRUD。
+  :45 - Repository 是业务数据访问的唯一入口，通过 `database.DB()` 或 `database.Named(name)` 获取连接。
+  :46 - Handler 和 Service 禁止执行 SQL。
+  :47 - Repository 不得通过模块级 `Init` 复制同一个数据库实例。
+  :49 ## Client 与执行边界
+  :51 - 所有外部 HTTP 协议实现位于 `internal/infra/client`，统一处理 timeout、retry、错误映射、日志、trace 和 metrics。
+  :52 - 业务代码禁止直接创建 `http.Client`，只能调用 `Search`、`FindAuthor`、`FetchByURL`、`CheckProxy` 等类型化方法。
+  :53 - Cloud 是业务事实中心，可以直接调用抖音等公开数据 API。
+  :54 - Desktop / Local Agent 负责本地浏览器、Profile、账号登录态、本地文件落地、发布和互动等本机能力。
+  :55 - M4-M5 视频合成由 Cloud Compose Worker 调用受控 FFmpeg；Desktop、Local Agent 和 Cloud Agent 均不得执行该视频合成链路。
+  :56 - 需要本机环境的操作必须经过 Agent；纯服务端公开数据抓取不经过 Agent。
+  :58 ## 日志规则
+  :60 - 禁止使用 `fmt.Println` 记录运行日志。
+  :61 - 使用 `logger.App()`、`Access()`、`Job()`、`External()`、`Audit()`、`Panic()` 六个独立 Logger。
+  :62 - 六类 Logger 写入六个独立物理文件。
+  :63 - 请求相关日志必须能够包含 `trace_id`、`request_id` 和 `module`。
+  :65 ## Scheduler、Job 与 Worker
+  :67 - HTTP Server 不启动 Scheduler 或 Worker。
+  :68 - Scheduler 只负责发现到期任务并创建 pending 任务。
+  :69 - Worker 只负责原子领取任务并调用 Job 执行。
+  :70 - Job 定义一次任务执行什么，外部 API 调用是同步过程。
+  :71 - 只有 `internal/scheduler` 可以在生产代码中使用 `time.NewTicker`。
+  :72 - 业务模块和 `init()` 禁止启动后台任务。
+  :74 ## Module 规则
+  :76 目标结构：
+  :78 ```text
+  :79 modules/{module}/
+  :80 ├── router.go
+  :81 ├── handler.go
+  :82 ├── dto/
+  :83 ├── service/
+  :84 ├── repository/
+  :85 └── model/
+  :88 - Router 只绑定 method、path 和函数 Handler，例如 `h.POST(path, Login)`。
+  :89 - Handler 位于模块根包，调用包级 Service 函数；禁止 Handler Struct 和 `...any` 依赖查找。
+  :90 - `dto` 和 `model` 是真实类型源，禁止反向别名到 Service。
+  :91 - Service 只处理业务规则；Repository 只处理数据访问。
+  :92 - 模块根包不得重新导出整个 Service、Repository 或 Model API。
+  :93 - 跨模块只能按固定单向依赖调用目标模块 Service，禁止跨模块访问 Repository 和循环依赖。
+  :95 ## Shared 与 API
+  :97 - HTTP 响应信封、错误响应和 JSON 解码归 `internal/shared/api`。
+  :98 - ID、Token 等稳定公共定义归 `internal/shared/id`。
+  :99 - 不创建单独的 `response` 目录。
+  :100 - 所有 HTTP 接口保持 `errcode`、`message`、`data`、`logid` 响应信封。
+  :101 - 除已批准的同步人工搜索外，重构不得改变路由、错误码、数据库结构或 Cloud–Agent Contract。
+  :103 ## 测试与提交
+  :105 - 新行为和重构必须测试先行，对于测试不需要强行过度测试，只需要关键链接测试严谨即可
+  :106 - Repository 单元测试使用 `go-sqlmock` 包装为 `*gorm.DB`，不依赖真实 MySQL。
+  :107 - 每个迁移阶段运行局部测试，最终运行 `go test ./...`、`go vet ./...`、格式和架构边界扫描。
+  :108 - 保留用户已有工作区改动；禁止使用破坏性 Git 命令。
+  :109 - 不修改无关的 `web/dist-*` 构建产物。
+  :110 - 待一个较大重构完成以后，再摸底集成测试
+  :113 - 对于.gitignore里的包禁止扫描，除此之外还包括dist、node_modules等文件
+
+### CLAUDE.md lines vs AGENTS.md + AGENT-INDEX.md + DIRECTORY_MAP.md
+
+=== CLAUDE.md: 99 non-empty line(s) (denominator), 56 covered by AGENTS.md, AGENT-INDEX.md, DIRECTORY_MAP.md, 43 without an equivalent ===
+  :11 Go + Hertz + Modular Monolith。
+  :13 禁止提前微服务化。
+  :17 # 目录规则
+  :21 只负责启动入口。
+  :25 只负责生命周期。
+  :29 生产初始化唯一发起方，管理基础资源的初始化与回滚。
+  :31 基础资源通过各包公有只读 Getter 使用，禁止创建全局单例和 `internal/runtime`。
+  :38 -   redis
+  :57 禁止在 internal 存放 yaml/json。
+  :63 -   Struct定义
+  :67 # 基础能力规则
+  :69 禁止业务模块初始化：
+  :72 -   Redis
+  :76 必须通过 Runtime 获取。
+  :80 # 外部服务规则
+  :82 新增第三方服务必须：
+  :84 1.  增加 config/clients 配置；
+  :85 2.  创建 internal/infra/client 实现；
+  :86 3.  接入 Runtime；
+  :87 4.  增加日志、trace、metrics。
+  :89 禁止业务代码直接 HTTP 调用。
+  :99 必须使用统一 Logger。
+  :101 日志必须包含：
+  :109 # 定时任务规则
+  :115 业务自行启动任务。
+  :117 所有定时任务必须：
+  :121 通过 scheduler 注册。
+  :125 # 模块规则
+  :127 新增模块必须：
+  :139 # API规则
+  :141 所有接口返回：
+  :150 # 修改原则
+  :152 修改代码前：
+  :154 1.  阅读已有架构；
+  :155 2.  优先复用已有基础能力；
+  :156 3.  不新增重复框架；
+  :157 4.  不创建万能目录。
+  :161 # 提交要求
+  :163 代码必须：
+  :165 -   可运行；
+  :166 -   符合分层；
+  :167 -   无重复初始化；
+  :168 -   不破坏架构边界。
+
+### AGENT-INDEX.md lines vs AGENTS.md (body lines not yet in AGENTS.md)
+
+=== AGENT-INDEX.md: 45 non-empty line(s) (denominator), 4 covered by AGENTS.md, 41 without an equivalent ===
+  :1 # wt-media-cloud Agent Index
+  :5 关于文档等事实都在`../wt-media-workspace`，需要执行时优先考虑对应的约束边界
+  :9 本仓库是 WT Media 的**业务事实中心**，同时承载统一 Vue 前端工程。技术栈：Go + Hertz 模块化单体、MySQL 正式业务数据、Vue 3 + Vite。
+  :11 ## 本仓库拥有
+  :13 - 业务对象、状态流转、权限校验、正式业务数据、事务与幂等。
+  :14 - Cloud API 与 Agent API。
+  :15 - Cloud 自有执行链路：当前 M3 内容发现由 Scheduler + Crawler（`internal/scheduler`、`internal/jobs/discovery.go`）直接抓取并写入业务表，依据 ADR-0015，不经过 Python Agent。
+  :16 - M4-M5 内容生产由 Cloud Scheduler / Worker / FFmpeg 执行；`compose_task`、`file_transfer_task` 与 `composite_output` 事实在 Cloud，依据 ADR-0017。
+  :17 - **全部 Vue 源码**（`web/`）：Cloud Web 应用（`web/src/apps/cloud`）与 Desktop Vue 应用（`web/src/apps/desktop`）共用 `web/src/modules` 业务模块和 `web/src/shared` 通用能力。
+  :19 ## 本仓库不拥有
+  :21 - 运营电脑上的 BitBrowser、Cookie、本地文件、浏览器自动化 → `../wt-media-agent`
+  :22 - 下载到运营电脑、打开本地文件、发布和互动执行 → `../wt-media-agent`
+  :23 - Tauri 原生能力、Sidecar 进程管理、安装包 → `../wt-media-desktop`
+  :25 ## 需求路由
+  :27 | 需求是 | 去哪里 |
+  :29 | 改业务规则、状态流转、API | `internal/modules/<模块>`，先查 `DIRECTORY_MAP.md` 模块表 |
+  :30 | 改内容发现策略与 M3 抓取执行 | `internal/jobs/discovery.go`、`internal/modules/contentpool/service/` |
+  :31 | 改调度触发 | `internal/scheduler/` |
+  :32 | 改 M4-M5 合成、文件准备或对象存储 | Cloud 生产模块、`internal/jobs/`、`internal/infra/media`、`internal/infra/storage`；不存在的目录按已批准 CHG 增量创建 |
+  :33 | 改 Cloud Web 页面 | `web/src/apps/cloud/` 或 `web/src/modules/` |
+  :34 | 改 Desktop 使用的 Vue 业务页面 | `web/src/modules/` 或 `web/src/apps/desktop/`（**不在** `wt-media-desktop` 仓库） |
+  :35 | 改 Desktop 的「本机设置」页或日志查看器 | `web/src/apps/desktop/features/local-settings/`、`local-logs/`（页面逻辑放同名的纯 JS 模块里才有单测——本仓 vitest **不编译 `.vue`**）；命令面在 `../wt
+  :36 | 改 Desktop Vue Runtime 适配 | `web/src/apps/desktop/runtime/`，必要时联动 `../wt-media-desktop` |
+  :37 | 改 Desktop 的 Cloud 地址 / Local Agent 端口来源 | `web/src/apps/desktop/features/local-agent/init.js`（经 `get_public_config`，**不得**落回环字面量），边界由 `web/src/local
+  :38 | 改外部 HTTP 调用 | `internal/infra/client/` |
+  :39 | 改 Cloud–Agent 契约服务端 | `internal/modules/cloudagent/` 与 `contracts/` |
+  :43 - 绕过 Local Agent 直接操作运营电脑的 BitBrowser、Cookie、本地文件。
+  :44 - Go HTTP 接口直接承担需要独立执行和恢复的长时间任务。
+  :45 - 跨模块直接改其他模块的数据（只能单向调用目标模块 Service）。
+  :46 - Cloud Web 页面直接执行 Tauri 原生操作。
+  :47 - 在 Desktop 仓库复制一套 Vue 业务页面。
+  :48 - 重新引入已被取消的 Agent 内容发现任务链路。
+  :49 - 把 M4-M5 视频合成或 FFmpeg 执行下放到 Desktop、Local Agent 或 Cloud Agent。
+  :50 - Desktop 页面里出现 `127.0.0.1` / `localhost` / `fetch(`：窗口的 CSP 挡着，直连只会得到一句「Agent 不可达」；本机能力一律经 `invoke` 走 Rust（`web/src/localAgentBoundary.test.js` 常驻守护，
+  :51 - 在 `.vue` 页面里放可测逻辑：本仓 vitest 不编译 `.vue`，写在那里等于写在没有单测的地方（页面逻辑放同名的纯 JS 模块，页面只负责渲染）。
+  :53 ## 上下文加载顺序
+  :55 1. 本文件（职责与路由）
+  :56 2. `AGENTS.md` 与 `CLAUDE.md`（架构与编码规则）
+  :57 3. `DIRECTORY_MAP.md`（目录导航，只记录实际存在的目录）
+  :58 4. 只读目标模块的代码与直接依赖、测试
+  :60 治理上下文（当前 CHG、Spec、Contract）在 `../wt-media-workspace`，按其 `.ai/CURRENT_CONTEXT.md` 指引加载；本仓库不做运行时依赖。禁止默认扫描 `web/dist-*`、`node_modules`、`logs` 等产物目录。
+
+### DIRECTORY_MAP.md lines vs AGENT-INDEX.md + AGENTS.md
+
+=== DIRECTORY_MAP.md: 75 non-empty line(s) (denominator), 9 covered by AGENT-INDEX.md, AGENTS.md, 66 without an equivalent ===
+  :1 # wt-media-cloud 目录地图
+  :3 本文只记录实际存在的目录。定位代码时从本文件出发，禁止全仓库扫描。
+  :5 ## 一、Go 后端
+  :7 ### 入口与生命周期
+  :9 | 路径 | 职责 | 何时进入 |
+  :11 | `cmd/server/` | 进程入口：`main.go` 只调用运行函数，`server.go` 管理 HTTP 启动、信号和优雅关闭 | 改启动方式、端口、优雅关闭 |
+  :12 | `internal/bootstrap/` | 生产初始化唯一发起方：`bootstrap.go` 初始化顺序、`resource.go` 资源初始化与回滚、`routes.go` 路由注册、`jobs.go` 任务连接 | 改初始化顺序、新增全局资源、注册路由 |
+  :13 | `internal/config/` | 配置 Loader、Schema、Validation、只读 Getter | 改配置结构 |
+  :15 ### 基础设施（`internal/infra/`）
+  :17 | 路径 | 职责 | 何时进入 |
+  :19 | `internal/infra/database/` | `*gorm.DB` 资源与 `DB()` / `Named()` 获取 | 改数据库连接、多库 |
+  :20 | `internal/infra/logger/` | App / Access / Job / External / Audit / Panic 六类 Logger | 改日志 |
+  :21 | `internal/infra/client/` | 全部外部 HTTP 协议实现（`agent/`、`observe/`、`platforms/`），统一 timeout、retry、错误映射 | 新增或修改外部 API 调用 |
+  :22 | `internal/infra/metrics/`、`internal/infra/tracing/` | 指标与链路追踪 | 改可观测性 |
+  :24 ### 调度与任务执行（Cloud 自有执行链路）
+  :26 | 路径 | 职责 | 何时进入 |
+  :28 | `internal/scheduler/` | Scheduler：发现到期任务并创建 pending 任务，全仓库唯一允许 `time.NewTicker` 的位置 | 改调度周期、触发逻辑 |
+  :29 | `internal/jobs/` | Job 定义：`discovery.go`（内容发现执行，含抓取与业务表写入，即 M3 Cloud Crawler 链路）、`proxy_expiry.go`（代理过期处理） | 改内容发现执行、抓取逻辑、代理过期任务 |
+  :31 当前 M3 依据 ADR-0015：内容发现由 Cloud Scheduler + Cloud Crawler（`internal/jobs/discovery.go`、`internal/modules/contentpool/service/discovery_crawler.go`）承担，不经
+  :33 ### 业务模块（`internal/modules/`）
+  :35 每个模块结构相同：`router.go`、`handler.go`、`dto/`、`service/`、`repository/`、`model/`。
+  :37 | 模块 | 业务对象 | 何时进入 |
+  :39 | `identity/` | 用户与权限 | 改登录、权限校验 |
+  :40 | `mediaaccount/` | 社媒账号业务记录 | 改账号管理 |
+  :41 | `profilebinding/` | Browser Profile 与账号/环境的绑定关系 | 改 Profile 云端记录 |
+  :42 | `profileguard/` | Profile 保护规则 | 改 Profile 校验 |
+  :43 | `proxy/` | 代理资源管理、代理检测结果（`service/check_result.go`） | 改代理管理 |
+  :44 | `contentpool/` | 内容发现与内容池：`service/discovery.go`、`discovery_crawler.go`（抓取执行）、`manual_search.go`（人工搜索） | 改内容发现、内容池 |
+  :45 | `cloudagent/` | Agent API 与 Agent 任务管理：任务领取、状态回写（`service/task_store.go`、`registry.go`、`operations.go`） | 改 Cloud–Agent 契约的服务端、任务状态 |
+  :46 | `runtimebinding/` | 运行时绑定关系 | 改绑定逻辑 |
+  :48 分层规则：Handler 不执行 SQL；Service 只管业务规则；Repository 是数据访问唯一入口。跨模块只能单向调用目标模块 Service。
+  :50 ### 公共与其他
+  :52 | 路径 | 职责 |
+  :54 | `internal/shared/` | `api/`（响应信封、错误响应、JSON 解码）、`id/`、`identity/`、`requestctx/` |
+  :55 | `internal/middleware/` | HTTP 中间件 |
+  :56 | `internal/architecture/` | 架构边界守护测试（`boundary_test.go`） |
+  :57 | `pkg/` | 可独立复用的库代码 |
+  :58 | `migrations/` | 数据库迁移 |
+  :59 | `config/`、`config_online/` | 运行时配置与发布打包替换配置（YAML 只允许在这两处） |
+  :60 | `contracts/` | 跨工程契约：`cloud-api/`、`cloud-agent-api/`、`business-schemas/`、`business-enums/`、`cloud-error-codes/`、`task-schemas/` |
+  :61 | `scripts/` | 构建与运维脚本 |
+  :63 ## 二、统一 Vue 前端（`web/`）
+  :65 **Cloud Web 与 Desktop Vue 两套应用共用本工程的模块，不另建第二套 Vue 源码。**
+  :67 ### 应用入口（`web/src/apps/`）
+  :69 | 路径 | 职责 | 何时进入 |
+  :71 | `web/src/apps/cloud/` | Cloud Web 应用入口：`main.ts`、`router.ts`、`pages/` | 改 Cloud Web 专属页面 |
+  :72 | `web/src/apps/desktop/` | Desktop Vue 应用入口：`main.ts`、`router.ts`、`App.vue`、`features/`、`runtime/`（Runtime 适配）、`desktopRoleGuard.test.js` | 改 Desktop
+  :73 | `web/src/apps/desktop/features/local-agent/init.js` | Desktop 侧唯一知道「Cloud 地址与 Local Agent 端口从哪来」的地方：经 `invoke('get_public_config')` 取得，不落任何回环字面量 | 改
+  :74 | `web/src/apps/desktop/features/local-settings/`、`local-logs/` | 「本机设置」页与日志查看器（CHG-058）。**页面逻辑在各自的纯 JS 模块里**（`local-settings-view.js` / `local-logs-v
+  :75 | `web/src/localSettingsService.test.js`、`localSettingsView.test.js`、`localLogsView.test.js`、`localSettingsWiring.test.js` | 上面那两页的测试：命令名与**精确**参数对象、纯
+  :76 | `web/src/localAgentBoundary.test.js` | 把「Desktop 页面不直连 Agent 回环端口」变成**常驻断言**（`init.js`、`LocalLogsPage.vue` 加一份**写死的**模块清单；新模块要显式进清单） | 改 Desktop–Age
+  :78 ### 共享业务模块（`web/src/modules/`）——按业务域
+  :80 `accounts`（社媒账号）、`analytics`（数据统计）、`auth`（认证）、`compose`（素材生产）、`contentpool`（内容池）、`dashboard`（仪表盘）、`discovery`（内容发现）、`interaction`（互动管理）、`materials`（素材
+  :82 两个应用共用的业务页面、Store、业务组件在此。改 Desktop 业务页面优先在 `modules/` 或 `apps/desktop/` 定位，不去 `wt-media-desktop` 仓库。
+  :84 ### 通用能力（`web/src/shared/`）——与业务无关
+  :86 `api/`（API 调用层）、`runtime/`（Runtime 接口适配）、`ui/`（通用组件）、`layouts/`、`composables/`、`constants/`、`styles/`、`utils/`。
+  :88 区分标准：含业务语义 → `modules/`；跨应用通用且无业务语义 → `shared/`。
+  :92 | 路径 | 说明 |
+  :94 | `web/src/generated/` | 生成代码，禁止手改 |
+  :95 | `web/src/layout/`、`web/src/styles/` | 全局布局与样式 |
+  :96 | `web/src/utils.js` | 根级工具 |
+  :98 ## 三、禁止扫描区
+  :100 以下目录为构建产物或依赖，除非诊断具体失败，禁止扫描或修改：
+  :102 - `web/dist-cloud/`、`web/dist-desktop/`（构建产物快照）
+  :103 - `web/node_modules/`、任何 `node_modules/`
+  :105 - `.git/`

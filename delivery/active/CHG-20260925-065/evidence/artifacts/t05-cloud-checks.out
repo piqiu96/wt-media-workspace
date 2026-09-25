@@ -1,0 +1,17 @@
+=== AC-09: every directory named on the infra rule line must exist ===
+matched rule line(s): 1 (denominator)
+enumerated: ['client', 'database', 'logger', 'metrics', 'tracing']
+missing on disk: none
+RESULT: PASS
+PC (inject 'cache'): missing -> ['cache'] => check CAN fail
+
+=== AC-11: no exclusion list left in AGENT-INDEX.md ===
+AGENT-INDEX.md: 205 line(s) (denominator), exclusion-list line(s): 0
+RESULT: PASS
+PC (HEAD:AGENT-INDEX.md) exclusion-list line(s): 1 => scan CAN see them
+
+=== AC-10: line counts, pre-change (HEAD) vs now ===
+AGENT-INDEX.md     before=60    after=205  
+AGENTS.md          before=113   after=11   
+CLAUDE.md          before=168   after=11   
+DIRECTORY_MAP.md   before=105   after=106  

@@ -18,13 +18,12 @@
 
 ## Current
 
-T-04 已完成（**门禁现在对真实现状报红 71 条**，见下「预期中间态见红」）；下一项是 T-05。
+T-05 已完成（`0db02ab`）；下一项是 T-06（agent）。
 
 ## Next
 
-1. **T-05 cloud 收口**：四件入口文件重写为 §3 形态，正文迁入 `AGENT-INDEX.md` 的 `## 本仓规则`；落实 F-03／F-05／F-07（权威冲突 A／B、禁止扫描区 E、目录树 F）。**只搬家不改义**，逐条归属表以改前行数为分母。**门禁给 cloud 的分母是 51 条 ERROR**（含八节序列那 1 条），收口目标 0。
-2. **T-06 agent 收口**（分母 10）、**T-07 desktop 收口**（分母 7，含 D-04 的范围限定句）。各仓独立提交。
-3. **T-08**：workspace 入口文件补机读键 ＋ 修 `CLAUDE.md:9` 那行复述（分母 3）。**T-09**：收尾归档与对账。
+1. **T-06 agent 收口**（分母 10）、**T-07 desktop 收口**（分母 7／8，含 D-04 的范围限定句）。各仓独立提交。两仓都需新增 `## 本仓规则` 节（八节第 6 位）——cloud 已就位，**跨仓序列相等判据要等这两仓落地才转绿**。
+2. **T-08**：workspace 入口文件补机读键 ＋ 修 `CLAUDE.md:9` 那行复述（分母 3）。**T-09**：收尾归档与对账（**不得早于 T-07**）。
 
 ## Blocked
 
@@ -32,18 +31,19 @@ T-04 已完成（**门禁现在对真实现状报红 71 条**，见下「预期�
 
 ## 预期中间态见红（不得静默容忍）
 
-**现状：`verify_agent_entry.py` exit=1，71 条 ERROR**（`evidence/artifacts/t04-gate-readings.out`）。这是 T-04 的**设计结果**，不是缺陷：新检查按构造先对现状报错，再由 T-05～T-07（三仓）与 T-08（治理仓）逐个收口。
+**现状：`verify_agent_entry.py` exit=1，22 条 ERROR**（`evidence/artifacts/t05-gate-after.out`；改前 71 条见 `t04-gate-readings.out`）。这是 T-04 的**设计结果**，不是缺陷：新检查按构造先对现状报错，再由 T-05～T-07（三仓）与 T-08（治理仓）逐个收口。
 
-| 仓／面 | ERROR 条数（收口目标 0） |
-|---|---|
-| `cloud` | 51 |
-| `agent` | 10 |
-| `desktop` | 7 |
-| `workspace` | 3 |
-| ↳ 其中三仓八节序列（`H2 sections, expected 8`） | 3（**已含在上面各仓的数里**，不是第四项） |
-| **合计** | **71** |
+| 仓／面 | T-04（改前） | 现在（T-05 后，收口目标 0） |
+|---|---|---|
+| `cloud` | 51 | **1** |
+| `agent` | 10 | 10 |
+| `desktop` | 7 | 8 |
+| `workspace` | 3 | 3 |
+| **合计** | **71** | **22** |
 
-分判据：`declares no rule body` 8 ／ `restates a rule without naming` 56 ／ `exceeds the pointer budget` 4 ／ `H2 sections, expected 8` 3；`H2 sequence diverges`、`disagree on the rule body`、`declares itself`、`declares a pointer as the rule body`、`declares an unknown rule body` 均 **0**（这些只出现在 `tests/` 的变异用例里，属构造性，不是现状）。
+分判据（现在）：`restates a rule without naming` 10 ／ `declares no rule body` 6 ／ `exceeds the pointer budget` 2 ／ `H2 sections, expected 8` 2 ／ `H2 sequence diverges` 2。`disagree on the rule body`、`declares itself`、`declares a pointer as the rule body`、`declares an unknown rule body` 均 **0**（只出现在 `tests/` 的变异用例里，属构造性，不是现状）。
+
+**云臂那条的归属必须写清**：cloud 剩的 1 条、desktop 的 8 条里 1 条、都是 `H2 sequence diverges`——**跨仓相等判据**，因为 agent 与 desktop 还没有 `## 本仓规则` 节（位置 6 不同）。cloud 自身文件**零缺陷**。⇒ 这三条只能由 T-06／T-07 消，**T-09 必须在那之后重测**。
 
 必须显式说明：CHG-20260925-063 的教训是「意料外的红会训练读者忽略这个门禁」，**已文档化的红同样会**（`conventions §10` 成文）。故本节的读数是**带收口计划的中间态**，不是「已知红项」：**T-09 不得早于 T-07**；本 CHG 不得在红的状态下归档。**其余五个门禁此时仍全绿**（本次改动未触及它们）。
 
@@ -78,6 +78,25 @@ T-02 收尾读数（`evidence/artifacts/t02-normative-strings.out`，@ 2026-09-2
 | `sync_skills.py check` | `exit=0` |
 
 六门禁全绿是**预期**：T-02 只写规范与文档、未动脚本，而新判据尚未实现——故此刻的绿**不**说明现状合规（与 T-01 的 0 warning 同理）。**行号漂移**：T-02 给 `AGENT-INDEX.md` §10 加 3 行后，§12 里那句旧描述由 `:193` 漂到 **`:198`**；本 CHG 的记录自此**按内容定位、不按行号**（已登记 `change.md` §14 第 7 项）。
+
+T-05 收尾读数（cloud，@ 2026-09-25T23:0xZ；`artifacts/t05-gate-after.out`）：
+
+| 判据 | 读数 |
+|---|---|
+| `verify_agent_entry` | `exit=1`，**22 ERROR / 0 WARN**（cloud 51 → **1**，见上表） |
+| `check_rule_text_duplication` | WARN 0；**分母** `compared 95 rule sentence(s) across 11 file(s) in 4 repositories` |
+| 其余五个门禁 | 全 `exit=0` |
+| `unittest discover -s tests -q` | `Ran 94` / OK |
+| 形态（`wc -l`） | `AGENT-INDEX` 60→205、`AGENTS` 113→11、`CLAUDE` 168→11、`DIRECTORY_MAP` 105→106 |
+| 逐条归属表 | 分母＝改前非空行数 86／99／45／75，各类加总等于分母（`task-05-cloud.md` §2） |
+| AC-09 阳性对照 | 注入 `cache` → infra 扫描报 `missing -> ['cache']` |
+| AC-11 阳性对照 | 同一扫描对未改动的 `HEAD:AGENT-INDEX.md` 命中 **1**（本文件命中 0） |
+| 指针链接 | 两个指针各 3 个链接全部 resolve |
+| cloud `git status --porcelain` | 仅 4 个 `M` ＋ 既存 `?? dump.rdb` |
+
+**两条如实登记的不足**：①AC-09 的判据**不是门禁**（全仓无脚本读 infra 列表，`change.md` §14 第 11 项）；②cloud 剩余的 1 条跨仓 ERROR 本 Task 无法消（§1 归属说明）。
+
+**一处自纠**：归属表初稿把「总行数」与「非空行数」两个分母混用，且 CLAUDE.md 的三类条数加总（99 行）写成了 112。改用 `HEAD` 版本重测分母后改正；**分母必须当场量**，不能沿用前一稿的读数。
 
 T-04 收尾读数（@ 2026-09-25T22:47Z 前后）：
 

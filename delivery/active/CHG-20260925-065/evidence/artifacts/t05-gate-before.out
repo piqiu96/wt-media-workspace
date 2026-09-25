@@ -1,0 +1,53 @@
+# cloud, pre-change (= T-04 closing reading, saved before this Task's edits)
+    ERROR cloud: AGENTS.md declares no rule body: expected `- 正文：`<file>``
+    ERROR cloud: AGENTS.md:8 restates a rule without naming AGENT-INDEX.md: 本项目使用 Go、CloudWeGo Hertz 和模块化单体架构。禁止提前拆分微服务，禁止未经决策引入 MQ、动态插件或工作流引擎。
+    ERROR cloud: AGENTS.md:17 restates a rule without naming AGENT-INDEX.md: - 不创建 `internal/runtime`、`internal/app`、`internal/server` 或 `bootstrap/modules.go`。
+    ERROR cloud: AGENTS.md:20 restates a rule without naming AGENT-INDEX.md: - `internal/shared` 只允许职责明确的公共定义，例如 `shared/api` 和 `shared/id`；禁止万能 `common`、`utils` 或 `resource` 包。
+    ERROR cloud: AGENTS.md:25 restates a rule without naming AGENT-INDEX.md: - 禁止导出可变资源变量，禁止 `runtime.Current`、万能 Service Locator 或动态资源注册表。
+    ERROR cloud: AGENTS.md:27 restates a rule without naming AGENT-INDEX.md: - 业务请求状态、用户状态和领域数据不得保存为全局变量。
+    ERROR cloud: AGENTS.md:28 restates a rule without naming AGENT-INDEX.md: - Module、Handler、Service、Repository 不得初始化基础资源。
+    ERROR cloud: AGENTS.md:32 restates a rule without naming AGENT-INDEX.md: - 配置文件只允许位于 `/config` 和 `/config_online`。
+    ERROR cloud: AGENTS.md:34 restates a rule without naming AGENT-INDEX.md: - 禁止在 `internal` 存放 YAML 或 JSON 配置。
+    ERROR cloud: AGENTS.md:36 restates a rule without naming AGENT-INDEX.md: - HTTP Server 配置属于 `app.yaml`，不创建独立 `server.yaml`。
+    ERROR cloud: AGENTS.md:39 restates a rule without naming AGENT-INDEX.md: - Client 连接配置与 Cookie、API Key、固定 Header 等认证配置必须分离。
+    ERROR cloud: AGENTS.md:44 restates a rule without naming AGENT-INDEX.md: - 保留显式 SQL：查询使用 `Raw`，写入使用 `Exec`，事务使用 `Transaction`；不得批量改写为 GORM ORM CRUD。
+    ERROR cloud: AGENTS.md:46 restates a rule without naming AGENT-INDEX.md: - Handler 和 Service 禁止执行 SQL。
+    ERROR cloud: AGENTS.md:47 restates a rule without naming AGENT-INDEX.md: - Repository 不得通过模块级 `Init` 复制同一个数据库实例。
+    ERROR cloud: AGENTS.md:52 restates a rule without naming AGENT-INDEX.md: - 业务代码禁止直接创建 `http.Client`，只能调用 `Search`、`FindAuthor`、`FetchByURL`、`CheckProxy` 等类型化方法。
+    ERROR cloud: AGENTS.md:55 restates a rule without naming AGENT-INDEX.md: - M4-M5 视频合成由 Cloud Compose Worker 调用受控 FFmpeg；Desktop、Local Agent 和 Cloud Agent 均不得执行该视频合成链路。
+    ERROR cloud: AGENTS.md:56 restates a rule without naming AGENT-INDEX.md: - 需要本机环境的操作必须经过 Agent；纯服务端公开数据抓取不经过 Agent。
+    ERROR cloud: AGENTS.md:60 restates a rule without naming AGENT-INDEX.md: - 禁止使用 `fmt.Println` 记录运行日志。
+    ERROR cloud: AGENTS.md:63 restates a rule without naming AGENT-INDEX.md: - 请求相关日志必须能够包含 `trace_id`、`request_id` 和 `module`。
+    ERROR cloud: AGENTS.md:72 restates a rule without naming AGENT-INDEX.md: - 业务模块和 `init()` 禁止启动后台任务。
+    ERROR cloud: AGENTS.md:89 restates a rule without naming AGENT-INDEX.md: - Handler 位于模块根包，调用包级 Service 函数；禁止 Handler Struct 和 `...any` 依赖查找。
+    ERROR cloud: AGENTS.md:90 restates a rule without naming AGENT-INDEX.md: - `dto` 和 `model` 是真实类型源，禁止反向别名到 Service。
+    ERROR cloud: AGENTS.md:92 restates a rule without naming AGENT-INDEX.md: - 模块根包不得重新导出整个 Service、Repository 或 Model API。
+    ERROR cloud: AGENTS.md:93 restates a rule without naming AGENT-INDEX.md: - 跨模块只能按固定单向依赖调用目标模块 Service，禁止跨模块访问 Repository 和循环依赖。
+    ERROR cloud: AGENTS.md:99 restates a rule without naming AGENT-INDEX.md: - 不创建单独的 `response` 目录。
+    ERROR cloud: AGENTS.md:101 restates a rule without naming AGENT-INDEX.md: - 除已批准的同步人工搜索外，重构不得改变路由、错误码、数据库结构或 Cloud–Agent Contract。
+    ERROR cloud: AGENTS.md:105 restates a rule without naming AGENT-INDEX.md: - 新行为和重构必须测试先行，对于测试不需要强行过度测试，只需要关键链接测试严谨即可
+    ERROR cloud: AGENTS.md:108 restates a rule without naming AGENT-INDEX.md: - 保留用户已有工作区改动；禁止使用破坏性 Git 命令。
+    ERROR cloud: AGENTS.md:109 restates a rule without naming AGENT-INDEX.md: - 不修改无关的 `web/dist-*` 构建产物。
+    ERROR cloud: AGENTS.md:113 restates a rule without naming AGENT-INDEX.md: - 对于.gitignore里的包禁止扫描，除此之外还包括dist、node_modules等文件
+    ERROR cloud: AGENTS.md exceeds the pointer budget (lines, bytes, H2 headings): 113 lines, 6046 bytes, 12 H2 headings
+    ERROR cloud: CLAUDE.md declares no rule body: expected `- 正文：`<file>``
+    ERROR cloud: CLAUDE.md:13 restates a rule without naming AGENT-INDEX.md: 禁止提前微服务化。
+    ERROR cloud: CLAUDE.md:31 restates a rule without naming AGENT-INDEX.md: 基础资源通过各包公有只读 Getter 使用，禁止创建全局单例和 `internal/runtime`。
+    ERROR cloud: CLAUDE.md:52 restates a rule without naming AGENT-INDEX.md: 配置文件只允许：
+    ERROR cloud: CLAUDE.md:57 restates a rule without naming AGENT-INDEX.md: 禁止在 internal 存放 yaml/json。
+    ERROR cloud: CLAUDE.md:69 restates a rule without naming AGENT-INDEX.md: 禁止业务模块初始化：
+    ERROR cloud: CLAUDE.md:76 restates a rule without naming AGENT-INDEX.md: 必须通过 Runtime 获取。
+    ERROR cloud: CLAUDE.md:82 restates a rule without naming AGENT-INDEX.md: 新增第三方服务必须：
+    ERROR cloud: CLAUDE.md:89 restates a rule without naming AGENT-INDEX.md: 禁止业务代码直接 HTTP 调用。
+    ERROR cloud: CLAUDE.md:95 restates a rule without naming AGENT-INDEX.md: 禁止：
+    ERROR cloud: CLAUDE.md:99 restates a rule without naming AGENT-INDEX.md: 必须使用统一 Logger。
+    ERROR cloud: CLAUDE.md:101 restates a rule without naming AGENT-INDEX.md: 日志必须包含：
+    ERROR cloud: CLAUDE.md:111 restates a rule without naming AGENT-INDEX.md: 禁止：
+    ERROR cloud: CLAUDE.md:117 restates a rule without naming AGENT-INDEX.md: 所有定时任务必须：
+    ERROR cloud: CLAUDE.md:127 restates a rule without naming AGENT-INDEX.md: 新增模块必须：
+    ERROR cloud: CLAUDE.md:156 restates a rule without naming AGENT-INDEX.md: 3.  不新增重复框架；
+    ERROR cloud: CLAUDE.md:157 restates a rule without naming AGENT-INDEX.md: 4.  不创建万能目录。
+    ERROR cloud: CLAUDE.md:163 restates a rule without naming AGENT-INDEX.md: 代码必须：
+    ERROR cloud: CLAUDE.md exceeds the pointer budget (lines, bytes, H2 headings): 168 lines, 2715 bytes, 7 H2 headings
+    ERROR cloud: AGENT-INDEX.md has 7 H2 sections, expected 8: 依赖, 定位, 本仓库拥有, 本仓库不拥有, 需求路由, 禁止, 上下文加载顺序
+# cloud-only lines above; the 51-line denominator is in t04-gate-readings.out

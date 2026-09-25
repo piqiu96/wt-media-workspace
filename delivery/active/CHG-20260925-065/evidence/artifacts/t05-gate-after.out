@@ -1,0 +1,26 @@
+# after cloud rewrite @ 2026-09-25T14:51:40Z
+ERROR agent: AGENTS.md declares no rule body: expected `- 正文：`<file>``
+ERROR agent: AGENTS.md:24 restates a rule without naming AGENT-INDEX.md: - `executors`: 任务类型编排：`protocol.py`（`Executor`/`ExecutorFactory`，不得 import `runner/`）、`profile.py`、`account_check.py`、`cookie.py`、`proxy.py`、`proxy_mutation.py`、`noop.py`。
+ERROR agent: AGENTS.md:41 restates a rule without naming AGENT-INDEX.md: - Agent 不创建正式业务任务，不决定正式业务对象的最终状态。
+ERROR agent: AGENTS.md:42 restates a rule without naming AGENT-INDEX.md: - 平台适配（未来 CHG 引入后）不得直接修改 Cloud 状态。
+ERROR agent: AGENTS.md:43 restates a rule without naming AGENT-INDEX.md: - 高风险外部操作结果无法确认时必须如实上报，禁止盲目重试。
+ERROR agent: AGENTS.md:45 restates a rule without naming AGENT-INDEX.md: - 依赖锁文件（`uv.lock`、`dependency.lock`）禁止手改。
+ERROR agent: AGENTS.md exceeds the pointer budget (lines, bytes, H2 headings): 45 lines, 3705 bytes, 5 H2 headings
+ERROR agent: CLAUDE.md declares no rule body: expected `- 正文：`<file>``
+ERROR agent: CLAUDE.md:10 restates a rule without naming AGENT-INDEX.md: dependency tool and must not be edited by hand.
+ERROR desktop: AGENTS.md declares no rule body: expected `- 正文：`<file>``
+ERROR desktop: AGENTS.md:36 restates a rule without naming AGENT-INDEX.md: - Rust 代理 Local Agent 的 HTTP。Agent 侧虽有 `text/event-stream` 端点，Desktop 不消费流（`local_agent_task_status` 是状态快照），不要在文档或代码注释里把这条写成已实现。
+ERROR desktop: AGENTS.md:39 restates a rule without naming AGENT-INDEX.md: - `src-tauri/gen/`（Tauri 生成内容）禁止手改。
+ERROR desktop: AGENTS.md exceeds the pointer budget (lines, bytes): 39 lines, 3170 bytes, 4 H2 headings
+ERROR desktop: CLAUDE.md declares no rule body: expected `- 正文：`<file>``
+ERROR desktop: CLAUDE.md:12 restates a rule without naming AGENT-INDEX.md: Generated content under `src-tauri/gen` must not be edited by hand.
+ERROR workspace: AGENTS.md declares no rule body: expected `- 正文：`<file>``
+ERROR workspace: CLAUDE.md declares no rule body: expected `- 正文：`<file>``
+ERROR workspace: CLAUDE.md:9 restates a rule without naming AGENT-INDEX.md: 本仓库**不是**运行时代码仓：不存放业务代码、服务运行代码、构建产物或临时文件，也不得成为任何运行时的依赖。运行时代码位于 `../wt-media-cloud`、`../wt-media-agent`、`../wt-media-desktop`。
+ERROR agent: AGENT-INDEX.md has 7 H2 sections, expected 8: 依赖, 定位, 本仓库拥有, 本仓库不拥有, 需求路由, 禁止, 上下文加载顺序
+ERROR desktop: AGENT-INDEX.md has 7 H2 sections, expected 8: 依赖, 定位, 本仓库拥有, 本仓库不拥有, 需求路由, 禁止, 上下文加载顺序
+ERROR cloud: AGENT-INDEX.md H2 sequence diverges from agent at position 6: '本仓规则' != '禁止'
+ERROR desktop: AGENT-INDEX.md H2 sequence diverges from cloud at position 6: '禁止' != '本仓规则'
+execution snapshot: 2014 characters (~806 tokens, budget 8000 characters)
+rule-text duplication: compared 95 rule sentence(s) across 11 file(s) in 4 repositories
+# exit=1
