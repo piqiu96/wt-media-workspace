@@ -1,0 +1,70 @@
+== T-04 workspace gates + suite (after the last change) ==
+date: 2026-09-26 03:48:08
+
+--- scripts/verify_delivery_governance.py exit=0 ---
+    archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+    archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+    Delivery governance verification ok. Active CHG: CHG-20260926-068
+--- scripts/verify_agent_entry.py exit=0 ---
+    execution snapshot: 2021 characters (~808 tokens, budget 8000 characters)
+    rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+    Agent entry verification ok. 0 warning(s) need review.
+--- scripts/verify_skills.py exit=0 ---
+    verified 10 skill source files
+--- scripts/verify_m0_config.py exit=0 ---
+    Workspace config verification ok
+--- scripts/verify_product_master_alignment.py exit=0 ---
+    Product and Master Plan alignment verification ok
+--- scripts/verify_m2_acceptance.py exit=0 ---
+    M2 static cross-repository acceptance matrix ok
+    NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+--- scripts/sync_skills.py check ---
+exit=0
+    skill outputs are up to date
+
+--- python3 -m unittest discover -s tests -q ---
+exit=0
+    ----------------------------------------------------------------------
+    Ran 106 tests in 0.748s
+    
+    OK
+
+--- denominator: tracked/untracked ---
+    tracked=974  untracked=3
+
+== denominator reconciliation (tracked-file count is measured, not recalled) ==
+  tracked at T-00's gate run (before its own commit)  = 951
+  tracked at e4e1587 (T-00 commit, +7 = the CHG-068 dir) = 958   [git ls-tree -r --name-only]
+  tracked at 9aca4f2 (T-01 record, +5)                = 963
+  tracked at 34fb54f (T-02 record, +6)                = 969
+  tracked at 19f4898 (T-03 record, +5)                = 974
+  tracked now                                          = 974   [git ls-files]
+  e4e1587..HEAD name-status: 16 A, 2 M
+  951 + 7 + 16 = 974  -> closes; the +16 are the T-01/T-02/T-03 evidence and artifact files.
+  untracked now = 3 = tests/test_bin_control_entry.py, t04-workspace-mutations.out, t04-workspace-gate.out
+                   (the first is not yet added; the other two are this task's own products)
+
+== suite baseline ==
+  Ran 106 / OK  (T-04 baseline was Ran 101 -> +5 = the 5 tests in tests/test_bin_control_entry.py)
+
+== re-run after the T-04 record edits (the gates read change.md / checkpoint.md, so the reading must follow them) ==
+date: 2026-09-26 03:49:08
+--- scripts/verify_delivery_governance.py exit=0 ---
+    Delivery governance verification ok. Active CHG: CHG-20260926-068
+--- scripts/verify_agent_entry.py exit=0 ---
+    Agent entry verification ok. 0 warning(s) need review.
+--- scripts/verify_skills.py exit=0 ---
+    verified 10 skill source files
+--- scripts/verify_m0_config.py exit=0 ---
+    Workspace config verification ok
+--- scripts/verify_product_master_alignment.py exit=0 ---
+    Product and Master Plan alignment verification ok
+--- scripts/verify_m2_acceptance.py exit=0 ---
+    NOTE: real MySQL and BitBrowser evidence must be recorded separately
+skill outputs are up to date
+--- sync_skills.py check exit=0 ---
+--- unittest discover -s tests -q exit=0 ---
+    Ran 106 tests in 0.765s
+    
+    OK

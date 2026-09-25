@@ -37,13 +37,22 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   `.local/` 污染护栏未触发（该检出**有** `.local/`，护栏处于生效态；needle 在 `scripts/test.sh` 里命中 1 处）。
   详见 `evidence/task-03-agent-entry.md`。
 
+- **T-04 workspace**：`scripts/test-control.sh` 判据 4 → 6 条（四条 `bash "$CONTROL"` 改**直接调用**，补判据 1／2）；
+  新建 `tests/test_bin_control_entry.py`（跨仓 5 用例，判据 1-4、6；**不比对跨仓源码文本**；兄弟仓缺席 `skip` 并印分母）。
+  变异 ① `chmod -x wt-media-desktop/bin/control.sh` → **恰 3 failed 全标 desktop**（本仓检查仍 `exit=0`）；
+  ② `chmod -x bin/control.sh` → 恰 3 failed 全标 workspace ＋ 本仓检查 `exit=1`；
+  缺席路径对照 `ran=5 skipped=5`、skip 文案含 `3/4`。六门禁全 `exit=0`、`sync_skills` `exit=0`、`Ran 106`（+5）。
+  自造缺陷一处（生成器式循环中断）已修并登记。详见 `evidence/task-04-workspace-entry.md`。
+
 ## Current
 
-T-03 收尾：量体量、在 agent 提交、在工作仓提交记录。
+T-04 收尾：量体量、提交；随后 T-05 四仓四动词真跑。
 
 ## Next
 
-T-04 workspace：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓复证 1-4、6）。
+T-05 workspace：先按 **pid** 杀实况（54420／54456，**不是 `bin/control.sh stop`**，见 §14 第 4 项），
+再逐仓 `status → start → status → restart → status → stop → status`，顺序 cloud → agent → desktop → workspace，
+16 格逐格标注覆盖面，收尾留运行态。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -78,3 +87,6 @@ T-04 workspace：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）
 | agent 机检（T-03） | 绿 7/7；变异 ① `chmod -x` → 4 failed、② index-only → **恰 1 failed**；还原后复读 `100755` |
 | agent 全跑（T-03） | `scripts/test.sh` `exit=0`：`Ran 416`／`OK`（基线 409，+7）；`.local/` 护栏未触发 |
 | 实况进程归属（T-03） | 8765＝pid 54456 `local_api.server --port 8765`（ppid 1）、18080＝pid 54420（ppid 54410）；**两条 `stop` 都停不掉**（见 §14 第 4 项，T-05 必读） |
+| workspace 两件（T-04） | `scripts/test-control.sh` 全跑 `exit=0`（判据 6 条）；跨仓 5 用例绿；缺席路径 `ran=5 skipped=5`、分母 `3/4` |
+| workspace 变异（T-04） | ① desktop `chmod -x` → 恰 3 failed（全 desktop），本仓检查仍 `exit=0`；② 本仓 `chmod -x` → 恰 3 failed（全 workspace）＋本仓检查 `exit=1` |
+| workspace 门禁（T-04） | 六门禁 `exit=0`、`sync_skills` `exit=0`、`Ran 106`／`OK`（基线 101，+5）；分母 `tracked=974 / untracked=3`，与 `e4e1587..HEAD` 的 `16 A／2 M` 对账闭合 |

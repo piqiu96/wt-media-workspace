@@ -1,0 +1,46 @@
+== T-04 mutations (each reverted; every arm evaluates all four cells) ==
+
+-- baseline: both workspace checks green --
+PASS: bin/control.sh entry (tracked, index 100755, executable, directly invocable), usage, dispatch, status wiring, and no-port-literal
+  scripts/test-control.sh exit=0
+Ran 5 tests in 0.176s
+
+OK
+
+-- mutation 1: chmod -x wt-media-desktop/bin/control.sh (the defect class CHG-067 missed) --
+  workspace scripts/test-control.sh exit=0 (must stay 0 -- it checks THIS repo's entry)
+FAIL: test_direct_invocation_help_exits_zero (tests.test_bin_control_entry.BinControlEntryTest.test_direct_invocation_help_exits_zero) (repository='desktop')
+FAIL: test_unknown_verb_exits_two_with_usage_on_stderr (tests.test_bin_control_entry.BinControlEntryTest.test_unknown_verb_exits_two_with_usage_on_stderr) (repository='desktop')
+FAIL: test_working_tree_mode_is_executable (tests.test_bin_control_entry.BinControlEntryTest.test_working_tree_mode_is_executable) (repository='desktop')
+Ran 5 tests in 0.181s
+FAILED (failures=3)
+
+-- revert --
+-rwxr-xr-x@ 1 aqiuye  staff  5233 Sep 26 02:00 ../wt-media-desktop/bin/control.sh
+Ran 5 tests in 0.217s
+
+OK
+
+-- mutation 2: workspace's OWN entry, chmod -x bin/control.sh --
+FAIL: bin/control.sh is not executable on disk
+  scripts/test-control.sh exit=1
+FAIL: test_direct_invocation_help_exits_zero (tests.test_bin_control_entry.BinControlEntryTest.test_direct_invocation_help_exits_zero) (repository='workspace')
+FAIL: test_unknown_verb_exits_two_with_usage_on_stderr (tests.test_bin_control_entry.BinControlEntryTest.test_unknown_verb_exits_two_with_usage_on_stderr) (repository='workspace')
+FAIL: test_working_tree_mode_is_executable (tests.test_bin_control_entry.BinControlEntryTest.test_working_tree_mode_is_executable) (repository='workspace')
+Ran 5 tests in 0.167s
+FAILED (failures=3)
+
+-- revert --
+  scripts/test-control.sh exit=0
+Ran 5 tests in 0.177s
+
+OK
+
+-- skip control: is the absent-sibling path real? (4th entry pointed at a directory that does not exist) --
+----------------------------------------------------------------------
+Ran 5 tests in 0.137s
+
+OK (skipped=5)
+  ran=5 skipped=5 failures=0 errors=0
+  skip: desktop: no sibling checkout at /nonexistent/wt-media-desktop -- this arm covers 3/4 repositories
+  skip: desktop: no sibling checkout at /nonexistent/wt-media-desktop -- this arm covers 3/4 repositories

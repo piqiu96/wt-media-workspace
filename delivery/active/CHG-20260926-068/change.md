@@ -124,7 +124,7 @@ None.
 | T-01 | **desktop**：`bin/control.sh` 模式 → `100755`（磁盘＋index）；新建 `tests/control.test.sh`（755，六条判据） | DONE | 改前 `./bin/control.sh help` **126**／改后 **0**；先红 3/9；**变异红** 8 failed（`chmod -x`）与恰 1 failed（`git update-index --chmod=-x`）；`scripts/test.sh` `exit=0`（372／12／20）。见 `evidence/task-01-desktop-entry.md` |
 | T-02 | **cloud**：新建 `scripts/verify/test-control.sh`＋`scripts/test.sh` 一行＋`scripts/README.md` 一行 | DONE | `bash scripts/test.sh` `exit=0`（`^ok\s` 56／`^FAIL` 0／vitest 25-166／`[control]` 12-0）；**变异红** 8 failed 与恰 1 failed；`[control]` 13 行对门禁两条正则各贡献 0 行。见 `evidence/task-02-cloud-entry.md` |
 | T-03 | **agent**：新建 `tests/test_control_sh.py` | DONE | 7 用例绿；**变异红** 4 failed 与恰 1 failed；`Ran 416`（基线 409，+7）；`.local/` 护栏未触发。见 `evidence/task-03-agent-entry.md` |
-| T-04 | **workspace**：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓） | TODO | 两条绿；**变异红**：`chmod -x wt-media-desktop/bin/control.sh` → 跨仓用例在 desktop 那格红（CHG-067 漏掉的缺陷类别）→ 还原；六门禁 `exit=0` |
+| T-04 | **workspace**：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓） | DONE | 两条绿；**变异** `chmod -x` 兄弟仓 desktop → **恰 3 failed 全标 desktop**（本仓检查仍 0）／本仓 → 恰 3 failed＋本仓检查 `exit=1`；缺席路径 skip 并印分母 `3/4`；六门禁 `exit=0`、`Ran 106`（+5）。见 `evidence/task-04-workspace-entry.md` |
 | T-05 | **workspace**：四仓四动词**真跑**（16 格），先停实况，逐仓 `status → start → status → restart → status → stop → status`，原始读数落 `evidence/artifacts/t05-*-verbs.out`；收尾留在运行态 | TODO | 逐格标注「端到端／止于既有前置／未覆盖」；仓序 cloud → agent → desktop → workspace；副作用登记 |
 | T-06 | **workspace**：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | TODO | 六门禁 ＋ `unittest` ＋ `sync_skills.py check`，取在最后一次改动之后；两遍指针扫描（各带对照与分母，锚取**不变基线**）；四仓 `git status` 对账 |
 
@@ -139,7 +139,7 @@ None.
 ### wt-media-workspace
 
 - [ ] `delivery/active/CHG-20260926-068/` 三件齐备；LEDGER 表行；快照 `--change`；`MASTER` §3 刷新（T-00）
-- [ ] `scripts/test-control.sh` 强化；`tests/test_bin_control_entry.py`（T-04）
+- [x] `scripts/test-control.sh` 强化；`tests/test_bin_control_entry.py`（T-04）
 - [ ] 四仓四动词真跑与逐格覆盖面（T-05）
 - [ ] 归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描、四仓对账、AC 签字、DONE Gate（T-06）
 
@@ -160,9 +160,9 @@ None.
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
 | AC-01 | desktop `bin/control.sh` 可直接调用 | 改前 `help`=**126**／改后 **0**；index 与磁盘均 `100755` | PASS（T-01） |
-| AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PARTIAL：desktop（T-01）／cloud（T-02）／agent（T-03）已绿＋各两处变异；workspace 待 T-04 |
+| AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PASS：desktop（T-01）／cloud（T-02）／agent（T-03）／workspace（T-04）各绿＋各两处变异 |
 | AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | TODO |
-| AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PARTIAL：三仓同形（磁盘变异连带 4～8 项红／index 变异恰 1 项红）；workspace 待 T-04 |
+| AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PASS：四仓磁盘变异连带 3～8 项红、index 变异恰 1 项红；跨仓缺席路径有 skip 对照（分母 `3/4`） |
 | AC-05 | 跨仓回指与既有判据不被本 CHG 打红 | 六个静态门禁 `exit=0` ＋ `unittest` 套件 `OK` | TODO |
 | AC-06 | 改动逐条落在 §5；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 路径逐条归属；端口值 diff **0** | TODO |
 | AC-07 | 记录体量按**每 Task 增量**在界内 | `change.md` ≤ 5120 B／Task、`checkpoint.md` ≤ 4096、evidence md ≤ 9216；锚取上一 Task 提交后的 blob | TODO |
@@ -175,6 +175,7 @@ None.
 - `evidence/task-01-desktop-entry.md` ＋ `artifacts/t01-entry-red.out`、`t01-entry-fix-and-mutations.out`、`t01-desktop-test-sh.out`
 - `evidence/task-02-cloud-entry.md` ＋ `artifacts/t02-cloud-control.out`、`t02-cloud-mutations.out`、`t02-cloud-prefix-control.out`、`t02-cloud-test-sh.out`
 - `evidence/task-03-agent-entry.md` ＋ `artifacts/t03-agent-control.out`、`t03-agent-mutations.out`、`t03-agent-test-sh.out`
+- `evidence/task-04-workspace-entry.md` ＋ `artifacts/t04-workspace-mutations.out`、`t04-workspace-gate.out`
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 ## 12. Current Checkpoint
@@ -221,3 +222,9 @@ None.
    ⇒ 这两个实况进程是**别处**（09-25 手工／harness）起的，不在本仓 pid 文件的记录内；
    T-05 必须**按 pid 直接杀**（用户已裁定「直接全部杀掉重跑」），不能写成「用 `stop` 停掉」——
    否则那两格会变成「`stop` 退 0 但进程仍在」的假绿。**这是 T-05 的必读前置。**
+
+5. **T-04：我的第一版跨仓用例把「一格红」放大成了「后面的格没被看过」。** `each_repository()` 写成生成器后，
+   `self.fail()` 在生成器里抛出会连带触发 `GeneratorExit` 并**中断循环**——变异 ②（workspace 是第一格）时
+   cloud／agent／desktop 从未求值，却被记成 `GeneratorExit` ERROR。改为「先取列表、再逐个 `with self.subTest(...)`」后
+   每格独立求值，一格红不遮蔽其余格（重跑：恰 3 failed，全部标 `repository='workspace'`）。
+   这与本 CHG 主题同形：**判据的求值范围本身要被检查**，否则「只红一格」可能只是「只跑到一格」。
