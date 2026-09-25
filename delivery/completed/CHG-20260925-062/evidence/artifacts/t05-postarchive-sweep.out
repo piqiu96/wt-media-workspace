@@ -1,0 +1,26 @@
+=== 归档后指针扫描（两遍，判据不同）——含第二遍的更正 ===
+
+--- 第一遍：字符串扫描，分母 = 本仓跟踪文件 714 个 ---
+$ git grep -n 'active/CHG-20260925-062'  → 命中 3
+  delivery/completed/CHG-20260925-062/change.md:96:- `wt-media-workspace/delivery/active/CHG-20260925-062/`：本记录、`checkpoint.md`、`evidence/`。
+  delivery/completed/CHG-20260925-062/checkpoint.md:15:- 2026-09-25 T-01：建 `delivery/active/CHG-20260925-062/`（`change.md` 十三节、本 `checkpoint.md`、
+  delivery/completed/CHG-20260925-062/evidence/artifacts/t01-activate.out:14:  "active_change_file": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-workspace/delivery/active/CHG-20260925-062/change.md",
+  以上 3 处**全部是历史叙述/原始输出**，不是可重放路径：
+    - change.md:96 是 §5 Scope 里「本 CHG 建了哪些文件」的过去时叙述
+    - checkpoint.md:15 是 T-01 的完成日志
+    - t01-activate.out:14 是 T-01 当时生成器输出的原始留档（不可改写）
+  判据「路径判修、叙述判留」⇒ 三处均**保留**，不改为 completed/。
+
+  阳性对照：$ git grep -n 'completed/CHG-20260925-062' → 命中 1
+    delivery/LEDGER.md:11:[CHG-20260925-062](completed/CHG-20260925-062/change.md)（2026-09-24 入口重构的治理补记与三处指针修正
+
+--- 第二遍：链接 resolve（**按引用文件自己的目录**解析，不是只从仓根）---
+  首轮只从仓根解析，把 LEDGER 的 'completed/...' 误判为 MISS——那个链接是相对
+  LEDGER 自己所在的 delivery/ 的。已改为逐引用文件解析：
+  OK   [自身目录 delivery/] delivery/LEDGER.md -> completed/CHG-20260925-062/change.md
+
+--- 另扫：归档目录本身是否可达（正向）---
+  OK   delivery/completed/CHG-20260925-062/change.md
+  OK   delivery/completed/CHG-20260925-062/checkpoint.md
+  OK   delivery/completed/CHG-20260925-062/evidence/task-05-close.md
+  delivery/active/ 内容: .gitkeep 

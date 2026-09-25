@@ -87,8 +87,50 @@ grep -rni 'root `AGENT-INDEX.md`' skills/ .claude/skills .codex/skills ../.claud
 齐备），才是可比读数：**73 测试 / 4 红**。两处读数都留在
 `artifacts/t05-unittest-baseline-placement.out`。
 
+## 归档后的读数与指针扫描
+
+**① 归档后门禁**（`git mv active/ → completed/`、LEDGER 回占位行、`prepare_ai_workspace.py --no-active`）：
+
+| 项 | 读数 |
+| --- | --- |
+| 快照 | `Active CHG: none` / `Status: NONE`，**1668 字符**（与开工前同值） |
+| `verify_delivery_governance.py` | `ok. Active CHG: none` |
+| `verify_agent_entry.py` | `ok. 0 warning(s) need review` |
+| `verify_skills.py` | `verified 10 skill source files` |
+| `delivery/active/` | 只剩 `.gitkeep` |
+
+**② 中间态的预测被证实**。归档前 §13 记下一条**可证伪的预测**：`Status: DONE` 但仍在 `active/` 时
+`verify_product_master_alignment.py` 会多出 1 项（8 项既知 + 1 项中间态 = 9）。归档后复测
+**回到 8 项**（见 `t05-prearchive-product-master.out` 与本次 `8`）。即：那 1 项确由「DONE 仍在 active」
+这一个条件触发，别无他因。
+
+**③ 顺带核掉一个疑似漂移（结论是「不漂移」，登记以免后人重提）**。重生成的快照里
+「Required Reading Order」是 `AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md`，看着像与本次重构的
+「正文归口 `AGENT-INDEX.md`」相抵触。核对 `AGENT-INDEX.md` §4 第一层：原文即
+`AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md` → `.ai/CURRENT_CONTEXT.md`，**与生成器
+（`prepare_ai_workspace.py:144-146`）逐项一致**，无漂移。
+（两条轴不同，勿混：§4 是**读取顺序**（先读薄入口、再读正文），skill 的 `Authority Order` 是
+**冲突时的裁决优先级**（正文最高），二者不矛盾。）
+
+**④ 归档后失效指针扫描**（原始输出 `artifacts/t05-postarchive-sweep.out`）：
+
+- **第一遍，字符串扫描**：`git grep -n 'active/CHG-20260925-062'`，分母 = 本仓 714 个跟踪文件，
+  **命中 3**——分别是 `change.md:96`（§5 Scope 的过去时叙述）、`checkpoint.md:15`（T-01 完成日志）、
+  `t01-activate.out:14`（T-01 当时生成器输出的原始留档）。**三处全部判为「叙述」而非「可重放路径」**，
+  按「路径判修、叙述判留」予以**保留**：改成 `completed/` 会让 §5 与那条日志描述一个当时不存在的位置，
+  改原始留档更是伪造证据。阳性对照：同一 `git grep` 扫 `completed/CHG-20260925-062` **命中 1**
+  （LEDGER 的链接），证明该 grep 确实能命中。
+- **第二遍，链接 resolve** —— **首轮我自己的解析器误判，登记**：只从**仓根**解析，把 LEDGER 的
+  `completed/CHG-20260925-062/change.md` 报成 `MISS`。该链接是相对 **LEDGER 自己所在的 `delivery/`**
+  的，文件其实一直在。这正是 T-02 那次「只从仓根解析产生 32 个假 MISS」的同一类错误，我又犯了一次。
+  改为**逐引用文件按其自身目录解析**后：`OK [自身目录 delivery/] delivery/LEDGER.md -> …/change.md`，
+  **MISS 归零**。正向可达性另测三处（`change.md`/`checkpoint.md`/`task-05-close.md`）均 `OK`。
+
 ## Follow-Up
 
+- 归档编辑 LEDGER 时**又发现一处同类陈旧指针**，已登记为 §14 遗留第 8 项：`delivery/LEDGER.md:21`
+  仍写「**D（CHG-059）已于 2026-09-25 激活**（见上表）」，而 059 已关闭归档、表行已移除，
+  「见上表」不再可达。**只登记不改**（属 LEDGER 的历史叙述，改动会把范围扩到本 CHG 之外）。
 - `CLAUDE.md` 的 `## 高频红线` 与 `AGENT-INDEX.md` §2 的局部重复（4/8 条）需独立 CHG 处置；
   本 CHG 只登记。
 - 两处临时 worktree（`../wt-baseline840ba38-tmp`、`/tmp/wt-base-840ba38`）已 `worktree remove` +

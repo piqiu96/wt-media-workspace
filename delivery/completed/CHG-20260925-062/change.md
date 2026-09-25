@@ -310,3 +310,4 @@ Recent verification:
 | 5 | `executing-wt-media-change/SKILL.md` Authority Order 第 6 项仍写「Affected repository `AGENTS.md` files」 | 用户裁定的范围是「第 1 步读取指针」，第 6 项不在内（且该措辞不算错，层三本来就读该仓三件） | 需独立 CHG（措辞精确化） |
 | 6 | desktop 13 个 `.rs`、cloud `dump.rdb` 为**他人/他任务**的在途改动 | 先于本会话，非本 CHG 造成 | 不碰、不提交、不清理；后续 CHG 以它们为基线前需先确认归属 |
 | 7 | `verify_m0_config.py` 3 项、`verify_product_master_alignment.py` 的既知红项 | 与本 CHG 无关 | 保持红 |
+| 8 | `delivery/LEDGER.md` 里「**D（CHG-059）已于 2026-09-25 激活**（见上表）」一句已陈旧——059 已关闭归档、表行已移除，故「见上表」不再可达 | 与本 CHG 无关（写于 059 激活当时，此后未随其关闭更新）；改动它会把本 CHG 的范围扩到 LEDGER 的历史叙述 | 需独立 CHG（同属「归档后遗留指针」，与本 CHG 修的三处同类） |
