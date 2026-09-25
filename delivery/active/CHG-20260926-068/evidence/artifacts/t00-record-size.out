@@ -1,0 +1,27 @@
+# CHG-20260926-068 T-00：记录体量（按每 Task 增量）
+# 判据（沿用 CHG-065/066/067 的 v5）：每 Task 增量 —— change.md ≤ 5120 B、checkpoint.md ≤ 4096 B、evidence md ≤ 9216 B
+# 锚：上一 Task 提交后的 blob。T-00 无上一 Task ⇒ 锚取 5622622（本 CHG 开工前 HEAD）下的同名路径。
+# 取数时刻：2026-09-26 03:38:50（本文件是最后一次写入之后量的）
+
+## 锚侧读数（5622622 下这些路径尚不存在 ⇒ 0 B）
+change.md        fatal: path 'delivery/active/CHG-20260926-068/change.md' exists on disk, but not in '5622622'
+checkpoint.md    fatal: path 'delivery/active/CHG-20260926-068/checkpoint.md' exists on disk, but not in '5622622'
+
+## 当前读数（T-00 新建 ⇒ 全量 = 增量）
+change.md                         14149 B   界 5120 → 越界 +176.3%
+checkpoint.md                      3530 B   界 4096 → 界内
+evidence/task-00-activation.md     5732 B   界 9216 → 界内
+
+## 说明
+① T-00 的形态是「一次写完整份计划／整份记录」，同 CHG-067 T-00 的结构性越界。
+② evidence md 自身的体量自指（写在文件里的数字会因该次写入而变）⇒ evidence 正文只报方向、指本产物。
+③ 本产物自身不参与判据分母（判据只管三份记录）。
+
+## 同类先例（实测读数，不当作上限）
+CHG-20260926-067 T-00：change.md 24095 B（越界 +370.6%）、checkpoint.md 3720 B、evidence 5281 B
+本 Task 对照：change.md 14149 B（越界 +176.3%，为 067 同 Task 的 58.7%）
+⇒ 读数比先例小一档；照报、不强压（CHG-066 §14 第 4 项、CHG-067 T-00 同一处置）
+
+## 正文陈述与实测的逐项比对（防「同一句里两个数字自相矛盾」）
+checkpoint.md 正文陈述：change.md = 14149 B、+176% → 实测 14149 B、+176.3%
+evidence §6 正文陈述：change.md 14149 B（+176%）、checkpoint.md 3530 B、占 067 T-00 的 58.7% → 实测 14149 B、3530 B、58.7%

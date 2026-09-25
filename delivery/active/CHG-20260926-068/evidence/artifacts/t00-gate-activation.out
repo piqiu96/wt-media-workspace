@@ -1,0 +1,45 @@
+# CHG-20260926-068 T-00：六个静态门禁 ＋ sync_skills ＋ workspace 套件
+# 取在激活写入（change.md／checkpoint.md／LEDGER 表行／MASTER §3／快照）之后
+# 采集时间: 2026-09-26 03:37:36
+
+## 已跟踪／未跟踪分母
+已跟踪 951／未跟踪 6
+
+### scripts/verify_delivery_governance.py
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-068
+exit=0
+
+### scripts/verify_agent_entry.py
+execution snapshot: 2021 characters (~808 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+### scripts/verify_skills.py
+verified 10 skill source files
+exit=0
+
+### scripts/verify_m0_config.py
+Workspace config verification ok
+exit=0
+
+### scripts/verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+exit=0
+
+### scripts/verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+### scripts/sync_skills.py check
+skill outputs are up to date
+exit=0
+
+### python3 -m unittest discover -s tests -q
+Ran 101 tests in 0.589s
+
+OK
+exit=0

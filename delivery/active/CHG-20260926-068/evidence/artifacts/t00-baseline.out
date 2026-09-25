@@ -1,0 +1,45 @@
+# CHG-20260926-068 T-00 基线读数
+# 采集时间: 2026-09-26 03:35:57
+
+## 四仓 HEAD 与工作树
+wt-media-workspace HEAD=5622622
+  status --porcelain:
+    ?? delivery/active/CHG-20260926-068/
+  status 行数=1
+wt-media-cloud HEAD=e2ba4d8
+  status --porcelain:
+     D internal/architecture/boundary_test.go
+  status 行数=1
+wt-media-agent HEAD=aa95332
+  status --porcelain:
+     M AGENT-INDEX.md
+  status 行数=1
+wt-media-desktop HEAD=9ba5486
+  status --porcelain:
+  status 行数=0
+
+## 四仓 bin/control.sh 形态
+wt-media-workspace index=100755 disk=-rwxr-xr-x size=1734
+wt-media-cloud index=100755 disk=-rwxr-xr-x size=3669
+wt-media-agent index=100755 disk=-rwxr-xr-x size=4445
+wt-media-desktop index=100644 disk=-rw-r--r-- size=5233
+
+## desktop 直接调用（缺陷读数）
+  ./bin/control.sh help exit=126
+  bash bin/control.sh help exit=0
+
+## 四仓 help / 未知动词
+  wt-media-workspace help exit=0
+  wt-media-workspace bogus exit=2 stdout_bytes=0 stderr_bytes=503
+  wt-media-cloud help exit=0
+  wt-media-cloud bogus exit=2 stdout_bytes=0 stderr_bytes=354
+  wt-media-agent help exit=0
+  wt-media-agent bogus exit=2 stdout_bytes=0 stderr_bytes=467
+  wt-media-desktop help exit=126
+  wt-media-desktop bogus exit=126 stdout_bytes=0 stderr_bytes=47
+
+## 监听端口占用（本 CHG 开工前）
+  �\x94� 13947 *:54345
+  server 54420 127.0.0.1:18080
+  server 54420 127.0.0.1:18080
+  python3.1 54456 127.0.0.1:8765

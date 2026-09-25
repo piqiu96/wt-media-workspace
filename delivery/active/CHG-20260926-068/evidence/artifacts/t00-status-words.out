@@ -1,0 +1,20 @@
+# CHG-20260926-068 T-00：MASTER §3 读数列（量法＝直接 import 门禁自己的 status_word()）
+# 采集时间: 见文件 mtime；分母逐条打印
+
+## 激活前
+planned 分母=19  {'SUPERSEDED': 9, 'PLANNED': 3, 'DISCUSSION': 7}
+active  分母=0  {}
+completed 分母=42  {'VERIFYING': 1, 'IN_PROGRESS': 4, 'DONE': 32, 'CLOSED': 2, 'HANDOFF': 2, 'IMPLEMENTING': 1}
+活记录 = planned 19 + active 0 = 19
+归档列 = completed 分母 = 42
+退役(CLOSED/HANDOFF/IN_PROGRESS) = 8
+闭合式：归档列 42 + 退役 8 = 50
+
+## 激活后
+planned 分母=19  {'SUPERSEDED': 9, 'PLANNED': 3, 'DISCUSSION': 7}
+active  分母=1  {'IMPLEMENTING': 1}
+completed 分母=42  {'VERIFYING': 1, 'IN_PROGRESS': 4, 'DONE': 32, 'CLOSED': 2, 'HANDOFF': 2, 'IMPLEMENTING': 1}
+活列 = planned 19 + active 1 = 20
+归档列 = DONE 32 + VERIFYING 1 + IMPLEMENTING 1 = 34
+归档分母 = 42；退役 CLOSED 2 + HANDOFF 2 + IN_PROGRESS 4 = 8
+闭合式：归档列 34 + 退役 8 = 42
