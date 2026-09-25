@@ -1,0 +1,86 @@
+# T-10 关闭读数（最后一段）
+# 取数时间：2026-09-25 20:20:24 CST
+# 说明：本段在 T-10 对记录（change.md／checkpoint.md）的最后一次改动之后运行。
+# 每段都是先取 exit code 再打印输出（zsh 的 ${PIPESTATUS[0]} 读不到，故不用管道）。
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m0_config.py
+Workspace config verification ok
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_delivery_governance.py
+Delivery governance verification ok. Active CHG: CHG-20260925-064
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_agent_entry.py
+execution snapshot: 1936 characters (~774 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_skills.py
+verified 10 skill source files
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q
+----------------------------------------------------------------------
+Ran 79 tests in 0.280s
+
+OK
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/sync_skills.py check
+skill outputs are up to date
+-- exit=0
+
+################################################################
+# T-10 关闭读数（末段，覆盖上一段）
+# 取数时间：2026-09-25 20:20:43 CST
+# 为什么有第二段：上一段之后我又改了 change.md §14 第 18 项与 evidence §8 第 2 项的措辞
+# （把「没有任何东西在验」收紧为「这份 Lock 没有任何读者」，避免读成「生成副本无人校验」）。
+# 按"关闭读数必须在最后一次改动之后"的纪律，这里整段重跑，不沿用上一段。
+################################################################
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m0_config.py
+Workspace config verification ok
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_delivery_governance.py
+Delivery governance verification ok. Active CHG: CHG-20260925-064
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_agent_entry.py
+execution snapshot: 1936 characters (~774 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_skills.py
+verified 10 skill source files
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q
+----------------------------------------------------------------------
+Ran 79 tests in 0.276s
+
+OK
+-- exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/sync_skills.py check
+skill outputs are up to date
+-- exit=0

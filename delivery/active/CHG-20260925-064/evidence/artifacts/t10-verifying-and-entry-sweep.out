@@ -1,0 +1,50 @@
+# T-10 判据 A/B：verifying/ 与 根 `AGENTS.md` 复扫（2026-09-25）
+
+## A. verifying/ 全仓扫描
+分母：git ls-files = 793 个受控文件
+
+### A-1 全仓命中（含历史归档、本 CHG 自身记录）
+  delivery/active/CHG-20260925-064/change.md:55:| C7 | `delivery/verifying/` | `MASTER:28` 与 `arch:1964` 的目录树画了它，**实测不存在** |
+  delivery/active/CHG-20260925-064/change.md:109:- `MASTER:28`、`arch:1964` 目录树里的 `verifying/` 条目（T-10）
+  delivery/active/CHG-20260925-064/change.md:118:- **不做架构文档 `_V1.md` 的全篇审计**：只处置被点名的三处（目录树 `verifying/`、执行根入口段、前端源码根），其余陈旧点登记为遗留。
+  delivery/active/CHG-20260925-064/change.md:152:| T-10 | 目录树、死指针、执行根入口描述、外层 `docs` 指针 | TODO | `verifying/` 只余历史归档；树内条目逐条 `ls`；`根 \`AGENTS.md\`` → 0 | 独立 |
+  delivery/active/CHG-20260925-064/change.md:302:| AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`（含阳性对照） | TODO |
+  delivery/active/CHG-20260925-064/evidence/task-04-reading-order-single-landing.md:131:   该树的其余问题（`verifying/` 条目、缺 `tests/`）仍属 T-10。
+  delivery/completed/CHG-20260925-063/change.md:264:3. **G-9 的 8 条权威冲突**（ADR-0015/0017 的 FFmpeg 归属、读取顺序两版、`milestones/README.md:7` 的 M3 状态与事实相反、`MASTER:54` 的 `delivery/verifying/` 不存在等）。**独立 CHG。**
+  命中合计：7
+
+### A-2 活文件（排除 delivery/completed/、delivery/reports/）
+分母：200 个文件
+  delivery/active/CHG-20260925-064/change.md:55:| C7 | `delivery/verifying/` | `MASTER:28` 与 `arch:1964` 的目录树画了它，**实测不存在** |
+  delivery/active/CHG-20260925-064/change.md:109:- `MASTER:28`、`arch:1964` 目录树里的 `verifying/` 条目（T-10）
+  delivery/active/CHG-20260925-064/change.md:118:- **不做架构文档 `_V1.md` 的全篇审计**：只处置被点名的三处（目录树 `verifying/`、执行根入口段、前端源码根），其余陈旧点登记为遗留。
+  delivery/active/CHG-20260925-064/change.md:152:| T-10 | 目录树、死指针、执行根入口描述、外层 `docs` 指针 | TODO | `verifying/` 只余历史归档；树内条目逐条 `ls`；`根 \`AGENTS.md\`` → 0 | 独立 |
+  delivery/active/CHG-20260925-064/change.md:302:| AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`（含阳性对照） | TODO |
+  delivery/active/CHG-20260925-064/evidence/task-04-reading-order-single-landing.md:131:   该树的其余问题（`verifying/` 条目、缺 `tests/`）仍属 T-10。
+  命中合计：6
+
+### A-3 剔除本 CHG 自身记录后的活文件命中
+  命中合计：0
+
+### A-4 阳性对照：同一扫描器读 HEAD（T-10 改前）的同一批文件
+  HEAD:delivery/MASTER_IMPLEMENTATION_PLAN.md:54:│   └── verifying/
+  HEAD:"docs/engineering/architecture/\347\244\276\345\252\222\350\277\220\350\220\245\345\271\263\345\217\260\345\267\245\347\250\213\346\236\266\346\236\204\344\270\216\345\210\206\345\261\202\350\256\276\350\256\241_V1.md":1964:│   └── verifying/
+  命中合计：2（＝工作区同样的两棵树改前各有 1 条）
+
+## B. 根 `AGENTS.md` 断言
+分母：793 个受控文件（同 A）
+
+### B-1 全仓命中
+  delivery/active/CHG-20260925-064/change.md:49:| C1 | 读取顺序 | **两版并存**：`AGENT-INDEX.md:7,:64`（入口 → 正文）与 `AGENTS.md:16-20`、`CLAUDE.md:22-26`（正文 → 快照 → CHG）；`MASTER:791-796` 还有第三版（Codex 专用，**整份不含 `AGENT-INDEX.md`**，第 1 项指向已被删除的根 `AGENTS.md`） |
+  delivery/active/CHG-20260925-064/change.md:59:| B-5／N3 | 执行根入口文件的描述 | `conventions:18-20` 与架构文档 7 处描述「执行根承载自动生成的根 `AGENTS.md`／`CLAUDE.md` 与 `.skill-sync.lock.json`」；实测三样**都不存在**，且 `prepare_ai_workspace.py` 从不生成根入口文件 |
+  delivery/active/CHG-20260925-064/change.md:182:| 删 Codex 6 项清单（整份不含 `AGENT-INDEX.md`，第 1 项指向已删的执行根 `AGENTS.md`） | `MASTER:791-796` → 1 行 |
+  delivery/active/CHG-20260925-064/checkpoint.md:17:- **T-04 读取顺序单一化**：读取顺序由 **5 处手写清单 + 1 个代码常量**（其中 3 处内容互不相同，`MASTER` 那版整份不含 `AGENT-INDEX.md`、第 1 项指向已删的执行根 `AGENTS.md`）收敛为 **1 处手写（`AGENT-INDEX.md` §4）＋ 1 处生成物**。§4 补齐第 6–8 项（T-03 发现的两版「第二层」不一致按 `AGENT-INDEX.md` 为准）；`AGENTS.md` 30→22 行、`CLAUDE.md` 37→28 行（删各自复述的红线与清单，只留指针）；`MASTER:791-796` 6 项清单删为 1 行；`MASTER:66` 的退休词「渐进式加载」就地改写；生成器常量加注释登记为「§4 的生成物镜像」。**变异对照**：常量第 1 项改探针 → 快照正好 2 行不同（时间戳＋第 1 项），还原后只剩时间戳且生成器逐字节相同。**入口红线 9/9 逐条归属**（删掉的 4+5 条全部在 `AGENT-INDEX.md` §2／§9 有落点，阳性对照：`HEAD` 两文件对应小节各命中 1–2）。**两条提交约定回迁**至 `AGENT-INDEX.md` §9「提交纪律」（改前活落点 0，阳性对照 `0de87e8:CLAUDE.md` 各命中 1）。
+  delivery/active/CHG-20260925-064/evidence/task-04-reading-order-single-landing.md:17:| 5 | `MASTER:791-796` | 6 项 Codex 专用清单，**整份不含 `AGENT-INDEX.md`**，第 1 项指向已被删除的执行根 `AGENTS.md` | **第四套** |
+  命中合计：5
+
+### B-2 活文件（排除 completed/、reports/、本 CHG 自身记录）
+  命中合计：0
+
+### B-3 阳性对照：同一扫描器读 HEAD 版架构文档
+  452:- 承载自动生成的根 `AGENTS.md`、`CLAUDE.md` 和 IDE Workspace 文件；
+  命中合计：1

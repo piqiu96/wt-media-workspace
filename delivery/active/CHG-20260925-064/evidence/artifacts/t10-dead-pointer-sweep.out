@@ -1,0 +1,35 @@
+# 第一遍（模式过宽，判为无效）：`\.\./docs` 同时匹配到了仓内合法相对链接 `../../docs/...`
+→ 9 条命中里 8 条是 `delivery/*` 指向本仓 docs/ 的合法链接，1 条是历史归档。
+→ 该模式对目标（执行根的 ../docs）没有判别力，改用下面 P1/P2。
+
+## P1：反引号包裹的字面 `\`../docs\``（死指针的原始写法）
+分母：git ls-files = 793 个受控文件
+  工作区命中合计：0
+
+### P1 阳性对照：同一模式读 HEAD（T-10 改前）
+  HEAD:AGENT-INDEX.md:58:其他历史文档（含执行根 `../docs`、`docs/superpowers/` 下的分析材料）不作为新开发依据；分析材料必须经 Delivery 或 Decision 确认后才可驱动修改。
+  HEAD:README.md:48:- Do not use root `../docs` as the source of truth for new implementation decisions.
+  HEAD:docs/README.md:14:Root `../docs` is legacy and must not be used as the source of truth for new code implementation.
+  HEAD 命中合计：3
+
+## P2：`垃圾桶`
+  工作区命中合计：0
+### P2 阳性对照：同一模式读 HEAD
+  HEAD:docs/product/README.md:9:- Do not edit legacy trash documents under root `../docs/prd/**/垃圾桶/**`.
+  HEAD 命中合计：1
+
+## P3：`docs/视觉`
+  delivery/active/CHG-20260925-064/change.md:61:| B-7 | ADR-0007 的死指针 | `0007:9` 的 `docs/视觉/…`（实测该目录不存在，全仓零命中） |
+  delivery/completed/CHG-20260715-010/change.md:21:- Visual proposal: `docs/视觉/模块化自媒体运营平台_Web与Desktop前端复用及视觉体系方案.md`
+  工作区命中合计：2
+### P3 阳性对照：同一模式读 HEAD
+  HEAD:delivery/active/CHG-20260925-064/change.md:61:| B-7 | ADR-0007 的死指针 | `0007:9` 的 `docs/视觉/…`（实测该目录不存在，全仓零命中） |
+  HEAD:delivery/completed/CHG-20260715-010/change.md:21:- Visual proposal: `docs/视觉/模块化自媒体运营平台_Web与Desktop前端复用及视觉体系方案.md`
+  HEAD:docs/decisions/0007-visual-engineering-baseline.md:9:M1 (Cloud-Agent-Desktop Minimum Task Loop) has been completed and accepted. The current Cloud Web frontend at `wt-media-cloud/web/` uses hand-written CSS with no UI component library, resulting in inconsistent styling, low development velocity, and poor visual quality. A comprehensive visual proposal exists at `docs/视觉/模块化自媒体运营平台_Web与Desktop前端复用及视觉体系方案.md` (also mirrored at `../engineering/specs/web-desktop-visual-system.md`).
+  HEAD 命中合计：3
+
+## 目标路径存在性（同一脚本两种结果）
+  ABSENT  docs/视觉
+  EXISTS  docs/superpowers
+  ABSENT  ../docs
+  EXISTS  docs/engineering/specs/web-desktop-visual-system.md

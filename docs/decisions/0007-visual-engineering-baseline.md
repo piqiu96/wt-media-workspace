@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-M1 (Cloud-Agent-Desktop Minimum Task Loop) has been completed and accepted. The current Cloud Web frontend at `wt-media-cloud/web/` uses hand-written CSS with no UI component library, resulting in inconsistent styling, low development velocity, and poor visual quality. A comprehensive visual proposal exists at `docs/视觉/模块化自媒体运营平台_Web与Desktop前端复用及视觉体系方案.md` (also mirrored at `../engineering/specs/web-desktop-visual-system.md`).
+M1 (Cloud-Agent-Desktop Minimum Task Loop) has been completed and accepted. The current Cloud Web frontend at `wt-media-cloud/web/` uses hand-written CSS with no UI component library, resulting in inconsistent styling, low development velocity, and poor visual quality. A comprehensive visual proposal exists at `docs/engineering/specs/web-desktop-visual-system.md`.
 
 The following decisions are needed before M2 business module development begins, to ensure all subsequent pages share a consistent visual system.
 

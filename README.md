@@ -45,7 +45,7 @@ Runtime code lives in `../wt-media-cloud`, `../wt-media-agent`, and `../wt-media
 - Do not store production secrets here.
 - Do not make runtime repositories depend on this repository at build or runtime.
 - Do not edit generated `.codex/skills` or `.claude/skills` copies by hand.
-- Do not use root `../docs` as the source of truth for new implementation decisions.
+- Do not use a `docs/` tree outside this repository as the source of truth for new implementation decisions; the execution root `wt-media/` carries none.
 - Do not store OpenAPI, schema, DTO, or event definitions here when a provider repository owns them.
 - Do not create `changes/active`; use `delivery/active/<change-id>/change.md`.
 - Remove completed delivery records after final outcomes are reflected in stable baselines and Git.

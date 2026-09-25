@@ -55,7 +55,7 @@
 | `skills/` | Codex / Claude skill 唯一源文件 | skill 唯一源 |
 | `scripts/` | 快照生成、skill 分发、入口与治理校验 | 治理工具 |
 
-其他历史文档（含执行根 `../docs`、`docs/superpowers/` 下的分析材料）不作为新开发依据；分析材料必须经 Delivery 或 Decision 确认后才可驱动修改。
+其他历史文档（含 `docs/superpowers/` 下的分析材料）不作为新开发依据；分析材料必须经 Delivery 或 Decision 确认后才可驱动修改。执行根 `wt-media/` 不承载 `docs/`，不存在第二份文档树。
 
 ## 4. 读取顺序与上下文加载
 

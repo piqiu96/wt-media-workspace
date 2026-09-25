@@ -26,13 +26,15 @@
 
 - **T-09 里程碑与交付事实：三处陈旧结论就地改写**：判据串 `E3 未开始`／`仍为 IN_PROGRESS`／`` 不标 `DONE` `` 在**活文件（分母 174）改前 3 → 改后 0**；放宽关键词的补充扫（`未开始`／`进行中`／`尚未验收`／`待验收`／`待签收`／`签收前`／`IN_PROGRESS`／`NOT_STARTED`／`实施中` 与 `M3` 同现）剩 **1** 条，是 `MASTER:162` 里引述旧行标的**过去时叙述**，判留。三处：`milestones/README.md:7`（「实施中…E3 未开始」→ 写明 2026-09-23 通过 E3 并由用户签收、`DONE`）、`M3-content-discovery-v2.md:35`（把「暂时通过」的口径钉在时间上＋写明整体已 `DONE`；**表内 5 处读数不改**，同 T-07 先例）、`MASTER:162`（**删断言、留缘由**——只记「为什么 `M3-M10` 拆两行」，明写「不重复断言任何状态」）。**计划落点与实况不符并如实登记**：计划写 `MASTER:158`，那行（今 `:159`）本来就是 `DONE`，真正陈旧的是紧邻下方 `:162` 的 2026-09-23 拆分注。**为什么漂移（本轮新量的机制读数）**：同一事实当时 2 个有门禁落点、3 个无门禁落点——`verify_product_master_alignment.py:64` 硬编码期望并读 `MASTER` §3 的 `| 状态 |` 字段（**变异对照**：改成 `IN_PROGRESS` → `exit=1` 报 `M3 status expected 'DONE', got 'IN_PROGRESS'`，连带触发候选块结构检查共 2 条；还原后 `sha256` 相同），而 `milestones/README.md`、`M3-*.md` 的散文、`MASTER` §2 表行**没有任何门禁**（分母 `scripts/`＋`tests/` 共 30 文件：对判据串 0 命中，对 `milestones/` 路径的 7 处命中全是测试夹具的字面量）。**对账**：三处改写与四处权威源（`M3-*.md:3-4`／§2.2、`MASTER:159`／`:362`、`LEDGER:27`）在状态词／签收日期／验收矩阵三项事实上无一处相反。**不新增任何机检点**（为里程碑散文加判据会把措辞冻成契约）。§14 第 2 项就地补上「双落点里只有一处被盯着」这一实测事实与今日行号。
 
+- **T-10 目录树、死指针与执行根入口描述**：四组判据都带阳性对照。①**目录树**：脚本 `t10-tree-entries-check.py` 解析 MASTER §2／arch §3.1／A.1／A.2 四棵树的每个条目、按树根选基址后逐条判存在——**实际核对 94 条，缺失 0**；阳性对照每棵树注入 1 个必然不存在的条目，**注入 4 报 4**。**这个脚本自己先红过两次**（首轮根名多拼一个斜杠 → 四棵树全落进「未知根，跳过整棵树」并报 0；次轮没剥掉路径里的树根名 → 连 `wt-media-cloud` 都报 MISS），两次都是**脚本拒绝出结论**，修好后才有那个 0。②**死指针**：反引号字面 `` `../docs` ``（执行根的 `docs/`）改前 **3 → 0**、`垃圾桶` **1 → 0**、`docs/视觉` **3 → 2**（余下 2 处是本记录与 2026-07 历史归档的过去时叙述，判留）；三处的阳性对照都是读 `HEAD` 报出同样的数。**第一遍模式抄宽了**：`\.\./docs` 把 `delivery/*` 指向本仓 docs/ 的合法相对链接 `../../docs/product/…` 也算进去，得 9 条假命中，**该模式对目标没有判别力**，换掉后才有效。③**执行根入口描述**：实际勘定四个候选文件的分布——`AGENTS.md`／`CLAUDE.md` 执行根**无**、三仓各有；`.skill-sync.lock.json` 三仓各有、执行根与 workspace 仓都**无**；`wt-media.code-workspace` **只有执行根有**。架构文档 7 处按实况改写，§3.10 的启动流程由 5 步（含「生成根 `AGENTS.md` 和 `CLAUDE.md`」「生成 `wt-media.code-workspace`」「写入同步 Lock」「校验 Hash」）收敛为实际的两段式；`根 \`AGENTS.md\`` 活文件命中 **0**（阳性对照读 `HEAD` 报 1）。**三仓各自的树一律不动**（那些条目实测存在）。④**两处计划外落点**：`README.md:48` 与 `AGENT-INDEX.md:58` 的反引号 `` `../docs` `` 与本 Task 要修的 `docs/README.md:14` 逐字同义，一并收口。**计划落点 `conventions:18-20` 已是 verify-only**（T-03 已改，本 Task 只复测）。改动面 7 文件、`+28/-46`；快照重生成只有 `Generated:` 时间戳一行不同（已还原，不带噪声进提交）。新登记 §14 第 17／18 项：`wt-media.code-workspace` 无生成器；`.skill-sync.lock.json` 三仓各有一份却无任何脚本读写（分母 48 文件净 0 命中，阳性对照读全仓 14 命中）。
+
 ## Current
 
-- T-09 已落。下一个是 T-10／T-11（相互独立，可换序）。
+- T-10 已落。下一个是 T-11（前端源码根 ＋ 两篇视觉规范合并），随后 T-12 收尾。
 
 ## Next
 
-1. **T-10／T-11**（相互独立，可换序）：目录树与死指针／前端源码根与视觉规范合并。
+1. **T-11**：前端源码根 ＋ 两篇视觉规范合并（先出逐节清单；`web-desktop-visual-system.md` 存活、去功能描述；`frontendDist`／`beforeDevCommand`／`frontendCommit` 不得改）。
 2. **T-12**：归档、LEDGER 同步、快照重生成、两遍失效指针扫描；并按 AC-15 与开工基线对账三仓（只应多出 `skills/` 分发副本）。
 
 ## Blocked
@@ -67,6 +69,13 @@
 | 里程碑散文是否有门禁（T-09，分母 `scripts/`＋`tests/` 共 30 文件） | 判据串 **0 命中**；`milestones/` 路径 7 命中**全是测试夹具字面量**，无一处读取 ⇒ `milestones/README.md` 与 `M3-*.md` 的散文**无门禁** |
 | 与四处权威源对账（T-09） | `M3-*.md:3-4`／§2.2、`MASTER:159`／`:362`、`LEDGER:27` 与三处改写，在状态词／签收日期／验收矩阵三项事实上**无一处相反** |
 
-取数时间与逐次读数见 `evidence/artifacts/t09-gate-readings.out`——该文件**逐段追加，每段段首都有取数时间**（T-09 的初遍跑在该文件建立之前、未同时写时间戳，已在该文件开头如实注明、**不列为独立一段**）；各段读数除 `unittest` 耗时外**逐行相同**。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①初遍记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故末段正文的措辞不影响任何判据。T-09 的扫描与对账原始输出见 `evidence/artifacts/t09-stale-m3-sweep.out`／`t09-canonical-alignment.out`；逐条明细见 `evidence/task-09-milestone-delivery-facts.md`。T-08 的对应产物为 `t08-gate-readings.out`／`t08-sweep-*.out` 与 `task-08-ffmpeg-ownership.md`。
+| 四棵目录树逐条存在性（T-10，分母＝MASTER §2／arch §3.1／A.1／A.2） | 声明 98 条（模板占位 4）⇒ **实际核对 94 条，缺失 0** |
+| 同一脚本可失败（T-10 阳性对照） | 每棵树注入 1 个必然不存在的条目 → **注入 4 报 4** |
+| 死指针 `` `../docs` ``（T-10） | 改前 **3 → 0**（阳性对照读 `HEAD` 报 3）；`垃圾桶` **1 → 0**（读 `HEAD` 报 1）；`docs/视觉` **3 → 2**（余下 2 处判为过去时叙述） |
+| `verifying/` 在活文件（T-10，分母 793 受控／200 活文件） | 全仓 7 → 活文件 6 → **剔本记录后 0**；余 1 条历史归档 ＋ 6 条本记录自述 |
+| 执行根入口文件描述（T-10） | `根 \`AGENTS.md\`` 活文件 **0**；阳性对照读 `HEAD` 版架构文档报 **1** |
+| 无脚本读写 `.skill-sync.lock.json`／`wt-media.code-workspace`（T-10，分母 `scripts/ tests/ config/ skills/ templates/` 共 48 文件） | 净 **0**（唯一 1 条是 `m2b_local_acceptance.py:361` 注释）；阳性对照读全仓 **14** |
 
-上一版读数（`t06-gate-readings.out`，19:57）已被**覆盖**：T-07 改了 `planned/` 的记录与 `MASTER` §3 的读数列，那些数字不再是关闭值。T-06 那一版同理覆盖了 T-05 的 19:51 读数。`t08-gate-readings.out`（20:06–20:08）同理被 **T-09** 覆盖：T-09 改了 `MASTER:162`、两个里程碑文件，那些数字不再是关闭值——但两版的**判据行仍逐行相同**（T-09 只改文档文本，不碰任何判据的输入面，`unittest` 仍 79）。
+取数时间与逐次读数见 `evidence/artifacts/t10-gate-readings.out`——该文件**逐段追加，每段段首都有取数时间**；各段读数除 `unittest` 耗时外**逐行相同**。为什么本行不写死一个时间：本记录与 `checkpoint.md` 本身是门禁读入的对象，每改一次记录就得重跑一次，写死的时间必然追不上最后一次改动。纪律的实质由两件事保证：①各段记在本记录更新之前，**不作关闭值**；②末段在本记录最后一次改动之后。门禁对 `checkpoint.md` 只查**存在性**（`git grep -i checkpoint -- scripts/` 唯一命中 `verify_delivery_governance.py` 的 `is_file()`），故末段正文的措辞不影响任何判据。T-10 的原始输出见 `evidence/artifacts/t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out`（＋脚本 `t10-tree-entries-check.py`）；逐条明细见 `evidence/task-10-tree-dead-pointer-execution-root.md`。T-09／T-08 的对应产物为 `t09-*`／`t08-*`。
+
+早先几版读数（`t06-`、`t07-`、`t08-`、`t09-gate-readings.out`）均已被后续 Task **覆盖**：每个 Task 都改了门禁读入的文档，那些数字不再是关闭值。但各版的**判据行逐行相同**（T-08～T-10 只改文档文本，不碰任何判据的输入面，`unittest` 仍 79）。

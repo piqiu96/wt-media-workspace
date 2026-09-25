@@ -6,7 +6,7 @@ Rules:
 
 - Product requirements used for implementation must reference this directory.
 - Do not store implementation plans, handoffs, progress notes, or temporary decisions here.
-- Do not edit legacy trash documents under root `../docs/prd/**/垃圾桶/**`.
+- Do not keep a legacy PRD copy outside this tree: the PRD lives under `prd/` below, and the execution root `wt-media/` carries no `docs/` directory of its own.
 
 ## Current M3 baseline
 

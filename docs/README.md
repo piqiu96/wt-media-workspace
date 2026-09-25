@@ -11,4 +11,4 @@ This tree contains current governance baselines and durable governance records.
 
 Temporary implementation plans, progress, handoffs, and verification notes belong under `../delivery/active/<change-id>/change.md`, not under `docs`.
 
-Root `../docs` is legacy and must not be used as the source of truth for new code implementation.
+This tree is the only documentation location. The execution root `wt-media/` carries no `docs/` directory of its own, so there is no second copy to fall back to: when a document here is wrong or stale, fix it here.

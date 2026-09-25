@@ -1,0 +1,55 @@
+# T-10 判据 D：四棵目录树逐条存在性核对（AC-07）
+脚本：t10-tree-entries-check.py（同目录）
+树：MASTER §2、arch §3.1、arch A.1、arch A.2
+路径解析：树根 `wt-media/` → 执行根；树根 `wt-media-workspace/` → 本仓根
+
+================================================================
+## D-1 实测（不注入）
+================================================================
+注入模式: 关（实测）
+
+=== MASTER §2  root=wt-media-workspace/  声明条目 36 ===
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN   （模板占位符）
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN/change.md   （模板占位符）
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN/checkpoint.md   （模板占位符）
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN/evidence   （模板占位符）
+
+=== arch §3.1  root=wt-media/  声明条目 9 ===
+
+=== arch A.1  root=wt-media/  声明条目 12 ===
+
+=== arch A.2  root=wt-media-workspace/  声明条目 45 ===
+
+合计：声明条目 98（其中模板占位 4，实际核对 94），缺失 0
+
+================================================================
+## D-2 阳性对照（每棵树注入一个必然不存在的条目 __t10_injected_absent__）
+================================================================
+注入模式: 开（阳性对照）
+
+=== MASTER §2  root=wt-media-workspace/  声明条目 37 ===
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN   （模板占位符）
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN/change.md   （模板占位符）
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN/checkpoint.md   （模板占位符）
+  SKIP  wt-media-workspace/delivery/active/CHG-YYYYMMDD-NNN/evidence   （模板占位符）
+  MISS  wt-media-workspace/__t10_injected_absent__
+
+=== arch §3.1  root=wt-media/  声明条目 10 ===
+  MISS  wt-media/__t10_injected_absent__
+
+=== arch A.1  root=wt-media/  声明条目 13 ===
+  MISS  wt-media/__t10_injected_absent__
+
+=== arch A.2  root=wt-media-workspace/  声明条目 46 ===
+  MISS  wt-media-workspace/__t10_injected_absent__
+
+合计：声明条目 102（其中模板占位 4，实际核对 98），缺失 4
+
+================================================================
+## D-3 说明
+================================================================
+- D-2 显示注入项在四棵树上**全部**被报为 MISS：脚本对"不存在的条目"有判别力，D-1 的"缺失 0"不是空转。
+- 脚本首轮曾对每棵树报"未知根 //"（根名已带斜杠，我又拼了一个）与全量 MISS（未剥掉树根名）——
+  两次都是**先拒绝出结论**，修好后才有 D-1。这两次都写在这里，不隐去。
+- 已知不对称（非本条判据范围，登记不改）：MASTER §2 的 docs/ 只列 product／engineering／contracts／decisions，
+  未列同样存在的 docs/superpowers/；arch A.2 列了。AC-07 只要求"条目都存在"，不要求"存在的都列"，故本条不动它。

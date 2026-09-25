@@ -149,7 +149,7 @@ None.
 | T-07 | `planned` 记录状态词就地改写 | DONE | 见 §8.5；活记录 20 篇改前 19/20、改后 **20/20** 落在 §3 表内（阳性对照：同一脚本对归档仍报 8 处表外词）；023 的 diff 恰一行 | T-06 |
 | T-08 | FFmpeg 归属（ADR-0015 就地改写 ＋ 复扫发现的两处 skill 落点） | DONE | 见 §8.6；活文件里判给 Agent 的落点 **4 → 0**（20 条候选逐条判定）；扫描器阳性对照 9→10 且还原经 `sha256` 证明 | 独立 |
 | T-09 | 里程碑与交付事实（C6／B-3／N1） | DONE | 见 §8.7；判据串在活文件（分母 174）改前 3 → 改后 **0**；三处改写与四处权威源在状态／签收／验收矩阵三项事实上无一处相反；**计划落点 `MASTER:158` 与实况不符**（那行本来就是 `DONE`，真正陈旧的是 `:162` 的拆分注），已如实登记 | 独立 |
-| T-10 | 目录树、死指针、执行根入口描述、外层 `docs` 指针 | TODO | `verifying/` 只余历史归档；树内条目逐条 `ls`；`根 \`AGENTS.md\`` → 0 | 独立 |
+| T-10 | 目录树、死指针、执行根入口描述、外层 `docs` 指针 | DONE | 见 §8.8；`verifying/` 活文件（剔除本记录）**0**，余 1 条历史归档＋6 条本记录自述；四棵树 94 个条目逐条 `ls` **缺失 0**（阳性对照：注入 4 报 4）；`根 \`AGENTS.md\`` 活文件 **0**（阳性对照读 `HEAD` 报 1）；**计划外多出两处同类死指针**（`README.md:48`、`AGENT-INDEX.md:58`）已一并改写 | 独立 |
 | T-11 | 前端源码根 + 两篇视觉规范合并 | TODO | `wt-media-cloud/frontend` → 0；索引数与实际篇数一致；删除前逐节对照 | 独立 |
 | T-12 | 收尾：归档、LEDGER 同步、快照重生成、evidence 汇总 | TODO | 六门禁 + `unittest` 在**最后一次改动之后**重测；两遍失效指针扫描（各带阳性对照与分母） | 全部 |
 
@@ -269,6 +269,31 @@ None.
 
 细节见 `evidence/task-09-milestone-delivery-facts.md`。
 
+### 8.8 目录树、死指针与执行根入口描述（T-10）
+
+四组判据（原始输出：`artifacts/t10-verifying-and-entry-sweep.out`、`t10-dead-pointer-sweep.out`、`t10-tree-entry-check.out`）：
+
+| 判据 | 改前／对照 | 改后 | 分母 |
+|---|---:|---:|---|
+| `verifying/` 活文件（剔除本 CHG 自身记录） | HEAD 两棵树各有 1 条 | **0** | 793 受控 / 200 活文件 |
+| `根 \`AGENTS.md\`` 活文件 | HEAD 架构文档 1 条 | **0** | 同上 |
+| `` `../docs` ``（反引号字面） | HEAD **3**（`README.md:48`、`AGENT-INDEX.md:58`、`docs/README.md:14`） | **0** | 同上 |
+| `垃圾桶` | HEAD **1**（`docs/product/README.md:9`） | **0** | 同上 |
+| `docs/视觉` | HEAD **3** | **2**（本记录 1 ＋ 2026-07 历史归档 1，均为过去时叙述，判留） | 同上 |
+| 四棵树逐条存在性（MASTER §2、arch §3.1、A.1、A.2） | 阳性对照注入 4 报 **4** | 实际核对 **94** 条，缺失 **0** | — |
+
+**改动面**：7 个文件，`+28/-46`。除计划点名的 5 处外，**多出两处计划外落点**（`README.md:48`、`AGENT-INDEX.md:58` 的反引号 `` `../docs` ``）——它们是同一类死指针，与本 Task 要修的 `docs/README.md:14` 逐字同义，故一并收口；阳性对照读 `HEAD` 报出的 3 处正是这三处。
+
+**计划落点 vs 实际**：`conventions:18-20` 那条**已是 verify-only**（T-03 已把它改为「父层不承载入口文件…」，本 Task 只复测，未再改该文件）；`MASTER:28`／`arch:1964` 的行号随 T-05／T-07 位移，落点本身一致；架构文档 `:1988` 的 `tests/` 确认无需动。
+
+**执行根入口描述**：实际勘定四个候选文件的分布——`AGENTS.md`／`CLAUDE.md` 在执行根**不存在**（用户 2026-09-25 确认系其本人删除）而三仓各有一份；`.skill-sync.lock.json` 执行根与 workspace 仓都**没有**、只有三个运行仓有；`wt-media.code-workspace` **只有执行根有**。架构文档 7 处断言按实况改写：§3.10 的启动流程由 5 步（含「生成根 `AGENTS.md` 和 `CLAUDE.md`」「生成 `wt-media.code-workspace`」「写入同步 Lock」「校验 Hash」）收敛为实际的两段式；§3.12 标题 `根规则与仓库规则` → `入口规则与仓库规则`。**三仓各自的树一律不动**——那些条目实测确实存在。
+
+**判据 D 的脚本自己先红过两次**（都记在 evidence §6）：首轮根名多拼一个斜杠 → 四棵树全部进「未知根，跳过整棵树」并报 0；次轮未剥掉路径里的树根名 → 连 `wt-media-cloud` 都报 MISS。**两次都是脚本拒绝出结论**，修好后才报「94 条、缺失 0」。
+
+**新登记两条遗留**（§14）：`wt-media.code-workspace` 无生成器；`.skill-sync.lock.json` 三仓各有一份却无任何脚本读写。
+
+细节见 `evidence/task-10-tree-dead-pointer-execution-root.md`。
+
 ## 9. Repository Checklist
 
 ### wt-media-workspace
@@ -299,7 +324,7 @@ None.
 | AC-04 | CHG／里程碑状态词汇只剩一套，且**实测在用的每个词都被定义**；脚本接受集与成文一致 | T-05＋T-06＋T-07 的词汇统计逐词相等 | TODO（T-05 成文、T-06 接受集已收口；T-07 后逐词复算） |
 | AC-05 | `checkpoint.md` 有唯一权威落点、有模板、且有强制点（缺失会红） | T-06 的变异对照 | **PASS**（落点＝`AGENT-INDEX.md` §8／§9；模板＝`templates/delivery/checkpoint.md`；强制点＝`verify_delivery_governance.py`，失红并经活树阳性对照） |
 | AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的判据串：活文件（分母 174）改前 3 → 改后 0；放宽关键词补充扫剩 1 条，判为过去时叙述 | **PASS** |
-| AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`（含阳性对照） | TODO |
+| AC-07 | `verifying/` 不再是任何目录树的条目；树的每个条目都存在 | T-10 的逐条 `ls`：四棵树 **94** 条实测缺失 **0**（阳性对照注入 4 报 4）；`verifying/` 在活文件里剔掉本记录后 **0**（余 1 条历史归档 ＋ 6 条本记录自述） | **PASS** |
 | AC-08 | ADR-0015 与 ADR-0017 不再对 FFmpeg 归属给出相反答案；**活文件里没有一处把 FFmpeg 判给 Agent／Desktop**，该归属只有 Cloud 一个结论 | T-08 的复扫：改前 4 处 → 改后 0（20 条候选逐条判定，含阳性对照） | **PASS** |
 | AC-09 | `wt-media-cloud/frontend` 全仓 0 命中；被改的 `frontend` 只限目录名（字段名／脚本名不动） | T-11 的 grep＋逐处分类表 | TODO |
 | AC-10 | 视觉规范只剩一篇，且它自述为当前基线；其功能描述已去除、视觉与架构描述保留 | T-11 的逐节对照表 | TODO |
@@ -322,7 +347,8 @@ Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期�
 - `evidence/task-07-live-status-words.md`
 - `evidence/task-08-ffmpeg-ownership.md`
 - `evidence/task-09-milestone-delivery-facts.md`
-- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`、`t08-ffmpeg-ownership-sweep.py` ＋ `t08-sweep-head.out`／`t08-sweep-worktree.out`／`t08-sweep-positive-control.out`、`t09-stale-m3-sweep.out`／`t09-canonical-alignment.out`）
+- `evidence/task-10-tree-dead-pointer-execution-root.md`
+- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-`、`t05-`、`t06-gate-readings.out`、`t08-ffmpeg-ownership-sweep.py` ＋ `t08-sweep-head.out`／`t08-sweep-worktree.out`／`t08-sweep-positive-control.out`、`t09-stale-m3-sweep.out`／`t09-canonical-alignment.out`、`t10-verifying-and-entry-sweep.out`／`t10-dead-pointer-sweep.out`／`t10-tree-entry-check.out` ＋ `t10-tree-entries-check.py`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
 **开工三仓基线**（T-01 记录，收尾按同一命令复测）：
@@ -372,3 +398,5 @@ $ git -C ../wt-media-desktop status --porcelain
 | 14 | 58 篇记录里 **9 篇**的状态行带注（`（…）`／`(…)`／`**WORD（…）**`）；机器现已能读，但「状态行该不该带注」**无成文规则** | T-06 把脚本改成先剥注再判（不剥就会读成 `None`，`CHG-20260923-059` 实例），**属把已有的书写习惯接住，不是给它立规**；立规会与「就地覆盖、不追加注记」的用户政策相互牵扯，须用户裁定 |
 | 15 | **「引述型落点」失效**：ADR 里逐字引用**基线正文**的句子，在基线被就地覆盖后失去所指（`0016:13` 引述的架构基线 §5.4 定义「文件、FFmpeg、浏览器…」在活文档 §5.4 已不存在——T-08 判定其为 ADR `Context` 的历史引述、不改，因它正是「为什么 §5.4 要改名」的理由） | 本 CHG 的政策是「就地覆盖、不留注记」，两者天然相冲：被覆盖的正文在被引述处不会得到任何提示。要机检得把「引述必须与所指文本一致」做成判据——会把 ADR 的 `Context` 段冻成契约，属独立裁定 |
 | 16 | `wt-media-desktop/.gitignore:10-11` 忽略 `.claude`／`.codex`，而 `config/skills-distribution.yaml` 对该仓声明 `commit_generated: true`、`conventions` §7 写「这 5 处副本都随各自仓库提交」——**新增**一份分发到 desktop 的 skill 会被 ignore 静默吞掉（既有的 10 份因已 tracked 才不受影响，T-08 正因此才提交得上） | 修它要动运行仓的 `.gitignore`（`git add -f` 只是绕过），且要先裁定「desktop 的 `.claude`／`.codex` 到底该不该 tracked」——先有这一层，才谈得上把 `commit_generated` 变成可强制的事实 |
+| 17 | **`wt-media.code-workspace` 没有生成器**：执行根确有这份文件（T-10 实测），但全仓 `scripts/ tests/ config/ skills/ templates/`（分母 48 文件）对 `code-workspace` 净 0 命中——它是一份**无源的手工文件**，缺了没有任何检查会报。架构文档 §3.2 现已明写「它不是本仓脚本的产物」，但「那它由谁维护、丢了怎么办」无成文答案 | T-10 只把**描述**改对（删掉「自动生成」）。给它补生成器或补校验，都要先裁定「执行根还要不要维持这套聚合配置」——属独立 CHG |
+| 18 | **`.skill-sync.lock.json` 三仓各有一份、无任何脚本读写**：`cloud`／`agent`／`desktop` 各有（T-10 实测），执行根与 workspace 仓都没有；同一分母 48 文件（`scripts/ tests/ config/ skills/ templates/`）的扫描对 `skill-sync` **净 0 命中**（唯一 1 条是 `m2b_local_acceptance.py:361` 注释里的 "a skill-sync commit"，非读写者；阳性对照读全仓 14 命中）。架构文档 §3.11 为它规定了格式（Schema 版本／修订版本／源树 Hash／两侧目录 Hash／目标仓库标识）——**这份 Lock 没有任何读者**。注意区分：**生成副本本身**是有校验的（`sync_skills.py check` → `skill outputs are up to date`，T-10 收盘读数），缺的是「以 Lock 为介质的校验」 | 同第 16 项同源：先裁定「这份 Lock 还要不要」，才谈得上补实现或删规定。T-10 只按实况把 §3.11 的方位描述改对（「各代码仓库**各自**保存」），并把「目标仓库**或执行根目录**标识」里的执行根那半句删掉（执行根没有这份文件） |

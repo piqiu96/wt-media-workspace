@@ -50,8 +50,7 @@ wt-media-workspace/
 │   ├── milestones/                 # 人工确认的业务闭环基线
 │   ├── planned/                    # 待规划与待决记录
 │   ├── completed/                  # 已收口记录，默认不加载
-│   ├── reports/                    # 阶段性审计与分析报告
-│   └── verifying/
+│   └── reports/                    # 阶段性审计与分析报告
 ├── config/
 │   ├── contract-map.yaml           # 机器可读协议归属和消费关系
 │   ├── release-matrix.yaml         # 已验证版本组合
@@ -59,6 +58,7 @@ wt-media-workspace/
 │   └── repository-map.yaml         # 关联工程路径唯一来源
 ├── skills/
 ├── scripts/
+├── tests/
 ├── .claude/skills/                 # 自动生成并提交 Git
 ├── .codex/skills/                  # 自动生成并提交 Git
 ├── templates/
