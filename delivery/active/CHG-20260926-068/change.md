@@ -70,7 +70,7 @@ cloud `.cache/wt-media-cloud.pid` **不存在**（`stop` 不会误杀）；agent
 
 ## 5. Scope
 
-范围在 T-00 **封闭**；后续新发现只登记 §14，除非落在已列举项内。
+范围在 T-00 封闭；**T-05A 经用户裁定扩一项**（desktop `src-tauri/tauri.conf.json`，见 Modify 末条）；其余后续新发现只登记 §14。
 
 ### Add
 
@@ -86,6 +86,8 @@ cloud `.cache/wt-media-cloud.pid` **不存在**（`stop` 不会误杀）；agent
   ——`verify_m3_acceptance.py:1621-1632` 靠这三类正则解析该脚本的日志）。
 - **cloud** `scripts/README.md`：补新脚本一行。
 - **workspace** `scripts/test-control.sh`：把 `bash "$CONTROL"` 改为**直接调用**，补判据 1-4（原文件只有判据 4-6）。
+- **desktop** `src-tauri/tauri.conf.json`：`beforeDevCommand` 的 `cd ../../wt-media-cloud/web` → `cd ../wt-media-cloud/web`
+  （**T-05A 扩范围**：T-05 真跑查出 dev 模式从来没起来过；用户当场裁定「修了」。原行是一段路径的孤立笔误，见 §14 第 6 项）。
 
 ### Delete
 
@@ -111,6 +113,8 @@ None.
 | D-03 | cloud 里 `internal/architecture/boundary_test.go` 的删除与 `dump.rdb` 的消失**是用户自己的操作**，不追。 | CONFIRMED（用户 2026-09-26 裁定） |
 | D-04 | 比特浏览器（54345）**不在「全部杀掉」范围内**——第三方应用且被 harness 依赖（我的判断，登记待纠）。 | ASSUMED（本 CHG 登记） |
 | D-05 | 调整历史**直接覆盖旧的**，不留取代注记，理由记进本 CHG 的 `change.md`。 | CONFIRMED（用户既有政策，沿用） |
+| D-06 | T-05 查出的 desktop `beforeDevCommand` 路径缺陷：**修了**（扩 §5 范围，落 T-05A），不只登记。 | CONFIRMED（用户 2026-09-26 裁定） |
+| D-07 | 真跑完成后**不保留运行环境**：停 cloud／agent、退出 DMG 起的 desktop 应用、推出挂载卷。 | CONFIRMED（用户 2026-09-26 裁定） |
 
 ## 7. Pending Questions
 
@@ -126,6 +130,7 @@ None.
 | T-03 | **agent**：新建 `tests/test_control_sh.py` | DONE | 7 用例绿；**变异红** 4 failed 与恰 1 failed；`Ran 416`（基线 409，+7）；`.local/` 护栏未触发。见 `evidence/task-03-agent-entry.md` |
 | T-04 | **workspace**：强化 `scripts/test-control.sh`（直接调用＋判据 1-4）；新建 `tests/test_bin_control_entry.py`（跨仓） | DONE | 两条绿；**变异** `chmod -x` 兄弟仓 desktop → **恰 3 failed 全标 desktop**（本仓检查仍 0）／本仓 → 恰 3 failed＋本仓检查 `exit=1`；缺席路径 skip 并印分母 `3/4`；六门禁 `exit=0`、`Ran 106`（+5）。见 `evidence/task-04-workspace-entry.md` |
 | T-05 | **workspace**：四仓四动词**真跑**（16 格），先停实况，逐仓 `status → start → status → restart → status → stop → status`，原始读数落 `evidence/artifacts/t05-*-verbs.out`；收尾留在运行态 | DONE | **16 格：13 端到端／3 止于既有前置／0 未覆盖。** cloud 4/4（64839／64919 真起真停，pid 文件＋监听＋`healthz` 三路旁证）、agent 4/4（58703／58731）、workspace 4/4（真起 cloud 65668＋agent 65686 并跑完整条验收链：BitBrowser／DMG／登录冒烟全 `PASS`）；desktop `status` 端到端，`start`／`restart`／`stop` 止于 `beforeDevCommand` 既有缺陷（§14 第 6 项）。清场靠按 pid 杀（用户授权后 2 s 内清空），环境留在运行态（70220／70244）。见 `evidence/task-05-real-run.md` |
+| T-05A | **desktop**：修 `beforeDevCommand` 少写的一段路径（T-05 真跑查出、用户裁定「修了」） | DONE（desktop `b0ae3c3`） | 改后真跑 `cargo tauri dev`：`start`／`restart` exit 0、vite 5174 答 200、`status` `alive=yes health=ok` exit 0、`stop` 真停；无 stray 进程。`scripts/test.sh` exit=0（372／12／20，与修复前同读数）。desktop 四格由「止于既有前置」转为**端到端**。见 `evidence/task-05a-desktop-devcmd-fix.md` |
 | T-06 | **workspace**：收尾——归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字 | TODO | 六门禁 ＋ `unittest` ＋ `sync_skills.py check`，取在最后一次改动之后；两遍指针扫描（各带对照与分母，锚取**不变基线**）；四仓 `git status` 对账 |
 
 ### 顺序与红窗（硬约束）
@@ -161,7 +166,7 @@ None.
 |---|---|---|---|
 | AC-01 | desktop `bin/control.sh` 可直接调用 | 改前 `help`=**126**／改后 **0**；index 与磁盘均 `100755` | PASS（T-01） |
 | AC-02 | 四仓各有一条机检守住「index 100755＋磁盘执行位＋直接调用 `help`＝0＋未知动词＝2」 | 四条检查各自跑绿；**各做一次 `chmod -x` 变异红**并还原 | PASS：desktop（T-01）／cloud（T-02）／agent（T-03）／workspace（T-04）各绿＋各两处变异 |
-| AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | PASS（T-05）：13 端到端／3 止于既有前置／0 未覆盖，逐格标注落 `evidence/task-05-real-run.md`。desktop 那 3 格的「止于既有前置」是实测到的**既有**缺陷（§14 第 6 项），不是本 CHG 引入 |
+| AC-03 | 四仓四动词**各真跑一次**且逐格标注覆盖面 | 16 格读数落 `t05-*-verbs.out`；每格属「端到端／止于既有前置／未覆盖」之一 | PASS（T-05 ＋ T-05A）：**16 端到端／0 止于既有前置／0 未覆盖**，逐格标注落 `evidence/task-05-real-run.md`。desktop 那 3 格先被测成「止于既有前置」（既有缺陷，§14 第 6 项），T-05A 修复后复跑转为**端到端**（`t05-desktop-verbs-fixed.out`） |
 | AC-04 | 机检**有判别力**（能失败），不是空转 | 变异红读数留档；报分母与阳性对照 | PASS：四仓磁盘变异连带 3～8 项红、index 变异恰 1 项红；跨仓缺席路径有 skip 对照（分母 `3/4`） |
 | AC-05 | 跨仓回指与既有判据不被本 CHG 打红 | 六个静态门禁 `exit=0` ＋ `unittest` 套件 `OK` | TODO |
 | AC-06 | 改动逐条落在 §5；**业务代码／契约／端口值零改动** | 逐仓 `git status --porcelain` ＋ 路径逐条归属；端口值 diff **0** | TODO |
@@ -177,6 +182,7 @@ None.
 - `evidence/task-03-agent-entry.md` ＋ `artifacts/t03-agent-control.out`、`t03-agent-mutations.out`、`t03-agent-test-sh.out`
 - `evidence/task-04-workspace-entry.md` ＋ `artifacts/t04-workspace-mutations.out`、`t04-workspace-gate.out`
 - `evidence/task-05-real-run.md` ＋ `artifacts/t05-cloud-verbs.out`、`t05-agent-verbs.out`、`t05-desktop-verbs.out`、`t05-desktop-rootcause.out`、`t05-workspace-verbs.out`、`t05-cloud-workspace-blocked.out`（清场前读数）、`t05-record-size.out`、`t05-gate.out`
+- `evidence/task-05a-desktop-devcmd-fix.md` ＋ `artifacts/t05-desktop-verbs-fixed.out`（修复后复跑的四格）、`t05a-desktop-test-sh.out`（`scripts/test.sh` 全跑）
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 ## 12. Current Checkpoint
@@ -230,14 +236,15 @@ None.
    每格独立求值，一格红不遮蔽其余格（重跑：恰 3 failed，全部标 `repository='workspace'`）。
    这与本 CHG 主题同形：**判据的求值范围本身要被检查**，否则「只红一格」可能只是「只跑到一格」。
 
-6. **T-05：desktop 的 `start` 止于一条**计划未预见的既有缺陷**——`beforeDevCommand` 的路径多了一段。**
-   `src-tauri/tauri.conf.json` 写 `cd ../../wt-media-cloud/web && npm run dev:desktop`，而 tauri 执行它时的 cwd 是
-   `wt-media-desktop`（**不是** `src-tauri`），故解析成 `/Users/aqiuye/Develop/workspace/wt-media-cloud/web`——不存在。
-   实测手法：`--config` 只把该命令换成打印 `pwd`（未改仓内文件、无残留进程），日志落在 `t05-desktop-rootcause.out`。
-   从实测量到的 cwd 起，正确写法是 `cd ../wt-media-cloud/web`。**CHG-067 看不见它，因为它的 start/stop/restart 臂
-   跑在替身 cargo 上**（`PATH=/private/tmp/desktop-sim/bin`），替身根本不执行 `beforeDevCommand`——
-   又一处「判据与缺陷错开一格」，与本 CHG 起因同形。本 CHG **只登记不改**（§5 明列「不改 desktop 的 Tauri 配置」之外的
-   业务文件；改它需另起 CHG）。
+6. **T-05／T-05A：desktop 的 `start` 止于一条计划未预见的既有缺陷——`beforeDevCommand` 的路径多了一段，已在 T-05A 修掉。**
+   `src-tauri/tauri.conf.json` 原写 `cd ../../wt-media-cloud/web && npm run dev:desktop`，而 tauri 执行它时的 cwd 是
+   `wt-media-desktop`（**不是** `src-tauri`），故解析成 `<wt-media>/wt-media-cloud/web`——不存在，dev 模式**从来没起来过**。
+   实测手法：`--config` 只把该命令换成打印 `pwd`（未改仓内文件、无残留进程），读数落 `t05-desktop-rootcause.out`。
+   **同文件内的第二个证人**：`beforeBuildCommand` 用的是**一段** `../wt-media-workspace/…`，它与
+   `scripts/prepare-release-sidecar.sh` 只有在 cwd＝`wt-media-desktop` 时才同时存在 ⇒ cwd 的形状本就如此，`../../` 是这一行的孤立笔误。
+   **CHG-067 看不见它，因为它的 start/stop/restart 臂跑在替身 cargo 上**（`PATH=/private/tmp/desktop-sim/bin`），
+   替身根本不执行 `beforeDevCommand`——又一处「判据与缺陷错开一格」，与本 CHG 起因同形。
+   用户当场裁定「修了」⇒ 本条**由登记转为修复**（§5 Modify 末条、Task T-05A，desktop `b0ae3c3`）。
 
 7. **T-05：实况必须按 pid 杀——`bin/control.sh stop` 停不掉；且按 pid 杀需要用户**明示**授权。**
    清场前 cloud 读 `alive=no health=ok` exit **1**（探针答话而无 pid 文件认领），`stop` 印 "not running" exit 0 而

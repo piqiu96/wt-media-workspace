@@ -1,0 +1,13 @@
+== gates after the last T-05A record change ==
+2026-09-26 04:13:53
+
+verify_delivery_governance.py exit=0  Delivery governance verification ok. Active CHG: CHG-20260926-068
+verify_agent_entry.py exit=0  Agent entry verification ok. 0 warning(s) need review.
+verify_skills.py exit=0  verified 10 skill source files
+verify_m0_config.py exit=0  Workspace config verification ok
+verify_product_master_alignment.py exit=0  Product and Master Plan alignment verification ok
+verify_m2_acceptance.py exit=0  NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+sync_skills.py check exit=0  skill outputs are up to date
+
+unittest discover -s tests -q exit=0  Ran 106 tests in 0.807s  OK 

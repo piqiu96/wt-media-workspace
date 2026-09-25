@@ -1,0 +1,64 @@
+== T-05 desktop re-run AFTER the beforeDevCommand fix (cargo tauri dev, real) ==
+2026-09-26 04:11:43
+HTTPS_PROXY=http://127.0.0.1:7897 (this invocation only, for cargo)
+change: beforeDevCommand 'cd ../../wt-media-cloud/web' -> 'cd ../wt-media-cloud/web'
+
+-- pre-state --
+  5174 listener: 
+
+### cell 1/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+  [probe] pidfile=(absent) 5174= http5174=000
+### cell 2/7  start (the command that used to die)
+$ ./bin/control.sh start
+cargo tauri dev started: pid=81359 log=.runtime/desktop.log
+dev server answering: http://127.0.0.1:5174
+exit=0
+
+  [probe] pidfile=81359 5174=81400 http5174=200
+### cell 3/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+desktop: pid=81359 alive=yes health=ok url=http://127.0.0.1:5174
+exit=0
+
+### cell 4/7  restart
+$ ./bin/control.sh restart
+cargo tauri dev stopped
+cargo tauri dev started: pid=81755 log=.runtime/desktop.log
+dev server answering: http://127.0.0.1:5174
+exit=0
+
+  [probe] pidfile=81755 5174=81800 http5174=200
+### cell 5/7  status (expect: alive=yes health=ok -> exit 0)
+$ ./bin/control.sh status
+desktop: pid=81755 alive=yes health=ok url=http://127.0.0.1:5174
+exit=0
+
+### cell 6/7  stop
+$ ./bin/control.sh stop
+cargo tauri dev stopped
+exit=0
+
+  [probe] pidfile=(absent) 5174= http5174=000
+### cell 7/7  status (expect: nothing running -> exit 1)
+$ ./bin/control.sh status
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+-- post-state --
+  5174 listener: 
+  stray cargo/tauri/vite/node processes:
+  (blank above = none)
+-- last 12 lines of .runtime/desktop.log --
+     Running BeforeDevCommand (`cd ../wt-media-cloud/web && npm run dev:desktop`)
+
+> wt-media-cloud-web@0.1.0 dev:desktop
+> vite --config vite.config.desktop.js
+
+
+  VITE v7.3.6  ready in 225 ms
+
+  ➜  Local:   http://127.0.0.1:5174/

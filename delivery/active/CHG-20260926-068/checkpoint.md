@@ -44,7 +44,7 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   缺席路径对照 `ran=5 skipped=5`、skip 文案含 `3/4`。六门禁全 `exit=0`、`sync_skills` `exit=0`、`Ran 106`（+5）。
   自造缺陷一处（生成器式循环中断）已修并登记。详见 `evidence/task-04-workspace-entry.md`。
 
-- **T-05 四仓四动词真跑（16 格：13 端到端／3 止于既有前置／0 未覆盖）**：cloud 4/4（64839／64919，
+- **T-05 四仓四动词真跑（16 格：13 端到端／3 止于既有前置／0 未覆盖——T-05A 修复后 desktop 那 3 格转端到端，最终 16/16）**：cloud 4/4（64839／64919，
   pid 文件＋监听＋`healthz` 三路旁证）、agent 4/4（58703／58731）、workspace 4/4（真起 cloud＋agent
   并跑完整条验收链：BitBrowser／DMG／登录冒烟全 `PASS`）；**desktop 3 格止于既有缺陷**——
   `beforeDevCommand` 的 `cd ../../wt-media-cloud/web` 多一段（实测 tauri 的 cwd 是 `wt-media-desktop`，
@@ -53,17 +53,23 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
   环境留在运行态（cloud 70220／agent 70244），Desktop 应用已由 DMG 启动（pid 72068）。
   自纠一处：exit 读数曾因中间 `echo` 重置 `$?` 而错记（§14 第 8 项）。详见 `evidence/task-05-real-run.md`。
 
+- **T-05A desktop `beforeDevCommand` 修复**（T-05 查出、用户裁定「修了」）：`cd ../../wt-media-cloud/web` → `cd ../wt-media-cloud/web`，
+  **一行、一段路径**。根因两条独立证据（实测 cwd ＝ `wt-media-desktop`；同文件 `beforeBuildCommand` 用的是**一段** `../`，
+  两条路径只有该 cwd 下才同时存在）。修复后真跑复跑：7 步读数全对（`start` 81359／`restart` 81755／`stop` 真停，
+  5174 答 200），desktop 四格**由「止于既有前置」转为端到端** ⇒ **AC-03 成为 16/16 端到端**；
+  `scripts/test.sh` `exit=0`（372／12／20，与修复前同读数）。改前查过**没有判据锚在该行**（四类读者只取 `version`／`devUrl`／CSP 键）。
+  desktop `b0ae3c3`。详见 `evidence/task-05a-desktop-devcmd-fix.md`。
+
 ## Current
 
-T-05 完成（16 格读数已落，环境留在运行态）。下一步 T-06 收尾。
+T-05A 完成；环境已按用户裁定**停掉**（cloud／agent 停、DMG 应用退出、挂载卷推出）。下一步 T-06 收尾。
 
 ## Next
 
 T-06 workspace：归档 → `delivery/completed/`；LEDGER 同步；快照 `--no-active`；AC 矩阵逐条签字。
 六门禁 ＋ `unittest discover -s tests -q` ＋ `sync_skills.py check` **取在最后一次改动之后**；
 两遍失效指针扫描（各带阳性对照与分母，对照锚取**不变基线**）；四仓 `git status --porcelain` 对账。
-**另有两件待用户裁定**：① desktop `beforeDevCommand` 差一段路径只登记未修（§5 范围已在 T-00 封闭，
-改它是运行仓改动，须另起 CHG）；② 环境已留运行态，是否在收尾时停掉。
+**无待裁定项**：desktop 路径已修（D-06）、环境已停（D-07）。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
@@ -109,3 +115,7 @@ T-06 workspace：归档 → `delivery/completed/`；LEDGER 同步；快照 `--no
 | 清场（T-05） | `stop` 停不掉实况（cloud `alive=no health=ok` exit 1；`stop` exit 0 而 54420 仍活）；用户授权 `kill 54420 54456` → 2 s 清空、两端口归 0、无残留；比特浏览器 13947 前后验活 |
 | 收尾读取（T-05） | `status` exit 0：cloud 70220／agent 70244 双 `health=ok`；18080 监听＝70227（`go run` 的子进程）；Desktop 应用 pid 72068（DMG 挂载态） |
 | 自纠（T-05） | 首版 exit 读数取在 `echo "$out"` 之后 ⇒ `$?` 被重置成 0（cloud `status` 错记 0／实为 1）；重测订正，错误读数未留档 |
+| desktop 修复后复跑（T-05A） | 7 步全对：空 `exit 1` → `start` 81359 `exit 0`（5174 答 200）→ `status` `alive=yes health=ok` → `restart` 81755 → `status` → `stop` 真停 → 空 `exit 1`；无 stray 进程 |
+| desktop 回归（T-05A） | `scripts/test.sh` `exit=0`：cargo 372 passed／0 failed／5 ignored、`control.test.sh` 12/0、`release-versions` 20/0——与修复前同读数 |
+| 改前影响面（T-05A） | 全仓读 `tauri.conf.json` 的只有取 `version` 的三处、取 `devUrl` 的一处、`bootstrap.rs:250` 断言 CSP 键不存在；**无一读 `beforeDevCommand`** |
+| 环境收尾（D-07） | cloud／agent `stop` 后 18080／8765 归零；DMG 应用 72068 退出、`/Volumes/WT Media` 推出；比特浏览器 13947 仍活、未触碰 |

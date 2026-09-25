@@ -1,0 +1,11 @@
+== T-05A record-cost measurement (per-Task increment; anchor = blob at ad505f5, the T-05 completion commit) ==
+2026-09-26 04:13:53
+
+change.md: anchor ad505f5 =    21805 B ; now =    23489 B ; T-05A increment = 1684 B
+checkpoint.md: anchor ad505f5 =    11503 B ; now =    13077 B ; T-05A increment = 1574 B
+
+evidence md: task-05a-desktop-devcmd-fix.md =     4875 B
+
+bounds: change.md <= 5120 B/Task ; checkpoint.md <= 4096 B/Task ; evidence md <= 9216 B/Task
+(anchor note: T-05A is a Task inserted after T-05, so its previous Task is T-05 -> anchor ad505f5.
+ T-05's own increment stays anchored at 653fc3e/T-04, recorded in t05-record-size.out.)
