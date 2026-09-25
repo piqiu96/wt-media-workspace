@@ -26,19 +26,20 @@
 
 ## Current
 
-- **T-06 五类版本已收尾**（T-01…T-06 均已收尾，见下六节）；**T-07 未开工**。
+- **T-07 升级不覆盖已收尾**（T-01…T-07 均已收尾，见下七节）；**T-08 未开工**。
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
   与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
   T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`；
   T-04 见 `evidence/task-04-integrity.md` 与 desktop 的 `04f46c3`；
   T-05 见 `evidence/task-05-shipped-config.md` 与 agent / desktop 各一个提交；
-  T-06 见 `evidence/task-06-versions.md` 与 desktop / workspace 各一个提交。
+  T-06 见 `evidence/task-06-versions.md` 与 desktop / workspace 各一个提交；
+  T-07 见 `evidence/task-07-upgrade.md` 与 desktop 的 `293806f`、agent 的 `feb532d`。
 
 ## Next
 
-- T-07 **升级不覆盖**：用**路径判据**（不是名字清单）证明升级路径不写用户设置 / SQLite / 检查点 /
-  待回传结果。先写一条会红的用例（把某条用户数据路径喂进升级写入集合），再最小实现。
-  按 `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
+- T-08 **M2 业务回归**：对 A/B/C/D 之后的树重跑 M2 链路（`m2b_local_acceptance.py`；
+  实网/实凭据部分逐条标注覆盖与否），按
+  `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
 
 ## T-01（已收尾，2026-09-25）
 
@@ -248,11 +249,60 @@
   x86_64／Windows 未测；`--stamp-frontend` 对「`package.json` 无 version」的拒绝路径没有独立臂；
   真机五类只有 arm64 macOS 一份。
 
+## T-07（已收尾，2026-09-25）
+
+- **交付物是判据，不是行为**（D-24）。本 CHG 不实现升级器（`updater/`、`filesystem/` 仍是空壳），
+  否定命题「升级不写用户数据」没有动作可改 ⇒ desktop 新增 `src-tauri/src/upgrade.rs`
+  （**故意是 `#[cfg(test)]` 模块**：一个没有调用方的守卫等于一个 `dead_code` 警告加一句没人执行的
+  声明），`main.rs` 只多 `#[cfg(test)] mod upgrade;` 一行；agent 侧新增
+  `tests/test_upgrade_preserves_data.py`，**不改任何实现文件**。
+- 判据只有一条规则：`inside` = `Path::starts_with`，即**按路径分量**比较。声明两个写入点
+  （`settings::path`、`Root::Versions`），数据根下其余一切**都是用户数据**；Agent 的数据根
+  由 `WTMedia/<Component>` 的同一形状解析——归另一侧所有的位置，无论文件叫什么。
+- **两侧的「升级面」不是同一件事**：Desktop 是它自己的数据根；Agent 是 `storage/migration.py`
+  的**迁移**（新版本跑在旧版本写的库上）。这就是这个仓今天真的会做的升级。
+- **先红是判据本身**：desktop 首轮把 `refuse` 写成**名字清单** ⇒ 3 passed / 6 failed，
+  六条失败臂正是「名字 vs 路径」的判别力（改名过的文件、目录、另一侧的位置、带点的兄弟目录、
+  检出布局，以及清单连自己该放行的 `<data>/settings.toml` 也拒掉）。转录 `task-07-desktop-red.out`。
+- **Agent 侧没有实现级的先红**（迁移本来加性、本来只写一个路径）⇒ 如实登记，红全部来自变异。
+  这一条必须留着：`no such file` 式的红什么都不证明，而「已经在做正确的事」的代码也没有可红的实现。
+- 变异 desktop **9/9**、agent **6/6**、0 unproven（每次跑完从 pristine 还原并校验 sha256）。
+  **第一轮 desktop 是 7 条，有两条臂没有任何变异能打掉**（`the_two_roots_are_siblings_with_disjoint_sites`、
+  `allows_a_path_outside_both_roots`）——不是记分问题而是判据上的洞：关掉「拒绝」到不了量常量关系
+  与量作用域的两条臂。补 M8（组件常量抄错，两个根重合）与 M9（去掉数据根那个合取项，于是判据会拒掉
+  包内暂存的 `agent.toml`）后逐条有主。
+- **两处过程订正（都不静默）**：① agent M4 首轮「打不掉任何用例」，根因是那条路径臂有个**真盲点**
+  ——它的 planting 先调了一次 `apply_migrations`，于是「每次 apply 都产生的路径」在 before 快照里
+  已经有了，该臂原来只量得到**第二次**（升级那一次）的写入集 ⇒ 补第二个比较（以「用例动手之前的
+  目录」为基准，`after - empty - planted` 必须恰好是 `{DEFAULT_DB_NAME}`），补法是**补一个比较**
+  而不是改断言；② agent M6 首版锚在迁移循环**之前**，四条臂是被 `sqlite3.OperationalError:
+  no such table` 打红的——**一个异常不是那条被禁止的写入** ⇒ 锚点移到循环之后，现在只打掉加性臂、
+  报文是丢行。M6 本身就是里程碑那条禁止行为的形态（升级清掉它以为是过期的待回传结果）。
+- 计数：desktop **372 passed / 0 failed / 5 ignored**（363→372，+9 = 九条臂；警告 7→7，
+  `#[cfg(test)]` 不引入 `dead_code`）；agent **401 OK**（397→401，+4）。
+- **作用域如实登记**：两个根之外的路径（要暂存的产物、cache、日志树）不在本判据之内。
+  Agent 侧的用户设置/检查点/待回传结果**在库里的表**上（由加性臂逐行覆盖），
+  「库旁的一切」由路径臂覆盖——两侧看起来不对称，是因为承载数据的方式本来就不同。
+
 ## Blocked
 
 - 无硬阻塞。Q-04 已由 D-17 关闭；AC-09「干净机」那一臂按 D-09 登记为未做（不以文字充当证据）。
 
 ## Recent verification
+
+- **T-07 之后**（2026-09-25）：desktop `cargo test --workspace` **372 passed / 0 failed / 5 ignored**
+  （363→372，+9 = 九条臂；编译警告 7→7）；agent `bash scripts/test.sh` **Ran 401 tests / OK**
+  （397→401，+4）；变异 desktop **9/9**、agent **6/6**、0 unproven
+  （`task-07-desktop-mutations.out` / `task-07-agent-mutations.out`，每轮从 pristine 还原并校验
+  sha256：desktop `6ab1fc90…`、agent `248307e7…`；两处过程订正见 `evidence/task-07-upgrade.md` §4）。
+  **workspace 门禁**（`task-07-gate.out`）：`verify_delivery_governance.py`（Active CHG:
+  CHG-20260923-059）、`verify_agent_entry.py`（快照 2144 字符 / 预算 8000，0 warning）、
+  `verify_skills.py`（10 个 skill 源文件）三者全绿；`unittest discover -s tests -q`
+  **Ran 69 / failures=4**，四条**逐条同名**于 T-06 的读数（`test_verify_m0_config` ×2、
+  `test_verify_m2_acceptance` ×1、`test_verify_product_master_alignment` ×1）⇒ 无新增红、
+  无意外转绿。**本次没有重跑 `git archive HEAD` 的同集合阳性对照**——T-07 未改 workspace 的
+  测试或治理脚本，读数与 T-06 那次带对照的读数**完全一致**；按 T-06 已登记的陷阱，
+  若下次要重跑对照，归档必须放在能看见 `../wt-media-*` 的位置。
 
 - **T-06 之后的 workspace 门禁**（2026-09-25）：`verify_delivery_governance.py`（Active CHG:
   CHG-20260923-059）、`verify_agent_entry.py`（快照 2144 字符 / 预算 8000，0 warning）、`verify_skills.py`

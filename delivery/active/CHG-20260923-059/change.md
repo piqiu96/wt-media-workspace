@@ -256,6 +256,7 @@
 | D-21 | **记录写在签名窗口内**（`repair-macos-signing.sh` 的 sidecar manifest 之后、外层签名之前），与 D-15 同源：`Contents/Resources` 被外层签名封住，签后写入破坏封印；而记录要覆盖它描述的一切，就必须在所有被描述的文件写入之后再算。真机读数证明这条顺序成立：记录里的清单含 `sidecar-manifest.json` 自身。 | `evidence/task-06-release.out`；变异 M9／M13 |
 | D-22 | **不把 `version_classes:` 块加进 `config/release-matrix.yaml`。** 五类的来源已在 `release-versions.sh`（运行时唯一读法）与每份制品内的 `versions.json`（包自带）各声明一次；再抄一份到 yaml 就是**第二份没人校验的声明**，正是治理规范要避免的漂移。workspace 侧本任务的实际交付是 `build-desktop.sh` 的 stamp——没有它前端构建版本无来源。 | AGENT-INDEX 的单一权威源原则；`verify_m0_config.validate_release_matrix` 只做子串存在性检查，加块不会变红 ⇒ 「不会红」不是「该加」 |
 | D-23 | **订正一处真 bug**：`build-release-macos.sh` 的 `DMG_PATH` 原为写死的 `WT Media_0.1.0_${arch}.dmg`，而 `verify-release-macos.sh` 与 `package-release-macos.sh` 都按 `tauri.conf.json` 算名字——版本一升，构建出的 DMG 与验证要找的 DMG 就分叉。改为同一来源。**今日不可分辨**（`0.1.0` 恰好等于写死的那串），故这是**读证不是跑证**，登记于证据 §9。 | `evidence/task-06-versions.md` §9 第 1 条 |
+| D-24 | **T-07 交付的是判据，不是行为。** 本 CHG 不实现升级器（§5），否定命题「升级不写用户数据」因此没有动作可改 ⇒ 交付物是一份**路径**判据（`src-tauri/src/upgrade.rs`：两个写入点 + 对其余一切的拒绝）、一份把两侧各自的**升级面**钉住的臂（Desktop 是它自己的数据根；**Agent 是 `storage/migration.py` 的迁移**——新版本跑在旧版本写的库上，这才是这个仓今天真的会做的事），以及两侧的变异表。**`upgrade.rs` 故意是 `#[cfg(test)]` 模块**：一个没有调用方的守卫等于一个 `dead_code` 警告加一句没人执行的声明；将来升级器被写出来时它要调的就是这个模块，这些臂是它第一个版本必须保持绿的。**作用域如实登记**：两个根之外的路径（要暂存的产物、cache、日志）不在本判据之内——`allows_a_path_outside_both_roots` 说的就是这句话。 | AC-07 的判据行「路径判据的用例（先红）」；desktop 变异 9/9（首轮 7 条时**两条臂没有任何变异能打掉**，补 M8/M9 才逐条有主）、agent 变异 6/6——**Agent 侧没有实现级的先红**（迁移本来就加性、本来就只写一个路径），故红全部来自变异，如实登记 |
 
 ## 7. Pending Questions
 
@@ -278,7 +279,7 @@
 | T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | **DONE** | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖**。**加一臂**：`#[ignore]` 的用例外加一条**包内臂**——拿签名脚本真写出的 sidecar 与记录造 `.app` 布局，从 `Contents/MacOS` 里跑，四条读数（通过 / 追加一字节必拒 / 删记录必拒 / 复原仍通过）全在 `evidence/task-04-bundle.out`；该用例本身另有 **5/5** 变异（`evidence/task-04-bundle-mutations.out`）。打包侧一半同 commit：记录写在外层签名之前，且出包脚本做相等性判定 |
 | T-05 | **`config_online → 产物/config`**：产物上的暂存步骤（**不是** `bundle.resources`，见 D-12）+ 冻结侧由可执行文件推导配置目录 + `diff -r` 校验 | desktop + agent | **DONE** | 产物内配置与 `config_online/` `diff -r` 无差异（`green` 臂 exit 0）；**产物里不含凭证**（D-05）：`config_online/` 12 个叶子里 0 命中，且同一次运行里的阳性对照抓得住两种形态。**加五臂**：`changed`（两侧签名各自合法而内容不符 ⇒ 只有内容比对抓得住）、`absent`、`empty-source`（防「空集通过」）、`resealed`（封条盖住配置 ⇒ 定位置与顺序）。真机读数：同一条夹具同一条判据，修复前报 `127.0.0.1`、修复后报 `localhost`——**冻结侧真的读随包配置**。变异 agent **17/17**（M10 是为它补的用例）。详见 `evidence/task-05-shipped-config.md` |
 | T-06 | **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个来源；发布脚本加 Desktop ↔ sidecar 版本兼容校验 | desktop + workspace | **DONE** | 五类各有来源且各有读数（`evidence/task-06-reals.out` 段 1：`0.1.0` / `0.2.2` / `0.1.0+f21bbcb` / `contracts=10` / `files=4, sha256:69f34a89…`）。**不匹配必拒拿到两条真机红**：改一个随包资源 → `--verify` 拒绝并**点名那个文件**；pin 改 `0.2.3` → `--check` 拒绝并点名 pin 路径与两侧版本，且同一条命令在 pin 还原后转绿（阳性对照，pin 文件 sha256 前后一致）。**发布流程真跑了一遍**（`build-release-macos.sh` exit=0，出 DMG）：构建后 `--check` 通过、签名窗口内 `--record`、挂载 DMG 的 `--verify` **复算出同一摘要** ⇒ 暂存 + 封条 + DMG 装配都不动 `Contents/Resources`。变异 **15/15**（20 条臂，M7 多打一个 A18 已记明）。Q-04 按 D-17 关闭。详见 `evidence/task-06-versions.md` |
-| T-07 | **升级不覆盖**：用路径判据证明升级路径不写用户设置 / SQLite / 检查点 / 待回传结果 | desktop + agent | TODO | 先写一条会红的用例（把某条用户数据路径喂进升级写入集合）；按路径而非名字 |
+| T-07 | **升级不覆盖**：用路径判据证明升级路径不写用户设置 / SQLite / 检查点 / 待回传结果 | desktop + agent | **DONE** | **先红**：desktop 首轮把判据写成**名字清单** ⇒ 3 passed / 6 failed（六条失败臂正是「名字 vs 路径」的判别力：改名过的文件、目录、另一侧的位置、带点的兄弟目录、检出布局、以及它连自己该放行的 `settings.toml` 也拒掉）；**Agent 侧没有实现级的先红**（迁移本来加性、本来只写一个路径），红全部来自变异，如实登记。**变异 desktop 9/9**（首轮 7 条时两条臂无主——`the_two_roots_are_siblings_with_disjoint_sites` 与 `allows_a_path_outside_both_roots` 谁都到不了，补 M8/M9 后逐条有主）、**agent 6/6**（M6 = 里程碑那条「升级/清理删除业务数据」的形态，只打掉加性臂且报文是丢行不是异常）。计数：desktop 363→**372**（+9，警告 7→7）、agent 397→**401**（+4）。**两处过程订正**：agent M4 首轮打不掉任何用例，根因是臂自己有个真盲点（planting 先调一次 apply，故「每次 apply 都产生的路径」在 before 快照里已有）⇒ 补第二个比较（以用例动手之前的目录为基准）；M6 首版锚在循环之前，红在 `no such table` 这个**异常**上而不是那条禁止的写入 ⇒ 重锚到循环之后。详见 `evidence/task-07-upgrade.md`、D-24 |
 | T-08 | **M2 业务回归**：对 A/B/C/D 之后的树重跑 M2 链路 | workspace + cloud | TODO | `m2b_local_acceptance.py` 读数；实网/实凭据部分按 §7 如实标注覆盖与否 |
 | T-09 | **吸收项**：Agent 侧 `AGENTS.md`/`README.md`/`contracts/*/README.md` 同步；workspace skill 改指 `clients/<platform>` 并跑 `sync_skills.py` | agent + workspace | TODO | `sync_skills.py` 后生成副本与源一致；skill 里的路径真的存在（resolve 判据，不只是字符串） |
 | T-10 | **回写基线 + 关闭收尾**：架构基线、里程碑、`release-matrix`、`LEDGER.md`、快照与归档；并把 `config_online/agent.toml:17-21` 那段过期的 Q-01 注释改成「已裁定：保持回环」（D-08） | workspace + agent | TODO | 先失败的检查钉着回写；关闭门禁同集合阳性对照；档案两遍扫描 |
@@ -300,6 +301,9 @@
 - [x] `runtime/config.py`：冻结侧由**可执行文件的位置**推导配置目录（`.app` 布局优先、其次 exe 旁边、
       都命中不了则回落并 WARNING）（T-05）
 - [x] `scripts/build_desktop_sidecar.py`：`--config-dir`——先删后拷的整目录替换 + 读回比对 + 报出文件清单（T-05）
+- [x] `tests/test_upgrade_preserves_data.py`（**新增**，4 条臂）：升级不覆盖的 Agent 侧判据——
+      库是声明的那个路径、新增迁移不丢既有行、写入集只有一个路径、控制台入口是同一个操作。
+      **本任务不改实现文件**：迁移本来就是加性的、本来也只写一个路径（T-07／D-24）
 - [ ] 入口文档同步（`AGENTS.md`、`README.md`、`contracts/*/README.md`）（T-09）
 
 ### wt-media-desktop
@@ -326,6 +330,9 @@
 - [x] `scripts/build-release-macos.sh`：构建后 `--check`；`DMG_PATH` 去掉写死的 `0.1.0`（D-23）（T-06）
 - [x] `scripts/repair-macos-signing.sh`：签名窗口内 `--record`（D-21）；`scripts/verify-release-macos.sh`：
       挂载后 `--verify`；`scripts/package-release-macos.sh`：记录复制进发布目录并进 `SHA256SUMS`（T-06）
+- [x] `src-tauri/src/upgrade.rs`（**新增**，`#[cfg(test)]` 模块，9 条臂）：升级写入面的**路径**判据——
+      两个声明写入点（`settings::path`、`Root::Versions`）+ 对其余一切的拒绝；`main.rs` 只加
+      `#[cfg(test)] mod upgrade;` 一行（D-24：没有调用方就不假装有）（T-07）
 
 ## 10. Acceptance Matrix
 
@@ -337,7 +344,7 @@
 | AC-04 | 随包 sidecar 被验过：篡改必拒、完好必过 | 阳性对照 + 阴性对照各一条 | **满足**（T-04）：三条阴性（追加一字节 / 删记录 / 记录字段不可比对）与一条阳性（真记录通过）都有，且**在真包布局下量过**——`task-04-bundle.out` 的四条读数取自 `Contents/MacOS` 里跑的进程（`current_exe()` 与 `resource_dir()` 是真实包内值），阳性那条的 sha256 与对同一文件的独立 `shasum` 一致。**一处例外**：没有「双击启动一个被篡改的包会怎样」的读数（需要 GUI），本任务证的是校验逻辑本身，见 `evidence/task-04-integrity.md` §9 第 1 条 |
 | AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | **满足**（T-05）：`green` 臂 `diff -r` 无输出、exit 0；凭据扫描分母 12 叶子 / 命中 0，**阳性对照在同一个运行里抓得住两种形态**（嵌套混合大小写的键名 + 值里的 userinfo）。**一处例外**：没有真跑过一次完整出包（`cargo tauri build` → 暂存 → 签名 → 打 DMG），五臂用的是真闸门脚本 + 真产物 app、DMG 手工造的；配置已不进 `bundle.resources`，所以未被量到的那一步在下单路径上不存在了。**该例外已于 T-06 关闭**：发布流程真跑了一遍（`build-release-macos.sh` exit=0 → DMG），其中 T-05 的暂存步骤照跑，挂载后 `diff -r` 仍无差异（`evidence/task-06-release.out`）。T-05 当时的记录（`evidence/task-05-shipped-config.md` §9 第 1 条）不改写 |
 | AC-06 | 五类版本可追溯；Desktop ↔ sidecar 版本不匹配必拒 | 五条来源命令 + 一条不匹配必红的用例 | **满足**（T-06）：五类各有一条命令与真机读数（`evidence/task-06-reals.out` 段 1／段 2），其中第五类只能由 `--verify <app>` 得到——它是**产物的摘要**，产物完成前无从计算。**「不匹配必拒」有两条真机红**且各带阳性对照：① 改一个随包资源 → `--verify` 拒绝并点名 `resources/desktop.production.toml`（段 4，改前同一命令 exit=0）；② pin 改 `0.2.3` → `--check` 拒绝并点名 pin 路径与两侧版本（段 5），pin 还原后同一条命令转绿且 pin 文件 sha256 前后一致（段 6）。**一处如实登记**：真机只跑了 arm64 macOS，x86_64／Windows 目标本机做不到（既有登记） |
-| AC-07 | 升级不覆盖用户设置 / SQLite / 检查点 / 待回传结果 | 路径判据的用例（先红） | TODO（T-07） |
+| AC-07 | 升级不覆盖用户设置 / SQLite / 检查点 / 待回传结果 | 路径判据的用例（先红） | **满足**（T-07，判据那一半，按 D-24）：desktop 的先红是**判据本身**——首轮写成名字清单即 6 条臂转红，六条正是「名字 vs 路径」的判别力（`task-07-desktop-red.out`）；两侧臂逐条有主（desktop 9 条臂 / 变异 **9/9**，agent 4 条臂 / 变异 **6/6**，`task-07-*-mutations.out`）。**Agent 侧没有实现级的先红**——迁移本来就加性、本来就只写一个路径，故红全部来自变异，如实登记（`evidence/task-07-upgrade.md` §3.3）。**一处如实登记**：这条命题的**动作仍不存在**（本 CHG 不实现升级器），本 AC 证的是判据与臂，不要读成「升级器已被验证」 |
 | AC-08 | M2 业务回归对 A/B/C/D 之后的树通过 | `m2b_local_acceptance.py` 读数；实网部分按覆盖情况如实标注 | TODO（T-08） |
 | AC-09 | 正式安装包脱离开发源码 / venv / 开发机路径可运行 | **含一条登记过的例外**：干净机这一臂**未做**（D-09）——能证的是「产物不含 `config_online` 之外的开发态路径引用」与「sidecar 是随包原生二进制」；**不证**「在没有 Python 的机器上装过」 | **一半**（T-05 的那半）：配置的来源只有 `config_online/`，冻结侧的目标是**包内**的 `Contents/Resources/config`（`evidence/task-05-frozen-reading.out` 的 fixed 段就是包内布局下的真进程读数）；**版本那一半已在 T-06 交付**：包内 `versions.json` 使「这是哪个包」不再需要开发源码才能回答，且它的摘要覆盖了随包配置与 sidecar 记录（`evidence/task-06-reals.out` 段 2 的清单）。**但不宣布这一条满足**——AC-09 的判据是「脱离开发机可运行」，干净机那一臂未做（D-09），版本可追溯只是它的一半。D-09 的例外照旧登记 |
 | AC-10 | 发布可追溯五类版本 | 同 AC-06 | **满足**（T-06）：发布流程真跑了一遍（`build-release-macos.sh` exit=0，产出 `WT Media_0.1.0_aarch64.dmg` 17,129,049 字节），且五类版本**落在产物里**——包内 `Contents/Resources/versions.json` 记 `desktop_version` / `agent_version` / `frontend_build_version` / 10 条 `contract_versions` / `components_resources_version` + 逐文件清单，出包时另有一份复制到发布目录并进 `SHA256SUMS`。**可追溯的判据**是挂载 DMG 后 `--verify` 复算出同一摘要（`evidence/task-06-release.out:279,299`） |
@@ -382,7 +389,12 @@
   `evidence/task-06-red.out`（首轮 `exit=127` 的弱红，如实登记为「什么都不证明」）、
   `evidence/task-06-desktop-suite.out`（363 passed / 0 failed / 5 ignored + 两个 shell 套件）、
   `evidence/task-06-agent-suite.out`（397 OK）
-- `evidence/task-07-upgrade.md`——路径判据的先红用例与结论
+- `evidence/task-07-upgrade.md`——路径判据：先红（desktop 的名字清单首轮）、两侧变异表、
+  「Agent 侧无实现级先红」的如实登记、两处过程订正（臂的真盲点与「红的理由要同源」）。**已产出**，
+  另附原始转录 `evidence/task-07-desktop-red.out`（首轮 3 passed / 6 failed，六条失败臂名）、
+  `evidence/task-07-desktop-mutations.out`（9/9）、`evidence/task-07-agent-mutations.out`（6/6）、
+  `evidence/task-07-desktop-green.out`（372 passed / 0 failed / 5 ignored）、
+  `evidence/task-07-agent-green.out`（四条臂逐条 OK）、`evidence/task-07-agent-suite.out`（`Ran 401 ... OK`）
 - `evidence/task-08-m2-regression.md`——M2 重跑读数与**覆盖情况**（实网/实凭据部分逐条标注）
 - `evidence/task-09-absorbed.md`——文档同步与 skill 路径 resolve
 - `evidence/task-10-writeback-and-close.md`、`evidence/test-summary.md`
@@ -440,8 +452,19 @@
     会产出的措辞后才各自成立。desktop 套件 **363 passed / 0 failed / 5 ignored**（未改 Rust，计数不变）
     + 两个 shell 套件（顺带把此前无人调用的 `tests/*.test.sh` 接进 `scripts/test.sh`）；
     agent **397 OK**（未改）。Q-04 按 D-17 关闭。详见 `evidence/task-06-versions.md`。
-- **Current**：T-06 已收尾；T-07「升级不覆盖」未开工。
-- **Next**：T-07 → T-08 → T-09 → T-10。
+  - **T-07 升级不覆盖**（desktop + agent）。**交付物是判据**（D-24）：本 CHG 不实现升级器，
+    否定命题没有动作可改 ⇒ `src-tauri/src/upgrade.rs`（`#[cfg(test)]`，9 条臂）+ Agent 侧
+    `tests/test_upgrade_preserves_data.py`（4 条臂，**不改实现文件**）。**先红是判据本身**：
+    desktop 首轮写成名字清单 ⇒ 3 passed / 6 failed，六条失败臂正是「名字 vs 路径」的判别力。
+    变异 desktop **9/9**（首轮 7 条时两条臂无主，补 M8/M9 后逐条有主）、agent **6/6**；
+    desktop **372 passed / 0 failed / 5 ignored**（363→372，+9 = 九条臂；警告 7→7，
+    `#[cfg(test)]` 不引入 `dead_code`）、agent **401 OK**（397→401，+4）。**两处过程订正**：
+    ① agent M4 首轮打不掉任何用例，根因是臂自己有个真盲点（它的 planting 先调一次 apply，
+    「每次 apply 都产生的路径」于是在 before 快照里已有）⇒ 补第二个比较，以「用例动手之前的目录」
+    为基准；② M6 首版红在 `no such table` **这个异常**上而不是那条被禁止的写入 ⇒ 重锚到循环之后，
+    现在只打掉加性臂、报文是丢行。详见 `evidence/task-07-upgrade.md`。
+- **Current**：T-07 已收尾；T-08「M2 业务回归」未开工。
+- **Next**：T-08 → T-09 → T-10。
 - **Blocked**：无。Q-04 已由 D-17 关闭（「组件与资源版本」= 内容摘要，不是被递增的号）。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
   Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。

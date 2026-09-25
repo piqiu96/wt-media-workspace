@@ -1,0 +1,8 @@
+pristine sha256=248307e7bd8f826488f84899fca74f6093adb59f2642b827197103128a4499ec
+M1 applied migrations are applied again: killed ['a_new_migration_leaves_existing_rows_alone', 'the_console_script_an_installer_runs_is_the_same_operation', 'the_upgrade_writes_the_database_and_no_other_path'] restore_ok=True
+M2 the upgrade leaves a safety copy beside the database: killed ['the_console_script_an_installer_runs_is_the_same_operation', 'the_upgrade_writes_the_database_and_no_other_path'] restore_ok=True
+M3 the declared database name is not the one used: killed ['the_database_is_the_declared_path_under_the_data_directory', 'the_upgrade_writes_the_database_and_no_other_path'] restore_ok=True
+M4 the upgrade stages a payload under the data directory: killed ['the_upgrade_writes_the_database_and_no_other_path'] restore_ok=True
+M5 the upgrade starts from a fresh database: killed ['a_new_migration_leaves_existing_rows_alone', 'the_console_script_an_installer_runs_is_the_same_operation', 'the_upgrade_writes_the_database_and_no_other_path'] restore_ok=True
+M6 the upgrade prunes what it calls stale: killed ['a_new_migration_leaves_existing_rows_alone'] restore_ok=True
+mutations=6 unproven=0

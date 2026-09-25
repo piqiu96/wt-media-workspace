@@ -1,0 +1,504 @@
+   Compiling wt-media-desktop-shell v0.1.0 (/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/src-tauri)
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `directory` is never read
+   --> src-tauri/src/logging/rolling.rs:196:5
+    |
+195 | pub struct Writer {
+    |            ------ field in this struct
+196 |     directory: PathBuf,
+    |     ^^^^^^^^^
+
+warning: method `directory` is never used
+   --> src-tauri/src/logging/rolling.rs:256:12
+    |
+202 | impl Writer {
+    | ----------- method in this implementation
+...
+256 |     pub fn directory(&self) -> &Path {
+    |            ^^^^^^^^^
+
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+
+warning: variant `Unsupported` is never constructed
+  --> src-tauri/src/storage.rs:60:5
+   |
+53 | pub enum StorageError {
+   |          ------------ variant in this enum
+...
+60 |     Unsupported { reason: String },
+   |     ^^^^^^^^^^^
+   |
+   = note: `StorageError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell" test) generated 7 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.78s
+     Running unittests src/main.rs (target/debug/deps/wt_media_desktop_shell-5a814c8fd84e893d)
+
+running 377 tests
+test app_paths::tests::each_layout_reads_one_input_and_ignores_the_other ... ok
+test app_paths::tests::cache_is_never_inside_the_data_root ... ok
+test app_paths::tests::a_development_layout_resolves_without_a_home ... ok
+test app_paths::tests::an_installed_layout_without_a_home_is_an_error ... ok
+test app_paths::tests::resolve_gathers_the_four_roots_directory_reports ... ok
+test app_paths::tests::prepare_is_repeatable ... ok
+test app_paths::tests::a_root_that_exists_but_cannot_be_written_is_an_error ... ok
+test app_paths::tests::prepare_leaves_no_probe_file ... ok
+test app_paths::tests::preparing_one_root_does_not_create_the_others ... ok
+test app_paths::tests::prepare_creates_the_root_and_reports_the_same_path ... ok
+test app_paths::tests::a_root_occupied_by_a_file_is_an_error_rather_than_a_panic ... ok
+test app_paths::tests::the_log_root_is_never_inside_the_data_root ... ok
+test app_paths::tests::the_four_roots_are_distinct ... ok
+test app_paths::tests::the_installed_layout_is_the_architecture_baselines ... ok
+test app_paths::tests::the_development_layout_is_under_the_crates_local_directory ... ok
+test app_paths::tests::the_log_root_is_the_logging_modules_own_answer ... ok
+test app_paths::tests::a_stale_probe_file_does_not_make_the_root_unusable ... ok
+test bootstrap::tests::a_debug_build_is_development_and_a_release_build_is_production ... ok
+test bootstrap::tests::apply_csp_writes_the_field_a_dev_build_would_otherwise_prefer_over ... ok
+test bootstrap::tests::tauri_conf_carries_no_policy_of_its_own ... ok
+test bootstrap::tests::the_policy_is_shape_for_shape_the_literal_it_replaced ... ok
+test bootstrap::tests::production_ignores_the_environment_end_to_end ... ok
+test bootstrap::tests::a_development_build_reads_the_tree_and_reports_it ... ok
+test bootstrap::tests::a_rejected_file_falls_back_and_says_why_without_echoing_a_value ... ok
+test bootstrap::tests::the_policy_takes_its_connect_src_from_the_config ... ok
+test cleanup::tests::a_file_that_cannot_be_deleted_is_reported_and_not_counted ... ok
+test cleanup::tests::a_socket_is_left_in_place ... ok
+test cleanup::tests::a_freed_byte_count_is_what_an_independent_walk_says_the_tree_lost ... ok
+test cleanup::tests::an_absent_log_tree_is_nothing_to_do ... ok
+test cleanup::tests::a_directory_that_still_holds_a_kept_entry_stays_with_it ... ok
+test cleanup::tests::the_kept_reasons_are_the_pages_vocabulary ... ok
+test cleanup::tests::an_absent_root_has_nothing_to_delete_and_is_not_created ... ok
+test cleanup::tests::a_root_is_emptied_down_to_its_own_contents ... ok
+test cleanup::tests::an_unreadable_root_is_an_error_rather_than_a_silent_zero ... ok
+test cleanup::tests::the_live_file_is_never_touched_and_the_archives_are ... ok
+test cleanup::tests::a_symlink_is_left_in_place_and_never_followed ... ok
+test cleanup::tests::an_archive_that_cannot_be_deleted_is_reported_and_the_live_file_stays ... ok
+test cleanup::tests::the_log_tree_itself_is_never_removed ... ok
+test cleanup::tests::an_unrecognised_name_is_left_where_the_reader_leaves_it ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started） operation_id=session-one
+2026-09-24T10:11:12 [WARN] agent.supervisor: read error: unexpected eof
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started）
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: connection refused
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"}
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: connection refused
+test commands::agent::tests::a_failure_keeps_the_tail_out_of_the_record ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 未在运行，忽略本次停止请求
+test commands::agent::tests::a_record_outside_a_session_has_no_id_field ... ok
+test commands::agent::tests::a_session_is_held_and_released_around_its_two_records ... ok
+test commands::agent::tests::a_failure_with_no_output_is_the_message_alone ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 未在运行，忽略本次停止请求
+test commands::agent::tests::a_stop_with_nothing_running_is_recorded ... ok
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"}
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"} operation_id=session-one
+test commands::agent::tests::a_cargo_test_run_is_not_a_package ... ok
+test commands::agent::tests::a_health_check_reports_the_session_it_was_asked_in ... ok
+test commands::agent::tests::a_vacant_slot_is_decided_without_asking ... ok
+test commands::agent::tests::a_health_answer_is_returned_and_recorded ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started） operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已就绪：wt-media-agent local API listening on 127.0.0.1:8765 operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已在运行，忽略本次启动请求 operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理 operation_id=session-one
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"} operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: 已请 Local Agent（pid 4321）停止 operation_id=session-one
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 在宽限内自行退出（120 ms） operation_id=session-one
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: error sending request for url (http://127.0.0.1:49863/healthz)
+2026-09-24T10:11:12 [WARN] agent.supervisor: 宽限已到，强杀 Local Agent（5000 ms） operation_id=session-one
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent stop failed: no such process operation_id=session-one
+2026-09-24T10:11:12 [WARN] agent.supervisor: agent unreachable: connection refused operation_id=session-one
+test commands::agent::tests::an_unreachable_agent_keeps_the_tail_out_of_the_record ... ok
+test commands::agent::tests::every_record_a_session_can_make_names_that_session ... ok
+test commands::agent::tests::the_bundled_sidecar_is_resolved_from_the_app_and_checked_against_its_record ... ignored
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started）
+2026-09-24T10:11:12 [DEBUG] agent.supervisor: 健康检查成功：{"status":"ok"}
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已就绪：wt-media-agent local API listening on 127.0.0.1:8765
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已在运行，忽略本次启动请求
+2026-09-24T10:11:12 [INFO] agent.supervisor: 随应用的 Local Agent 校验通过 sha256=710ed9c0a39979cf7a6e80768ccc00c90c908e4760c3b15056755cd07e760c46 version=0.2.5 native_target=aarch64-apple-darwin
+test commands::agent::tests::the_health_body_is_development_only ... ok
+test commands::agent::tests::the_real_agent_answers_the_ask_or_is_killed_at_the_deadline ... ignored
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止
+2026-09-24T10:11:12 [INFO] agent.supervisor: 已请 Local Agent（pid 4321）停止
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 在宽限内自行退出（120 ms）
+2026-09-24T10:11:12 [WARN] agent.supervisor: 宽限已到，强杀 Local Agent（5000 ms）
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 未在运行，忽略本次停止请求
+test commands::agent::tests::the_lifecycle_records_are_desktops_own_and_survive_production ... ok
+test commands::cleanup::tests::a_failed_removal_reaches_the_page ... ok
+test commands::cleanup::tests::an_unknown_source_is_an_error_rather_than_a_default ... ok
+test commands::agent::tests::the_session_id_never_reaches_the_request ... ok
+test commands::cleanup::tests::the_five_categories_are_outside_every_directory_a_cleanup_can_name ... ok
+test commands::cleanup::tests::the_log_command_removes_archives_and_reports_what_it_kept ... ok
+test commands::diagnostic::probe::probe_real_machine ... ignored, a probe, run by hand: cargo test --offline probe_real_machine -- --ignored --nocapture
+test commands::diagnostic::tests::an_empty_secret_is_dropped_and_a_real_one_is_kept ... ok
+test commands::diagnostic::tests::the_agent_fields_are_what_it_answered_and_never_the_profile_list ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理 operation_id=session-one
+test commands::agent::tests::a_stale_handle_is_recorded_dropped_and_released_with_its_session ... ok
+test commands::diagnostic::tests::the_export_goes_to_downloads_when_there_is_one_and_the_data_root_when_there_is_not ... ok
+test commands::profile::tests::create_profile_payload_maps_safe_bitbrowser_fields ... ok
+test commands::cleanup::tests::the_cache_command_empties_the_cache_and_not_the_data_root ... ok
+test commands::profile::tests::create_profile_payload_requires_real_group ... ok
+test commands::profile::tests::restore_payload_only_contains_safe_profile_fields ... ok
+test commands::profile::tests::verify_restored_profiles_accepts_matching_readback ... ok
+test commands::profile::tests::verify_restored_profiles_rejects_mismatched_readback ... ok
+test commands::profile::tests::verify_snapshot_has_profile_rejects_missing_created_profile ... ok
+test commands::reveal::tests::a_directory_that_is_not_there_is_reported ... ok
+test commands::reveal::tests::a_path_is_not_a_place ... ok
+test commands::agent::tests::an_agent_that_answers_is_left_alone ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已不再应答，丢弃记着的句柄并按未运行处理
+test commands::reveal::tests::an_unknown_or_shouted_label_is_refused ... ok
+2026-09-24T10:11:12 [WARN] agent.supervisor: 随应用的 Local Agent 没有包内记录，本次启动未校验 path=/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/debug/wt-media-agent
+test commands::reveal::tests::each_place_is_the_directory_the_other_commands_use ... ok
+test commands::reveal::tests::every_place_has_its_own_label ... ok
+test commands::reveal::tests::reveal_opens_a_directory_that_is_there ... ignored, opens a Finder window on the machine that runs it
+2026-09-24T10:11:12 [INFO] agent.supervisor: 已请 Local Agent（pid 47342）停止 operation_id=session-ignored
+test commands::reveal::tests::the_log_labels_are_the_ones_the_read_commands_take ... ok
+test commands::reveal::tests::the_places_are_the_roots_app_paths_resolves ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已启动（sidecar_started） operation_id=d81b2b7e-d6dd-4df4-910f-4de1142f89a8
+2026-09-24T10:11:12 [INFO] agent.supervisor: 已请 Local Agent（pid 47343）停止 operation_id=session-answered
+test commands::settings::tests::a_first_launch_reports_nothing_chosen_and_writes_nothing ... ok
+test commands::settings::tests::a_file_that_cannot_be_read_is_reported_and_left_alone ... ok
+test commands::settings::tests::a_save_dir_that_cannot_be_used_is_refused_before_anything_is_written ... ok
+test commands::settings::tests::an_error_never_echoes_the_files_contents ... ok
+test commands::settings::tests::an_unparsable_file_is_reported_rather_than_treated_as_empty ... ok
+test commands::settings::tests::the_data_root_is_the_one_the_storage_commands_use ... ok
+test commands::settings::tests::a_saved_choice_comes_back ... ok
+test commands::diagnostic::tests::the_export_reports_the_node_id_and_never_the_credential ... ok
+test commands::settings::tests::writing_prepares_the_data_root_and_reading_does_not ... ok
+test commands::storage::tests::a_name_that_is_not_in_the_listing_is_never_read ... ok
+test commands::settings::tests::clearing_the_choice_leaves_a_readable_file ... ok
+test commands::storage::tests::an_unknown_level_is_an_error_rather_than_a_default ... ok
+test commands::storage::tests::a_trees_total_is_the_sum_of_the_files_the_listing_shows ... ok
+test commands::storage::tests::the_agents_tree_comes_from_the_configured_data_dir ... ok
+test commands::storage::tests::the_filter_reports_both_counts_and_the_level_it_used ... ok
+test commands::storage::tests::the_trees_are_the_builds_not_the_configs_environment ... ok
+test commands::storage::tests::the_listing_maps_the_readers_vocabulary ... ok
+test commands::storage::tests::the_two_trees_are_this_components_then_the_agents ... ok
+test commands::storage::tests::the_listing_scopes_by_directory_and_not_by_kind ... ok
+2026-09-24T10:11:12 [ERROR] webview: boom
+2026-09-24T10:11:12 [ERROR] webview: boom
+2026-09-24T10:11:12 [ERROR] webview: [stack] at handler (app.js:1:2)
+test commands::webview::tests::the_stack_and_the_message_are_two_records_under_this_target ... ok
+test config::tests::code_agrees_with_serde ... ok
+test commands::webview::tests::an_empty_stack_is_not_a_record ... ok
+test config::tests::empty_cloud_address_is_development_only ... ok
+test config::tests::development_honours_the_python_fallback_opt_in ... ok
+test config::tests::agent_host_rule_accepts_loopback_and_rejects_everything_else ... ok
+test config::tests::environment_can_only_be_narrowed_never_widened ... ok
+test config::tests::malformed_and_incomplete_toml_are_rejected ... ok
+test config::tests::production_ignores_the_whole_env_namespace ... ok
+test config::tests::rejected_values_are_not_echoed_in_validation_errors ... ok
+test config::tests::shipped_production_resource_parses_and_validates ... ok
+test config::tests::every_accepted_log_level_loads_and_is_named_in_the_message ... ok
+test config::tests::the_accepted_log_levels_are_these_six_spellings ... ok
+test config::tests::the_shipped_logging_values_are_the_writers_shipped_limits ... ok
+test diagnostic::tests::a_bundle_with_no_task_log_has_no_failure_source ... ok
+test config::tests::out_of_range_values_are_rejected ... ok
+test config::tests::unknown_key_is_rejected_by_name_without_echoing_its_value ... ok
+test diagnostic::tests::a_directory_that_is_not_one_is_refused ... ok
+test diagnostic::tests::a_file_longer_than_the_cap_is_the_end_of_the_file_and_says_so ... ok
+test commands::storage::tests::the_line_count_is_clamped_to_the_reader_ceiling ... ok
+test diagnostic::tests::a_file_that_ends_at_the_cap_exactly_is_not_reported_as_a_window ... ok
+test diagnostic::tests::a_name_that_is_not_one_component_is_refused ... ok
+test diagnostic::tests::a_credential_in_the_logs_or_the_facts_never_reaches_the_archive ... ok
+test diagnostic::tests::a_name_over_the_cap_is_left_out_rather_than_shortened ... ok
+test diagnostic::tests::a_tree_that_cannot_be_read_is_an_omission_rather_than_a_failed_export ... ok
+test diagnostic::tests::an_unreachable_agent_is_a_stated_state_not_a_failed_export ... ok
+test diagnostic::tests::a_media_file_inside_a_subdirectory_of_the_tree_is_not_reachable ... ok
+test diagnostic::tests::masking_twice_leaves_the_bytes_alone ... ok
+test diagnostic::tests::an_archive_already_at_that_name_is_never_overwritten ... ok
+test diagnostic::tests::both_trees_are_named_after_their_source_and_only_what_is_listed_is_read ... ok
+test diagnostic::tests::the_bundle_opens_with_the_summary_then_the_manifest ... ok
+test diagnostic::tests::the_credential_is_masked_even_in_the_field_the_agent_answered ... ok
+test diagnostic::tests::the_entry_below_a_nested_directory_is_not_in_the_bundle ... ok
+test diagnostic::tests::the_failure_log_name_is_one_the_reader_lists ... ok
+test diagnostic::tests::the_failure_summary_is_the_warn_and_louder_records ... ok
+test diagnostic::tests::the_failure_summary_stops_at_its_cap_and_says_so ... ok
+test diagnostic::tests::the_checksum_file_names_the_archive_and_holds_its_digest ... ok
+test diagnostic::tests::the_manifest_lists_every_entry_and_every_omission ... ok
+test diagnostic::tests::the_manifest_never_claims_a_credential_free_bundle_it_cannot_know ... ok
+test diagnostic::tests::the_name_is_the_prefix_the_stamp_and_the_extension ... ok
+test diagnostic::tests::the_stem_of_a_moment_sorts_and_needs_no_escaping ... ok
+test diagnostic::tests::the_log_payload_stops_at_its_ceiling_and_registers_everything_after_it ... ok
+test dto::cleanup::tests::an_empty_report_still_carries_every_key ... ok
+test dto::cleanup::tests::the_wire_key_sets_are_pinned ... ok
+test dto::config::tests::each_fact_is_read_from_the_config ... ok
+test dto::config::tests::no_private_value_appears_anywhere_in_the_answer ... ok
+test dto::config::tests::the_page_gets_exactly_the_three_facts_it_is_allowed ... ok
+test dto::diagnostic::tests::an_empty_report_still_carries_every_key ... ok
+test dto::diagnostic::tests::the_wire_key_sets_are_pinned ... ok
+test dto::profile::tests::profile_operation_args_accepts_tauri_camel_case_payload ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 在宽限内自行退出（212 ms） operation_id=session-answered
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-answered
+test dto::profile::tests::profile_operation_result_can_omit_snapshot_for_open_close ... ok
+test diagnostic::tests::the_written_archive_holds_exactly_what_was_handed_to_it ... ok
+test commands::agent::tests::a_stop_the_agent_answers_reads_as_it_leaving_on_its_own ... ok
+test dto::settings::tests::an_unchosen_directory_arrives_as_null ... ok
+test dto::storage::tests::the_enumerations_and_optionals_cross_the_wire_as_the_reader_spells_them ... ok
+test dto::settings::tests::the_wire_key_sets_are_pinned ... ok
+test dto::storage::tests::the_wire_key_sets_are_pinned ... ok
+test http::local_agent::tests::a_request_url_is_the_base_and_the_path_with_no_query ... ok
+test http::local_agent::tests::every_request_carries_its_own_clients_token ... ok
+test http::local_agent::tests::the_base_url_comes_from_the_config ... ok
+test http::tests::a_closed_loopback_port_is_refused_promptly_instead_of_hanging ... ok
+test http::tests::a_loopback_request_does_not_reach_the_proxy_it_was_handed ... ok
+test http::tests::only_loopback_destinations_are_treated_as_local ... ok
+test diagnostic::tests::the_digest_is_the_digest_of_the_file_by_an_independent_reader ... ok
+2026-09-24T10:11:12 [INFO] desktop.startup: connected with token=*** to the local Agent
+test logging::backend::tests::a_credential_never_reaches_the_file_and_the_line_around_it_does ... ok
+desktop.log: cannot write /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/wt-media-backend-blocked-write-47245-58712000: File exists (os error 17)
+2026-09-24T10:11:12 [WARN] agent.supervisor: Local Agent 在 300ms 内没有报告就绪；它没有打印监听行，可能未能启动或已退出。 operation_id=d81b2b7e-d6dd-4df4-910f-4de1142f89a8
+2026-09-24T10:11:12 [INFO] desktop.startup: still here
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=d81b2b7e-d6dd-4df4-910f-4de1142f89a8
+test logging::backend::tests::a_directory_that_cannot_be_written_is_refused_and_the_launch_still_has_a_subscriber ... ok
+test logging::backend::tests::a_level_below_the_one_configured_is_dropped_before_it_is_rendered ... ok
+test commands::agent::tests::a_start_after_the_agent_died_does_not_answer_already_running ... ok
+2026-09-24T10:11:12 [WARN] webview: TypeError\n  at click (app.js:1:2)\n  at render (app.js:9:9)
+test logging::backend::tests::a_record_stays_one_line_when_the_message_does_not ... ok
+test logging::backend::tests::a_record_that_never_got_its_newline_is_still_written_when_the_sink_drops ... ok
+test logging::backend::tests::every_stamp_is_the_same_moment_the_same_way ... ok
+2026-09-24T10:11:12 [INFO] desktop.startup: the launch summary
+2026-09-24T10:11:12 [INFO] agent.supervisor: a record
+2026-09-24T10:11:12 [INFO] desktop.startup: a record
+2026-09-24T10:11:12 [INFO] webview: a record
+test logging::backend::tests::a_target_desktop_does_not_own_never_reaches_the_file ... ok
+test logging::backend::tests::every_target_desktop_owns_produces_a_record_in_the_file ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: the sidecar exited
+test logging::backend::tests::supervision_is_recorded_even_at_a_level_that_would_hide_it ... ok
+2026-09-24T10:11:12 [WARN] desktop.startup: a problem
+2026-09-24T10:11:12 [DEBUG] desktop.startup: a detail
+2026-09-24T10:11:12 [WARN] desktop.startup: a problem
+2026-09-24T10:11:12 [INFO] desktop.startup: hello
+test logging::backend::tests::the_line_reads_the_way_the_agent_writes_it ... ok
+test logging::backend::tests::the_configured_level_decides_what_reaches_the_file ... ok
+test logging::backend::tests::the_stamp_is_local_at_the_edges_of_the_day ... ok
+test logging::backend::tests::the_stamp_is_the_local_day_and_time_with_no_zone_mark ... ok
+test logging::paths::tests::a_configured_agent_data_dir_puts_the_logs_beside_it ... ok
+test logging::paths::tests::a_data_dir_that_cannot_be_resolved_from_here_is_refused ... ok
+test logging::paths::tests::a_stale_probe_file_does_not_make_the_directory_unusable ... ok
+test logging::paths::tests::a_directory_that_exists_but_cannot_be_written_is_an_error ... ok
+test logging::paths::tests::an_unset_agent_data_dir_lands_in_the_agents_installed_tree ... ok
+test logging::paths::tests::development_writes_under_the_injected_manifest_directory ... ok
+test logging::paths::tests::each_layout_reads_one_input_and_ignores_the_other ... ok
+test logging::paths::tests::no_home_refuses_the_arms_that_need_one ... ok
+test logging::paths::tests::a_target_that_is_a_file_is_an_error_rather_than_a_panic ... ok
+2026-09-24T10:11:12 [WARN] agent.supervisor: 宽限已到，强杀 Local Agent（400 ms） operation_id=session-ignored
+2026-09-24T10:11:12 [INFO] agent.supervisor: Local Agent 已停止 operation_id=session-ignored
+test logging::paths::tests::prepare_creates_the_directory_and_reports_the_same_path ... ok
+test logging::paths::tests::prepare_is_repeatable ... ok
+test logging::paths::tests::production_writes_under_the_injected_home ... ok
+test logging::paths::tests::the_agent_tree_is_not_desktops_tree ... ok
+test logging::paths::tests::the_production_directory_ends_at_the_component_level ... ok
+test logging::paths::tests::the_refusal_does_not_fall_back_to_the_installed_tree ... ok
+test logging::paths::tests::prepare_leaves_no_probe_file ... ok
+test logging::reader::tests::a_continuation_line_inherits_the_record_above_it ... ok
+test logging::reader::tests::a_collision_index_is_an_archive_and_leaves_the_stamp_behind_it ... ok
+test logging::reader::tests::a_level_inside_a_message_is_not_a_record ... ok
+test logging::reader::tests::a_line_before_the_first_record_has_no_level ... ok
+test logging::reader::tests::a_tail_is_the_last_lines_without_the_trailing_newline ... ok
+test logging::reader::tests::a_subdirectory_is_not_listed ... ok
+test commands::agent::tests::a_stop_the_agent_ignores_reads_as_killed_at_the_deadline ... ok
+test logging::reader::tests::a_tail_of_a_missing_file_is_an_error ... ok
+test logging::reader::tests::an_absent_directory_lists_as_empty_and_is_not_created ... ok
+test logging::reader::tests::an_archive_is_recognised_by_the_stamp_the_rotator_writes ... ok
+test logging::reader::tests::a_tail_longer_than_one_chunk_keeps_its_lines_whole ... ok
+test logging::reader::tests::an_unreadable_directory_is_an_error_rather_than_empty ... ok
+test logging::reader::tests::asking_for_more_lines_than_there_are_gives_what_there_is ... ok
+test logging::reader::tests::both_components_level_spellings_are_recognised ... ok
+test logging::reader::tests::one_components_live_name_is_not_the_others ... ok
+test logging::reader::tests::names_the_rotator_never_writes_are_other ... ok
+test logging::reader::tests::only_the_stamp_shapes_the_crate_accepts_are_archives ... ok
+test logging::reader::tests::the_agents_three_live_files_are_listed_by_name ... ok
+test logging::reader::tests::the_filter_keeps_blocks_whole_and_never_hides_the_unclassified ... ok
+test logging::reader::tests::the_levels_are_ordered ... ok
+test diagnostic::tests::the_attempts_are_bounded ... ok
+test logging::reader::tests::the_listing_is_live_then_newest_archive_then_the_unknown ... ok
+test logging::reader::tests::the_live_name_is_the_live_kind_for_each_component ... ok
+test logging::reader::tests::the_page_spelling_parses_and_an_unknown_one_does_not ... ok
+test logging::reader::tests::the_wire_spelling_round_trips_and_an_unknown_one_does_not ... ok
+test logging::redact::tests::a_bearer_word_with_nothing_token_shaped_after_it_is_left_alone ... ok
+test logging::redact::tests::a_name_that_merely_contains_a_credential_name_is_left_alone ... ok
+test logging::redact::tests::a_secret_this_process_holds_is_masked_without_a_key_to_name_it ... ok
+test logging::redact::tests::a_url_with_a_user_but_no_password_keeps_its_user ... ok
+test logging::redact::tests::a_value_too_short_to_be_a_secret_is_not_used_as_a_needle ... ok
+test logging::redact::tests::every_credential_on_a_line_is_masked_and_not_just_the_first ... ok
+test logging::reader::tests::the_tails_edges_are_handled ... ok
+test logging::redact::tests::every_credential_shape_is_masked_and_the_line_around_it_survives ... ok
+test logging::redact::tests::masking_a_line_twice_changes_nothing_more ... ok
+test logging::rolling::tests::a_cap_too_small_for_the_marker_still_marks_the_record ... ok
+test logging::rolling::tests::a_directory_that_does_not_exist_yet_is_created ... ok
+test logging::rolling::tests::a_file_that_is_not_an_archive_is_left_alone ... ok
+test logging::rolling::tests::a_record_at_exactly_the_cap_is_still_whole ... ok
+test logging::rolling::tests::a_live_path_that_is_a_directory_is_an_error_rather_than_a_silent_sink ... ok
+test logging::rolling::tests::a_record_over_the_cap_is_marked_in_the_file_it_lands_in ... ok
+test logging::rolling::tests::a_record_that_fits_is_written_whole_and_unmarked ... ok
+test logging::rolling::tests::a_record_in_a_new_hour_rotates_the_file_the_previous_run_left ... ok
+test logging::rolling::tests::an_ordinary_record_is_never_marked_under_the_shipped_cap ... ok
+test logging::rolling::tests::an_oversized_record_is_truncated_and_says_how_long_it_was ... ok
+test logging::rolling::tests::an_archive_is_deleted_by_the_next_writer_and_not_by_the_one_that_missed_it ... ok
+test logging::rolling::tests::an_unusable_directory_is_an_error_rather_than_a_panic ... ok
+test logging::rolling::tests::records_are_one_line_each ... ok
+test logging::rolling::tests::records_in_one_hour_stay_in_one_file ... ok
+test logging::rolling::tests::history_past_the_window_is_deleted_and_history_inside_it_is_kept ... ok
+test logging::rolling::tests::the_first_record_lands_in_the_stable_live_file ... ok
+test logging::rolling::tests::the_age_rule_deletes_nothing_when_everything_is_inside_the_window ... ok
+test logging::rolling::tests::the_live_file_exists_as_soon_as_the_writer_does ... ok
+test logging::rolling::tests::the_names_and_the_formats_are_the_ones_the_ruling_names ... ok
+test logging::rolling::tests::the_shipped_limits_are_the_ones_the_ruling_names ... ok
+test logging::rolling::tests::the_live_file_is_recreated_after_a_rotation ... ok
+test logging::rolling::tests::truncation_never_leaves_half_a_character ... ok
+test logging::setup::tests::an_unusable_directory_is_a_reason_and_not_a_failure ... ok
+test logging::setup::tests::every_accepted_token_maps_and_auto_is_the_sentinel ... ok
+test logging::rolling::tests::the_window_is_the_configured_one ... ok
+test logging::setup::tests::every_accepted_token_maps_to_this_filter ... ok
+test logging::setup::tests::the_limits_are_the_configured_ones ... ok
+test logging::setup::tests::the_summary_names_the_destination_the_level_and_both_environments ... ok
+test logging::targets::tests::a_target_without_an_override_takes_the_default ... ok
+test logging::setup::tests::the_plan_follows_the_build_not_the_effective_environment ... ok
+test logging::targets::tests::every_owned_target_is_selectable_at_the_level_it_runs_at ... ok
+test logging::targets::tests::supervision_is_never_held_stricter_than_info ... ok
+test logging::targets::tests::the_filter_is_off_for_every_target_desktop_does_not_own ... ok
+test logging::targets::tests::the_floor_belongs_to_the_supervision_target_alone ... ok
+test logging::targets::tests::the_floor_holds_at_the_filter_and_not_only_in_the_rule ... ok
+test logging::targets::tests::the_shipped_levels_are_production_info_and_development_debug ... ok
+test logging::targets::tests::the_vocabulary_is_the_one_the_ruling_names ... ok
+test paths::tests::a_production_build_ignores_the_locator ... ok
+test paths::tests::development_order_is_override_then_manifest_resources_only ... ok
+test paths::tests::every_source_has_its_own_code ... ok
+test paths::tests::locate_takes_the_first_candidate_that_exists ... ok
+test paths::tests::no_candidate_existing_falls_through_to_the_compiled_default ... ok
+test paths::tests::production_order_is_resource_then_exe ... ok
+test paths::tests::an_existing_file_that_cannot_be_read_falls_back_instead_of_panicking ... ok
+test paths::tests::the_compiled_default_is_a_usable_config ... ok
+test preflight::tests::binding_guard_uses_the_callers_sentence ... ok
+test preflight::tests::cloud_base_url_is_normalized_then_checked ... ok
+test preflight::tests::divergent_wording_is_not_shared ... ok
+test preflight::tests::identity_guard_accepts_a_readable_normal_bitbrowser ... ok
+test preflight::tests::message_parity ... ok
+test preflight::tests::release_failure_composes_the_flows_own_sentence ... ok
+test preflight::tests::status_is_rendered_by_display_including_the_reason_phrase ... ok
+test preflight::tests::release_text_still_names_the_account_check_flow ... ok
+test settings::tests::a_chosen_directory_round_trips ... ok
+test settings::tests::a_file_claiming_version_zero_is_refused ... ok
+test settings::tests::a_directory_where_the_file_belongs_is_an_error_not_a_default ... ok
+test settings::tests::a_file_from_a_newer_schema_is_refused_and_left_untouched ... ok
+test settings::tests::a_half_written_replacement_leaves_the_previous_file_untouched ... ok
+test settings::tests::a_missing_file_is_a_first_launch_and_is_not_created_by_looking ... ok
+test settings::tests::a_path_that_is_not_a_directory_is_refused ... ok
+test settings::tests::a_relative_save_dir_is_refused ... ok
+test settings::tests::a_stale_temp_file_does_not_break_the_next_save ... ok
+test settings::tests::a_replacement_does_not_leave_the_previous_contents_behind ... ok
+test settings::tests::an_error_never_echoes_the_files_contents ... ok
+test settings::tests::an_existing_absolute_directory_is_accepted ... ok
+test settings::tests::a_successful_save_leaves_no_temp_file ... ok
+test settings::tests::an_unknown_key_is_refused_rather_than_dropped ... ok
+test settings::tests::an_unchosen_directory_round_trips_as_none ... ok
+test settings::tests::each_problem_says_something_of_its_own ... ok
+test settings::tests::save_refuses_to_replace_a_file_from_another_schema ... ok
+test settings::tests::corrupt_settings_are_an_error_and_the_file_is_left_untouched ... ok
+test settings::tests::save_refuses_to_replace_a_file_it_cannot_read ... ok
+test settings::tests::save_reports_a_missing_directory_rather_than_creating_it ... ok
+test settings::tests::save_then_load_round_trips_through_a_file ... ok
+test settings::tests::temp_path_is_a_sibling_of_the_target ... ok
+test settings::tests::save_stamps_the_version_this_build_understands ... ok
+test settings::tests::the_default_is_this_builds_schema ... ok
+test settings::tests::the_path_is_the_data_roots_settings_file ... ok
+test settings::tests::the_settings_file_lands_in_the_data_root_app_paths_resolves ... ok
+test sidecar::drain::tests::blank_chunks_are_dropped_and_garbled_ones_are_kept ... ok
+test sidecar::drain::tests::exit_report_distinguishes_held_lines_from_shown_lines ... ok
+test sidecar::drain::tests::exit_report_names_the_status_held_count_and_the_lines ... ok
+2026-09-24T10:11:12 [WARN] agent.supervisor: [读取 sidecar 输出失败] channel closed
+test sidecar::drain::tests::a_read_failure_is_buffered_and_logged ... ok
+test sidecar::drain::tests::keeps_the_newest_lines_and_forgets_the_oldest ... ok
+test sidecar::drain::tests::summary_appends_the_tail_under_a_header ... ok
+test sidecar::drain::tests::summary_is_empty_when_nothing_was_captured ... ok
+test sidecar::drain::tests::tail_returns_the_end_in_order ... ok
+test sidecar::drain::tests::ordinary_output_reaches_the_buffer_and_no_record ... ok
+test sidecar::drain::tests::the_reported_window_is_the_same_one_either_way ... ok
+test sidecar::drain::tests::the_two_directions_are_named_and_the_rest_is_ignored ... ok
+test sidecar::integrity::tests::a_missing_record_is_refused_in_a_package_and_tolerated_in_a_build_tree ... ok
+2026-09-24T10:11:12 [INFO] agent.supervisor: [wt-media-desktop] Local Agent（sidecar_started）退出码 1；缓冲共 50 行，末 20 行输出：\n[wt-media-desktop] | l30\n[wt-media-desktop] | l31\n[wt-media-desktop] | l32\n[wt-media-desktop] | l33\n[wt-media-desktop] | l34\n[wt-media-desktop] | l35\n[wt-media-desktop] | l36\n[wt-media-desktop] | l37\n[wt-media-desktop] | l38\n[wt-media-desktop] | l39\n[wt-media-desktop] | l40\n[wt-media-desktop] | l41\n[wt-media-desktop] | l42\n[wt-media-desktop] | l43\n[wt-media-desktop] | l44\n[wt-media-desktop] | l45\n[wt-media-desktop] | l46\n[wt-media-desktop] | l47\n[wt-media-desktop] | l48\n[wt-media-desktop] | l49
+test sidecar::drain::tests::the_exit_is_one_record_carrying_the_tail ... ok
+test sidecar::integrity::tests::a_record_that_cannot_be_compared_is_refused ... ok
+test sidecar::integrity::tests::a_sidecar_that_matches_its_record_passes_and_one_changed_byte_does_not ... ok
+test sidecar::integrity::tests::only_a_launch_from_inside_a_bundle_counts_as_one ... ok
+test sidecar::integrity::tests::no_sidecar_is_not_a_failure ... ok
+test sidecar::integrity::tests::the_sidecar_is_resolved_beside_the_app_and_out_of_deps ... ok
+test sidecar::readiness::tests::a_refused_credential_fails_at_once_and_names_itself ... ok
+test sidecar::integrity::tests::the_digest_is_the_one_the_machine_computes ... ok
+test sidecar::readiness::tests::an_announcement_on_another_port_fails_at_once ... ok
+test sidecar::readiness::tests::an_agent_that_never_announces_times_out ... ok
+test sidecar::readiness::tests::an_announcing_answering_agent_is_ready ... ok
+test sidecar::readiness::tests::an_announcement_that_arrives_late_is_still_seen ... ok
+test sidecar::readiness::tests::the_announcement_is_recognised_and_its_port_read ... ok
+test sidecar::readiness::tests::the_gate_waits_for_a_real_agent_process ... ignored
+test sidecar::readiness::tests::an_announcing_silent_agent_times_out_with_the_other_message ... ok
+test sidecar::tests::a_pid_of_zero_is_refused_rather_than_signalled ... ok
+test logging::reader::tests::a_tail_stopped_by_the_byte_ceiling_keeps_whole_lines_and_says_so ... ok
+test sidecar::tests::a_refusal_is_never_answered_with_the_python_path ... ok
+test logging::reader::tests::one_record_longer_than_the_ceiling_reads_as_no_lines_and_a_flag ... ok
+test sidecar::tests::an_unset_data_dir_is_omitted_and_a_set_one_is_passed_through ... ok
+test sidecar::tests::the_agent_is_told_where_to_listen_and_what_to_demand ... ok
+test sidecar::tests::the_fallback_command_line_is_only_the_module_name ... ok
+test sidecar::tests::the_token_the_agent_is_told_is_the_one_the_requests_carry ... ok
+test state::tests::a_fresh_holder_has_no_session ... ok
+test state::tests::each_session_gets_its_own_uuid ... ok
+test state::tests::the_session_is_held_until_it_is_cleared ... ok
+test storage::tests::a_symlink_is_not_followed ... ok
+test storage::tests::a_symlinked_directory_is_not_walked ... ok
+test storage::tests::a_tree_is_the_sum_of_its_files ... ok
+test storage::tests::a_tree_that_cannot_be_read_is_an_error_rather_than_zero ... ok
+test storage::tests::a_tree_that_is_a_file_is_an_error_rather_than_zero ... ok
+test storage::tests::an_absent_tree_is_zero_and_is_not_created ... ok
+test storage::tests::an_empty_tree_is_zero ... ok
+test storage::tests::an_error_names_the_path_it_could_not_measure ... ok
+test storage::tests::free_space_for_an_absent_path_comes_from_its_nearest_existing_ancestor ... ok
+test storage::tests::free_space_for_an_absent_path_is_an_error_not_zero ... ok
+test storage::tests::free_space_for_an_existing_path_is_the_same_either_way ... ok
+test storage::tests::free_space_is_measured_for_an_existing_path ... ok
+test storage::tests::free_space_stops_at_the_last_component_and_reports_the_error ... ok
+test tests::python_fallback_requires_debug_build_and_explicit_opt_in ... ok
+test token::tests::a_token_is_a_canonical_v4_uuid ... ok
+test token::tests::expose_is_stable_for_a_given_token ... ok
+test token::tests::tokens_do_not_repeat_across_launches ... ok
+test upgrade::tests::a_directory_under_the_data_root_is_refused ... ok
+test upgrade::tests::a_sibling_with_a_shared_prefix_is_not_inside ... ok
+test upgrade::tests::allows_a_path_outside_both_roots ... ok
+test upgrade::tests::an_unrecognised_file_under_the_data_root_is_refused ... ok
+test upgrade::tests::the_agent_root_is_refused_whatever_the_file_is_called ... ok
+test upgrade::tests::the_declared_sites_are_writable ... ok
+test upgrade::tests::the_development_layout_gets_the_same_rule ... ok
+test upgrade::tests::the_sites_are_the_roots_owner_declaration ... ok
+test upgrade::tests::the_two_roots_are_siblings_with_disjoint_sites ... ok
+test http::tests::a_request_to_a_silent_server_gives_up_instead_of_waiting_forever ... ok
+test sidecar::tests::an_ask_reaches_a_real_process_and_it_leaves ... ok
+test sidecar::tests::a_process_that_ignores_the_ask_is_still_alive ... ok
+test commands::agent::tests::a_tampered_sidecar_is_refused_and_an_intact_one_is_started ... ok
+test sidecar::readiness::tests::the_wait_is_the_configured_one ... ok
+test http::tests::the_unproxied_client_is_built_without_the_system_proxy ... ok
+test http::cloud::tests::a_loopback_cloud_url_is_sent_without_the_system_proxy ... ok
+
+test result: ok. 372 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 3.94s
+

@@ -1,0 +1,11 @@
+pristine sha256=6ab1fc90abaad170c1d1af25b868f8f1ca1aba4231c74d27050292b9699989af
+M1 the criterion goes back to a name list: killed ['a_directory_under_the_data_root_is_refused', 'a_sibling_with_a_shared_prefix_is_not_inside', 'an_unrecognised_file_under_the_data_root_is_refused', 'the_agent_root_is_refused_whatever_the_file_is_called', 'the_declared_sites_are_writable', 'the_development_layout_gets_the_same_rule'] restore_ok=True
+M2 inside() becomes a string prefix: killed ['a_sibling_with_a_shared_prefix_is_not_inside'] restore_ok=True
+M3 the Agent's root is not refused at all: killed ['the_agent_root_is_refused_whatever_the_file_is_called'] restore_ok=True
+M4 the Desktop branch accepts anything under the data root: killed ['a_directory_under_the_data_root_is_refused', 'a_sibling_with_a_shared_prefix_is_not_inside', 'an_unrecognised_file_under_the_data_root_is_refused', 'the_development_layout_gets_the_same_rule'] restore_ok=True
+M5 the payload area is declared as the cache root: killed ['the_declared_sites_are_writable', 'the_sites_are_the_roots_owner_declaration'] restore_ok=True
+M6 the Agent's refusal is reported as the Desktop's class: killed ['the_agent_root_is_refused_whatever_the_file_is_called'] restore_ok=True
+M7 a site is refused for its own subpaths: killed ['the_declared_sites_are_writable', 'the_development_layout_gets_the_same_rule'] restore_ok=True
+M8 the Agent's root is the Desktop's own directory: killed ['a_directory_under_the_data_root_is_refused', 'a_sibling_with_a_shared_prefix_is_not_inside', 'an_unrecognised_file_under_the_data_root_is_refused', 'the_declared_sites_are_writable', 'the_two_roots_are_siblings_with_disjoint_sites'] restore_ok=True
+M9 the Desktop branch forgets that it is scoped to the data root: killed ['a_sibling_with_a_shared_prefix_is_not_inside', 'allows_a_path_outside_both_roots'] restore_ok=True
+mutations=9 unproven=0

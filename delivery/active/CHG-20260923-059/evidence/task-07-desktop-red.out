@@ -1,0 +1,95 @@
+=== T-07 first red: the criterion as a name list, on the arms that decide whether it is a path ===
+--- command: cargo test --bin wt-media-desktop-shell upgrade::
+warning: struct `FileSystemBridge` is never constructed
+ --> src-tauri/src/filesystem/mod.rs:3:12
+  |
+3 | pub struct FileSystemBridge;
+  |            ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+warning: field `directory` is never read
+   --> src-tauri/src/logging/rolling.rs:196:5
+    |
+195 | pub struct Writer {
+    |            ------ field in this struct
+196 |     directory: PathBuf,
+    |     ^^^^^^^^^
+warning: method `directory` is never used
+   --> src-tauri/src/logging/rolling.rs:256:12
+    |
+202 | impl Writer {
+    | ----------- method in this implementation
+...
+256 |     pub fn directory(&self) -> &Path {
+    |            ^^^^^^^^^
+warning: struct `SecureStore` is never constructed
+ --> src-tauri/src/secure_store/mod.rs:3:12
+  |
+3 | pub struct SecureStore;
+  |            ^^^^^^^^^^^
+warning: variant `Unsupported` is never constructed
+  --> src-tauri/src/storage.rs:60:5
+   |
+53 | pub enum StorageError {
+   |          ------------ variant in this enum
+...
+60 |     Unsupported { reason: String },
+   |     ^^^^^^^^^^^
+   |
+   = note: `StorageError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+warning: struct `SystemBridge` is never constructed
+ --> src-tauri/src/system/mod.rs:3:12
+  |
+3 | pub struct SystemBridge;
+  |            ^^^^^^^^^^^^
+warning: struct `Updater` is never constructed
+ --> src-tauri/src/updater/mod.rs:3:12
+  |
+3 | pub struct Updater;
+  |            ^^^^^^^
+warning: `wt-media-desktop-shell` (bin "wt-media-desktop-shell" test) generated 7 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.49s
+     Running unittests src/main.rs (target/debug/deps/wt_media_desktop_shell-5a814c8fd84e893d)
+running 9 tests
+test upgrade::tests::allows_a_path_outside_both_roots ... ok
+test upgrade::tests::the_sites_are_the_roots_owner_declaration ... ok
+test upgrade::tests::a_directory_under_the_data_root_is_refused ... FAILED
+test upgrade::tests::an_unrecognised_file_under_the_data_root_is_refused ... FAILED
+test upgrade::tests::a_sibling_with_a_shared_prefix_is_not_inside ... FAILED
+test upgrade::tests::the_development_layout_gets_the_same_rule ... FAILED
+test upgrade::tests::the_declared_sites_are_writable ... FAILED
+test upgrade::tests::the_two_roots_are_siblings_with_disjoint_sites ... ok
+test upgrade::tests::the_agent_root_is_refused_whatever_the_file_is_called ... FAILED
+failures:
+---- upgrade::tests::a_directory_under_the_data_root_is_refused stdout ----
+thread 'upgrade::tests::a_directory_under_the_data_root_is_refused' (1608304) panicked at src-tauri/src/upgrade.rs:180:48:
+must be refused: ()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+---- upgrade::tests::an_unrecognised_file_under_the_data_root_is_refused stdout ----
+thread 'upgrade::tests::an_unrecognised_file_under_the_data_root_is_refused' (1608307) panicked at src-tauri/src/upgrade.rs:180:48:
+must be refused: ()
+---- upgrade::tests::a_sibling_with_a_shared_prefix_is_not_inside stdout ----
+thread 'upgrade::tests::a_sibling_with_a_shared_prefix_is_not_inside' (1608305) panicked at src-tauri/src/upgrade.rs:282:9:
+assertion `left == right` failed
+  left: DesktopUserData
+ right: AgentData
+---- upgrade::tests::the_development_layout_gets_the_same_rule stdout ----
+thread 'upgrade::tests::the_development_layout_gets_the_same_rule' (1608310) panicked at src-tauri/src/upgrade.rs:332:9:
+assertion failed: refuse(&settings_file, &paths, &agent()).is_ok()
+---- upgrade::tests::the_declared_sites_are_writable stdout ----
+thread 'upgrade::tests::the_declared_sites_are_writable' (1608309) panicked at src-tauri/src/upgrade.rs:185:13:
+/home/operator/Library/Application Support/WTMedia/Desktop/settings.toml must be writable on the upgrade path, but it was refused as the Desktop's data root: a recognised user-data file name
+---- upgrade::tests::the_agent_root_is_refused_whatever_the_file_is_called stdout ----
+thread 'upgrade::tests::the_agent_root_is_refused_whatever_the_file_is_called' (1608308) panicked at src-tauri/src/upgrade.rs:249:13:
+assertion `left == right` failed: local-agent.sqlite3
+  left: DesktopUserData
+ right: AgentData
+failures:
+    upgrade::tests::a_directory_under_the_data_root_is_refused
+    upgrade::tests::a_sibling_with_a_shared_prefix_is_not_inside
+    upgrade::tests::an_unrecognised_file_under_the_data_root_is_refused
+    upgrade::tests::the_agent_root_is_refused_whatever_the_file_is_called
+    upgrade::tests::the_declared_sites_are_writable
+    upgrade::tests::the_development_layout_gets_the_same_rule
+test result: FAILED. 3 passed; 6 failed; 0 ignored; 0 measured; 368 filtered out; finished in 0.00s
+error: test failed, to rerun pass `--bin wt-media-desktop-shell`

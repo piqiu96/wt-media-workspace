@@ -1,0 +1,13 @@
+test_a_new_migration_leaves_existing_rows_alone (test_upgrade_preserves_data.UpgradePreservesDataTest.test_a_new_migration_leaves_existing_rows_alone)
+The additivity arm, written against the mechanism rather than a guess. ... ok
+test_the_console_script_an_installer_runs_is_the_same_operation (test_upgrade_preserves_data.UpgradePreservesDataTest.test_the_console_script_an_installer_runs_is_the_same_operation)
+`migration.main` — the entry point `migrate-storage.sh` calls — over ... ok
+test_the_database_is_the_declared_path_under_the_data_directory (test_upgrade_preserves_data.UpgradePreservesDataTest.test_the_database_is_the_declared_path_under_the_data_directory)
+`default_db_path` is the one rule, and it is the data directory's own. ... ok
+test_the_upgrade_writes_the_database_and_no_other_path (test_upgrade_preserves_data.UpgradePreservesDataTest.test_the_upgrade_writes_the_database_and_no_other_path)
+The path criterion: the upgrade's write set is one declared file. ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.027s
+
+OK

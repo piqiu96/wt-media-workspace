@@ -1,0 +1,17 @@
+=== T-07 之后的 workspace 门禁（2026-09-25） ===
+--- scripts/verify_delivery_governance.py
+Delivery governance verification ok. Active CHG: CHG-20260923-059
+--- scripts/verify_agent_entry.py
+execution snapshot: 2144 characters (~858 tokens, budget 8000 characters)
+Agent entry verification ok. 0 warning(s) need review.
+--- scripts/verify_skills.py
+verified 10 skill source files
+--- python3 -m unittest discover -s tests -q
+Ran 69 tests in 0.263s
+
+FAILED (failures=4)
+--- 失败集合（逐条同名对照 T-06 的读数）
+FAIL: test_contract_map_matches_m1_cloud_agent_compatibility (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_matches_m1_cloud_agent_compatibility)
+FAIL: test_contract_map_provider_paths_exist_in_full_workspace (test_verify_m0_config.VerifyM0ConfigTests.test_contract_map_provider_paths_exist_in_full_workspace)
+FAIL: test_current_product_master_and_governance_are_aligned (test_verify_product_master_alignment.ProductMasterAlignmentTests.test_current_product_master_and_governance_are_aligned)
+FAIL: test_static_cross_repo_contract_and_security_matrix (test_verify_m2_acceptance.VerifyM2AcceptanceTests.test_static_cross_repo_contract_and_security_matrix)
