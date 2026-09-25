@@ -1,0 +1,152 @@
+CHG-20260926-067 T-03 -- wt-media-desktop/bin/control.sh readings
+repo HEAD at run time: 7c1b0ad (+ T-03 working tree)
+date: 2026-09-26 02:00:31
+
+################################################################
+# PART 0 -- the arm that found a defect (PRE-FIX revision) and why
+################################################################
+The first revision read the dev address with:
+    node -p 'require(process.argv[1]).build.devUrl' "$CONF"
+and treated an empty capture as failure. A missing key is not an error for
+that expression -- it prints the string 'undefined' and exits 0 -- so the
+guard never fired and the bogus value was printed as a URL:
+
+    desktop: pid=- alive=no health=down url=undefined       exit=1
+
+Still exit=1 (health could not answer 'undefined'), but the reading was a
+lie. Fixed by making the expression yield '' for a missing key (and by
+checking the config file first). The arms below run on the fixed revision;
+PART 3 M4/M5 are the regression arms for exactly this.
+
+################################################################
+# PART 1 -- real tree, verbs that change nothing
+################################################################
+--- help
+Usage: bin/control.sh <start|stop|restart|status|help>
+
+  start    Run `cargo tauri dev` in the background and wait for the dev server.
+  stop     Stop the process started by `start` (and its children).
+  restart  Stop it, then start it again.
+  status   Report whether that process is alive and whether the dev server answers.
+  help     Show this help.
+exit=0
+--- unknown verb (usage must go to stderr, not stdout)
+exit=2
+    stdout bytes:        0   stderr bytes:      378
+--- status, nothing started
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+--- stop, nothing running
+cargo tauri dev not running
+exit=0
+--- bash -n
+exit=0
+--- port-literal scan ':[0-9]{4,5}' (expect 0 hits)
+0 hits
+
+################################################################
+# PART 2 -- start/stop/restart with a simulated cargo on PATH
+################################################################
+PATH=</private/tmp/desktop-sim/bin>:$PATH -- the sim implements only 'tauri --version' and
+'tauri dev' (which runs a local http.server on the configured port).
+
+=== ARM A: start ===
+cargo tauri dev started: pid=44755 log=.runtime/desktop.log
+dev server answering: http://127.0.0.1:5174
+exit=0
+--- .runtime contents
+total 16
+-rw-r--r--@ 1 aqiuye  staff  28 Sep 26 02:00 desktop.log
+-rw-r--r--@ 1 aqiuye  staff   6 Sep 26 02:00 desktop.pid
+--- pid file: 44755; process group members:
+44755 44755 bash /private/tmp/desktop-sim/bin/cargo tauri dev
+44759 44755 /opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -m http.server 5174 --bind 127.0.0.1
+
+=== ARM B: status while running ===
+desktop: pid=44755 alive=yes health=ok url=http://127.0.0.1:5174
+exit=0
+
+=== ARM C: restart ===
+cargo tauri dev stopped
+cargo tauri dev started: pid=44810 log=.runtime/desktop.log
+dev server answering: http://127.0.0.1:5174
+exit=0
+
+=== ARM D: stop (must take the whole group, not just the leader) ===
+cargo tauri dev stopped
+exit=0
+--- listeners on the dev port after stop:
+    (empty above = none)
+--- sim children still alive?
+    (none)
+
+=== ARM E: status after stop ===
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+=== ARM F: start with no cargo anywhere on PATH (fail-fast guard) ===
+cargo tauri not available; install it with: cargo install tauri-cli
+exit=1
+
+=== ARM G: log written by the simulated run ===
+sim: dev server child=44814
+
+=== ARM H: server answering, but no pid of ours ===
+desktop: pid=- alive=no health=ok url=http://127.0.0.1:5174
+exit=1   <-- exit=1 means 'not started by this harness', not 'service down'
+    (H is the mirror of M3 below: alive=no health=ok and alive=yes health=down
+     are both reachable, so the two signals are not one signal printed twice.)
+
+################################################################
+# PART 3 -- arms on a throwaway copy of the tree (/private/tmp/desktop-mut)
+################################################################
+=== M1: copied tree, config unchanged, nothing listening ===
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+
+=== M2: simulated server up on the configured port (control for M3) ===
+desktop: pid=44930 alive=yes health=ok url=http://127.0.0.1:5174
+exit=0
+
+=== M3: MUTATION -- copy's build.devUrl repointed to a dead port, sim still up ===
+    copy devUrl -> http://127.0.0.1:5175 ; sim still answering on 5174
+desktop: pid=44930 alive=yes health=down url=http://127.0.0.1:5175
+exit=1   <-- health follows the config, not a constant
+
+=== M4: MUTATION -- copy's config has no build.devUrl (regression for PART 0) ===
+cannot read build.devUrl from src-tauri/tauri.conf.json
+exit=1   <-- must fail loudly; 'url=undefined' is the defect PART 0 records
+
+=== M5: MUTATION -- copy's config file removed ===
+missing config: src-tauri/tauri.conf.json
+exit=1
+
+--- restored copy reads again (positive control that the copy is not just broken):
+cannot read build.devUrl from src-tauri/tauri.conf.json
+exit=1
+
+################################################################
+# PART 4 -- real tree left clean
+################################################################
+--- .runtime after the arms (pid file must be gone; the log stays):
+total 8
+-rw-r--r--@ 1 aqiuye  staff  28 Sep 26 02:00 desktop.log
+
+=== M5c: CORRECTION to the 'restored copy reads again' line above ===
+That line was NOT a positive control: M4 removed build.devUrl and M5 only
+restored the FILE, so the copy was still mutated and failed for the M4
+reason. The key is restored here; this is the real control.
+--- M5c-1: copy with a valid config, nothing listening:
+desktop: pid=- alive=no health=down url=http://127.0.0.1:5174
+exit=1
+--- M5c-2: copy with a valid config and the simulated server up:
+cargo tauri dev started: pid=45147 log=.runtime/desktop.log
+dev server answering: http://127.0.0.1:5174
+exit=0
+desktop: pid=45147 alive=yes health=ok url=http://127.0.0.1:5174
+exit=0
+cargo tauri dev stopped
+exit=0
+=> with the same file and only build.devUrl varying (M3 vs M5c-2), health
+   flips; with the same config and only the server varying (M1 vs M5c-1
+   vs M5c-2), health flips. Both digits are readings, not constants.

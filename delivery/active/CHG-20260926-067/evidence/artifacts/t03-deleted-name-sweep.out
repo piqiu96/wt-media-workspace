@@ -1,0 +1,48 @@
+CHG-20260926-067 T-03 -- residual-reference sweep for the 11 removed scripts
+repo: wt-media-desktop   HEAD: 7c1b0ad
+mode: git grep -F --untracked (fixed strings; -F because '.' in a name is a
+      regex wildcard and 'build.sh' matched 'build_sha256' in an earlier pass)
+
+denominator: git ls-files = 109 tracked files (+untracked, non-ignored)
+
+  bootstrap.sh             hits=0
+  build.sh                 hits=0
+  dev.sh                   hits=0
+  health-check.mjs         hits=0
+  health-dev.mjs           hits=0
+  health.sh                hits=0
+  start-dev.mjs            hits=0
+  start.sh                 hits=0
+  stop-dev.mjs             hits=0
+  stop.sh                  hits=0
+  verify-real-scripts.mjs  hits=0
+
+positive control (a name that must still resolve):
+  release-versions.sh      files=10
+  test.sh                  files=8
+
+positive control, negative direction (a name that never existed here):
+  no-such-script-zz9.sh    files=0
+
+the 11 removed paths, as git sees them now:
+ M scripts/README.md
+D  scripts/bootstrap.sh
+D  scripts/build.sh
+D  scripts/dev.sh
+D  scripts/health-check.mjs
+D  scripts/health-dev.mjs
+D  scripts/health.sh
+D  scripts/start-dev.mjs
+D  scripts/start.sh
+D  scripts/stop-dev.mjs
+D  scripts/stop.sh
+ M scripts/test.sh
+D  scripts/verify-real-scripts.mjs
+?? scripts/dev/
+?? scripts/verify/
+
+ls scripts/ denominator:
+  current: 9 file(s) -> README.md build-release-macos.sh dev package-release-macos.sh prepare-release-sidecar.sh release-versions.sh repair-macos-signing.sh stage-release-config.sh test.sh verify verify-release-macos.sh 
+  pre-T-03: 20 file(s)
+-- control C redo, correct needle:
+   bin/control.sh

@@ -90,6 +90,8 @@
 - **agent 两处注释性路径**（非逻辑）：`src/wt_media_agent/local_api/server.py:44` 与 `tests/test_local_api_server.py:154` 中指向被移脚本的注释串。
 - agent 三处 README 端口字面量**去值留名**（F-11）。
 - **desktop** `.github/workflows/m0-desktop.yml` → Rust-only。
+- **desktop** `.gitignore`：加 `.runtime/`——`bin/control.sh` 的 PID 与日志落点，该目录此前不存在（第 16 项）。
+- **desktop `DIRECTORY_MAP.md:24,82`**：`devUrl` 的值**去值留名**。原措辞只覆盖「脚本层段落」，这里按 D-06「端口值只在配置文件里呈现」的精神一并处理并留痕（第 17 项）。
 
 ### Delete
 
@@ -133,7 +135,7 @@ None.
 | T-00 | 激活：`change.md`／`checkpoint.md`／`evidence/`；§5 封闭；LEDGER 表行；快照 `--change`；四仓 `git status` 基线；`MASTER` §3 读数列按 F-05 刷新（仅本 CHG 激活带来的三项） | DONE | 六门禁 `exit=0`；LEDGER 表行逐字合 `validate_active_change`；§7 为 `None.`。见 `evidence/task-00-activation.md` |
 | T-01 | **workspace 脚本层分层**：`bin/control.sh`（由 `scripts/local-control.sh` 改：加 `restart`／`status`，保留 `verify`／`help`）；`scripts/test-local-control.sh` → `scripts/test-control.sh`；`scripts/dev/`＋`scripts/verify/`（各 `.gitkeep`）；`scripts/README.md`（**首建，终态**）；`AGENT-INDEX.md` 指针行；`verify_delivery_governance.py` 扫描面改递归 | DONE | 见 `evidence/task-01-workspace-layout.md`。要点：扫描面两臂对照落 `artifacts/t01-scan-surface-arm-{a,b}.out`（臂 A 分母 12／0 处、臂 B 分母 13／点名）；`test-control.sh` 四条判据的**五处变异全红**（`artifacts/t01-test-control-mutations.out`）；`status` 实读落 `artifacts/t01-control-status.out`；六门禁 ＋ `Ran 101 / OK` 落 `artifacts/t01-gate-{after,final}.out` |
 | T-02 | workspace：**门禁前置（必须早于 T-03）**——`verify_m0_config.py:272-280` needle 收敛到 T-03 的终态、`:243-253` docstring 同步；`verify_m0_local.sh:39-45` desktop 块 → 只剩 `scripts/test.sh` | DONE | 见 `evidence/task-02-m0-gate-preamble.md`。要点：CI needle 判据**四臂**对照落 `artifacts/t02-m0-gate-arms.out` §A（臂 0 现状×新 tuple 绿／臂 1 变异点名／臂 2 **终态×新 tuple 绿**／臂 3 旧 tuple×终态 **3 处红**，证明收窄承重）；desktop 块两臂落同文件 §B（旧块 `exit=1` 停在 `npm ci`、单跑 `npm run lint` `exit=254`、新块 `exit=0` ＋ `377 tests`）；六门禁落 `artifacts/t02-gate-final.out` |
-| T-03 | **desktop**：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | `ls scripts/` 分母 **20 → 9**；**每个被删名字 `git -C … grep` 命中 0**，阳性对照 `release-versions.sh` 命中 >0（`git -C` 逐仓跑）；`scripts/test.sh` 全跑读数在最后一次改动之后；如实记录 **GitHub Actions 本身未在此运行**。**① 的输入已由 T-02 先行量到一条**：两个 shell 套件都要 `node` 当 JSON 读取器（`node -p`／`node -e`，共 4 处，分母 2），故 `setup-node` 必须保留、只去掉 `cache:` 与 `cache-dependency-path:`（§14 第 13 项） |
+| T-03 | **desktop**：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | DONE | desktop **`9ba5486`**（+277/−346）。见 `evidence/task-03-desktop-layout.md`。要点：`ls scripts/` 分母 **20 → 9**；11 个被删名字 `git grep -F --untracked` **各命中 0**（分母 109 个已跟踪文件；阳性对照 `release-versions.sh` 10 文件／`test.sh` 8，反向对照 0；`--untracked` 覆盖面另用 `cargo tauri` 两臂证明），落 `artifacts/t03-deleted-name-sweep.out`；`bin/control.sh` 十臂 ＋ 六处变异（含一处**自己踩到并修掉**的读端口静默坏法）落 `artifacts/t03-desktop-control-arms.out`；`scripts/test.sh` 全跑 `exit=0`／`372 passed; 0 failed; 5 ignored` ＋ `release-versions 20 passed` 落 `artifacts/t03-desktop-test-sh.out`；无 sidecar 的克隆上占位分支生效且读数逐字相同落 `artifacts/t03-clean-clone.out`；文档端口值三形态扫描落 `artifacts/t03-doc-port-literals.out`。**如实记：GitHub Actions 本身未在此运行；真实 `cargo tauri dev` 未跑（第 18 项）**。**① 的输入已由 T-02 先行量到一条**：两个 shell 套件都要 `node` 当 JSON 读取器（`node -p`／`node -e`，共 4 处，分母 2），故 `setup-node` 必须保留、只去掉 `cache:` 与 `cache-dependency-path:`（§14 第 13 项） |
 | T-04 | **cloud**：`bin/control.sh`；`.gitignore` `bin/` → `bin/*`＋`!bin/*.sh`；删三个原脚本；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | `git check-ignore -v bin/control.sh` **改读数**（同命令对 `bin/wt-media-cloud` 仍报被忽略＝阳性对照）；`bash -n`；四动词各跑一次（`status` 未运行／运行中各一次） |
 | T-05 | workspace：**必须紧接 T-04**——`verify_m3_acceptance.py:561`／`:1738` 与 `:414-421` 回指 cloud `bin/control.sh` | TODO | `bash -n` 无（Python，改常数）；**回指充分性**：`git grep -nE 'scripts/(start\|stop\|health)\.sh'` 在 workspace＋cloud 命中 **0**，阳性对照（搜 `bin/control.sh`）>0，报分母；`verify_m3_acceptance.py` 的 `--help`／语法可跑 |
 | T-06 | **agent**：`bin/control.sh`；删三个 health 脚本；三处 README 端口去值；两处注释路径；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` | TODO | 端口正则命中 **0**，**报分母（三文件行数）＋阳性对照**；`unittest discover -s tests -q` 读数与 F-04 口径一致 |
@@ -165,7 +167,7 @@ None.
 
 ### wt-media-desktop
 
-- [ ] CI → Rust-only；删 11 死脚本；`bin/control.sh`；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md`（T-03）
+- [x] CI → Rust-only；删 11 死脚本；`bin/control.sh`；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md`；`.gitignore` 加 `.runtime/`；`scripts/dev/`＋`scripts/verify/`（T-03）
 
 ## 10. Acceptance Matrix
 
@@ -190,6 +192,7 @@ None.
 - `evidence/task-00-activation.md` ＋ `artifacts/t00-*.out`
 - `evidence/task-01-workspace-layout.md` ＋ `artifacts/t01-*.out`（7 个）
 - `evidence/task-02-m0-gate-preamble.md` ＋ `artifacts/t02-*.out`
+- `evidence/task-03-desktop-layout.md` ＋ `artifacts/t03-*.out`（7 个）
 - 其余各 Task 的 evidence 与 artifacts 随 Task 落地。
 
 每条记录含：命令或手工动作、期望、实测、通过与否、相关 commit。
@@ -226,3 +229,7 @@ None.
 12. **CI needle 是「workflow 文本里有这个字符串」，从不证明那一步能跑**（T-02 实测）。`m0-desktop.yml` 的 `npm run lint` 自 `7aabb1a`（`package.json` 在那次提交被删）起就已经坏了，而 needle 一直绿——**判据与它想保证的事之间差了一整层**。本案实测：`npm run lint` 在 desktop `exit=254`；旧 desktop 块的第一颗钉 `scripts/bootstrap.sh`（`npm ci`）`exit=1` 就停住，**根本走不到 lint**。故计划里写的变异（「把 `npm run lint` 放回 → 脚本失败」）成立但**降级**：它不是被第二个动词抓到的，是第一个动词就断了。⇒ 这一条不改任何判据（needle 的形态正是 CHG-065 D-01 要的稳定判据），只作**已知限制**登记。
 13. **「Rust-only」= 没有 Node 包工具链，不是没有 `node`**（T-02 实测，直接改写 T-03 ① 的待决项）。desktop 的两个 shell 套件都调 `node`，但只当 JSON 读取器：`tests/package-release-macos.test.sh:15` 与 `tests/release-versions.test.sh:168,267,314`（`node -p`／`node -e`，分母 2 个套件共 4 处）。⇒ `setup-node` **保留**，只去掉 `cache:` 与 `cache-dependency-path: package-lock.json`（锁文件不存在）。计划把这一项留给 T-03 ① 决定，现已提前量到并写进 T-03 行。
 14. **T-02 收窄的 4 条 needle 里只有 3 条是被迫的。** 臂 3（旧 tuple × T-03 终态 workflow）只报 3 处红：`scripts/bootstrap.sh`／`npm run lint`／`scripts/build.sh`。第 4 条 `node-version: "26"` 在终态文本里仍在（`setup-node` 保留），删它是**主动**决定——理由见第 13 项：node 已不是本仓工具链，把它当契约来卡会让判据的可满足性取决于一个尚未做的决定。**如实记：这一条不是被迫的。**
+15. **读端口的那一行有个静默坏法**（T-03 自己踩到，已修）。首版用 `node -p '…devUrl'` 并「为空即报错」，但**键不存在时 `node -p` 打印字符串 `undefined` 且 `exit=0`**，空判断永不触发，读数把 `url=undefined` 当地址打出来（`exit=1` 由 health 侧掩盖了它）。改为表达式对缺键返回空串 ＋ 先判配置文件在不在；回归臂 M4／M5。第 10 项那对信号在 desktop 实测互为镜像：`alive=no health=ok`（有东西在答但非本 harness 所起）与 `alive=yes health=down`（进程在、配置指到的地址无应答）**两个方向都取到了**。
+16. **`scripts/test.sh` 在没有 sidecar 的克隆上会写一个占位文件**（T-03 的必要偏离）。`externalBin` 的存在性检查没有开关，真 sidecar 由跨仓的 `prepare-release-sidecar.sh` 产出，而套件**不读它的内容** ⇒ 只在路径缺失时写一个自报家门、`exit 1` 的占位符。实测有／无 sidecar 读数逐字相同（`377 tests`／`372 passed; 0 failed; 5 ignored`）；占位符被 `.gitignore:10` 挡住；`release-versions.sh --check` 拒绝任何没有 `target/sidecar-manifest.json` 的包（只有真构建写得出）⇒ 到不了发布。
+17. **端口字面量的常驻机检只有 workspace 有**（`scripts/test-control.sh` 第 4 条，见第 11 项）。desktop／cloud／agent 本次只有一次性 grep，因为 §8 的 T-03／T-04／T-06 三行都没写「建本仓 `test-control.sh`」——**计划级缺口，登记不补**。连带：desktop `DIRECTORY_MAP.md:24,82` 原把 `devUrl` 的值写进了正文（`devUrl 5174`），按 D-06 的精神去值留名（§5 Modify 末条）——**这条裁定的措辞是「不进 README」，而实际漏网处是目录地图**，故留痕。
+18. **desktop `start` 只在模拟 cargo 下跑过。** 真实 `cargo tauri dev` 会编译并打开窗口，不适合在本 Task 里跑；`PATH` 前置一个只实现 `tauri --version`／`tauri dev` 的替身，把 `.runtime/` 的落点、进程组、探针、`stop` 的整组回收都跑到（`artifacts/t03-desktop-control-arms.out`）。**如实记：真实 `cargo tauri dev` 未跑；GitHub Actions 未跑。**

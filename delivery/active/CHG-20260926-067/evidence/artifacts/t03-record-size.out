@@ -1,0 +1,29 @@
+CHG-20260926-067 T-03 -- 记录体量（口径同 CHG-066 t03-record-size.out）
+change.md / checkpoint.md：整文件**字节**增量，锚是**上一个 Task 的提交**（不是 HEAD，也不是工作树）。
+evidence：只数 evidence/task-NN-*.md；artifacts/ 单列为非约束参考，自指件按定义不数自己。
+date: 2026-09-26 02:10:14
+
+锚（上一个 Task 的提交）= ec3032effaceef3e0452b280251577f73d79d78d  feat(chg-067): T-02 M0 门禁前置——desktop needle 收敛到 Rust-only 终态
+
+  change.md      锚内  29351 B  现在  32781 B  增量  3430 B  上限 5120 B  OK
+  checkpoint.md  锚内   7895 B  现在  10567 B  增量  2672 B  上限 4096 B  OK
+
+  evidence（只数 task-NN-*.md；T-03 的新增篇）：
+    task-00-activation.md                        5281 B
+    task-01-workspace-layout.md                  5462 B
+    task-02-m0-gate-preamble.md                  4467 B
+    task-03-desktop-layout.md                    7423 B   <-- T-03 增量
+  T-03 evidence 增量   7423 B  上限 9216 B  OK
+
+artifacts/t03-*.out（非约束参考，不计入上面任何一条；本文件自指，按定义不数自己）：
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-clean-clone.out   42866 B
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-deleted-name-sweep.out    1652 B
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-desktop-control-arms.out    6378 B
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-desktop-test-sh.out   42420 B
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-doc-port-literals.out    3255 B
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-gate-after.out    2751 B
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-gate-final.out    1685 B
+    delivery/active/CHG-20260926-067/evidence/artifacts/t03-m0-local.out   29355 B
+
+取值时刻：本文件取在 change.md／checkpoint.md／evidence 的最后一次改动**之后**；
+此后不再改这三者，故上面的数字就是 T-03 的关闭值。

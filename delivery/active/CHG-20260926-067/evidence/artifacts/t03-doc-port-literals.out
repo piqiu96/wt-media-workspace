@@ -1,0 +1,50 @@
+CHG-20260926-067 T-03 -- port values in desktop's prose (rule: the value's only
+landing point is the configuration file; D-06, user ruling 2026-09-26)
+files in scope: README.md, scripts/README.md, DIRECTORY_MAP.md
+date: 2026-09-26 02:03:28
+
+=== BEFORE (at HEAD 7c1b0ad), three input forms, each with its own control ===
+-- form 1: ':<4-5 digits>'
+   0 hits
+-- form 2: a bare 4-5 digit group ('[0-9]{4,5}')
+50:The Desktop boundary consumes Cloud-Agent API `v1@2026.07.15.1`, task schemas
+51:`v1@2026.07.15.1`, Local Agent API `v1@2026.07.14.7`, Profile guard events
+52:`profile-guard@2026.07.14.8`, and local status enums `status@2026.07.14.8`.
+115:| `src-tauri/tauri.conf.json` | 应用配置：`frontendDist: ../.generated/frontend`、devUrl 5174、构建命令指向 `../wt-media-cloud/web`、`bundle.resources: ["resources/*.toml"]`。**CSP 不在此处**——它由 `bootstrap.rs` 在运行期经 `config_mut()` 注入，使地址来自配置而非字面量 | 改窗口/构建配置 |
+172:- 开发：`tauri.conf.json` 的 `beforeDevCommand` 进入 `../../wt-media-cloud/web` 跑 `npm run dev:desktop`（devUrl 5174）。
+-- form 3: '127.0.0.1'
+   0 hits
+   => form 2 is the one with discriminating power here: the value appears as
+      prose ('devUrl 5174'), not as an address, so forms 1 and 3 are blind to it.
+
+=== AFTER: the two prose occurrences carry the key name, not the value ===
+-- DIRECTORY_MAP.md:24 (now):
+| `src-tauri/tauri.conf.json` | 应用配置：`frontendDist: ../.generated/frontend`、`devUrl`、构建命令指向 `../wt-media-cloud/web`、`bundle.resources: ["resources/*.toml"]`。**CSP 不在此处**——它由 `bootstrap.rs` 在运行期经 `config_mut()` 注入，使地址来自配置而非字面量 | 改窗口/构建配置 |
+-- DIRECTORY_MAP.md:82 (now):
+- 开发：`tauri.conf.json` 的 `beforeDevCommand` 进入 `../../wt-media-cloud/web` 跑 `npm run dev:desktop`（地址由同文件的 `devUrl` 给出，本文不复述其值）。
+
+=== the three forms re-run on the working tree ===
+  README.md            form1=0 form2=3 form3=0
+  scripts/README.md    form1=0 form2=0 form3=0
+  DIRECTORY_MAP.md     form1=0 form2=0 form3=0
+  bin/control.sh       form1=0 form2=0 form3=0
+
+=== positive control: the same form-2 pattern DOES find the value where it
+    is allowed to live ===
+8:    "devUrl": "http://127.0.0.1:5174",
+=== and the pre-change copies of the same files, to show the grep was not
+    simply broken by the edit ===
+   HEAD:DIRECTORY_MAP.md hits: 2
+
+=== two notes on the readings above ===
+1. The form-2 label lost its two backslashes: the shell inside the heredoc-free
+   echo turned '' into a backspace byte. The pattern actually run was
+   grep -nE '[0-9]{4,5}'.
+2. README.md form2=3 is not a leftover runtime parameter. Those three are
+   contract versions in the 'Local Agent Control Boundary' section
+   (v1@2026.07.15.1 x2, v1@2026.07.14.7), i.e. identifiers that a reader has
+   to see, not ports/addresses/credentials/timeouts. The comparison with the
+   BEFORE reading is one for one: 5 form-2 hits then, 2 of them devUrl prose
+   values (both now de-valued) + the same 3 contract versions.
+   HEAD form-2 count over the three files: 5
+   working-tree form-2 count over the three files: 3

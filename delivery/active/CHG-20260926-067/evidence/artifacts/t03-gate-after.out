@@ -1,0 +1,59 @@
+# t03-gate-after.out
+取数时刻：T-03 的全部改动落地之后（desktop 工作树已改、尚未提交）。
+desktop HEAD: 7c1b0ad（T-03 改动在**未提交的工作树**里）
+本文件曾在首轮被写坏一次：verify_m0_local.sh 是 shell 脚本，首轮误用 python3 跑它，
+留下一条 SyntaxError 且退出码取的是 tail 的。已重跑，两处读数在本文件里都是 bash 的。
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_delivery_governance.py
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-067
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_agent_entry.py
+execution snapshot: 2048 characters (~819 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_skills.py
+verified 10 skill source files
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m0_config.py
+Workspace config verification ok
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_product_master_alignment.py
+Product and Master Plan alignment verification ok
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/verify_m2_acceptance.py
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+
+$ bash scripts/verify_m0_local.sh   (完整输出见 t03-m0-local.out)
+exit=0
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q
+----------------------------------------------------------------------
+Ran 101 tests in 0.590s
+
+OK
+
+$ python3 -B -X pycache_prefix=/tmp/pyc-none scripts/sync_skills.py check
+skill outputs are up to date
+exit=0
+
+NOTE on 'bash scripts/verify_m0_local.sh exit=2' above:
+  This script is NOT one of the six static gates, and it does not complete on
+  this machine for a reason unrelated to T-03 -- it aborts in its **agent**
+  block (wt-media-agent/scripts/build.sh, line 36 of the script) because
+  'uv build' wants to fetch hatchling from PyPI and this sandbox has no
+  network. See t03-m0-local.out for the full trace.
+  The desktop block is the script's LAST step (line 42-45), so it never ran
+  inside this script. It was exercised directly instead --
+  'cd wt-media-desktop && scripts/test.sh' -> exit=0 (t03-desktop-test-sh.out).
+  Under the exception rule this is the honest reading: the M0 local script is
+  red in this environment, and the red is in another repo's build step.

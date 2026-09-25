@@ -18,22 +18,24 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 - **T-01 workspace 脚本层分层**：`scripts/local-control.sh` → `bin/control.sh`（加 `restart`／`status`）；`scripts/test-local-control.sh` → `scripts/test-control.sh`（判据 1→4 条）；`scripts/dev/`＋`scripts/verify/`（各 `.gitkeep`）；`scripts/README.md` 首建；`AGENT-INDEX.md` §3 加 `bin/` 行；`verify_delivery_governance.py` 扫描面改 `rglob`（两臂对照落 `artifacts/t01-scan-surface-arm-{a,b}.out`）；`m2b_local_acceptance.py` 新增 `status` 动词。详见 `evidence/task-01-workspace-layout.md`。
 
 - **T-02 M0 门禁前置**：`verify_m0_config.py` 的 desktop needle 元组 7 → 3 条（docstring 同步）；`verify_m0_local.sh:39-45` desktop 块 4 → 1 条。四臂对照证明收窄承重（臂 3：旧 tuple × T-03 终态 workflow = 3 处红）且前瞻安全（臂 2：终态 × 新 tuple = 绿）。顺带量到两条改写 T-03 决策的读数：`npm run lint` 自 `7aabb1a` 起就坏而 needle 一直绿；两个 shell 套件都要 `node` 当 JSON 读取器 ⇒ `setup-node` 必须保留。详见 `evidence/task-02-m0-gate-preamble.md`。
+- **T-03 desktop 脚本层分层**：删 11 个死脚本（`scripts/` 分母 20 → 9）；`m0-desktop.yml` → Rust-only（`setup-node` 保留、去掉 `cache:`）；`scripts/test.sh` 重写（缺 sidecar 时写自报家门的占位符）；新建 `bin/control.sh`（`cargo tauri dev` 的 `start|stop|restart|status`，地址读 `tauri.conf.json` 的 `devUrl`，PID／日志落 `.runtime/`）；`.gitignore` 加 `.runtime/`；`scripts/dev/`＋`scripts/verify/`；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md` 重写（含两处 `devUrl` 值去值留名）。详见 `evidence/task-03-desktop-layout.md`。
 
 ## Current
 
-无。T-02 已完成，下一步是 T-03。
+无。T-03 已完成，下一步是 T-04（cloud）。
 
 ## Next
 
-1. **T-03**（desktop）：①干净克隆先测；②CI → Rust-only；③删 11 个死脚本；④新建 `bin/control.sh`；⑤`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md`。① 的 `setup-node` 那一问已由 T-02 提前量到答案（§14 第 13 项）：**保留 `setup-node`，只去掉 `cache:` 与 `cache-dependency-path:`**。
-2. **T-04 → T-05 → T-06**：cloud、workspace 回指、agent，逐仓独立提交。**T-05 必须紧接 T-04**（本 CHG 唯一的跨仓红窗）。
-3. **T-07**：收尾。
+1. **T-04**（cloud）：`bin/control.sh`（合并 `start.sh`／`stop.sh`／`health.sh`，source `../scripts/local-env.sh`）；`.gitignore:3` `bin/` → `bin/*` ＋ `!bin/*.sh`；删三个原脚本；`README.md`／`DIRECTORY_MAP.md`／`scripts/README.md`。`.gitignore` 的改法是**硬约束**：被排除的**目录**无法用 `!` 反向包含内容。
+2. **T-05 必须紧接 T-04**：workspace 的 `verify_m3_acceptance.py:561`／`:1738` 与 `:414-421` 回指 cloud `bin/control.sh`。这是本 CHG **唯一的跨仓红窗**，中间不插任何工作。
+3. **T-06**（agent）→ **T-07**（收尾）。
 
-### 对后续 Task 直接适用的四条硬约束（本 CHG 已踩定）
+### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
-- **建 `bin/control.sh`**：不得承载端口字面量（读本仓既有运行台的常量，由各仓 `scripts/test-control.sh` 机检）；`status` 的 `exit=1` 语义统一为「不是经本仓 harness 起的」而非「服务挂了」，且 `alive` 与 `health` **分开打印**；`bin/control.sh` 只分派动词。（§14 第 10、11 项）
+- **建 `bin/control.sh`**：不得承载端口字面量；`status` 的 `exit=1` 语义统一为「不是经本仓 harness 起的」而非「服务挂了」，且 `alive` 与 `health` **分开打印**；只分派动词。（§14 第 10、11 项）
+- **不把地址写进脚本，是「读配置」而不是「抄配置」**：`node -p`／`jq` 对**缺键**返回字符串 `undefined` 而 `exit=0`，空判断抓不住它。取值表达式必须对缺键返回空，并先判配置文件在不在。（§14 第 15 项，T-03 实测踩到）
 - **写记录**：`change.md` 的 H1 标题里不得出现 `|`；LEDGER 表行必须是 `| CHG-… | 标题 | 状态 | 仓库 |` 四格、无反引号无链接。（§14 第 8 项）
-- **报「0 命中／已收口」**：做阳性对照、报出分母，锚取**不变的基线**而非 `HEAD`；枚举输入形态，不用一种推断其余。
+- **报「0 命中／已收口」**：做阳性对照、报出分母，锚取**不变的基线**而非 `HEAD`；**枚举输入形态**——T-03 实测「端口值」有三种写法，只有其中一种抓得到 `devUrl 5174` 这种散文形态。**正文扫描用 `git grep -F`**：`-E` 里的 `\b` 会静默匹配不到，名字里的 `.` 在正则下是通配符（`build.sh` 命中过 `build_sha256`）；新文件是未跟踪的，要带 `--untracked`（并证明它真的覆盖到了）。
 - **判据「绿」不等于那件事成立**：needle 是对文本的字符串检查（§14 第 12 项）。改判据前先问它实际保证的是什么。
 
 ## Blocked
@@ -65,3 +67,8 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 | desktop 块两臂（T-02） | 旧块 `exit=1`（停在 `npm ci`）；单跑 `npm run lint` `exit=254`；新块 `exit=0` ＋ `running 377 tests`／`372 passed; 0 failed; 5 ignored` ＋ 2 个 shell 套件各 `exit=0`（同文件 §B） |
 | desktop 套件的读数缺口 | 2 个 shell 套件里**只有 1 个自带计数**（`release-versions` 20 passed）；`package-release-macos.test.sh` 静默通过，唯一证据是退出码 |
 | 六门禁 + 套件（T-02 记录写完后复跑） | 见 `artifacts/t02-gate-final.out`——**不在此内联** |
+| desktop `scripts/` 分母（T-03） | **20 → 9**；11 个被删名字各命中 **0**（分母 109 个已跟踪文件，`git grep -F --untracked`），阳性对照 `release-versions.sh` 10 文件／`test.sh` 8，反向对照 0（`artifacts/t03-deleted-name-sweep.out`） |
+| desktop `bin/control.sh`（T-03） | `bash -n` `exit=0`；端口字面量 **0 命中**；十臂 ＋ 六处变异全按预期（`artifacts/t03-desktop-control-arms.out`）。**含一处自己踩到并修掉的缺陷**：`node -p` 对缺键打印 `undefined` 而 `exit=0`，首版把它当地址打了出来（§14 第 15 项） |
+| desktop `scripts/test.sh`（T-03，最后一次改动之后） | `exit=0`；`372 passed; 0 failed; 5 ignored` ＋ `release-versions 20 passed`；14.19s（`target/` 是热的，非冷启动）（`artifacts/t03-desktop-test-sh.out`） |
+| desktop 无 sidecar 的克隆（T-03） | 占位分支生效（`no sidecar at …; writing a placeholder`），读数与有 sidecar 时逐字相同：`372 passed; 0 failed; 5 ignored` ＋ `20 passed`，`exit=0`；占位符被 `.gitignore:10` 挡住（`artifacts/t03-clean-clone.out`） |
+| desktop 文档端口值（T-03，三种写法） | 改前：写法 1 命中 0／写法 2 命中 **5**／写法 3 命中 0；改后写法 2 **5 → 3**（余下 3 条是契约版本号，非运行参数）；阳性对照：同模式在 `tauri.conf.json` 命中（`artifacts/t03-doc-port-literals.out`） |
