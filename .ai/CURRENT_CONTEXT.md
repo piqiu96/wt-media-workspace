@@ -1,6 +1,6 @@
 # WT Media Current AI Context
 
-- Generated: 2026-09-25T11:36:08Z
+- Generated: 2026-09-25T11:46:23Z
 - Active CHG: `CHG-20260925-064` — 权威冲突与重复落点处置——按单一落点收口
 - Status: `IMPLEMENTING`
 - Change file: `delivery/active/CHG-20260925-064/change.md`
@@ -22,7 +22,7 @@ this file exists in the outer execution root.
 4. `.ai/CURRENT_CONTEXT.md`
 5. `delivery/LEDGER.md`
 6. `delivery/active/CHG-20260925-064/change.md`
-7. Affected repository `AGENT-INDEX.md`, `AGENTS.md`, and `CLAUDE.md`
+7. Affected repository `AGENT-INDEX.md`, `AGENTS.md`, `CLAUDE.md`, and `DIRECTORY_MAP.md`
 
 ## Affected Repositories
 

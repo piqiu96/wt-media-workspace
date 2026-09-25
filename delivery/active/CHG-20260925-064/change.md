@@ -141,7 +141,7 @@ None.
 | T-01 | 激活：建 active 记录、`LEDGER.md` 表行、重生成快照 | DONE | 两门禁 `exit=0`；LEDGER 表行逐字等于 `\| <CHG> \| <title> \| <status> \| <repo> \|`；§7 为字面 `None.` | — |
 | T-02 | 承接两处未入账工作区编辑（`CLAUDE.md`、`conventions:33`） | DONE | `git show --stat` 只含这两个文件；六门禁复测 | T-01 |
 | T-03 | `conventions` 精简保留（按用户裁定的保留清单：删读数与历史叙述；逐节复核 2 处引用） | DONE | 见 §8.1；208→148 行、节数 11→11；两处引用改 1 留 1（留的理由见 evidence §5） | T-02 |
-| T-04 | 读取顺序单一化 + 入口文件只留指针 + 补回两条提交约定 | TODO | 落点收敛为 1 处＋生成物；入口红线逐条归属表；`verify_agent_entry.py` 改前后各留读数 | T-03 |
+| T-04 | 读取顺序单一化 + 入口文件只留指针 + 补回两条提交约定 | DONE | 见 §8.2；落点由 5 处手写＋1 常量收敛为 **1 处手写＋1 生成物**；入口红线 9/9 逐条归属；变异对照证明快照确由该常量派生 | T-03 |
 | T-05 | 状态词汇成文（`MASTER:105-128` 就地覆盖为实测在用词汇＋一行历史词汇） | TODO | 词汇表与 T-07 改后的记录逐词对齐（报分母） | T-04 |
 | T-06 | 脚本／模板／checkpoint 落点对齐（接受集、文案、模板、新增结构检查） | TODO | 六门禁 + `unittest`；**新判据做变异对照**；**本 CHG 仍 active 时复测** | T-05 |
 | T-07 | `planned` 记录状态词就地改写 | TODO | 逐文件 `git diff` 只改状态词一行；两遍词汇统计 | T-06 |
@@ -167,12 +167,30 @@ None.
 | §10 | 删实测读数表、全部 WARN 计数（含 `0/8/0`）与两条已关闭 WARN 段；保留判据稳定性分层表、候选块段、「报『通过／0 命中』前必须证明检查能失败」四条、`check_entry_drift` 的机制登记、`不设 CI ⇒ 不把红项写进文档` 的规则。同时把 `AGENT-INDEX.md:198` 的「该节是校验状态的唯一落点」改为「**校验读数不作文档落点**」 |
 | §11 明确不做 | 保留 |
 
+### 8.2 读取顺序落点收敛（T-04）
+
+改前 **5 处手写清单**（`AGENT-INDEX.md:7`、`AGENT-INDEX.md` §4、`AGENTS.md`、`CLAUDE.md`、`MASTER:791-796`，
+后三者内容互不相同）＋ **1 处代码常量**；改后 **1 处手写（`AGENT-INDEX.md` §4）＋ 1 处生成物**
+（`.ai/CURRENT_CONTEXT.md`，由 `prepare_ai_workspace.py::build_context` 的 `reading_order` 渲染）。
+
+| 改动 | 落点 |
+|---|---|
+| §4 补齐第 6–8 项（T-03 删 `conventions §5` 时发现的两版不一致） | `AGENT-INDEX.md` §4 |
+| 入口两文件删自己的清单，改指回 §4；删各自复述的 4+5 条红线，改指回 §2 | `AGENTS.md`（30→22 行）、`CLAUDE.md`（37→28 行） |
+| 删 Codex 6 项清单（整份不含 `AGENT-INDEX.md`，第 1 项指向已删的执行根 `AGENTS.md`） | `MASTER:791-796` → 1 行 |
+| 常量加注释登记「§4 的生成物镜像」与双向同步义务 | `scripts/prepare_ai_workspace.py:143-147` |
+| `conventions` §5 标题「渐进式加载」→「读取顺序」（该节本就只是指路，无清单；改名消掉已退休的术语），并在 §9 耦表**新增「读取顺序」一行**登记双向同步义务 | `docs/engineering/specs/agent-workspace-conventions.md` |
+| 退休词「渐进式加载」在目录树里的残余（本 Task 内自捕） | `MASTER:66` |
+| 补回被瘦身丢掉的两条提交约定 | `AGENT-INDEX.md` §9「提交纪律」 |
+
+细节读数、变异对照与逐条归属表见 `evidence/task-04-reading-order-single-landing.md`。
+
 ## 9. Repository Checklist
 
 ### wt-media-workspace
 
 - [x] 本 CHG 的全部改动都落在本仓
-- [ ] `AGENT-INDEX.md` 与两个入口文件在 T-04 后只剩单落点
+- [x] `AGENT-INDEX.md` 与两个入口文件在 T-04 后只剩单落点
 - [ ] 六个静态门禁 + `unittest discover -s tests -q` 在收尾后全绿（T-12）
 
 ### wt-media-cloud
@@ -191,9 +209,9 @@ None.
 
 | AC | Requirement | Verification | Status |
 |---|---|---|---|
-| AC-01 | 读取顺序在全仓只剩 1 个落点（`AGENT-INDEX.md`）＋生成物；两个入口文件与 `MASTER` 的第三版都改为指回它 | T-04 的 grep 读数（含阳性对照） | TODO |
-| AC-02 | 两个入口文件不再逐字复述 `AGENT-INDEX.md` §2 的红线；每条被删条目都有归属依据 | T-04 的逐条归属表 | TODO |
-| AC-03 | 被削薄弄丢的两条提交约定在 `AGENT-INDEX.md` 有活落点 | T-04 的 grep（改前 0 命中留证） | TODO |
+| AC-01 | 读取顺序在全仓只剩 1 个落点（`AGENT-INDEX.md`）＋生成物；两个入口文件与 `MASTER` 的第三版都改为指回它 | T-04 的 grep 读数（含阳性对照） | **PASS** |
+| AC-02 | 两个入口文件不再逐字复述 `AGENT-INDEX.md` §2 的红线；每条被删条目都有归属依据 | T-04 的逐条归属表 | **PASS** |
+| AC-03 | 被削薄弄丢的两条提交约定在 `AGENT-INDEX.md` 有活落点 | T-04 的 grep（改前 0 命中留证） | **PASS** |
 | AC-04 | CHG／里程碑状态词汇只剩一套，且**实测在用的每个词都被定义**；脚本接受集与成文一致 | T-05＋T-06＋T-07 的词汇统计逐词相等 | TODO |
 | AC-05 | `checkpoint.md` 有唯一权威落点、有模板、且有强制点（缺失会红） | T-06 的变异对照 | TODO |
 | AC-06 | 视图中「E3 未开始」等与事实相反的结论为 0 | T-09 的 grep 改前 ≥3／改后 0 | TODO |
@@ -212,7 +230,10 @@ None.
 Evidence 落在 `evidence/`，记事实不重复需求：命令／动作、期望、实际、结论、相关 commit。
 
 - `evidence/task-01-activate.md`
-- `evidence/artifacts/`：原始输出
+- `evidence/task-02-adopt-working-tree-edits.md`
+- `evidence/task-03-conventions-slim.md`
+- `evidence/task-04-reading-order-single-landing.md`
+- `evidence/artifacts/`：原始输出（`t01-`、`t03-`、`t04-gate-readings.out`）
 - 后续每个 Task 一份 `evidence/task-xx-<topic>.md`
 
 **开工三仓基线**（T-01 记录，收尾按同一命令复测）：
@@ -255,3 +276,4 @@ $ git -C ../wt-media-desktop status --porcelain
 | 7 | `AGENT-INDEX.md:198` 曾把 `conventions §10` 定为「校验状态的唯一落点」，而 §10 承载的是易失读数 | **T-03 已取消该落点**（改为「校验读数不作文档落点」）；但「易失内容该不该有文档落点」这一机制尚无可机检的通用对策，登记 |
 | 8 | B-6⑨ 余项：`docs/superpowers/`（23 篇中 21 篇无人引用）、`delivery/planned/` 的 9 个 `SUPERSEDED` + 6 个「已实施却仍挂 planned」、`completed/CHG-20260916-052` 单条占归档 74% | 属诊断 G-5／G-6，需独立 CHG 与用户裁定 |
 | 9 | `conventions §1`（6 条不变量）与 `§7` 开头同 `AGENT-INDEX.md` §2／§10 局部重叠：T-03 按用户裁定的保留清单**未去重** | 去重须先裁定「规范文件可否复述红线」，属用户取舍。本 CHG 只登记「落点未减」这一事实 |
+| 10 | `AGENT-INDEX.md` §4 作为读取顺序的**唯一**落点，**没有机检点**（`conventions` §9 耦表已如实登记「入口文件与 `MASTER` 不得再列清单」靠人工复核） | T-04 把落点降下来了，但「唯一」目前只由本 CHG 的一次性扫描证明。为它新增机检点会把 §4 的条目文本冻成契约（措辞一变就红），与 CHG-063 的判据分层结论相悖，须独立裁定 |

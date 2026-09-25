@@ -1,0 +1,37 @@
+=== CHG-20260925-064 T-04 gate readings ===
+date: 2026-09-25 19:47:08 CST
+invocation: python3 -B -X pycache_prefix=<fresh tmpdir> <script>
+note: taken AFTER the last content change of T-04 (AGENT-INDEX/AGENTS/CLAUDE/MASTER/generator/snapshot);
+      only this CHG's change.md/checkpoint.md/evidence changed after it, and no gate parses those
+      (proof: git grep -l checkpoint -- scripts tests -> 0 files; same scan on change.md -> 9, positive control).
+
+verify_delivery_governance.py          exit=0
+    Delivery governance verification ok. Active CHG: CHG-20260925-064
+
+verify_agent_entry.py                  exit=0
+    execution snapshot: 1936 characters (~774 tokens, budget 8000 characters)
+    Agent entry verification ok. 0 warning(s) need review.
+
+verify_skills.py                       exit=0
+    verified 10 skill source files
+
+verify_m0_config.py                    exit=0
+    Workspace config verification ok
+
+verify_product_master_alignment.py     exit=0
+    Product and Master Plan alignment verification ok
+
+verify_m2_acceptance.py                exit=0
+    M2 static cross-repository acceptance matrix ok
+    NOTE: real MySQL and BitBrowser evidence must be recorded separately
+
+unittest discover -s tests -q          Ran 75 tests in 0.258s  OK (exit captured separately below)
+unittest exit=0
+
+--- snapshot size (characters; verify_agent_entry budgets in characters, wc -c counts bytes) ---
+  characters: 1936  bytes: 1978
+
+--- three-runtime-repo baseline (AC-15) ---
+  wt-media-cloud       ?? dump.rdb 
+  wt-media-agent       
+  wt-media-desktop     

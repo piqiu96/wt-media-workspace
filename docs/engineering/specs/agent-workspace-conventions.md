@@ -41,11 +41,11 @@
 - **体积预算**：≤ 8000 字符（中英混排约 2700–4000 token，对应 <3000 token 目标）。脚本按 `字符数 / 2.5` 估算 token 并在校验时输出。
 - **两个互斥模式**：`--change` 与 `--no-active` 互斥；`verify_delivery_governance.py` 把「无活动 CHG」当作合法状态，故生成与校验两侧必须同时支持它。
 
-## 5. 渐进式加载
+## 5. 读取顺序
 
-读取顺序与三层加载的**唯一落点是 `AGENT-INDEX.md` 第 4 节**：本节不重复其清单，只登记该节不表达的一条理由——
+读取顺序的**唯一落点是 `AGENT-INDEX.md` 第 4 节**（`.ai/CURRENT_CONTEXT.md` 的 Required Reading Order 是它的生成物镜像）：本节不重复其清单，只登记该节不表达的一条理由——
 
-第一层里 `AGENTS.md` 与 `CLAUDE.md` 在治理仓是薄入口，正文与权威仍在 `AGENT-INDEX.md`；顺序之所以固定，是因为它同时约束 `.ai/CURRENT_CONTEXT.md` 生成器与三个工程仓，改动它需要三者同步。
+顺序开头的 `AGENTS.md` 与 `CLAUDE.md` 在治理仓是薄入口，正文与权威仍在 `AGENT-INDEX.md`；顺序之所以固定，是因为它同时约束 `.ai/CURRENT_CONTEXT.md` 生成器与三个工程仓，改动它需要三者同步。
 
 ## 6. 多工程并行
 
@@ -99,6 +99,7 @@
 | 配置文件语法 | `scripts/agent_config.py` | `sync_skills.py`、`verify_agent_entry.py` 均 import 它 | 语法放宽必须同时改 `tests/test_agent_config.py` |
 | 规范正文归口 | `wt-media-workspace/AGENT-INDEX.md` | 无强制（`verify_agent_entry.py` 只强制入口文件存在性） | 改治理规范只改 `AGENT-INDEX.md`；`AGENTS.md` / `CLAUDE.md` 只保留指针，指针漂移靠人工复核 |
 | 入口文件平级 | 各仓 `AGENTS.md` / `CLAUDE.md` | 无强制 | `verify_agent_entry.py` 的漂移检查产出 WARN 供人工复核 |
+| 读取顺序 | `AGENT-INDEX.md` §4 | `prepare_ai_workspace.py::build_context` 的 `reading_order` 常量（生成物镜像）；`AGENTS.md`／`CLAUDE.md`／`MASTER` §5 只留指针 | 改 §4 必须同步该常量并重生成快照；反之亦然。入口文件与 `MASTER` **不得**再列清单 |
 | skill 单一源 | `skills/<group>/<name>/SKILL.md` | `sync_skills.py` 分发到 `skills-distribution.yaml` 的 targets | `sync_skills.py check` / `diff`；分组认领由 `verify_agent_entry.py::check_group_coverage` 兜住 |
 | 快照由脚本生成 | `prepare_ai_workspace.py` | `planning-wt-media-delivery` skill 第 7 步 | 两者措辞需同时更新 |
 

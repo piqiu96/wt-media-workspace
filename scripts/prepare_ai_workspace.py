@@ -140,6 +140,11 @@ def build_context(change: ChangeInfo | None, workspace_repo: Path) -> str:
     generated in that state too, so it must still be renderable here.
     """
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # The single textual landing point for the reading order is
+    # `AGENT-INDEX.md` §4.  This constant is the generated mirror of that
+    # section (rendered into the snapshot's "Required Reading Order").
+    # Changing §4 without changing this list — or the reverse — recreates
+    # exactly the multi-landing-point conflict CHG-20260925-064 removed.
     reading_order = [
         "`AGENTS.md`",
         "`CLAUDE.md`",
@@ -164,7 +169,7 @@ def build_context(change: ChangeInfo | None, workspace_repo: Path) -> str:
         affected = "\n".join(f"- `{repo}`" for repo in change.affected_repositories) or "- None"
         reading_order.append(f"`{change_path}`")
         reading_order.append(
-            "Affected repository `AGENT-INDEX.md`, `AGENTS.md`, and `CLAUDE.md`"
+            "Affected repository `AGENT-INDEX.md`, `AGENTS.md`, `CLAUDE.md`, and `DIRECTORY_MAP.md`"
         )
         change_dir_token = change.change_id
     reading_order_text = "\n".join(

@@ -2,9 +2,9 @@
 
 > 本文件是 WT Media 全部仓库的 **Agent 统一索引与治理规范正文**（中文）。表述冲突时以本文件为准；与 `delivery/`、`docs/decisions` 中的确认记录冲突时，以确认记录为准。
 >
-> `AGENTS.md`（Codex 入口）与 `CLAUDE.md`（Claude Code 入口）是**薄入口**：只声明本文件的权威性与最小硬约束，不复制本文件内容。
+> `AGENTS.md`（Codex 入口）与 `CLAUDE.md`（Claude Code 入口）是**薄入口**：只声明本文件的权威性与读取入口。**它们不复制本文件内容——包括 §2 的红线**：红线的唯一落点是 §2，入口文件一旦复述，§2 改动时就会静默过期。
 
-**读取顺序**：`AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md` → `.ai/CURRENT_CONTEXT.md` → 当前 CHG。
+**读取顺序**：见 §4——该节是全项目唯一落点，`.ai/CURRENT_CONTEXT.md` 的 Required Reading Order 是它的生成物镜像。
 
 **导航**
 
@@ -59,11 +59,18 @@
 
 ## 4. 读取顺序与上下文加载
 
-**渐进式加载**：
+**读取顺序**（本节是全项目唯一落点；`.ai/CURRENT_CONTEXT.md` 的 Required Reading Order 是它的**生成物镜像**，由 `scripts/prepare_ai_workspace.py` 的 `reading_order` 渲染）：
 
-1. **第一层（固定入口）**：`AGENTS.md` → `CLAUDE.md` → `AGENT-INDEX.md` → `.ai/CURRENT_CONTEXT.md`。
-2. **第二层（当前任务）**：快照指明的当前 CHG 的 `change.md`、plan、spec、checkpoint。
-3. **第三层（目标工程）**：进入目标仓库后读其 `AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`、`DIRECTORY_MAP.md`，再进入相关代码与测试。
+1. `AGENTS.md` —— Codex / OpenAI Harness 的薄入口；
+2. `CLAUDE.md` —— Claude Code 的薄入口；
+3. `AGENT-INDEX.md` —— 治理规范正文与路由（本节所在文件）；
+4. `.ai/CURRENT_CONTEXT.md` —— 全项目唯一执行快照，指明当前 CHG、受影响仓库与稳定基线路径；
+5. `delivery/LEDGER.md` —— 交付台账（哪些 CHG 在做、哪些已归档）；
+6. 快照指明的当前 Milestone（仅 M/L 级 CHG 有）；
+7. 当前 CHG 的 `change.md`，及其 plan / spec / checkpoint；
+8. 目标仓库的 `AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`、`DIRECTORY_MAP.md`，再进入相关代码与测试。
+
+第 1、2 项由各自 Harness 在会话启动时载入，列出它们是为了说明入口集合完整。无活动 CHG（`--no-active`）时第 6–8 项不存在。开工会话另需、但不属本顺序：受影响仓库的 `git status`、当前分支与相关测试。
 
 **理解优先级**（理解完成后再改代码）：
 
@@ -132,6 +139,10 @@
 
 - 只有记录在 Delivery 或 Decision 中的确认内容可以驱动代码修改。
 - 结束开发任务前必须更新 checkpoint，记录：已完成、未完成、阻塞、下一步。
+- **提交纪律**（治理仓与三个工程仓一律适用）：
+  - 提交信息用 Conventional Commits：`<type>(<scope>): <subject>`，例如 `docs(chg-064): T-03 …`。
+  - **纯移动／重命名与改逻辑不放进同一个 commit**——混在一起 diff 不可审，review 只能看出「文件全变了」。
+  - 一仓一 commit：跨仓改动在各仓分别提交（commit boundaries 见 `skills/workspace/executing-wt-media-change/SKILL.md`）。
 - 完成检查项：
   - 修改项目归属正确
   - 跨项目协议正确

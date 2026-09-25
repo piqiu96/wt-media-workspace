@@ -63,7 +63,7 @@ wt-media-workspace/
 ├── .codex/skills/                  # 自动生成并提交 Git
 ├── templates/
 │   └── delivery/                   # CHG 与 evidence 记录模板
-├── AGENT-INDEX.md                  # 跨仓库路由与渐进式加载规则
+├── AGENT-INDEX.md                  # 跨仓库路由与治理规范正文（唯一权威源）
 ├── AGENTS.md
 ├── CLAUDE.md
 └── README.md
@@ -788,14 +788,7 @@ python3 wt-media-workspace/scripts/prepare_ai_workspace.py --change CHG-YYYYMMDD
 codex
 ```
 
-Codex 每次必须按顺序读取：
-
-1. 根 `AGENTS.md`；
-2. 根 `.ai/CURRENT_CONTEXT.md`；
-3. 当前 `delivery/active/<CHG>/change.md`；
-4. CHG 引用的产品、工程、协议和决策基线；
-5. 受影响仓库各自的 `AGENTS.md`；
-6. 各仓库 `git status`、当前分支和相关测试。
+Codex 每次必须按 `AGENT-INDEX.md` §4 的**读取顺序**执行——该节是全项目唯一落点（入口、执行快照、交付台账、里程碑、当前 CHG、目标仓库逐项列明），本节不重复其清单。
 
 编码前必须输出：
 
