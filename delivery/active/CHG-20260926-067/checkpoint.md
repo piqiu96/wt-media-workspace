@@ -22,26 +22,27 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 - **T-04 cloud 脚本层分层**：`bin/control.sh`（合并三脚本，`alive`／`health` 分列）；`.gitignore` `bin/` → `bin/*` ＋ `!bin/*.sh`；删三脚本；`scripts/README.md` 重写并补 `local-env.sh` 行；`README.md`／`DIRECTORY_MAP.md` 改指。cloud `e2ba4d8`。15 臂落 `artifacts/t04-cloud-control-arms.out`。**一处自己写坏的读数留痕**（首轮把第六个门禁错写成 `verify_m1_integration.py`）。详见 `evidence/task-04-cloud-layout.md`。
 
 - **T-05 workspace 回指收口**：`verify_m3_acceptance.py` 三处改指 cloud `bin/control.sh`（`:561`／`:566`／`:1738`；计划只点名 2 处，实测 3 处）。**回改 T-04 的假阴性读数**（§14 第 24 项）：`t04-cloud-sweep.out` 加「更正一」、T-04 证据 §8 改为「已作废（假阴性）＋更正读数」、`change.md`／`checkpoint.md` 同步；预算在文件内部重新分配，收在 9211/9216。`foreign` 清单逐条重查落点后结论不变。`bin/control.sh`／`test-control.sh` 系 T-01 已建，本 Task 只复核。**跨仓红窗自此关闭。** 详见 `evidence/task-05-workspace-repoint.md`。
+- **T-06 agent 脚本层分层**：`bin/control.sh`（合并三脚本，`alive`／`health` 分列）；删 `start-health.sh`／`stop-health.sh`／`health.sh`（`scripts/` 分母 10 → 7）；三处 README 端口字面量去值、命令行改指 `bin/control.sh`；**三处**注释回指（计划点名 2 处，实测 3 处）。agent **`aa95332`**（13 文件，+221/−124）。12 臂落 `artifacts/t06-control-arms.out`。**本 Task 无红窗**——`scripts/verify-health.sh` 自内联启停，不调用被删的三个。详见 `evidence/task-06-agent-layout.md`。
 
 ## Current
 
-无。T-05 已完成，**跨仓红窗已关闭**。下一步 T-06（agent），无顺序硬约束。
+无。T-06 已完成。四仓的运行仓改动**全部落地**（workspace／cloud／agent／desktop 各一次提交），下一步 T-07 只动 workspace 的收尾记录。
 
 ## Next
 
-1. **T-06**（agent）：`bin/control.sh`；删 `start-health.sh`／`stop-health.sh`／`health.sh`；三处 README 端口字面量去值留名；两处注释路径；`scripts/README.md` 补 `build_desktop_sidecar.py` 行。
-2. **T-07**（workspace 收尾）：归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描、四仓对账、AC 矩阵签字、DONE Gate。
+1. **T-07**（workspace 收尾）：归档、LEDGER 同步、快照 `--no-active`、两遍指针扫描、四仓对账、AC 矩阵签字、DONE Gate。
 
 ### 对后续 Task 直接适用的硬约束（本 CHG 已踩定）
 
 - **建 `bin/control.sh`**：不得承载端口字面量；`status` 的 `exit=1` 语义统一为「不是经本仓 harness 起的」而非「服务挂了」，且 `alive` 与 `health` **分开打印**；只分派动词。（§14 第 10、11 项）
 - **不把地址写进脚本，是「读配置」而不是「抄配置」**：`node -p`／`jq` 对**缺键**返回字符串 `undefined` 而 `exit=0`，空判断抓不住它。取值表达式必须对缺键返回空，并先判配置文件在不在。（§14 第 15 项，T-03 实测踩到）
 - **写记录**：`change.md` 的 H1 标题里不得出现 `|`；LEDGER 表行必须是 `| CHG-… | 标题 | 状态 | 仓库 |` 四格、无反引号无链接。（§14 第 8 项）
-- **报「0 命中／已收口」**：做阳性对照、报出分母，锚取**不变的基线**而非 `HEAD`；**枚举输入形态**——T-03 实测「端口值」有三种写法，只有其中一种抓得到 `devUrl 5174` 这种散文形态。**正文扫描用 `git grep -F`**：`-E` 里的 `\b` 会静默匹配不到，名字里的 `.` 在正则下是通配符（`build.sh` 命中过 `build_sha256`）；**新建文件必须带 `--untracked` 并证明它覆盖到了**——T-04 就栽在这：分母少了本 CHG 新建的三个未跟踪文件，而两条命中恰在其中（§14 第 24 项，机制已在合成仓复现）。**「判别力」与「分母」是两件事**：形态 D 的边界写法挡得住子串假阳，挡不住空集。**扫描产物自己会进分母**：首版 T-05 产物把原始 dump 写进被扫树，既把自己算进 205 行、又毒化了反向对照 ⇒ 报数时把自指单列，优先报与轮次无关的子集。
+- **报「0 命中／已收口」**：做阳性对照、报出分母，锚取**不变的基线**而非 `HEAD`；**枚举输入形态**——T-03 实测「端口值」有三种写法，只有其中一种抓得到 `devUrl 5174` 这种散文形态。**正文扫描用 `git grep -F`**：`-E` 里的 `\b` 会静默匹配不到，名字里的 `.` 在正则下是通配符（`build.sh` 命中过 `build_sha256`）；**新建文件必须带 `--untracked` 并证明它覆盖到了**——T-04 就栽在这：分母少了本 CHG 新建的三个未跟踪文件，而两条命中恰在其中（§14 第 24 项，机制已在合成仓复现）。**「判别力」与「分母」是两件事**：形态 D 的边界写法挡得住子串假阳，挡不住空集。**扫描产物自己会进分母**：首版 T-05 产物把原始 dump 写进被扫树，既把自己算进 205 行、又毒化了反向对照 ⇒ 报数时把自指单列，优先报与轮次无关的子集。**判据的「改后 0」要配「改前非 0」**：T-06 实测计划给的端口正则**抓不到** `VAR=18765` 形态（两段都要求数字前有冒号），改前读数可证——只报改后 0、不跑改前那几条，等于没有判别力证据（§14 第 27 项）。
+- **按名字点清单会漏项**：T-05（计划 2 处 / 实测 3 处）与 T-06（计划 2 处注释 / 实测 3 处）各栽一次，两次漏的都是「同一事实的另一种表述」⇒ 扫描按**形态**跑，不按清单跑（§14 第 26 项）。
 - **判据「绿」不等于那件事成立**：needle 是对文本的字符串检查（§14 第 12 项）。改判据前先问它实际保证的是什么。
 - **六门禁的清单只在 `AGENT-INDEX.md:199-210`**：第六个是 `verify_m2_acceptance.py`，**不是** `verify_m1_integration.py`（后者与 `verify_m3_acceptance.py` 同属「需真实运行实例、不属上表」）。T-04 首轮写错过一次。
 - **`git check-ignore` 的退出码不表示方向**：`-v` 对被 `!` 取反的规则也 `exit=0`。判「是否被忽略」用 `-q`，或用 `git add -n`／`git status --porcelain -uall` 三读数并各带阳性对照。（§14 第 20 项）
-- **`start` 的探针不认领它探到的是谁**：端口上有别人的进程在答时，`start` 可能报 `exit=0` 而它起的那个人已经死了。**两仓共有，本次不修**；写记录时不得把 `start` 的 `exit=0` 当作「起来了」。（§14 第 19 项）
+- **`start` 的探针不认领它探到的是谁**：端口上有别人的进程在答时，`start` 可能报 `exit=0` 而它起的那个人已经死了。**三个仓（cloud／workspace／agent）各有一次实测，四仓的 `control.sh` 共享这一判据形状，本次不修**；写记录时不得把 `start` 的 `exit=0` 当作「起来了」。（§14 第 19 项）
 - **替身/工具本身出错要有判据**：`PATH` 前置替身时必须先 `command -v <cmd>` 断言落点（`bash` 遇 `EACCES` 会跳过该条目继续往后找，静默落到真程序上）；被测对象的替身先自检它自己的前提（如「探针路径答 200」）。
 
 ## Blocked
@@ -87,3 +88,8 @@ State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record 
 | `bin/control.sh`／`test-control.sh`（T-05 复核） | 两个 `bash -n` `exit=0`；`test-control.sh` 全跑 `exit=0`（聚合 PASS：`usage, dispatch, status wiring, and no-port-literal`）；`bin/control.sh` 端口字面量 0 命中（`artifacts/t05-test-control.out`） |
 | T-04 假阴性更正（T-05） | 复扫 cloud 得 **2** 条（`bin/control.sh:4-5`，叙述判留）；验算 500 − 3 已入索引的删除 = **497** = 产物自报分母、497 + 3 新增 = 500；机制在合成仓复现（同内容一跟踪一未跟踪，默认 `git grep` 只命中前者）|
 | 六门禁 + 套件（T-05 记录写完后复跑） | 见 `artifacts/t05-gate-final.out`——**不在此内联** |
+| agent `scripts/` 分母（T-06） | **10 → 7**（`git ls-tree --name-only HEAD scripts/` = 10；`git ls-files scripts/` = 7） |
+| agent `bin/control.sh`（T-06） | `bash -n`／`sh -n` 均 `exit=0`；**12 臂**全按预期：10 条功能臂对**真实健康台**跑（`status` 运行中 `alive=yes health=ok` `exit=0`／停止后 `alive=no health=down` `exit=1`、`restart` pid 86409→86446、重复 start 幂等、未知动词 `exit=2`）；2 条变异臂复现 §14 第 19 项 ⇒ **该危害三仓共有**（`artifacts/t06-control-arms.out`） |
+| agent 端口字面量（T-06，三形态） | 分母 57／17／16 行。改前：冒号两形态各命中 **2**（`:17` 的 54345、`:16` 的 18080）、裸数值形态命中 **7**；改后：冒号两形态 **0**、裸数值形态 **3**（全是同文件的历史 CHG 编号，非端口）。阳性对照：副本里放回两个数字 ⇒ 冒号形态 1、裸形态 5。**计划的模式抓不到 `VAR=18765` 形态（无冒号）**（`artifacts/t06-doc-port-literals.out`，§14 第 27 项） |
+| agent 回指扫描（T-06，四形态） | 带边界精确形态：只读已跟踪 **0**、`--untracked` **2** 行（全在 `bin/control.sh:4-5` 表头的过去时叙述，判留）⇒ **可解析活指针 = 0**；带目录路径形态去重后同这 2 行；裸 `health\.sh` 形态 **10** 行全是子串重叠（8 行在幸存的 `verify-health.sh` 上）。阳性对照同命令同集合 `bin/control.sh` **6 文件／12 行**，反向对照 0。**当场复现 §14 第 24 项**：同一命令只差 `--untracked`，读数 0 → 2（`artifacts/t06-pointer-sweep.out`） |
+| agent 套件（T-06，最后一次改动之后） | `PYTHONPATH=src .venv/bin/python -B -X pycache_prefix=/tmp/pyc-none -m unittest discover -s tests -q` → `Ran 409 tests in 11.590s` / `OK`，rc=0，与激活前 `Ran 409 tests` / `OK` **逐字相同**。**归因声明**：工作树带一处开工前就存在的 `AGENT-INDEX.md` 未提交改动，未触碰 ⇒ 这是「脏工作树上的绿」 |

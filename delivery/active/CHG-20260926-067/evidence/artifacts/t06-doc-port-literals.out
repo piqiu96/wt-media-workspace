@@ -1,0 +1,49 @@
+# T-06 agent 三处 README 端口字面量去值：改前 / 改后
+# 仓: wt-media-agent  日期: 2026-09-26
+# 文件: README.md config_online/README.md scripts/README.md
+# 改前读数用 git show HEAD:<f> 取（工作树已改，读卷宗而非工作树）
+
+## 分母
+README.md                      改前   57 行  改后   63 行
+config_online/README.md        改前   17 行  改后   18 行
+scripts/README.md              改前   16 行  改后   53 行
+
+## 三种写法（计划只给了前两种；第三种是补的，理由见下）
+### 写法: 127\.0\.0\.1:[0-9]{2,5}
+--- 改前 ---
+README.md:HEAD:17:- `WT_MEDIA_BITBROWSER_API_URL`: local service base URL, default `http://127.0.0.1:54345`.
+config_online/README.md:HEAD:16:  local Cloud service on `127.0.0.1:18080`. Nothing here is waiting on a
+--- 改后 ---
+  (0 hits)
+
+### 写法: :[0-9]{4,5}
+--- 改前 ---
+README.md:HEAD:17:- `WT_MEDIA_BITBROWSER_API_URL`: local service base URL, default `http://127.0.0.1:54345`.
+config_online/README.md:HEAD:16:  local Cloud service on `127.0.0.1:18080`. Nothing here is waiting on a
+--- 改后 ---
+  (0 hits)
+
+### 写法: [0-9]{4,5}
+--- 改前 ---
+README.md:HEAD:17:- `WT_MEDIA_BITBROWSER_API_URL`: local service base URL, default `http://127.0.0.1:54345`.
+README.md:HEAD:48:WT_MEDIA_AGENT_HEALTH_PORT=18765 scripts/start-health.sh
+README.md:HEAD:49:WT_MEDIA_AGENT_HEALTH_PORT=18765 scripts/health.sh
+config_online/README.md:HEAD:11:  file. ADR-0016 §7 permits credentials in this directory; the loader is
+config_online/README.md:HEAD:12:  deliberately narrower today (recorded as a deviation in CHG-20260923-056), so
+config_online/README.md:HEAD:15:  value: Q-01 was closed on 2026-09-25 (CHG-20260923-059, D-08) in favour of the
+config_online/README.md:HEAD:16:  local Cloud service on `127.0.0.1:18080`. Nothing here is waiting on a
+--- 改后 ---
+config_online/README.md:11:  file. ADR-0016 §7 permits credentials in this directory; the loader is
+config_online/README.md:12:  deliberately narrower today (recorded as a deviation in CHG-20260923-056), so
+config_online/README.md:15:  value: Q-01 was closed on 2026-09-25 (CHG-20260923-059, D-08) in favour of the
+
+## 为什么补第三种写法
+# 计划给的模式是 `127\.0\.0\.1:[0-9]{2,5}|:[0-9]{4,5}`，两者都要求数字前有冒号。
+# 而 README.md 改前 :48/:49 写的是 `WT_MEDIA_AGENT_HEALTH_PORT=18765` —— **没有冒号**，
+# 计划自己的模式抓不到它（改前读数里它确实没出现）。补 `[0-9]{4,5}` 覆盖 `VAR=值` 形态。
+
+## 阳性对照（证明这条判据能失败）
+# 在 /private/tmp 的副本里把一个数字放回去，同模式必须命中：
+  写法 127\.0\.0\.1:[0-9]{2,5}  副本命中 1
+  写法 :[0-9]{4,5}              副本命中 1
+  写法 [0-9]{4,5}               副本命中 5

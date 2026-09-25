@@ -1,0 +1,124 @@
+# T-06 agent bin/control.sh 动词实跑：12 臂
+# 仓: wt-media-agent  日期: 2026-09-26  产物: 原样转录自 /tmp/t06-arms.txt（臂在真实健康台上跑）
+#
+# 端口是内核分配的临时高位端口，用 WT_MEDIA_AGENT_HEALTH_PORT 注入；PID/LOG 都改到
+# /private/tmp 下的临时目录，**不动本仓 .cache/**，也**不碰本机开发台的 18765**。
+#
+# 判读（10 条功能臂）：
+#   arm1  start            首次启动并等到 /healthz 应答 → exit=0, pid=86409
+#   arm2  start 重复       幂等：认领已有 pid，不启第二个 → exit=0
+#   arm3  status 运行中     alive=yes health=ok 两项并报 → exit=0
+#   arm4  restart          先停后起，pid 变了（86409 → 86446） → exit=0
+#   arm5  status 重启后    仍 alive=yes health=ok → exit=0
+#   arm6  stop             停掉 → exit=0
+#   arm7  status 停止后     alive=no health=down → **exit=1**（这就是 status 的判据：两项都成立才 0）
+#   arm8  stop 重复         未运行 → 不报错，exit=0
+#   arm9  未知动词          → 用法打到 stderr, exit=2
+#  arm10  help / 无参       → usage, exit=0
+#  收尾核对：该端口上无残留监听；临时目录只剩 agent.log（日志落点确实生效）；
+#           工作树新增只有 bin/control.sh（另有开工前就存在的 AGENT-INDEX.md 改动，未触碰）。
+#
+# 判读（2 条变异臂）——§14 第 19 项的危害是**三仓共有的**，agent 也复现：
+#  arm11 对照：替身子进程立刻退出、端口无人应答 → start 报 failed to stay running, exit=1（窗口关着）
+#  arm12 变异：**外来进程占着端口**、替身子进程 2 秒后自杀
+#        → start 探到 /healthz 有应答就报 started, exit=0（**假成功**）
+#        → 3 秒后 status: alive=no health=ok, exit=1
+#        即：端口先被占时，start 的探针无法区分「自己的子进程活着」与「别人的进程在应答」，
+#        窗口在 start 返回后、子进程死亡前是打开的。cloud/workspace 同形（T-04/T-05 已各测一次）。
+#        本 CHG 不修（属 §14 登记项，修的落点是 start 里加 pid 存活与探针的联合判据）。
+
+PORT=60392 (free port from kernel)  PID/LOG under /private/tmp/t06.wt714k
+=== arm 1 start ===
+$ bin/control.sh start
+wt-media-agent health started: 86409
+exit=0
+
+=== arm 2 start again ===
+$ bin/control.sh start
+wt-media-agent health already running: 86409
+exit=0
+
+=== arm 3 status while running ===
+$ bin/control.sh status
+agent: pid=86409 alive=yes health=ok url=http://127.0.0.1:60392/healthz
+exit=0
+
+=== arm 4 restart ===
+$ bin/control.sh restart
+wt-media-agent health stopped
+wt-media-agent health started: 86446
+exit=0
+
+=== arm 5 status after restart ===
+$ bin/control.sh status
+agent: pid=86446 alive=yes health=ok url=http://127.0.0.1:60392/healthz
+exit=0
+
+=== arm 6 stop ===
+$ bin/control.sh stop
+wt-media-agent health stopped
+exit=0
+
+=== arm 7 status after stop ===
+$ bin/control.sh status
+agent: pid=- alive=no health=down url=http://127.0.0.1:60392/healthz
+exit=1
+
+=== arm 8 stop again ===
+$ bin/control.sh stop
+wt-media-agent health not running
+exit=0
+
+=== arm 9 unknown verb ===
+$ bin/control.sh bogus
+unknown command: bogus
+Usage: bin/control.sh <command>
+
+  start    Start the health server in the background and wait for /healthz.
+  stop     Stop the process recorded by the PID file.
+  restart  Stop, then start.
+  status   Report whether that process is alive and whether the endpoint answers.
+  help     Show this help.
+
+Script-level overrides: PYTHON_BIN, WT_MEDIA_AGENT_HEALTH_HOST,
+WT_MEDIA_AGENT_HEALTH_PORT, WT_MEDIA_AGENT_PID_FILE, WT_MEDIA_AGENT_LOG_FILE.
+exit=2
+
+=== arm 10 help ===
+$ bin/control.sh help
+Usage: bin/control.sh <command>
+
+  start    Start the health server in the background and wait for /healthz.
+  stop     Stop the process recorded by the PID file.
+  restart  Stop, then start.
+  status   Report whether that process is alive and whether the endpoint answers.
+  help     Show this help.
+
+Script-level overrides: PYTHON_BIN, WT_MEDIA_AGENT_HEALTH_HOST,
+WT_MEDIA_AGENT_HEALTH_PORT, WT_MEDIA_AGENT_PID_FILE, WT_MEDIA_AGENT_LOG_FILE.
+exit=0
+
+=== listeners left on that port ===
+(none)
+=== tmp dir contents ===
+agent.log
+=== worktree (excluding the known pre-existing AGENT-INDEX.md edit) ===
+?? bin/control.sh
+=== arm 11 (control): stand-in child exits at once, nothing on the port ===
+$ bin/control.sh start
+wt-media-agent health failed to stay running
+exit=1
+
+=== arm 12 (mutation): a foreign process holds the port; stand-in child suicides after 2s ===
+$ bin/control.sh start
+wt-media-agent health started: 86699
+exit=0
+
+--- 3s later ---
+$ bin/control.sh status
+agent: pid=- alive=no health=ok url=http://127.0.0.1:60409/healthz
+exit=1
+
+bash: line 17: 86679 Terminated: 15          python3 "/private/tmp/t06mut.P2wusi/probe2.py" "${PORT}"
+
+# 末行 `Terminated: 15` 是驱动脚本收尾时清理 arm12 遗留探针进程的 shell 通知，不是脚本输出。

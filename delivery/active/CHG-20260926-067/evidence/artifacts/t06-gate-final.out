@@ -1,0 +1,52 @@
+# T-06 记录写完后复跑：六门禁 + sync_skills + 套件
+# 日期: 2026-09-26  仓: wt-media-workspace（T-06 在这一侧只动了 CHG 记录文件）
+# 每条都打印退出码，不用管道尾部的 $? 冒充（那是 tail 的退出码）
+
+## 逐条明细（第一次）
+=== verify_delivery_governance ===
+archive readonly: scanned 12 script(s) under scripts/, 0 write(s) reaching delivery/completed/
+archive boundary: checked delivery/completed/README.md, 1 boundary marker(s)
+Delivery governance verification ok. Active CHG: CHG-20260926-067
+exit=0
+=== verify_agent_entry ===
+execution snapshot: 2048 characters (~819 tokens, budget 8000 characters)
+rule-text duplication: compared 99 rule sentence(s) across 11 file(s) in 4 repositories
+Agent entry verification ok. 0 warning(s) need review.
+exit=0
+=== verify_skills ===
+verified 10 skill source files
+exit=0
+=== verify_m0_config ===
+Workspace config verification ok
+exit=0
+=== verify_product_master_alignment ===
+Product and Master Plan alignment verification ok
+exit=0
+=== verify_m2_acceptance ===
+M2 static cross-repository acceptance matrix ok
+NOTE: real MySQL and BitBrowser evidence must be recorded separately
+exit=0
+=== sync_skills.py check ===
+exit=0
+skill outputs are up to date
+=== unittest discover -s tests -q（workspace 侧套件）===
+exit=0
+Ran 101 tests in 0.578s
+OK
+
+## 复跑确认（本产物写完后，读数不变）
+verify_delivery_governance         exit=0
+verify_agent_entry                 exit=0
+verify_skills                      exit=0
+verify_m0_config                   exit=0
+verify_product_master_alignment    exit=0
+verify_m2_acceptance               exit=0
+sync_skills.py check               exit=0
+unittest discover -s tests         exit=0  Ran 101 tests in 0.563s
+
+## 判读
+# 六门禁 6/6 exit=0；sync_skills exit=0；workspace 套件 Ran 101 / OK（T-01 起为 101，未变动）。
+# 归档只读扫描面分母 12 —— 与 T-01 改递归后的一致（`scripts/` 下 12 个 .py，子目录仍无 .py）。
+# 本 Task 在 workspace 只改 CHG 记录，故这三组读数与 T-05 的终值同形，是预期的。
+# 与 agent 侧的量分开记：agent 套件（Ran 409 / OK）落 `evidence/task-06-agent-layout.md` §7，
+# 它不是 workspace 的门禁，两者不互相代表。
