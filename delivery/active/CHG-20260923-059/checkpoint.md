@@ -26,17 +26,19 @@
 
 ## Current
 
-- **T-04 运行期完整性校验已收尾**（T-01、T-02、T-03、T-04 均已收尾，见下四节）；**T-05 未开工**。
+- **T-05 `config_online → 产物/config` 已收尾**（T-01…T-05 均已收尾，见下五节）；**T-06 未开工**。
 - 记录链：激活记录见 `0449604`；T-01 的代码、证据与回写见 `evidence/task-01-readiness.md`
   与对应的两个仓提交；T-02 见 `evidence/task-02-identity.md` 与 desktop 的 `15951a4`、`c54025a`；
   T-03 见 `evidence/task-03-exit.md` 与 agent 的 `70a1647`、desktop 的 `242f61e`；
-  T-04 见 `evidence/task-04-integrity.md` 与 desktop 的 `04f46c3`。
+  T-04 见 `evidence/task-04-integrity.md` 与 desktop 的 `04f46c3`；
+  T-05 见 `evidence/task-05-shipped-config.md` 与 agent / desktop 各一个提交。
 
 ## Next
 
-- T-05 **`config_online → 产物/config`**：`build_desktop_sidecar.py` 的整目录替换 + `tauri.conf.json`
-  的 `bundle.resources` 补 Agent 配置 + `diff -r` 校验（**不携带凭证**，D-05），
-  按 `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
+- T-06 **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个可得来源；发布脚本加
+  Desktop ↔ sidecar 版本兼容校验（**版本不匹配的包必须被拒**）。**Q-04**（「组件与资源版本」的口径）
+  在本任务内定，定不下则退回用户。按
+  `先失败的验证/测试 → 最小实现 → 测试 → diff 检查 → evidence → checkpoint → 独立提交` 推进。
 
 ## T-01（已收尾，2026-09-25）
 
@@ -164,6 +166,44 @@
   用例（套件里没有装 subscriber 的读法）；`sha2` 每启动一次全文件读、未量代价；
   `package-release-macos.sh` 的相等性判定没有真跑过一次完整出包。
 
+## T-05（已收尾，2026-09-25）
+
+- agent `runtime/config.py`：`default_config_dir(*, frozen, exe)` 由**可执行文件的位置**推导
+  （`.app` 布局优先、其次 exe 旁边、都命中不了回落并 WARNING），`frozen`/`exe` 穿透
+  `_read_document`/`load_config`；`scripts/build_desktop_sidecar.py`：`--config-dir` = 先删后拷的
+  整目录替换 + 读回比对 + 报出文件清单。desktop：**新增** `scripts/stage-release-config.sh`，
+  `build-release-macos.sh` 一行接线（`cargo tauri build` 之后、`repair-macos-signing.sh` 之前），
+  `verify-release-macos.sh` 加 DMG 内配置的 `diff -r` 判定与两条防「空集通过」的判据。
+- **设计被实测改过一次**：原计划走 `tauri.conf.json` 的 `bundle.resources: ["config/*"]`。
+  Tauri 会拒绝匹配不到任何文件的 glob（`glob pattern config/* path not found or didn't match any
+  files.`）⇒ **任何还没跑过发布步骤的检出**（干净 clone、`cargo test`、`cargo tauri dev`）都编译不过。
+  三条改动（`.gitignore`、`tauri.conf.json`、`prepare-release-sidecar.sh`）**已回退到 HEAD**，
+  改为在**产物**上暂存（§6 D-12 记了这条否掉的路与原因，因为「Tauri 也能送」下次还会被提出来）。
+- **真机读数**（`evidence/task-05-frozen-reading.out`）：夹具把 `Contents/Resources/config/agent.toml`
+  放在它该在的位置、只改 `local_api.host = "localhost"`（内置默认是字面量 `127.0.0.1`，没有环境变量
+  在这里设它），端口走环境变量的临时端口。**修复前那份随包产物报 `127.0.0.1`**（文件没被读），
+  **含本次改动的新构建报 `localhost`**。两侧只有二进制不同。
+  同一条转录里另有两条辅助读数：`raw-build`（刚构建、未重签的产物体起不来 ⇒ `repair-macos-signing.sh`
+  是承重的一步，同时解释了 T-03 记的「随包 sidecar 在本机起不来」）与 `alias`（第一版夹具用
+  `127.0.0.2`，macOS 绑不上，`[Errno 49]`；换 `localhost` 重跑，失败那条留档不删）。
+- **发布闸门五臂**（`evidence/task-05-gate.out`，真闸门脚本 + 真产物 app，DMG 手工造）：
+  `green` exit 0；`changed` 两侧签名各自合法而内容不符 ⇒ 只有内容比对抓得住；`absent` 指向
+  `stage-release-config.sh`；`empty-source` 拒绝「空集通过」；`resealed` 让
+  `codesign --verify --deep --strict` 报 `a sealed resource is missing or invalid` 并指名那个文件
+  ⇒ **封条盖住配置**，位置与顺序由此定下（D-12/D-15）。
+- 计数：agent 382→**397** OK（+15）；desktop **363 passed / 0 failed / 5 ignored**（未改任何 Rust 文件，
+  读数与 T-04 相同）、警告 7→**7**。变异 agent **17/17**（M10 是为它补的：删掉读回校验起初没有用例会红，
+  补法是让**拷贝本身说谎**——`mock.patch.object` 把 `copytree` 换成「拷完再删掉 `agent.toml`」的版本）。
+- 凭据（AC-05 的另一半）：`config_online/agent.toml` **12** 个叶子、命中 **0**；**阳性对照在同一次运行里**
+  抓得住两种形态（嵌套且大小写混合的键名 + 值里的 userinfo），扫描到的叶子数 3 而不是 0。
+- 顺手订正一处**成因写错的注释**（D-16，只改注释）：`repair-macos-signing.sh` 原把
+  `different Team IDs` 归给 Tauri。实测是 PyInstaller 6.22.2 `utils/osx.py:413-421`——identity 为假时
+  才跳过硬运行时，而我们传的字面量 `-` 是真值；未重签的**构建产物**已经带 `flags=0x10002(adhoc,runtime)`。
+- 未覆盖项（`evidence/task-05-shipped-config.md` §9）：没有真跑过一次完整出包（DMG 手工造）；
+  `--config-dir` 指向不存在的目录时脚本层拦、库函数层会自建，这个错配没有用例；
+  只读文件系统/权限失败无用例；Windows/Linux 布局未测（Q-03）；开发树里的冻结 sidecar 未做真机读数；
+  打包场景下 env > file 的三层优先级只被单测逐键覆盖。
+
 ## Blocked
 
 - 无硬阻塞。**T-06 内有一条待关闭的 Q-04**（「组件与资源版本」的**口径**——M-launch-engineering
@@ -172,6 +212,12 @@
 
 ## Recent verification
 
+- **T-05 之后**（2026-09-25）：agent `bash scripts/test.sh` **Ran 397 tests / OK**（HEAD 的树
+  `git archive` 到 `/tmp` 后跑同一套件是 **382 OK**，差 = 本次新增 15 条）；desktop `cargo test`
+  **363 passed / 0 failed / 5 ignored**（**本次未改任何 Rust 文件**，读数与 T-04 相同，未重跑全仓）；
+  变异 agent **17/17**（跑完工作区复原并比对）。**注**：desktop 的 13 个 rustfmt 变更文件**仍保持
+  `工作区 == rustfmt(HEAD)` 的脏状态**（`evidence/task-05-suite.out` 只报 agent 侧增量，就是因为
+  desktop 这次没有可报的增量）。
 - **T-04 之后**（2026-09-25，churn 还原后重跑）：desktop `cargo test`
   **363 passed / 0 failed / 5 ignored**，汇总行 `generated 7 warnings`（与基线同）；
   `git diff --name-only` = **13** 条，逐个核对为 `工作区 == rustfmt(HEAD)`（13/13）；

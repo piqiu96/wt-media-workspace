@@ -1,0 +1,13 @@
+# CHG-059 T-05 测试计数：修复前后各跑一遍同一套件
+# 日期 2026-09-25
+
+== agent：HEAD 的树（git archive HEAD 到 /tmp 后跑 scripts/test.sh）
+Ran 382 tests in 11.512s
+OK
+
+== agent：本次改动后的树
+Ran 397 tests in 11.798s
+OK
+
+== desktop：本次未改任何 Rust 文件，套件读数与 T-04 相同
+(cargo test --workspace) 363 passed / 0 failed / 5 ignored

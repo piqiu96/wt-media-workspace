@@ -1,0 +1,35 @@
+# CHG-059 T-05 打包侧读数：config_online/ 怎样进产物、以什么顺序进
+# 日期 2026-09-25
+
+== 1. 构建脚本自己把配置暂存到位（sync_config：先删后拷，再读回比对）
+$ .venv/bin/python scripts/build_desktop_sidecar.py --output-dir /tmp/chg059/t05/binaries \
+      --manifest /tmp/chg059/t05/manifest.json --config-dir /tmp/chg059/t05/product-config
+config-dir=/tmp/chg059/t05/product-config files=2
+config-file=README.md
+config-file=agent.toml
+/tmp/chg059/t05/binaries/wt-media-agent-aarch64-apple-darwin
+
+== 2. 暂存结果与 config_online/ 的 diff——AC 的判据
+$ diff -r /tmp/chg059/t05/product-config /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/config_online
+exit=0
+
+== 3. 谁给 sidecar 加了 hardened runtime（T-03 记的那个起不来的原因）
+PyInstaller 6.22.2 utils/osx.py:413-421 —— sign_binary(identity) 只在 identity 为假时
+跳过硬运行时；我们的 pyinstaller_signing_args() 传的是字面量 '-'，它是真值：
+def sign_binary(filename, identity=None, entitlements_file=None, deep=False):
+    """
+    Sign the binary using codesign utility. If no identity is provided, ad-hoc signing is performed.
+    """
+    extra_args = []
+    if not identity:
+        identity = '-'  # ad-hoc signing
+    else:
+        extra_args.append('--options=runtime')  # hardened runtime
+    if entitlements_file:
+
+$ codesign -dvv <刚构建、未重签的那个> | grep flags
+CodeDirectory v=20500 size=21229 flags=0x10002(adhoc,runtime) hashes=656+2 location=embedded
+$ codesign -dvv <output/ 里随包的那个> | grep flags
+CodeDirectory v=20400 size=21200 flags=0x2(adhoc) hashes=656+2 location=embedded
+$ codesign -dvv <刚构建、按 repair-macos-signing.sh 重签过的> | grep flags
+CodeDirectory v=20400 size=21209 flags=0x2(adhoc) hashes=656+2 location=embedded

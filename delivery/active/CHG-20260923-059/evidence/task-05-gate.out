@@ -1,0 +1,70 @@
+# CHG-059 T-05 发布闸门读数：verify-release-macos.sh 的五个臂
+# 日期 2026-09-25 ｜ 跑法见 /tmp/chg059/t05/gate_arms.sh
+#
+# 闸门脚本是真的那份（复制到伪造的工作区根下运行，它自己算出来的每个路径都照常），
+# DMG 里的 app 也是真的那份（output/ 里最后一次发布构建的结果），配置按管线的顺序加进去：
+# 先加进 Contents/Resources，再签外层，所以封条盖住它。
+
+########## arm: green
+arm=green
+/tmp/chg059/t05/gate/green/staging/WT Media.app: replacing existing signature
+--- codesign --verify --deep --strict ---
+/tmp/chg059/t05/gate/green/staging/WT Media.app: valid on disk
+/tmp/chg059/t05/gate/green/staging/WT Media.app: satisfies its Designated Requirement
+--- verify-release-macos.sh ---
+/private/tmp/wt-media-dmg.izkCI1/WT Media.app: valid on disk
+/private/tmp/wt-media-dmg.izkCI1/WT Media.app: satisfies its Designated Requirement
+Agent configuration in the DMG is a 2-file mirror of config_online/: /private/tmp/wt-media-dmg.izkCI1/WT Media.app/Contents/Resources/config
+macOS DMG contains a complete ad-hoc-signed app: /tmp/chg059/t05/gate/green/root/wt-media-desktop/target/release/bundle/dmg/WT Media_0.1.0_aarch64.dmg
+gate exit=0
+
+########## arm: changed
+/tmp/chg059/t05/gate/changed/staging/WT Media.app: replacing existing signature
+--- codesign --verify --deep --strict ---
+/tmp/chg059/t05/gate/changed/staging/WT Media.app: valid on disk
+/tmp/chg059/t05/gate/changed/staging/WT Media.app: satisfies its Designated Requirement
+--- verify-release-macos.sh ---
+diff -r /tmp/chg059/t05/gate/changed/root/wt-media-agent/config_online/agent.toml /private/tmp/wt-media-dmg.UbgS2C/WT Media.app/Contents/Resources/config/agent.toml
+15c15
+< environment = "production"
+---
+> environment = "staging"
+The packaged Agent configuration is not a mirror of /tmp/chg059/t05/gate/changed/root/wt-media-agent/config_online
+gate exit=1
+
+########## arm: absent
+arm=absent
+--- codesign --verify --deep --strict ---
+/tmp/chg059/t05/gate/absent/staging/WT Media.app: valid on disk
+/tmp/chg059/t05/gate/absent/staging/WT Media.app: satisfies its Designated Requirement
+--- verify-release-macos.sh ---
+/private/tmp/wt-media-dmg.U2Xgng/WT Media.app: valid on disk
+/private/tmp/wt-media-dmg.U2Xgng/WT Media.app: satisfies its Designated Requirement
+The packaged app carries no Agent configuration: /private/tmp/wt-media-dmg.U2Xgng/WT Media.app/Contents/Resources/config is missing.
+build-release-macos.sh must run scripts/stage-release-config.sh on the app before signing it.
+gate exit=1
+
+########## arm: empty-source
+arm=empty-source
+--- codesign --verify --deep --strict ---
+/tmp/chg059/t05/gate/empty-source/staging/WT Media.app: valid on disk
+/tmp/chg059/t05/gate/empty-source/staging/WT Media.app: satisfies its Designated Requirement
+--- verify-release-macos.sh ---
+/private/tmp/wt-media-dmg.v9IdS9/WT Media.app: valid on disk
+/private/tmp/wt-media-dmg.v9IdS9/WT Media.app: satisfies its Designated Requirement
+config_online/ carries no files, so a mirror of it would prove nothing: /tmp/chg059/t05/gate/empty-source/root/wt-media-agent/config_online
+gate exit=1
+
+########## arm: resealed
+/tmp/chg059/t05/gate/resealed/staging/WT Media.app: replacing existing signature
+--- codesign --verify --deep --strict ---
+/tmp/chg059/t05/gate/resealed/staging/WT Media.app: valid on disk
+/tmp/chg059/t05/gate/resealed/staging/WT Media.app: satisfies its Designated Requirement
+--- codesign --verify --deep --strict (after tampering with the sealed config) ---
+/tmp/chg059/t05/gate/resealed/staging/WT Media.app: a sealed resource is missing or invalid
+file modified: /private/tmp/chg059/t05/gate/resealed/staging/WT Media.app/Contents/Resources/config/agent.toml
+codesign exit=1
+--- verify-release-macos.sh ---
+/private/tmp/wt-media-dmg.fLMKJA/WT Media.app: a sealed resource is missing or invalid
+file modified: /private/tmp/wt-media-dmg.fLMKJA/WT Media.app/Contents/Resources/config/agent.toml
+gate exit=1

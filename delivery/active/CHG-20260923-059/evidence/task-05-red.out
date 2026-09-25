@@ -1,0 +1,15 @@
+# CHG-059 T-05 先红读数（修复前的树与修复前的产物）
+# 日期 2026-09-25 ｜ 全部读数都不改动任何东西（output/ 只读）
+
+== 1. 产物里今天根本没有 Agent 配置（AC 的判据命令因此无法通过）
+$ ls -1 '/Users/aqiuye/Develop/workspace/wt-media/output/WT-Media_0.1.0_macos-aarch64/WT Media.app/Contents/Resources/'
+resources
+
+$ diff -r /Users/aqiuye/Develop/workspace/wt-media/wt-media-agent/config_online '/Users/aqiuye/Develop/workspace/wt-media/output/WT-Media_0.1.0_macos-aarch64/WT Media.app/Contents/Resources/config'
+exit=2
+
+== 2. 开发树里也没有任何「产物侧的 config」：bundle.resources 只有 Desktop 自己的 toml
+$ node -p "require('src-tauri/tauri.conf.json').bundle.resources"
+[ 'resources/*.toml' ]
+
+== 3. 因此冻结 sidecar 跑的是内置默认值——真进程读数见 task-05-frozen-reading.out

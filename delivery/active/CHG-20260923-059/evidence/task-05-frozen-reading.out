@@ -1,0 +1,74 @@
+# CHG-059 T-05 真机读数：冻结 sidecar 读不读随包的 Contents/Resources/config
+# 2026-09-25 ｜ 夹具与跑法见 /tmp/chg059/t05/read_config.sh
+#
+# 判据是那一行 listening：夹具把配置里的 local_api.host 改成 localhost（内置默认是
+# 字面量 127.0.0.1，且没有任何环境变量在这里设它），端口一律走环境变量的临时端口。
+# 所以读到 localhost 只可能来自文件，读到 127.0.0.1 就是没读文件。
+
+########## pre：修复前（HEAD 的随包产物，output/ 里那份，sha256 f92cbdee…）
+# 夹具：Contents/Resources/config = 发布用的 config_online/（host 改成 localhost）
+label=pre
+app=/tmp/chg059/t05/pre.app
+sidecar=f92cbdee38bc590c32c91a3d050add074e16d585e2b87e2ad06e976cc2957d87
+port=18781 (scratch; 8765 is the developer's dev Agent and is never bound here)
+--- the value that can only come from the file ---
+28:host = "localhost"
+29:port = 8765
+--- run ---
+2026-09-25T10:49:32 [INFO] wt_media_agent.local_api.server: wt-media-agent local API listening on 127.0.0.1:18781
+wt-media-agent local API listening on 127.0.0.1:18781
+stopped=31482
+
+########## fixed：含 T-05 改动的新构建（sha256 d7f8040c…），已按发布流程重签
+# 同一条夹具。改的是二进制，不是夹具。
+label=fixed
+app=/tmp/chg059/t05/fixed.app
+sidecar=7db6ae7e6c7d75da7d436466054344d97c39aae022eefeb414a8e4f0d44fdd4f
+port=18769 (scratch; 8765 is the developer's dev Agent and is never bound here)
+--- the value that can only come from the file ---
+28:host = "localhost"
+29:port = 8765
+--- run ---
+2026-09-25T10:50:04 [INFO] wt_media_agent.local_api.server: wt-media-agent local API listening on localhost:18769
+wt-media-agent local API listening on localhost:18769
+stopped=31948
+2026-09-25T10:50:26 [INFO] wt_media_agent.local_api.server: 收到 SIGTERM，停止接受新请求并等在飞请求收尾
+wt-media-agent local API stopped
+
+########## raw-build：同一次构建、但没有跑 repair-macos-signing.sh 里的重签
+# 这条与夹具无关，是打包中间态自己的问题，留在这里是因为它解释了为什么
+# 上一次 T-03 记成「随包 sidecar 在本机起不来」而今天它起得来。
+label=raw-build
+app=/tmp/chg059/t05/raw-build.app
+sidecar=d7f8040cc4268bfdfcaf465471d925c7886d8a75ad22ba42dda84190e6cba908
+port=18767 (scratch; 8765 is the developer's dev Agent and is never bound here)
+--- the value that can only come from the file ---
+28:host = "localhost"
+29:port = 8765
+--- run ---
+[PYI-37937:ERROR] Failed to load Python shared library '/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib': dlopen(/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib, 0x000A): tried: '/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' (code signature in <4C4C4466-5555-3144-A14E-6D269061AEBC> '/private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' not valid for use in process: mapping process and mapped file (non-platform) have different Team IDs), '/System/Volumes/Preboot/Cryptexes/OS/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' (no such file), '/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' (code signature in <4C4C4466-5555-3144-A14E-6D269061AEBC> '/private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' not valid for use in process: mapping process and mapped file (non-platform) have different Team IDs), '/private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' (code signature in <4C4C4466-5555-3144-A14E-6D269061AEBC> '/private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' not valid for use in process: mapping process and mapped file (non-platform) have different Team IDs), '/System/Volumes/Preboot/Cryptexes/OS/private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' (no such file), '/private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' (code signature in <4C4C4466-5555-3144-A14E-6D269061AEBC> '/private/var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/_MEI0000942aarRrSZ/libpython3.14.dylib' not valid for use in process: mapping process and mapped file (non-platform) have different Team IDs)
+exited on its own
+
+########## alias：第一次用的夹具（host = 127.0.0.2）
+# macOS 只绑 127.0.0.1，除非加 lo0 别名（要 sudo，不做）。这条读数的价值在于
+# 失败本身：进程去绑文件里那个地址，而不是内置默认值——但它不是一条能看清的成功读数，
+# 所以换了 localhost 夹具重跑（上面的 pre/fixed）。
+label=alias
+app=/tmp/chg059/t05/alias.app
+sidecar=7db6ae7e6c7d75da7d436466054344d97c39aae022eefeb414a8e4f0d44fdd4f
+port=18774 (scratch; 8765 is the developer's dev Agent and is never bound here)
+--- the value that can only come from the file ---
+28:host = "127.0.0.2"
+29:port = 8765
+--- run ---
+Traceback (most recent call last):
+  File "sidecar_main.py", line 27, in <module>
+  File "sidecar_main.py", line 23, in main
+  File "wt_media_agent/bootstrap/sidecar.py", line 27, in run
+  File "wt_media_agent/local_api/server.py", line 660, in serve
+  File "socketserver.py", line 457, in __init__
+  File "http/server.py", line 148, in server_bind
+  File "socketserver.py", line 478, in server_bind
+OSError: [Errno 49] Can't assign requested address
+[PYI-38351:ERROR] Failed to execute script 'sidecar_main' due to unhandled exception!
+exited on its own

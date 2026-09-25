@@ -180,8 +180,9 @@
 - Desktop：退出钩子（`RunEvent::Exit`）→ 请停 → 宽限 → 强杀；
 - Agent：SIGTERM 处理与在飞任务收尾；
 - Desktop：启动前**运行期完整性校验**（读 `sidecar-manifest.json`、验 sha256、失败拒绝启动）；
-- Desktop + Agent：`config_online/ → 产物/config` 的打包步骤与 `diff -r` 校验；`tauri.conf.json`
-  的 `bundle.resources` 补上 Agent 配置；
+- Desktop + Agent：`config_online/ → 产物/config` 的打包步骤与 `diff -r` 校验；**新增**
+  `scripts/stage-release-config.sh`（配置**不进** `bundle.resources`，改在**产物**上暂存——
+  那条路被实测否掉，见 §6 D-12 的依据）；
 - Desktop + workspace：**五类版本**的来源与发布脚本的 **Desktop ↔ sidecar 版本兼容校验**；
 - workspace：M2 回归的**重跑记录**（工具已有）。
 
@@ -191,6 +192,11 @@
   （超时语义由 T-01 定义；键名不变）；
 - `src-tauri/src/sidecar/`（就绪、退出、完整性）、`commands/agent.rs`（活性判定）；
 - `wt-media-agent/src/wt_media_agent/local_api/server.py`（信号处理）；
+- `wt-media-agent/src/wt_media_agent/runtime/config.py`（冻结侧由**可执行文件的位置**推导配置目录，
+  不再回落内置默认值）与 `wt-media-agent/scripts/build_desktop_sidecar.py`（`--config-dir`：
+  整目录替换 + 读回比对）（T-05）；
+- Desktop 的 `scripts/build-release-macos.sh`（一行接线）、`scripts/verify-release-macos.sh`（产物配置校验）
+  与 `scripts/repair-macos-signing.sh`（**只订正一处成因写错的注释**，行为不变）（T-05）；
 - `wt-media-agent/tests/test_sidecar_entry.py`：**T-01 已用**——就绪行的格式与顺序钉死。
   Desktop 从 T-01 起解析这行，于是它成了跨仓契约，而两侧都没有构建期检查（§6 D-01）；
 - `wt-media-agent` 的入口文档：`AGENTS.md`、`README.md`、`contracts/*/README.md`（吸收项）；
@@ -227,6 +233,11 @@
 | D-09 | **「干净机」安装验收按用户 2026-09-25 裁定登记为未做**：本机是开发机，装了 Python/Node/Rust 与 `.local/` 开发树，装一次证不了「没有 Python 的机器」。`release-matrix` 的 `0.2.5` **status 不改**，D 的 DONE Gate **带一条登记过的例外**，不以文字充当证据。 | 用户 2026-09-25 裁定「登记为未做，不宣布发布验证通过」；skill 的 Stop Condition「实机验收需要未提供的权限/资源」 |
 | D-10 | **Agent 侧不改轮转与保留**：C 已定型的「有意不对称」（Desktop 由 `file-rotate` 按天删、Agent 由 `LogBudget` 按天删）在本 CHG **原样保留**。D 只动退出路径上写入者的生命周期。 | C 的 §6；避免在 D 内重开已关闭的口径 |
 | D-11 | **同一个 401，两道判定给出相反的处置**：T-01 的就绪闸门里 401 **致命**（凭据对不上 = 用不了，等待改不了一份凭据）；T-02 的活性探针里 401 **算活着**（谁在不在与人认不认我们是两个问题，把 401 当「没人应答」会去 `kill` 一个活着的进程）。两条都由同一次实测（`/healthz` 在 `_check_auth` 之后）推出，**不能合并成一条规则**。 | §4.1 实测；两处判定的问题不同，见 `evidence/task-02-identity.md` §3 |
+| D-12 | **产物里的 Agent 配置落 `Contents/Resources/config`，且不进 `bundle.resources`——改为在产物上暂存。** 位置那一半由外层签名的封条决定（`resealed` 臂实测：签后改这个目录里的文件，`codesign --verify --deep --strict` 直接报 `a sealed resource is missing or invalid`）。**否掉 `bundle.resources: ["config/*"]` 的理由是实测的**：Tauri 拒绝匹配不到任何文件的 glob，`cargo build` 当场失败（`glob pattern config/* path not found or didn't match any files.`），于是**任何还没跑过发布步骤的检出**（干净 clone、`cargo test`、`cargo tauri dev`）都编译不过。发布步骤不该长在每个人的编译里。 | §4.5 实测产物无配置；T-04 §6 的封印实测；`evidence/task-05-gate.out` 的 `resealed` 臂；glob 失败读数见 `evidence/task-05-shipped-config.md` §5 第 5 条 |
+| D-13 | **冻结侧由可执行文件的位置推导配置目录，不引入任何环境变量或参数开关**（ADR-0016 §6 明禁）。两个候选：`<exe_dir>/../Resources/config`（`.app` 布局）优先，其次 `<exe_dir>/config`；**都命中不了时回落到检出路径并报 WARNING**（指名找过哪些位置）。静默回落会让「这次修的东西又没了」表现得和「配置正确」一模一样——那正是本次缺陷原来的样子。 | §4.5 实测「frozen 跑的是内置默认值」；`evidence/task-05-frozen-reading.out` 的 pre/fixed 对照 |
+| D-14 | **替换是整目录、且读回比对。** 先删后拷（不是合并），因为 `config_online/` 是**替换源**：源里删掉的文件必须也从产物里消失，否则「1:1 镜像」只在第一次拷贝那天成立。拷完把文件集合与逐字节都比一遍，不一致就**拒绝构建**；并报出**拷了哪些文件**（分母）。 | 吸收项验收判据；`evidence/task-05-packaging.out` 第 1 节；变异 M7–M12 |
+| D-15 | **暂存顺序：`cargo tauri build` → 暂存配置 → `repair-macos-signing.sh`。** 与 T-04 写 sidecar 记录的位置、顺序同源（同一段理由：`Contents/Resources` 由外层签名封住，签后加进去会**弄坏外层签名**，不是「没封住」）。 | `evidence/task-05-gate.out` 的 `resealed` 臂；与 T-04 的 `task-04-packaging.out` 第 3 条一致 |
+| D-16 | **顺带订正一处成因写错的注释**：`repair-macos-signing.sh` 原写「Tauri 的硬运行时签名让 macOS 26 拒绝那个嵌套库」。实测：**未重签的构建产物**（Tauri 还没碰过）就已带 `flags=0x10002(adhoc,runtime)` 且起不来，而 PyInstaller 6.22.2 `utils/osx.py:413-421` 只在 identity 为假时才跳过硬运行时——我们传的字面量 `-` 是真值。⇒ 加这个标志的是**构建脚本自己的参数形态**。**只改注释，不改行为**：重签这一步今天仍然必要，且是让 sidecar 能起来的那一步。 | `evidence/task-05-packaging.out` 第 3 节；`evidence/task-05-frozen-reading.out` 的 `raw-build` 段 |
 
 ## 7. Pending Questions
 
@@ -247,7 +258,7 @@
 | T-02 | **活性探针**：`already_running` 的判定改为问一次；sidecar 死后如实报「未在运行」并允许重启 | desktop | **DONE** | 先有一条**能红的**用例复现 CHG-057 登记的缺陷（杀掉 sidecar 后仍说已在运行）；修复后同一条转绿。变异 **8/8**；第一轮曾 6/8，两个存活变异各查出一处真洞（详见 `evidence/task-02-identity.md` §4.1） |
 | T-03 | **退出收尾**：Desktop `RunEvent::Exit` → SIGTERM → 宽限 → 强杀；Agent 侧 SIGTERM 处理与在飞任务收尾 | desktop + agent | **DONE** | 真机上两条读数**都拿到**（`--ignored real_agent`：Desktop 自己那条停路对上真 Agent 进程，`Some(0)`/518ms 与 `Some(9)`/1ms，5 次连跑 5/5）；先红是把 `stop` 还原成 HEAD 的硬杀形状，两条用例都红（日志不可区分、`(None, Some(9))`、窗口 900µs）；变异 agent 5/5 + desktop 9/9。**随包 onefile sidecar 那一臂做不到**（本机 `dlopen` 被签名拒），引导器是否转发 SIGTERM 未测——登记在证据 §7 |
 | T-04 | **运行期完整性校验**：启动前读 `sidecar-manifest.json` 验 sha256，失败拒绝启动 | desktop | **DONE** | 篡改一个字节的 sidecar 必须被拒且报出原因；完好时必须通过（阳性对照）；**不新增依赖**。**加一臂**：`#[ignore]` 的用例外加一条**包内臂**——拿签名脚本真写出的 sidecar 与记录造 `.app` 布局，从 `Contents/MacOS` 里跑，四条读数（通过 / 追加一字节必拒 / 删记录必拒 / 复原仍通过）全在 `evidence/task-04-bundle.out`；该用例本身另有 **5/5** 变异（`evidence/task-04-bundle-mutations.out`）。打包侧一半同 commit：记录写在外层签名之前，且出包脚本做相等性判定 |
-| T-05 | **`config_online → 产物/config`**：打包步骤 + `bundle.resources` 补 Agent 配置 + `diff -r` 校验 | desktop + agent | TODO | 产物内配置与 `config_online/` `diff -r` 无差异；**产物里不含凭证**（D-05） |
+| T-05 | **`config_online → 产物/config`**：产物上的暂存步骤（**不是** `bundle.resources`，见 D-12）+ 冻结侧由可执行文件推导配置目录 + `diff -r` 校验 | desktop + agent | **DONE** | 产物内配置与 `config_online/` `diff -r` 无差异（`green` 臂 exit 0）；**产物里不含凭证**（D-05）：`config_online/` 12 个叶子里 0 命中，且同一次运行里的阳性对照抓得住两种形态。**加五臂**：`changed`（两侧签名各自合法而内容不符 ⇒ 只有内容比对抓得住）、`absent`、`empty-source`（防「空集通过」）、`resealed`（封条盖住配置 ⇒ 定位置与顺序）。真机读数：同一条夹具同一条判据，修复前报 `127.0.0.1`、修复后报 `localhost`——**冻结侧真的读随包配置**。变异 agent **17/17**（M10 是为它补的用例）。详见 `evidence/task-05-shipped-config.md` |
 | T-06 | **五类版本**：Desktop / Agent / 前端构建 / Contract / 组件与资源各一个来源；发布脚本加 Desktop ↔ sidecar 版本兼容校验 | desktop + workspace | TODO | 五类逐个有可得来源（每条附命令）；版本不匹配的包**必须被拒**（先造一个不匹配的，看它红）；Q-04 一并关闭 |
 | T-07 | **升级不覆盖**：用路径判据证明升级路径不写用户设置 / SQLite / 检查点 / 待回传结果 | desktop + agent | TODO | 先写一条会红的用例（把某条用户数据路径喂进升级写入集合）；按路径而非名字 |
 | T-08 | **M2 业务回归**：对 A/B/C/D 之后的树重跑 M2 链路 | workspace + cloud | TODO | `m2b_local_acceptance.py` 读数；实网/实凭据部分按 §7 如实标注覆盖与否 |
@@ -266,7 +277,9 @@
 
 - [x] `local_api/server.py`：SIGTERM 处理与在飞任务收尾（T-03）——`70a1647`；
       `daemon_threads = False` 与「stopped」的位置各有一条会红的用例钉着
-- [ ] `scripts/build_desktop_sidecar.py`：`config_online/ → 产物/config` 整目录替换（T-05）
+- [x] `runtime/config.py`：冻结侧由**可执行文件的位置**推导配置目录（`.app` 布局优先、其次 exe 旁边、
+      都命中不了则回落并 WARNING）（T-05）
+- [x] `scripts/build_desktop_sidecar.py`：`--config-dir`——先删后拷的整目录替换 + 读回比对 + 报出文件清单（T-05）
 - [ ] 入口文档同步（`AGENTS.md`、`README.md`、`contracts/*/README.md`）（T-09）
 
 ### wt-media-desktop
@@ -278,7 +291,11 @@
       `ask`/`alive`/`force` 三个函数、`stop()` 的请停→宽限→强杀、`RunEvent::Exit` 钩子
 - [x] `src-tauri/src/commands/agent.rs`：活性探针（T-02）——`c54025a` 生产修复 + 4 条用例；
       `15951a4` 的 `tauri` `test` feature dev-dependency 与 `R: Runtime` 泛化是它的前置
-- [ ] `src-tauri/tauri.conf.json`：`bundle.resources` 补 Agent 配置（T-05）
+- [x] `scripts/stage-release-config.sh`（**新增**）：把 `config_online/` 暂存进已打包的 app——
+      `tauri.conf.json` 的 `bundle.resources` **不动**（D-12：glob 匹配不到文件会让 `cargo build` 失败）
+- [x] `scripts/build-release-macos.sh`：一行接线（在 `cargo tauri build` 之后、`repair-macos-signing.sh`
+      之前，D-15）；`scripts/verify-release-macos.sh`：DMG 内产物配置的 `diff -r` 判定 + 两条防「空集通过」
+- [x] `scripts/repair-macos-signing.sh`：**只订正注释**（D-16，行为不变）
 - [x] `scripts/repair-macos-signing.sh` + `scripts/package-release-macos.sh`：写包内记录（在 sidecar
       的 ad-hoc 签名之后、外层签名之前）与相等性判定（T-04 的打包侧一半）——`04f46c3`
 - [ ] `scripts/package-release-macos.sh`：Desktop ↔ sidecar 版本兼容校验（T-06）
@@ -292,11 +309,11 @@
 | AC-02 | 不会连上旧进程：sidecar 死后如实报「未在运行」 | 先红后绿的复现用例 + 真机读数 | **一半**（T-02）：先红后绿已成立（`evidence/task-02-red.out` / `task-02-green.out`，真 `CommandChild` + 真无人听的端口）；**真机读数未做**，按 T-02 证据 §7 第 1 条登记，不以文字充当证据 |
 | AC-03 | 退出是收尾过的：请停 → 宽限 → 强杀；报告能区分 | 真机两条读数 | **满足**（T-03）：两条读数都是真 Agent 进程给的（`task-03-desktop-real-agent.out`），请停/自行退出/宽限强杀三条记录互不重名。**一处例外**：随包 onefile sidecar 的引导器是否转发 SIGTERM **未测**（本机跑不起来，D-09 式登记，见 `evidence/task-03-exit.md` §7 第 1 条） |
 | AC-04 | 随包 sidecar 被验过：篡改必拒、完好必过 | 阳性对照 + 阴性对照各一条 | **满足**（T-04）：三条阴性（追加一字节 / 删记录 / 记录字段不可比对）与一条阳性（真记录通过）都有，且**在真包布局下量过**——`task-04-bundle.out` 的四条读数取自 `Contents/MacOS` 里跑的进程（`current_exe()` 与 `resource_dir()` 是真实包内值），阳性那条的 sha256 与对同一文件的独立 `shasum` 一致。**一处例外**：没有「双击启动一个被篡改的包会怎样」的读数（需要 GUI），本任务证的是校验逻辑本身，见 `evidence/task-04-integrity.md` §9 第 1 条 |
-| AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | TODO（T-05） |
+| AC-05 | 产物带着 Agent 配置且 `diff -r` 无差异；**不含凭证** | `diff -r` 输出 + 凭据扫描阳性对照 | **满足**（T-05）：`green` 臂 `diff -r` 无输出、exit 0；凭据扫描分母 12 叶子 / 命中 0，**阳性对照在同一个运行里抓得住两种形态**（嵌套混合大小写的键名 + 值里的 userinfo）。**一处例外**：没有真跑过一次完整出包（`cargo tauri build` → 暂存 → 签名 → 打 DMG），五臂用的是真闸门脚本 + 真产物 app、DMG 手工造的；配置已不进 `bundle.resources`，所以未被量到的那一步在下单路径上不存在了，但「整条出包脚本连起来跑通」**未做**，见 `evidence/task-05-shipped-config.md` §9 第 1 条 |
 | AC-06 | 五类版本可追溯；Desktop ↔ sidecar 版本不匹配必拒 | 五条来源命令 + 一条不匹配必红的用例 | TODO（T-06） |
 | AC-07 | 升级不覆盖用户设置 / SQLite / 检查点 / 待回传结果 | 路径判据的用例（先红） | TODO（T-07） |
 | AC-08 | M2 业务回归对 A/B/C/D 之后的树通过 | `m2b_local_acceptance.py` 读数；实网部分按覆盖情况如实标注 | TODO（T-08） |
-| AC-09 | 正式安装包脱离开发源码 / venv / 开发机路径可运行 | **含一条登记过的例外**：干净机这一臂**未做**（D-09）——能证的是「产物不含 `config_online` 之外的开发态路径引用」与「sidecar 是随包原生二进制」；**不证**「在没有 Python 的机器上装过」 | TODO（T-05/T-06；例外见 D-09） |
+| AC-09 | 正式安装包脱离开发源码 / venv / 开发机路径可运行 | **含一条登记过的例外**：干净机这一臂**未做**（D-09）——能证的是「产物不含 `config_online` 之外的开发态路径引用」与「sidecar 是随包原生二进制」；**不证**「在没有 Python 的机器上装过」 | **一半**（T-05 的那半）：配置的来源只有 `config_online/`，冻结侧的目标是**包内**的 `Contents/Resources/config`（`evidence/task-05-frozen-reading.out` 的 fixed 段就是包内布局下的真进程读数）；**版本那一半是 T-06**。D-09 的例外照旧登记 |
 | AC-10 | 发布可追溯五类版本 | 同 AC-06 | TODO（T-06） |
 | AC-11 | 计数只增不减 | desktop 336 / agent 377 为分母，逐任务报增量；agent 若有例外**先登记再吸收** | 进行中 |
 
@@ -322,7 +339,13 @@
   `evidence/task-04-bundle-mutations.out`（包内臂 5/5）、
   `evidence/task-04-packaging.out`（三条摘要读数：构建期 ≠ 随包、重复签名可复现、记录写在外层签名之前）、
   `evidence/task-04-seal-probe.out`（外层签名与嵌套代码校验覆盖了什么，三份独立副本各测一件）
-- `evidence/task-05-shipped-config.md`——`diff -r` 输出、产物树、凭据扫描（带阳性对照与分母）
+- `evidence/task-05-shipped-config.md`——产物配置：位置与顺序的裁定、五臂发布闸门、变异 17/17、
+  凭据扫描（带阳性对照与分母）、未覆盖项。**已产出**，另附原始转录
+  `evidence/task-05-red.out`（产物里没有配置：AC 的判据命令 `exit=2`）、
+  `evidence/task-05-frozen-reading.out`（同一条夹具下 `pre` 报 `127.0.0.1` / `fixed` 报 `localhost`，
+  外加 `raw-build` 与 `alias` 两条辅助读数）、`evidence/task-05-packaging.out`（暂存读数、
+  `diff -r` exit 0、hardened runtime 的真成因）、`evidence/task-05-gate.out`（五臂）、
+  `evidence/task-05-suite.out`（agent 382→397）、`evidence/task-05-mutations.out`（17/17）
 - `evidence/task-06-versions.md`——五类版本的来源命令与不匹配必红
 - `evidence/task-07-upgrade.md`——路径判据的先红用例与结论
 - `evidence/task-08-m2-regression.md`——M2 重跑读数与**覆盖情况**（实网/实凭据部分逐条标注）
@@ -360,8 +383,18 @@
     4097 字节）、M6 最初存活且瞄错了用例（补 `bundled()` 与 `a_cargo_test_run_is_not_a_package`）、
     封印探针第一版把三件事串在同一副本上读（第二条读的是第一条留下的损坏，已按独立副本重测）。
     详见 `evidence/task-04-integrity.md`。
-- **Current**：T-04 已收尾；T-05 `config_online → 产物/config` 未开工。
-- **Next**：T-05 → T-06 → T-07 → T-08 → T-09 → T-10。
+  - **T-05 `config_online → 产物/config`**（双侧）。agent 382→**397** OK（+15）；desktop
+    **363 passed / 0 failed / 5 ignored**（本次未改任何 Rust 文件，读数与 T-04 相同）；警告 7→**7**；
+    变异 agent **17/17**（M10 是为它补的用例——删掉读回校验起初没有任何用例会红，补法不是改断言，
+    而是让**拷贝本身说谎**）。**真机读数**：同一条夹具、同一条判据，修复前那份随包产物报
+    `127.0.0.1`（内置默认值）、含本次改动的新构建报 `localhost`（文件值）——**冻结侧真的读随包配置**。
+    发布闸门五臂（`green`/`changed`/`absent`/`empty-source`/`resealed`）齐全，其中 `changed` 证明
+    两侧签名各自合法时**只有内容比对**抓得住，`resealed` 证明封条盖住配置（定位置与顺序）。
+    凭据：12 叶子 / 0 命中，阳性对照可失败。**过程中被实测否掉一条路**：`bundle.resources: config/*`
+    让 `cargo build` 直接失败（glob 匹配不到文件），故改为在**产物**上暂存。详见
+    `evidence/task-05-shipped-config.md`。
+- **Current**：T-05 已收尾；T-06「五类版本」未开工。
+- **Next**：T-06 → T-07 → T-08 → T-09 → T-10。
 - **Blocked**：无。Q-04（「组件与资源版本」的口径）在 **T-06 内部**待定，若定不下则退回用户。
 - **不动的东西**（免得后来者以为是漏项）：两份出货配置与 CSP（D-08）、日志轮转与保留（D-10）、
   Cloud 的 Go 后端与 `web/`、`0.2.5` 的 status（D-09）、Windows/x86_64 构建（Q-03）。
@@ -373,7 +406,9 @@
 - [ ] Manual verification evidence recorded where required.——**不完全满足，如实标注**：干净机那一臂**未做**（D-09）；
       **真机**（真进程/真应用）读数已拿到的是**就绪**（真 Agent 的 readiness 行）与**退出**（真 Agent 进程的
       请停/强杀两条）；**完整性**是**真包布局**读数（进程真的跑在 `.app/Contents/MacOS` 里，但不是 GUI 双击）；
-      **活性**的真机读数按 AC-02 登记为未做；**产物配置与版本**未开工，届时一并按此表如实标注
+      **活性**的真机读数按 AC-02 登记为未做；**产物配置**已有真机读数（包内布局下冻结侧读到了随包文件，
+      修复前/修复后各一次），但**没有真跑过一次完整出包**（DMG 是手工造的）；**版本**未开工，
+      届时一并按此表如实标注
 - [ ] 计数只增不减（desktop 336 / agent 377 为分母；例外先登记）
 - [ ] 一仓一 commit；「移动文件」与「改逻辑」不同 commit；desktop 只对单个文件跑 `rustfmt`
 - [ ] 关闭门禁：三个校验器 + `unittest discover`（**4 条既知红项**，判据是同集合阳性对照，不是「看着无关」）

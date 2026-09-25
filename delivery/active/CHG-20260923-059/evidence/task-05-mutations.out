@@ -1,0 +1,56 @@
+== 控制行：未变异的树上，每条被点名的用例都必须是绿的
+   green: test_a_packaged_agent_reads_the_configuration_in_its_resources
+   green: test_a_packaged_agent_reads_the_configuration_in_its_resources
+   green: test_the_app_layout_wins_over_a_directory_beside_the_executable
+   green: test_a_bundle_with_nothing_shipped_falls_back_and_says_so
+   green: test_a_checkout_ignores_a_bundle_shaped_directory
+   green: test_a_packaged_agent_reads_a_flat_configuration_next_to_the_executable
+   green: test_a_copy_over_an_existing_directory_drops_what_the_source_lost
+   green: test_the_mirror_check_names_every_way_a_copy_can_disagree
+   green: test_the_mirror_check_names_every_way_a_copy_can_disagree
+   green: test_a_copy_that_did_not_reproduce_the_source_is_refused
+   green: test_syncing_from_a_source_that_is_not_there_is_an_error
+   green: test_the_product_configuration_is_a_wholesale_mirror
+   green: test_the_credential_scan_finds_both_shapes_it_claims_to
+   green: test_the_credential_scan_finds_both_shapes_it_claims_to
+   green: test_the_credential_scan_finds_both_shapes_it_claims_to
+   green: test_a_call_with_nothing_to_do_is_an_error
+   green: test_the_build_arguments_still_go_together
+
+== 变异表
+   打掉 ✓  M1 回到修复前的形状：不看 frozen，恒返回 checkout 的 config/
+         -> test_a_packaged_agent_reads_the_configuration_in_its_resources
+   打掉 ✓  M2 忽略传入的 exe，恒用本进程的 sys.executable
+         -> test_a_packaged_agent_reads_the_configuration_in_its_resources
+   打掉 ✓  M3 候选顺序反过来：先看 exe 旁边，再看 Resources
+         -> test_the_app_layout_wins_over_a_directory_beside_the_executable
+   打掉 ✓  M4 找不到时不发 warning，静默回落到内置默认值
+         -> test_a_bundle_with_nothing_shipped_falls_back_and_says_so
+   打掉 ✓  M5 忽略 frozen：任何进程都按「在包里」解析
+         -> test_a_checkout_ignores_a_bundle_shaped_directory
+   打掉 ✓  M6 去掉 exe 旁边那个候选（只认 .app 布局）
+         -> test_a_packaged_agent_reads_a_flat_configuration_next_to_the_executable
+   打掉 ✓  M7 sync_config 只覆盖同名文件、不删多余文件（合并而不是整替）
+         -> test_a_copy_over_an_existing_directory_drops_what_the_source_lost
+   打掉 ✓  M8 镜像校验只比文件名，不比字节
+         -> test_the_mirror_check_names_every_way_a_copy_can_disagree
+   打掉 ✓  M9 镜像校验漏掉「多出来的文件」这一支
+         -> test_the_mirror_check_names_every_way_a_copy_can_disagree
+   打掉 ✓  M10 拷完不读回校验（校验整段去掉）
+         -> test_a_copy_that_did_not_reproduce_the_source_is_refused
+   打掉 ✓  M11 不给源目录不存在设错误（让它以别的异常收场）
+         -> test_syncing_from_a_source_that_is_not_there_is_an_error
+   打掉 ✓  M12 不报告拷了哪些文件（返回空表）
+         -> test_the_product_configuration_is_a_wholesale_mirror
+   打掉 ✓  M13 敏感键按整条点路径比，而不是叶名
+         -> test_the_credential_scan_finds_both_shapes_it_claims_to
+   打掉 ✓  M14 敏感键大小写敏感（去掉 .lower()）
+         -> test_the_credential_scan_finds_both_shapes_it_claims_to
+   打掉 ✓  M15 不看值里的 userinfo（只看键名）
+         -> test_the_credential_scan_finds_both_shapes_it_claims_to
+   打掉 ✓  M16 什么都不给也算成功（去掉「无事可做」的报错）
+         -> test_a_call_with_nothing_to_do_is_an_error
+   打掉 ✓  M17 不检查 --output-dir / --manifest 必须成对
+         -> test_the_build_arguments_still_go_together
+
+打掉 17/17；树已复原 = True
