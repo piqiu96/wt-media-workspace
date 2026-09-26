@@ -29,25 +29,24 @@
 - **T-03 播放地址解析（第一段）**：新增 `internal/infra/client/platforms/douyin/media.go` 的 `MediaAddress(payload)`。worker **不读** `materials.source_snapshot` 取地址——快照存的是 provider 原始 payload，其中的签名 URL 早已过期（该既存问题另见 Blocked）；改为执行时用稳定的 `platform_content_id` 重新解析详情。只读 `video.play_addr.url_list`：真实 payload 另有 `play_addr_h264`、`download_addr` 与按码率给出的地址，但哪一个才是源而非转码／带水印版本尚未对该 provider 实测，选一个就是「把猜测当兜底」，留给第一次实网抓取定案。列表其余项不遍历（它们是等价地址，一次尝试内换一个 URL 只会掩盖失败）。地址是凭据：不记录、任何拒绝都不带它，`url.Parse` 的错误文本就是地址本身故只传出 cause。提交 `9760794`。
 - **T-03 投影写入（第一段）**：`production` 增加 `MarkVideoReady`／`MarkVideoFailed` 与 `VideoFacts`，并暴露为 `production/service` 的 `MarkVideoReady`／`MarkVideoFailed`——worker 与两个既有 job 一样走模块的 `service` 公共面，仓储是模块内部的持久化细节，越过它会让 `internal/jobs` 成为第二个知道 SQL 面的地方。四个事实作为一个值同行进检（`ready` 但没有键／大小／哈希的行比 `failed` 更坏：下游无法把它与已备好的视频区分开）且大小按字符而非字节截到 500（严格模式下 1406 会让语句失败，恰好在最想知道失败原因时丢掉原因）。**就绪写入刻意不带状态谓词**（准备可以从任意状态完成，谓词必须枚举全部状态并会拒绝它漏掉的那些；内容寻址保证重跑得到同一个键），**失败写入刻意拒绝已 `ready` 的素材**（更慢的先前尝试已成功时，重跑失败不得把有可取视频的素材拖回 failed）。service 对两个行数读法不同且这一不对称就是要点：就绪写入零行是 `ErrNotFound`（无谓词＋每条语句都写新的 `updated_at`，匹配不到只可能是该团队没有这条素材），失败写入被拒不是错误。连接**没有**设 `CLIENT_FOUND_ROWS`，所以这是「改动的行」而非「匹配的行」，`updated_at` 赋值正是让两种读法相等的那个东西，测试为此单独钉它。提交 `8be62d4`。
 
+- **T-03 素材准备 Worker（第一段收口）**：新增 `internal/jobs/material_prepare.go`（约 825 行）与 21 个测试／39 个子用例的失败注入矩阵。worker 经 `filetransfer` **仓储**而非其 service 领取 `material_download_task`（service 的对应函数一律先鉴一个 Cloud worker 没有、也不得假装的节点凭据），解析平台地址、边下边算 sha256、探针读过、再按自身字节派生的键提交：暂存 → 回读 → 拷贝 → 回读 → 删暂存。**只有到这里**才写 `ready` 投影并把事实交给等待中的下载：此前任一步失败都要把三行都写上（素材、等待者、任务），此后素材已是 ready、失败只是账面记录，不得记成准备的失败。四点刻意决定：探针跑在上传**之前**（计划写的是之后；它保护的要求——不为未在正式键校验通过的字节写事实——未变，而一个解析不了的容器不值得两次上传和一个无人引用的键）；**不调 `MarkVideoPreparing`**（一次点击裁定后点击本身已置 `downloading`，真正的双执行排除是 `ClaimCloudTask` 的租约，计划里那条旧守卫到此作废）；完成写入失败**刻意不记终态**（行留在 `running`、租约过期、下次领取重跑一遍每步都幂等的准备，因为键是内容寻址的）；worker 在**每条**终态路径上自己释放等待者，因为**本 build 没有注册任何 reconciler job**，而 `leaseable` 会永久拒绝带 `dependency_task_id` 的本地任务。沿用既有 worker 进程与 `WorkerInterval`，不新增 `cmd/`、也不新增配置键（两个 worker 都是轮询排空队列，第二个键只会让进程在运维编辑两棵配置树之前拒绝启动）。**先红**：36 个变异臂逐条单独施加（每臂一个守卫、逐臂从字节备份还原、断言锚点恰好命中一次、要求能编译且能变红），读数 **36 红 / 0 绿 / 0 跳过**，文件逐字节还原（sha256 `56bf8508…`）。两个臂查出了东西，都做了处置而非容忍：`commit` 之后的 lost-lease 分支**不可达**（`commit` 只与对象存储说话，不与任何持有租约的东西说话），按 §12「无法被证伪的规则不是防御」**删除**；失败消息的上限此前只被长度钉住，测试补钉「本来就装得下的消息原样返回」（截断装得下的消息会丢掉末字并像一条还没说完的话）。提交 `88532e7`。
+
 ## Current
 
-Task 3 第一段进行中（Cloud 仓 `codex/m4-a-cloud`，HEAD `8be62d4`）。配置键、存储边界、接线、「一次点击＝云端排队＋本地等待任务」的 Cloud 侧全链路，以及 worker 的全部依赖（源文件流式客户端、媒体探针、播放地址解析、投影写入）均已落地并有读数。第一段余下**只剩 worker 本身**：`internal/jobs/material_prepare.go`（claim → 解析地址 → 流式下载并算 sha256 → 临时键→校验→正式键 → 探针 → 才写 `video_status='ready'`；成功调 `HandOverDependencies`，失败调 `FailDependents` ＋ `FailCloudTask`）、`RunMaterialPrepareWorker` 与 `bootstrap/jobs.go` 接线，以及失败注入矩阵逐行留证。
+Task 3 第一段**已完成**（Cloud 仓 `codex/m4-a-cloud`，HEAD `88532e7`）。配置键、存储边界、租约授权接线、「一次点击＝云端排队＋本地等待任务」的 Cloud 侧全链路、worker 的全部依赖（源文件流式客户端、媒体探针、播放地址解析、投影写入）与 worker 本身均已落地、均有读数、均已有先红证据。Cloud 侧可离线的部分到此为止，余下的是需要真实凭据与可达端点的第二段。
 
-**用户裁定（2026-09-26，不再重开）**：一次点击即可——「发起下载先判断云端任务是否有，有就本地直接下载，否则云端先加等待，本地定期获取作为本地下载的一部分」。落地为本提交：本地任务立即创建并带 `dependency_task_id`，在准备任务交出事实前不可领取（`/claim` 回 `{"task": null}`，即合同里既有的「无事可做」），因此「本地定期获取」不需要第二条机制，也不需要改任何冻结合同。
+**用户裁定（2026-09-26，不再重开）**：一次点击即可——「发起下载先判断云端任务是否有，有就本地直接下载，否则云端先加等待，本地定期获取作为本地下载的一部分」。落地为 `7c83969`：本地任务立即创建并带 `dependency_task_id`，在准备任务交出事实前不可领取（`/claim` 回 `{"task": null}`，即合同里既有的「无事可做」），因此「本地定期获取」不需要第二条机制，也不需要改任何冻结合同。
 
 ## Next
 
-1. **Task 3 第一段余项（无外部副作用，可离线完成）**：`internal/jobs/material_prepare.go`（claim → 解析地址 → 流式下载并算 sha256 → 临时键→校验→正式键 → 探针 → **才**写 `video_status='ready'`；成功时调 `HandOverDependencies`，失败时调 `FailDependents`＋`FailCloudTask`）与失败注入矩阵逐行留证，再加 `RunMaterialPrepareWorker` 与 `bootstrap/jobs.go` 接线（挂在既有 worker 进程，不新增 `cmd/`——AC-10 要的是 HTTP Server 不启动 Worker）。四项依赖均已落地：`sourcefile`（`5b8ee56`）、`media` 探针（`27cef54`）、`MediaAddress`（`9760794`）、投影写入（`8be62d4`）。
-
-   **写 worker 前需先解决一处计划过期**：计划写的是 worker 用 `MarkVideoPreparing` 作双执行守卫，但一次点击裁定后点击本身已把投影置为 `downloading`，故该调用会返回 false。真正的双执行排除是 `ClaimCloudTask` 的租约；worker 对 `MarkVideoPreparing` 的返回值该作何处理，在写 worker 时一并定案并留证。
-2. **Task 3 第二段（需要凭据与可达端点）**：真实键、真实 size／sha256 对账、真实字节上的媒体探针、`play_addr` 实网确认与 AC-01 反证。凭据只存在于用户手工填写的未跟踪文件 `config/credentials/object_storage.toml`。
-3. **Task 4**：合同先行（`save-directory` 端点与 `contracts/local-error-codes/v1/transfer.yaml`）→ Agent 侧下载执行分层 → checkpoint 字段与 `0003` 迁移 → local API → Desktop 选择器与推送。Task 4 的唯一硬前置（Cloud-Agent 领取／完成响应 schema）已在 `a5b5e43` 冻结。
-4. **Task 5 待办（因本次裁定新增）**：准备任务按**素材**去重而非按用户，所以第二个操作员的抽屉里只会有他自己那条等待中的本地任务，看不到共享的云端准备。UI 必须把等待中的本地任务标注为「等待云端准备」，否则它会看起来像一条停滞的任务。
+1. **Task 3 第二段（需要凭据与可达端点）**：真实键、真实 size／sha256 对账、真实字节上的媒体探针、`play_addr` 实网确认与 AC-01 反证。凭据只存在于用户手工填写的未跟踪文件 `config/credentials/object_storage.toml`；`minio.New` 是否接受该 endpoint／bucket／region、presign 出的 url 在 Agent 机器上真能下，都只有这一段能回答。
+2. **Task 4**：合同先行（`save-directory` 端点与 `contracts/local-error-codes/v1/transfer.yaml`）→ Agent 侧下载执行分层 → checkpoint 字段与 `0003` 迁移 → local API → Desktop 选择器与推送。Task 4 的唯一硬前置（Cloud-Agent 领取／完成响应 schema）已在 `a5b5e43` 冻结。
+3. **Task 5 待办（因本次裁定新增）**：准备任务按**素材**去重而非按用户，所以第二个操作员的抽屉里只会有他自己那条等待中的本地任务，看不到共享的云端准备。UI 必须把等待中的本地任务标注为「等待云端准备」，否则它会看起来像一条停滞的任务。
 
 ## Blocked
 
 - **Task 3 第二段与 T-03 真实验收**需要两个尚未提供的值：(1) 凭据文件 `config/credentials/object_storage.toml` 由用户手工填写且不入库，尚未创建；(2) **桶名与 region**——用户只给了端点 `data.bucket.oss.longyanyue.cn`，桶名与 region 未知。两棵树里的 `bucket` 现写作自述式哨兵 `REPLACE_WITH_BUCKET`（而非看起来可信的虚构名），使缺失值在第一次调用即显式失败，而不是伪装成 access denied。二者都不阻止第一段、Task 4 与 Task 5。
-- **两处既有问题待登记，不在本 CHG 范围内**（计划已裁定只登记、不扩大范围）：(1) `migrations/README.md` 的 Active Migrations 清单停在 025，且其 `WT_MYSQL_DSN`／`WT_MEDIA_MYSQL_DSN` 说明与 Go 源码不符；(2) `materials.source_snapshot` 存 provider 原始 payload，Douyin 响应含短时效签名 URL，与 CHG §4「不把完整签名 URL 写入 Cloud 业务表」相悖（`contentpool/service/discovery_crawler.go`，M3 既存路径）。
+- **三处既有问题待登记，不在本 CHG 范围内**（计划已裁定只登记、不扩大范围）：(1) `migrations/README.md` 的 Active Migrations 清单停在 025，且其 `WT_MYSQL_DSN`／`WT_MEDIA_MYSQL_DSN` 说明与 Go 源码不符；(2) `materials.source_snapshot` 存 provider 原始 payload，Douyin 响应含短时效签名 URL，与 CHG §4「不把完整签名 URL 写入 Cloud 业务表」相悖（`contentpool/service/discovery_crawler.go`，M3 既存路径）；(3) **没有任何 job 注册传输模块的两个 reconciler**。取证：`git grep -n "ReconcileCancelledTasks\|ReconcileExhaustedTasks\|failDependentsOfTerminalTasks" -- '*.go'` 的全部命中都在 `filetransfer/repository/store_mysql.go`（定义、彼此调用、注释）与 `store_mysql_test.go`（测试），**没有生产调用方**；`git grep -n "runner.Register(" -- '*.go'` 只命中 `bootstrap/jobs.go` 的四行（`discovery-schedule`、`proxy-expiry`、`discovery-worker`、`material-prepare-worker`），没有一条是清扫。同一分母下的阳性对照：把函数换成 `ClaimCloudTask` 重跑同一模式，命中 `material_prepare.go:749` 的真实调用方——即该检索能看见调用方，`0` 是真 `0`。因此本 CHG 的 worker 在每条终态路径上自己释放等待者，不依赖那趟清扫；但**别的**路径留下的悬空 `dependency_task_id`（节点中途死亡、任务被别处终结）仍然只能靠人工。这是本 CHG 之前就有的缺口，登记在案，修它要动 scheduler 的 job 清单与两个仓的配置。
 
 ## Recent verification
 
@@ -83,3 +82,7 @@ Task 3 第一段进行中（Cloud 仓 `codex/m4-a-cloud`，HEAD `8be62d4`）。�
 | Cloud `go test ./...`（`8be62d4`，最后一次内容改动之后重跑） | `67 ok / 0 FAIL` |
 | Cloud `go vet ./...` / `gofmt -l internal/`（`8be62d4`） | `exit=0` / 无输出 |
 | 投影写入变异控制（`8be62d4`） | 27 个（仓储 19 ＋ service 8），各自单独施加、各自变红；两文件 sha256 还原后与备份一致。仓储批首轮 5 个为绿且都是同一处自身测试缺陷：把「被拒绝」断言成「返回了错误」——语句落到未布防的 mock 上也会返回错误，故删掉守卫同样通过；此前提交里写的范围拒绝测试有同一个洞，三处一并改成断言拒绝原因。另有两个**完全没有测试**的守卫（对象键与哈希的空白裁剪，因 `video_sha256` 是 `CHAR(64)` 而校验接受的是裁剪后的值，属承重项）补测试而非删除 |
+| Cloud `go test -count=1 ./...`（`88532e7`，最后一次内容改动之后重跑） | `67 ok / 0 FAIL` |
+| Cloud `go vet ./...` / `gofmt -l internal/`（`88532e7`） | `exit=0` / 无输出 |
+| `internal/jobs` 用例量（`88532e7`） | 21 个顶层测试 ／ 39 个子用例 ／ 0 FAIL（分母为 `-v` 下 `^--- PASS` 与 `^    --- PASS` 的计数） |
+| 素材准备 worker 变异控制（`88532e7`） | 36 个，各自单独施加、各断言锚点恰好命中一次、各要求能编译、各自变红；文件 sha256 还原后与备份一致（`56bf8508…`）。首轮 30 臂：24 红、2 绿、4 因编译或锚点被跳过。两条绿都是真发现而非噪声，都做了处置：`commit` 之后的 lost-lease 分支**不可达**（臂删掉它没有任何测试变红，因为 `commit` 只与对象存储说话、`errLeaseLost` 是包内私有哨兵，没有任何实现能返回它）→ 删除该分支；失败消息上限只被长度钉住（臂删掉「装得下就原样返回」后仍全绿）→ 补断言而非删除守卫。4 条跳过的臂逐条修复后重射（3 条因删代码块留下未使用变量而改成「把条件置假」的形式，1 条锚点在两个函数里各命中一次而按上一行文本拆成两条独立臂） |
