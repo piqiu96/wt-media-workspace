@@ -69,7 +69,14 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.09.06.1"
+    # CHG-20260924-061 T-04 added GET/POST /api/v1/save-directory, which moves the
+    # definition to 2026.09.27.1. This line was already stale before that change:
+    # it read 2026.09.06.1 while the definition said 2026.09.24.1, and the stale
+    # pair passed everything, because the only check that pins this value compares
+    # it to a constant in scripts/verify_m0_config.py -- never to the definition
+    # file sitting beside it. CHG-20260923-059 T-09 measured that drift and
+    # CHG-20260925-063 T-01 then moved that constant onto the stale value.
+    contract_revision: "2026.09.27.1"
     consumers:
       - wt-media-desktop
   local_event_schemas:
@@ -93,6 +100,9 @@ contracts:
     path: ../wt-media-agent/contracts/local-error-codes
     state: active
     formal_definition: active
-    error_revision: "2026.07.14.6"
+    # The newest of the area's definitions, as `local_event_schemas` does: the
+    # files carry their own revisions and `v1/bitbrowser.yaml` is still at
+    # 2026.07.14.6. CHG-20260924-061 T-04 added `v1/transfer.yaml`.
+    error_revision: "2026.09.27.1"
     consumers:
       - wt-media-desktop

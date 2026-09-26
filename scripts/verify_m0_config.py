@@ -105,16 +105,29 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
         if name == "local_agent_api":
             if actual.get("api_major_version") != "v1":
                 errors.append("local_agent_api: expected api_major_version 'v1'")
-            # 同上：由 2026.07.14.7 更新为 2026.09.06.1（CHG-20260925-063）。
-            if actual.get("contract_revision") != "2026.09.06.1":
-                errors.append("local_agent_api: expected contract_revision '2026.09.06.1'")
+            # 由 2026.09.06.1 更新为 2026.09.27.1（CHG-20260924-061 T-04 新增
+            # `GET`/`POST /api/v1/save-directory`）。
+            #
+            # 上一次更新（CHG-20260925-063 T-01）把本钉子从 2026.07.14.7 挪到
+            # 2026.09.06.1，理由是「对齐现状」——而 map 的那个值本身就是旧的：定义
+            # 文件早在 `87b1264`（CHG-20260923-057 T-08）就到了 2026.09.24.1。于是钉子
+            # 与 map 一起停在同一个过期值上，双双通过。全工作区模式下本脚本完全读得到
+            # 那份文件（下面的 `provider_path` 已经把它解析出来了），却没有把两者对比
+            # 过：钉子只保证「map 没背着人动」，保证不了「这个值还对」。CHG-20260923-059
+            # Q-06 登记了这处缺口，CHG-20260924-061 复核后确认，仍不在其范围内。
+            if actual.get("contract_revision") != "2026.09.27.1":
+                errors.append("local_agent_api: expected contract_revision '2026.09.27.1'")
         if name == "local_event_schemas":
             if actual.get("event_revision") != "2026.07.14.9":
                 errors.append("local_event_schemas: expected event_revision '2026.07.14.9'")
         if name == "local_status_enums" and actual.get("enum_revision") != "2026.07.14.8":
             errors.append("local_status_enums: expected enum_revision '2026.07.14.8'")
-        if name == "local_error_codes" and actual.get("error_revision") != "2026.07.14.6":
-            errors.append("local_error_codes: expected error_revision '2026.07.14.6'")
+        # 由 2026.07.14.6 更新为 2026.09.27.1（CHG-20260924-061 T-04 新增
+        # `v1/transfer.yaml`）。与 `local_event_schemas` 同一约定：map 记该区**最新**
+        # 的定义版本，每个文件自己的 `revision` 才是它自己的；`v1/bitbrowser.yaml` 仍在
+        # 2026.07.14.6，由 release-matrix.yaml 按发布范围逐条记录，不由本钉子跟踪。
+        if name == "local_error_codes" and actual.get("error_revision") != "2026.09.27.1":
+            errors.append("local_error_codes: expected error_revision '2026.09.27.1'")
 
         provider_path = (ROOT / rel_path).resolve()
         if not provider_path.is_dir() and not allow_missing_repos:
