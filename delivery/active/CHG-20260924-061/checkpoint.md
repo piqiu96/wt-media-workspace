@@ -22,16 +22,20 @@
 - **T-03 对象存储配置键（第一段）**：`config/storage/object_storage.toml` 与 `config_online/` 同构新增（`endpoint`／`bucket`／`region`／`prefix`／`use_ssl`／`presign_ttl`），`internal/config` 增加 `Storage.ObjectStorage` 与凭据键并在 `Validate` 里校验端点、桶名、正数 TTL 与「凭据成对」。凭据文件 `config/credentials/object_storage.toml` **不入库**：仓内只提交无值 `.example`，`.gitignore` 加两条规则并在 `config/README.md` 说明该偏离（既有 `agent.toml`／`douyin.toml` 是被跟踪的，A-03 记录在案）。这一偏离由 `git check-ignore -v` 双向验证：真实路径被忽略、`.example` 不被忽略、真实文件不出现在 `git status`。提交 `af13a22`。
 - **T-03 对象存储边界（第一段）**：新增 `internal/infra/storage`，`Store` 接口 `PresignGet`／`Stat`／`Put`／`Copy`／`Remove`；键位内容寻址 `materials/{id}/{sha256}.{ext}` 与暂存键 `materials/{id}/.staging/{taskID}.{ext}`；`registry.go` 照抄 `pkg/clients/http/registry.go` 形状，**凭据双空是正常状态**（发布 `notConfiguredStore{}`，五个方法全部 `ErrNotConfigured`），使发布树与本仓测试在没有用户密钥时也能启动。依赖 `minio-go/v7 v7.0.98`（`go 1.24.0` 可接受的最新高版本；`v7.0.99+` 要求 `go 1.25.0`，实测会连带升级 x/crypto 等）。另修一处会在生产里才暴露的缺陷：region 为空时 minio-go 会在**本地签名**过程里插入一次 `GetBucketLocation` 网络往返，故显式传入 region 并用请求计数型 `httptest` 把该行为钉住。提交 `20c8847`。`validateExtension` 里一条空白字符守卫被**删除**：移除它不改变任何可观测行为（`[a-z0-9]` 字符检查已拒绝空格），按 §12「无法被证伪的规则不是防御」不保留死防御。
 - **T-03 接线：租约授权改由对象存储签发（第一段）**：此前 claim 路径落到默认的 `unavailableGrants`——没有 bucket 时正确，有 bucket 时**每次领取都失败**，且故障在执行器侧显形、看起来像 Cloud 的错。新增 `objectStorageGrants` 适配器（接口不收寿命、`storage.Store.PresignGet` 要求寿命，故不做成 Store 本身：模块内调用方因此无从指定地址有效期），`storageResource()` 加入 **server 与 worker 两个 plan** 的 database 与 clients 之间（server 要签发是因为冻结合同的 `LocalLease` 携带地址），migration 与 scheduler plan 明确不带。新增三个守门测试覆盖无其他测试可达的接缝：server plan 丢步、接线服务退回拒绝态、适配器丢 `ExpiresAt`、注册表未捕获配置寿命。提交 `a620e4f`。
+- **T-03 一次点击：云端排队 ＋ 本地等待任务（第一段）**：此前 `POST /materials/{id}/downloads` 对任何 `video_status != ready` 的素材一律回 409 `material_unavailable`，于是 M4-AC-03 的「触发后有任务」没有任何触发点——M4-A 里**没有任何代码**会创建准备任务，T-03 的 worker 将无任务可领。这与 PRD 5.3.4 的状态表相反（`not_downloaded` 一栏写的是「是，系统先准备文件」）。按用户裁定改为一次点击、两条状态行、一个 `dependency_task_id` 相连：`filetransfer` 新增 `compose_input_prepare`（Cloud 任务，去重键 `material_source_prepare|asset|generation`，故同素材并发点击只取一次源）；`leaseable` 增加 `AND (execution_scope = 'cloud' OR dependency_task_id IS NULL)`，等待中的本地任务不可领取——它租约要承诺的对象、大小与哈希正是它等待的那个任务尚未写出的事实；`HandOverDependencies` 一条语句写入事实并清空指针，`FailDependents` 与 `failDependentsOfTerminalTasks` 终结失败／取消的准备的下游（安全网用多表 `UPDATE ... JOIN` 而非子查询，MySQL 1093 禁止更新表出现在自身子查询里）；`validateCreateInput` 仅在带依赖时跳过本地事实检查，并拒绝「Cloud 准备任务依赖另一个任务」；`production.CreateDownload` 先解析节点（失败不留痕）再动投影，且在被守卫的投影写入被拒时**重读**素材——「别人已在准备」与「此刻已 ready」需要不同的任务，猜错第二个会把可下载的文件挡在无人需要的准备之后。`MarkVideoPreparing` 以 `video_status IN ('not_downloaded','failed')` 守卫，使带着陈旧读数的点击无法把 `ready` 拖回 `downloading`。提交 `7c83969`。
 
 ## Current
 
-Task 3 第一段进行中（Cloud 仓 `codex/m4-a-cloud`，HEAD `a620e4f`）。配置键、存储边界与接线已落地并有读数；第一段余下 `infra/client/sourcefile`、`MediaAddress` 合成夹具、媒体探针、`material_prepare` worker 与失败注入矩阵。
+Task 3 第一段进行中（Cloud 仓 `codex/m4-a-cloud`，HEAD `7c83969`）。配置键、存储边界、接线与「一次点击＝云端排队＋本地等待任务」的 Cloud 侧全链路已落地并有读数；第一段余下 `storage.Stat/Put/Copy/Remove` 的调用方（`infra/client/sourcefile`、`MediaAddress` 合成夹具、媒体探针、`material_prepare` worker 与失败注入矩阵）。
+
+**用户裁定（2026-09-26，不再重开）**：一次点击即可——「发起下载先判断云端任务是否有，有就本地直接下载，否则云端先加等待，本地定期获取作为本地下载的一部分」。落地为本提交：本地任务立即创建并带 `dependency_task_id`，在准备任务交出事实前不可领取（`/claim` 回 `{"task": null}`，即合同里既有的「无事可做」），因此「本地定期获取」不需要第二条机制，也不需要改任何冻结合同。
 
 ## Next
 
-1. **Task 3 第一段余项（无外部副作用，可离线完成）**：`infra/client/sourcefile`（`Open(ctx, url, offset)` 带 `Range` 并如实报告服务端是否忽略）、`infra/client/platforms/douyin/media.go` 的 `MediaAddress(payload)`（`example.invalid` 合成夹具）、`infra/media/probe.go`（MP4 box 解析，不引入 FFmpeg；`moov` 在尾时 `DurationMS=0` 不算失败）、`internal/jobs/material_prepare.go`（临时键→校验→正式键，任一失败绝不写正式键与 `video_status='ready'`）与失败注入矩阵逐行留证。
+1. **Task 3 第一段余项（无外部副作用，可离线完成）**：`infra/client/sourcefile`（`Open(ctx, url, offset)` 带 `Range` 并如实报告服务端是否忽略）、`infra/client/platforms/douyin/media.go` 的 `MediaAddress(payload)`（`example.invalid` 合成夹具）、`infra/media/probe.go`（MP4 box 解析，不引入 FFmpeg；`moov` 在尾时 `DurationMS=0` 不算失败）、`internal/jobs/material_prepare.go`（claim → `MarkVideoPreparing` 守卫 → 解析地址 → 临时键→校验→正式键 → 探针 → **才**写 `video_status='ready'`；成功时调 `HandOverDependencies`，失败时调 `FailDependents`＋`FailCloudTask`）与失败注入矩阵逐行留证。`MarkVideoPreparing` 已在 `7c83969` 落地；`MarkVideoReady`／`MarkVideoFailed` 与 worker 同批。
 2. **Task 3 第二段（需要凭据与可达端点）**：真实键、真实 size／sha256 对账、真实字节上的媒体探针、`play_addr` 实网确认与 AC-01 反证。凭据只存在于用户手工填写的未跟踪文件 `config/credentials/object_storage.toml`。
 3. **Task 4**：合同先行（`save-directory` 端点与 `contracts/local-error-codes/v1/transfer.yaml`）→ Agent 侧下载执行分层 → checkpoint 字段与 `0003` 迁移 → local API → Desktop 选择器与推送。Task 4 的唯一硬前置（Cloud-Agent 领取／完成响应 schema）已在 `a5b5e43` 冻结。
+4. **Task 5 待办（因本次裁定新增）**：准备任务按**素材**去重而非按用户，所以第二个操作员的抽屉里只会有他自己那条等待中的本地任务，看不到共享的云端准备。UI 必须把等待中的本地任务标注为「等待云端准备」，否则它会看起来像一条停滞的任务。
 
 ## Blocked
 
@@ -61,3 +65,7 @@ Task 3 第一段进行中（Cloud 仓 `codex/m4-a-cloud`，HEAD `a620e4f`）。�
 | Cloud `gofmt -l internal/`（`a620e4f`） | 无输出 |
 | 接线变异控制（`a620e4f`） | 4 个，各自单独施加、各自变红，且各自只被预期的那条断言抓住；每条臂开始时还原全部四个被触碰文件，结束读数 4 份 sha256 与备份逐一相同 |
 | 存储边界变异控制（`20c8847`） | 6 个，各自单独施加、各自变红；其中 1 个（空白守卫）保持不变红，该守卫随即被删除而不是保留 |
+| Cloud `go test ./...`（`7c83969`，最后一次内容改动之后重跑） | `65 ok / 0 FAIL` |
+| Cloud `go build ./...` / `go vet ./...`（`7c83969`） | `exit=0` |
+| Cloud `gofmt -l internal/`（`7c83969`） | 无输出 |
+| 一次点击变异控制（`7c83969`） | 12 个，各自单独施加、各自变红，且各自只被预期的那条断言抓住；每条臂开始时还原全部七个被触碰文件，结束读数 7 份 sha256 与备份逐一相同。其中两条首轮为绿（`validateCreateInput` 的准备依赖守卫、`MarkVideoPreparing` 的投影接线）——前者是测试用的 mock 未按「守卫被删后会插入的那一行」布防，等于让 mock 而非守卫去拒绝；后者是选错了判据，两条都已改成能失败的形式并复跑 |
