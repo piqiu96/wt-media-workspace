@@ -16,19 +16,23 @@
 - **T-02 合同冻结与迁移运行器缺陷**：`contracts/cloud-agent-api/v1/file-transfer.openapi.yaml` 补齐领取/完成响应 schema（`LocalLease`、`ClaimResult`、`TransferTerminal`）并给缺失 `responses` 的 `progress` 补上该键；`contracts/business-schemas/v1/file-transfer.yaml` 增加 `file_name`。另修迁移运行器：`strings.Split(sql, ";")` 会把 039 头注释里的分号当语句边界，导致该迁移从未被应用过（`Error 1064`），现改为五状态扫描器。
 - **T-02 迁移 041 与传输仓储**：新增 `20260926_041_file_transfer_task_executor_facts.sql`（`asset_title`／`source_object_key`／`file_name`），因运行器按版本字符串判定，改已提交的 040 会被静默跳过。仓储补齐 `GetTask`／`ListTasks`／`RetryTask`／`ClaimCloudTask` 与两个 reconciler；修三处真实缺陷：领取缺 `cancel_requested_at IS NULL` 会让取消中的任务永远卡在 `running`、`attempt_count` 无上限、`createTask` 在去重键冲突时按 `input.ID` 回读导致成功请求报 `ErrNotFound`。
 - **T-02 API helper 与“我的素材”**：`api` 增加 `Accepted`／`NoContentEmpty`／`UnprocessableEntity`／`ConflictNamed`／`FailureNamed`（冻结的错误码合同只发布名字，`error.type` 是唯一判别位）；`production` 增加 `GET /api/v1/my-materials` 与 `DELETE /api/v1/material-usages/{id}`，后者由 200 信封改为真 204，并把“我的素材记录不存在”从 15003（素材不存在）拆出为 15006。
+- **T-02 传输模块与下载入口（收口）**：`filetransfer` 补齐 `dto`／`service`／`handler`／`router` 七条路由（会话侧 3 条 ＋ Cloud-Agent 侧 4 条），Cloud-Agent 四条的凭据读取一律排在 body 解析之前，使无凭据答案统一为 401；`runtimebinding` 增加仅凭凭据识别节点（`claim` 的冻结合同既无路径参数也无请求体，身份只能来自凭据）与按用户解析新鲜本机节点（确定性择一）；`production` 增加 `POST /api/v1/materials/{id}/downloads`（权限 → `video_status=ready` → 新鲜节点 → 建 `user_download`／`local_agent` 任务 → 202）；`bootstrap/routes.go` 把模块清单拆成 `registerModuleRoutes` 并注册 `filetransfer`，使“模块漏注册＝全路由 404 而无其他症状”可被断言。`production` 的 200/201 由 SQL 的 `RowsAffected` 判定（`updated_at` 改为条件赋值，否则重复点击恒为 201），并修同一语句里 `status` 读写顺序导致恢复行留下陈旧 `removed_at` 的缺陷。读数：`go test ./...` `64 ok / 0 FAIL`（`0607087`）；提交 `74b6568`、`1355baf`、`b542403`、`a159315`、`c106283`、`e78a031`、`dbd35f5`、`4243e21`。
+- **T-02 错误映射守门**：`filetransfer/writeTransferError` 的七支映射此前无可证伪测试（两个 409 仅靠 `error.type` 区分，422 是合同专属的完整性状态，把 422 折进 409 会让全仓测试保持全绿）。新增两张测试表读同一份表的两端：一张经探针路由断言真实响应，一张读 `contracts/cloud-error-codes/v1/file-transfer.yaml` 断言名字与状态均已声明，链条为「代码 → 表 → 合同」；另断言未映射错误必须完全省略 `error`（而非 `"type": ""`）与受检名字数。五个变异控制各自单独施加且各自变红，文件按 sha256 逐字节还原；提交 `0607087`。
 
 ## Current
 
-Task 2 进行中（Cloud 仓 `codex/m4-a-cloud`）。已完成：迁移运行器的注释切分缺陷修复、迁移 041、`filetransfer` 仓储全量补全与两处领取谓词修复、`api` 的状态 helper、`production` 的“我的素材”读取与移出（含 204 与 15006 对齐）。尚未开始：`filetransfer` 的 dto／service／handler／router、`runtimebinding` 的凭据鉴权与新鲜节点解析、`production` 的 `POST /materials/{id}/downloads`、路由注册。
+Task 2 已完成（Cloud 仓 `codex/m4-a-cloud`，HEAD `0607087`）。Cloud 侧的迁移、仓储、`dto`／`service`／`handler`／`router`、节点凭据解析、下载入口与路由注册全部落地并有读数。下一步进入 Task 3。
 
 ## Next
 
-1. **Task 2 余下部分**：`filetransfer/dto` → `service`／`handler`／`router`（会话侧 3 条 ＋ Cloud-Agent 侧 4 条）→ `runtimebinding.AuthenticateNodeCredential` 与 `FindFreshLocalNode` → `production` 的下载入口（202）→ `bootstrap/routes.go` 注册。
-2. **Task 3**：在获得对象存储端点、桶与最小权限凭据后实现真实 Cloud 原素材准备；此前只完成无外部副作用的类型化客户端与配置加载。
+1. **Task 3 第一段（无外部副作用，可离线完成）**：对象存储配置键与 `Validate`（凭据不得要求非空）、`.gitignore` 与无值模板、`infra/storage` 全部形状（含 `notConfiguredStore` 与离线可验证的 presign）、`infra/client/sourcefile`、`MediaAddress` 合成夹具、媒体探针、worker 控制流与失败注入矩阵。此段不需要凭据，也不产生真实网络副作用。
+2. **Task 3 第二段（需要凭据与可达端点）**：真实键、真实 size／sha256 对账、真实字节上的媒体探针、`play_addr` 实网确认与 AC-01 反证。凭据只存在于用户手工填写的未跟踪文件 `config/credentials/object_storage.toml`。
+3. **Task 4**：合同先行（`save-directory` 端点与 `contracts/local-error-codes/v1/transfer.yaml`）→ Agent 侧下载执行分层 → checkpoint 字段与 `0003` 迁移 → local API → Desktop 选择器与推送。Task 4 的唯一硬前置（Cloud-Agent 领取／完成响应 schema）已在 `a5b5e43` 冻结。
 
 ## Blocked
 
-- 真实对象存储测试环境未配置：`config/` 与 `config_online/` 当前没有对象存储端点、桶或凭据文件。它只阻止 Task 3/Task 6 的真实文件传输验收，不阻止当前 API、Agent 或 UI 开发。
+- **Task 3 第二段与 T-03 真实验收**需要端点凭据：`config/credentials/object_storage.toml` 由用户手工填写且不入库，本轮尚未创建。它不阻止 Task 3 第一段、Task 4 与 Task 5。
+- **两处既有问题待登记，不在本 CHG 范围内**（计划已裁定只登记、不扩大范围）：(1) `migrations/README.md` 的 Active Migrations 清单停在 025，且其 `WT_MYSQL_DSN`／`WT_MEDIA_MYSQL_DSN` 说明与 Go 源码不符；(2) `materials.source_snapshot` 存 provider 原始 payload，Douyin 响应含短时效签名 URL，与 CHG §4「不把完整签名 URL 写入 Cloud 业务表」相悖（`contentpool/service/discovery_crawler.go`，M3 既存路径）。
 
 ## Recent verification
 
@@ -44,3 +48,7 @@ Task 2 进行中（Cloud 仓 `codex/m4-a-cloud`）。已完成：迁移运行器
 | Cloud `go vet ./...`（`1355baf`） | `exit=0` |
 | 迁移应用到稳定 dev 库（`1355baf`） | `1 applied, 42 total`；重跑 `0 applied, 42 total` |
 | 空库从零跑全部迁移（`1355baf`） | `42 applied`，28 张表；`file_transfer_tasks` 33 列且顺序与 `taskColumnList` 一致 |
+| Cloud `go test ./...`（`0607087`，最后一次内容改动之后重跑） | `64 ok / 0 FAIL` |
+| Cloud `go vet ./...`（`0607087`） | `exit=0` |
+| Cloud `gofmt -l internal/`（`0607087`） | 无输出 |
+| 错误映射守门变异控制（`0607087`） | 5 个，各自单独施加、各自变红；还原后两文件 sha256 与备份一致 |
