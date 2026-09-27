@@ -103,20 +103,22 @@ wt-media-workspace/
 
 状态词只有下表这些；写记录时从表里取，不造新词。读数列是**实测**值，两种写入形式（`- Status:` 与更早的 `> 状态：`）各自计数后相加。
 
-两张表加历史词汇应凑齐分母：活列 **19**（退役词在活记录里已归零）；归档列 **35** ＋ 退役 `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **43**。对不上就说明有词没被登记。
+两张表加历史词汇应凑齐分母：活列 **18**（退役词在活记录里已归零）；归档列 **36** ＋ 退役 `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **44**。对不上就说明有词没被登记。
 
 **CHG**，变迁为 `DISCUSSION → PLANNED → IMPLEMENTING → VERIFYING → DONE`（`SUPERSEDED` 可从除 `DONE` 外的任何状态进入）：
 
 | 状态 | 含义 | 活记录 | 归档记录 |
 |---|---|---|---|
 | `DISCUSSION` | 草案，方向待裁定；不激活 | 7 | 0 |
-| `PLANNED` | 方向已定、已拆分，可激活 | 3 | 0 |
+| `PLANNED` | 方向已定、已拆分，可激活 | 2 | 0 |
 | `IMPLEMENTING` | 实施中 | 0 | 1 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 33 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 34 |
 | `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 9 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` 19 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **43** 篇。本行读数由 CHG-20260925-066 的 T-06、CHG-20260926-067 的 T-00 与 T-07、CHG-20260926-068 的 T-00 与 **T-06** 各刷新一次并逐词复测（读数与分母见 `delivery/completed/CHG-20260926-068/evidence/artifacts/t06-status-words.out` 与 `delivery/completed/CHG-20260926-067/evidence/artifacts/t07-status-words.out`，量法**直接 import 门禁自己的 `status_word()`**）；该数列**每次归档即过期**的机制只登记不设通用对策（CHG-064 §14 第 7 项、CHG-20260925-066 §14 第 2 项）。
+分母：活记录＝`delivery/planned/*/change.md` **18** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **44** 篇。本行读数由 CHG-20260925-066 的 T-06、CHG-20260926-067 的 T-00 与 T-07、CHG-20260926-068 的 T-00 与 **T-06**、CHG-20260924-061 的 T-09 各刷新一次并逐词复测（量法**直接 import 门禁自己的 `status_word()`**；本轮读数与分母见 `delivery/completed/CHG-20260924-061/evidence/20260927-closeout.md`）；该数列**每次归档即过期**的机制只登记不设通用对策（CHG-064 §14 第 7 项、CHG-20260925-066 §14 第 2 项）。
+
+> **2026-09-27 就地勘误（CHG-20260924-061 T-09 实测）**：上面两行原写 `PLANNED` 活 **3**／活 `IMPLEMENTING` **0**／分母「planned **19** ＋ active **0**」。实测（同一仪器、同一次跑）该三处应为 **2／1／18＋1**——**四个数里错了三个，而活列总数 19 恰好对**，因为两处偏差互相抵消（一条记录从 `planned` 移进 `active` 时，`PLANNED` 少 1、活 `IMPLEMENTING` 多 1）。**成因是 CHG-061 自己 2026-09-26 的激活动作没被反映到读数列**——这正是本表两行注释里预告过的那类过期，只是这次它**没有让总数对不上**，故没人被提醒。归档后读数：活 **18**（`DISCUSSION` 7 ＋ `PLANNED` 2 ＋ `SUPERSEDED` 9）／归档 **44**（`DONE` 34 ＋ `VERIFYING` 1 ＋ `IMPLEMENTING` 1 ＋ `CLOSED` 2 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4），闭合式 36＋2＋2＋4＝44 ✓。**阳性对照**：同一仪器在归档前的 `HEAD` 上读到 18／**1**／43 与 `PLANNED` **2**、`DONE` **33**——两个状态各读出各自的值，故上面的差不是仪器认不出，是表没跟上。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 
@@ -159,7 +161,7 @@ wt-media-workspace/
 | M1 | `DONE` | M1 任务链路闭环复验通过。创建→领取→执行→上报→查询完整链路跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：router 连接、mysql_registry 时间格式。 | M1 冻结。不扩建通用任务系统。 |
 | M2 | `DONE` | 2026-09-14 用户完成本轮综合人工验收并确认完整通过。M2-A/B/C/E 的真实依赖、构建、Desktop 与人工走查证据均已归档；M2-D 保持 `DEFERRED`。 | M2 冻结为当前运行环境与账号管理基线；后续内容发现从 M3 开始，M2-D 或真实受限样本校准须以独立 CHG 恢复。 |
 | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
-| M4 | `IN_PROGRESS` | M4-A（CHG-20260924-061）已激活，尚无达到 M4 退出条件的正式完成项。 | 仅执行 M4-A；M5-M10 仍按本计划顺序等待。 |
+| M4 | `IN_PROGRESS` | M4-A（CHG-20260924-061）已于 2026-09-27 关闭归档 `DONE`；尚无达到 M4 退出条件的正式完成项。 | 下一个 M4 闭环须等 M4-A 的真实验收（该记录把用户签收与八条走查臂登记为未闭合）后再建立；M5-M10 仍按本计划顺序等待。 |
 | M5-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
 > 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的实际进度不一致，故拆为两行。各里程碑的当前状态以其在第 3 节的字段为准，本节只记这一行的拆分缘由，不重复断言任何状态。
@@ -421,8 +423,8 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 | 依赖 | M3 `DONE` |
 | 闭环 | `delivery/milestones/M4-content-production.md` |
 | 产品/决策 | 第五章素材生产；ADR-0017；M4-M5 Cloud 内容生产工程设计 |
-| Active CHG | `CHG-20260924-061`（M4-A） |
-| Evidence | 开工基线已记录；尚无功能验收证据。 |
+| Active CHG | None。`CHG-20260924-061`（M4-A）已于 2026-09-27 关闭归档 `DONE` |
+| Evidence | 开工基线已记录；M4-A 的功能验收证据见 `delivery/completed/CHG-20260924-061/evidence/`（含两处**未闭合**：用户签收与八条走查臂） |
 | 完成日期 | None |
 | Commit/Tag | None |
 
@@ -442,7 +444,7 @@ material
 候选 CHG：
 
 ```text
-M4-C1 / CHG-20260924-061 素材库、material_usage 与原素材懒加载准备/下载（IMPLEMENTING）
+M4-C1 / CHG-20260924-061 素材库、material_usage 与原素材懒加载准备/下载（DONE，2026-09-27 归档）
 M4-C2 compose_strategy 模板、参数、版本和人工选择
 M4-C3 compose_task 模型、API、状态、策略快照、取消和重试
 M4-C4 对象存储、FFmpeg/FFprobe 与 Cloud Compose Worker 基础设施

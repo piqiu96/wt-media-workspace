@@ -1,6 +1,6 @@
 # CHG-20260924-061：M4-A 素材库、我的素材与原素材懒加载下载
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §4「闭环卡 M4-A：素材库与我的素材」
@@ -12,7 +12,12 @@
 - 当前仓库：`wt-media-cloud` 为业务事实、API、Cloud 文件准备和 Web 主仓；`wt-media-agent` 为本地下载执行；`wt-media-desktop` 为本机目录/打开文件能力；`wt-media-workspace` 为治理与 Evidence
 - 激活前置：M3 `DONE`；当前 active CHG 与其已批准后继顺序完成或由用户重新排期；任一时刻仍只允许一个 active CHG。2026-09-26 已逐项核验并激活本 CHG。
 
-> 本记录是 M4-A 的唯一 active 执行合同；进度和验证读数只记录在同目录 `checkpoint.md` 与 `evidence/`。
+> 本记录曾是 M4-A 的唯一 active 执行合同；进度和验证读数记录在同目录 `checkpoint.md` 与 `evidence/`。
+> 2026-09-27 关闭归档为 `DONE`，本目录位于 `delivery/completed/`，按归档边界**保持原样、不回改**
+> （`delivery/completed/README.md`）。**登记但未闭合的项**：T-07 的八条走查臂与 061-AC-15 的页面
+> 半边未跑，原因与逐条读数见两份证据的「未覆盖」节与 `checkpoint.md` §Next——它们**不算通过**，
+> 是本次签收留给运营的剩余动作。本 CHG 范围内登记、未修的问题（Q-01…Q-10 与各处合同／门禁缺口）
+> 一律留在 `checkpoint.md` §Blocked，`§10 Pending Questions` 保持 `None.`。
 
 ## 1. 独立目标
 
@@ -83,6 +88,10 @@ source_content
 - **保存位置迁移**：在本机设置里换保存位置后，新目录立刻推给 Local Agent（下一次下载即落新目录）；随后弹窗列出「云端任务里记着名字、本机已知保存位置里找得到」的文件，逐行由用户决定 搬运／删除／保留。**不自动搬运、不扫整个目录、目标已有同名不覆盖、跨卷先写临时名再就位**；
 - **已下载文件可见性与重新下载**：列表页按文件名回答「这个文件现在在哪儿」（当前目录／更早的已知保存位置／已不在／还没查过），并且**只有实测已不在时**才提供「重新下载」；
 - **下载入口不再按内部状态门控**：需要准备的行点下去即进入「准备中 → 下载中」的内部流转（状态是系统自己走的，不是按钮的前提）；已取消的行、以及依赖从未交付的失败行，给「重新下载」一条出路；「重试」只在依赖已交付时出现。
+
+2026-09-27 Q-11 裁定后增补的第三项能力（用户选定选项 ②；同一载体的同一次交付，见 Task 8）：
+
+- **把这个目录也作为查找位置**：本机设置页新增一个入口，用与「选择保存位置」**同一个**文件夹对话框挑一个目录，把它加入**查找位置**（`settings.toml` 的 `known_save_dirs`），使旧版设置文件（v1 只知道一个目录，且只是最后一个）记不下的那些旧文件重新可被查找。**不改保存位置、不加第二份名单、不扫文件系统**：新下载仍然落当前保存位置；查找位置有上限，加进去一个会挤掉最旧的一个，被挤掉的那个名字当场报出来。
 
 ## 4. 明确不做
 
@@ -172,6 +181,26 @@ source_content
 
 验收：三条走查现象在同一入口、同一分母下复测——改前必失败的输入改后得到预期结果；迁移与查找的读数进 `evidence/20260927-walkthrough-defects.md`；边界（v1 只记得最后一个目录）如实登记而不是靠代码补丁掩盖。
 
+### Task 8：「添加查找位置」入口（2026-09-27 Q-11 裁定后增）
+
+Q-11 的裁定是选项 ②：v1 升级只记得最后一个目录，那之前下好的文件于是谁也不找、回答与「已删掉」一模一样——这条事实要有一个**用户自己的**出口，而不是让应用去扫盘或者再加一份名单。三件事一个都不做：不扫文件系统、不动任何跨仓合同、不加第二份名单（入册的还是 `known_save_dirs`）。
+
+- **Desktop**：`UserSettings::note_search_dir` 把目录加进已知历史而**不动** `save_dir`（`remember` 表达不了这件事——它顺带改当前目录）；已在查找范围内的记为无变化并当场说清（否则同一个目录会占掉两个名额、把真目录挤出去）；超过上限时返回被挤掉的那个名字（`SearchNote::dropped`）；`commands::settings::add_search_dir` 沿用 `check_save_dir` 的**同一道**判据与同一个「读—改—写」，拒绝发生在开文件之前、无变化时一个字节都不写；`local_pick_search_directory` 复用保存位置那个文件夹对话框，但**不碰** `save_dir`；DTO `SearchDirectoryView` 是第二个形状，因为「这次挤掉了谁」是这一问的事实，事后问不出来；
+- **WebView**：`pickSearchDirectory()` 是全服务里**唯一可以答 `null`** 的调用（对话框取消不是答案，页面为它不渲染任何东西）；`describeSearchDirectory` 三个分支（加入／已在／挤掉，被挤掉用 warning 并点名，被点名的那个从此不再被查找）；保存位置卡片上一个按钮与一句提示。
+
+验收：加入前后 `save_dir` 读数对照（新下载仍落原处）、已存在的旧文件由「已不存在」变为可打开、触发上限时被挤掉的目录真的不再被查找；读数为 `evidence/20260927-q11-search-directory.md`；变异臂各自转红。
+
+### Task 9：关闭归档与三仓合并（2026-09-27 用户裁定后执行）
+
+用户裁定「确认这个 CHG 可以结束关系合并然后放入主干」。四件事**必须在同一次提交内落地**（分开做会留一个双红中间态：快照先改 `--no-active` 而表行仍在时，`verify_delivery_governance` 与 `verify_agent_entry` 各报错）：
+
+- 记录从 `delivery/active/` 移入 `delivery/completed/`（`git mv`，全目录 rename），`delivery/LEDGER.md` 的 active 表行移出并改为归档叙述，`.ai/CURRENT_CONTEXT.md` 以 `--no-active` 重生成；
+- `MASTER_IMPLEMENTATION_PLAN.md` §3 的读数列按门禁自己的 `status_word()` 刷新，并顺带勘误该表三处过期读数（`PLANNED` 3→2、活 `IMPLEMENTING` 0→1 是归档前的实况、分母 planned 19→18）——三处都源于 CHG-061 自己 2026-09-26 的激活未被反映，而**活列总数 19 恰好对**故无人被提醒；
+- 三仓分支 `git merge --ff-only` 进各自 `main`（三条均 0 behind），两个主检出**先于本 CHG 的**脏文件不碰；
+- 六门禁与 `unittest` 在归档之后重跑。
+
+验收：`MASTER`/`milestones`/`planned` 三处对本 CHG 的指针全部改指 `delivery/completed/`；归档区之外的失效指针扫描（字符串面 ＋ 链接面）各带分母与阳性对照；读数见 `evidence/20260927-closeout.md`。
+
 ## 6. 验收矩阵
 
 | AC | 要求 | 最低证据 |
@@ -190,6 +219,7 @@ source_content
 | 061-AC-12 | M2/M3 回归、Cloud Web/Desktop WebView 和真实用户流程通过 | 自动测试摘要、截图、用户签收 |
 | 061-AC-13 | 保存位置变更后新下载即落新目录；已下载文件按名字可查到「现在在哪儿」，可搬运、可删除 | Desktop 命令读数、Agent store 回读、真实落盘对照 |
 | 061-AC-14 | 未准备／失败的行可点下载并进入准备流转；已取消与依赖未交付的行可重新下载 | 页面动作、任务链、素材投影 |
+| 061-AC-15 | 「添加查找位置」让旧目录里的文件重新被找到，且不改变新下载的保存位置 | Desktop 命令读数（`save_dir` 前后对照、`searched` 计数、被挤掉的名字）、页面动作、变异臂 |
 
 ## 7. 验证命令基线
 
@@ -229,7 +259,7 @@ python3 scripts/verify_agent_entry.py
 ## 9. Initial planning record
 
 - Completed：M4-A 的独立目标、仓库边界、任务顺序和 12 项验收条件已规划。
-- Current：`IMPLEMENTING`；激活后的实时进度见同目录 `checkpoint.md`。
+- Current：`IMPLEMENTING`（本行是规划当时的快照，不再随状态改写；2026-09-27 的实际结局为 `DONE`，见第 6 行的 `- Status:` 与同目录 `checkpoint.md`）。
 - Next：执行 Task 0，冻结正式合同并验证外部下载授权、对象存储测试环境与跨平台保存目录策略。
 - Blockers：上述运行前提必须在其需要真实外部副作用的 Task 前验证；尚无阻止 Task 0 的待决业务选择。
 - Verification：本轮只验证治理文档完整性与交叉引用，不代表 M4-A 运行链路已交付。

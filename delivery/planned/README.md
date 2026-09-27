@@ -1,6 +1,6 @@
 # Planned delivery index
 
-更新：2026-09-26。当前唯一 active CHG 是 [CHG-20260924-061](../active/CHG-20260924-061/change.md)（M4-A 素材库、我的素材与原素材懒加载下载）；台账见 [delivery/LEDGER.md](../LEDGER.md)。此前的 [CHG-20260923-056](../completed/CHG-20260923-056/change.md)～[CHG-20260923-059](../completed/CHG-20260923-059/change.md) 均已归档 `DONE`，属上线前工程加固程序（`docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md），不属 M2/M3 里程碑。本目录 DISCUSSION/PLANNED 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 的分层、依赖方向与配置目录约定已由 ADR-0016 确认；M4-M5 Cloud 视频生产边界已由 ADR-0017 确认。
+更新：2026-09-27。当前没有 active CHG：M4-A 的 [CHG-20260924-061](../completed/CHG-20260924-061/change.md)（M4-A 素材库、我的素材与原素材懒加载下载）已于 2026-09-27 关闭归档为 `DONE`；台账见 [delivery/LEDGER.md](../LEDGER.md)。此前的 [CHG-20260923-056](../completed/CHG-20260923-056/change.md)～[CHG-20260923-059](../completed/CHG-20260923-059/change.md) 均已归档 `DONE`，属上线前工程加固程序（`docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md），不属 M2/M3 里程碑。本目录 DISCUSSION/PLANNED 表示执行草案，不自动批准其中待决建议。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界已由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 的分层、依赖方向与配置目录约定已由 ADR-0016 确认；M4-M5 Cloud 视频生产边界已由 ADR-0017 确认。
 
 ## 联合工程优化程序（2026-09-23 立项）
 
@@ -15,7 +15,7 @@
 
 ## M4 Cloud 内容生产
 
-有效基线：[M4 Cloud 内容生产闭环](../milestones/M4-content-production.md)、[第五章：素材生产](../../docs/product/prd/详细文档/第五章_素材生产.md) 与 ADR-0017。M4 当前为 `IN_PROGRESS`；首个独立闭环 M4-A 已由 [CHG-20260924-061](../active/CHG-20260924-061/change.md) 激活。M4 的后续 CHG 必须等 M4-A 的真实验收后再建立。
+有效基线：[M4 Cloud 内容生产闭环](../milestones/M4-content-production.md)、[第五章：素材生产](../../docs/product/prd/详细文档/第五章_素材生产.md) 与 ADR-0017。M4 当前为 `IN_PROGRESS`；首个独立闭环 M4-A 由 [CHG-20260924-061](../completed/CHG-20260924-061/change.md) 承载并于 2026-09-27 关闭归档为 `DONE`，但该记录把用户签收与八条走查臂登记为**未闭合**。M4 的后续 CHG 必须等 M4-A 的真实验收后再建立。
 
 ## 当前 M3 V2
 

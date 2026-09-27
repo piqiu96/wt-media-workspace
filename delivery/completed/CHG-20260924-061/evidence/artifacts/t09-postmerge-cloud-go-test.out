@@ -1,0 +1,76 @@
+?   	github.com/wt-media/wt-media-cloud/cmd/discovery-scheduler	[no test files]
+?   	github.com/wt-media/wt-media-cloud/cmd/discovery-worker	[no test files]
+?   	github.com/wt-media/wt-media-cloud/cmd/migrate	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/cmd/server	0.295s
+ok  	github.com/wt-media/wt-media-cloud/internal/bootstrap	0.480s
+ok  	github.com/wt-media/wt-media-cloud/internal/config	0.710s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/client/agent	0.816s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/client/observe	1.025s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/client/platforms/douyin	1.186s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/client/sourcefile	1.365s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/database	1.578s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/database/migration	1.708s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/logger	1.753s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/media	1.632s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/metrics	1.700s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/storage	1.744s
+ok  	github.com/wt-media/wt-media-cloud/internal/infra/tracing	1.668s
+ok  	github.com/wt-media/wt-media-cloud/internal/jobs	1.792s
+ok  	github.com/wt-media/wt-media-cloud/internal/middleware	1.716s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent	1.436s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/dto	1.599s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/model	1.609s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/repository	1.525s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent/service	1.529s
+?   	github.com/wt-media/wt-media-cloud/internal/modules/contentpool	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/dto	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/model	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/repository	1.621s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/service	1.576s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer	1.604s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/dto	1.699s
+?   	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/model	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/repository	1.649s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/service	1.750s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity	1.684s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/dto	1.812s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/model	1.731s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/repository	1.582s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/service	5.372s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount	1.711s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/dto	1.779s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/model	1.700s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/repository	1.508s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/service	1.598s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production	1.629s
+?   	github.com/wt-media/wt-media-cloud/internal/modules/production/model	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production/repository	1.635s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production/service	1.394s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding	1.410s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/dto	1.512s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/model	1.583s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/repository	1.359s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/service	1.348s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard	1.360s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/dto	1.471s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/model	1.449s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/repository	1.401s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profileguard/service	1.458s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy	1.426s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/dto	1.507s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/model	1.417s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/repository	1.331s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/service	1.387s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding	1.516s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/dto	1.627s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/model	1.703s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/repository	1.460s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/runtimebinding/service	1.577s
+ok  	github.com/wt-media/wt-media-cloud/internal/scheduler	1.729s
+ok  	github.com/wt-media/wt-media-cloud/internal/shared/api	1.577s
+?   	github.com/wt-media/wt-media-cloud/internal/shared/id	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/shared/identity	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/shared/requestctx	1.567s
+ok  	github.com/wt-media/wt-media-cloud/pkg/clients/http	1.461s
+ok  	github.com/wt-media/wt-media-cloud/pkg/config	1.570s
+ok  	github.com/wt-media/wt-media-cloud/pkg/logger	1.549s

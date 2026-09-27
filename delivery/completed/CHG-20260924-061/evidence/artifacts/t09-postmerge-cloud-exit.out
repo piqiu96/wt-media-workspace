@@ -1,0 +1,2 @@
+cloud build exit=0
+cloud test exit=0
