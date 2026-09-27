@@ -123,11 +123,14 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
         if name == "local_status_enums" and actual.get("enum_revision") != "2026.07.14.8":
             errors.append("local_status_enums: expected enum_revision '2026.07.14.8'")
         # 由 2026.07.14.6 更新为 2026.09.27.1（CHG-20260924-061 T-04 新增
-        # `v1/transfer.yaml`）。与 `local_event_schemas` 同一约定：map 记该区**最新**
-        # 的定义版本，每个文件自己的 `revision` 才是它自己的；`v1/bitbrowser.yaml` 仍在
-        # 2026.07.14.6，由 release-matrix.yaml 按发布范围逐条记录，不由本钉子跟踪。
-        if name == "local_error_codes" and actual.get("error_revision") != "2026.09.27.1":
-            errors.append("local_error_codes: expected error_revision '2026.09.27.1'")
+        # `v1/transfer.yaml`），再更新为 2026.09.27.2（同一 Task：本机 API 的
+        # 「无 store」拒绝回答 503 `save_directory_unavailable`，而该文件从未声明它；
+        # 补声明的同一次改动即为该文件加上了真正的消费方）。与 `local_event_schemas`
+        # 同一约定：map 记该区**最新**的定义版本，每个文件自己的 `revision` 才是它
+        # 自己的；`v1/bitbrowser.yaml` 仍在 2026.07.14.6，由 release-matrix.yaml 按
+        # 发布范围逐条记录，不由本钉子跟踪。
+        if name == "local_error_codes" and actual.get("error_revision") != "2026.09.27.2":
+            errors.append("local_error_codes: expected error_revision '2026.09.27.2'")
 
         provider_path = (ROOT / rel_path).resolve()
         if not provider_path.is_dir() and not allow_missing_repos:
