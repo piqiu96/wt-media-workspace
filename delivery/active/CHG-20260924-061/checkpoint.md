@@ -64,7 +64,13 @@ Task 3 第一段**已完成**（Cloud 仓 `codex/m4-a-cloud`，HEAD `88532e7`）
 
 Task 4 **合同闸门已过**（Agent 仓 `9584d9c`、workspace `551527c`），代码段与**装配**均已落地（Agent 仓 `3f728da`、`d2df5ee`、`20cc33a`、`5aef044`、`b62e1ce`、`0d76a48`、`be7ddf4`、`2d2dd48`）：合同定义、流式源、原子落盘、Cloud-Agent 四个协议方法、本机 API 的保存目录两条路由、续传记录与 `0003_transfer_resume`、下载执行器本身、拒绝词汇表的消费方、接线（任务类型常量、registry 条目与 `UnwiredTransfer`、独立 `TransferRunner` 循环），以及装配（凭据通道、`start_task_loops`、两处既有装配缺口）。Desktop 侧也已收口（Desktop 仓 `8559a5f` ＋ `a726bcf` ＋ `f6b8ace`）：凭据进既有 bind 请求体、每次启动成功重推、保存目录通道与设置读口、目录选择器与三个命令，以及两处文档漂移的对齐。**Task 4 到此没有余项**——Agent 侧与 Desktop 侧都已有读数与先红证据，两端之间只有那条已核验的回环 HTTP。
 
-Task 5（UI）**已完成**（Cloud 仓 `codex/m4-a-cloud`，HEAD `70cc829`）：四个切片——列表页约定量具抽共享件（`586dcde`）、素材 API 客户端与纯判据（`0c405df`）、下载中心（`19e4adc`）、两页与跨端路由一致性（`70cc829`），每片都在**把其余改动 stash 掉之后**单独跑过套件（读数依次 26 files／171、28／180、30／198、34／222），故「每片自身可构建」不是推断而是量出来的。三个 Task 里只剩 **Task 3 第二段**（要凭据与可达端点）与 **Task 6**（跨仓验收与交接）。
+Task 5（UI）**已完成**（Cloud 仓 `codex/m4-a-cloud`，HEAD `70cc829`）：四个切片——列表页约定量具抽共享件（`586dcde`）、素材 API 客户端与纯判据（`0c405df`）、下载中心（`19e4adc`）、两页与跨端路由一致性（`70cc829`），每片都在**把其余改动 stash 掉之后**单独跑过套件（读数依次 26 files／171、28／180、30／198、34／222），故「每片自身可构建」不是推断而是量出来的。
+
+Task 3 第二段**已完成**（Cloud 仓 `codex/m4-a-cloud`，配置 `34f965a`、缺陷修复 `3dddbc0`）。端点不是用户最初给的那个：`data.bucket.oss.longyanyue.cn` 实测是 Garage 的 `s3_web` 只读站点（PUT 回 `InvalidRequest: HTTP method not supported`），`data.oss.longyanyue.cn` NXDOMAIN，S3 API 在同一集群的 `s3.oss.longyanyue.cn`；`region = garage` 取自 Garage 自身 XML 错误体而非管理界面的分桶放置字段。三问实测：寻址是 path-style（presign path `/data/dev/…`）、presign GET 真取回字节（`status=200 bytes=1048576 sha256 match=true`，`PUT ok in 398ms`，`REMOVE` 后 `Stat` 失败）、`region="garage"` 时 `PresignGet` 发 **0** 次 HTTP 而空 region 发 **1** 次。真实链路：一次点击 → 云端准备 99,242,095 bytes → 本机下载 99,242,095 bytes → 素材 153 `ready`；对象、运营机文件、`file_transfer_tasks`、`materials` 四方同 size 同 sha256，provider 侧 `Stat` 读数 `size=99242095`、`content_type=video/mp4`、桶内该素材前缀下恰好 1 个对象，且桶总量增量恰为 99,242,095 bytes。AC-01 反证（点击前）与边界扫描亦已留证，见 `evidence/20260927-task-03-second-segment.md`。
+
+**这一段真跑出一个本 CHG 自己引入的缺陷并已修**（`3dddbc0`）：`PreparationSource` 把本库 `source_contents.id` 当作平台视频 id 发给 douyin，平台答「视频不存在」——与真正下架的视频同一句话，故一直静默；真实链路里表现为每次准备都 `source_detail_failed`，而 8 次手工调用全成功。修法是显式分开两个身份（`platform_content_id` 经投影列带入、`json:"-"`），解析不出正整数即拒绝。另**推翻计划里一条 AC 措辞**：计划说对象 `ETag` 应与 `video_sha256` 一致，实测 ETag 是 `…-6`（六段分片上传的摘要），按构造不可能等于 sha256；`material_prepare.go:440-443` 早已写明这一点，故改的是计划措辞而非代码。
+
+至此三个 Task 里只剩 **Task 6**（跨仓验收与交接）。
 
 **用户裁定（2026-09-26，不再重开）**：一次点击即可——「发起下载先判断云端任务是否有，有就本地直接下载，否则云端先加等待，本地定期获取作为本地下载的一部分」。落地为 `7c83969`：本地任务立即创建并带 `dependency_task_id`，在准备任务交出事实前不可领取（`/claim` 回 `{"task": null}`，即合同里既有的「无事可做」），因此「本地定期获取」不需要第二条机制，也不需要改任何冻结合同。
 
@@ -72,12 +78,12 @@ Task 5（UI）**已完成**（Cloud 仓 `codex/m4-a-cloud`，HEAD `70cc829`）�
 
 ## Next
 
-1. **Task 3 第二段（需要凭据与可达端点）**：真实键、真实 size／sha256 对账、真实字节上的媒体探针、`play_addr` 实网确认与 AC-01 反证。凭据只存在于用户手工填写的未跟踪文件 `config/credentials/object_storage.toml`；`minio.New` 是否接受该 endpoint／bucket／region、presign 出的 url 在 Agent 机器上真能下，都只有这一段能回答。
-2. **Task 6（跨仓验收、提交与交接）**：Task 3 第二段与 Task 5 都已落地后，按 `change.md` §6 的验收矩阵逐条留证，并把三个仓的分支合并进 `main` —— **合并时机由用户在 CHG 关闭时确认**，不自行合并。
+1. **Task 6（跨仓验收、提交与交接）**，进行中。已完成：真实链路跑通（Task 3 第二段）、三方对账、AC-01 反证、边界扫描、两条越界发现的登记。尚欠：AC-02／03／09／10／11／12 的逐条判据与读数、B3 故障注入（取消、Agent 重启后续传、源地址失效——本轮实测；磁盘不足／hash 不符／并发去重／非法状态回退——引用既有自动化证据并逐条标注「未在本轮重跑」）、`evidence/20260927-task-06-acceptance.md` 的 12 行验收矩阵与「本轮未覆盖」一节。
+2. 收尾：删掉临时探针 `cmd/ossprobe/`，确认 Cloud 工作树没有残留脚本；三仓套件与 workspace 六个门禁在**最后一次改动之后**重跑；三仓分支**不合并进 `main`**——**合并时机由用户在 CHG 关闭时确认**。
 
 ## Blocked
 
-- **Task 3 第二段与 T-03 真实验收**需要两个尚未提供的值：(1) 凭据文件 `config/credentials/object_storage.toml` 由用户手工填写且不入库，尚未创建；(2) **桶名与 region**——用户只给了端点 `data.bucket.oss.longyanyue.cn`，桶名与 region 未知。两棵树里的 `bucket` 现写作自述式哨兵 `REPLACE_WITH_BUCKET`（而非看起来可信的虚构名），使缺失值在第一次调用即显式失败，而不是伪装成 access denied。二者都不阻止第一段、Task 4 与 Task 5。
+- ~~**Task 3 第二段与 T-03 真实验收**需要两个尚未提供的值~~ ——**已解除**（2026-09-27）：凭据由用户贴出、我写入被忽略的 `config/credentials/object_storage.toml`（**未提交**；因已进入本会话记录，建议用后轮换）；桶名 `data` 由用户裁定；端点与 region 由实测确定（见 §Current）。两棵树里的自述式哨兵 `REPLACE_WITH_BUCKET` 已被真实值替换。这一段曾刻意让缺失值在第一次调用即显式失败而不是伪装成 access denied，实测照此发生了：哨兵值下第一次直连就报错，没有静默走通。
 - **三处既有问题待登记，不在本 CHG 范围内**（计划已裁定只登记、不扩大范围）：(1) `migrations/README.md` 的 Active Migrations 清单停在 025，且其 `WT_MYSQL_DSN`／`WT_MEDIA_MYSQL_DSN` 说明与 Go 源码不符；(2) `materials.source_snapshot` 存 provider 原始 payload，Douyin 响应含短时效签名 URL，与 CHG §4「不把完整签名 URL 写入 Cloud 业务表」相悖（`contentpool/service/discovery_crawler.go`，M3 既存路径）；(3) **没有任何 job 注册传输模块的两个 reconciler**。取证：`git grep -n "ReconcileCancelledTasks\|ReconcileExhaustedTasks\|failDependentsOfTerminalTasks" -- '*.go'` 的全部命中都在 `filetransfer/repository/store_mysql.go`（定义、彼此调用、注释）与 `store_mysql_test.go`（测试），**没有生产调用方**；`git grep -n "runner.Register(" -- '*.go'` 只命中 `bootstrap/jobs.go` 的四行（`discovery-schedule`、`proxy-expiry`、`discovery-worker`、`material-prepare-worker`），没有一条是清扫。同一分母下的阳性对照：把函数换成 `ClaimCloudTask` 重跑同一模式，命中 `material_prepare.go:749` 的真实调用方——即该检索能看见调用方，`0` 是真 `0`。因此本 CHG 的 worker 在每条终态路径上自己释放等待者，不依赖那趟清扫；但**别的**路径留下的悬空 `dependency_task_id`（节点中途死亡、任务被别处终结）仍然只能靠人工。这是本 CHG 之前就有的缺口，登记在案，修它要动 scheduler 的 job 清单与两个仓的配置。
 
 - **`config/contract-map.yaml` 的 revision 只被一个手写常量守着**（本 CHG 因推进合同而实测确认；不在其范围内，只登记）。唯一的守卫是 `scripts/verify_m0_config.py` 里的期望值，它比的是「map vs 脚本常量」，**从不比「map vs 定义文件」**——尽管全工作区模式下 `provider_path` 已经把那份文件解析出来了。于是钉子与 map 可以一起停在一个过期值上而双双通过。实测时间线（三处都在 git 上）：`988a010`（M2-C）把 map 定在 `2026.09.06.1`；`87b1264`（CHG-057 T-08）把定义文件推进到 `2026.09.24.1`，没碰 map；CHG-20260923-059 T-09 量到该漂移并登记为 Q-06、判不阻塞；CHG-20260925-063 T-01 以「对齐现状」为由把钉子挪到 `2026.09.06.1`，即把守卫对到了一个已经过期的值上。本 CHG 改 map 时红是必然的（改前四个校验器全绿、改后 `verify_m0_config.py` 与 `tests/test_verify_m0_config.py` 两条用例点名这两处期望值），**这条红同时就是该钉子能失败的阳性对照**。map 只有三个读者（`verify_m0_config.py:50` 等值钉值、`verify_m2_acceptance.py:62` 与 `verify_product_master_alignment.py:389` 子串包含），故改这两条 revision 只影响第一处。要让「map 与定义文件相等」真被守住，需要新增一条读定义文件的检查；本 CHG 不做（会把「合约版本前进须人工复核」的既有设计换成自动跟随）。
@@ -89,6 +95,8 @@ Task 5（UI）**已完成**（Cloud 仓 `codex/m4-a-cloud`，HEAD `70cc829`）�
 - **本机 API 的 13 个拒绝码里 9 个不在任何定义文件中**（T-04 补声明时实测；**M2 期既存漂移，不在本 CHG 范围内**，只登记）。分母与读数（`server.py` 里 `"code": "<名字>"` 的**去重**集合，不是出现次数——首次按 `git grep` 的行数记成 16，那是出现次数）：**13 个不同的码**，其中 **4 个**能在 `contracts/local-error-codes/*.yaml` 里找到同名声明（`bitbrowser_identity_unverifiable`、`bitbrowser_response_error`、`save_directory_invalid`、`save_directory_unavailable`），**9 个**找不到：`account_check_input_invalid`、`cookie_read_input_invalid`、`profile_id_required`、`proxy_extract_input_invalid`、`proxy_extract_request_failed`、`proxy_extract_response_invalid`、`proxy_input_invalid`、`proxy_mutation_input_invalid`、`proxy_mutation_readback_mismatch`。属于本 CHG 的两个（`save_directory_*`）已在 `0d76a48` 补齐；余下 9 个都是 proxy／cookie／profile／account 区自 M2-C 起的状况。**阳性对照**：同一次检索确实认出了本 CHG 新声明的两个名字（就在那 4 个里），故该检索能看见已声明的码，`9` 是真 `9`。修它要逐个判断这些码是否仍属预期契约、要不要新增 `v1/proxy.yaml` 等区域文件，且会改动 M2 期的合同与守护它的测试——故只登记。
 
 - **两处 T-04／T-05 交界处的空转，登记但不在本 CHG 内修**（两处都是「写了没有消费方」，与既有的 `profile-delete` 同类；实测于 T-05 收尾）。①**Desktop 的 `local_pick_save_directory` 在 web 侧没有调用方**：`git grep -n "local_pick_save_directory" -- src` 在 `web/src` 的 **149** 个已跟踪文件里 **0 命中**，而 Desktop 设置页仍只提供文本框（写口是 `local_settings_set`）——即运营能选目录的唯一入口是手打路径，本 CHG 新加的目录选择器只对原生调用方可用。**阳性对照**：同一检索在**同一分母**下找到了别的命令名（`local_settings_set` 于 `apps/desktop/features/local-settings/service.js`、`local_open_saved_file` 于 `modules/transfer/desktopBridge.js`），故该检索能看见命令名、`0` 是真 `0`。修它要在 Desktop 设置页加一颗按钮并接上新命令——属 UI 功能而非本 CHG 的 UI 任务清单，且 Task 5 的范围是素材库／我的素材／下载中心。②**`ContentPoolPage.vue` 的 `isLibrary` 分支已不可达**：该常量是 `route.path === '/material-library'`，而该地址在 `70cc829` 已改指 `modules/materials/pages/MaterialLibraryPage.vue`，故这份文件里 13 处 `isLibrary`／`!isLibrary` 三元与 `v-if` 如今恒取「非素材库」那一支。留着它是死代码，删它会动到内容池页的模板与 `ContentPoolPage.test.js` 的既有断言——两件都不属于本 CHG 的范围，只登记。
+
+- **两条本轮跑真实链路时才被观测到的越界问题，已登记为 `change.md §10` 的 Q-01／Q-02，均不阻塞本 CHG、均不在本 CHG 内修**。Q-01：`cloudagent` 的 `projectResult` 把 task Result 里的**句柄**当本表行号写进 `WHERE id = ?`，`browser_profiles.id`（bigint）实测报 `Error 1292 Truncated incorrect INTEGER value: 'browser_profile_7c90…'` 且 `rows:0`，即 `bit_status` 从未落地而任务状态是 `succeeded`。四处 `WHERE id = ?` 的影响面（`267`–`320`）：`media_accounts.id` bigint（同 1292 类，本轮未触发）、`proxy_configs.id` **varchar(64)**（不报类型错，值是句柄时只**静默不匹配**）、`browser_profiles.id` bigint ×2（本轮实测失败）。两个可能的责任点，本轮不足以判定是哪一个：`projectResult` 的字段语义（该撞 `bit_profile_id` 而非 `id`），或 7 月排任务侧写进 payload 的值。但第 171 行 `_ = projectResult(db, updated)` **把错误丢掉了**，所以无论责任在哪一侧，都不会有人被告知——这是它至今无人发现的唯一原因。Q-02：`ClaimTask` 对任务时效无上界，本轮 sidecar 一启动就领走并执行了 2026-07-24 的 4 条 `profile_open_task`＋1 条 `profile_close_task`（在真实 BitBrowser 上开关了真实 profile）与 2026-09-16 的 8 条 `discovery_task`。两条的修法都属架构决定，请用户裁定。
 
 ## Recent verification
 
@@ -108,6 +116,15 @@ Task 5（UI）**已完成**（Cloud 仓 `codex/m4-a-cloud`，HEAD `70cc829`）�
 | Cloud `go vet ./...`（`0607087`） | `exit=0` |
 | Cloud `gofmt -l internal/`（`0607087`） | 无输出 |
 | 错误映射守门变异控制（`0607087`） | 5 个，各自单独施加、各自变红；还原后两文件 sha256 与备份一致 |
+| 对象存储三问（真实端点，`34f965a`） | path-style ✓；`PUT ok in 398ms`、`presign GET status=200 bytes=1048576 sha256 match=true`、`REMOVE` 后 `Stat` 失败 ✓；`region="garage"` → 0 次 HTTP，`region=""` → 1 次 ✓ |
+| 桶级交叉核对（7 对象态） | 探针列表 7 objects／163,119,670 bytes ＝ 155.56 MiB；Garage 管理界面同桶 7 objects／155.56 MB |
+| AC-01 反证（点击前） | 该素材前缀下 0 对象；`file_transfer_tasks` 0 行；`material_usages` 0 行；素材 153 `not_downloaded` 且键／size／sha 全 NULL |
+| 真实链路一次点击（`3dddbc0`） | 云端准备 success 99,242,095/99,242,095；本机下载 success 99,242,095/99,242,095；素材 153 `ready` `video_size_bytes=99242095` |
+| 三方对账（对象／磁盘／两表） | size 均为 99,242,095；sha256 均为 `e8acfe3e610fd44b…c6d`；`file_transfer_tasks` 的 `expected_sha256` ＝ `integrity_sha256`，`integrity_bytes=99242095` |
+| provider 侧回读（`ossprobe stat 153`） | `size=99242095 etag=2a472d0f…-6 content_type=video/mp4`，`OBJECT COUNT=1` |
+| 桶总量增量 | 7 objects／163,119,670 bytes → 8 objects／262,361,765 bytes，增量 99,242,095 bytes ＝ 该素材字节数 |
+| 边界扫描（业务表＋日志，含阳性对照） | 表：`materials` 0/149、`file_transfer_tasks` 0/12、`/Users/` 与 `/tmp/` 形态 0；日志 `access.log` 0/606、`external.log` 0/6、`job.log` 0/6、`panic.log` 0/2；阳性对照 1 |
+| Cloud `go test -count=1 ./internal/modules/production/...`（`3dddbc0`） | `ok` ×3（production／repository／service），非缓存 |
 | Cloud `go test ./...`（`a620e4f`，最后一次内容改动之后重跑） | `65 ok / 0 FAIL` |
 | Cloud `go build ./...` / `go vet ./...`（`a620e4f`） | `exit=0` |
 | Cloud `gofmt -l internal/`（`a620e4f`） | 无输出 |

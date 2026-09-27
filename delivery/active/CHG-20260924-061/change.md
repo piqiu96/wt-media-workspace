@@ -219,3 +219,11 @@ python3 scripts/verify_agent_entry.py
 ## 10. Pending Questions
 
 None.
+
+> 本轮跑真实链路时观测到两条越出本 CHG 范围的问题（`cloudagent` / BitBrowser 面），
+> 登记在本 CHG 的 `checkpoint.md` §Blocked：一条是 `projectResult` 拿 Result 里的
+> 句柄当本表行号、且投影错误被显式丢弃；一条是 `ClaimTask` 对任务时效无上界，
+> 使新起的 Agent 会执行两个月前的任务。两条都不阻塞本 CHG，也都不在本 CHG 内修。
+> **本节必须保持 `None.`**：`scripts/verify_product_master_alignment.py` 用
+> `^## \d+\. Pending Questions\s+None\.\s*$` 钉死它，凡有开放问题的 CHG 过不了门禁。
+
