@@ -102,9 +102,10 @@ contracts:
     formal_definition: active
     # The newest of the area's definitions, as `local_event_schemas` does: the
     # files carry their own revisions and `v1/bitbrowser.yaml` is still at
-    # 2026.07.14.6. CHG-20260924-061 T-04 added `v1/transfer.yaml`, and the same
-    # task moved it to 2026.09.27.2 when the local API's missing-store refusal
-    # turned out to be returned without a line in the file.
-    error_revision: "2026.09.27.2"
+    # 2026.07.14.6. CHG-20260924-061 T-04 added `v1/transfer.yaml`, moved it to
+    # 2026.09.27.2 when the local API's missing-store refusal turned out to be
+    # returned without a line in the file, and to 2026.09.27.3 when the bind
+    # route's `node_credential_unavailable` was added the same way.
+    error_revision: "2026.09.27.3"
     consumers:
       - wt-media-desktop
