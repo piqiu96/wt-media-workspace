@@ -1,6 +1,6 @@
 # WT Media Current AI Context
 
-- Generated: 2026-09-27T15:16:40Z
+- Generated: 2026-09-28T19:31:20Z
 - Active CHG: `none`
 - Status: `NONE`
 
@@ -10,16 +10,14 @@ this file exists in the outer execution root.
 
 ## Required Skill
 
-- Plan the next CHG with `planning-wt-media-delivery`.
-- Implement, resume, review, and complete a CHG with `executing-wt-media-change`.
+- Plan delivery changes with `planning-wt-media-delivery` when applicable.
 
 ## Required Reading Order
 
-1. `AGENTS.md`
-2. `CLAUDE.md`
-3. `AGENT-INDEX.md`
-4. `.ai/CURRENT_CONTEXT.md`
-5. `delivery/LEDGER.md`
+1. `AGENTS.md`（Codex）或 `CLAUDE.md`（Claude Code）
+2. `AGENT-INDEX.md`
+3. `.ai/CURRENT_CONTEXT.md`
+4. 交付规划或状态查询时：`delivery/LEDGER.md`
 
 ## Affected Repositories
 
@@ -45,10 +43,4 @@ decision records it depends on; read those files instead of this summary.
 
 ## Execution Boundaries
 
-- Execute only the active CHG.
-- Do not start the next CHG.
-- Do not modify Cloud, Agent, or Desktop business code unless listed in the active CHG.
-- Stop and record `Q-xx` if scope, contracts, facts, or responsibilities need a new decision.
-- Multi-repository CHGs record per-repository status under
-  `delivery/active/<CHG>/status/<repo>.md`. Never edit this
-  snapshot concurrently from more than one agent.
+- No active CHG; use `AGENT-INDEX.md` for task routing and delivery rules.

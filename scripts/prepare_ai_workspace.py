@@ -140,28 +140,31 @@ def build_context(change: ChangeInfo | None, workspace_repo: Path) -> str:
     generated in that state too, so it must still be renderable here.
     """
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    # The single textual landing point for the reading order is
-    # `AGENT-INDEX.md` §4.  This constant is the generated mirror of that
-    # section (rendered into the snapshot's "Required Reading Order").
-    # Changing §4 without changing this list — or the reverse — recreates
+    # The textual landing point for the reading order is the workspace
+    # AGENT-INDEX.md section "读取顺序与上下文加载". This constant is its
+    # generated mirror in the snapshot's "Required Reading Order".
+    # Changing that section without changing this list — or the reverse — recreates
     # exactly the multi-landing-point conflict CHG-20260925-064 removed.
     reading_order = [
-        "`AGENTS.md`",
-        "`CLAUDE.md`",
+        "`AGENTS.md`（Codex）或 `CLAUDE.md`（Claude Code）",
         "`AGENT-INDEX.md`",
         "`.ai/CURRENT_CONTEXT.md`",
-        "`delivery/LEDGER.md`",
     ]
     if change is None:
         header_lines = "- Active CHG: `none`\n- Status: `NONE`\n"
         affected = "- None"
-        change_dir_token = "<CHG>"
+        reading_order.append("交付规划或状态查询时：`delivery/LEDGER.md`")
+        required_skill = "- Plan delivery changes with `planning-wt-media-delivery` when applicable."
+        execution_boundaries = (
+            "- No active CHG; use `AGENT-INDEX.md` for task routing and delivery rules."
+        )
     else:
         change_path = change.path.relative_to(workspace_repo)
         header_lines = (
             f"- Active CHG: `{change.change_id}` — {change.title}\n"
             f"- Status: `{change.status}`\n"
         )
+        reading_order.append("`delivery/LEDGER.md`")
         if change.milestone:
             header_lines += f"- Current milestone: `{change.milestone}`\n"
             reading_order.append(f"`{change.milestone}`")
@@ -169,9 +172,20 @@ def build_context(change: ChangeInfo | None, workspace_repo: Path) -> str:
         affected = "\n".join(f"- `{repo}`" for repo in change.affected_repositories) or "- None"
         reading_order.append(f"`{change_path}`")
         reading_order.append(
-            "Affected repository `AGENT-INDEX.md`, `AGENTS.md`, `CLAUDE.md`, and `DIRECTORY_MAP.md`"
+            "Affected repository current Harness entry, `AGENT-INDEX.md`, and `DIRECTORY_MAP.md`"
         )
         change_dir_token = change.change_id
+        required_skill = (
+            "- Plan delivery scope changes with `planning-wt-media-delivery` when applicable.\n"
+            "- Implement, resume, review, and complete a CHG with `executing-wt-media-change`."
+        )
+        execution_boundaries = f"""- Execute only the active CHG.
+- Do not start the next CHG.
+- Do not modify Cloud, Agent, or Desktop business code unless listed in the active CHG.
+- Stop and record `Q-xx` if scope, contracts, facts, or responsibilities need a new decision.
+- Multi-repository CHGs record per-repository status under
+  `delivery/active/{change_dir_token}/status/<repo>.md`. Never edit this
+  snapshot concurrently from more than one agent."""
     reading_order_text = "\n".join(
         f"{index}. {entry}" for index, entry in enumerate(reading_order, start=1)
     )
@@ -185,8 +199,7 @@ this file exists in the outer execution root.
 
 ## Required Skill
 
-- Plan the next CHG with `planning-wt-media-delivery`.
-- Implement, resume, review, and complete a CHG with `executing-wt-media-change`.
+{required_skill}
 
 ## Required Reading Order
 
@@ -213,13 +226,7 @@ decision records it depends on; read those files instead of this summary.
 
 ## Execution Boundaries
 
-- Execute only the active CHG.
-- Do not start the next CHG.
-- Do not modify Cloud, Agent, or Desktop business code unless listed in the active CHG.
-- Stop and record `Q-xx` if scope, contracts, facts, or responsibilities need a new decision.
-- Multi-repository CHGs record per-repository status under
-  `delivery/active/{change_dir_token}/status/<repo>.md`. Never edit this
-  snapshot concurrently from more than one agent.
+{execution_boundaries}
 """
 
 

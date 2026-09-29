@@ -118,6 +118,21 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
             "- Current milestone: `delivery/milestones/M2-account-runtime.md`", text
         )
         self.assertIn("- `outer execution root rule files`", text)
+        self.assertIn("`AGENTS.md`（Codex）或 `CLAUDE.md`（Claude Code）", text)
+        self.assertIn("`delivery/LEDGER.md`", text)
+        self.assertIn("`planning-wt-media-delivery`", text)
+        self.assertIn("`executing-wt-media-change`", text)
+        self.assertIn(
+            "Affected repository current Harness entry, `AGENT-INDEX.md`, and `DIRECTORY_MAP.md`",
+            text,
+        )
+        self.assertLess(
+            text.index("`delivery/LEDGER.md`"),
+            text.index(
+                "`delivery/milestones/M2-account-runtime.md`",
+                text.index("## Required Reading Order"),
+            ),
+        )
         self.assertIn("GENERATED FILE", generated_skill.read_text(encoding="utf-8"))
         self.assertFalse(
             outer_context.exists(),
@@ -151,6 +166,13 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
         self.assertIn("- Status: `NONE`", text)
         self.assertNotIn("Current milestone:", text)
         self.assertNotIn("Change file:", text)
+        self.assertIn("`AGENTS.md`（Codex）或 `CLAUDE.md`（Claude Code）", text)
+        self.assertNotIn("Execute only the active CHG.", text)
+        self.assertNotIn("Do not start the next CHG.", text)
+        self.assertIn(
+            "No active CHG; use `AGENT-INDEX.md` for task routing and delivery rules.",
+            text,
+        )
         self.assertIn(
             "- None",
             text,
