@@ -8,11 +8,11 @@
 | 用途 | 判据（这一类回答什么问题） | 脚本（仅文件名） |
 | --- | --- | --- |
 | 运营 | 把本地环境跑起来 / 确认在跑 / 停下 | 见 [`../bin/control.sh`](../bin/control.sh) |
-| 开发 | 改完东西之后重建 / 重生成 / 迁移 / 分发 | `sync_skills.py`、`prepare_ai_workspace.py`、`init-agent-entry.sh`、`build-desktop.sh` |
-| 验收 | 证明某件事成立 / 不成立 | `verify_delivery_governance.py`、`verify_agent_entry.py`、`verify_skills.py`、`verify_m0_config.py`、`verify_product_master_alignment.py`、`verify_m1_integration.py`、`verify_m2_acceptance.py`、`verify_m3_acceptance.py`、`verify_m0_local.sh`、`test-control.sh` |
-| 运行台 | 上面几类共用的执行体，本身不是入口 | `m2b-local-acceptance.sh`、`m2b_local_acceptance.py`（含 `start` 与 `verify` 两类动词，故同时属运营与验收）、`agent_config.py` |
+| 开发 | 改完东西之后重建 / 重生成 / 迁移 / 分发 | `sync_skills.py`、`prepare_ai_workspace.py`、`build-desktop-frontend.sh` |
+| 验收 | 证明某件事成立 / 不成立 | `verify_delivery_governance.py`、`verify_ai_workspace.py`、`verify_skills.py`、`verify_m0_config.py`、`verify_product_master_alignment.py`、`verify_m1_integration.py`、`verify_m2_acceptance.py`、`verify_m3_acceptance.py`、`verify_m0_local.sh`、`verify-control.sh` |
+| 运行台 | 上面几类共用的执行体，本身不是入口 | `m2b-local-acceptance.sh`、`m2b_local_acceptance.py`（含 `start` 与 `verify` 两类动词，故同时属运营与验收）、`workspace_config.py` |
 
-多归属是特性，不是错误：`test-control.sh` 是 `bin/control.sh` 的验收件；
+多归属是特性，不是错误：`verify-control.sh` 是 `bin/control.sh` 的验收件；
 `m2b_local_acceptance.py` 既供运营（`status`）也供验收（`verify`）。
 
 ## 新脚本落在哪
@@ -27,9 +27,9 @@
 
 ## 本文件不拥有什么
 
-逐文件事实不在这里。命令清单归 [`AGENT-INDEX.md`](../AGENT-INDEX.md) §12；跨仓环境手册归
+逐文件事实不在这里。常用校验命令见 [`README.md`](../README.md) 的“Verification”；跨仓环境手册归
 `skills/common/environment-bring-up/SKILL.md`。
 
 **数值型运行参数——端口、地址、凭据、超时与保留期默认值——的唯一落点是配置文件**，
 本文件与 [`../bin/control.sh`](../bin/control.sh) 都不得复述；`bin/control.sh` 只分派动词，
-端口由它调用的运行台读取。这条约束由 `test-control.sh` 机检。
+端口由它调用的运行台读取。这条约束由 `verify-control.sh` 机检。

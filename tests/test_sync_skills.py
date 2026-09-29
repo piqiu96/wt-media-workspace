@@ -100,7 +100,7 @@ class SyncSkillsTests(unittest.TestCase):
             self.assertEqual(self.module.resolve_target_path("..", resolved_root), shared)
 
     def test_absolute_declared_path_is_rejected(self) -> None:
-        with self.assertRaises(self.module.agent_config.ConfigError):
+        with self.assertRaises(self.module.workspace_config.ConfigError):
             self.module.resolve_target_path("/tmp/elsewhere", Path("/tmp/wt-media"))
 
     def test_load_targets_reads_groups_and_kind(self) -> None:
@@ -137,7 +137,7 @@ class SyncSkillsTests(unittest.TestCase):
                 'targets:\n  cloud:\n    path: "../wt-media-cloud"\n', encoding="utf-8"
             )
 
-            with self.assertRaises(self.module.agent_config.ConfigError) as caught:
+            with self.assertRaises(self.module.workspace_config.ConfigError) as caught:
                 self.module.load_targets(path, Path("/tmp/wt-media"))
 
         self.assertIn("declares no groups", str(caught.exception))
@@ -155,7 +155,7 @@ class SyncSkillsTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with self.assertRaises(self.module.agent_config.ConfigError) as caught:
+            with self.assertRaises(self.module.workspace_config.ConfigError) as caught:
                 self.module.load_targets(path, Path("/tmp/wt-media"))
 
         self.assertIn("unknown kind: sibling", str(caught.exception))

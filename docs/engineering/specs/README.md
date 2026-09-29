@@ -14,4 +14,3 @@ This file is the index. Every other `*.md` in this directory must be listed belo
 ## Programs and conventions
 
 - [Desktop × Agent 联合上线工程优化程序](2026-09-23-launch-engineering-optimization-program.md)：上线前工程加固程序（已结束，四个阶段全部归档 DONE）；记录 A/B/C/D 四阶段的验收结果与未决风险。
-- [Agent Workspace 协作规范](agent-workspace-conventions.md)：多仓库在 AI Agent 协作下的入口、上下文加载与校验约定，补充 `AGENT-INDEX.md` 第 10 节。

@@ -2,11 +2,11 @@
 
 What this adds over the per-repository checks (desktop `tests/control.test.sh`,
 cloud `scripts/verify/test-control.sh`, agent `tests/test_control_sh.py`,
-workspace `scripts/test-control.sh`): one place that sees all four entries at
+workspace `scripts/verify-control.sh`): one place that sees all four entries at
 once, so the defect class that CHG-20260926-067 missed cannot be visible in one
 repository and invisible in the rest. A sibling repository whose directory is not
 next to this one is **skipped, with the denominator printed**, following
-`scripts/verify_agent_entry.py`'s precedent -- otherwise a single-repository
+`scripts/verify_ai_workspace.py`'s precedent -- otherwise a single-repository
 checkout would go red for a reason that has nothing to do with the entries.
 
 This file asserts **behaviour and modes only**: does the file exist, is it

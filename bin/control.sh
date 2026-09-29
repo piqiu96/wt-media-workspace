@@ -5,7 +5,7 @@
 # 本文件是**薄封装**：真正干活的是 scripts/m2b_local_acceptance.py，本文件只负责
 # 动词分派与 usage。端口、地址、运行目录等数值型参数一律不出现在本文件里——它们的
 # 唯一落点是 harness 读取的配置文件与环境变量，在这里复述一份就是第二份真相。
-# 这条约束由 scripts/test-control.sh 机检。
+# 这条约束由 scripts/verify-control.sh 机检。
 #
 # 与 `AGENT-INDEX.md` §6「修改 Agent Sidecar 启停 → Desktop」的分工：本文件管的是
 # **本地开发环境**里 Cloud 与 Local Agent 的进程启停，sidecar 的生命周期由 Desktop

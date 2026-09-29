@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# build-desktop.sh — 联合构建 Desktop 前端并复制到 Desktop 仓库
+# build-desktop-frontend.sh — 联合构建 Desktop 前端并复制到 Desktop 仓库
 # ============================================================
 set -euo pipefail
 

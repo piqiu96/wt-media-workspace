@@ -2,7 +2,7 @@ schema_version: 1
 
 # Related repositories, keyed by the target names used in
 # config/skills-distribution.yaml. Paths are relative to this repository.
-# `scripts/verify_agent_entry.py` requires the two files to agree, in both
+# `scripts/verify_ai_workspace.py` requires the two files to agree, in both
 # directions, for every target declared as `kind: repository`.
 repositories:
   cloud:

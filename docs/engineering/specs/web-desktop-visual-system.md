@@ -323,7 +323,7 @@ Tauri Desktop 通过 devUrl 加载 http://127.0.0.1:5174   （npm run dev:deskto
   "build": {
     "devUrl": "http://127.0.0.1:5174",
     "beforeDevCommand": "cd ../../wt-media-cloud/web && npm run dev:desktop",
-    "beforeBuildCommand": "bash scripts/prepare-release-sidecar.sh && bash ../wt-media-workspace/scripts/build-desktop.sh",
+    "beforeBuildCommand": "bash scripts/prepare-release-sidecar.sh && bash ../wt-media-workspace/scripts/build-desktop-frontend.sh",
     "frontendDist": "../.generated/frontend"
   }
 }
@@ -371,7 +371,7 @@ Desktop 构建：
 3. npm ci
 4. npm run build:desktop
 5. 生成 dist-desktop
-6. Tauri 打包（由 workspace 的 scripts/build-desktop.sh 复制到 .generated/frontend）
+6. Tauri 打包（由 workspace 的 scripts/build-desktop-frontend.sh 复制到 .generated/frontend）
 7. 生成 exe / msi / dmg
 ```
 
@@ -404,10 +404,10 @@ Desktop 构建：
 | 落点 | 作用 |
 |---|---|
 | `config/release-matrix.yaml` | 每个已核实 release 的 `components:`（cloud／cloud_agent／desktop／local_agent 版本）、`contracts:`、`verification:` 与 `scope` |
-| `config/repository-map.yaml` | 相邻仓库路径映射（被 `verify_agent_entry.py` 双向校验） |
+| `config/repository-map.yaml` | 相邻仓库路径映射（被 `verify_ai_workspace.py` 双向校验） |
 | `scripts/release-versions.sh` | 版本号的唯一实现处；各产物自己的 `versions.json` 也在声明同一份事实 |
 
-前端产物自身携带溯源信息。`scripts/build-desktop.sh` 在复制产物后调用 `release-versions.sh --stamp-frontend`，写出 `wt-media-desktop/.generated/frontend/frontend-build.json`，其字段为：
+前端产物自身携带溯源信息。`scripts/build-desktop-frontend.sh` 在复制产物后调用 `release-versions.sh --stamp-frontend`，写出 `wt-media-desktop/.generated/frontend/frontend-build.json`，其字段为：
 
 ```json
 {

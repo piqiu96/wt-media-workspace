@@ -33,7 +33,7 @@ def load_sibling(name: str):
     return module
 
 
-agent_config = load_sibling("agent_config")
+workspace_config = load_sibling("workspace_config")
 
 
 def execution_root(workspace: Path) -> Path:
@@ -75,7 +75,7 @@ def resolve_target_path(declared: str, workspace_root: Path) -> Path:
     """
     declared_path = Path(declared)
     if declared_path.is_absolute():
-        raise agent_config.ConfigError(
+        raise workspace_config.ConfigError(
             f"target path must be relative to the execution root: {declared}"
         )
     parts = [part for part in declared_path.parts if part != ".."]
@@ -89,18 +89,18 @@ def load_targets(
 ) -> tuple[dict[str, Target], tuple[str, ...]]:
     """Build the distribution targets and tools from the configuration file."""
     targets: dict[str, Target] = {}
-    for name, settings in agent_config.read_section(config_path, "targets").items():
+    for name, settings in workspace_config.read_section(config_path, "targets").items():
         declared = settings.get("path")
         groups = settings.get("groups")
         kind = settings.get("kind", "repository")
         if not isinstance(declared, str):
-            raise agent_config.ConfigError(f"{config_path}: target '{name}' has no path")
+            raise workspace_config.ConfigError(f"{config_path}: target '{name}' has no path")
         if not isinstance(groups, list) or not groups:
-            raise agent_config.ConfigError(
+            raise workspace_config.ConfigError(
                 f"{config_path}: target '{name}' declares no groups"
             )
         if kind not in {"repository", "distribution"}:
-            raise agent_config.ConfigError(
+            raise workspace_config.ConfigError(
                 f"{config_path}: target '{name}' has unknown kind: {kind}"
             )
         targets[name] = Target(
@@ -110,8 +110,8 @@ def load_targets(
             kind=str(kind),
         )
     if not targets:
-        raise agent_config.ConfigError(f"{config_path}: no targets declared")
-    return targets, tuple(agent_config.read_sequence(config_path, "tools"))
+        raise workspace_config.ConfigError(f"{config_path}: no targets declared")
+    return targets, tuple(workspace_config.read_sequence(config_path, "tools"))
 
 
 TARGETS, TOOLS = load_targets(CONFIG_PATH, WORKSPACE_ROOT)

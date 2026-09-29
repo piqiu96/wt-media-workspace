@@ -7,21 +7,21 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "agent_config.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "workspace_config.py"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_module():
-    spec = importlib.util.spec_from_file_location("agent_config", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location("workspace_config", SCRIPT_PATH)
     if spec is None or spec.loader is None:
-        raise RuntimeError("could not load agent_config.py")
+        raise RuntimeError("could not load workspace_config.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
 
-class AgentConfigTests(unittest.TestCase):
+class WorkspaceConfigTests(unittest.TestCase):
     def setUp(self) -> None:
         self.module = load_module()
         self.tmp = tempfile.TemporaryDirectory()
