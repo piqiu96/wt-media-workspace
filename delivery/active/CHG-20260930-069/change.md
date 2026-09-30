@@ -19,6 +19,9 @@
 - Cloud Web 素材列表保留素材 ID（第一业务列）与「素材」识别列（封面、标题、来源平台副行；游戏仍为独立列）、文件状态、入库/加入时间与操作；作者、链接、文件大小移至共用详情抽屉。
 - 「该素材是否已加入我的素材」不新增后端字段：素材库页同时读取 `/api/v1/my-materials` 并按素材 ID 做客户端 join（2026-09-30 用户裁定）。两条接口都是全量返回，join 的覆盖范围与现有视频状态、游戏筛选一致。
 - 素材状态（`materials.status`，2026-09-30 走查六轮用户裁定「这是素材库的内部职责」）：新增一列 `status VARCHAR(16) NOT NULL DEFAULT 'available'`，取值 `available / paused / delisted`，列为素材库自有生命周期，与 `video_status` 并排不合并；Business Schema 的 `Material` 增该属性并列入 `required`（revision `2026.09.30.3`）。**本轮不含写路径**——没有任何接口能把一行改成 `paused` / `delisted`。
+- 全站筛选栏统一为「字段标题 + 控件」，标题在控件**左侧**（2026-09-30 走查七轮用户裁定）；Select 的默认展示用「全部」，不再拿字段名（「文件状态」「游戏」）当 placeholder。范围 7 页：素材库、我的素材、内容池 crawl-tasks / 挖掘策略、用户管理、运营分组、游戏管理——前三类已有 `.filter-field` 包裹，后三页补齐。
+- 我的素材列表与共用详情抽屉（2026-09-30 走查七轮，用户带提示词）：列收敛为「素材 ID | 素材（封面 + 标题 + 游戏 · 作者副行）| 文件状态 | 使用状态 | 加入时间 | 操作」；「移出」文案改为「放弃使用」；页面副标题由「你收藏的素材，可随时下载到本机」改为「已加入的素材，在这里下载、补充文件并进入后续生产」。使用状态是 `material_usages.status` 的展示（`active` → 使用中，`removed` → 已放弃），与素材状态（`materials.status`）、文件状态（`video_status`）三者各自独立，不合并（§7.2）。
+- 使用状态的读取与恢复（同轮）：`GET /api/v1/my-materials` 不再只取 `status = 'active'`，改为两类关系行都返回；新增 `POST /api/v1/material-usages/{usage_id}/restore`，把一行改回 `active` 并清 `removed_at`。**不需要迁移**——`material_usages` 自 M4-A（`20260926_039`）起就带 `status VARCHAR(16) (active/removed)`、`removed_at` 与 `UNIQUE KEY uq_material_usages_user_material (user_id, material_id)`，「移出保留同一行、只改状态，故历史可追溯、可恢复」本来就是 Business Schema `MaterialUsage` 写下的设计。恢复与素材库的 `POST /materials/{id}/usages`（`CreateOrRestoreUsage`）落到同一行，两条路径幂等。
 - 下载中心分为“正在下载”（pending/running）和“最近完成”（success/failed/cancelled）。保留真实任务状态、取消、重试、重新下载和打开文件行为。
 - 公开对象 URL 的前提是现有对象存储地址与桶策略允许公开读取；本 CHG 不修改桶 ACL 或发布外部配置。
 
@@ -31,6 +34,11 @@
 - 不含**使用情况统计**（成片数、发布数、最近生产/发布时间、重复风险）与列表分页总数、各状态计数、服务端筛选参数：这些要跨成片与发布聚合，数据源尚不存在（见 `delivery/planned/CHG-20260930-071`，本 CHG 关闭后按队列激活）。本 CHG 内只落前端读取协议与展现样式，协议是 `material.usage`（`clip_count`、`published_count`、`last_produced_at`、`last_published_at`、`duplicate_risk`），声明在 `web/src/modules/materials/labels.js`；字段未到达时渲染占位，不兜底默认值。
 - **素材状态不在本节**（2026-09-30 走查六轮用户裁定推翻任务 9 的「后端另立 CHG」归属）：素材生命周期是素材库的内部职责，不等外部数据，见 §2 与任务 12。暂停 / 下架的**写路径**仍不在本 CHG 内，也没有登记给任何 CHG——谁来暂停、在哪一页操作尚未裁定。
 - 同样因为数据未到，列表顶部的统计卡与状态筛选**本轮不动**：在缺 `status` 的数据上挂一排「素材状态」计数卡与筛选器，每一档点下去都是 0 行。这与页面上那条既有判断同源（游戏筛选项只列已加载数据里真出现过的值）——列一个点下去没有任何行的选项，和「筛了但服务端没筛」是同一种误导。它们随数据一起落地。
+- **上传素材**（2026-09-30 走查七轮，用户裁定「暂时先不做」）：production 模块 7 条路由里没有上传端点，`materials` 也没有无来源的素材。我的素材页面级主操作本轮仍只有「刷新」。
+- **使用状态的 tab 与计数**（同轮裁定「不用做」）：列表接口返回裸数组、`LIMIT 200`、无 `total`、无聚合——见 `delivery/planned/CHG-20260930-071` §0 盘点表。使用状态这一轮只作为**列**存在。
+- **「来源」列**（同轮裁定「不做这一列，以后再说」）：`materials.source_content_id` 是 `NOT NULL` 加 `UNIQUE`，每条素材都必须挂一条来源内容；加上上传不做，「素材库 / 手动添加」的第二个值无处产生。做出来是一列恒等于单个值的字段，正是用户提示词里那句「不要伪造新字段」要挡的东西。
+- **「已中断」这一档使用状态**：`material_usages.status` 的 `CHECK` 只允许 `active / removed`，没有第三档。用户同轮裁定其含义为「准备 / 下载中途断了」——但那是文件状态那一维，与规范 §7.2 那句「可以同时存在 `使用中 + 下载失败`，不应为了页面简单重新制造混合状态」互斥；同时用户提示词自己写着「如果当前代码尚未正式存在某个状态，不要直接新增数据库 enum」。两种读法互相推翻，**本轮不实现、不猜**，等用户裁定机制（加第三个 enum 还是别的）。§7.2 里「使用状态：使用中 / 已放弃 / 已中断」那行因此仍是规范先行、实现未跟。
+- **「文件异常」这一档**：`video_status` 四态（`not_downloaded / downloading / ready / failed`）里没有它，云端列表也不返回本机文件状态——它与规范 §7.4 的「文件异常 → 重新下载」今天都收在 `failed` 上。本轮按四态分支，不新造状态。
 
 ## 4. 验收标准
 
@@ -49,6 +57,11 @@
 - 共用详情抽屉（2026-09-30 走查六轮，用户三条反馈）：正文五段信息**平铺在一页**，不再分标签（`t-tabs`、`t-tab-panel` 与 `activeTab` 都不存在），顺序为 使用情况 → 基本信息 → 文件信息 → 来源信息 → 来源内容池统计；hero 标题在 `material.source_url` 存在时是可点击外链、跳来源平台落地页，没有落地页时退回普通文本；hero 副行作者在 `material.author_home_url` 存在时可点击跳作者主页；副行只留「平台 · 作者」，游戏不入副行（它与列表的「游戏」列、详情「基本信息」里的游戏行重复同一个值）。
 - 素材状态（2026-09-30 走查六轮追加裁定，见任务 12）：`GET /api/v1/materials` 与 `GET /api/v1/materials/{id}` 的每条素材带 `status`，取值 `available / paused / delisted`，与 `video_status` 相互独立；列表「素材状态」列与详情徽章渲染真值，缺值渲染 `—`、不兜底。库列为 `NOT NULL DEFAULT 'available'`，所以键恒在。**今天每一行都读作「可用」**——没有任何接口能把一行改成 `paused` / `delisted`，这是这批素材的真实状态，不是占位，但也不是一个能用起来的状态维度。
 - 全站守卫测试：`web/src/**/*.vue` 里每个 `t-drawer` 必须对页脚表态（给 `#footer` 插槽或显式写 `footer` 属性）。TDesign 的 drawer footer 默认 `true`，不表态就渲染一对「取消 / 确认」。实测全站 12 个抽屉曾有 2 个漏写；`t-dialog` 不在扫描范围内（那对按钮正是它的用途）。
+- 筛选栏（2026-09-30 走查七轮）：7 个管理列表的每一个筛选控件都有一个可见的字段标题，标题在控件左侧；判定不靠肉眼——守卫测试扫 `web/src/**/*.vue` 里所有含 `filter-row` 的页面，逐个断言控件被 `.filter-field` 的标题包裹、且 Select 的 placeholder 不等于它自己的字段标题。查询用 Primary、重置用次级（§4.3）。
+- 我的素材（同轮）：页面副标题为「已加入的素材，在这里下载、补充文件并进入后续生产」；列表列集合为「素材 ID | 素材 | 文件状态 | 使用状态 | 加入时间 | 操作」；操作列文案为「放弃使用」而不是「移出」。使用状态列与文件状态列并排且不合并（§7.2）：`active` → 「使用中」、`removed` → 「已放弃」，缺值渲染 `—`、不兜底。
+- 行操作按「使用状态 × 文件状态」分支，按钮总数 ≤5 时全部平铺、超过 5 个才出现「更多」（§5.6，2026-09-30 走查三轮用户补充裁定）——用户提示词里那套「3 个动作也进更多」的写法不采用，因为它是 3 个。使用中 + 可下载为「详情 | 加入合成 | 放弃使用」；使用中 + 准备失败为「详情 | 重试 | 放弃使用」；已放弃为「详情 | 恢复使用」。
+- 恢复使用（同轮）：已放弃的行能直接恢复，走 `POST /api/v1/material-usages/{usage_id}/restore`；恢复后该行回到使用中，且与在素材库里再点一次「加入我的素材」落到同一行（`uq_material_usages_user_material` 保证一行）。越权（他人的 usage）与不存在的 usage 不生效。
+- 共用详情抽屉（同轮）：hero 下是小型状态 Badge（使用状态 + 文件状态），不是横跨整页的状态色块（§7.1「状态颜色不得替代按钮层级」）；正文首段是「当前进度 / 使用情况」（文件状态、使用状态、加入时间、下一步），其后依次是文件信息、来源信息、来源内容统计；页脚按状态给真实业务动作，不出现「确认」。「下一步」是前端提示文案，不新增业务状态。
 - 定向 Go/Web 测试、Cloud 与 Desktop Web 构建通过；真实桌面页面留给用户走查签收。
 
 ## 5. 有序任务
@@ -92,6 +105,29 @@
     5. `go test ./...`、定向 vitest、全量 vitest、双构建；`up --force-restart` 后读 API 与库，并做一次「改成 paused → API 变化 → 还原」的阳性对照。
     证据 `evidence/task12-material-status.md`，提交 `71deb48`。
     不在本轮：暂停 / 下架的写路径（无人裁定发起方与操作页）；使用情况（仍在 `CHG-20260930-071`）。
+13. （2026-09-30 走查七轮，用户提示词第「四」「筛选区域」节 + 末尾「统一到整个项目」）筛选栏统一「标题 + 控件」，纯前端、跨 7 页：
+    1. 先写守卫测试：扫 `web/src/**/*.vue` 里含 `filter-row` 的页面，钉住「每个筛选控件都被 `.filter-field` 的标题包裹」「Select 的 placeholder ≠ 它自己的字段标题」「查询按钮 theme=primary、重置为次级」；同时改 `ListPageConventions` 与各页既有断言，确认红——红线要落在**缺标题的那三页**（用户管理 / 运营分组 / 游戏管理）上，只红在别处说明扫的位置不对；
+    2. 素材库、我的素材、内容池两页已用 `.filter-field`（后两页的改动仍在工作区未提交，一并纳入本次提交），本轮补「全部」默认值：Select 加一条 `value: ''` 的「全部」选项并置默认，替掉拿字段名当 placeholder 的写法；
+    3. 用户管理、运营分组、游戏管理三页的裸 placeholder 控件套上同一套 `.filter-field`，并按 §4.3 补齐「查询 / 重置」；
+    4. 定向 vitest、全量 vitest、双构建。
+    不在本轮：把筛选改成服务端参数（见 §3 与 `CHG-20260930-071` Q-06）。
+14. （2026-09-30 走查七轮，用户提示词第「一、二、五、六、七、九、十、十一」节）我的素材列表与共用详情抽屉重构，纯前端：
+    1. 先改 `MyMaterialsPage.test.js` / `MaterialDetailDrawer.test.js` / `labels.test.js`，钉住目标形态（副标题、列集合、放弃使用文案、使用状态列、≤5 平铺、hero 小型 Badge、正文四段顺序、页脚无「确认」），确认红；
+    2. `labels.js` 增使用状态协议（`material.usage_status`：`active` / `removed` → 使用中 / 已放弃），与 `material.status`（素材库自有）、`video_status`（文件状态）三组并列，函数一律缺值渲染 `—`；
+    3. 列表列收敛为 6 列，游戏并入「素材」格副行（`游戏 · 作者`）；「移出」→「放弃使用」；
+    4. 行操作按「使用状态 × 文件状态」分支，≤5 全平铺、超过 5 个才出现「更多」；
+    5. 共用详情抽屉：hero 下改小型 Badge 组，正文首段换成「当前进度 / 使用情况」并带「下一步」提示文案，文件信息 / 来源信息 / 来源内容统计顺延，页脚按状态给动作；
+    6. 副标题改写；定向 vitest、全量 vitest、双构建。
+    不在本轮：使用状态的 tab 与计数、来源列、已中断、文件异常（见 §3）。
+15. （2026-09-30 走查七轮，用户裁定「其他的前后端一起改」）使用状态的读与恢复，后端 + 契约 + 前端：
+    1. 先改 Go 测试钉住新行为（`repository` 的关系行读回含 `removed`、`service` 的恢复幂等与越权拒绝、`handler` 的路由与错误码），确认红；
+    2. `ListMyMaterials` 的 SQL 去掉 `status = 'active'`，两类关系行都返回，`removed_at` 随行带出；
+    3. 新增 `RestoreMaterialUsage`（Repository → Service → Handler）与路由 `POST /api/v1/material-usages/{usage_id}/restore`，条件更新 `status = 'active' AND removed_at IS NULL`，受影响 0 行时按「已是他人的行 / 已恢复」区分错误；
+    4. `contracts/cloud-api/v1/content-production.openapi.yaml` 增该路径；Business Schema `MaterialUsage` 已是 `active / removed`，不改；
+    5. 前端接上：使用状态列读真值、已放弃的行给「恢复使用」，恢复后重取列表；
+    6. `go test ./...`、全量 vitest、双构建；`up --force-restart` 后做一次「放弃 → 读回 removed → 恢复 → 读回 active」的真实往返，并核对库里的 `removed_at` 被清掉。
+    证据 `evidence/task13-15-walkthrough-seven.md`。
+    没有迁移——`material_usages` 自 M4-A 起就是这个形状（见 §2）。
 
 ## 6. 验证与提交边界
 

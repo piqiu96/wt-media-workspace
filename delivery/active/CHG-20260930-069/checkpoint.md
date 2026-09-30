@@ -1,7 +1,7 @@
 # CHG-20260930-069 Checkpoint
 
 - Status: VERIFYING
-- Current task: 等待用户真实桌面走查与 M4-A 签收（实现任务 1-12 已全部完成；环境已用任务 12 重建重启，DMG 已从最新产物挂载并启动）。
+- Current task: **走查七轮（任务 13-15，2026-09-30 用户带提示词）**——13 筛选栏 Label 统一（纯前端、跨 7 页）、14 我的素材列表与共用详情抽屉重构（纯前端）、15 使用状态的读与恢复（后端 + 契约 + 前端，无迁移）。任务 1-12 已全部完成并提交，环境已重建（见下）。
 - Completed:
   - Task 1 完成：`model.Material` 新增 `cover_url`/`author_home_url`（JSON 可选键），投影 SQL JOIN source_contents 带出，无数据库迁移；Business Schema Material 增两属性、revision `2026.09.30.1`；wire/repository/service 测试先行后全绿（证据 `evidence/task1-source-links.md`）。
   - Task 2 完成：`infra/storage.PublicURL` 组合稳定公开地址（endpoint/bucket/prefix，无凭据可用，键校验，生命周期随 Initialize/Close）；service `ObjectLinker` 注入 + `VideoURL`（范围→就绪→事实完整→组合）；路由 `GET /api/v1/materials/:id/video-url`；OpenAPI + Business Schema `MaterialVideoLink`，Material 禁携 `video_url`；测试先行后全绿，全仓 Go 测试 0 失败（证据 `evidence/task2-video-url.md`）。
