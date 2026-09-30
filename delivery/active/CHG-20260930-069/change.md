@@ -126,8 +126,12 @@
     4. `contracts/cloud-api/v1/content-production.openapi.yaml` 增该路径；Business Schema `MaterialUsage` 已是 `active / removed`，不改；
     5. 前端接上：使用状态列读真值、已放弃的行给「恢复使用」，恢复后重取列表；
     6. `go test ./...`、全量 vitest、双构建；`up --force-restart` 后做一次「放弃 → 读回 removed → 恢复 → 读回 active」的真实往返，并核对库里的 `removed_at` 被清掉。
-    证据 `evidence/task13-15-walkthrough-seven.md`。
+    证据 `evidence/task15-usage-restore.md`（原写 `evidence/task13-15-walkthrough-seven.md`，
+    实际落成时 13、14 各自成文）。两处与计划不符、已在证据 §5/§4 登记：恢复的语句不返回
+    bool（0 行能描述的唯一结果就是「已在使用中」，即调用方要的状态）；列表排序由 `updated_at`
+    改 `created_at`（页面上那一列是「加入时间」，且改状态不该让行跳位置）。
     没有迁移——`material_usages` 自 M4-A 起就是这个形状（见 §2）。
+    不在本轮：上传素材、使用状态 tab 与计数、来源列、已中断（见 §3）。
 
 ## 6. 验证与提交边界
 
