@@ -6,5 +6,6 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20260930-069 | M4-A 素材详情与下载中心走查修正 | VERIFYING | wt-media-cloud |
 
 历史叙述（按需回溯）：[LEDGER 历史说明](reports/2026-09-29-ledger-historical-notes.md)。

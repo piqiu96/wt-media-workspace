@@ -1,7 +1,7 @@
 # CHG-20260930-069 Checkpoint
 
-- Status: `ACTIVE`
-- Current task: 等待用户真实桌面走查与 M4-A 签收（实现任务 1-6 已全部完成；环境已用任务 6 前端重建重启并通过全部验收门）。
+- Status: VERIFYING
+- Current task: 等待用户真实桌面走查与 M4-A 签收（实现任务 1-9 已全部完成；环境已用任务 9 前端重建重启）。
 - Completed:
   - Task 1 完成：`model.Material` 新增 `cover_url`/`author_home_url`（JSON 可选键），投影 SQL JOIN source_contents 带出，无数据库迁移；Business Schema Material 增两属性、revision `2026.09.30.1`；wire/repository/service 测试先行后全绿（证据 `evidence/task1-source-links.md`）。
   - Task 2 完成：`infra/storage.PublicURL` 组合稳定公开地址（endpoint/bucket/prefix，无凭据可用，键校验，生命周期随 Initialize/Close）；service `ObjectLinker` 注入 + `VideoURL`（范围→就绪→事实完整→组合）；路由 `GET /api/v1/materials/:id/video-url`；OpenAPI + Business Schema `MaterialVideoLink`，Material 禁携 `video_url`；测试先行后全绿，全仓 Go 测试 0 失败（证据 `evidence/task2-video-url.md`）。
@@ -11,10 +11,13 @@
   - Task 6 一轮完成（走查反馈修正，证据 `evidence/task6-walkthrough-fixes.md`，提交 `6ffdd15`）：素材投影 JOIN 带出内容池统计（Business Schema `2026.09.30.2`）；两列表素材 ID 列第一、标题蓝色外链跳来源平台落地页；「下载到本机」改「下载」并删除提示小字（`downloadHint` 删除）；详情抽屉新增「来源内容池统计」独立区块（千分位）。前端测试先行红（6 失败）后绿；定向 Go 五包 ok；后端部分系上一会话开工留在工作区的未提交改动，验证后一并提交。封面链路核对：`source_contents.cover_url` 已由投影带出，占位图问题属来源 CDN 签名过期，不在本 CHG 内修。
   - Task 6 二轮完成（走查反馈「统计全 0」「ID 带 #」，提交 `be89265`）：「统计全 0」根因是运行中的 Cloud 为旧编译产物（m2b 对已健康服务不重启），`up --force-restart` 后 API 验证返回真实统计；抖音对 518 行来源 `play_count` 恒为 0，经用户裁定统计区块不展示「播放」；素材 ID 在两列表与详情抽屉均去 `#` 前缀。定向 vitest 93 用例通过、双构建成功、m2b all exit 0（Cloud 新代码 + DMG/assets 以二轮前端重建）。
   - Task 8 完成（走查三轮，交互对齐 `docs/standards/前端交互规范.md`，证据 `evidence/task8-interaction-alignment.md`，提交 `84def36` + `8f15a6c`）：「查看」统一「详情」；素材库行与抽屉移除下载（下载归我的素材，用户裁定），主操作「加入我的素材」；我的素材行 详情 | 下载（failed→「重试」）| 移出（§5.6 用户补充裁定：按钮 ≤5 全平铺，首版误收进「更多」，`8f15a6c` 改回平铺）；共用抽屉按 mode 提供上下文动作。测试先行红（7 失败）后绿；定向 96 用例、全量 331/332（唯一失败为既有 localSettingsWiring，范围外已登记）、双构建、m2b all exit 0。规范 §5.6 已回写阈值规则；范围仅交互层；标题跳来源页登记为与 §5.3 的已裁定偏差；内容池对齐另立 CHG-20260930-070（planned，待本 CHG 关闭后激活，行操作 ≤3 全平铺无「更多」）。
+  - Task 9 完成（走查四轮，用户带设计图 + 三项裁定，证据 `evidence/task9-walkthrough-four.md`）：范围切分按用户裁定「先落纯交互层，后端另立 CHG」——交互层留本任务，素材状态维度与使用情况统计登记为 `delivery/planned/CHG-20260930-071`（§4 的 Q-01～Q-06 未闭前不具备可执行范围）。两列表 8 列收敛为 6 列（素材 ID 为第一业务列，用户裁定保留；封面/标题/来源平台合成「素材」格；`视频状态` → `文件状态`）；行主操作按加入状态分支（未加入 → 加入我的素材；已加入 → 去我的素材），加入状态由客户端 join `/api/v1/my-materials` 得出，不新增后端字段；加入成功的 Toast 给「立即下载」（仅文件已就绪时）+「去我的素材」，`立即下载` 复用我的素材页的 `createDownload` 与 `createDownloadFailureMessage`；共用详情抽屉改为封面 + 标题 + 副行 + 状态徽章、三标签（概览/文件信息/来源信息）、底部只有「关闭」+ 上下文主操作。规范 §7.2/§16.2「已退役」→「已下架」并补用词说明。测试先行红（4 文件 16 失败 / 45 分母）后绿；定向 45/45、全量 340/341（唯一失败为既有 localSettingsWiring，范围外已登记）、双构建成功。与设计图一处偏差（副行只带来源平台，游戏保留独立列）已登记待用户走查裁定。
 - In progress: 无实现中任务。剩余：用户真实走查（含任务 6 两轮与任务 8 修正项）与 M4-A 签收；签收后关闭本 CHG 并激活 CHG-20260930-070（内容池交互对齐）。
 - Blocked: 真实对象 URL 可访问性取决于现有对象存储桶读权限；本 CHG 不改变桶 ACL（用户走查时验证）。
+- 记录收敛（任务 9 收尾）：`verify_product_master_alignment.py` 原先 exit 1——Status 写 `ACTIVE`（§3 已退役词、且反引号被 `status_word()` 原样保留）、缺 `## N. Pending Questions` 节、LEDGER 行随之失配。三条均为本任务之前既有。已就 Status 改 `VERIFYING`、LEDGER 同步、补 Pending Questions / `None.`、重生成 `.ai/CURRENT_CONTEXT.md`；现两条校验器均 exit 0。详见任务 9 证据的「附带修复」节。
 - 范围外备注：全量 Web 测试有一条既有失败 `localSettingsWiring.test.js`（桌面路由数量），由本 CHG 之前已存在的工作区脏改动（TasksPage 删除/路由调整）造成，不属于本 CHG，保持原样。
-- Next: 用户在已重启的 WT Media.app 中走查验收（封面/ID 列与占位图、ID 第一列、标题蓝色跳转来源页、详情四项与内容池统计四项、越权/不存在/未就绪不返回地址、下载中心两栏计数与终态行为、云端视频 URL 实际可访问性、任务 8 交互形态：素材库无下载/我的素材重试与平铺移出/两页「详情」）；签收后走 Completion Gate，关闭本 CHG 并激活 CHG-20260930-070。签收前不启动 M4-C2。
-- Recent verification: 定向 Go 五包 ok（-count=1）；定向 vitest 96 用例通过、全量 331/332（唯一失败为既有 localSettingsWiring）；`build:cloud`/`build:desktop` 成功；Cloud `--force-restart` 后 API 实测返回真实统计；`m2b-local-acceptance.sh all` 复跑 exit 0（任务 8 前端已进 DMG 与 assets）。
+- 待用户裁定（非阻塞，走查时一并确认）：① 规范 §7.2 的「文件状态」示例词仍是「未下载/下载中/已下载/下载失败」，与本 CHG 定稿的「未准备/准备中/可下载/准备失败」不一致——本轮只按用户裁定改了「已退役 → 已下架」，这条未擅自改；② 素材格副行只显示来源平台（设计图是「平台 · 游戏」，而游戏另有独立列，同一行会重复显示同一值）。
+- Next: 用户在已重启的 WT Media.app 中走查验收（封面/ID 列与占位图、ID 第一列、标题蓝色跳转来源页、详情四项与内容池统计四项、越权/不存在/未就绪不返回地址、下载中心两栏计数与终态行为、云端视频 URL 实际可访问性、任务 8 交互形态：素材库无下载/我的素材重试与平铺移出/两页「详情」；任务 9 交互形态：6 列形状与「文件状态」列名、行主操作加入/去我的素材随加入状态翻转、加入成功 Toast 的「立即下载」+「去我的素材」、详情抽屉三标签与底部单主操作、副行只带来源平台）；签收后走 Completion Gate，关闭本 CHG 并按队列激活 CHG-20260930-070（071 需先关闭其 §4 待裁定项）。签收前不启动 M4-C2。
+- Recent verification: 定向 vitest 45 用例（materials 模块）通过、全量 340/341（唯一失败为既有 localSettingsWiring）；`build:cloud`（6.32s）/`build:desktop`（6.24s）成功；`m2b-local-acceptance.sh all --force-restart` exit 0（任务 9 前端已进 DMG 与 assets）。此前：定向 Go 五包 ok（-count=1）；Cloud `--force-restart` 后 API 实测返回真实统计。
 - 提交边界备注：工作区 13 个文件的既有改动按 change.md §6 保持原样；与本 CHG 重叠的 3 个 Vue 文件其既有样式改动随 CHG 提交一并保留（内容不回退），无关文件不提交。
 - Acceptance: 等定向验证、桌面人工走查和 M4-A 用户签收；保持 M4-C2 未激活。
