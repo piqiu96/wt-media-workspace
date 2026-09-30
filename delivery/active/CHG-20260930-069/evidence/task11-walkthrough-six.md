@@ -58,9 +58,11 @@
 
 - `npx vitest run src/modules/materials` → 6 文件 / 68 用例全绿；
 - 全量 `npx vitest run` → **Test Files 1 failed | 44 passed (45)**、**Tests 1 failed | 368 passed (369)**；
-  唯一失败是既有 `src/localSettingsWiring.test.js`（桌面路由数量 `expected 20 to be greater than 20`），
-  根因是工作区里**别人未提交**的改动删掉了 `execute-tasks` 路由（`web/src/apps/desktop/router.ts`
-  与 `web/src/modules/tasks/pages/TasksPage.vue` 的删除均不在本 CHG 暂存范围），与本任务无关，保持原样；
+  唯一失败是 `src/localSettingsWiring.test.js`（桌面路由数量 `expected 20 to be greater than 20`），
+  根因是工作区里本 CHG 暂存范围之外的未提交改动删掉了 `execute-tasks` 路由（`web/src/apps/desktop/router.ts`
+  与 `web/src/modules/tasks/pages/TasksPage.vue` 的删除均不在本 CHG 暂存范围），与本任务无关；
+  **更正**：该删除后来按「单仓任务」独立提交（`029ae3a` / `5c3a5fa`），下限改为实测的 20，
+  全量随之复绿（45 文件 / 369 用例），详见 `checkpoint.md` 的范围外备注；
 - `npm run build:cloud` exit 0、`npm run build:desktop` exit 0。
 
 ## 5. 边界

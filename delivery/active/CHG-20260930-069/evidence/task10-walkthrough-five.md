@@ -125,11 +125,14 @@ Test Files  1 failed | 44 passed (45)
      Tests  1 failed | 364 passed (365)
 ```
 
-唯一失败是既有 `src/localSettingsWiring.test.js`（`expected 20 to be greater than 20`），
+唯一失败是 `src/localSettingsWiring.test.js`（`expected 20 to be greater than 20`），
 **与本 CHG 无关**，根因已定位：HEAD 的 `web/src/apps/desktop/router.ts:19,26` 有
 `execute-tasks → TasksPage.vue` 一条路由，工作区把它删了（`TasksPage.vue` 与
 `shared/api/tasks.js` 同时处于删除状态），可数的 loader 从 21 掉到 20，撞上 `>20` 的阈值。
-这两处删除都是本 CHG 之前就在工作区的脏改动，按 `change.md` §6 保持原样、不提交。
+这两处删除都是本 CHG 之前就在工作区的脏改动，按 `change.md` §6 保持原样、不随本 CHG 提交。
+**更正**：该删除后来按「单仓任务」独立提交（`029ae3a` / `5c3a5fa`），测试下限改为实测的 20，
+全量复绿（45 文件 / 369 用例）；「既有失败」这个说法也随之作废——它一直是同一处脏改动，
+不是仓库里的独立缺陷。详见 `checkpoint.md` 的范围外备注。
 
 ## 6. 实现要点
 
