@@ -15,7 +15,15 @@
 
 ## M4 Cloud 内容生产
 
-有效基线：[M4 Cloud 内容生产闭环](../milestones/M4-content-production.md)、[第五章：素材生产](../../docs/product/prd/详细文档/第五章_素材生产.md) 与 ADR-0017。M4 当前为 `IN_PROGRESS`；首个独立闭环 M4-A 由 [CHG-20260924-061](../completed/CHG-20260924-061/change.md) 承载并于 2026-09-27 关闭归档为 `DONE`，但该记录把用户签收与八条走查臂登记为**未闭合**。M4 的后续 CHG 必须等 M4-A 的真实验收后再建立。
+有效基线：[M4 Cloud 内容生产闭环](../milestones/M4-content-production.md)、[第五章：素材生产](../../docs/product/prd/详细文档/第五章_素材生产.md) 与 ADR-0017。M4 当前为 `IN_PROGRESS`；首个独立闭环 M4-A 由 [CHG-20260924-061](../completed/CHG-20260924-061/change.md) 承载并于 2026-09-27 关闭归档为 `DONE`，但该记录把用户签收与八条走查臂登记为**未闭合**。M4-C2～C8 的候选结果、依赖和验收边界见 [M4 §3.1](../milestones/M4-content-production.md#31-剩余-chg-执行边界)；它们尚非正式 CHG。M4 的后续 CHG 必须等 M4-A 的真实验收后再逐项建立。
+
+## 前端交互规范对齐（2026-09-30 立项）
+
+依据基线：[前端交互规范](../../docs/standards/前端交互规范.md)。用户裁定拆开执行：素材库/我的素材由 [CHG-20260930-069](../active/CHG-20260930-069/change.md) 任务 8 承载（走查三轮）；内容池另立草案。`delivery/active` 同一时间只允许一个活跃 CHG，故按下表顺序激活：
+
+| 草案 | 内容 | 状态 |
+| --- | --- | --- |
+| [CHG-20260930-070](CHG-20260930-070/change.md) | 内容池行操作按状态收敛、「查看→详情」、已转素材行级「素材详情」入口、忽略/恢复收纳（仅交互层，不动后端与契约） | PLANNED（待 CHG-069 关闭后激活） |
 
 ## 当前 M3 V2
 
