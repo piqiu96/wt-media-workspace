@@ -106,3 +106,12 @@ ERROR: Ledger is not aligned with active CHG CHG-20260930-069 status '`ACTIVE`'
 - 产物核对（证明跑的是任务 9 的前端，而不是上一版）：桌面侧 `wt-media-desktop/.generated/frontend/assets/` 下 `MaterialLibraryPage-oCJGBUgC.js` 含字符串「立即下载」、`MaterialDetailDrawer-BsoizIDs.js` 含「去我的素材」；两者哈希与 `npm run build:cloud` 输出的一致。
 - 说明：`frontend-build.json` 此刻仍写 `source_commit 8f15a6c` + `source_dirty true`——提交尚未发生，脏标记表示这份产物含未提交改动，属预期；下次重建（提交后）会收敛到新提交号。
 - 状态：PASS
+
+### 追加：提交后重建（供用户走查的那一次）
+
+- 命令：`bash scripts/m2b-local-acceptance.sh all --force-restart`（日志 `/tmp/m2b-task9-postcommit-*.log`）
+- **第一遍 exit 1**，但红的不是构建：日志显示两处 BitBrowser 门——第一处（启动后、建 DMG 前）`PASS`，DMG 于 16:26:54 建好并 launch，Cloud dist-desktop 重建完成；红的是**最后那一轮复验**里 agent `/api/v1/status` 的读超时（`http_json` 默认 3.0s）。随后 `m2b_local_acceptance.py verify` 复验 **exit 0**，六门全 PASS。
+- 机制（已实测）：该接口稳态 **1.21～1.35s**（连测三次，`bitbrowser_status=normal`）。`verify_bitbrowser()` 是**单发、无重试、3s 预算**（第 235 行走默认值），而同一脚本里 Cloud/Agent 门用的是 `wait_http` 的 20s 死线 + 重试。agent 刚被 `--force-restart` 拉起、桌面包又同时启动时，这个「探一次 BitBrowser 连接再拼状态」的接口越过 3s 就会把整轮判成失败——**这是一处会自造假 FAIL 的门禁**，不是环境问题。是否把该门也改成 `wait_http` 那样的重试，留给用户裁定（属 Workspace 工具，不在本 CHG 范围）。
+- 产物核对（提交后）：`frontend-build.json` 的 `source_commit` 已从 `8f15a6c` 收敛到 **`26e1f62`**（`source_dirty` 仍为 true，来自工作区其它既有脏改动，非本任务文件）。`.generated/frontend/assets/MaterialLibraryPage-oCJGBUgC.js` 含「去我的素材 / 已加入我的素材 / 立即下载 / 文件状态」，与 `web/dist-desktop` 同名产物 **SHA-256 逐字节一致**（`bcea165c…`）；阳性对照「加入我的素材 / 素材 ID」命中，阴性对照（编造串）0 命中，证明这个 grep 有判别力。
+- 证据的边界：**没能直接看进 `.app` 二进制里那最后一段**——Tauri 把 assets 压进 `wt-media-desktop-shell`，对二进制 `grep -a` 连「wt-resource-actions」都取不到，阴性对照同样 0，属空转，不能据此断言「包内没有」。可确认的是：被包装的那份产物内容正确 + `verify_dmg` 的 `check_fresh` 保证 DMG 晚于 `cloud/web` 与 `desktop/src-tauri` 的源。最后的「装上之后确实是这一版」由用户走查确认。
+- 状态：PASS（复验 exit 0）
