@@ -46,11 +46,35 @@
 - 各门：Cloud/Agent 健康 PASS、BitBrowser normal、Desktop 前端与 DMG 全新构建（含任务 6 前端）并挂载启动、Desktop assets fresh、登录冒烟 PASS user=admin。
 - 状态：PASS
 
+## 走查二轮修正（2026-09-30，用户反馈两条）
+
+### 反馈 1：统计数据全部为 0
+
+- 根因定位：`m2b_local_acceptance.py` 的 `start_cloud` 对「已健康」的服务直接返回不重启，运行中的 Cloud 为任务 5 时的旧编译产物，API 不含五个统计键，前端缺键显示 0。
+- 修正动作：`m2b_local_acceptance.py up --force-restart` 强制重启。
+- 验证（阳性对照）：登录 admin 后 `GET /api/v1/materials`，149 条素材中抽到的行返回真实统计（如 id 153：like 72,313 / favorite 15,676 / comment 4,028 / share 8,323），`view_count` 全部为 0。
+- 「播放」恒 0 的数据事实：直查 MySQL `source_contents` 518 行带 `raw.statistics` 的来源行 `play_count` 全部为 0（抖音该接口不提供播放数）；归一化映射 `statistics.play_count → view_count` 本身正确（discovery_crawler_test 有 340,000 阳性样例）。
+- 用户裁定（2026-09-30）：统计区块不展示「播放」项；`view_count` 字段保留在契约中不渲染。
+- 状态：PASS
+
+### 反馈 2：素材 ID 不能用 # 号
+
+- 修正：两列表 ID 列与详情抽屉的素材 ID 均显示纯数字，去掉 `#` 前缀；页面测试钉住 `#{{ row.id }}` / `#{{ material.id }}` 不再出现。
+- 状态：PASS
+
+### 二轮验证
+
+- 命令：`npx vitest run src/modules/materials src/modules/transfer src/shared/api/materials.test.js` → 12 文件 93 用例全部通过。
+- 命令：`npm run build:cloud` → `✓ built in 7.04s`；`npm run build:desktop` → `✓ built in 7.32s`。
+- 命令：`m2b-local-acceptance.sh all` exit 0：Cloud/Agent 健康（Cloud 为强制重启后的新代码）、BitBrowser normal、DMG 与 assets 以二轮前端重建 fresh、登录冒烟 PASS。
+- 状态：PASS
+
 ## 真实桌面包走查（待用户执行）
 
-- 环境已用任务 6 前端重建重启；用户可在 WT Media.app 中核对：ID 第一列、标题蓝色跳转、下载按钮与无小字、详情统计区块数值与既有素材数据一致。
+- 环境已用二轮前端重建重启；用户可在 WT Media.app 中核对：ID 第一列纯数字、标题蓝色跳转、下载按钮与无小字、详情统计四项与既有素材数据一致。
 - 状态：PENDING（用户签收前本 CHG 保持 ACTIVE）
 
 ## 相关提交（wt-media-cloud）
 
 - `6ffdd15` Task 6（后端投影与前端走查修正一并提交）
+- `be89265` Task 6 二轮（ID 去 # 前缀；统计区块不展示「播放」）
