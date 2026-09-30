@@ -32,7 +32,7 @@
 
 - 「查看」→「详情」：两页行操作与断言统一；`>查看</t-button>` 被测试钉住不再出现。
 - 素材库行：`详情 | 加入我的素材`（primary）；`download`/`createDownload`/`createDownloadFailureMessage`/`downloadCentre` 全部从页面移除（测试钉住缺席）；页面描述改为「加入我的素材后即可下载到本机」。
-- 我的素材行：`详情 | {{ downloadActionLabel(video_status) }} | 更多：移出`；failed 显示「重试」（§7.4），其余「下载」；移出收进 `t-dropdown`（与挖掘策略页同形状），不再平铺危险按钮。
+- 我的素材行：`详情 | {{ downloadActionLabel(video_status) }} | 移出`；failed 显示「重试」（§7.4），其余「下载」；移出平铺并保留危险样式——规范 §5.6 补充裁定（2026-09-30 用户）：按钮不超过 5 个全部平铺，超过 5 个才把低频收敛进「更多」（本行 3 个，首版误收进 `t-dropdown`，提交 `8f15a6c` 撤回收纳）。
 - 共用详情抽屉：新增 `mode` prop（library/mine）；library 上下文只有「加入我的素材」，mine 上下文只有「下载/重试」；我的素材页随之移除 `addBack`（在「我的素材」给自己一个加入按钮是同义反复，恢复路径仍是回素材库再点一次，测试注释已更新）。
 - `labels.js` 新增 `downloadActionLabel(videoStatus)`，行内与抽屉共用同一文案源。
 
@@ -49,3 +49,4 @@
 ## 相关提交（wt-media-cloud）
 
 - `84def36` Task 8
+- `8f15a6c` §5.6 补充裁定：移出改回平铺
