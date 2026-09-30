@@ -212,7 +212,35 @@ Test Files  1 failed | 44 passed (45)
 **前置**：先确认比特浏览器在 54345 上监听（本机不自启，`all` 的第一道门就是它，不先起会白起一遍
 Cloud/Agent 再中止）。
 
-**实际**：见「产物与门表」（本节于重建完成后补齐）。
+**实际**：**exit 0，六道门一次全 PASS**（这次没有复现上轮那个单发 3s 无重试的 BitBrowser 假 FAIL）。
+
+```text
+Cloud: PASS http://127.0.0.1:18080/api/v1/health
+Agent: PASS http://127.0.0.1:8765/healthz
+BitBrowser via Agent: PASS
+Desktop assets: fresh / PASS
+DMG: fresh / PASS  WT Media_0.1.0_aarch64.dmg
+Login smoke: PASS user=admin
+[exited with code 0]
+```
+
+产物核对：
+
+- `wt-media-desktop/.generated/frontend/assets/MaterialLibraryPage-DhZ_QhYt.js` 与
+  `wt-media-cloud/web/dist-desktop/assets/MaterialLibraryPage-DhZ_QhYt.js` 同名同内容，
+  SHA-256 均为 `05b5c877299b6bb1add3e8c43a4a493d55197b6b13b6897ae36cb9914051a17a`；
+- `.generated/frontend/assets` 里 `已生产成片`、`疑似重复`、`最近发布`、`已下架` 各命中 1 个文件
+  （抽屉 chunk），阴性对照 0；
+- DMG 构建时间 16:52（在 `27f74b3` 之后），产物里的 `source_commit` 戳为 **`27f74b3`**，
+  即本次任务的前端提交（上一轮是 `26e1f62`，已翻页）；
+- Cloud 在 127.0.0.1:18080、Agent 在 127.0.0.1:8765 上监听。
+
+**打包后二进制不做字符串判据**（这是量法本身的限制，不是结论）：对
+`/Volumes/WT Media/WT Media.app/Contents/MacOS/wt-media-desktop-shell` grep
+`素材状态`、`wt-resource-actions` 与阴性对照 `ZZZnotpresentZZZ`，三者**都是 0**——
+阴性对照同样是 0 说明这个 grep 在该文件上会失败（Tauri 压缩了内嵌资源），
+因此从这个 0 里得不出任何关于「包里有没有新代码」的结论。上面那条 SHA-256 相等才是判据：
+进包的前端产物就是刚构建的这一份。
 
 ## 10. 范围外登记
 
