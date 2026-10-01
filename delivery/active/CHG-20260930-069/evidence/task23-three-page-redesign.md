@@ -78,8 +78,12 @@
 
 ## 相关提交
 
-- `wt-media-cloud`（本任务提交，见文末 commit）
+- `wt-media-cloud`（本任务提交 `5091ce3`，走查修正 `560b875`）
 - 本 Workspace（证据 + checkpoint + change.md §5 任务 23，随本记录提交）
+
+## 走查修正（2026-10-01，抽屉尺寸）
+
+用户反馈「下载中心的弹窗可以参考详情的弹窗，需要更大一些的组件」：下载中心 `t-drawer` 尺寸 `min(46vw, 640px)` → `min(62vw, 880px)`（与 `MaterialDetailDrawer` 同宽）。旧宽度下历史表格五列（素材/大小/完成时间/状态/操作 ≈720px）必然横向滚动，新宽度整表一屏放得下。新增测试钉住尺寸防回退。读数：全量 vitest（web/ 下）**46 文件 / 426 用例全绿**、`build:cloud` 与 `build:desktop` 均 exit 0（均在最后一次改动之后重跑）。提交 cloud `560b875`。
 
 ## 验证 / 剩余（m2b 重建走查）
 

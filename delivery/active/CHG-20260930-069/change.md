@@ -204,7 +204,7 @@
     4. 我的素材 `#op` 改状态矩阵（全部平铺 ≤3，无「更多」）：removed→恢复使用；active+''→下载；active+downloading→不给主操作（文件已在准备）；active+downloaded→加入合成；active+failed→重新下载；恒有 详情/放弃使用。`labels.js` `DOWNLOAD_STATUSES` 增 `''`→未下载(neutral)、failed 主操作词改「重新下载」。文件状态列 `fileStatus(row)` 改**纯 `download_status`**（未下载/下载中/已下载/下载失败），video_status 兜底拿掉，云端源文件态只留详情抽屉「文件信息」区；
     5. `MaterialDetailDrawer` mine 页脚同矩阵；downloading 时「文件信息」卡渲染下载进度/速度/ETA（复用 `transferRow`，从已拉 `transfer.listTasks()` 找该素材 pending/running 的 user_download 行）+ 取消下载（`canCancel`→`transfer.cancelTask`→本地 `cancelRequested`，与下载中心同一条「本机记忆」约定）；云端文件态与本地目录区保留不动；
     6. `go test -count=1 ./...`（66 包 0 FAIL）+ 全量 vitest（web/ 下，46 文件 425 用例）+ 双构建；m2b 重建走查（不碰 8765 Agent 的 runner 入口）：三 Tab 各自窗口、矩阵 5 行、downloading 进度/取消、取消落「已取消」进历史（7 天窗口内）。
-    证据 `evidence/task23-three-page-redesign.md`。不做 DB 删除/归档 job、不加 `requested_by` 索引（展示层截断即可）；不从详情抽屉移除云端文件态；不改两阶段取消机制、不动节点注册/绑定；边界观察「从未下载 + 云端准备失败 → 显示『未下载』+『下载』（点了在下载中心快速失败）」按严格隔离接受。
+    证据 `evidence/task23-three-page-redesign.md`。不做 DB 删除/归档 job、不加 `requested_by` 索引（展示层截断即可）；不从详情抽屉移除云端文件态；不改两阶段取消机制、不动节点注册/绑定；边界观察「从未下载 + 云端准备失败 → 显示『未下载』+『下载』（点了在下载中心快速失败）」按严格隔离接受。走查修正（cloud `560b875`）：下载中心抽屉 `min(46vw, 640px)` → `min(62vw, 880px)`（与详情抽屉同宽，用户反馈「参考详情的弹窗、需要更大一些」；旧宽度下历史表格五列 ≈720px 必然横向滚动），新增测试钉住尺寸，vitest 425 → 426。
 
 ## 6. 验证与提交边界
 
