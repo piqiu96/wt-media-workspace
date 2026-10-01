@@ -1,6 +1,6 @@
 # CHG-20260930-070：内容池交互对齐前端交互规范
 
-- Status: `PLANNED`
+- Status: PLANNED
 - Level: `S`
 - 依据基线：`docs/standards/前端交互规范.md`（稳定规范）；业务闭环不变——内容池发现、筛选、转素材与忽略的业务事实以 M3 闭环（`delivery/milestones/M3-content-discovery-v2.md`）与既有代码为准，本 CHG 只对齐交互层。
 - Current repository: `wt-media-cloud`

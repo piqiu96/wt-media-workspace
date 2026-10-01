@@ -1,10 +1,11 @@
 # CHG-20261001-072：固定设备绑定、会话自动续接与个人信息
 
-- Status: `PLANNED`
+- Status: IMPLEMENTING
 - Level: `L`
+- Current repository: `wt-media-cloud`
 - 来源：2026-09-30～10-01 用户对重复绑定、手动换设备和个人信息页的裁定。
 - 业务锚点：[M2-F](../../milestones/M2-account-runtime.md)、第三章 PRD §3.2.7、[ADR-0018](../../../docs/decisions/0018-stable-device-binding-and-session-renewal.md)。
-- 激活条件：当前 [CHG-20260930-069](../../active/CHG-20260930-069/change.md) 关闭归档后，按交付队列激活；本记录当前不是活跃 CHG，不能标记为已验收。
+- 激活条件：已满足——CHG-20260930-069 于 2026-10-01 关闭归档，本记录按交付队列激活（072 为唯一活跃 CHG）。[CHG-20261001-073](../../planned/CHG-20261001-073/change.md) 为耦合伴记：共享同一 worktree，随本记录实施窗口一并执行，提交/证据按 CHG 区分，关闭时一并验收归档。
 - 代码位置：Cloud 与 Desktop 各有独立 worktree，均在 `codex/device-profile-brand` 分支；物理位置由 `config/repository-map.yaml` 定位原仓后用 `git worktree list` 查询，不在文档保存本机绝对路径。Agent 原仓未修改。
 
 ## 1. 独立结果
@@ -43,3 +44,8 @@ Provider 先更新 Cloud OpenAPI 和兼容性版本，再更新 Desktop 消费�
 ## 5. 当前实施状态与接手
 
 2026-10-01 已在上述**未提交的独立工作树**中开展实现，不能以本记录推断功能已交付。实施顺序见 [plan.md](plan.md)，文件清单、已通过和待运行验证、潜在问题见 [checkpoint.md](checkpoint.md)。接手模型先检查两个工作树 `git status` 和当前活跃 CHG，再继续验证与修复；不要在原 Cloud checkout 上覆盖 CHG-069 的未提交改动。
+
+## 6. Pending Questions
+
+None.
+

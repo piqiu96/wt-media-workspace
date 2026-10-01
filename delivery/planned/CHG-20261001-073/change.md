@@ -1,10 +1,10 @@
 # CHG-20261001-073：起飞品牌、登录页与桌面应用图标
 
-- Status: `PLANNED`
+- Status: PLANNED
 - Level: `M`
 - 来源：2026-10-01 用户提供的 Logo 和登录页参考图，并明确要求桌面端应用图标一致。
 - 业务锚点：[M2-G](../../milestones/M2-account-runtime.md)。参考图：[品牌](../../../docs/product/assets/qifei-brand-reference.png)、[登录页](../../../docs/product/assets/qifei-login-reference.png)。
-- 激活条件：当前 CHG-20260930-069 关闭归档后，与 CHG-20261001-072 按依赖协调；本记录当前不是活跃 CHG，也未验收。
+- 激活条件：随唯一活跃 [CHG-20261001-072](../../active/CHG-20261001-072/change.md) 的**耦合伴记**一并执行——共享同一 worktree，提交/证据按 CHG 区分，072 关闭时一并验收归档。本记录自身仍为 PLANNED（`delivery/active/` 同一时间只允许一个活跃 CHG）。
 - 代码位置：与 CHG-20261001-072 共用两个独立工作树及分支 `codex/device-profile-brand`，见本 CHG 的[实施进度](checkpoint.md)。后续提交与验收证据需能按 CHG 区分。
 
 ## 1. 独立结果

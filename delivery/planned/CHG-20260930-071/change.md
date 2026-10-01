@@ -1,6 +1,6 @@
 # CHG-20260930-071：素材状态写路径与使用情况统计
 
-- Status: `PLANNED`
+- Status: PLANNED
 - Level: `M`
 - 激活条件：`CHG-20260930-069` 关闭归档后，按 `delivery/planned/README.md` 的队列顺序激活（`delivery/active` 同一时间只允许一个活跃 CHG）。
 - 来源：2026-09-30 素材库走查四轮，用户带设计图并裁定「先落纯交互层，后端另立 CHG」（交互层那半由 CHG-20260930-069 任务 9 承载）。

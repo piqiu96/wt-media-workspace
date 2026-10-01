@@ -1,10 +1,10 @@
 # CHG-072 / CHG-073 实施进度（2026-10-01）
 
-本文件记录**进行中的实现草稿**，供后续模型从现有工作树继续。它不是验收证据，不改变两份 CHG 的 `PLANNED` 状态。产品裁定以 [CHG-072](change.md)、[CHG-073](../CHG-20261001-073/change.md)、[M2-F/G](../../milestones/M2-account-runtime.md) 为准。
+本文件记录**进行中的实现草稿**，供后续模型从现有工作树继续。它不是验收证据，不改变 CHG-072 的 `IMPLEMENTING` 状态。产品裁定以 [CHG-072](change.md)、[CHG-073](../../planned/CHG-20261001-073/change.md)（耦合伴记）、[M2-F/G](../../milestones/M2-account-runtime.md) 为准。
 
 ## 1. 工作区与先读顺序
 
-1. 先读 Workspace `AGENT-INDEX.md`、`.ai/CURRENT_CONTEXT.md`、`delivery/LEDGER.md`；当前原仓已有 CHG-069 的未提交改动。不要把两个独立工作树直接覆盖回原 checkout。
+1. 先读 Workspace `AGENT-INDEX.md`、`.ai/CURRENT_CONTEXT.md`、`delivery/LEDGER.md`；CHG-069 已于 2026-10-01 关闭归档，原仓 checkout 已干净。不要把两个独立工作树直接覆盖回原 checkout。
 2. 从 `config/repository-map.yaml` 找到 Cloud 和 Desktop 原仓，再用各仓 `git worktree list` 找分支 `codex/device-profile-brand` 的 worktree；Cloud 起点 `6928291`，Desktop 起点 `909d582`。两树截至本文件编写时均有**未提交**改动。先各自运行 `git status --short` 和 `git diff --stat`，不把本机物理路径写成长期事实。
 3. 读目标仓 `CLAUDE.md` 与 `AGENT-INDEX.md`，再看 Cloud 的 `contracts/cloud-agent-api/v1/runtime-binding.openapi.yaml`、`contracts/cloud-api/v1/identity.openapi.yaml`，最后看 Desktop `contracts.lock.json`。Provider 版本与消费者版本均暂改为 `2026.10.01.1`；尚未完成契约生成/兼容性全套检查。
 4. Workspace 原仓已有其他用户或 CHG 的修改：`AGENT-INDEX.md`、`AGENTS.md`、`CLAUDE.md`、`delivery/MASTER_IMPLEMENTATION_PLAN.md`、M5 文档、`docs/standards/`、`reference/` 等；不要清理或重写。
