@@ -231,6 +231,16 @@
     6. 读数：`go test -count=1 ./...` 66 包 ok / 0 FAIL、全量 vitest（web/ 下）46 文件 / 430 用例全绿、双构建 rc=0；5 条变异逐条变红后还原、还原后逐文件 sha256 一致；真实链路两读数（不打印地址）：生产适配器签发的地址 + `Range: bytes=0-1023` → **206，`bytes 0-1023/48511909`**，同一 key 的**无签名**地址 → **403**（阴性对照成立）。
     证据 `evidence/task26-video-url-presign.md`。**遗留（不阻塞本 CHG 任何验收项，交用户另裁）**：`storage.PublicURL` 改动后已无生产调用方，但「对象存储加 CDN」正是它的用途，本次不删；留一个会构造**已知 403 地址**的导出函数是个坑。**不写成 `Q-xx`** —— `scripts/verify_product_master_alignment.py:337-342` 要求 active CHG 的 §7 恰好是 `None.`，而这不是一个阻塞本 CHG 的决定。
 
+27. （2026-10-01 走查现场裁定：修法选「交给系统浏览器」，范围选「连其它外链一起修」）把外链交给系统浏览器——修「打开云端视频」在打包桌面端点不动，`wt-media-desktop` 两提交 + `wt-media-cloud` 一提交（前端，不动 Go）：
+    1. 根因（查实，非猜测）：打包的 Desktop 是 Tauri 2.11.5 的 WKWebView，而 WebView 不是浏览器。`window.open`（以及每一个 `<a target="_blank">`，走同一条路）不自己开窗口，它抛出「新窗口请求」由壳接；`new_window_handler` 从没装过（`tauri-2.11.5/src/webview/mod.rs:354,433` 两处默认构造都是 `None`），能力里也没有 `core:webview:allow-create-webview-window` → 请求被丢，`window.open` 恒返回 null。任务 26 那句「浏览器拦截了新标签页」是自造误报；
+    2. Desktop `a09dccb`：新模块 `external_links.rs`（判据只放行 `http`/`https`，`open::that` 交给系统默认浏览器，一律 `NewWindowResponse::Deny`，应用内永不开窗）；主窗口不再由 `tauri.conf.json` 自动创建（`"create": false`）而是在 setup 里用 `WebviewWindowBuilder::from_config` 重建——`on_new_window` 只在 builder 上（`webview/mod.rs:585` 按值收 `self`），且 `tauri::Builder` 没有够得到已存在 webview 的钩子。**处理器一行日志都不加**：`logging::targets` 的 target 词表是 Q-07 定死的，`webview` 那个 target 又明写只放两条 JS 错误记录；附带好处是签名地址不进 `desktop.log`；
+    3. 闸门（本任务的核心发现）：WebKit 在「有没有新窗口请求」之外还问「这次有没有用户手势」，`javaScriptCanOpenWindowsAutomatically` 在 macOS 上 wry 不设（`wry-0.55.1/src/android/kotlin/RustWebView.kt:26` 只在 Android 设）→ 留的是默认 false。用最小 WKWebView 探针量了四组：无手势的 `window.open` 与无手势锚点都到不了（pref=true 时两者都到达，阳性对照）；有激活时两者都到达；**一次激活只撑得到 250ms 与 0ms，1000ms 起全被丢**。所以「取到地址再 `window.open`」（计划里的前端那条）是亚秒级竞态，桌面端必须是本任务 `967ddb2` 那条偏好（主窗口从自己设了该偏好的 `WKWebViewConfiguration` 建；`Cargo.lock` +2 行，无新 crate）；
+    4. 对计划的偏离：计划钉的「**不要**新增 `local_open_external_url` 之类的命令」**保持住了**——收尾选的是打开那道闸门，页面要的仍然只是导航、落点由壳决定；计划写的「处理器记一条日志」**没做**（见第 2 小条）；
+    5. Cloud `b51108e`：前端按宿主交付地址，判据与两条分支的理由抽到 `web/src/modules/materials/cloudVideo.js`，抽屉只回答「现在跑在哪个宿主里」；抽出来是为了能按行为测（本仓 vitest environment 是 node、没有组件挂载），「浏览器先预留标签页再取地址」「桌面端一次都不预留」「壳返回的 null 不算被拦」「取址失败要关预留标签页」「空地址算失败」逐条钉住；
+    6. 读数：`cargo test` 502 通过 / 0 失败 / 6 忽略（与改动前同）、`cargo build` 12 条警告与改动前逐条同一批（stash 实测基线也是 12，顺带更正 `a09dccb` 里把汇总行数进去的「13」）、全量 vitest（web/ 下）47 文件 / 436 通过（任务 26 记的 46/430，+6 全是本任务新增用例）；前端 6 个变异逐条变红，还原后两文件 sha256 逐字节一致。**未跑 Go**（未改）；
+    7. 真机验收 5 条（用户手动，先提交 Cloud 再重建 DMG —— 否则 `frontend-build.json` 会把 `source_commit`/`source_dirty` 记成脏工作区）：点「打开云端视频」系统浏览器打开并播放、应用内不出新窗口；点「平台原视频」系统浏览器打开（补第 3 小条没量到的那条）；目录选择器仍可用；窗口标题/尺寸/单实例聚焦无回归；日志里不得出现签名地址。未做完，故本任务不关闭。
+    证据 `evidence/task27-external-links.md`（含可重放探针 `evidence/task27-wkwebview-probe.swift`）。**顺带查实的 Garage 一问**：Garage v2.x 没有匿名访问（403 体是上游硬编码拒绝），公开读只有 bucket website 模式一条路，bucket 级匿名访问是 WIP（上游 PR #1306，目标 3.0）——桶侧没有可翻转的开关，任务 26 的签发方向是唯一方向；本任务不改也不动桶。
+
 ## 6. 验证与提交边界
 
 - Cloud Repository/Service/Handler 与 wire/schema 测试覆盖字段映射、权限、就绪状态及 URL 生成；
