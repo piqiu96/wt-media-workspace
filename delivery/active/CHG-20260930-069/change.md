@@ -197,6 +197,14 @@
     4. 新增 jobs 级编译期绑定测试（`var run func(context.Context) error = RunTransferReconcile`，照 `discovery_test.go:8` 范式）；既有 repo 机制测试（`store_mysql_test.go:425/449`）重跑即证据；
     5. `go test -count=1 ./...`（66 包 0 FAIL）；m2b 重建 Cloud 后只重启 worker 进程（Agent 保留不重启），一个 `worker_interval` 内 3 行自愈成 `cancelled`，走查「正在取消」清成「已取消」可再次下载。
     证据 `evidence/task22-transfer-reconcile-scheduled.md`。不改两阶段取消机制、不改 `CancelTask`/`leaseable` 谓词、不改前端 `downloadFacts.js`（终态优先本就正确）、不做一次性手工 UPDATE（修复自愈即可）。
+23. （2026-10-01 用户裁定：①折入本 CHG（不新建）；②生命周期走**展示层截断**（DB 不删不归档，成功 30 天/失败 90 天/取消 7 天只是显示窗口）；③我的素材文件状态列**纯 `download_status`**（去掉 video_status 兜底）；④游戏/平台/时间/状态筛选本轮不做）三页职责重定义——我的素材按钮矩阵 + 下载中心三 Tab + 下载记录生命周期，Cloud 一仓（后端 + 前端），任务状态与业务状态严格隔离：
+    1. 后端：`dto.Task` 增**可选** `finished_at *time.Time json:"finished_at"`（无 omitempty，nullable 序列化为 `null`；不能用 `updated_at`——会被租约续租移动）；契约 `file-transfer.yaml` 属性增 `finished_at` + revision `2026.09.27.1 → 2026.10.01.1`（`contract-map business_schemas.schema_revision` 不动，任务 20 确认的独立版本空间）；`GET /api/v1/file-transfer-tasks` 增 `status`（逗号分隔、枚举校验、未知值 400 `10001`）/`finished_after`（RFC3339、解析失败 400、SQL `finished_at >= ?`）/`limit`（≤200 封顶、缺省 100、≤0 或畸形 400），handler+service+repository 三层。先红锚点：`dto_test.go` 键集测试「Go dto 键集 == yaml 属性集」，加字段后失配即红，分母 20/12；
+    2. 前端 `downloadFacts.js` 增 `isFailed`/`isHistory`（success|cancelled）/`withinDays`（取 `finished_at`，缺了退 `updated_at`）；`transferRows.js` `splitTransferRows` 改三分（active/failed/history），row 增 `finishedAt`/`finishedText`；
+    3. 下载中心三 Tab：进行中 `status=pending,running`（含云 prepare 兄弟行，`purpose==='user_download'` 过滤保留在 `transferRows` **之后**，`needsCloudPreparation` 不退化）；失败 `status=failed&finished_after=now-90d`；历史 `status=success,cancelled&finished_after=now-30d&limit=50`，cancelled 客户端再收到 7 天内。每栏各拉各的查询、计数只挂当前栏；历史用 `t-table`（素材/大小/完成时间/状态/操作）；失败行「详情」开 `MaterialDetailDrawer mode="transfer"`（只读无页脚——下载中心不承担素材管理）；轮询门加 `activeTab==='active'`；
+    4. 我的素材 `#op` 改状态矩阵（全部平铺 ≤3，无「更多」）：removed→恢复使用；active+''→下载；active+downloading→不给主操作（文件已在准备）；active+downloaded→加入合成；active+failed→重新下载；恒有 详情/放弃使用。`labels.js` `DOWNLOAD_STATUSES` 增 `''`→未下载(neutral)、failed 主操作词改「重新下载」。文件状态列 `fileStatus(row)` 改**纯 `download_status`**（未下载/下载中/已下载/下载失败），video_status 兜底拿掉，云端源文件态只留详情抽屉「文件信息」区；
+    5. `MaterialDetailDrawer` mine 页脚同矩阵；downloading 时「文件信息」卡渲染下载进度/速度/ETA（复用 `transferRow`，从已拉 `transfer.listTasks()` 找该素材 pending/running 的 user_download 行）+ 取消下载（`canCancel`→`transfer.cancelTask`→本地 `cancelRequested`，与下载中心同一条「本机记忆」约定）；云端文件态与本地目录区保留不动；
+    6. `go test -count=1 ./...`（66 包 0 FAIL）+ 全量 vitest（web/ 下，46 文件 425 用例）+ 双构建；m2b 重建走查（不碰 8765 Agent 的 runner 入口）：三 Tab 各自窗口、矩阵 5 行、downloading 进度/取消、取消落「已取消」进历史（7 天窗口内）。
+    证据 `evidence/task23-three-page-redesign.md`。不做 DB 删除/归档 job、不加 `requested_by` 索引（展示层截断即可）；不从详情抽屉移除云端文件态；不改两阶段取消机制、不动节点注册/绑定；边界观察「从未下载 + 云端准备失败 → 显示『未下载』+『下载』（点了在下载中心快速失败）」按严格隔离接受。
 
 ## 6. 验证与提交边界
 
