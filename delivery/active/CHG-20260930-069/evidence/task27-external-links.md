@@ -132,5 +132,5 @@ cd wt-media-desktop/src-tauri && cargo tauri build --bundles dmg --no-sign
 ## 8. 遗留
 
 - 真机验收 5 条未做（等用户重建 DMG），因此本任务**未关闭**。
-- 任务 26 落档时登记的那条仍在册，等用户裁定：`storage.PublicURL` 改动后已无生产调用方，删或留
-  （`change.md` §5 任务 26 第 5 小条）。
+- 任务 26 落档时登记的那条**已裁并落地**（2026-10-01，用户裁定「删掉」）：`storage.PublicURL` 连同
+  `publicBaseOf`、`registry.publicBase` 与 4 条相关用例已删除，提交 cloud `594a99c`。
