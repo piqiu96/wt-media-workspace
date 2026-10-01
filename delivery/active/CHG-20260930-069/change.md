@@ -182,6 +182,14 @@
     6. 下载中心：`rows` 在 `transferRows` **之后** `.filter((row) => row.task.purpose === 'user_download')`（提前滤掉云行会让 `needsCloudPreparation` 退化），轮询闸门 `hasLiveTask` 改对 `user_download` 判断；
     7. `go test ./...`、全量 vitest（web/ 下）、双构建；`up --force-restart` 后走查：点一次下载 → 下载中心一条（准备中→下载中→已完成）；素材页 文件状态：点击即「下载中」、成功后「已下载」、重下失败「下载失败」、从未下载的已就绪素材「可下载」；DB 依旧两行。
     证据 `evidence/task20-one-row-download-status.md`。不合并 DB 两行、不改 `video_status` 枚举、下载中心保留细分阶段（见 §3）。
+21. （2026-10-01 用户裁定「下载的文件名修改 日期/游戏名-ID-发布时间-标题名」）命名规则再改 + 修复任务 19 的 complete 400 缺陷，Agent + Cloud + Contract 三侧：
+    1. 先红：Cloud `TestCompleteTaskEnforcesTheFrozenOneSubdirectoryNamePattern` 钉住运行时校验（`20261001/三角洲-31.mp4`、`a/b.mp4` 放行；`a\b.mp4`、`a/b/c.mp4`、`/abs.mp4`、`a/b.mp4/`、`a//b.mp4`、256 字节拒绝），红在「新语义 vs 旧 `strings.ContainsAny(/\\)` 校验」；Agent executor 默认租约带 `title` 后命名形状红（红还先撞出实现丢扩展名圆点的 bug）；
+    2. 修复任务 19 缺陷：Cloud `service.go` complete 校验与契约 `Completion.file_name` pattern `^[^/\\]+(?:/[^/\\]+)?$` 对齐（`validCompletedFileName`：至多一层相对子目录、两段非空、不含 `\`、拒绝对路径/两层/`.`/`..`，空名=可选键放行）——否则新形状 `20261001/三角洲行动-30-20260922-….mp4` 同任务 19 一样被 400 卡死；
+    3. Contract：`LocalLease` 增**可选** `published_at`（format date-time，description 说明用于命名）；`info.version` → `2026.10.01.1`；`compatibility.go` 与 `contract-map.yaml` 同步（最小兼容版本 `2026.07.14.7` 不动）；
+    4. Cloud：迁移 `20261001_044_file_transfer_publish_time.sql` 加 `published_at DATETIME(6) NULL AFTER game_name`；production `CreateDownload` 把 `material.PublishedAt` 经 `CreateUserDownloadInput.PublishedAt` 传入；filetransfer 落库 + `scanTask` 读回 + `leaseBody` 带出（仿任务 19 game_name 全链路）；
+    5. Agent：`TransferLease` 增可选 `published_at: date | None`（`parse_lease` 宽容解析，不可解析→None→省略）；`DownloadSink.file_name` 新签名 → `日期/游戏名-ID[-YYYYMMDD][-标题].ext`（发布段非空才拼、空则省略；标题 `_sanitize` 消毒 + 字节预算内尾部截断；有标题时游戏名封顶 `budget//2`、标题截空则整段连同 `-` 省略；无游戏兜底 `未分类`、碰撞 `(2)`、日期目录不变）；executor `_prepare` 透传 `lease.published_at, lease.title`；
+    6. 三侧测试 + 契约三处一致核对 + m2b 端到端（重建 Cloud 含 044 迁移，Agent 保留不重启）：真实下载落 `20261001/三角洲行动-30-20260922-标题.mp4` 形状，complete 不再 400，下载中心一条「已完成」、素材页「已下载」；无发布时间的素材省略该段；标题超长截断。
+    证据 `evidence/task21-publish-time-naming.md`。不改 `LocalLease` 语义/权限模型；`game_name`/`Completion.file_name` pattern 不动（新形状仍是一层子目录）；任务 19 卡死残留两行属历史数据，验证靠新行。
 
 ## 6. 验证与提交边界
 
