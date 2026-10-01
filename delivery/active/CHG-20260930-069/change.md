@@ -190,6 +190,13 @@
     5. Agent：`TransferLease` 增可选 `published_at: date | None`（`parse_lease` 宽容解析，不可解析→None→省略）；`DownloadSink.file_name` 新签名 → `日期/游戏名-ID[-YYYYMMDD][-标题].ext`（发布段非空才拼、空则省略；标题 `_sanitize` 消毒 + 字节预算内尾部截断；有标题时游戏名封顶 `budget//2`、标题截空则整段连同 `-` 省略；无游戏兜底 `未分类`、碰撞 `(2)`、日期目录不变）；executor `_prepare` 透传 `lease.published_at, lease.title`；
     6. 三侧测试 + 契约三处一致核对 + m2b 端到端（重建 Cloud 含 044 迁移，Agent 保留不重启）：真实下载落 `20261001/三角洲行动-30-20260922-标题.mp4` 形状，complete 不再 400，下载中心一条「已完成」、素材页「已下载」；无发布时间的素材省略该段；标题超长截断。
     证据 `evidence/task21-publish-time-naming.md`。不改 `LocalLease` 语义/权限模型；`game_name`/`Completion.file_name` pattern 不动（新形状仍是一层子目录）；任务 19 卡死残留两行属历史数据，验证靠新行。
+22. （2026-10-01 走查反馈「一直卡在正在取消过程中，状态卡住无法处理」）下载取消卡死修复——transfer-reconcile 从未被调度，Cloud 一仓：
+    1. 先核实根因（只读）：取消是两阶段——`CancelTask` 对 `running` 只写 `cancel_requested_at`，终态 `cancelled` 由执行器在下次上报撞 `cancel_requested_at IS NOT NULL` 谓词时自写；执行器失联则永不写终态，且带取消请求的任务不可被认领（`leaseable` 要求 `cancel_requested_at IS NULL`）。兜底 `ReconcileCancelledTasks`/`ReconcileExhaustedTasks`（`store_mysql.go:801/829`）早已写好、单测通过，但**从未被任何调度进程注册**（死代码）；而部署只跑 `cmd/server` + `cmd/discovery-worker`，scheduler 进程根本没起。线上库 3 行实证：`running` + `cancel_requested_at` 已置 + 租约过期 + claimed 于已死节点；
+    2. 新增 `internal/jobs/transfer_reconcile.go`：`RunTransferReconcile(ctx)` 依次调 `ReconcileCancelledTasks`/`ReconcileExhaustedTasks`（`time.Now()`），计数 >0 才打一条日志（同 material-prepare 的静默原则）；reconcile 走全局 `database.DB()`，不需对象存储；
+    3. `internal/bootstrap/jobs.go` `runWorkerProcess` 注册 `transfer-reconcile`（复用 `cfg.Scheduler.WorkerInterval`，零 config 改动）——挂 worker 进程而非 scheduler 进程，因为部署只跑 server+worker，挂 scheduler 仍是死代码；
+    4. 新增 jobs 级编译期绑定测试（`var run func(context.Context) error = RunTransferReconcile`，照 `discovery_test.go:8` 范式）；既有 repo 机制测试（`store_mysql_test.go:425/449`）重跑即证据；
+    5. `go test -count=1 ./...`（66 包 0 FAIL）；m2b 重建 Cloud 后只重启 worker 进程（Agent 保留不重启），一个 `worker_interval` 内 3 行自愈成 `cancelled`，走查「正在取消」清成「已取消」可再次下载。
+    证据 `evidence/task22-transfer-reconcile-scheduled.md`。不改两阶段取消机制、不改 `CancelTask`/`leaseable` 谓词、不改前端 `downloadFacts.js`（终态优先本就正确）、不做一次性手工 UPDATE（修复自愈即可）。
 
 ## 6. 验证与提交边界
 
