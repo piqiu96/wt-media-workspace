@@ -20,3 +20,5 @@ Reports are allow-listed: normalized OS/architecture and dependency statuses/ver
 - Neither a user ID nor technical-role Cloud access can forge local resource presence.
 - Desktop integration must transport a one-time ticket to the local Agent without exposing the HttpOnly session Cookie; that end-to-end bridge is verified in C6.
 - C4 attestation alone grants no sensitive task permission. C5 still performs task-time validation and locking.
+
+ADR-0018 adds a stable, explicitly bound Desktop installation identity. Session replacement still revokes the old node credential; the same bound device obtains a fresh credential automatically after login. The device binding is not the session or node ID.
