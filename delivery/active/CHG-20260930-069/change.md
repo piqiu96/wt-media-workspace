@@ -25,11 +25,17 @@
 - 关闭统一到抽屉标题栏右上角的 `×`（2026-09-30 用户裁定「关闭按钮统一做到右上角（统一改组件统一）」）：页脚不再放「关闭」，只放业务动作并靠右收；没有业务动作时整条页脚不出现。范围是全站 `t-drawer`。**这一条不只是删两颗页脚按钮**：本仓装的 `tdesign-vue-next` 1.20.3 里 drawer 的 `closeBtn` 没有 `default`（同版本的 `dialog` 写着 `default: true`），不写 `:close-btn="true"` 的抽屉今天**没有 ×**——2026-09-30 用 headless Chrome 渲染核对过 DOM 与量测（`.t-drawer__close-btn` 在 `top: 16px; right: 8px`，落在 56px 高的页头里）。因此 12 个抽屉一律补上该属性，由站级守卫 `web/src/drawerFooterConvention.test.js` 钉住。本仓没有共享抽屉包装组件，「统一」落在守卫与规范条目（`前端交互规范.md` §6.3 / §9.1）上，不是落在某一个组件里——用户那句「改组件」按「改在组件这一层、不逐页写布局」执行，若要的是抽出包装组件需另立任务。
 - 我的素材详情的「文件信息」卡增加本机下载落点（2026-09-30 用户裁定「已下载的素材，需要有展示下载目录的地方同时能打开目录快速找到原视频」，并指定「放在文件信息一栏里」；范围裁定为「折进 CHG-069 任务 17」）：值来自两处已经存在的事实——会话里这张 `file_transfer_tasks`（`asset_type=material` + `asset_id` + `purpose=user_download` + `execution_scope=local_agent` + `status=success` + `file_name`，服务端按 `created_at DESC, id DESC` 返回，取第一条）与 Desktop 侧量出来的 `local_saved_file_states`（`directory`）。**「已下载」由本机事实判定，不拿 `video_status === 'ready'` 冒充**——文件状态说的是云端那份源文件，本机下载进度从来不是它的含义。按钮只做一件事：在文件管理器里打开那一份所在的目录。这需要 Desktop 新增一个命令 `local_reveal_saved_file`（收**名字**不收路径，与 `local_open_saved_file` 同形，复用 `saved_files::find_in_known` 与 `commands::reveal` 的打开动作）：现有命令里没有能按名定位到目录的——`local_open_saved_file` 是 `open::that(文件)`，交给默认播放器打开视频本身；`local_open_place` 只认 app 自有目录的位置标签。因此本 CHG 从「只改 Cloud」扩到 `wt-media-desktop/src-tauri`；Tauri 命令载荷不在 `docs/contracts/` 的跨仓契约里，按 Desktop 仓 `AGENT-INDEX.md` 那句「命令载荷构成前端接口，变化时核对 Cloud 的 Vue 调用」在同一任务内两侧一起改。
 - 下载中心分为“正在下载”（pending/running）和“最近完成”（success/failed/cancelled）。保留真实任务状态、取消、重试、重新下载和打开文件行为。
+- 下载中心显示层合并（2026-10-01 用户裁定「一次点击在下载中心只显示一条记录，用状态区分阶段」）：一次点击在库里是两行（`compose_input_prepare` 云准备 + `user_download` 本机下载，同一毫秒同建），下载中心只显示 `user_download` 那一条——**展示层合并，DB 不动**。过滤必须在 `transferRows` **之后**：`taskState → needsCloudPreparation` 要看到兄弟云任务才知道「等待云端准备」，提前滤掉云行会退化成「排队中」。轮询闸门同时改为只对 `user_download` 判断。
+- 素材页「文件状态」补全下载侧生命周期（2026-10-01 用户裁定「排队到传输都算下载中」「准备失败和本地下载失败都属于下载失败，用户不需要知道那么细致」）：`MaterialUsage` 增**按用户派生**的可选 `download_status`（后端按该用户最新一条 `user_download` 任务派生：pending/running→`downloading`、success→`downloaded`、failed/cancelled→`failed`，`''`=从未下载过；`omitempty` 让从未下载的行与旧响应字节一致），我的素材列表与共用详情抽屉的「文件状态」= `download_status` 优先 + `video_status` 兜底（`video_status=failed` 也呈现「下载失败」）。这是第四组状态维度，与冻结的 `video_status` 分开。
 - 公开对象 URL 的前提是现有对象存储地址与桶策略允许公开读取；本 CHG 不修改桶 ACL 或发布外部配置。
 
 ## 3. 明确不做
 
-- 不改变 Local Agent 下载、保存目录、任务记录或完整性校验；
+- 不合并 `file_transfer_tasks` 两行：`compose_input_prepare` 是 M4-B/M5 合成管线预留的共享输入准备契约，CHECK 约束/去重键/租约模型/执行器都建立在两行协作上（Python Agent 只执行 `user_download`），只做展示层合并；
+- 不改 `video_status` 冻结枚举、不改 使用状态 字段与来源；下载中心单条任务仍细分阶段（准备中/下载中/已完成）——两处说法按用户裁定保留差异（列表页简化、下载中心细分）；
+- 素材库页（`MaterialLibraryPage`）无用户关系语义，不加下载状态（默认；要加再议）；判定只看 `user_download` + 该用户，不看 `compose_input_prepare`（云准备只通过 `video_status` 兜底参与）。
+
+- 除任务 18/19 外，不改变 Local Agent 下载、保存目录、任务记录或完整性校验（任务 18 改下载引擎的故障分类与重试，任务 19 改落盘命名与保存目录的一层子目录，均经用户裁定并入本 CHG）；
 - 不把对象 key、长期存储凭据或本机路径写入素材列表、任务记录或日志；
 - 不向非详情接口返回云端视频 URL；
 - 不包含合成策略、合成任务或 M4-C2；
@@ -67,6 +73,8 @@
 - 抽屉关闭统一（2026-09-30 用户裁定，见 §2 与任务 16）：全站 12 个 `t-drawer` 的页脚不含「关闭」按钮，关闭入口是标题栏右上角的 `×`；页脚只放业务动作并靠右收。守卫测试同时钉两条：页脚里不得出现 `关闭`（分母与不经切片的正则读数对齐，切片器坏掉时两数对不上）、每个抽屉必须写 `:close-btn="true"`（不写就没有 ×）。素材详情与本机扫描结果两个抽屉的页脚「关闭」在本任务撤掉；本机扫描结果的页脚在「没有可接受的变化」时整条不出现，不留空条。
 - 我的素材详情（2026-09-30 用户裁定，见 §2 与任务 17）：已在本机下载过的素材，在「文件信息」卡里显示本机那一份所在的目录，并给一颗「打开目录」；未下载过、或本机事实读不到（浏览器构建、Desktop 还没扫到）时**整行不出现**，不写「未下载」——与下载中心同一条约定（读不到本机 ≠ 文件不在）。目录是 Desktop 量出来的，不是前端拼的路径；按钮的动作是打开该目录（不在文件管理器里选中该文件，见任务 17「不在本轮」）。
 - 定向 Go/Web 测试、Desktop `cargo test`、Cloud 与 Desktop Web 构建通过；真实桌面页面留给用户走查签收。
+- 下载中心（2026-10-01 任务 20）：一次点击下载只显示**一条**记录，从「准备中（等待云端准备）→ 下载中 → 已完成」随任务事实推进；DB 里仍是两行（`compose_input_prepare` + `user_download`），`file_transfer_tasks` 无变化。
+- 我的素材列表「文件状态」列（任务 20）：点击下载即「下载中」，成功后「已下载」，重新下载失败显示「下载失败」（`video_status` 与 `download_status` 两种失败都呈现「下载失败」）；从未下载过的已就绪素材仍显示「可下载」；从未下载过的准备失败素材显示「下载失败」。
 
 ## 5. 有序任务
 
@@ -151,6 +159,29 @@
     4. Desktop `cargo test`、定向 vitest、全量 vitest、双构建；`up --force-restart` 后用真实任务表读一次目录，并核对新命令已在 Rust 侧注册。
     证据 `evidence/task17-download-directory.md`。
     不在本轮：在文件管理器里**选中**那个文件（`open -R` / `tauri-plugin-opener` 是平台分支，本仓 `open` 这个轮子只做到「打开目录」；`bundle.targets` 是 `all`，写一条只有 macOS 能跑的分支等于另外两个平台拿不到实现）；「已下载」这一维不进列表列与筛选（用户只说了详情）。
+18. （2026-09-30 用户裁定「帮我解决当前下载不成功的问题」，修法范围「改 Agent 引擎 + 我留意基建」；故障取证见 checkpoint「走查反馈四条」第③条——丢包 16.5% 的链路上，早断流被归成 `Integrity`（丢 part 从头下）、连接失败被归成非 retryable 的 `SourceUnavailable`，两者都把坏链路变成终态）下载引擎硬化，Agent 一仓：
+    1. 先红：`tests/test_transfer_source.py` 与 `tests/test_material_download_executor.py` 钉住目标分类——早断流 → `download_stalled` 且 part 保留续传；unreachable host → retryable；签名过期仍非 retryable；secret-policy 全绿；:1096 词表不变；
+    2. `executors/material_download.py` 末尾大小校验：`written < total`（早断）改抛 `Stalled`（retryable、不丢 part），over-delivery / 摘要不符仍 `Integrity`；
+    3. `clients/transfer/source.py`：`URLError` 非超时与 `OSError` 从 `SourceUnavailableError` 改抛 `SourceStalledError`；`HTTPError`（签名过期）与 `ValueError`（畸形地址）保持非 retryable；
+    4. `clients/cloud/client.py` `_http_transfer_transport`：捕 `URLError`/`TimeoutError` → `TransferUnavailableError`（心跳/进度/complete 的网络失败从 `executor_error` 终态改为 `LeaseUnconfirmed` 重试）；
+    5. 全量 Agent 测试；在丢包链路上实测一条断链重试到完成。
+    证据 `evidence/task18-download-engine.md`。不新增下载错误码（复用 `download_stalled`）；契约 `local-error-codes/v1/transfer.yaml` 不动。
+19. （2026-09-30 用户裁定「对于文件名按照日期/游戏-素材ID进行命名」；命名形状「日期目录不带横杠 + 文件名 `游戏-素材ID`」，无游戏兜底 `未分类`，日期取下载日期 Agent 本机时钟）落盘命名改 日期/游戏-素材ID，Agent + Cloud + Desktop + Contract 四侧：
+    1. Contract：`LocalLease` 增可选 `game_name`；`Completion.file_name` 模式放宽为至多一层子目录 `^[^/\\]+(?:/[^/\\]+)?$`；`info.version` → `2026.09.30.1`；`compatibility.go` 与 `contract-map.yaml` 同步；
+    2. Cloud：迁移 `20260930_043_file_transfer_game_name.sql` 加 `game_name VARCHAR(64) NULL AFTER asset_title`；production `CreateDownload` 用 `identityservice.ResolveGame` 解析游戏名 → `CreateUserDownloadInput.GameName`；filetransfer 落库 + `leaseBody` 带出；前端不动（`file_name` 透传）；
+    3. Agent：`DownloadSink.file_name` 改 `日期/游戏-素材ID`（`today` 注入可测试），executor `_prepare` 用 `lease.game_name`（空 → `未分类`），`commit` 对日期子目录 `mkdir`；
+    4. Desktop：`file_name_of` 放宽为一层相对子目录 + 文件名（逐段校验、拒深层/绝对路径），`entry_in` 一层下钻查日期目录，`find_in_known`/`scout`/`presences` 经 `entry_in` 自动生效；
+    5. 三仓测试 + 契约核对 + m2b 端到端：真实下载落 `20260930/三角洲行动-30.mp4`，详情「本机下载目录」与「打开目录」在日期目录生效。
+    证据 `evidence/task19-date-game-naming.md`。不改后端 API 语义/数据库状态枚举/权限模型；`<标题>` 在下载中心记录里保持。
+20. （2026-10-01 用户裁定「一次点击在下载中心只显示一条记录，用状态区分阶段」「排队到传输都算下载中」「准备失败和本地下载失败都属于下载失败」）下载中心显示层合并 + 素材页「文件状态」补全下载生命周期，Cloud 一仓（后端 + 前端）：
+    1. 先红：filetransfer `LatestUserDownloadStatuses` 仓存测试（多条取最新一条、空 ID 列表不查询、命中/空集）与 service 测试（透传用户、`userID <= 0` 拒绝）；production `ListMyMaterials` 派生测试与映射函数 `downloadStatusOf`（pending/running→downloading、success→downloaded、failed/cancelled→failed、''→空）测试；wire_test 分母 9 → 10；
+    2. 后端：filetransfer 仓存新增 `LatestUserDownloadStatuses(userID, materialIDs)`（`requested_by=? AND asset_type='material' AND purpose='user_download' AND asset_id IN (…)`，`ORDER BY created_at DESC, id DESC` 首见去重=最新一条）→ Store 接口 + service 方法 + `operations.go` wired 函数；production `TransferCreator` 接口接线 → `ListMyMaterials` 建好 `visible` 后批量查、把原始任务状态映射为 `MaterialUsage.DownloadStatus`（`json:"download_status,omitempty"`，与 `status` 平级按用户派生）；
+    3. 契约（增量兼容）：`content-production.yaml` `MaterialUsage` properties 增**可选** `download_status` enum [downloading, downloaded, failed]，revision `2026.10.01.1`；冻结 `video_status` 枚举不动；
+    4. 前端 `labels.js`：增三档 下载中(info)/已下载(success)/下载失败(danger)，不改 `VIDEO_STATUSES` 冻结数组；
+    5. 前端列表与详情：`MyMaterialsPage` 的 `toRows` 带 `download_status`，文件状态 cell 按 `download_status` 优先 + `video_status` 兜底；`MaterialDetailDrawer` 从已拉的 `transfer.listTasks()` 就地派生同一语义（mine 上下文）；
+    6. 下载中心：`rows` 在 `transferRows` **之后** `.filter((row) => row.task.purpose === 'user_download')`（提前滤掉云行会让 `needsCloudPreparation` 退化），轮询闸门 `hasLiveTask` 改对 `user_download` 判断；
+    7. `go test ./...`、全量 vitest（web/ 下）、双构建；`up --force-restart` 后走查：点一次下载 → 下载中心一条（准备中→下载中→已完成）；素材页 文件状态：点击即「下载中」、成功后「已下载」、重下失败「下载失败」、从未下载的已就绪素材「可下载」；DB 依旧两行。
+    证据 `evidence/task20-one-row-download-status.md`。不合并 DB 两行、不改 `video_status` 枚举、下载中心保留细分阶段（见 §3）。
 
 ## 6. 验证与提交边界
 
