@@ -85,11 +85,62 @@
 
 用户反馈「下载中心的弹窗可以参考详情的弹窗，需要更大一些的组件」：下载中心 `t-drawer` 尺寸 `min(46vw, 640px)` → `min(62vw, 880px)`（与 `MaterialDetailDrawer` 同宽）。旧宽度下历史表格五列（素材/大小/完成时间/状态/操作 ≈720px）必然横向滚动，新宽度整表一屏放得下。新增测试钉住尺寸防回退。读数：全量 vitest（web/ 下）**46 文件 / 426 用例全绿**、`build:cloud` 与 `build:desktop` 均 exit 0（均在最后一次改动之后重跑）。提交 cloud `560b875`。
 
+## 走查修正（2026-10-01，第二轮：标题溢出 + 去「重试」+ 每素材一行）
+
+用户本轮走查提三条，全部折进任务 23（同 CHG，不新建）。用户两项裁定：**A.「重试」与「重新下载」合并为单一「重新下载」**（前后端一起清）；**B. 每个素材一行 + 已成功的不能再次下载**。
+
+### Part 1 历史 Tab 标题冲出边界（前端 CSS，根因在行内元素）
+
+`DownloadCentreDrawer.vue` 的 `.transfer-table__title` **三件套齐全但不生效**：它是个行内 `<span>`，`overflow/white-space/text-overflow` 在行内元素上不产生裁切盒子，长标题直接压出单元格。补 `display: block; max-width: 100%;`（对齐同仓可用写法 `.material-title`，`MyMaterialsPage.vue:308`），三件套原样保留。断言用模板读 `.transfer-table__title` 规则块，钉住 `display: block` 与 `max-width: 100%`。
+
+### Part 2 去掉「重试」，失败行只留「重新下载」（前端 + 后端 + 契约）
+
+根因是两个动作对同一行同时成立：`canRetry`（failed 且 attempts 有余、非等待类错误码）走 `retryTask` **复用原行**；`canRedownload`（failed/cancelled 恒真）走 `createDownload` **新建一行**。后端既有注释（`service.go`）已写明等待云端准备而失败的行「出路是 new download 而不是 retry」——即「重新下载」才是一律成立的那个动作。
+
+- **前端**：`DownloadCentreDrawer.vue` 删 `retry()` 与两处「重试」按钮（进行中栏本就恒不成立，一并清掉死按钮）；`transferRows.js` 行对象去掉 `canRetry`；`downloadFacts.js` 删 `canRetry` 与 `WAITER_RELEASE_CODES`；`shared/api/fileTransfer.js` 删 `retryTask`（删后全仓无调用方）。
+- **后端**：`router.go` 删路由、`handler.go`/`service/operations.go`/`service/service.go`（含 Store 接口那行）/`service/store_adapter.go`/`repository/store_mysql.go` 逐层删除。**`cloudagent` 模块的同名 `RetryTask` 是另一功能，未触碰**。
+- **契约**：`contracts/cloud-api/v1/file-transfer.openapi.yaml` 删 `/api/v1/file-transfer-tasks/{task_id}/retry` path，`info.version` `2026.09.26.2 → 2026.10.01.1`；`contracts/cloud-api/README.md` 去掉 retry 字面。该 openapi 是文档性契约（`dto_test` 的键集锚点指向另一个文件 `cloud-agent-api`，不校验此文件），版本号的判别力在于「与 path 集合同步」而非机器校验——如实登记。
+
+### Part 3 每个素材一行（前端展示层收敛 + 后端幂等去重）
+
+**先说清这不是 DB 错**：`reference/state-models/README.md` 规则 4/5——`file_transfer_task` 记录**过程**、`material` 记录**资产**，执行记录默认保留。重复的来源有两处，都不该靠删数据解决：
+1. `createUserDownloadTask` 的去重键带**代次** `userDownloadDedupeKey(assetID, userID, assignedNodeID, finished+1)`，`finished` = 终态行数（`store_mysql.go`）——每次进入终态后再点就是新代次 = 新行；
+2. 每栏各查各的 `status`，同一素材的失败行与成功行会**跨栏各出现一次**。
+
+收敛口径与「我的素材」的派生（`production/service.go` `downloadStatusOf` ← `LatestUserDownloadStatuses` **取该素材最新一条 user_download**）对齐。
+
+- **前端**：`DownloadCentreDrawer.vue` 改**一次查询 + 客户端按素材收敛**——`listTasks({ limit: 200 })`（不带 `status`/`finished_after`：`finished_after` 会把 `finished_at` 为 null 的非终态行滤掉，不能用），`transferRows(...)` → `purpose === 'user_download'` 过滤（仍保留在 `transferRows` **之后**，`needsCloudPreparation` 不退化）→ 按 `asset_id` **首见去重**（服务端顺序 `created_at DESC, id DESC`，首见即最新）。分栏按最新任务的 `status` 归栏，窗口在客户端套（失败 90 天；历史 success 30 天、cancelled 7 天）。删掉 `QUERIES`/`daysAgoISO` 那套按栏查询。轮询门不变（`visible && activeTab==='active' && hasLiveTask(liveDownloads)`）。任务 23 已加的三个后端参数**保留不回退**（`limit` 仍在用，`status`/`finished_after` 成为可选能力）。
+- **后端**（防客户端绕过）：`createUserDownloadTask` 事务闭包开头先查该（素材, 用户, `user_download`）**最新一条**任务的 `status`，若为 `success` 则**直接返回那条既有行**（不新建代次）。做成**最新一条**而非「任意一条成功」是为了与 `LatestUserDownloadStatuses` 同口径——那正是界面上「已下载」标签的来源，两者不一致会让「显示已下载」与「还能再下」同时成立。
+
+### Part 4 「已成功的不能再次下载」
+
+`downloadFacts.canRedownload` 去掉 `success && presence === absent` 那支（连带 `presence` 参数），只对 `failed`/`cancelled` 为真；下载中心那句「文件已不在本机已知的保存位置，可以重新下载」去掉后半句承诺，只陈述事实（`rows` 里成功行的 `canRedownload` 因此恒假，`transferRows.test.js` 三条读数为证）。
+
+### 测试（先红后绿）
+
+- **web 定向**：`DownloadCentreDrawer.test.js` 重写 tabs 块（单一查询、按素材收敛成一行、按最新任务归栏、三栏窗口、失败行只有 `重新下载`+`详情`）；新增「无 retry 按钮与 retry 调用残留」与「历史标题在单元格内被裁切」（断言 `display: block` / `max-width: 100%`）；`downloadFacts.test.js` 去 `canRetry`、`canRedownload` 只认 failed/cancelled；`transferRows.test.js` 钉 `'canRetry' in row === false`、成功行 `canRedownload === false`；`fileTransfer.test.js` 去 retry；`labels.js` failed 主操作词「重试」→「重新下载」。
+- **Cloud 定向**：`handler_test.go` 路由表去掉 retry 行（路由表被整表钉住，少一行即红）；`service_test.go`/`store_mysql_test.go` 去掉 RetryTask 用例；新增 `TestCreateUserDownloadTaskRepeatsAnAlreadySuccessfulDownload`（sqlmock：最新为 success → 返回既有行、不新建；最新为 failed → 照常新代次）。
+
+### 读数
+
+- `gofmt -l internal/modules/filetransfer/` → 空（新增 sqlmock 常量块对齐用单文件 `go fmt` 修平；**未**整仓 `cargo fmt`/全仓格式化）
+- `go build ./...` → 干净；`go test -count=1 ./...` → **66 包 ok / 0 FAIL**
+- `npx vitest run`（cwd = `web/`）→ **46 文件 / 428 用例全绿**（上一轮走查修正时实测 426；本轮净 +2——删掉 retry 相关用例的同时新增了裁切与去 retry 断言）
+- `build:cloud` 与 `build:desktop` 均 exit 0（均在最后一次改动之后重跑）；两个 `npm run` 都必须在 `web/` 下落跑——在仓根跑是 `ENOENT: …/wt-media-cloud/package.json`（与 vitest 同一条规矩），第一次就这么误跑了一次，改目录后 `rc=0` 才是真读数
+- 契约：`file-transfer.openapi.yaml` `2026.10.01.1`、无 retry path；`contract-map.yaml` 未动
+
+### 与计划不符 / 边界
+
+- **一处与计划文字不符（如实登记）**：计划 Part 2 写「删两处『重试』按钮（进行中 309、失败 334）」，实际只有失败栏那一处是真按钮，进行中栏的 `canRetry/canRedownload/canOpen` 在该栏恒为假——按计划把这几个死条件一并清掉，只留「取消」。
+- **待确认项按批准执行**：Part 4 后，「文件已下载成功但本机文件被删」的素材没有重新下载入口（我的素材对该态本就给「加入合成」），按用户原话「已成功的不能再次下载」一律不重下。
+- 不删 DB 任何执行记录；不做素材状态机重构；`cloudagent` 的同名 `RetryTask` 不动；不动节点注册/绑定。
+
 ## 验证 / 剩余（m2b 重建走查）
 
 前端有变 → 整跑，但**不碰 8765 Agent 的 runner 入口**（沿用节点绑定约束）：
 
-- 下载中心三 Tab：进行中（点下载 → 下载中/进度/取消）；失败（造一次失败 → 原因/时间/重新下载）；历史（成功行表格式、打开文件/重新下载；>30 天成功与 >7 天取消不出现——可用旧数据验证窗口）；
+- 下载中心三 Tab：进行中（点下载 → 下载中/进度/取消）；失败（造一次失败 → 原因/时间/重新下载）；历史（成功行表格式、打开文件；>30 天成功与 >7 天取消不出现——可用旧数据验证窗口）；
+- 本轮四条新增核对：① 历史 Tab 里超长标题被省略号裁在单元格内、不压出边界；② 失败栏每素材一行、只有「重新下载」+「详情」，全站无「重试」入口；③ 同一素材多次下载只显示最新一条（不是每代次一行）；④ 已成功的素材无法再下载（行上只有「打开文件」，点下载入口不会新建任务）；
 - 我的素材矩阵 5 行逐一核对按钮；文件状态列纯四态；详情抽屉 downloading 显示进度/速度/ETA + 取消下载；
 - 取消后行落「已取消」进历史（7 天窗口内）。
 
