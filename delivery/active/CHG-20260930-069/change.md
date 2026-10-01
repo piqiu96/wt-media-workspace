@@ -206,6 +206,31 @@
     6. `go test -count=1 ./...`（66 包 0 FAIL）+ 全量 vitest（web/ 下，46 文件 425 用例）+ 双构建；m2b 重建走查（不碰 8765 Agent 的 runner 入口）：三 Tab 各自窗口、矩阵 5 行、downloading 进度/取消、取消落「已取消」进历史（7 天窗口内）。
     证据 `evidence/task23-three-page-redesign.md`。不做 DB 删除/归档 job、不加 `requested_by` 索引（展示层截断即可）；不从详情抽屉移除云端文件态；不改两阶段取消机制、不动节点注册/绑定；边界观察「从未下载 + 云端准备失败 → 显示『未下载』+『下载』（点了在下载中心快速失败）」按严格隔离接受。走查修正（cloud `560b875`）：下载中心抽屉 `min(46vw, 640px)` → `min(62vw, 880px)`（与详情抽屉同宽，用户反馈「参考详情的弹窗、需要更大一些」；旧宽度下历史表格五列 ≈720px 必然横向滚动），新增测试钉住尺寸，vitest 425 → 426。**走查修正第二轮（cloud `7955724`）**，用户三条反馈 + 两项裁定（「重试」与「重新下载」合并为单一「重新下载」，前后端一起清；每个素材一行 + 已成功的不能再次下载）：① 历史 Tab 标题溢出——`.transfer-table__title` 三件套齐全但是行内 `<span>`，补 `display: block; max-width: 100%`（对齐 `.material-title`）；② 去「重试」——前端删 `canRetry`/`WAITER_RELEASE_CODES`/`retryTask`/按钮与处理、后端逐层删 `RetryTask`（路由/handler/operations/service/Store 接口/store_adapter/repository）、契约删 retry path + `info.version 2026.09.26.2 → 2026.10.01.1`（`cloudagent` 模块的同名 `RetryTask` 不动）；③ 每素材一行——下载中心改**一次查询 + 客户端按素材首见去重**（口径与「我的素材」`LatestUserDownloadStatuses` 取最新一条对齐；执行记录按状态模型规则 4/5 原样保留，只是展示层收敛），后端 `createUserDownloadTask` 增「最新为 success 则返回既有行」的幂等去重防绕过；④ 已成功不重下——`canRedownload` 只认 failed/cancelled，去掉「文件已不在…可以重新下载」的后半句承诺。读数：66 包 ok / 0 FAIL、全量 vitest（web/ 下）**46 文件 / 428 用例全绿**、双构建 exit 0。
 
+24. （2026-10-01 用户裁定：并行分片折进本 CHG；分片默认 8）分片 part 文件的存储层支持，`wt-media-agent` 一仓（`storage/download_sink.py` + `tests/test_download_sink.py`）：
+    1. 诊断实测对象存储对**每条 TCP 流**限速 ~112–160 KB/s、聚合随连接数线性（8 流 8.44×、64 流 80 Mbps 撞线路）、全程回 206 —— 分片**不必动基建**；Agent 引擎严格单连接串行，46 MB 素材只用掉线路 0.9%；
+    2. 分片 k 写自己的 `<safe_task_id>.part.<k>`，各自**只追加**、各自的大小就是它自己的续传依据 —— 不引入任何持久化分片账本，崩溃一致性与改动前相同（既有不变式：**磁盘文件大小是唯一的续传依据**，`resume_offset` docstring 明写「不信 checkpoint」）。代价是拼装期间磁盘峰值 2×；
+    3. 新增 `part_path(task_id, shard=None)`（`None` 保持单流形状，负序号 `ValueError`）/`shard_offset`/`append_shard`/`assemble_shards`（`"wb"` 拼装、顺带截断上次中断的合并；哈希留在执行器）/`written_bytes`/`shard_indices`；`discard` 与 `commit` 扩展为连分片一起收（`commit` 在 `replace` **之后**清理，先删会把 re-merge 需要的字节丢掉）；
+    4. 匹配一律**精确词干**，不用 `glob(f"{safe}.part*")` —— 任务 `a` 不能删掉任务 `a1` 的文件；
+    5. 本任务**没有调用方**（执行器在任务 25 才接上），只增加 API 与测试；13 条变异逐条变红后还原、还原后逐文件 sha256 一致；一条登记为**等价变异**（`_task_parts` 的 `.isdigit()` 子句不可达，改为简化匹配器而不是编夹具）；
+    6. 自查时发现并修掉自己刚写的缺陷：`written_bytes` 第一版把该任务所有 part 大小相加，「拼装完成、尚未 commit」窗口里报 `2 × total` 给 Cloud。抓法是**跟着消费者走**（读 `_report_failure` 的调用点）而不是推演生产者；改成 `max(合并, 分片之和)` 后 amend 进本任务提交。
+    证据 `evidence/task24-shard-part-files.md`。不改 `LocalLease`、契约、`info.version`、`contract-map.yaml`、`REQUIRED_LEASE_FIELDS`。
+25. （接任务 24）执行器并行分片，`wt-media-agent` 一仓（`executors/material_download.py` + `tests/test_material_download_executor.py`）：
+    1. 新增模块常量（构造函数可注入，对齐既有 `DEFAULT_CHUNK_BYTES` 范式）：`DEFAULT_SHARD_COUNT = 8`、`MIN_SHARD_BYTES = 4 MiB`、`DEFAULT_SHARD_POLL_SECONDS = 0.5`。分片数是**模块常量 + 构造函数默认值**，不是契约字段、不是配置项；
+    2. `_attempt` 拆出 `_classify_transfer_error` 供线程体复用；`_transfer` 变分派器，原主体原样搬进 `_transfer_single`；`_plan` 判定顺序：`count==1` → 单流｜有分片 part（含序号 ≥ count 的残留）→ 分片｜否则有正式 `.part` → 单流（改动前就在下载中的旧任务）｜否则 → 分片。**这个顺序别换**；
+    3. `ThreadPoolExecutor`（stdlib；ADR-0016 禁的是 `os/socket/http/urllib/subprocess/sqlite3/ctypes/requests`，**没禁 `threading`/`concurrent.futures`**；HTTP 仍只经 `clients/transfer.open_source`）。分片线程只做「读网络 + 追加自己的 part + 累加一个加锁的总数」，**主线程独占** `_Progress.note`，所以进度上报与心跳仍是既有 ~2 秒窗口语义、Cloud 侧流量不变；
+    4. 三种情况回退单流，其中「服务端不认 Range」**在同一次尝试内**回退（`200` 不是故障，不该吃掉 attempt 预算）；判据落在**任何 `offset > 0`** 的分片拿到 `range_honoured == False`（分片 0 本来就不发 Range 头）。「206 但 `Content-Range` 起点不符」判 `SourceUnavailable`（非 retryable）是**照既有**（`source.py` 已这么判，任务 18 定过），一致性优先于自创；
+    5. 收尾逐分片校验 `size == region_len` 再顺序拼装，同一次读里算整份 sha256（sha256 不可由分片摘要合成，这一遍躲不掉）；`_prepare` 的 `require_room` 在分片路径上按 **2×** 申请；`_report_failure` 的 `completed_bytes` 改用 `written_bytes`；
+    6. 22 条变异逐条变红后还原；并发臂用 `threading.Barrier(N)` 放进假 opener（串行实现会超时失败，不是时序测试）。**计划里两处判断被实测推翻并如实登记**：① 「既有单流臂会静默切到分片路径」不成立（body 4096 字节，`4096 // 4 MiB == 0`，本来就是 1），仍显式钉 `shards=1` 但理由改成「一个只是碰巧单流的臂会在阈值移动那天开始量另一条路」；② 计划要求给测试假 opener 加锁 —— **没加**，`list.append`/`pop` 在 GIL 下本就原子，加一把从不 acquire 的锁是装饰（先确实写了那把锁和一段「防日志交织」的注释，自查时改回一句实话）。
+    证据 `evidence/task25-parallel-shard-transfer.md`。已知代价写进证据：故障时一次尝试最多多等一个 socket 超时（`shutdown(wait=True)` 等运行中的分片在下一块察觉 `stop`；未启动的 future 靠 `cancel_futures=True` + worker 开头查 `stop` 收掉）。**端到端真机验证未执行**，见 checkpoint Blockers。
+26. （2026-10-01 用户裁定：video-url 的 403 由端点改签发 presign；抽屉里的视频链接改成点击时才取地址）视频链接改签发 presign + 前端点击取址，`wt-media-cloud` 一仓（后端 + 前端 + 契约）：
+    1. 诊断的附带发现：`GET /api/v1/materials/:id/video-url` 返回**无签名**地址，桶拒绝匿名读（403 `Garage does not support anonymous access yet`），任务 2 的验收项「云端视频 URL 实际可访问性」当前不成立；
+    2. 后端：`productionObjectLinker.PublicObjectURL`（`storage.PublicURL`）→ `PresignObjectURL(ctx, objectKey)`（`storage.PresignGet`），`ObjectLinker` 随接口改形，`Service.VideoURL`/`operations.VideoURL`/handler 增 `ctx` 并透传。grant 的 `ExpiresAt` **不到达响应体**（契约只有 `url`，点击时取址后没有持有中的地址需要过期信息）；
+    3. 前端 `MaterialDetailDrawer.vue`：去掉开抽屉预取、`videoUrl` ref 与「地址获取中」中间态，链接按 `video_status === 'ready'` 直接渲染、点击才取址。**空标签页在 `await` 之前同步开出来**（跨过 await 后浏览器不算「用户手势」，那时才调的 `window.open` 会被 WebKit 拦，而打包的 Desktop 用的就是它），`opener` 置空、拿到地址后 `location.replace`；同步就被拦时不发那次签名请求；
+    4. 契约（本任务的核心之一，不是附注）：openapi `info.version 2026.09.30.2 → 2026.10.01.1` + `summary`/`description`/`200` 改写（原文「it is not a presigned grant and carries no expiry」改后即假话）；业务 schema `MaterialVideoLink` 描述改写 + `revision 2026.10.01.1 → 2026.10.01.2`。**不加 `expires_at` 字段**；
+    5. **对计划的一处偏离**：计划写「同步 `contract-map.yaml business_schemas.schema_revision`」，**未动**（仍 `2026.07.14.4`）—— `scripts/verify_m0_config.py:99-100` 把它钉成常量，任务 20 已确认那是与业务 schema 文件 `revision` **独立的版本空间**，任务 21/23 改同类契约时同样只动前者。按计划改会同时打红校验器并覆盖一条已确认的裁定；
+    6. 读数：`go test -count=1 ./...` 66 包 ok / 0 FAIL、全量 vitest（web/ 下）46 文件 / 430 用例全绿、双构建 rc=0；5 条变异逐条变红后还原、还原后逐文件 sha256 一致；真实链路两读数（不打印地址）：生产适配器签发的地址 + `Range: bytes=0-1023` → **206，`bytes 0-1023/48511909`**，同一 key 的**无签名**地址 → **403**（阴性对照成立）。
+    证据 `evidence/task26-video-url-presign.md`。**遗留（不阻塞本 CHG 任何验收项，交用户另裁）**：`storage.PublicURL` 改动后已无生产调用方，但「对象存储加 CDN」正是它的用途，本次不删；留一个会构造**已知 403 地址**的导出函数是个坑。**不写成 `Q-xx`** —— `scripts/verify_product_master_alignment.py:337-342` 要求 active CHG 的 §7 恰好是 `None.`，而这不是一个阻塞本 CHG 的决定。
+
 ## 6. 验证与提交边界
 
 - Cloud Repository/Service/Handler 与 wire/schema 测试覆盖字段映射、权限、就绪状态及 URL 生成；
