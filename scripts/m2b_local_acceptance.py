@@ -45,7 +45,10 @@ GO_BIN = Path(os.environ.get("GO_BIN", "/Users/aqiuye/Develop/workspace/devenv/g
 GOROOT = os.environ.get("GOROOT", "/Users/aqiuye/Develop/workspace/devenv/go26/go")
 GOPATH = os.environ.get("GOPATH", "/Users/aqiuye/Develop/workspace/devenv/go19/gopath")
 AGENT_PYTHON = Path(os.environ.get("PYTHON_BIN", AGENT_DIR / ".venv" / "bin" / "python"))
-DMG_PATH = DESKTOP_DIR / "target" / "release" / "bundle" / "dmg" / "WT Media_0.1.0_aarch64.dmg"
+# Where launch_dmg attaches the freshly built DMG. A fixed private mountpoint
+# (instead of the default /Volumes/<product>) so the script never depends on the
+# product or volume name, and never opens a leftover mount instead of the new build.
+DMG_MOUNT = RUNTIME_DIR / "dmg-mount"
 
 
 def log(message: str) -> None:
@@ -255,12 +258,29 @@ def verify_assets() -> None:
     print("Desktop assets: PASS")
 
 
+def current_dmg() -> Path:
+    """The freshest built DMG.
+
+    The filename embeds the product name and version
+    (WT Media_0.1.0_aarch64.dmg -> 起飞_0.1.0_aarch64.dmg), so it is found by glob
+    rather than hardcoded: a rename or version bump must not break the script.
+    """
+    dmg_dir = DESKTOP_DIR / "target" / "release" / "bundle" / "dmg"
+    candidates = sorted(
+        dmg_dir.glob("*.dmg"), key=lambda p: p.stat().st_mtime, reverse=True
+    )
+    if not candidates:
+        raise RuntimeError(f"DMG: no *.dmg under {dmg_dir}")
+    return candidates[0]
+
+
 def verify_dmg() -> None:
     log("Verifying DMG")
-    if not DMG_PATH.is_file() or DMG_PATH.stat().st_size == 0:
-        raise RuntimeError(f"DMG: missing {DMG_PATH}")
-    check_fresh(DMG_PATH, [(CLOUD_DIR, ("web",)), (DESKTOP_DIR, ("src-tauri",))], "DMG")
-    print(f"DMG: PASS {DMG_PATH}")
+    dmg = current_dmg()
+    if dmg.stat().st_size == 0:
+        raise RuntimeError(f"DMG: empty {dmg}")
+    check_fresh(dmg, [(CLOUD_DIR, ("web",)), (DESKTOP_DIR, ("src-tauri",))], "DMG")
+    print(f"DMG: PASS {dmg}")
 
 
 def clean_artifacts() -> None:
@@ -290,11 +310,23 @@ def rebuild_cloud_dist() -> None:
 
 def launch_dmg() -> None:
     log("Launching latest DMG")
+    dmg = current_dmg()
     subprocess.run(["pkill", "-f", "wt-media-desktop-shell"], check=False)
-    for volume in ["/Volumes/WT Media", "/Volumes/WT Media 1"]:
-        subprocess.run(["hdiutil", "detach", volume], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    run(["hdiutil", "attach", str(DMG_PATH)])
-    run(["open", "/Volumes/WT Media/WT Media.app"])
+    # Mount at a fixed private mountpoint and detach it first: a leftover
+    # /Volumes/<product> mount from an earlier run could otherwise be opened
+    # instead of the fresh build, and its name is not scripted anywhere.
+    subprocess.run(
+        ["hdiutil", "detach", str(DMG_MOUNT)],
+        check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    DMG_MOUNT.mkdir(parents=True, exist_ok=True)
+    run(["hdiutil", "attach", "-mountpoint", str(DMG_MOUNT), str(dmg)])
+    apps = sorted(DMG_MOUNT.glob("*.app"))
+    if len(apps) != 1:
+        raise RuntimeError(
+            f"DMG mount: expected one .app under {DMG_MOUNT}, found {[p.name for p in apps]}"
+        )
+    run(["open", str(apps[0])])
 
 
 def verify_all() -> None:
