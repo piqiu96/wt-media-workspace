@@ -1,6 +1,6 @@
-# CHG-072 / CHG-073 实施进度（2026-10-01）
+# CHG-072 / CHG-073 实施进度（2026-10-02，已关闭）
 
-本文件记录**进行中的实现草稿**，供后续模型从现有工作树继续。它不是验收证据，不改变 CHG-072 的 `IMPLEMENTING` 状态。产品裁定以 [CHG-072](change.md)、[CHG-073](../../planned/CHG-20261001-073/change.md)（耦合伴记）、[M2-F/G](../../milestones/M2-account-runtime.md) 为准。
+本文件此前记录**进行中的实现草稿**。2026-10-02 走查完成：交付**阶段 0（样式与即时修复）+ 073 品牌**，走查结论、关闭读数与遗留见 [change.md](change.md) §5 与 [evidence/phase0-walkthrough-and-closing.md](evidence/phase0-walkthrough-and-closing.md)。**联动功能（阶段 1-3）未实现**，归入 [CHG-20261002-074](../../planned/CHG-20261002-074/change.md)。产品裁定以 [CHG-072](change.md)、[CHG-073](../../planned/CHG-20261001-073/change.md)（耦合伴记）、[M2-F/G](../../milestones/M2-account-runtime.md) 为准。
 
 ## 1. 工作区与先读顺序
 

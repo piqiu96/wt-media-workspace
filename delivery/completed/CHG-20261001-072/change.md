@@ -1,6 +1,6 @@
 # CHG-20261001-072：固定设备绑定、会话自动续接与个人信息
 
-- Status: IMPLEMENTING
+- Status: CLOSED
 - Level: `L`
 - Current repository: `wt-media-cloud`
 - 来源：2026-09-30～10-01 用户对重复绑定、手动换设备和个人信息页的裁定。
@@ -43,7 +43,9 @@ Provider 先更新 Cloud OpenAPI 和兼容性版本，再更新 Desktop 消费�
 
 ## 5. 当前实施状态与接手
 
-2026-10-01 已在上述**未提交的独立工作树**中开展实现，不能以本记录推断功能已交付。实施顺序见 [plan.md](plan.md)，文件清单、已通过和待运行验证、潜在问题见 [checkpoint.md](checkpoint.md)。接手模型先检查两个工作树 `git status` 和当前活跃 CHG，再继续验证与修复；不要在原 Cloud checkout 上覆盖 CHG-069 的未提交改动。
+2026-10-02 走查完成并关闭。交付内容为**阶段 0：样式与即时修复**（隐藏工作台菜单、数据分析移位、移除环境检测页、顶栏工作环境胶囊、http.js 401 修复、PersonalInfoPage 状态与保存按钮、登录页品牌文案、顶栏品牌区版本号）+ 073 的品牌与图标。走查结论与关闭读数见 [evidence/phase0-walkthrough-and-closing.md](evidence/phase0-walkthrough-and-closing.md)。
+
+**联动功能（阶段 1-3）未实现**——desktop/web 会话共存、执行凭据独立与落盘、node 两层、下载重投递与解绑重分配、比特环境自助确认，全部归入 [CHG-20261002-074](../../planned/CHG-20261002-074/change.md)（契约 v2 主线，已备登记草稿）。
 
 ## 6. Pending Questions
 

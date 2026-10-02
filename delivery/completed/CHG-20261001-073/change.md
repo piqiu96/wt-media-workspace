@@ -1,6 +1,6 @@
 # CHG-20261001-073：起飞品牌、登录页与桌面应用图标
 
-- Status: PLANNED
+- Status: CLOSED
 - Level: `M`
 - 来源：2026-10-01 用户提供的 Logo 和登录页参考图，并明确要求桌面端应用图标一致。
 - 业务锚点：[M2-G](../../milestones/M2-account-runtime.md)。参考图：[品牌](../../../docs/product/assets/qifei-brand-reference.png)、[登录页](../../../docs/product/assets/qifei-login-reference.png)。
@@ -28,4 +28,4 @@ Cloud Web 与 Desktop 的登录页、顶部品牌和网页图标统一为“起�
 
 ## 4. 当前实施状态
 
-2026-10-01 已在独立工作树中实现页面、SVG、favicon 和 Tauri 图标/名称改动，尚未完成双构建、打包和人工走查。实施顺序见 [plan.md](plan.md)，具体文件与下一步见 [checkpoint.md](checkpoint.md)。
+2026-10-01 在独立工作树中实现页面、SVG、favicon 和 Tauri 图标/名称改动，随 CHG-20261001-072 阶段 0 一并走查验收（cloud `a88604c`、desktop `0519fa8`），2026-10-02 用户确认验收，随 072 归档。走查结论与关闭读数见 [CHG-072 关闭证据](../../completed/CHG-20261001-072/evidence/phase0-walkthrough-and-closing.md)。实施顺序见 [plan.md](plan.md)。
