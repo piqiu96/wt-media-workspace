@@ -1,129 +1,327 @@
-# WT Media Agent Index
+# WT Media Workspace Agent Index
 
-> 本文件是 WT Media 全部仓库的 **Agent 统一索引与治理规范正文**（中文）。表述冲突时以本文件为准；与 `delivery/`、`docs/decisions` 中的确认记录冲突时，以确认记录为准。
->
-> Workspace 的 `AGENTS.md`（Codex 入口）与 `CLAUDE.md`（Claude Code 入口）提供五分钟内可读完的项目定位、关联工程、任务执行、相关文档和关键约束。它们只概述行动路线；正式规则、流程和例外以本文件为准。运行仓入口同样提供可直接使用的定位和任务起点，长期规则由各仓自己的 `AGENT-INDEX.md` 承载。
+本文件定义 `wt-media-workspace` 的长期 Agent 工作规则，以及 WT Media 多仓之间的任务路由、上下文协作和 Delivery 规则。
 
-按“读取顺序与上下文加载”渐进读取；`.ai/CURRENT_CONTEXT.md` 的 Required Reading Order 是它的生成物镜像。入口只负责把读者带到这里，本文件不要求读者返回入口。
+系统级 Product、Architecture、Contract、Decision 和 Delivery 由 Workspace 维护；Cloud、Agent、Desktop 的本仓工程规则由各自 `AGENT-INDEX.md` 维护。
 
-## 1. 本仓库定位
+本文件不复制产品、架构、协议或运行仓规则，也不记录当前 Milestone、CHG、临时任务状态和本机路径。
 
-`wt-media-workspace` 是 WT Media 多项目系统的研发控制中心（Engineering Control Plane）。
 
-- **拥有**：产品需求、工程架构、跨仓库协议、技术决策、交付生命周期、AI 开发协作规范。
-- **不拥有**：运行时代码、服务运行代码、构建产物、临时文件。
-- **只保存**：知识、规范、决策、交付状态。
+## 1. Workspace 与关联工程
 
-运行时代码分别由 `wt-media-cloud`、`wt-media-agent`、`wt-media-desktop` 维护。实际路径从 `config/repository-map.yaml` 读取。
+`wt-media-workspace` 是 WT Media 的研发控制中心（Engineering Control Plane），负责系统级知识、决策、交付和跨仓协作，不承载运行时代码。
 
-## 2. 红线（不可协商）
+| 仓库 | 主要职责 |
+| --- | --- |
+| `wt-media-workspace` | Product、Architecture、Contract、Decision、Delivery、AI 协作规则 |
+| `wt-media-cloud` | 业务事实、Backend、HTTP API、数据、Cloud Runtime，以及 Cloud Web / Desktop 共用的 Vue 业务源码 |
+| `wt-media-agent` | 运营电脑上的本地执行、浏览器自动化、Profile、Cookie、本地文件及其他受控执行 |
+| `wt-media-desktop` | Tauri Runtime、系统桥、Local Agent Sidecar 生命周期和安装包 |
 
-- 运行时改动只在对应工程仓库执行；本仓库不得成为任何运行时的依赖。
-- 本仓库不得存放运行时代码、业务实现、编译文件、临时输出或自动生成产物。
-- 讨论、建议与假设不自动进入实施范围；以用户当前明确指令和已确认的 Delivery、Decision 为准。
-- 不得实现 Delivery 中标记为 Explicitly Not Doing 的内容。
-- 关联工程路径以 `config/repository-map.yaml` 为准，脚本与文档不得另行硬编码，也不得与之漂移。
-- `.ai/CURRENT_CONTEXT.md` 由脚本生成；禁止手工编辑，执行根父层不得出现副本。
-- `skills/` 是唯一源；`.claude/skills`、`.codex/skills` 等生成副本不得手工编辑。
-- 不引入第二套任务管理系统。
+任务按实际能力和代码 Ownership 路由，不根据页面名称、产品名称或需求表述机械分仓。
 
-## 3. 知识地图与唯一可信来源
+关联工程物理路径统一从：
 
-| 位置 | 内容 | 权威性 |
-| --- | --- | --- |
-| `delivery/` | Milestone、实施状态、验证结果、完成交付 | 交付唯一可信来源 |
-| `docs/product` | 产品需求、用户场景、功能目标、验收标准 | 产品唯一可信来源 |
-| `docs/engineering/architecture` | 系统架构、模块边界、分层与通信规约 | 工程唯一可信来源 |
-| `docs/engineering/specs` | 技术规范、工程标准、开发约束 | 工程唯一可信来源 |
-| `docs/contracts` | API Contract、Cloud–Agent 协议、Cloud–Desktop 协议、Event Schema | 协议唯一可信来源 |
-| `docs/decisions` | 架构选择、技术取舍、ADR 记录 | 决策唯一可信来源 |
-| `config/` | repository-map、skills-distribution、contract-map、release-matrix | 配置事实 |
-| `skills/` | Codex / Claude skill 唯一源文件 | skill 唯一源 |
-| `bin/` | 本地开发环境的统一启停入口（`bin/control.sh`） | 运营入口 |
-| `scripts/` | 快照生成、skill 分发、入口与治理校验；分类与落位规则见 `scripts/README.md` | 治理工具 |
+`config/repository-map.yaml`
 
-其他历史文档（含 `docs/superpowers/` 下的分析材料）不作为新开发依据；分析材料必须经 Delivery 或 Decision 确认后才可驱动修改。执行根 `wt-media/` 不承载 `docs/`，不存在第二份文档树。
+读取。
 
-## 4. 读取顺序与上下文加载
+文档和脚本不得维护第二份固定工程路径。
 
-当前工具的入口已自动载入时不必重读；随后读本文件和 `.ai/CURRENT_CONTEXT.md`，了解项目边界与当前状态。快照的 Required Reading Order 是这条基础路径的生成物镜像，不要求每个任务加载同一套后续资料。
 
-- **分析或小修改**：根据问题选择产品、工程、协议或决策资料；不因快照显示 `none` 就建立 CHG。
-- **交付规划、状态查询或 CHG 执行**：用 `delivery/LEDGER.md` 定位活动记录，再读相关 Milestone、CHG 和必要的稳定基线。
-- **涉及运行仓**：使用目标仓当前工具对应的入口、`AGENT-INDEX.md` 和 `DIRECTORY_MAP.md`，按实际改动进入代码与测试。
+## 2. 核心边界
 
-不默认加载全量代码、`delivery/completed/`、旧证据、历史文档或全量 skills。开工时检查受影响仓库的工作区状态，避免覆盖已有修改。
+- Workspace 不存放运行时代码，也不能成为 Cloud、Agent 或 Desktop Runtime 的运行时依赖。
+- 运行时代码只修改在其所属工程，不复制到 Workspace。
+- 用户讨论、分析、建议和假设不自动进入实施范围；实施以当前明确指令和已确认的 Delivery / Decision 为准。
+- 不实现 Delivery 中明确排除的范围。
+- `.ai/CURRENT_CONTEXT.md` 是生成内容，禁止手工维护第二份执行快照。
+- `skills/` 是 Skill 源目录；分发到各 Harness 的 Skill 副本不手工修改。
+- 不建立第二套 Delivery、任务状态或临时上下文系统。
 
-## 5. 关联仓库与职责边界
 
-| 仓库 | 拥有 | 不拥有 |
-| --- | --- | --- |
-| `wt-media-cloud` | 后端服务、HTTP API、业务编排、数据存储（MySQL / Redis）、Scheduler、Cloud Runtime | 浏览器自动化、本地机器操作、Desktop UI |
-| `wt-media-agent` | 本地执行能力、浏览器自动化、Agent Runtime、系统级操作 | Cloud 业务逻辑、数据业务管理 |
-| `wt-media-desktop` | Desktop 应用、Tauri 运行环境、用户交互、本地桥接能力 | Cloud 业务逻辑、Agent 内部执行能力 |
-| `wt-media-workspace` | 知识、规范、决策、交付状态 | 上述全部运行时职责 |
+## 3. 系统事实来源
 
-仓库路径只从 `config/repository-map.yaml` 获取；文档与脚本不另写固定相对路径。
+不同类型的信息由不同位置负责，不设置一套覆盖所有内容的全局优先级。
 
-工程可以并行执行，但不得同时修改其他工程拥有的代码与正式治理状态。
+| 位置 | 负责内容 |
+| --- | --- |
+| `docs/product/` | 产品需求、用户场景、功能目标和产品验收 |
+| `docs/engineering/architecture/` | 系统架构、模块边界、分层和通信设计 |
+| `docs/engineering/specs/` | 工程规范、技术标准和开发约束 |
+| `docs/contracts/` | 跨仓 API、协议、Event Schema 和数据契约 |
+| `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
+| `reference/state-models/` | 可引用的业务状态说明与一致性索引；不独立裁定产品状态或接口枚举 |
+| `delivery/` | Milestone、CHG、执行状态、验证和完成交付 |
+| `config/` | 仓库映射、Skill 分发、Contract 映射和发布配置等治理配置 |
+| `skills/` | Claude Code / Codex Skill 源文件 |
+| `scripts/` | 上下文生成、Skill 分发和治理校验工具 |
+| `bin/` | 本地开发环境统一启停入口 |
 
-## 6. 需求路由
+历史分析、旧 Evidence 和已完成 Delivery 不作为当前任务的默认依据。
 
-先确认**实际要修改的能力和文件归属**，再确定责任仓库，不根据需求中的产品名或界面名直接分派。Cloud 负责服务、业务状态、API 和 Cloud Web；Agent 负责本地执行与浏览器自动化；Desktop 负责 Tauri 运行环境、桌面交互和本地桥接。Desktop 使用的业务页面也可能属于 Cloud Web，应按代码归属核对。
+分析结果只有在进入 Product、Architecture、Contract、Decision 或 Delivery 后，才成为正式项目事实。
 
-跨仓变更由 Workspace 维护共同目标和协议，各责任仓分别实施。具体目录和本仓约束以目标仓的入口、`AGENT-INDEX.md` 与 `DIRECTORY_MAP.md` 为准；遇到边界不明时先核对架构和现有实现，再决定落点。
 
-## 7. 端到端工作流
+## 4. 上下文加载
 
-跨仓任务先明确目标、受影响仓库和协议变化，再由各责任仓实施并验证自己的部分。Workspace 汇总已确认的交付状态，以及需要进入稳定基线的产品、架构和协议结果。具体实施步骤由当前任务和目标仓实际情况决定。
+采用渐进式加载，不要求所有任务读取固定材料。
 
-## 8. 交付治理
+### 普通分析和小修改
 
-必须创建 `delivery/active/<change-id>/` 的情形：中大型功能、跨项目修改、架构调整、Contract 调整。该目录至少包含 `change.md` 与 `checkpoint.md`。
+从当前问题开始，只读取解决问题需要的文档、代码和测试。
 
-小修改可直接执行：文档修正、小 Bug、不影响行为的重构。分析和建议不因阅读交付资料或快照显示无活动 CHG 而创建 CHG；只有确认进入交付实施且达到上述条件时才建立。
+不因为存在 Workspace 或 `.ai/CURRENT_CONTEXT.md` 就自动创建 CHG。
 
-**归档边界**：`delivery/completed/` 是只读归档，不作为当前状态依据，也不默认加载。关闭 CHG 时将记录从 `active/` 与 `LEDGER.md` 移出并保留在 `completed/`；具体边界见 [`delivery/completed/README.md`](delivery/completed/README.md)。
+### CHG 任务
 
-## 9. 变更规则与完成检查
+先读取当前 CHG，再根据：
 
-- 实施前确认本次指令与已有交付记录的关系；分析与建议可以先形成可评审结论，无需建立 CHG。
-- 执行中的 CHG 在每轮结束时更新其 `checkpoint.md`，记录已完成、未完成、阻塞和下一步；小修改和分析任务不套用这项要求。
-- 完成前按实际改动核对责任仓、跨仓协议、必要测试和交付记录。提交与收口的细节在相应任务的 skill 和 Delivery 记录中处理。
+- CHG 的目标与范围；
+- References；
+- 实施过程中实际发现的依赖；
 
-## 10. Agent 入口与执行快照
+读取相关 Product、Architecture、Contract、Decision 和代码。
 
-### 入口文件
+References 是优先入口，不限制任务确实需要的进一步查证。
 
-下表说明入口与快照各自承载的内容。
+### 涉及运行仓
 
-| 文件 | 角色 | 强制 |
-| --- | --- | --- |
-| `AGENT-INDEX.md` | 本仓是治理规范正文；运行仓承载各自长期规则与架构边界 | 四仓都必须存在 |
-| `AGENTS.md` | Codex / OpenAI Harness 入口；概述项目定位、任务起点和关键约束 | 四仓都必须存在 |
-| `CLAUDE.md` | Claude Code 入口；概述项目定位、任务起点和关键约束 | 四仓都必须存在 |
-| `DIRECTORY_MAP.md` | 该仓**目录事实与禁止扫描区**的唯一落点 | 运行仓必须存在；本仓不要求（本仓目录树在“知识地图与唯一可信来源”及 `README.md`） |
-| `.ai/CURRENT_CONTEXT.md` | 执行状态快照（生成物） | 必须存在且唯一 |
+进入目标工程时：
 
-`AGENTS.md` 与 `CLAUDE.md` 是**平级入口**，不允许互相软链或互相替代，也不与本文件矛盾。会话只使用当前工具对应的入口，随后沿本文件、快照、相关交付与文档、目标仓规则、代码的方向前进。
+1. 使用当前 Harness 对应的入口文件；
+2. 读取该仓 `AGENT-INDEX.md`；
+3. 目标位置不明确时读取 `DIRECTORY_MAP.md`；
+4. 再进入目标代码、直接依赖、调用方和相关测试。
 
-两份入口允许概述同一组定位、任务分类和关键约束，以便首次进入时直接理解项目；详细条件、例外与长期规则由对应仓库的 `AGENT-INDEX.md` 维护。运行仓的目录事实归 `DIRECTORY_MAP.md`。
+Workspace 不复制运行仓局部规则。
 
-### 执行状态快照
+### 默认不加载
 
-`.ai/CURRENT_CONTEXT.md` 只保存当前执行状态：当前 Milestone、当前 CHG、当前状态、必读文件顺序、受影响仓库、稳定基线路径与稳定职责边界。
+默认不做：
 
-- 由 `scripts/prepare_ai_workspace.py` 生成；无活动 CHG 也是合法状态
-- 禁止手工编辑；禁止在执行根父层再放一份
-- 禁止写入历史记录、完整决策库或临时验证内容
-- Milestone 专属决策不复制进快照，由当前 CHG 指明其依赖的 Decision 记录
+- 全量代码扫描；
+- `delivery/completed/` 扫描；
+- 历史分析和旧 Evidence 扫描；
+- 全量 Skills 源码扫描；
+- 与任务无关的工程扫描；
+- 构建、缓存、临时和生成目录扫描。
 
-## 11. 多 Agent 并行
+任务确实需要扩大范围时可以扩大，并说明要解决的问题。
 
-- 禁止多个 Agent 同时修改 `.ai/CURRENT_CONTEXT.md`。
-- **仅当同一个 CHG 需要多个工程并行实施时**，才在该 CHG 下建立 `delivery/active/<change-id>/status/`，按 `<repo>.md` 逐仓记录当前状态、修改内容、验证结果；单仓实施的 CHG 不建该目录。
-- 由 workspace 统一汇总，不引入第二套任务管理系统。
 
-## 12. 校验
+## 5. Delivery 与跨仓执行
 
-根据本次修改的范围选择校验，不默认运行所有脚本。常用命令在 `README.md` 的“Verification”；脚本用途在 `scripts/README.md`，具体行为以脚本和测试为准。跨仓校验应依据协议、schema 或行为，避免依赖易随重构变化的源码字面量。校验结果以本次实际运行输出为准。
+### 任务类型
+
+以下情况通常建立 CHG：
+
+- 中大型功能；
+- 跨仓修改；
+- Architecture 调整；
+- Contract 调整；
+- 需要明确范围、计划和验收的工程变更。
+
+以下任务可以直接进行：
+
+- 分析和调研；
+- 问题定位；
+- 文档修正；
+- 小 Bug；
+- 明确的小范围单仓修改；
+- 不影响行为的简单重构。
+
+如果直接任务在执行过程中扩大为跨仓、架构或 Contract 变化，再进入 CHG 管理。
+
+### CHG 文件
+
+活动 CHG 位于：
+
+`delivery/active/<change-id>/`
+
+文件职责：
+
+- `change.md`
+  - 为什么做；
+  - 做什么；
+  - 范围；
+  - References；
+  - Acceptance Criteria。
+
+- `plan.md`
+  - 如何实现；
+  - 复杂或中大型 CHG 使用；
+  - 记录技术方案、实施顺序和验证计划。
+
+- `checkpoint.md`
+  - 当前完成情况；
+  - 未完成内容；
+  - 阻塞；
+  - 下一步。
+
+- `status/<repo>.md`
+  - 仅同一 CHG 需要多个工程并行实施时使用；
+  - 记录对应工程的当前进度、修改和验证结果。
+
+单仓 CHG 不创建 `status/`。
+
+不创建独立 `context.md`。
+
+任务上下文由当前 CHG、相关事实源和 `.ai/CURRENT_CONTEXT.md` 共同提供。
+
+### 跨仓执行
+
+Workspace 维护：
+
+- 共同目标；
+- CHG 范围；
+- 系统级 Contract / Architecture；
+- 整体交付状态。
+
+各运行仓维护：
+
+- 自己的代码；
+- 本仓工程规则；
+- 本仓测试和验证。
+
+Workspace 发起跨仓任务时，直接通过当前 Workspace 上下文访问关联工程，不向运行仓复制临时任务上下文。
+
+运行仓完成自己的 CHG 工作后：
+
+- 多仓 CHG 更新对应 `status/<repo>.md`；
+- 整体状态由 Workspace 汇总到 `checkpoint.md`。
+
+如果实施过程中发现需要改变：
+
+- 跨仓 Contract；
+- 系统 Architecture；
+- 仓库 Ownership；
+- 已确认 CHG 范围；
+
+先更新 Workspace 中的共同定义，再继续扩大实现。
+
+### 完成与归档
+
+CHG 完成前确认：
+
+- Acceptance Criteria 满足；
+- 必要验证通过；
+- 相关 Contract / Architecture 已同步；
+- checkpoint 和多仓状态已收口；
+- 稳定事实已经进入对应正式文档。
+
+完成记录移入：
+
+`delivery/completed/`
+`delivery/completed/` 是历史归档，不作为当前状态依据，也不默认加载。
+
+## 6. Agent 入口与执行快照
+
+### Harness 入口
+
+Workspace 和各运行仓分别维护：
+
+- `AGENTS.md`
+  - Codex / OpenAI Harness 入口；
+
+- `CLAUDE.md`
+  - Claude Code 入口；
+
+- `AGENT-INDEX.md`
+  - 本仓长期 Agent 工作规则。
+
+`AGENTS.md` 与 `CLAUDE.md` 是平级入口。
+
+入口文件负责快速说明：
+
+- 项目定位；
+- 关联工程；
+- 任务执行；
+- 相关文档；
+- 关键约束。
+
+详细规则不在入口文件重复。
+
+运行仓额外维护：
+
+- `DIRECTORY_MAP.md`
+  - 代码导航；
+  - 验证入口；
+  - 默认扫描边界。
+
+### CURRENT_CONTEXT
+
+`.ai/CURRENT_CONTEXT.md` 是当前 AI 执行快照，由：
+
+`scripts/prepare_ai_workspace.py`
+
+生成。
+
+它用于提供：
+
+- 当前 Milestone；
+- 当前 CHG；
+- 当前状态；
+- 受影响仓库；
+- 当前任务入口；
+- 稳定事实源位置。
+
+它不是新的事实源，不复制：
+
+- 产品正文；
+- 架构正文；
+- Contract 正文；
+- 完整 Decision；
+- 技术实施方案；
+- 历史执行记录。
+
+禁止手工编辑，也不在 Workspace 外建立第二份副本。
+
+
+## 7. Skills 与验证
+
+### Skills
+
+`skills/` 是 Skill 唯一源目录，按现有 scope 管理，例如：
+
+- `common/`
+- `workspace/`
+- `agent/`
+- `desktop/`
+
+由现有脚本分发到对应 Harness 目录。
+
+正常任务使用已经分发的 Skills，不默认扫描源 `skills/`。
+
+只有以下任务才读取 Skill 源目录：
+
+- Skill 开发；
+- Skill 修改；
+- Skill 分发；
+- Skill 治理。
+
+### 验证
+
+验证范围与修改范围匹配。
+
+优先使用：
+
+- 目标仓已有测试；
+- 仓库现有脚本；
+- Contract / Schema 校验；
+- 已有构建和验收入口。
+
+不默认执行全部仓库、全部构建和全部测试。
+
+涉及跨仓 Contract、Schema 或运行边界时，必须同时核对提供方和消费方。
+
+具体命令和脚本行为以：
+
+- Workspace `README.md`
+- `scripts/README.md`
+- 目标运行仓 `DIRECTORY_MAP.md`
+- 当前代码和测试配置
+
+为准。
+
+验证结果以本次实际执行输出为准。

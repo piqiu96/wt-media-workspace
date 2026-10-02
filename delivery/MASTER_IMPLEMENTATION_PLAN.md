@@ -450,13 +450,15 @@ material
 ```text
 M4-C1 / CHG-20260924-061 素材库、material_usage 与原素材懒加载准备/下载（DONE，2026-09-27 归档）
 M4-C2 compose_strategy 模板、参数、版本和人工选择
-M4-C3 compose_task 模型、API、状态、策略快照、取消和重试
-M4-C4 对象存储、FFmpeg/FFprobe 与 Cloud Compose Worker 基础设施
-M4-C5 人工任务从源视频准备到 composite_output 的真实闭环
+M4-C3 compose_task 模型、API、不可变策略快照、批量创建与排队中取消
+M4-C4 对象存储、FFmpeg/FFprobe 与独立 Cloud Compose Worker 基础设施
+M4-C5 人工任务从源视频准备到 composite_output 的真实闭环，含运行中取消与单任务安全恢复
 M4-C6 我的成片、来源追踪和去发布入口
-M4-C7 file_transfer_task、下载中心 Drawer 与 Local Agent 本地文件落地
+M4-C7 复用 file_transfer_task 与下载中心 Drawer，扩展成片的 Local Agent 本地文件落地
 M4-C8 真实视频、对象存储、故障恢复和 UI 综合验收
 ```
+
+各候选的独立结果、依赖门槛、明确排除和关闭证据见 `delivery/milestones/M4-content-production.md` §3.1。M4-A 实施记录虽已归档，其用户走查和签收尚未闭合；在该门槛关闭前不把 M4-C2 激活为执行中 CHG。
 
 关键约束：
 
