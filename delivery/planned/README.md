@@ -1,6 +1,6 @@
 # Planned delivery index
 
-更新：2026-10-01。当前活跃记录为 [CHG-20260930-069](../active/CHG-20260930-069/change.md)；本目录的 `DISCUSSION` / `PLANNED` 均未激活，不自动批准待决建议。M4-A 的 [CHG-20260924-061](../completed/CHG-20260924-061/change.md) 已于 2026-09-27 关闭归档为 `DONE`；台账见 [delivery/LEDGER.md](../LEDGER.md)。此前的 [CHG-20260923-056](../completed/CHG-20260923-056/change.md)～[CHG-20260923-059](../completed/CHG-20260923-059/change.md) 均已归档 `DONE`，属上线前工程加固程序。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 分层与配置目录约定由 ADR-0016 确认；M4-M5 Cloud 视频生产边界由 ADR-0017 确认。
+更新：2026-10-03。**当前无活跃记录**——[CHG-20261002-074](../completed/CHG-20261002-074/change.md) 已于 2026-10-03 关闭归档（`DONE`），此前 [CHG-20260930-069](../completed/CHG-20260930-069/change.md)、[CHG-20261001-072](../completed/CHG-20261001-072/change.md)、[CHG-20261001-073](../completed/CHG-20261001-073/change.md) 亦已归档；本目录的 `DISCUSSION` / `PLANNED` 均未激活，不自动批准待决建议。M4-A 的 [CHG-20260924-061](../completed/CHG-20260924-061/change.md) 已于 2026-09-27 关闭归档为 `DONE`；台账见 [delivery/LEDGER.md](../LEDGER.md)。此前的 [CHG-20260923-056](../completed/CHG-20260923-056/change.md)～[CHG-20260923-059](../completed/CHG-20260923-059/change.md) 均已归档 `DONE`，属上线前工程加固程序。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 分层与配置目录约定由 ADR-0016 确认；M4-M5 Cloud 视频生产边界由 ADR-0017 确认。
 
 ## 联合工程优化程序（2026-09-23 立项）
 
@@ -19,18 +19,26 @@
 
 ## M2 验收后设备与品牌扩展（2026-10-01 立项）
 
-用户已裁定固定设备绑定、同机自动续接、手动解绑换设备、个人信息/系统头像，以及“起飞”品牌、登录页和桌面应用图标。业务闭环见 [M2 §6](../milestones/M2-account-runtime.md)，设备架构见 [ADR-0018](../../docs/decisions/0018-stable-device-binding-and-session-renewal.md)。CHG-069 已于 2026-10-01 关闭归档；**CHG-072 已激活为唯一活跃记录（IMPLEMENTING）**，CHG-073 为其**耦合伴记**（共享同一 worktree，提交/证据按 CHG 区分），代码草稿在独立工作树中，尚未验收。
+用户已裁定固定设备绑定、同机自动续接、手动解绑换设备、个人信息/系统头像，以及“起飞”品牌、登录页和桌面应用图标。业务闭环见 [M2 §6](../milestones/M2-account-runtime.md)，设备架构见 [ADR-0018](../../docs/decisions/0018-stable-device-binding-and-session-renewal.md)。CHG-069 已于 2026-10-01 关闭归档；CHG-072（含耦合伴记 CHG-073，共享同一 worktree、提交/证据按 CHG 区分）与承接其未实现部分的 **CHG-074 均已于 2026-10-03 关闭归档**。
 
 | 记录 | 独立结果 | 当前进度 |
 | --- | --- | --- |
-| [CHG-20261001-072](../active/CHG-20261001-072/change.md) | 固定设备绑定、会话自动续接、手动解绑/换绑、个人信息、头像昵称、顶部菜单与退出 | IMPLEMENTING；已有未提交草稿；验证与真实走查待完成，见[实施进度](../active/CHG-20261001-072/checkpoint.md) |
-| [CHG-20261001-073](CHG-20261001-073/change.md) | 起飞品牌、登录页、真实版本、Web favicon 与 Desktop 原生图标 | PLANNED（072 耦合伴记，随 072 窗口执行）；已有未提交草稿；双构建与打包走查待完成，见[实施进度](CHG-20261001-073/checkpoint.md) |
+| [CHG-20261001-072](../completed/CHG-20261001-072/change.md) | 固定设备绑定、会话自动续接、手动解绑/换绑、个人信息、头像昵称、顶部菜单与退出 | 已归档（`CLOSED`）；其设备/会话主线的 v2 延续由 CHG-20261002-074 承载 |
+| [CHG-20261001-073](../completed/CHG-20261001-073/change.md) | 起飞品牌、登录页、真实版本、Web favicon 与 Desktop 原生图标 | 已归档（`CLOSED`） |
 
-激活顺序（2026-10-01 用户裁定）：072/073 先，070 次之，071 保持 `PLANNED` 阻塞（写入口 Q-01 未裁定、使用统计 Q-04 依赖 M4-B/C，见 [CHG-20260930-071](CHG-20260930-071/change.md)）。不得由草稿存在推断已完成。
+激活顺序（2026-10-01 用户裁定，**历史记录**；该窗口已由 072/073 与随后的 074 用掉）：072/073 先，070 次之，071 保持 `PLANNED` 阻塞（写入口 Q-01 未裁定、使用统计 Q-04 依赖 M4-B/C，见 [CHG-20260930-071](CHG-20260930-071/change.md)）。不得由草稿存在推断已完成。
+
+## CHG-074 关闭遗留技术债（2026-10-03 立项）
+
+来源：[CHG-20261002-074](../completed/CHG-20261002-074/change.md) §8.4。用户裁定技术债另立 planned 草案，本 CHG 自身的复验留在归档记录。关闭时 workspace 套件 **92 用例 / 3 红**，其中 2 条即下表第 1/2 项的产物。
+
+| 记录 | 内容 | 状态 |
+| --- | --- | --- |
+| [CHG-20261003-075](CHG-20261003-075/change.md) | 契约锁与 `verify_m2_acceptance.py` 硬编码 M2 基线的对齐（含 `cloud_agent_api` 漂移）、`verify_m0_config.py` 钉子的过期红灯、`docs/standards/` 进索引与两处死链、`node_id` 悬置的同族点、会话 cookie 无 `Max-Age`、`document.hidden` 未实测、`scan=reuse` 待实机、负载下假红的 desktop 用例、反引号使 `Level` 不可解析的门禁缺口、M2-F 基线回写 | PLANNED（未激活） |
 
 ## 前端交互规范对齐（2026-09-30 立项）
 
-依据基线：[前端交互规范](../../docs/standards/前端交互规范.md)。用户裁定拆开执行：素材库/我的素材由 [CHG-20260930-069](../active/CHG-20260930-069/change.md) 任务 8 承载（走查三轮）；内容池另立草案。`delivery/active` 同一时间只允许一个活跃 CHG，故按下表顺序激活：
+依据基线：[前端交互规范](../../docs/standards/前端交互规范.md)。用户裁定拆开执行：素材库/我的素材由 [CHG-20260930-069](../completed/CHG-20260930-069/change.md) 任务 8 承载（走查三轮）；内容池另立草案。`delivery/active` 同一时间只允许一个活跃 CHG，故按下表顺序激活：
 
 | 草案 | 内容 | 状态 |
 | --- | --- | --- |

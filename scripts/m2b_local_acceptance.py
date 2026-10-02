@@ -4,9 +4,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -49,6 +51,25 @@ AGENT_PYTHON = Path(os.environ.get("PYTHON_BIN", AGENT_DIR / ".venv" / "bin" / "
 # (instead of the default /Volumes/<product>) so the script never depends on the
 # product or volume name, and never opens a leftover mount instead of the new build.
 DMG_MOUNT = RUNTIME_DIR / "dmg-mount"
+
+# The Cloud worker's build output. A built binary rather than `go run` because
+# `go run` compiles into a child of the `go` process, and the stop path can only
+# signal the pid it recorded: CHG-20260930-069 measured that child surviving its
+# parent as an orphan (pid 42569) still holding the same job loops. The build
+# output lives under the tree's `.cache`, next to the server binary.
+WORKER_BIN = CLOUD_DIR / ".cache" / "wt-media-discovery-worker"
+
+# Where `cargo tauri build` writes the app bundle and where this script assembles
+# the DMG from it. The app bundle's own name is the product name from
+# `tauri.conf.json`, so both are globbed/derived rather than written out here --
+# the same reason `current_dmg()` globs.
+APP_BUNDLE_DIR = DESKTOP_DIR / "target" / "release" / "bundle" / "macos"
+DMG_DIR = DESKTOP_DIR / "target" / "release" / "bundle" / "dmg"
+
+# The packaged app's main binary, which is also the process that supervises the
+# sidecar it spawns. Matched by name rather than path: the app can run from the
+# mount point or from a build tree, and both own the Agent port the same way.
+DESKTOP_SHELL = "wt-media-desktop-shell"
 
 
 def log(message: str) -> None:
@@ -123,6 +144,26 @@ def http_json(url: str, timeout: float = 3.0) -> dict[str, object]:
     return json.loads(raw)
 
 
+def http_answers(url: str, timeout: float = 2.0) -> bool:
+    """Whether anything HTTP answers at `url`, whatever the status code.
+
+    A 401 is an answer. The packaged Agent only talks to callers holding the
+    per-launch token Desktop generates and hands to it, so an unauthenticated
+    probe from here is *expected* to be refused -- `src-tauri/src/commands/agent.rs`
+    makes the same distinction, treating any HTTP answer as "something is
+    listening" while `sidecar::readiness` asks the different question of whether
+    the Agent can be used. Asking the second question here would report a healthy
+    environment as down.
+    """
+    try:
+        urllib.request.urlopen(url, timeout=timeout)
+        return True
+    except urllib.error.HTTPError:
+        return True
+    except Exception:  # noqa: BLE001 - no answer is the reading this reports.
+        return False
+
+
 def wait_http(url: str, name: str, timeout_seconds: float = 20.0) -> None:
     deadline = time.time() + timeout_seconds
     last_error = ""
@@ -137,14 +178,66 @@ def wait_http(url: str, name: str, timeout_seconds: float = 20.0) -> None:
     raise RuntimeError(f"{name}: FAIL {url}: {last_error}")
 
 
+def process_alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
 def pid_alive(pid_file: Path) -> bool:
     if not pid_file.exists():
         return False
     try:
-        os.kill(int(pid_file.read_text(encoding="utf-8").strip()), 0)
-        return True
-    except (OSError, ValueError):
+        return process_alive(int(pid_file.read_text(encoding="utf-8").strip()))
+    except ValueError:
         return False
+
+
+def close_desktop_app() -> None:
+    """Close the packaged app and wait for the Agent port it supervises to free.
+
+    The app owns its Agent's lifecycle -- `src-tauri` starts, supervises and
+    stops the sidecar itself -- so the order matters in both directions: killing
+    the sidecar behind the app's back gets it restarted, and launching an app
+    while the previous one's sidecar still holds the port leaves the new one with
+    nothing to bind.
+    """
+    subprocess.run(["pkill", "-f", DESKTOP_SHELL], check=False)
+    deadline = time.time() + 15.0
+    while time.time() < deadline and lsof_listener_pids(AGENT_PORT):
+        time.sleep(0.3)
+    stop_listener(AGENT_PORT, "agent port")
+    wait_port_free(AGENT_PORT)
+
+
+def hand_over_agent_port() -> None:
+    """Stop this script's Agent so the app's own Agent can hold `AGENT_PORT`.
+
+    Only one process can listen there, and which one it is decides whether the
+    environment has a local executor at all. The python Agent started here is an
+    API-only stand-in: it answers `/healthz` and `/status` but runs no task loop
+    (`wt_media_agent/bootstrap/cloud.py` claims nothing without a credential
+    delivered by Desktop). The app ships the real one -- its bundled config sets
+    `python_fallback = false`, so inside a bundle the packaged sidecar is the only
+    Agent there is.
+
+    Left in place, the stand-in costs the walkthrough its executor: measured
+    2026-10-02, the freshly packaged sidecar started, failed to bind with
+    `OSError: [Errno 48] Address already in use`, and was stopped by the app's own
+    supervisor -- so the queued `local_agent` download had no claimant while
+    every health check in this script read green.
+    """
+    log("Handing the Agent port to the Desktop app")
+    pid_file = PID_DIR / "agent.pid"
+    if pid_alive(pid_file):
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
+        os.kill(pid, signal.SIGTERM)
+        print(f"agent: stopped pid {pid} from pid file")
+    pid_file.unlink(missing_ok=True)
+    stop_listener(AGENT_PORT, "agent")
+    wait_port_free(AGENT_PORT)
 
 
 def start_background(name: str, cmd: list[str], cwd: Path, env: dict[str, str]) -> None:
@@ -205,12 +298,45 @@ def start_cloud() -> None:
     wait_http(f"{CLOUD_BASE_URL}/api/v1/health", "Cloud")
 
 
+def start_worker() -> None:
+    """Start the Cloud worker as a managed component.
+
+    The worker is where Cloud's polled jobs live -- `discovery-worker`,
+    `material-prepare-worker` and `transfer-reconcile` are all registered on this
+    one entry point (internal/bootstrap/jobs.go). `cmd/server` runs none of them,
+    so before this component existed an environment could report healthy and
+    still have no executor for anything Cloud prepares.
+
+    The scheduler process (`cmd/discovery-scheduler`) is deliberately left out:
+    it only enqueues new discoveries on a timer, which is noise for a local
+    review environment and unrelated to whether work already queued gets done.
+    """
+    log("Building and starting Cloud worker")
+    run(
+        [str(GO_BIN), "build", "-o", str(WORKER_BIN), "./cmd/discovery-worker"],
+        cwd=CLOUD_DIR,
+        env=env_with(
+            GOROOT=GOROOT,
+            GOPATH=GOPATH,
+            GOCACHE=str(CLOUD_DIR / ".cache" / "go-build"),
+        ),
+    )
+    start_background("worker", [str(WORKER_BIN)], CLOUD_DIR, env_with())
+
+
 def start_agent() -> None:
-    try:
-        wait_http(f"{AGENT_BASE_URL}/healthz", "Agent already healthy", timeout_seconds=1.0)
+    """Start this script's Agent, taking the Agent port if the app is holding it.
+
+    One Agent fits on the port and the two are alternatives rather than
+    neighbours: this is the headless environment, so it takes the port back. Left
+    running, the app's Agent would keep the port and the Agent started below would
+    die on `Address already in use` while `start_background` recorded its pid as
+    if it had started -- and the checks that read the Agent's own state would be
+    reading a caller it refuses (`verify_bitbrowser`).
+    """
+    if pid_alive(PID_DIR / "agent.pid"):
         return
-    except Exception:
-        pass
+    close_desktop_app()
     log(f"Starting Agent on {AGENT_ADDR}")
     start_background(
         "agent",
@@ -235,6 +361,16 @@ def start_agent() -> None:
 
 def verify_bitbrowser() -> None:
     log("Verifying BitBrowser through Agent")
+    if not pid_alive(PID_DIR / "agent.pid"):
+        # This reads the Agent's own view of BitBrowser, so it needs an Agent it
+        # can query -- and after `launch-dmg` the port belongs to the packaged
+        # app's, which refuses a caller without its token. Naming that beats
+        # turning a 401 into "BitBrowser is not normal".
+        raise RuntimeError(
+            f"BitBrowser via Agent: cannot check -- {AGENT_ADDR} is not this script's "
+            "Agent (the Desktop app's is serving it); start the headless environment "
+            "with `bin/control.sh start`, or read it from the app"
+        )
     data = http_json(f"{AGENT_BASE_URL}/api/v1/status")
     status = (data.get("data") or {}).get("bitbrowser_status") if isinstance(data.get("data"), dict) else None
     if status != "normal":
@@ -265,12 +401,11 @@ def current_dmg() -> Path:
     (WT Media_0.1.0_aarch64.dmg -> 起飞_0.1.0_aarch64.dmg), so it is found by glob
     rather than hardcoded: a rename or version bump must not break the script.
     """
-    dmg_dir = DESKTOP_DIR / "target" / "release" / "bundle" / "dmg"
     candidates = sorted(
-        dmg_dir.glob("*.dmg"), key=lambda p: p.stat().st_mtime, reverse=True
+        DMG_DIR.glob("*.dmg"), key=lambda p: p.stat().st_mtime, reverse=True
     )
     if not candidates:
-        raise RuntimeError(f"DMG: no *.dmg under {dmg_dir}")
+        raise RuntimeError(f"DMG: no *.dmg under {DMG_DIR}")
     return candidates[0]
 
 
@@ -288,8 +423,8 @@ def clean_artifacts() -> None:
     targets = [
         DESKTOP_DIR / ".generated" / "frontend",
         CLOUD_DIR / "web" / "dist-desktop",
-        DESKTOP_DIR / "target" / "release" / "bundle" / "dmg",
-        DESKTOP_DIR / "target" / "release" / "bundle" / "macos",
+        DMG_DIR,
+        APP_BUNDLE_DIR,
     ]
     for target in targets:
         if target.exists():
@@ -297,10 +432,62 @@ def clean_artifacts() -> None:
 
 
 def build_dmg() -> None:
+    """Build the DMG in the shape the app's own integrity check accepts.
+
+    `cargo tauri build --bundles dmg` produces a bundle with no
+    `Contents/Resources/sidecar-manifest.json`, and *inside a bundle* that file is
+    what `src-tauri/src/sidecar/integrity.rs` reads before it will start the Agent:
+    bundle + sidecar + no record is a refusal, not a warning. Measured on the
+    2026-10-02 build -- the packaged app logged "包内缺少记录文件" from 21:52 on and
+    never claimed a task, so the one `local_agent` download in the queue sat there
+    while every health check in this script read green.
+
+    The record is written by `scripts/repair-macos-signing.sh`, which belongs to
+    the release path -- that is why a plain `--bundles dmg` never runs it. The
+    sequence below mirrors `scripts/build-release-macos.sh`, minus
+    `stage-release-config.sh`: that one rebuilds the sidecar against
+    `config_online/`, and this environment is deliberately built against the local
+    config.
+    """
     clean_artifacts()
-    log("Building Desktop DMG")
+    log("Building Desktop frontend")
     run(["bash", str(SCRIPT_DIR / "build-desktop-frontend.sh")])
-    run(["cargo", "tauri", "build", "--bundles", "dmg", "--no-sign"], cwd=DESKTOP_DIR)
+    log("Building Desktop app bundle")
+    run(["cargo", "tauri", "build", "--bundles", "app", "--no-sign"], cwd=DESKTOP_DIR)
+    apps = sorted(APP_BUNDLE_DIR.glob("*.app"))
+    if len(apps) != 1:
+        raise RuntimeError(
+            f"Desktop app bundle: expected one .app under {APP_BUNDLE_DIR}, "
+            f"found {[p.name for p in apps]}"
+        )
+    app = apps[0]
+    log("Writing the sidecar record into the bundle and re-signing")
+    run(["bash", str(DESKTOP_DIR / "scripts" / "repair-macos-signing.sh"), str(app)])
+    dmg = _dmg_path(app)
+    log("Packing the DMG")
+    staging = Path(tempfile.mkdtemp(prefix="wt-media-dmg.", dir="/private/tmp"))
+    try:
+        run(["cp", "-R", str(app), str(staging / app.name)])
+        (staging / "Applications").symlink_to("/Applications")
+        DMG_DIR.mkdir(parents=True, exist_ok=True)
+        run([
+            "hdiutil", "create", "-volname", app.stem, "-srcfolder", str(staging),
+            "-ov", "-format", "UDZO", str(dmg),
+        ])
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+
+
+def _dmg_path(app: Path) -> Path:
+    """Where this script's DMG goes, named the way the release path names it.
+
+    `<product>_<version>_<arch>.dmg` -- the product name is the app bundle's own
+    name and the version comes from `tauri.conf.json`, so a rename or a version
+    bump lands in the filename instead of breaking it.
+    """
+    config = json.loads((DESKTOP_DIR / "src-tauri" / "tauri.conf.json").read_text(encoding="utf-8"))
+    arch = {"arm64": "aarch64", "x86_64": "x64"}.get(os.uname().machine, os.uname().machine)
+    return DMG_DIR / f"{app.stem}_{config['version']}_{arch}.dmg"
 
 
 def rebuild_cloud_dist() -> None:
@@ -311,7 +498,7 @@ def rebuild_cloud_dist() -> None:
 def launch_dmg() -> None:
     log("Launching latest DMG")
     dmg = current_dmg()
-    subprocess.run(["pkill", "-f", "wt-media-desktop-shell"], check=False)
+    close_desktop_app()
     # Mount at a fixed private mountpoint and detach it first: a leftover
     # /Volumes/<product> mount from an earlier run could otherwise be opened
     # instead of the fresh build, and its name is not scripted anywhere.
@@ -326,47 +513,117 @@ def launch_dmg() -> None:
         raise RuntimeError(
             f"DMG mount: expected one .app under {DMG_MOUNT}, found {[p.name for p in apps]}"
         )
+    # After the mount, before the app opens: the app's own Agent needs the port,
+    # and the mounted bundle is the only place the packaged sidecar lives.
+    hand_over_agent_port()
     run(["open", str(apps[0])])
+
+
+def verify_worker() -> None:
+    """Refuse a "ready" environment whose Cloud-side jobs have no runner.
+
+    Nothing else in this script can tell the difference: a worker that was never
+    started leaves health endpoints green, assets fresh and the DMG launchable
+    (CHG-20260930-069 measured exactly that -- a cloud-scope preparation sat
+    `pending` for five minutes with every other check passing).
+    """
+    log("Verifying Cloud worker")
+    pid_file = PID_DIR / "worker.pid"
+    if not pid_alive(pid_file):
+        raise RuntimeError(
+            f"Cloud worker: not running (pid file {pid_file}); "
+            "start the environment with `bin/control.sh start` before verifying"
+        )
+    print(f"Cloud worker: PASS pid={pid_file.read_text(encoding='utf-8').strip()}")
+
+
+def verify_agent() -> None:
+    """The Agent endpoint, accepting either of the two providers that can hold it.
+
+    This script's python Agent answers 2xx. The packaged Desktop app's refuses
+    callers without the per-launch token Desktop generates, so its correct answer
+    to this probe is 401 -- see `http_answers`. Which provider is up is not
+    something this check decides; it only refuses to call "nothing listening"
+    healthy.
+    """
+    log("Verifying Local Agent")
+    if pid_alive(PID_DIR / "agent.pid"):
+        wait_http(f"{AGENT_BASE_URL}/healthz", "Agent")
+        return
+    if http_answers(f"{AGENT_BASE_URL}/healthz"):
+        print(f"Agent: PASS {AGENT_BASE_URL}/healthz (served by the Desktop app)")
+        return
+    raise RuntimeError(f"Agent: FAIL {AGENT_BASE_URL}/healthz: nothing is listening")
 
 
 def verify_all() -> None:
     log("Verifying local M2-B environment")
     wait_http(f"{CLOUD_BASE_URL}/api/v1/health", "Cloud")
-    wait_http(f"{AGENT_BASE_URL}/healthz", "Agent")
+    verify_agent()
+    verify_worker()
     verify_bitbrowser()
     verify_assets()
     verify_dmg()
 
 
 def cmd_status() -> int:
-    """Report Cloud/Agent liveness and health without changing anything.
+    """Report Cloud/Agent/Worker liveness without changing anything.
 
     This is the reading behind `bin/control.sh status`. It is deliberately a
     query: it never starts, stops, or waits on anything, so calling it is safe
     on a machine where nothing is running. Prints one line per component and
-    returns 1 when any of them is not both alive and answering, so the exit
-    code is usable from a shell (the same verb in the other three repositories'
-    `bin/control.sh` has the same contract).
+    returns 1 when any of them is not alive -- and, where the component serves
+    one, not answering, so the exit code is usable from a shell (the same verb
+    in the other three repositories' `bin/control.sh` has the same contract).
+
+    The worker's `url` is `None`: it is a poller, not a server, so it has no
+    endpoint to answer on and its process is the whole of its liveness. Reading
+    that as anything but a probe would be inventing a health check it does not
+    have.
+
+    The Agent is the one component with two possible providers. After
+    `launch-dmg` the port belongs to the packaged app, which runs its own Agent
+    there -- so "no pid file, but something answers" is the intended state rather
+    than a fault, and the line says who owns it instead of leaving the reader to
+    guess from a `pid=-` next to a status. That state prints
+    `health=refused owner=desktop`: the app's Agent only talks to callers holding
+    the per-launch token Desktop generates, so 401 is its correct answer to this
+    probe (`http_answers`). `alive` still reports this script's process
+    truthfully -- it is not alive, it just is not the one being asked about.
     """
     log("Local M2-B environment status")
     all_healthy = True
     for name, pid_file, url in (
         ("cloud", PID_DIR / "cloud.pid", f"{CLOUD_BASE_URL}/api/v1/health"),
         ("agent", PID_DIR / "agent.pid", f"{AGENT_BASE_URL}/healthz"),
+        ("worker", PID_DIR / "worker.pid", None),
     ):
         pid_text = (
             pid_file.read_text(encoding="utf-8").strip() if pid_file.exists() else "-"
         )
         alive = pid_alive(pid_file)
-        try:
-            http_json(url, timeout=2.0)
-            health = "ok"
-        except Exception:  # noqa: BLE001 - a down probe is a reading, not a failure.
-            health = "down"
-        all_healthy = all_healthy and alive and health == "ok"
+        if url is None:
+            health = "pid-only"
+        else:
+            try:
+                http_json(url, timeout=2.0)
+                health = "ok"
+            except Exception:  # noqa: BLE001 - a down probe is a reading, not a failure.
+                health = "down"
+        served_by_desktop = name == "agent" and not alive and http_answers(url)
+        owner = " owner=desktop" if served_by_desktop else ""
+        if served_by_desktop:
+            # The app's Agent refuses an unauthenticated probe, so `health` above is
+            # `down` and would be the wrong reading to print next to `owner=desktop`.
+            health = "refused"
+        all_healthy = (
+            all_healthy
+            and health in ("ok", "pid-only", "refused")
+            and (alive or served_by_desktop)
+        )
         print(
             f"{name}: pid={pid_text} alive={'yes' if alive else 'no'} "
-            f"health={health} url={url}"
+            f"health={health} url={url or '-'}{owner}"
         )
     return 0 if all_healthy else 1
 
@@ -405,18 +662,36 @@ def wait_port_free(port: str, timeout_seconds: float = 10.0) -> None:
 
 
 def stop_started() -> None:
-    log("Stopping stale Cloud/Agent processes")
-    for name in ["cloud", "agent"]:
+    log("Stopping stale Cloud/Agent/Worker processes")
+    # First, so the port sweep below is final rather than a race with a supervisor
+    # that would start the Agent again.
+    close_desktop_app()
+    signalled: list[tuple[str, int]] = []
+    for name in ["cloud", "agent", "worker"]:
         pid_file = PID_DIR / f"{name}.pid"
         if pid_alive(pid_file):
             pid = int(pid_file.read_text(encoding="utf-8").strip())
             os.kill(pid, signal.SIGTERM)
+            signalled.append((name, pid))
             print(f"{name}: stopped pid {pid} from pid file")
         pid_file.unlink(missing_ok=True)
     stop_listener(CLOUD_PORT, "cloud")
     wait_port_free(CLOUD_PORT)
     stop_listener(AGENT_PORT, "agent")
     wait_port_free(AGENT_PORT)
+    # Cloud and the Agent are each swept a second time by port above, so a
+    # SIGTERM they ignored still gets caught. The worker holds no port and the
+    # pid file is gone by now, which makes this wait the only thing standing
+    # between "asked to stop" and "did stop" -- and a surviving worker would go
+    # on draining queues with nothing left to find it by.
+    for name, pid in signalled:
+        if name != "worker":
+            continue
+        deadline = time.time() + 10.0
+        while time.time() < deadline and process_alive(pid):
+            time.sleep(0.2)
+        if process_alive(pid):
+            print(f"worker: pid {pid} ignored SIGTERM and is still running", file=sys.stderr)
 
 
 def source_commit_epoch(repo_dir: Path, paths: tuple[str, ...] = ()) -> float:
@@ -491,6 +766,7 @@ def main() -> int:
         if args.command == "up":
             run_migrations()
             start_cloud()
+            start_worker()
             start_agent()
             verify_bitbrowser()
         elif args.command == "verify":
@@ -506,13 +782,19 @@ def main() -> int:
         elif args.command == "all":
             run_migrations()
             start_cloud()
+            start_worker()
             start_agent()
             verify_bitbrowser()
             build_dmg()
-            launch_dmg()
             rebuild_cloud_dist()
             verify_all()
             verify_login()
+            # Last, and not merely for tidiness: launching hands the Agent port to
+            # the app, after which the checks above cannot run -- they need an
+            # Agent they can query, and the app's refuses callers without the token
+            # Desktop generates per launch. Everything this script can verify, it
+            # verifies before the handover.
+            launch_dmg()
         elif args.command == "stop":
             stop_started()
     except (subprocess.CalledProcessError, RuntimeError, urllib.error.URLError) as exc:

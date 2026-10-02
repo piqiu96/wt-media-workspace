@@ -20,9 +20,9 @@ usage() {
 Usage: bin/control.sh <start|stop|restart|status|verify|help>
 
   start    Rebuild and start the full local end-to-end environment.
-  stop     Stop the Cloud and Local Agent processes started for local review.
+  stop     Stop the Cloud, Local Agent and Cloud worker processes started for local review.
   restart  Stop those processes, then rebuild and start the environment again.
-  status   Report whether those processes are alive and answering their health endpoint.
+  status   Report whether those processes are alive and, where they serve one, answering.
   verify   Run end-to-end readiness checks against the running environment.
   help     Show this help.
 EOF

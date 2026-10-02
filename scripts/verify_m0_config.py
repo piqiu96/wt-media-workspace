@@ -115,8 +115,10 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
             # 那份文件（下面的 `provider_path` 已经把它解析出来了），却没有把两者对比
             # 过：钉子只保证「map 没背着人动」，保证不了「这个值还对」。CHG-20260923-059
             # Q-06 登记了这处缺口，CHG-20260924-061 复核后确认，仍不在其范围内。
-            if actual.get("contract_revision") != "2026.09.27.1":
-                errors.append("local_agent_api: expected contract_revision '2026.09.27.1'")
+            # 再由 2026.09.27.1 更新为 2026.10.03.1（CHG-20261002-074 为
+            # `GET /api/v1/status` 增加可选 `scan` 参数，缺省仍是实时扫描）。
+            if actual.get("contract_revision") != "2026.10.03.1":
+                errors.append("local_agent_api: expected contract_revision '2026.10.03.1'")
         if name == "local_event_schemas":
             if actual.get("event_revision") != "2026.07.14.9":
                 errors.append("local_event_schemas: expected event_revision '2026.07.14.9'")

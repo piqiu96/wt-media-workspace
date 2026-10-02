@@ -76,7 +76,9 @@ contracts:
     # it to a constant in scripts/verify_m0_config.py -- never to the definition
     # file sitting beside it. CHG-20260923-059 T-09 measured that drift and
     # CHG-20260925-063 T-01 then moved that constant onto the stale value.
-    contract_revision: "2026.09.27.1"
+    # CHG-20261002-074 added the optional `scan` parameter to GET /api/v1/status,
+    # which moves the definition to 2026.10.03.1, and synced that constant as well.
+    contract_revision: "2026.10.03.1"
     consumers:
       - wt-media-desktop
   local_event_schemas:
