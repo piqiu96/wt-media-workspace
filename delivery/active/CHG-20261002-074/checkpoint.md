@@ -1,6 +1,14 @@
 # CHG-20261002-074 实施进度（2026-10-02）
 
-契约 v2 主线：**阶段 1、2、3 代码全部提交，收尾项（ADR、双构建、evidence）完成**；仅剩实机走查 + 用户签收，由用户驱动。范围与验收以 [change.md](change.md) 为准。
+契约 v2 主线：**阶段 1、2、3 代码全部提交，收尾项完成；走查发现的面板误报已修复（`416489f`），待用户重打 DMG 复验**。范围与验收以 [change.md](change.md) 为准。
+
+## 走查修复（2026-10-02，cloud `416489f`）
+
+- **走查发现**：DMG 安装版（迁移已应用、Agent/比特浏览器/Cloud 全部健康）面板误报「需检查」：本机服务=未连接执行节点、比特浏览器=未知、blocker 落在比特浏览器条。
+- **根因（实证）**：WorkEnvPill 把 snake_case 快照直喂读 camelCase 的页面工厂——真实运行时 camel 键全 undefined；`status` 键两形状同名存活（读到 idle），blocker 才落在比特浏览器条，与截图逐字吻合。单测漏报因夹具手写 camelCase 绕过真实形状边界。
+- **修复**：`localAgentStateFromStatus` 唯一映射源（service.js）＋ store/aggregate 复用；三行各说各话（`serviceText`/`bitbrowserText`）；文案白话化（未连接云端/未运行/未检测，blocker 去术语）。
+- **验证**：web vitest 462 用例全绿（净增 5，夹具改真实线格式 + 接线用例 + 行语义用例）；双构建通过；变异对照（撤适配）6 例红证明判别力。读数见 [evidence/walkthrough-panel-false-alarm.md](evidence/walkthrough-panel-false-alarm.md)。
+- **待复验**：重打 DMG 后面板应全绿；停比特浏览器应只落比特浏览器条 blocker 且本机服务行仍「已连接」。
 
 ## 收尾（2026-10-02）
 
@@ -50,5 +58,6 @@
 
 ## 下一步
 
-- **实机走查**（用户驱动，DONE 的前置）：迁移 046/047/048 经 `scripts/migrate.sh` 应用到真实 MySQL；验 desktop 与 web 双会话共存不互挤、同类型才 20010、会话失效后凭据仍可 authenticate、Desktop 重启凭据仍在；阶段 3 走查「设备 A 领任务→解绑→设备 B 绑定后可重取」与「比特主账号切换后自助确认」、23002/23003 实发。走查结果记入 evidence，用户签收后按完成门关闭并归档。
+- **重打 DMG + 面板复验**（先于其余走查）：刷新内嵌前端快照并重新打包安装；健康环境面板应「这台电脑可以工作」（正在这台电脑工作 / 已连接，当前无任务 / 已登录指定账号）；停比特浏览器应只落比特浏览器条 blocker、本机服务行仍「已连接」。
+- **实机走查**（用户驱动，DONE 的前置）：迁移 046/047/048 已应用（用户确认）；剩余验 desktop 与 web 双会话共存不互挤、同类型才 20010、会话失效后凭据仍可 authenticate、Desktop 重启凭据仍在；阶段 3 走查「设备 A 领任务→解绑→设备 B 绑定后可重取」与「比特主账号切换后自助确认」、23002/23003 实发。走查结果记入 evidence，用户签收后按完成门关闭并归档。
 - **待用户裁定（不阻塞走查）**：Level 级别定级（暂记 `L`）；`contracts.lock.json` 维持不 bump 的判断是否认可（wire schema 未变，见 ADR-0019 后果节）。
