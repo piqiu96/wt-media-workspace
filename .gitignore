@@ -4,3 +4,7 @@
 __pycache__/
 .DS_Store
 .local/secrets/*.env
+# Generated skill copies distributed by `scripts/sync_skills.py`;
+# rebuild with that script instead of committing them.
+.claude
+.codex

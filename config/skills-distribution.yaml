@@ -30,25 +30,25 @@ targets:
       - desktop
   cloud:
     path: "../wt-media-cloud"
-    commit_generated: true
+    commit_generated: false
     groups:
       - common
       - cloud
   agent:
     path: "../wt-media-agent"
-    commit_generated: true
+    commit_generated: false
     groups:
       - common
       - agent
   desktop:
     path: "../wt-media-desktop"
-    commit_generated: true
+    commit_generated: false
     groups:
       - common
       - desktop
   workspace:
     path: "../wt-media-workspace"
-    commit_generated: true
+    commit_generated: false
     groups:
       - common
       - workspace
