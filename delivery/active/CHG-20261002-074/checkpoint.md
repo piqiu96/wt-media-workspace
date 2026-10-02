@@ -2,13 +2,14 @@
 
 契约 v2 主线：**阶段 1、2、3 代码全部提交，收尾项完成；走查发现的面板误报已修复（`416489f`），待用户重打 DMG 复验**。范围与验收以 [change.md](change.md) 为准。
 
-## 走查修复（2026-10-02，cloud `416489f`）
+## 走查修复（2026-10-02，cloud `416489f` + `9d54203`）
 
 - **走查发现**：DMG 安装版（迁移已应用、Agent/比特浏览器/Cloud 全部健康）面板误报「需检查」：本机服务=未连接执行节点、比特浏览器=未知、blocker 落在比特浏览器条。
 - **根因（实证）**：WorkEnvPill 把 snake_case 快照直喂读 camelCase 的页面工厂——真实运行时 camel 键全 undefined；`status` 键两形状同名存活（读到 idle），blocker 才落在比特浏览器条，与截图逐字吻合。单测漏报因夹具手写 camelCase 绕过真实形状边界。
 - **修复**：`localAgentStateFromStatus` 唯一映射源（service.js）＋ store/aggregate 复用；三行各说各话（`serviceText`/`bitbrowserText`）；文案白话化（未连接云端/未运行/未检测，blocker 去术语）。
-- **验证**：web vitest 462 用例全绿（净增 5，夹具改真实线格式 + 接线用例 + 行语义用例）；双构建通过；变异对照（撤适配）6 例红证明判别力。读数见 [evidence/walkthrough-panel-false-alarm.md](evidence/walkthrough-panel-false-alarm.md)。
-- **待复验**：重打 DMG 后面板应全绿；停比特浏览器应只落比特浏览器条 blocker 且本机服务行仍「已连接」。
+- **走查发现 2（20010 文案 v1 遗留，`9d54203`）**：用户同机重复登录桌面端命中 20010 确认框——条件是「同 client_type 活跃会话存在」（`HasActiveSessionForClientType`，无设备维度；会话无过期机制，旧会话一直挂着），同机再登录也会命中，属阶段 1 设计语义。但两处文案是 v1 遗留：「已在其他位置登录」暗示另一台设备；「旧设备不能继续领取新的本地任务」在凭据解耦后**不成立**（执行由设备绑定决定，会话替换不夺权）。change.md 阶段 1「文案仍成立」的假设被走查证伪。两处文案已按 v2 语义改写。
+- **验证**：web vitest 462 用例全绿（净增 5：夹具改真实线格式 + 接线用例 + 行语义用例）；双构建通过；变异对照（撤适配）6 例红证明判别力。读数见 [evidence/walkthrough-panel-false-alarm.md](evidence/walkthrough-panel-false-alarm.md)。
+- **待复验**：重打 DMG 后面板应全绿；停比特浏览器应只落比特浏览器条 blocker 且本机服务行仍「已连接」；同机再登录的 20010 确认框显示新文案。
 
 ## 收尾（2026-10-02）
 
