@@ -1,11 +1,11 @@
 # CHG-20261003-076 实施进度
 
 - Status: IMPLEMENTING
-- 当前：产品 `v0.1.0-rc.1`、`v0.1.0-rc.2`、`v0.1.0-rc.3` 均按门禁失败且未发布。`rc.3` 中 Cloud Linux、三平台 Agent、macOS ARM 与 macOS Intel Desktop 均通过；Windows Desktop 失败于 Rust 源码无条件使用 Unix-only `rustix::process/Errno` 常量，`package` 与 `publish-pre` 正确跳过。Desktop 平台分支修复已提交为 `63e8380` 并推送组件 Tag `v0.1.0-rc.2`；正在准备产品 `rc.4`。RC 目标地址为 `https://wt.longyanyue.cn`。Workspace GitHub Actions 已配置三个组件仓的只读 Deploy Key 和对应 Secret。
+- 当前：产品 `v0.1.0-rc.1` 到 `v0.1.0-rc.4` 均按门禁失败且未发布。`rc.3` 中 Cloud Linux、三平台 Agent、macOS ARM 与 macOS Intel Desktop 均通过；Windows Desktop 失败于 Rust 源码无条件使用 Unix-only `rustix::process/Errno` 常量，`package` 与 `publish-pre` 正确跳过。`rc.4` 已证明 Desktop Windows Rust/NSIS 可编译并出包，但后置版本校验在 Windows 缺少 `shasum` 时失败；SHA-256 工具兼容修复已提交为 `0b919b0` 并推送 Desktop 组件 Tag `v0.1.0-rc.3`，正在准备产品 `rc.5`。RC 目标地址为 `https://wt.longyanyue.cn`。Workspace GitHub Actions 已配置三个组件仓的只读 Deploy Key 和对应 Secret。
 - 已验证：Workspace Release Manifest、环境注入、附件汇总单元测试及治理检查通过；`release.yml` 经 actionlint 校验；Cloud 打包/前端标记单元测试、Agent 冻结进程 smoke 单元测试通过；Cloud Web 487 项测试与 Desktop 507 项测试通过（Desktop 另有 6 项既有忽略）。
 - GitHub 主干 CI：Cloud `37081704343` 成功、Agent `37081932453` 成功、Desktop `37082128429` 成功。Agent 首轮 CI 暴露既有 Linux 配置复制入口提前解析本机 Sidecar 架构，修复后成功。
 - 前两轮 GitHub 试跑详情见 [github-rc-trial.md](evidence/github-rc-trial.md)。Cloud 根因是发布工作流选用 `go.mod` 声明的 Go 1.24 最低版本，与已通过主干 CI 的 Go 1.26.5 不一致；Windows Agent 清理故障在 `rc.2` 已修复。旧 Tag 保留，不移动。
-- 未完成：产品 `rc.4` Manifest 提交/Tag 推送、GitHub 原生 Runner 重跑、Pre-release 附件核验和完整试跑报告。
+- 未完成：产品 `rc.5` Manifest 提交/Tag 推送、GitHub 原生 Runner 重跑、Pre-release 附件核验和完整试跑报告。
 - 特别发现：原 Desktop Web 某些页面及通用 HTTP 客户端将 Cloud 写死为本机地址，现按 Cloud 网页、Desktop 开发、打包 Desktop 三种运行形态读取各自地址；打包路径拒绝硬编码本机 Cloud 地址。
-- 最近验证：Desktop 修复后本机 `cargo check --workspace` 通过；`scripts/test.sh` 通过（507 项 Rust 测试，6 项既有忽略；control 12 项、release-versions 20 项）。Workspace RC4 Manifest 单元测试 7 项通过、显式 Manifest 校验通过、治理检查通过。Windows 目标本机缺少 MSVC 标准库，不能本地 `cargo check`，需以 GitHub Windows Runner 验证。
+- 最近验证：Desktop 修复后本机 `cargo check --workspace` 通过；`scripts/test.sh` 通过（507 项 Rust 测试，6 项既有忽略；control 12 项、release-versions 20 项）。Workspace RC4 Manifest 单元测试 7 项通过、显式 Manifest 校验通过、治理检查通过。RC4 Windows Runner 已通过 Rust Release 编译与 NSIS 打包；`release-versions.sh` 修复后本机 release-versions 20 项测试与 `--check` 通过，仍需 Runner 复验。
 - 约束：各仓分别提交；所有 Tag 在代码、配置和校验固定后创建；生产部署不在本 CHG。
