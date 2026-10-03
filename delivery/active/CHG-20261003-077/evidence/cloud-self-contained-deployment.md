@@ -36,3 +36,12 @@
 
 - 尚未执行真实宝塔安装、外部 HTTPS 验收或生产对象存储写入。
 - 临时 MySQL 数据库和账号已删除。
+
+## GitHub RC10 回读
+
+- 产品 Run：`37153380541`，全 Job success。
+- Pre-release：https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.10
+- Cloud Artifact ID `11284707837`；包内 Cloud tar SHA-256 `5844a1e2da2bc95b40135d74e6fa58c400584959a4a5cc063ba64e7df1a4c0d1`。
+- Desktop Web SHA-256 `628ab41e68874da643b85d7610d077b92a4c4a7be51cea61388940a7ca4ffebb`。
+- Pre-release 三平台附件、Manifest、build-info 和 SHA256SUMS 下载校验全部通过。
+- Workspace source commit `25ee3110f2613083346f30653032848371518ef6`；Manifest environment=`online`。

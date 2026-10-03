@@ -146,12 +146,12 @@
 - Consumes: 新 Cloud 组件 Tag、未变化的 Agent/Desktop 组件 Tag，以及产品 RC Tag。
 - Produces: 新 Cloud Artifact、摘要、来源 Commit 和服务器验收记录；旧 RC8 保持不变。
 
-- [ ] 更新 Workspace Cloud 包结构校验，移除旧 systemd/Nginx 文件要求，增加自包含部署文件要求。
-- [ ] 运行 Manifest、Release 打包、Delivery 和 AI Workspace 校验。
-- [ ] 提交并推送新的 Cloud 组件 Tag，不移动旧 Tag。
-- [ ] 创建新的产品 Manifest 和产品 RC Tag，观察 GitHub Actions。
-- [ ] 下载 Cloud Artifact，核对 SHA-256、Tag、Commit、架构、Migration、无敏感配置和包内验证脚本。
-- [ ] 回写新的 Run、Artifact 和摘要，提交 Workspace 状态。
+- [x] 更新 Workspace Cloud 包结构校验，移除旧 systemd/Nginx 文件要求，增加自包含部署文件要求。
+- [x] 运行 Manifest、Release 打包、Delivery 和 AI Workspace 校验。
+- [x] 提交并推送新的 Cloud 组件 Tag，不移动旧 Tag。
+- [x] 创建新的产品 Manifest 和产品 RC Tag，观察 GitHub Actions。
+- [x] 下载 Cloud Artifact，核对 SHA-256、Tag、Commit、架构、Migration、无敏感配置和包内验证脚本。
+- [x] 回写新的 Run、Artifact 和摘要，提交 Workspace 状态。
 
 ### Task 7: 宝塔服务器人工验收
 
