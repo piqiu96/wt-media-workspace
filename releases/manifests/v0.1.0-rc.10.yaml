@@ -1,0 +1,16 @@
+schema_version: 1
+product_tag: v0.1.0-rc.10
+channel: rc
+environment: online
+cloud_origin: https://wt.longyanyue.cn
+network_smoke: false
+components:
+  cloud: v0.1.0-rc.7
+  agent: v0.2.2-rc.2
+  desktop: v0.1.0-rc.3
+targets:
+  cloud: linux-amd64
+  desktop:
+    - windows-x64
+    - macos-x64
+    - macos-arm64

@@ -19,16 +19,29 @@ COMMIT = "a" * 40
 class CloudPayloadTest(unittest.TestCase):
     def make_archive(self, credential: str = "", commit: str = COMMIT) -> Path:
         root = f"wt-media-cloud_{TAG}_linux-amd64/"
+        agent_template = (
+            b"auth_token = {{WT_AGENT_AUTH_TOKEN}}\n"
+            if not credential
+            else f"auth_token = '{credential}'\n".encode()
+        )
+        config_templates = {
+            "config/app.toml.tpl": b"password = {{WT_INITIAL_ADMIN_PASSWORD}}\n",
+            "config/database/primary.toml.tpl": b"password = {{WT_DB_PASSWORD}}\n",
+            "config/credentials/agent.toml.tpl": agent_template,
+            "config/credentials/douyin.toml.tpl": b"api_key = {{WT_DOUYIN_API_KEY}}\n",
+            "config/credentials/object_storage.toml.tpl": b"secret_key = {{WT_OBJECT_STORAGE_SECRET_KEY}}\n",
+            "config/storage/object_storage.toml.tpl": b"endpoint = {{WT_OBJECT_STORAGE_ENDPOINT}}\n",
+        }
         files = {
             "bin/server": b"ELF", "bin/discovery-scheduler": b"ELF",
             "bin/discovery-worker": b"ELF", "bin/migrate": b"ELF",
-            "bin/ffmpeg": b"ELF", "bin/ffprobe": b"ELF",
+            "bin/config-check": b"ELF", "bin/ffmpeg": b"ELF", "bin/ffprobe": b"ELF",
             "web/index.cloud.html": b"<html></html>",
             "ffmpeg-source.json": b"{}",
             "migrations/001_identity.sql": b"CREATE TABLE users (id INT);",
             "deploy/DEPLOYMENT.md": b"# Deployment",
             "deploy/prepare-database.sql.example": b"CREATE DATABASE example;",
-            "deploy/nginx-site-locations.conf.example": b"root /example/web;\n",
+            "deploy/render-config.py": b"#!/usr/bin/python3\n",
             "deploy/install.sh": b"#!/bin/bash\n",
             "deploy/init-config.sh": b"#!/bin/bash\n",
             "deploy/migrate.sh": b"#!/bin/bash\n",
@@ -37,15 +50,12 @@ class CloudPayloadTest(unittest.TestCase):
             "deploy/verify-database.sh": b"#!/bin/bash\n",
             "deploy/verify-runtime.sh": b"#!/bin/bash\n",
             "deploy/rollback.sh": b"#!/bin/bash\n",
-            "deploy/systemd/wt-media-cloud-server.service": b"[Service]\n",
-            "deploy/systemd/wt-media-cloud-scheduler.service": b"[Service]\n",
-            "deploy/systemd/wt-media-cloud-worker.service": b"[Service]\n",
-            "deploy/config-template/app.toml": b"[initial_admin]\npassword = ''\n",
-            "deploy/config-template/database/primary.toml": b"password = ''\n",
-            "deploy/config-template/credentials/agent.toml": f"auth_token = '{credential}'\n".encode(),
-            "deploy/config-template/credentials/douyin.toml": b"api_key = ''\ncookie = ''\n",
-            "deploy/config-template/credentials/object_storage.toml.example": b"access_key = ''\nsecret_key = ''\n",
-            "release-info.json": json.dumps({"product_tag": TAG, "source_commit": commit}).encode(),
+            "release-info.json": json.dumps({
+                "product_tag": TAG,
+                "source_commit": commit,
+                "configuration": "template-state config/ rendered by deploy/init-config.sh",
+            }).encode(),
+            **config_templates,
         }
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
@@ -54,6 +64,8 @@ class CloudPayloadTest(unittest.TestCase):
             for relative, content in files.items():
                 header = tarfile.TarInfo(root + relative)
                 header.size = len(content)
+                if relative in {"deploy/render-config.py", "deploy/install.sh", "deploy/init-config.sh", "deploy/migrate.sh", "deploy/activate.sh", "deploy/verify-package.sh", "deploy/verify-database.sh", "deploy/verify-runtime.sh", "deploy/rollback.sh"}:
+                    header.mode = 0o755
                 archive.addfile(header, io.BytesIO(content))
         return archive_path
 
@@ -61,7 +73,7 @@ class CloudPayloadTest(unittest.TestCase):
         verify_cloud(self.make_archive(), TAG, COMMIT)
 
     def test_rejects_populated_credential(self) -> None:
-        with self.assertRaisesRegex(ValueError, "nonempty credential"):
+        with self.assertRaisesRegex(ValueError, "WT_AGENT_AUTH_TOKEN"):
             verify_cloud(self.make_archive(credential="secret"), TAG, COMMIT)
 
     def test_rejects_source_commit_mismatch(self) -> None:
