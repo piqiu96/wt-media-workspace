@@ -95,13 +95,14 @@ jobs:
         run: bash scripts/dev/build-release-linux.sh
         working-directory: wt-media-cloud
       - name: Verify Cloud packaging tests
-        run: python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_stamp_desktop_web -v
+        run: python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_deployment_package scripts.verify.test_stamp_desktop_web -v
         working-directory: wt-media-cloud
       - name: Assemble Linux Cloud package and Desktop Web
         shell: bash
         run: |
           python3 scripts/dev/package_release_linux.py \
             --tag "$GITHUB_REF_NAME" \
+            --source-commit "$(git rev-parse HEAD)" \
             --ffmpeg-lock release/ffmpeg-linux-amd64.json \
             --output-dir "$RUNNER_TEMP/cloud-release"
           mkdir -p "$GITHUB_WORKSPACE/cloud-release"
@@ -269,6 +270,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Verify Cloud release payload checks
+        run: python3 -m unittest scripts.release.test_package_assets -v
       - uses: actions/download-artifact@v4
         with:
           pattern: desktop-*

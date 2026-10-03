@@ -1,8 +1,8 @@
 # CHG-20261003-077 实施进度
 
 - Status: IMPLEMENTING
-- 当前：完成事实核对。RC6 已有受控 Cloud Artifact，但包内缺少 `migrations/`、配置模板和部署脚本；数据库迁移入口和 SQL 在 Cloud 仓存在。Q-01 已裁定为 `admin / admin123`，开始实施 Cloud 部署包。
-- 已完成：识别 Cloud 部署包缺口、数据库迁移入口、生产配置注入规则和初始管理员密码冲突。
-- 未完成：Cloud 部署包与脚本、本地 MySQL/登录验证、新组件 Tag、产品 Tag、部署手册和人工验收。
+- 当前：Cloud 部署包已提交，组件 Tag 为 `v0.1.0-rc.5`；RC5 Cloud CI Run `37114213158` 通过，准备产品 RC7。
+- 已完成：部署包、配置模板、数据库 SQL 示例、进程模板与宝塔手册；本地 MySQL 8.4 空库迁移 50 个、重复迁移 0 个，管理员登录和三进程启动通过；Cloud 包脚本 8 个测试通过。
+- 未完成：Workspace 产品 Tag 与 GitHub 联合构建、Cloud Artifact 校验、宝塔实际部署及人工验收。
 - 阻塞：无。
-- 最近验证：RC6 Run `37091241538` 与 Pre-release 附件校验已通过；RC6 Cloud 包是本次部署包改造的输入，不直接用于生产迁移。
+- 最近验证：Cloud 本地完整安装/迁移/登录/三进程演练通过；RC6 包仍不用于服务器迁移。

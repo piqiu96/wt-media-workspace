@@ -10,7 +10,7 @@
   - `shared/logs/`：进程日志；
   - `current`：当前版本软链。
 - 数据库迁移使用包内 `bin/migrate --dir migrations --create-database=false`，目标库、账号和密码只来自服务器配置；数据库和账号由用户先用 SQL 模板创建。
-- 初始管理员使用用户裁定的 RC 固定值 `admin / admin123`，由 `deploy/init-config.sh` 写入服务器私有配置，不在 Git 中保存口令。
+- 初始管理员使用用户裁定的 RC 固定值 `admin / admin123`；部署时由操作者在 `deploy/init-config.sh` 的终端提示中输入，脚本只把实际输入写入服务器私有配置，不在 Cloud 制品中预填口令。
 - 进程管理提供 systemd 模板，分别守护 Server、Discovery Scheduler、Discovery Worker；宝塔反向代理只转发到 Server HTTP 地址。
 
 ## 有序任务

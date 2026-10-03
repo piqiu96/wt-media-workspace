@@ -8,6 +8,7 @@ import hashlib
 import json
 import re
 import tarfile
+import tomllib
 import zipfile
 from pathlib import Path
 
@@ -35,14 +36,76 @@ def exactly_one(paths: list[Path], label: str) -> Path:
     return paths[0]
 
 
-def verify_cloud(path: Path) -> None:
+def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
     with tarfile.open(path, "r:gz") as archive:
         names = {entry.name for entry in archive}
-    for relative in ("bin/server", "bin/discovery-scheduler", "bin/discovery-worker", "bin/migrate", "bin/ffmpeg", "bin/ffprobe", "web/index.cloud.html", "ffmpeg-source.json"):
-        if not any(name.endswith("/" + relative) for name in names):
-            raise ValueError(f"Cloud package omits {relative}")
-    if any("config_online" in name or name.endswith("/agent.toml") for name in names):
-        raise ValueError("Cloud package contains a release config source")
+        root = f"wt-media-cloud_{tag}_linux-amd64/"
+        required = (
+            "bin/server", "bin/discovery-scheduler", "bin/discovery-worker", "bin/migrate",
+            "bin/ffmpeg", "bin/ffprobe", "web/index.cloud.html", "ffmpeg-source.json",
+            "release-info.json", "deploy/DEPLOYMENT.md", "deploy/prepare-database.sql.example",
+            "deploy/install.sh", "deploy/init-config.sh", "deploy/migrate.sh",
+            "deploy/activate.sh", "deploy/verify-package.sh", "deploy/verify-database.sh",
+            "deploy/verify-runtime.sh", "deploy/rollback.sh",
+            "deploy/systemd/wt-media-cloud-server.service",
+            "deploy/systemd/wt-media-cloud-scheduler.service",
+            "deploy/systemd/wt-media-cloud-worker.service",
+            "deploy/config-template/app.toml", "deploy/config-template/database/primary.toml",
+            "deploy/config-template/credentials/agent.toml",
+            "deploy/config-template/credentials/douyin.toml",
+            "deploy/config-template/credentials/object_storage.toml.example",
+        )
+        for relative in required:
+            if root + relative not in names:
+                raise ValueError(f"Cloud package omits {relative}")
+        if not any(name.startswith(root + "migrations/") and name.endswith(".sql") for name in names):
+            raise ValueError("Cloud package omits SQL migrations")
+        if any(
+            "config_online" in name or name.startswith(root + "config/")
+            or name == root + "deploy/config-template/credentials/object_storage.toml"
+            for name in names
+        ):
+            raise ValueError("Cloud package contains private runtime configuration")
+
+        def read(relative: str) -> bytes:
+            stream = archive.extractfile(root + relative)
+            if stream is None:
+                raise ValueError(f"Cloud package cannot read {relative}")
+            return stream.read()
+
+        info = json.loads(read("release-info.json"))
+        if info.get("product_tag") != tag or info.get("source_commit") != source_commit:
+            raise ValueError("Cloud package Tag or source Commit differs from Release Manifest")
+        blank_fields = (
+            ("deploy/config-template/app.toml", ("initial_admin", "password")),
+            ("deploy/config-template/database/primary.toml", ("password",)),
+            ("deploy/config-template/credentials/agent.toml", ("auth_token",)),
+            ("deploy/config-template/credentials/douyin.toml", ("api_key",)),
+            ("deploy/config-template/credentials/douyin.toml", ("cookie",)),
+        )
+        for relative, keys in blank_fields:
+            value = tomllib.loads(read(relative).decode("utf-8"))
+            for key in keys:
+                value = value[key]
+            if value != "":
+                raise ValueError(f"Cloud package has a nonempty credential in {relative}")
+
+
+def verify_cloud_artifact_checksums(directory: Path, cloud: Path, web: Path) -> None:
+    sums_file = directory / "SHA256SUMS"
+    if not sums_file.is_file():
+        raise ValueError("Cloud artifact omits SHA256SUMS")
+    entries = {}
+    for line in sums_file.read_text(encoding="utf-8").splitlines():
+        parts = line.split("  ", 1)
+        if len(parts) != 2 or not re.fullmatch(r"[0-9a-f]{64}", parts[0]) or parts[1] in entries:
+            raise ValueError("Cloud artifact has an invalid SHA256SUMS entry")
+        entries[parts[1]] = parts[0]
+    if set(entries) != {cloud.name, web.name}:
+        raise ValueError("Cloud artifact checksum file does not name both packages exactly")
+    for package in (cloud, web):
+        if sha256(package) != entries[package.name]:
+            raise ValueError(f"Cloud artifact SHA-256 mismatch: {package.name}")
 
 
 def public_asset_name(tag: str, platform: str, suffix: str) -> str:
@@ -81,7 +144,8 @@ def package(tag: str, origin: str, manifest: Path, assets: Path, cloud_artifact:
         raise ValueError("all four source commits must be full Git SHA-1 values")
     cloud = exactly_one(list(cloud_artifact.glob(f"wt-media-cloud_{tag}_linux-amd64.tar.gz")), "Cloud Linux package")
     web = exactly_one(list(cloud_artifact.glob("desktop-web_*.tar.gz")), "Desktop Web package")
-    verify_cloud(cloud)
+    verify_cloud_artifact_checksums(cloud_artifact, cloud, web)
+    verify_cloud(cloud, tag, source_commits["cloud"])
     for platform, target in PLATFORMS.items():
         folder = agent_artifacts / f"agent-{platform}"
         record = json.loads((folder / "sidecar-manifest.json").read_text(encoding="utf-8"))
