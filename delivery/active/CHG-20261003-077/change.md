@@ -1,6 +1,6 @@
 # CHG-20261003-077：Cloud 预发布部署包与数据库初始化
 
-- Status: DISCUSSION
+- Status: IMPLEMENTING
 - Level: L
 - Milestone: `delivery/milestones/M-first-production-release.md#cloud-预发布部署与数据库初始化`
 - References: `docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md` §5.1、§7；`docs/decisions/0020-tagged-release-and-environment-config.md`；已完成 [CHG-20261003-076](../../completed/CHG-20261003-076/change.md)。
@@ -40,4 +40,4 @@
 
 ## Open Questions
 
-- **Q-01（BLOCKING）**：现有稳定规则要求用户密码至少 6 位，`admin/admin` 无法通过 `BootstrapAdmin` 初始化。是否为了预发布临时放宽为 `admin/admin`，还是保留 6 位下限并使用 `admin/admin123`/一次性强口令？推荐保留安全下限，不放宽。
+- **Q-01（RESOLVED）**：用户于 2026-10-03 裁定保留 6 位密码下限，RC 初始管理员固定为 `admin / admin123`。该值由部署脚本写入服务器私有配置，不进入 Git。
