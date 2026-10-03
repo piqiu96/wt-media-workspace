@@ -30,7 +30,7 @@
 
 1. 裁定 Q-01 初始管理员口令策略。
 2. Cloud Server 增加 Cloud Web 静态文件服务和 Vue history 路由回退，保持 API 与健康路由优先。
-3. Cloud 部署脚本改为版本自包含目录，首次生成配置、升级复制并校验当前配置，通过 `current` 原子切换。
+3. Cloud 部署脚本改为版本自包含目录，通过 `.toml.tpl` 和指定环境的远程变量表生成并校验实际配置，通过 `current` 原子切换；预发与生产复用同一制品和渲染能力。
 4. 宝塔手册改为 Go 项目管理 Server、进程管理器管理 Scheduler/Worker，移除 systemd 与手工 Nginx 静态站点方案。
 5. 增加 Web 路由、包结构与部署脚本测试；验证空库迁移、重复迁移和管理员初始化。
 6. Workspace 固定新 Cloud 组件 Tag 与产品 Tag，重新运行 GitHub 打包工作流。
@@ -43,7 +43,7 @@
 - 初始管理员能按 Q-01 裁定结果登录；密码不明文进入制品或交付记录。
 - Server、Discovery Scheduler、Discovery Worker 可按提供的进程管理模板启动，`/healthz` 与 `/api/v1/health` 通过。
 - `/`、真实静态资源和 `/login` 等深层路由由 Cloud Server 正确返回 Cloud Web，未知 `/api/` 路径仍返回 API 404 而不是前端页面。
-- 新版本安装后拥有独立配置、日志和临时目录；升级配置从 `current/config` 复制并校验；`current` 切换前不改变正在使用的版本。
+- 新版本安装后拥有独立配置、日志和临时目录；部署脚本能按显式环境拉取变量表、渲染 `.toml.tpl`、拒绝缺失/未知/残留变量，并通过 Cloud 配置校验；`current` 切换前不改变正在使用的版本。
 - 宝塔 Go 项目与两个进程管理器条目使用固定 `current` 路径、`www` 用户和正确工作目录，不依赖 systemd 或虚假端口。
 - 部署手册明确备份、校验、失败停止、回退和未验证业务边界。
 

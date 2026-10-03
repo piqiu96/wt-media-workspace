@@ -16,7 +16,7 @@ Cloud 通过 GitHub 生成 Linux amd64 部署包，由操作者上传宝塔服�
 2. 每个版本完整安装到 `/www/wt-media-cloud/releases/<product-tag>/`。
 3. `current` 是唯一运行入口，原子指向一个完整版本目录。
 4. 不使用 `shared/`。每个版本自行包含实际 `config/`、`logs/` 和 `data/tmp/`。
-5. GitHub 部署包仍只携带空白配置模板；实际密钥在服务器安装版本内生成或从当前版本复制，不能进入制品。
+5. GitHub 部署包只携带带变量占位符的配置模板和渲染/校验工具；部署时按显式环境拉取变量表，在目标版本内生成实际 `config/`，真实变量不能进入制品。
 6. Server 由宝塔 Go 项目管理；Discovery Scheduler 和 Discovery Worker 由宝塔进程管理器分别管理。
 7. 三个进程都使用 `www` 用户和 `/www/wt-media-cloud/current` 工作目录。
 8. 不再使用 systemd 管理这三个进程，也不为 Scheduler 或 Worker 配置虚假监听端口。
@@ -80,11 +80,15 @@ Server 必须同时提供 `current/web` 中的 Cloud Web。访问真实静态文
 
 ## 5. 配置与密钥
 
-首次部署时，在目标版本内根据空白模板生成 `config/`。升级时默认从 `current/config/` 复制到新版本，再使用新版本提供的校验程序检查必需文件、字段和权限；校验不通过时不能迁移或切换。
+配置模板以 `.toml.tpl` 进入制品，使用显式占位符引用环境变量。预发和生产共用同一套模板与渲染工具，部署时通过 `--environment staging|production` 和对应远程变量表生成目标版本的 `config/`。Tag 标识代码版本，部署参数决定运行环境，不能根据 RC 或正式 Tag 隐式猜测环境。
+
+部署脚本支持 HTTPS 拉取远程变量表，也支持已下载的本地变量表用于故障恢复。变量表作为数据解析，不能使用 Shell `source` 执行；替换工具只接受模板实际声明的变量，缺少变量、存在未知变量、残留占位符或生成非法 TOML 时必须失败。生成后还必须调用 Cloud 自身的配置解析和业务校验入口，校验不通过时不能迁移或切换。
+
+每次升级都使用所选环境的变量表重新渲染，不能默认复制 `current/config/`。这样同一制品可以部署到预发和生产，并避免把某一环境的数据库、对象存储或认证信息继承到另一环境。渲染记录只保存环境名、变量表摘要和时间，不保存变量值。
 
 私有配置目录和文件要求：
 
-- 所有者为 `www`；
+- 所有者和所属组统一为 `www:www`；
 - 目录权限为 `0700`；
 - 文件权限为 `0600`；
 - 数据库密码、对象存储密钥、平台凭据和初始管理员口令不能写入命令历史、Git、Manifest、Artifact 或交付记录；
@@ -99,7 +103,7 @@ Server 必须同时提供 `current/web` 中的 Cloud Web。访问真实静态文
 1. 下载并校验 GitHub Artifact 和 SHA-256。
 2. 解压到新的 `releases/<product-tag>/`；已存在的同名版本不得覆盖。
 3. 创建该版本的 `config/`、`logs/` 和 `data/tmp/`，设置所有者和权限。
-4. 从当前版本复制配置，并执行新版本配置校验。
+4. 指定 `staging` 或 `production`，拉取对应变量表，在新版本内渲染配置并执行语法与业务校验。
 5. 在维护状态下备份 MySQL 和需要保护的对象存储数据。
 6. 使用新版本的 `bin/migrate` 对显式目标数据库执行 Migration；重复执行应为零个新增迁移。
 7. 依次停止 Scheduler、Worker、Server，等待进程完全退出。
@@ -129,7 +133,7 @@ Server 必须同时提供 `current/web` 中的 Cloud Web。访问真实静态文
 - 三个宝塔进程从固定路径以 `www` 用户启动；
 - Server 提供 Cloud Web、Vue 深层路由、`/healthz` 和 `/api/v1/health`；
 - Scheduler 和 Worker 无监听端口也能被进程管理器正常启停、自动拉起和查看日志；
-- 新版本配置复制后经过结构和权限校验；
+- 同一套模板能分别使用预发和生产变量表生成有效配置，且生成结果经过占位符、TOML、Cloud 业务规则和权限校验；
 - 首次 Migration、重复 Migration、管理员登录和回退边界符合预期；
 - 外部只能访问宝塔公开的 HTTP/HTTPS 入口，MySQL 和 Server 内部端口不直接暴露公网。
 

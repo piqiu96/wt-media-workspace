@@ -4,7 +4,7 @@
 
 **Goal:** 将 Cloud RC 部署改为版本自包含目录，并通过宝塔 Go 项目与进程管理器运行 Server、Scheduler、Worker，同时由 Server 提供 Cloud Web。
 
-**Architecture:** 每个产品 Tag 安装为 `/www/wt-media-cloud/releases/<tag>`，内部包含程序、Web、Migration、实际私有配置、日志和临时目录；`current` 是宝塔唯一稳定运行入口。Server 在已有 API 路由之后为非 API GET/HEAD 请求提供静态资源和 SPA 回退；Scheduler/Worker 继续是无端口独立进程。
+**Architecture:** 每个产品 Tag 安装为 `/www/wt-media-cloud/releases/<tag>`，内部包含程序、Web、Migration、按环境渲染的实际私有配置、日志和临时目录；`current` 是宝塔唯一稳定运行入口。预发与生产共用 `.toml.tpl`，部署工具通过显式环境和远程变量表渲染并调用 Cloud 自身校验。Server 在已有 API 路由之后为非 API GET/HEAD 请求提供静态资源和 SPA 回退；Scheduler/Worker 继续是无端口独立进程。
 
 **Tech Stack:** Go 1.26、CloudWeGo Hertz、Bash、Python `unittest`、GitHub Actions、宝塔 Go 项目和进程管理器。
 
@@ -25,7 +25,7 @@
 - 未构建或缺失 `web/index.cloud.html` 时 Server 必须启动失败并给出明确错误，不能只运行 API 后造成首页 404。
 - `/api/` 未知路径必须保留 JSON/API 404 语义，不能被 SPA 回退为 HTTP 200 HTML。
 - 静态文件请求必须阻止目录穿越，并且非 GET/HEAD 请求不能返回前端页面。
-- 升级安装时配置复制失败、目标配置非空或版本目录已存在都必须停止且不改变 `current`。
+- 配置变量拉取、模板渲染、Cloud 校验失败，目标配置非空或版本目录已存在时都必须停止且不改变 `current`。
 - 密钥轮换后旧版本是否仍具回退资格必须在部署验收中显式记录。
 
 ---
@@ -46,7 +46,7 @@
 
 - [x] 更新 CHG 范围、任务、验收和明确排除项。
 - [x] 运行 `python3 scripts/verify_delivery_governance.py` 和 `python3 scripts/verify_ai_workspace.py`。
-- [ ] 提交 Workspace 规划变更。
+- [x] 提交 Workspace 规划变更。
 
 ### Task 2: Server 提供 Cloud Web 与 SPA 回退
 
@@ -65,23 +65,25 @@
 - [ ] 重新运行目标测试和 `go test ./internal/bootstrap -count=1`。
 - [ ] 提交 Cloud Web 服务变更。
 
-### Task 3: 改为版本自包含安装和配置复制
+### Task 3: 改为版本自包含安装和多环境配置渲染
 
 **Files:**
 - Modify: `wt-media-cloud/deploy/install.sh`
 - Modify: `wt-media-cloud/deploy/init-config.sh`
+- Create: `wt-media-cloud/deploy/render-config.py`
+- Create: `wt-media-cloud/cmd/config-check/main.go`
 - Modify: `wt-media-cloud/deploy/activate.sh`
 - Modify: `wt-media-cloud/deploy/rollback.sh`
 - Modify: `wt-media-cloud/deploy/verify-package.sh`
 - Modify: `wt-media-cloud/scripts/verify/test_deployment_package.py`
 
 **Interfaces:**
-- Consumes: 解压后的只含模板和程序的 Cloud 包，以及可选的现有 `current/config`。
-- Produces: `releases/<tag>/{config,logs,data/tmp}`；升级时复制当前配置，首次部署时由 `init-config.sh` 生成；`activate.sh` 只原子切换完整版本。
+- Consumes: 解压后的模板和程序、显式 `staging|production` 环境，以及 HTTPS 远程或本地 JSON 变量表。
+- Produces: `releases/<tag>/{config,logs,data/tmp}`；`init-config.sh` 拉取并调用 `render-config.py` 生成配置，`bin/config-check` 使用 Cloud 同一套规则进行业务校验；`activate.sh` 只原子切换完整版本。
 
-- [ ] 先改测试断言：安装后目录均为真实目录而非软链；第二版本复制当前配置；复制失败或目标非空时停止；安装不改变 `current`；切换和回退只改变单一软链；权限符合设计。
+- [ ] 先改测试断言：安装后目录均为真实目录而非软链；同一模板可分别渲染预发/生产变量；缺失、未知、残留变量、非法 TOML、Cloud 业务校验失败或目标非空时停止；安装不改变 `current`；切换和回退只改变单一软链；目录和文件归 `www:www`。
 - [ ] 运行 `python3 -m unittest scripts.verify.test_deployment_package -v`，确认旧实现失败。
-- [ ] 修改安装和配置脚本，以 `current/config` 为升级来源并拒绝覆盖已有版本。
+- [ ] 实现严格变量表解析、远程拉取、模板渲染、原子写入和 Cloud 配置校验；升级始终按目标环境重新渲染，不复制 `current/config`。
 - [ ] 更新激活/回退检查，要求目标版本拥有有效私有配置和必要目录。
 - [ ] 重新运行部署脚本测试和 `bash -n deploy/*.sh`。
 - [ ] 提交版本自包含部署脚本。

@@ -2,6 +2,7 @@
 
 - Current: product `v0.1.0-rc.8` is published as a GitHub Pre-release after successful Run `37116209229`.
 - Workspace release check now accepts only blank Cloud deployment templates, rejects private config, and validates Cloud Tag and source Commit.
+- CHG-077 deployment design now fixes one template set with explicit staging/production variable tables; real values are rendered and validated on the target server rather than copied from the current release.
 - Server acceptance template is `server-acceptance.md`; actual BaoTa evidence remains pending.
 - RC7 product Run `37114670702` was cancelled before publishing because its Cloud guide omitted the static Web site route. Its Cloud Artifact was downloaded and verified, but is not the deployment candidate.
 - Release readback: `isPrerelease=true`, `isDraft=false`; Windows x64, macOS Intel, macOS ARM Desktop assets, Manifest, checksums, and `build-info.json` are present. Published Cloud digest matches the downloaded Linux Artifact.
