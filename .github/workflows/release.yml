@@ -1,0 +1,332 @@
+name: Tagged product release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    outputs:
+      channel: ${{ steps.manifest.outputs.channel }}
+      environment: ${{ steps.manifest.outputs.environment }}
+      cloud_origin: ${{ steps.manifest.outputs.cloud_origin }}
+      cloud_tag: ${{ steps.manifest.outputs.cloud_tag }}
+      agent_tag: ${{ steps.manifest.outputs.agent_tag }}
+      desktop_tag: ${{ steps.manifest.outputs.desktop_tag }}
+      workspace_commit: ${{ steps.sources.outputs.workspace_commit }}
+      cloud_commit: ${{ steps.sources.outputs.cloud_commit }}
+      agent_commit: ${{ steps.sources.outputs.agent_commit }}
+      desktop_commit: ${{ steps.sources.outputs.desktop_commit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: wt-media-workspace
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Validate release manifest
+        id: manifest
+        shell: bash
+        run: |
+          uv run --with pyyaml==6.0.3 --no-project python wt-media-workspace/scripts/release/manifest.py \
+            --file "wt-media-workspace/releases/manifests/${GITHUB_REF_NAME}.yaml" \
+            --tag "$GITHUB_REF_NAME" --github-output "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-cloud
+          ref: ${{ steps.manifest.outputs.cloud_tag }}
+          path: wt-media-cloud
+          ssh-key: ${{ secrets.CLOUD_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-agent
+          ref: ${{ steps.manifest.outputs.agent_tag }}
+          path: wt-media-agent
+          ssh-key: ${{ secrets.AGENT_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-desktop
+          ref: ${{ steps.manifest.outputs.desktop_tag }}
+          path: wt-media-desktop
+          ssh-key: ${{ secrets.DESKTOP_DEPLOY_KEY }}
+          persist-credentials: false
+      - name: Record fixed source commits
+        id: sources
+        shell: bash
+        run: |
+          for component in workspace cloud agent desktop; do
+            repo="wt-media-$component"
+            printf '%s_commit=%s\n' "$component" "$(git -C "$repo" rev-parse HEAD)" | tee -a "$GITHUB_OUTPUT"
+          done
+
+  build-cloud:
+    needs: validate
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-cloud
+          ref: ${{ needs.validate.outputs.cloud_tag }}
+          path: wt-media-cloud
+          ssh-key: ${{ secrets.CLOUD_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: wt-media-cloud/go.mod
+          cache-dependency-path: wt-media-cloud/go.sum
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: wt-media-cloud/web/package-lock.json
+      - name: Build Cloud Linux binaries and both Web targets
+        run: bash scripts/dev/build-release-linux.sh
+        working-directory: wt-media-cloud
+      - name: Verify Cloud packaging tests
+        run: python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_stamp_desktop_web -v
+        working-directory: wt-media-cloud
+      - name: Assemble Linux Cloud package and Desktop Web
+        shell: bash
+        run: |
+          python3 scripts/dev/package_release_linux.py \
+            --tag "$GITHUB_REF_NAME" \
+            --ffmpeg-lock release/ffmpeg-linux-amd64.json \
+            --output-dir "$RUNNER_TEMP/cloud-release"
+          mkdir -p "$GITHUB_WORKSPACE/cloud-release"
+          cp "$RUNNER_TEMP"/cloud-release/* "$GITHUB_WORKSPACE/cloud-release/"
+        working-directory: wt-media-cloud
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cloud-linux-amd64
+          path: cloud-release/
+          if-no-files-found: error
+          retention-days: 30
+
+  build-agent:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            platform: windows-x64
+            target: x86_64-pc-windows-msvc
+          - os: macos-15-intel
+            platform: macos-x64
+            target: x86_64-apple-darwin
+          - os: macos-15
+            platform: macos-arm64
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-agent
+          ref: ${{ needs.validate.outputs.agent_tag }}
+          path: wt-media-agent
+          ssh-key: ${{ secrets.AGENT_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.12'
+      - name: Build native Agent Sidecar
+        shell: bash
+        working-directory: wt-media-agent
+        run: |
+          uv sync --locked --extra build
+          uv run --no-sync python scripts/build_desktop_sidecar.py \
+            --target '${{ matrix.target }}' \
+            --output-dir release-agent \
+            --manifest release-agent/sidecar-manifest.json
+      - name: Smoke frozen Agent with runner disabled
+        shell: bash
+        working-directory: wt-media-agent
+        run: |
+          uv run --no-sync python scripts/verify/smoke_frozen_sidecar.py \
+            --binary 'release-agent/wt-media-agent-${{ matrix.target }}${{ matrix.platform == 'windows-x64' && '.exe' || '' }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agent-${{ matrix.platform }}
+          path: wt-media-agent/release-agent/
+          if-no-files-found: error
+          retention-days: 30
+
+  build-desktop:
+    needs: [validate, build-cloud, build-agent]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            platform: windows-x64
+            target: x86_64-pc-windows-msvc
+          - os: macos-15-intel
+            platform: macos-x64
+            target: x86_64-apple-darwin
+          - os: macos-15
+            platform: macos-arm64
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    env:
+      WT_MEDIA_RELEASE_PREBUILT: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: wt-media-workspace
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-cloud
+          ref: ${{ needs.validate.outputs.cloud_tag }}
+          path: wt-media-cloud
+          ssh-key: ${{ secrets.CLOUD_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-agent
+          ref: ${{ needs.validate.outputs.agent_tag }}
+          path: wt-media-agent
+          ssh-key: ${{ secrets.AGENT_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: piqiu96/wt-media-desktop
+          ref: ${{ needs.validate.outputs.desktop_tag }}
+          path: wt-media-desktop
+          ssh-key: ${{ secrets.DESKTOP_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: cloud-linux-amd64
+          path: cloud-artifact
+      - uses: actions/download-artifact@v4
+        with:
+          name: agent-${{ matrix.platform }}
+          path: agent-artifact
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Tauri CLI
+        shell: bash
+        run: cargo install tauri-cli --version '^2' --locked
+      - name: Stage and verify fixed release inputs
+        shell: bash
+        run: |
+          mkdir -p wt-media-desktop/.generated/frontend wt-media-desktop/.generated/agent-config wt-media-desktop/target wt-media-desktop/src-tauri/binaries
+          tar -xzf cloud-artifact/desktop-web_*.tar.gz --strip-components=1 -C wt-media-desktop/.generated/frontend
+          cp agent-artifact/sidecar-manifest.json wt-media-desktop/target/sidecar-manifest.json
+          cp agent-artifact/wt-media-agent-* wt-media-desktop/src-tauri/binaries/
+          chmod +x wt-media-desktop/src-tauri/binaries/wt-media-agent-*
+          cp -R wt-media-agent/config_online/. wt-media-desktop/.generated/agent-config/
+          python3 wt-media-workspace/scripts/release/stage_config.py \
+            --desktop-toml wt-media-desktop/src-tauri/resources/desktop.production.toml \
+            --agent-toml wt-media-agent/config_online/agent.toml \
+            --cloud-origin '${{ needs.validate.outputs.cloud_origin }}'
+          cp wt-media-agent/config_online/agent.toml wt-media-desktop/.generated/agent-config/agent.toml
+          bash wt-media-desktop/scripts/prepare-release-inputs.sh
+      - name: Build and verify macOS Desktop package
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          bash scripts/package-release-macos.sh --output-dir "$RUNNER_TEMP/desktop-release"
+          mkdir -p "$GITHUB_WORKSPACE/desktop-release"
+          cp "$RUNNER_TEMP"/desktop-release/*.zip "$GITHUB_WORKSPACE/desktop-release/"
+        working-directory: wt-media-desktop
+      - name: Build Windows NSIS installer
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          cargo tauri build --bundles nsis
+          bash scripts/release-versions.sh --check
+          mkdir -p "$GITHUB_WORKSPACE/desktop-release"
+          cp target/release/bundle/nsis/*.exe "$GITHUB_WORKSPACE/desktop-release/"
+        working-directory: wt-media-desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.platform }}
+          path: desktop-release/
+          if-no-files-found: error
+          retention-days: 30
+
+  package:
+    needs: [validate, build-cloud, build-agent, build-desktop]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-*
+          merge-multiple: true
+          path: release-assets
+      - uses: actions/download-artifact@v4
+        with:
+          name: cloud-linux-amd64
+          path: cloud-artifact
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: agent-*
+          path: agent-artifacts
+      - name: Verify full asset set and write checksums
+        shell: bash
+        run: |
+          python3 scripts/release/package_assets.py \
+            --manifest "releases/manifests/${GITHUB_REF_NAME}.yaml" \
+            --tag "$GITHUB_REF_NAME" \
+            --cloud-origin '${{ needs.validate.outputs.cloud_origin }}' \
+            --source-commit 'workspace=${{ needs.validate.outputs.workspace_commit }}' \
+            --source-commit 'cloud=${{ needs.validate.outputs.cloud_commit }}' \
+            --source-commit 'agent=${{ needs.validate.outputs.agent_commit }}' \
+            --source-commit 'desktop=${{ needs.validate.outputs.desktop_commit }}' \
+            --assets release-assets \
+            --cloud-artifact cloud-artifact \
+            --agent-artifacts agent-artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: product-release-assets
+          path: release-assets/
+          if-no-files-found: error
+          retention-days: 90
+
+  publish-pre:
+    if: needs.validate.outputs.channel == 'rc'
+    needs: [validate, package]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: product-release-assets
+          path: release-assets
+      - name: Publish complete RC Pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/release/publish.sh rc "$GITHUB_REF_NAME" release-assets
+
+  publish-release:
+    if: needs.validate.outputs.channel == 'stable'
+    needs: [validate, package]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: product-release-assets
+          path: release-assets
+      - name: Create complete stable Draft Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/release/publish.sh stable "$GITHUB_REF_NAME" release-assets
