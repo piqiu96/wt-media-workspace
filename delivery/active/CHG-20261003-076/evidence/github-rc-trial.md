@@ -17,4 +17,10 @@
 
 ## 候选 v0.1.0-rc.3
 
-- 待运行。Cloud 使用新组件 Tag `v0.1.0-rc.3`；Agent 沿用已通过三平台烟测的 `v0.2.2-rc.2`；Desktop 沿用未改动的 `v0.1.0-rc.1`。
+- 输入：Cloud `v0.1.0-rc.3`；Agent `v0.2.2-rc.2`；Desktop `v0.1.0-rc.1`。
+
+- Workspace Run：[37083857785](https://github.com/piqiu96/wt-media-workspace/actions/runs/37083857785)，结论：失败，未创建 Pre-release。
+- 固定来源：Workspace `d961aa9`；Cloud `ed5a3c9`（`v0.1.0-rc.3`）；Agent `ac7f0b6`（`v0.2.2-rc.2`）；Desktop `50f707a`（`v0.1.0-rc.1`）。
+- 通过：Manifest/跨仓读取；Cloud Linux 包和 Desktop Web；Windows/macOS Intel/macOS ARM Agent Sidecar 与健康 smoke；macOS ARM 和 macOS Intel Desktop 包。
+- 失败：Windows Desktop 编译到应用本体时报 3 个 Rust 错误。根因是 `rustix::process` 与 `Errno::XDEV/PERM` 属 Unix API，但源码未按 Windows 配置；Windows Runner 上这些路径不可用。失败 Job：<https://github.com/piqiu96/wt-media-workspace/actions/runs/37083857785/job/111090751159>。
+- 后续：`package`、`publish-pre` 因门禁跳过；准备在 Desktop 用平台分支修复 Unix 进程信号/跨盘错误处理并用 Win32 查询进程存活，再以新组件 Tag 与产品 RC Tag 重跑整组。
