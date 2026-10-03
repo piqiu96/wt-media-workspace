@@ -16,7 +16,7 @@ Cloud 通过 GitHub 生成 Linux amd64 部署包，由操作者上传宝塔服�
 2. 每个版本完整安装到 `/www/wt-media-cloud/releases/<product-tag>/`。
 3. `current` 是唯一运行入口，原子指向一个完整版本目录。
 4. 不使用 `shared/`。每个版本自行包含实际 `config/`、`logs/` 和 `data/tmp/`。
-5. GitHub 部署包只携带带变量占位符的配置模板和渲染/校验工具；部署时按显式环境拉取变量表，在目标版本内生成实际 `config/`，真实变量不能进入制品。
+5. 仓库 `config/` 只用于本地开发和测试，不进入 GitHub 部署包。打包器把 `config_online/` 复制为部署包内的 `config/` 模板；部署时按显式环境拉取变量表，将它原子渲染为目标版本的实际 `config/`，真实变量不能进入制品。
 6. Server 由宝塔 Go 项目管理；Discovery Scheduler 和 Discovery Worker 由宝塔进程管理器分别管理。
 7. 三个进程都使用 `www` 用户和 `/www/wt-media-cloud/current` 工作目录。
 8. 不再使用 systemd 管理这三个进程，也不为 Scheduler 或 Worker 配置虚假监听端口。
@@ -46,7 +46,7 @@ Cloud 通过 GitHub 生成 Linux amd64 部署包，由操作者上传宝塔服�
 └── current -> releases/v0.1.0-rc.8
 ```
 
-`bin/`、`web/`、`migrations/`、`deploy/` 和 `release-info.json` 来自构建制品。`config/`、`logs/` 和 `data/tmp/` 在服务器安装时创建，不由 GitHub 打包真实内容。
+`bin/`、`web/`、`migrations/`、`deploy/`、模板状态的 `config/` 和 `release-info.json` 来自构建制品。包内 `config/` 只能来自仓库 `config_online/`，不得包含仓库本地 `config/`；部署脚本渲染成功后才将其变为运行配置。`logs/` 和 `data/tmp/` 在服务器安装时创建。
 
 不在根目录分别创建 `bin`、`web` 等多个软链。一个 `current` 软链保证程序、Web、Migration 和配置属于同一版本，避免部分路径已经切换、部分路径仍指向旧版本。
 
@@ -80,9 +80,9 @@ Server 必须同时提供 `current/web` 中的 Cloud Web。访问真实静态文
 
 ## 5. 配置与密钥
 
-配置模板以 `.toml.tpl` 进入制品，使用显式占位符引用环境变量。预发和生产共用同一套模板与渲染工具，部署时通过 `--environment staging|production` 和对应远程变量表生成目标版本的 `config/`。Tag 标识代码版本，部署参数决定运行环境，不能根据 RC 或正式 Tag 隐式猜测环境。
+仓库 `config_online/` 中需要替换的文件以 `.toml.tpl` 保存，其他固定配置可保留 `.toml`。打包器删除部署暂存区中的本地 `config/`，再把 `config_online/` 复制为包内 `config/`；部署包不保留 `config_test/`。预发和生产共用同一套模板与渲染工具，部署时通过 `--environment staging|production` 和对应远程变量表生成目标版本的最终 `config/*.toml`。Tag 标识代码版本，部署参数决定运行环境，不能根据 RC 或正式 Tag 隐式猜测环境。
 
-部署脚本支持 HTTPS 拉取远程变量表，也支持已下载的本地变量表用于故障恢复。变量表作为数据解析，不能使用 Shell `source` 执行；替换工具只接受模板实际声明的变量，缺少变量、存在未知变量、残留占位符或生成非法 TOML 时必须失败。生成后还必须调用 Cloud 自身的配置解析和业务校验入口，校验不通过时不能迁移或切换。
+部署脚本支持 HTTPS 拉取远程变量表，也支持已下载的本地变量表用于故障恢复。变量表作为数据解析，不能使用 Shell `source` 执行；替换工具在临时目录中复制固定 `.toml`、把 `.toml.tpl` 渲染为 `.toml`，并只接受模板实际声明的变量。缺少变量、存在未知变量、残留占位符或生成非法 TOML 时必须失败。生成后还必须调用 Cloud 自身的配置解析和业务校验入口；全部通过后才原子替换模板状态的 `config/`，校验失败时不能迁移或切换。
 
 每次升级都使用所选环境的变量表重新渲染，不能默认复制 `current/config/`。这样同一制品可以部署到预发和生产，并避免把某一环境的数据库、对象存储或认证信息继承到另一环境。渲染记录只保存环境名、变量表摘要和时间，不保存变量值。
 

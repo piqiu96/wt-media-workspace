@@ -72,16 +72,19 @@
 - Modify: `wt-media-cloud/deploy/init-config.sh`
 - Create: `wt-media-cloud/deploy/render-config.py`
 - Create: `wt-media-cloud/cmd/config-check/main.go`
+- Modify: `wt-media-cloud/config_online/**`
 - Modify: `wt-media-cloud/deploy/activate.sh`
 - Modify: `wt-media-cloud/deploy/rollback.sh`
 - Modify: `wt-media-cloud/deploy/verify-package.sh`
+- Modify: `wt-media-cloud/scripts/dev/package_release_linux.py`
+- Modify: `wt-media-cloud/scripts/verify/test_package_release_linux.py`
 - Modify: `wt-media-cloud/scripts/verify/test_deployment_package.py`
 
 **Interfaces:**
-- Consumes: 解压后的模板和程序、显式 `staging|production` 环境，以及 HTTPS 远程或本地 JSON 变量表。
-- Produces: `releases/<tag>/{config,logs,data/tmp}`；`init-config.sh` 拉取并调用 `render-config.py` 生成配置，`bin/config-check` 使用 Cloud 同一套规则进行业务校验；`activate.sh` 只原子切换完整版本。
+- Consumes: 仓库本地 `config/`、发布模板 `config_online/`、显式 `staging|production` 环境，以及 HTTPS 远程或本地 JSON 变量表。
+- Produces: 打包时丢弃本地 `config/` 并将 `config_online/` 放入包内 `config/`；安装后拥有 `releases/<tag>/{config,logs,data/tmp}`；`init-config.sh` 拉取并调用 `render-config.py` 把模板状态的 `config/` 原子生成为运行配置，`bin/config-check` 使用 Cloud 同一套规则进行业务校验；`activate.sh` 只原子切换完整版本。
 
-- [ ] 先改测试断言：安装后目录均为真实目录而非软链；同一模板可分别渲染预发/生产变量；缺失、未知、残留变量、非法 TOML、Cloud 业务校验失败或目标非空时停止；安装不改变 `current`；切换和回退只改变单一软链；目录和文件归 `www:www`。
+- [ ] 先改测试断言：打包器只把 `config_online/` 复制为包内 `config/`，不携带本地 `config/` 或 `config_test/`；安装后目录均为真实目录而非软链；同一模板可分别渲染预发/生产变量；缺失、未知、残留变量、非法 TOML、Cloud 业务校验失败时停止且保留模板；安装不改变 `current`；切换和回退只改变单一软链；目录和文件归 `www:www`。
 - [ ] 运行 `python3 -m unittest scripts.verify.test_deployment_package -v`，确认旧实现失败。
 - [ ] 实现严格变量表解析、远程拉取、模板渲染、原子写入和 Cloud 配置校验；升级始终按目标环境重新渲染，不复制 `current/config`。
 - [ ] 更新激活/回退检查，要求目标版本拥有有效私有配置和必要目录。

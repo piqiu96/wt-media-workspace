@@ -9,7 +9,7 @@
 
 ## 目标与范围
 
-1. Cloud Linux 部署包包含现有可执行程序、Cloud Web、FFmpeg/FFprobe、`migrations/`、非敏感配置模板、版本/摘要记录和服务器安装/验收脚本。
+1. Cloud Linux 部署包包含现有可执行程序、Cloud Web、FFmpeg/FFprobe、`migrations/`、从 `config_online/` 生成的包内 `config/` 模板、版本/摘要记录和服务器安装/验收脚本；本地 `config/` 不得进入制品。
 2. 提供数据库准备模板：用户可先创建专用数据库和账号；部署脚本只对显式目标库执行迁移，不隐式创建生产库。
 3. 提供宝塔/服务器可执行步骤：每个版本自包含私有 `config/`、`logs/`、`data/tmp/`，由单一 `current` 软链切换；执行迁移后，以宝塔 Go 项目启动 Server、宝塔进程管理器启动 Scheduler/Worker，并验证 Web、健康与登录。
 4. 用新的 Cloud 组件 Tag 和产品 Tag 重新生成可部署 Cloud Artifact；客户端无变更时沿用已验证组件 Tag。
@@ -38,7 +38,7 @@
 
 ## 验收
 
-- 新 Cloud Artifact 包含全部运行程序、Web、FFmpeg/FFprobe、全部 SQL Migration、部署脚本和非敏感配置模板。
+- 新 Cloud Artifact 包含全部运行程序、Web、FFmpeg/FFprobe、全部 SQL Migration、部署脚本，以及仅由 `config_online/` 生成的非敏感 `config/` 模板；不包含本地 `config/` 或 `config_test/`。
 - 在用户预先创建的 MySQL 空库上，包内 `bin/migrate --dir migrations --create-database=false` 能完整应用并重复执行通过。
 - 初始管理员能按 Q-01 裁定结果登录；密码不明文进入制品或交付记录。
 - Server、Discovery Scheduler、Discovery Worker 可按提供的进程管理模板启动，`/healthz` 与 `/api/v1/health` 通过。
