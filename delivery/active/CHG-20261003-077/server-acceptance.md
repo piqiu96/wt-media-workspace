@@ -8,8 +8,9 @@
 | --- | --- |
 | 产品 Tag | `v0.1.0-rc.8` |
 | Cloud 组件 Tag | `v0.1.0-rc.6` |
-| GitHub Actions Run URL | 待填写 |
-| Cloud Artifact 文件名与 SHA-256 | 待填写 |
+| GitHub Actions Run URL | [RC8 Run 37116209229](https://github.com/piqiu96/wt-media-workspace/actions/runs/37116209229)，结论 success |
+| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.8_linux-amd64.tar.gz`；`c02b55ec6d52432fdd54e2fab0d4a045f066f67bbc7c23c83eb4cf80082c5865` |
+| Cloud 源码 Commit | `27050a40366471a415d5ccb9045817eea5a42c30` |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
 | 安装路径与 `current` 指向 | 待填写 |
 | 维护提示开始/结束时间 | 待填写 |
