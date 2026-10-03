@@ -11,6 +11,6 @@
 - 系统动作：同一 `build → verify → package` 链路检查版本组合、平台、配置、Sidecar 和摘要，任何平台失败都不公开整组 Pre-release。
 - 成功事实：Cloud、Agent、Desktop 目标制品及来源和摘要齐全，GitHub Pre-release 中三平台客户端附件完整，试跑报告说明烟测边界。
 - 失败行为：不得从 `main` 或 `latest` 偷取源码；不得以编译成功宣称真实登录、BitBrowser、对象存储或宝塔部署通过；不得移动旧 Tag 或混用不同 RC 的包。
-- 当前实施单元：[CHG-20261003-076](../active/CHG-20261003-076/change.md)。
+- 当前实施单元：[CHG-20261003-076](../completed/CHG-20261003-076/change.md)。
 
 后续预发布环境与首次生产切换按部署计划另行实施，不由本闭环的打包通过自动宣布完成。
