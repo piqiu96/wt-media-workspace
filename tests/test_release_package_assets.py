@@ -42,9 +42,9 @@ class ReleasePackageAssetsTest(unittest.TestCase):
                 "component": "wt-media-agent", "version": "0.2.2", "target": target,
                 "filename": binary.name, "sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
             }), encoding="utf-8")
-        (assets / "installer.exe").write_bytes(b"nsis")
+        (assets / "起飞_0.1.0_x64-setup.exe").write_bytes(b"nsis")
         for arch in ("x64", "aarch64"):
-            with zipfile.ZipFile(assets / f"app_macos-{arch}.zip", "w") as archive:
+            with zipfile.ZipFile(assets / f"起飞_0.1.0_macos-{arch}.zip", "w") as archive:
                 prefix = "release/app.app/Contents/Resources/"
                 archive.writestr(prefix + "config/agent.toml", f'[cloud]\nbase_url = "{mac_origin}"')
                 archive.writestr(prefix + "resources/desktop.production.toml", f'[cloud]\nbase_url = "{mac_origin}"')
@@ -60,7 +60,8 @@ class ReleasePackageAssetsTest(unittest.TestCase):
             info = json.loads((assets / "build-info.json").read_text(encoding="utf-8"))
             self.assertEqual(info["source_commits"], SOURCES)
             self.assertEqual(len(info["desktop_assets"]), 3)
-            self.assertIn("installer.exe", (assets / "SHA256SUMS").read_text(encoding="utf-8"))
+            self.assertIn("WT-Media_v0.1.0-rc.1_windows-x64-setup.exe", (assets / "SHA256SUMS").read_text(encoding="utf-8"))
+            self.assertFalse(list(assets.glob("起飞_*")), "non-ASCII artifact names must not reach GitHub")
 
     def test_rejects_macos_package_with_different_cloud_origin(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

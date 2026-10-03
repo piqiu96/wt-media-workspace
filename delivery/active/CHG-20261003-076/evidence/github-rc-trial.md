@@ -32,3 +32,9 @@
 - 通过：Windows Desktop Rust 应用已完成 Release 编译并生成 NSIS 安装包 `起飞_0.1.0_x64-setup.exe`（14.29 MiB）；Cloud、三平台 Agent、macOS ARM 与 macOS Intel Desktop 也全部通过。
 - 失败：Windows 后置 `release-versions.sh --check` 依赖 macOS/Perl `shasum`，GitHub Windows Git Bash 中不存在，退出 127；因此未上传 Desktop Windows Artifact，`package`/`publish-pre` 继续按门禁跳过。
 - 后续：把版本校验脚本的 SHA-256 入口改为 `shasum`/`sha256sum` 双平台兼容，并用新 Desktop 组件 Tag 与产品 RC Tag 重跑整组。
+
+## 候选 v0.1.0-rc.5 发布后验收
+
+- Workspace Run：[37089104559](https://github.com/piqiu96/wt-media-workspace/actions/runs/37089104559)，全部 Job 通过并曾创建 Pre-release。
+- 手工下载附件复核发现：GitHub 将附件名中的中文「起飞」替换为 `_`；`SHA256SUMS` 仍指向中文名，三个安装包下载后无法按清单打开/校验。Job 未做发布后下载复核，不能把该 Run 判为最终通过。
+- 处置：已删除无效 `v0.1.0-rc.5` Release（保留 Tag 与 Actions 证据）；Workspace 将公共附件统一重命名为 ASCII `WT-Media_<tag>_<platform>`，并在发布后核对 GitHub 实际附件名与下载字节摘要。

@@ -5,4 +5,5 @@
 - Verification: local `cargo check --workspace` passed; `scripts/test.sh` passed with 507 Rust tests, 6 existing ignores, control 12 checks and release-version 20 checks.
 - RC4 result: Windows Rust release compile and NSIS package generation passed; `release-versions.sh --check` failed because Windows Git Bash lacks `shasum`.
 - SHA-256 compatibility fix: `0b919b0e8ff11d08d733362d6ff48e574d833b69` (`v0.1.0-rc.3`); local release-versions suite (20 checks) and `--check` pass after the fix.
-- Remaining: validate the fixed Windows artifact gate in RC5, then full product package and release checks.
+- RC5 result: the fixed Windows artifact gate passed and the Desktop Windows artifact was uploaded.
+- Remaining: no Desktop component change for RC6; await Workspace public-asset naming and post-publish verification.

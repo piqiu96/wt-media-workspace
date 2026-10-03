@@ -45,6 +45,22 @@ def verify_cloud(path: Path) -> None:
         raise ValueError("Cloud package contains a release config source")
 
 
+def public_asset_name(tag: str, platform: str, suffix: str) -> str:
+    """GitHub-safe public name without discarding the product identity."""
+    return f"WT-Media_{tag}_{platform}{suffix}"
+
+
+def normalize_public_asset(
+    source: Path, assets: Path, tag: str, platform: str, suffix: str
+) -> Path:
+    target_name = public_asset_name(tag, platform, suffix)
+    target = assets / target_name
+    if target.exists():
+        raise ValueError(f"duplicate normalized Desktop asset: {target_name}")
+    source.rename(target)
+    return target
+
+
 def verify_mac(path: Path, origin: str) -> None:
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
@@ -75,11 +91,23 @@ def package(tag: str, origin: str, manifest: Path, assets: Path, cloud_artifact:
         if not binary.is_file() or sha256(binary) != record["sha256"]:
             raise ValueError(f"Sidecar SHA-256 mismatch for {platform}")
     installers = [path for path in assets.iterdir() if path.is_file()]
-    windows = exactly_one([path for path in installers if path.suffix.lower() == ".exe"], "Windows NSIS installer")
-    intel = exactly_one([path for path in installers if path.name.endswith("_macos-x64.zip")], "macOS Intel package")
-    arm = exactly_one([path for path in installers if path.name.endswith("_macos-aarch64.zip")], "macOS ARM package")
-    if set(installers) != {windows, intel, arm}:
+    windows_source = exactly_one(
+        [path for path in installers if path.suffix.lower() == ".exe"],
+        "Windows NSIS installer",
+    )
+    intel_source = exactly_one(
+        [path for path in installers if path.name.endswith("_macos-x64.zip")],
+        "macOS Intel package",
+    )
+    arm_source = exactly_one(
+        [path for path in installers if path.name.endswith("_macos-aarch64.zip")],
+        "macOS ARM package",
+    )
+    if set(installers) != {windows_source, intel_source, arm_source}:
         raise ValueError("unexpected Desktop release assets")
+    windows = normalize_public_asset(windows_source, assets, tag, "windows-x64-setup", ".exe")
+    intel = normalize_public_asset(intel_source, assets, tag, "macos-x64", ".zip")
+    arm = normalize_public_asset(arm_source, assets, tag, "macos-arm64", ".zip")
     for path in (intel, arm):
         verify_mac(path, origin)
     (assets / manifest.name).write_bytes(manifest.read_bytes())

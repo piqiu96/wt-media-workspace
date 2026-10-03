@@ -17,3 +17,21 @@ gh release create "$TAG" "$ASSETS"/*.zip "$ASSETS"/*.exe "$ASSETS"/build-info.js
 if [[ "$MODE" == rc ]]; then
   gh release edit "$TAG" --draft=false --prerelease
 fi
+
+# GitHub is part of the release boundary, not merely a file sink. Check the
+# names and bytes that a user can actually download after upload and renaming.
+expected=$(
+  cd "$ASSETS"
+  find . -maxdepth 1 -type f ! -name RELEASE-NOTES.txt -printf '%f\n' | LC_ALL=C sort
+)
+actual=$(gh release view "$TAG" --json assets --jq '[.assets[].name] | sort | .[]')
+if [[ "$expected" != "$actual" ]]; then
+  printf 'published asset names differ:\nexpected:\n%s\nactual:\n%s\n' "$expected" "$actual" >&2
+  exit 1
+fi
+verify_dir="$(mktemp -d)"
+gh release download "$TAG" --dir "$verify_dir" --clobber
+(
+  cd "$verify_dir"
+  sha256sum --check SHA256SUMS
+)
