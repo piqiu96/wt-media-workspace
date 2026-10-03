@@ -44,6 +44,7 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
             "bin/server", "bin/discovery-scheduler", "bin/discovery-worker", "bin/migrate",
             "bin/ffmpeg", "bin/ffprobe", "web/index.cloud.html", "ffmpeg-source.json",
             "release-info.json", "deploy/DEPLOYMENT.md", "deploy/prepare-database.sql.example",
+            "deploy/nginx-site-locations.conf.example",
             "deploy/install.sh", "deploy/init-config.sh", "deploy/migrate.sh",
             "deploy/activate.sh", "deploy/verify-package.sh", "deploy/verify-database.sh",
             "deploy/verify-runtime.sh", "deploy/rollback.sh",

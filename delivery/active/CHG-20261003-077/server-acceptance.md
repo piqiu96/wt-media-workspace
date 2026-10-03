@@ -6,8 +6,8 @@
 
 | 项目 | 实际值 / 证据 |
 | --- | --- |
-| 产品 Tag | `v0.1.0-rc.7` |
-| Cloud 组件 Tag | `v0.1.0-rc.5` |
+| 产品 Tag | `v0.1.0-rc.8` |
+| Cloud 组件 Tag | `v0.1.0-rc.6` |
 | GitHub Actions Run URL | 待填写 |
 | Cloud Artifact 文件名与 SHA-256 | 待填写 |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
@@ -33,6 +33,7 @@
 | Server / Scheduler / Worker 服务状态 | 待填写 |
 | 本机 `/healthz` 和 `/api/v1/health` | 待填写 |
 | HTTPS 域名健康接口与 Web 页面 | 待填写 |
+| HTTPS `/login` 刷新后仍能加载 Cloud Web；`/api/v1/health` 为 JSON | 待填写 |
 | 初始管理员登录、修改密码 | 待填写 |
 | 回退切换演练或未执行原因 | 待填写 |
 | 异常、处理与发布结论 | 待填写 |

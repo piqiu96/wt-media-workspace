@@ -28,6 +28,7 @@ class CloudPayloadTest(unittest.TestCase):
             "migrations/001_identity.sql": b"CREATE TABLE users (id INT);",
             "deploy/DEPLOYMENT.md": b"# Deployment",
             "deploy/prepare-database.sql.example": b"CREATE DATABASE example;",
+            "deploy/nginx-site-locations.conf.example": b"root /example/web;\n",
             "deploy/install.sh": b"#!/bin/bash\n",
             "deploy/init-config.sh": b"#!/bin/bash\n",
             "deploy/migrate.sh": b"#!/bin/bash\n",
