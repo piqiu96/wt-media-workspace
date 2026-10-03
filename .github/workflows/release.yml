@@ -82,7 +82,9 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-go@v5
         with:
-          go-version-file: wt-media-cloud/go.mod
+          # go.mod's 1.24 is a minimum language version. Cloud's tested CI
+          # toolchain is 1.26.5; 1.24 fails to link sonic/loader on Linux.
+          go-version: '1.26.5'
           cache-dependency-path: wt-media-cloud/go.sum
       - uses: actions/setup-node@v4
         with:
