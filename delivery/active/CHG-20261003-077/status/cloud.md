@@ -1,10 +1,7 @@
 # Cloud status
 
-- Current: BaoTa site routing corrected in Cloud `v0.1.0-rc.6` (`27050a4`); Cloud CI Run `37115882244` passed.
-- Implemented: Linux package now carries SQL migrations, private-config templates, provenance, install/migrate/activate/verify/rollback scripts, database SQL example, systemd units, and BaoTa guide.
-- Local verification: 9 package/script tests passed; MySQL 8.4 empty database applied all 50 migrations, rerun applied 0; Server health and admin login passed; Scheduler and Worker remained running alongside Server. Temporary test database was removed.
-- Cloud CI Run `37113763595` for RC4 failed only because its duplicate-install test omitted `--service-user` on Linux; test corrected in RC5 without moving RC4. RC5 Cloud CI Run `37114213158` passed.
-- RC7 product Run `37114670702` was cancelled after finding that the original BaoTa guide would proxy the Cloud Web homepage to an API-only Go Server. RC6 package adds the static site root, SPA fallback, and `/api/` proxy example.
-- RC8 product Run `37116209229` succeeded. Downloaded Cloud Artifact matched its SHA256SUMS and published `build-info.json` digest `c02b55ec6d52432fdd54e2fab0d4a045f066f67bbc7c23c83eb4cf80082c5865`; archive has 50 SQL files, six executable Linux x86_64 ELF binaries, and the BaoTa Nginx site snippet. The extracted package passed `deploy/verify-package.sh`.
-- Deployment design changed before server installation: repository `config/` remains local-only, packaging copies `config_online/` to the artifact's template-state `config/`, and deployment renders it from an explicit staging or production variable table before Cloud validation. Each release contains its own config/log/tmp directories owned by `www`; `current` remains the only switch, Server will serve Cloud Web under BaoTa Go project management, and Scheduler/Worker will use BaoTa process manager entries. RC8 remains immutable but is no longer the server deployment candidate.
-- Remaining: implement and verify the added Cloud logic, issue a new component/product RC, then collect actual BaoTa deployment evidence in `server-acceptance.md`.
+- Current component: `v0.1.0-rc.7` → `99eaf30cdf08fdaa87c6799dce5cc8ca56b336cd`.
+- Implemented: self-contained release directory, template-state `config/`, `config-check`, pre/online variable rendering, atomic `current` activation, BaoTa Go project/process-manager guide, static Cloud Web with SPA fallback, and removal of shared/systemd/Nginx runtime layout.
+- Verification: Cloud CI `37151385427` passed; full Go/Web tests passed (Web 487); deployment/package tests passed; local MySQL 8.4 empty database applied 50 migrations, rerun applied 0; Server Web/API/login and Scheduler/Worker passed; second-version switch and rollback passed.
+- Local-only operator helper: `~/.wt-media/upload-config-variables.py` with `~/.wt-media/vars/cloud/{pre,online}.json`; dry-run only, no real variable upload.
+- Remaining: consume Cloud `rc.7` in product RC9, verify the GitHub Cloud Artifact, then collect real BaoTa server evidence.

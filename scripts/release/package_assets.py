@@ -8,7 +8,6 @@ import hashlib
 import json
 import re
 import tarfile
-import tomllib
 import zipfile
 from pathlib import Path
 
@@ -38,35 +37,62 @@ def exactly_one(paths: list[Path], label: str) -> Path:
 
 def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
     with tarfile.open(path, "r:gz") as archive:
-        names = {entry.name for entry in archive}
+        members = {entry.name: entry for entry in archive}
+        names = set(members)
         root = f"wt-media-cloud_{tag}_linux-amd64/"
         required = (
-            "bin/server", "bin/discovery-scheduler", "bin/discovery-worker", "bin/migrate",
-            "bin/ffmpeg", "bin/ffprobe", "web/index.cloud.html", "ffmpeg-source.json",
-            "release-info.json", "deploy/DEPLOYMENT.md", "deploy/prepare-database.sql.example",
-            "deploy/nginx-site-locations.conf.example",
-            "deploy/install.sh", "deploy/init-config.sh", "deploy/migrate.sh",
-            "deploy/activate.sh", "deploy/verify-package.sh", "deploy/verify-database.sh",
-            "deploy/verify-runtime.sh", "deploy/rollback.sh",
-            "deploy/systemd/wt-media-cloud-server.service",
-            "deploy/systemd/wt-media-cloud-scheduler.service",
-            "deploy/systemd/wt-media-cloud-worker.service",
-            "deploy/config-template/app.toml", "deploy/config-template/database/primary.toml",
-            "deploy/config-template/credentials/agent.toml",
-            "deploy/config-template/credentials/douyin.toml",
-            "deploy/config-template/credentials/object_storage.toml.example",
+            "bin/server",
+            "bin/discovery-scheduler",
+            "bin/discovery-worker",
+            "bin/migrate",
+            "bin/config-check",
+            "bin/ffmpeg",
+            "bin/ffprobe",
+            "web/index.cloud.html",
+            "ffmpeg-source.json",
+            "release-info.json",
+            "deploy/DEPLOYMENT.md",
+            "deploy/prepare-database.sql.example",
+            "deploy/render-config.py",
+            "deploy/install.sh",
+            "deploy/init-config.sh",
+            "deploy/migrate.sh",
+            "deploy/activate.sh",
+            "deploy/verify-package.sh",
+            "deploy/verify-database.sh",
+            "deploy/verify-runtime.sh",
+            "deploy/rollback.sh",
+            "config/app.toml.tpl",
+            "config/database/primary.toml.tpl",
+            "config/credentials/agent.toml.tpl",
+            "config/credentials/douyin.toml.tpl",
+            "config/credentials/object_storage.toml.tpl",
+            "config/storage/object_storage.toml.tpl",
         )
         for relative in required:
             if root + relative not in names:
                 raise ValueError(f"Cloud package omits {relative}")
+        for relative in required:
+            if relative.endswith((".sh", ".py")) and not members[root + relative].mode & 0o111:
+                raise ValueError(f"Cloud package deployment script is not executable: {relative}")
         if not any(name.startswith(root + "migrations/") and name.endswith(".sql") for name in names):
             raise ValueError("Cloud package omits SQL migrations")
-        if any(
-            "config_online" in name or name.startswith(root + "config/")
-            or name == root + "deploy/config-template/credentials/object_storage.toml"
-            for name in names
-        ):
-            raise ValueError("Cloud package contains private runtime configuration")
+        forbidden = (
+            "config_online",
+            "config_test",
+            "deploy/config-template",
+            "deploy/systemd",
+            "deploy/nginx-site-locations.conf.example",
+            "config/.render-info.json",
+            "config/app.toml",
+            "config/database/primary.toml",
+            "config/credentials/agent.toml",
+            "config/credentials/douyin.toml",
+            "config/credentials/object_storage.toml",
+            "config/storage/object_storage.toml",
+        )
+        if any(root + relative in names for relative in forbidden):
+            raise ValueError("Cloud package contains superseded or private runtime configuration")
 
         def read(relative: str) -> bytes:
             stream = archive.extractfile(root + relative)
@@ -77,19 +103,19 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
         info = json.loads(read("release-info.json"))
         if info.get("product_tag") != tag or info.get("source_commit") != source_commit:
             raise ValueError("Cloud package Tag or source Commit differs from Release Manifest")
-        blank_fields = (
-            ("deploy/config-template/app.toml", ("initial_admin", "password")),
-            ("deploy/config-template/database/primary.toml", ("password",)),
-            ("deploy/config-template/credentials/agent.toml", ("auth_token",)),
-            ("deploy/config-template/credentials/douyin.toml", ("api_key",)),
-            ("deploy/config-template/credentials/douyin.toml", ("cookie",)),
-        )
-        for relative, keys in blank_fields:
-            value = tomllib.loads(read(relative).decode("utf-8"))
-            for key in keys:
-                value = value[key]
-            if value != "":
-                raise ValueError(f"Cloud package has a nonempty credential in {relative}")
+        if info.get("configuration") != "template-state config/ rendered by deploy/init-config.sh":
+            raise ValueError("Cloud package does not identify its template-state configuration")
+        placeholders = {
+            "config/app.toml.tpl": "{{WT_INITIAL_ADMIN_PASSWORD}}",
+            "config/database/primary.toml.tpl": "{{WT_DB_PASSWORD}}",
+            "config/credentials/agent.toml.tpl": "{{WT_AGENT_AUTH_TOKEN}}",
+            "config/credentials/douyin.toml.tpl": "{{WT_DOUYIN_API_KEY}}",
+            "config/credentials/object_storage.toml.tpl": "{{WT_OBJECT_STORAGE_SECRET_KEY}}",
+            "config/storage/object_storage.toml.tpl": "{{WT_OBJECT_STORAGE_ENDPOINT}}",
+        }
+        for relative, placeholder in placeholders.items():
+            if placeholder.encode("utf-8") not in read(relative):
+                raise ValueError(f"Cloud package config template omits {placeholder}: {relative}")
 
 
 def verify_cloud_artifact_checksums(directory: Path, cloud: Path, web: Path) -> None:

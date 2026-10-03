@@ -28,9 +28,9 @@ def validate_manifest(path: Path, tag: str) -> dict:
     channel = "rc" if "-rc." in tag else "stable"
     if data.get("channel") != channel:
         raise ValueError(f"Manifest channel must be {channel} for {tag}")
-    environment = "staging" if channel == "rc" else "production"
-    if data.get("environment") != environment:
-        raise ValueError(f"Manifest environment must be {environment} for {tag}")
+    environment = data.get("environment")
+    if environment not in {"pre", "online"}:
+        raise ValueError("Manifest environment must be pre or online")
     if not isinstance(data.get("network_smoke"), bool):
         raise ValueError("Manifest network_smoke must be a boolean")
     origin = data.get("cloud_origin")

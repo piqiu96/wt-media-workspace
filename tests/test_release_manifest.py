@@ -10,7 +10,7 @@ from scripts.release.manifest import validate_manifest
 RC = """schema_version: 1
 product_tag: v0.1.0-rc.1
 channel: rc
-environment: staging
+environment: online
 cloud_origin: https://rc.wt-media.invalid
 network_smoke: false
 components:
@@ -42,9 +42,19 @@ class ReleaseManifestTest(unittest.TestCase):
             self.validate(RC.replace("https://rc.wt-media.invalid", "https://user:pass@rc.wt-media.invalid"))
 
     def test_stable_tag_cannot_select_rc_channel(self) -> None:
-        content = RC.replace("v0.1.0-rc.1", "v0.1.0")
+        content = RC.replace("v0.1.0-rc.1", "v0.1.0").replace("environment: online", "environment: pre")
         with self.assertRaisesRegex(ValueError, "channel"):
             self.validate(content, "v0.1.0")
+
+    def test_rejects_unknown_environment(self) -> None:
+        with self.assertRaisesRegex(ValueError, "environment"):
+            self.validate(RC.replace("environment: online", "environment: staging"))
+
+    def test_pre_and_online_are_both_valid(self) -> None:
+        pre = self.validate(RC.replace("environment: online", "environment: pre"))
+        online = self.validate(RC)
+        self.assertEqual(pre["environment"], "pre")
+        self.assertEqual(online["environment"], "online")
 
 
 if __name__ == "__main__":

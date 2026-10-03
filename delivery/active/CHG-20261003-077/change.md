@@ -30,7 +30,7 @@
 
 1. 裁定 Q-01 初始管理员口令策略。
 2. Cloud Server 增加 Cloud Web 静态文件服务和 Vue history 路由回退，保持 API 与健康路由优先。
-3. Cloud 部署脚本改为版本自包含目录，通过 `.toml.tpl` 和指定环境的远程变量表生成并校验实际配置，通过 `current` 原子切换；预发与生产复用同一制品和渲染能力。
+3. Cloud 部署脚本改为版本自包含目录，通过 `.toml.tpl` 和指定 `pre|online` 环境的远程变量表生成并校验实际配置，通过 `current` 原子切换；预发与生产复用同一制品和渲染能力。
 4. 宝塔手册改为 Go 项目管理 Server、进程管理器管理 Scheduler/Worker，移除 systemd 与手工 Nginx 静态站点方案。
 5. 增加 Web 路由、包结构与部署脚本测试；验证空库迁移、重复迁移和管理员初始化。
 6. Workspace 固定新 Cloud 组件 Tag 与产品 Tag，重新运行 GitHub 打包工作流。
@@ -38,6 +38,7 @@
 
 ## 验收
 
+- 编译和打包会双向校验 `config/` 与 `config_online/` 的归一化运行路径一一对应；缺失、多出或重复映射时失败。
 - 新 Cloud Artifact 包含全部运行程序、Web、FFmpeg/FFprobe、全部 SQL Migration、部署脚本，以及仅由 `config_online/` 生成的非敏感 `config/` 模板；不包含本地 `config/` 或 `config_test/`。
 - 在用户预先创建的 MySQL 空库上，包内 `bin/migrate --dir migrations --create-database=false` 能完整应用并重复执行通过。
 - 初始管理员能按 Q-01 裁定结果登录；密码不明文进入制品或交付记录。

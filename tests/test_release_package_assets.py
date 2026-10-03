@@ -26,13 +26,49 @@ class ReleasePackageAssetsTest(unittest.TestCase):
         manifest = root / f"{TAG}.yaml"
         manifest.write_text("product_tag: " + TAG + "\n", encoding="utf-8")
         payload = root / "content"
-        for relative in ("bin/server", "bin/discovery-scheduler", "bin/discovery-worker", "bin/migrate", "bin/ffmpeg", "bin/ffprobe", "web/index.cloud.html", "ffmpeg-source.json"):
-            file = payload / relative
+        package_root = payload / f"wt-media-cloud_{TAG}_linux-amd64"
+        files = {
+            "web/index.cloud.html": "cloud-web",
+            "ffmpeg-source.json": "{}",
+            "release-info.json": json.dumps({
+                "product_tag": TAG,
+                "source_commit": SOURCES["cloud"],
+                "configuration": "template-state config/ rendered by deploy/init-config.sh",
+            }),
+            "deploy/DEPLOYMENT.md": "# Deployment\n",
+            "deploy/prepare-database.sql.example": "-- prepare\n",
+            "config/app.toml.tpl": "password = {{WT_INITIAL_ADMIN_PASSWORD}}\n",
+            "config/database/primary.toml.tpl": "password = {{WT_DB_PASSWORD}}\n",
+            "config/credentials/agent.toml.tpl": "auth_token = {{WT_AGENT_AUTH_TOKEN}}\n",
+            "config/credentials/douyin.toml.tpl": "api_key = {{WT_DOUYIN_API_KEY}}\n",
+            "config/credentials/object_storage.toml.tpl": "secret_key = {{WT_OBJECT_STORAGE_SECRET_KEY}}\n",
+            "config/storage/object_storage.toml.tpl": "endpoint = {{WT_OBJECT_STORAGE_ENDPOINT}}\n",
+            "migrations/001_identity.sql": "CREATE TABLE users (id INT);\n",
+        }
+        for relative, content in files.items():
+            file = package_root / relative
             file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text(relative, encoding="utf-8")
-        with tarfile.open(cloud / f"wt-media-cloud_{TAG}_linux-amd64.tar.gz", "w:gz") as archive:
-            archive.add(payload, arcname="cloud")
-        (cloud / f"desktop-web_{TAG}.tar.gz").write_bytes(b"web")
+            file.write_text(content, encoding="utf-8")
+        for binary in ("server", "discovery-scheduler", "discovery-worker", "migrate", "config-check", "ffmpeg", "ffprobe"):
+            file = package_root / "bin" / binary
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text("#!/bin/sh\n", encoding="utf-8")
+            file.chmod(0o755)
+        for script in ("render-config.py", "install.sh", "init-config.sh", "migrate.sh", "activate.sh", "verify-package.sh", "verify-database.sh", "verify-runtime.sh", "rollback.sh"):
+            file = package_root / "deploy" / script
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text("#!/bin/sh\n", encoding="utf-8")
+            file.chmod(0o755)
+        cloud_archive = cloud / f"wt-media-cloud_{TAG}_linux-amd64.tar.gz"
+        with tarfile.open(cloud_archive, "w:gz") as archive:
+            archive.add(package_root, arcname=package_root.name)
+        web_archive = cloud / f"desktop-web_{TAG}.tar.gz"
+        web_archive.write_bytes(b"web")
+        (cloud / "SHA256SUMS").write_text(
+            f"{hashlib.sha256(cloud_archive.read_bytes()).hexdigest()}  {cloud_archive.name}\n"
+            f"{hashlib.sha256(web_archive.read_bytes()).hexdigest()}  {web_archive.name}\n",
+            encoding="utf-8",
+        )
         for platform, target in PLATFORMS.items():
             folder = agent / f"agent-{platform}"
             folder.mkdir()

@@ -59,11 +59,11 @@
 - Consumes: 包内工作目录下的 `web/index.cloud.html` 和现有 Hertz 路由。
 - Produces: `registerCloudWeb(engine *server.Hertz, webRoot string) error`，在 API/健康/模块路由之后注册 NoRoute 处理器。
 
-- [ ] 先写失败测试：`/` 返回入口页、真实 asset 返回文件、`/login` 回退入口页、未知 `/api/` 返回 404、POST 深层路由不回退、目录穿越不读取根目录外文件、缺少入口页返回错误。
-- [ ] 运行 `go test ./internal/bootstrap -run 'TestCloudWeb|TestRegisterModuleRoutes' -count=1`，确认新增测试失败。
-- [ ] 实现安全的静态文件解析和 SPA 回退，并从 `registerRoutes` 调用 `registerCloudWeb(engine, "web")`。
-- [ ] 重新运行目标测试和 `go test ./internal/bootstrap -count=1`。
-- [ ] 提交 Cloud Web 服务变更。
+- [x] 先写失败测试：`/` 返回入口页、真实 asset 返回文件、`/login` 回退入口页、未知 `/api/` 返回 404、POST 深层路由不回退、目录穿越不读取根目录外文件、缺少入口页返回错误。
+- [x] 运行 `go test ./internal/bootstrap -run 'TestCloudWeb|TestRegisterModuleRoutes' -count=1`，确认新增测试失败。
+- [x] 实现安全的静态文件解析和 SPA 回退，并从 `registerRoutes` 调用 `registerCloudWeb(engine, "web")`。
+- [x] 重新运行目标测试和 `go test ./internal/bootstrap -count=1`。
+- [x] 提交 Cloud Web 服务变更。
 
 ### Task 3: 改为版本自包含安装和多环境配置渲染
 
@@ -81,15 +81,15 @@
 - Modify: `wt-media-cloud/scripts/verify/test_deployment_package.py`
 
 **Interfaces:**
-- Consumes: 仓库本地 `config/`、发布模板 `config_online/`、显式 `staging|production` 环境，以及 HTTPS 远程或本地 JSON 变量表。
+- Consumes: 仓库本地 `config/`、发布模板 `config_online/`、显式 `pre|online` 环境，以及 HTTPS 远程或本地 JSON 变量表。
 - Produces: 打包时丢弃本地 `config/` 并将 `config_online/` 放入包内 `config/`；安装后拥有 `releases/<tag>/{config,logs,data/tmp}`；`init-config.sh` 拉取并调用 `render-config.py` 把模板状态的 `config/` 原子生成为运行配置，`bin/config-check` 使用 Cloud 同一套规则进行业务校验；`activate.sh` 只原子切换完整版本。
 
-- [ ] 先改测试断言：打包器只把 `config_online/` 复制为包内 `config/`，不携带本地 `config/` 或 `config_test/`；安装后目录均为真实目录而非软链；同一模板可分别渲染预发/生产变量；缺失、未知、残留变量、非法 TOML、Cloud 业务校验失败时停止且保留模板；安装不改变 `current`；切换和回退只改变单一软链；目录和文件归 `www:www`。
-- [ ] 运行 `python3 -m unittest scripts.verify.test_deployment_package -v`，确认旧实现失败。
-- [ ] 实现严格变量表解析、远程拉取、模板渲染、原子写入和 Cloud 配置校验；升级始终按目标环境重新渲染，不复制 `current/config`。
-- [ ] 更新激活/回退检查，要求目标版本拥有有效私有配置和必要目录。
-- [ ] 重新运行部署脚本测试和 `bash -n deploy/*.sh`。
-- [ ] 提交版本自包含部署脚本。
+- [x] 先改测试断言：`config/` 与 `config_online/` 的归一化运行路径必须双向一一对应；打包器只把 `config_online/` 复制为包内 `config/`，不携带本地 `config/` 或 `config_test/`；安装后目录均为真实目录而非软链；同一模板可分别渲染 pre/online 变量；缺失、未知、残留变量、非法 TOML、Cloud 业务校验失败时停止且保留模板；安装不改变 `current`；切换和回退只改变单一软链；目录和文件归 `www:www`。
+- [x] 运行 `python3 -m unittest scripts.verify.test_deployment_package -v`，确认旧实现失败。
+- [x] 实现严格变量表解析、远程拉取、模板渲染、原子写入和 Cloud 配置校验；升级始终按目标环境重新渲染，不复制 `current/config`。
+- [x] 更新激活/回退检查，要求目标版本拥有有效私有配置和必要目录。
+- [x] 重新运行部署脚本测试和 `bash -n deploy/*.sh`。
+- [x] 提交版本自包含部署脚本。
 
 ### Task 4: 替换宝塔部署手册和制品清单
 
@@ -108,11 +108,11 @@
 - Consumes: Tasks 2-3 的 Server/Web 和目录行为。
 - Produces: 宝塔 Go 项目 Server 配置、进程管理器 Scheduler/Worker 配置、发布顺序和验收步骤；制品不再携带 systemd/Nginx 示例。
 
-- [ ] 先修改包和手册测试，要求新目录/宝塔进程说明存在，禁止 `shared/`、systemd、虚假端口和真实凭据。
-- [ ] 运行两个 Python 测试模块，确认旧手册与打包清单失败。
-- [ ] 更新手册、模板注释、打包必需文件和包结构校验。
-- [ ] 运行 `python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_deployment_package -v`。
-- [ ] 提交宝塔部署文档和打包清单变更。
+- [x] 先修改包和手册测试，要求新目录/宝塔进程说明存在，禁止 `shared/`、systemd、虚假端口和真实凭据。
+- [x] 运行两个 Python 测试模块，确认旧手册与打包清单失败。
+- [x] 更新手册、模板注释、打包必需文件和包结构校验。
+- [x] 运行 `python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_deployment_package -v`。
+- [x] 提交宝塔部署文档和打包清单变更。
 
 ### Task 5: 重新执行 Cloud 端到端验证
 
@@ -125,11 +125,11 @@
 - Consumes: 新 Cloud 包、空 MySQL 8.4 数据库和三个本地进程。
 - Produces: 首次迁移、重复迁移、Server Web/API、管理员登录、Scheduler/Worker 存活和回退边界的事实证据。
 
-- [ ] 运行 Cloud Go 目标测试及两个部署/打包测试模块。
-- [ ] 构建 Linux 结构等价测试包并执行 `deploy/verify-package.sh`。
-- [ ] 在临时 MySQL 库执行首次和重复 Migration，确认管理员登录。
-- [ ] 从 `current` 路径启动三个进程，验证 `/`、`/login`、健康接口和后台进程；切换到第二版本后重启验证。
-- [ ] 删除临时数据库和账号，记录命令、预期、实际结果和结论。
+- [x] 运行 Cloud Go 目标测试及两个部署/打包测试模块。
+- [x] 构建 Linux 结构等价测试包并执行 `deploy/verify-package.sh`。
+- [x] 在临时 MySQL 库执行首次和重复 Migration，确认管理员登录。
+- [x] 从 `current` 路径启动三个进程，验证 `/`、`/login`、健康接口和后台进程；切换到第二版本后重启验证。
+- [x] 删除临时数据库和账号，记录命令、预期、实际结果和结论。
 - [ ] 提交 Workspace Evidence 和状态记录。
 
 ### Task 6: 生成新的 GitHub RC 候选

@@ -80,7 +80,9 @@ Server 必须同时提供 `current/web` 中的 Cloud Web。访问真实静态文
 
 ## 5. 配置与密钥
 
-仓库 `config_online/` 中需要替换的文件以 `.toml.tpl` 保存，其他固定配置可保留 `.toml`。打包器删除部署暂存区中的本地 `config/`，再把 `config_online/` 复制为包内 `config/`；部署包不保留 `config_test/`。预发和生产共用同一套模板与渲染工具，部署时通过 `--environment staging|production` 和对应远程变量表生成目标版本的最终 `config/*.toml`。Tag 标识代码版本，部署参数决定运行环境，不能根据 RC 或正式 Tag 隐式猜测环境。
+仓库 `config_online/` 中需要替换的文件以 `.toml.tpl` 保存，其他固定配置可保留 `.toml`。打包器删除部署暂存区中的本地 `config/`，再把 `config_online/` 复制为包内 `config/`；部署包不保留 `config_test/`。pre 和 online 共用同一套模板与渲染工具，部署时通过 `--environment pre|online` 和对应远程变量表生成目标版本的最终 `config/*.toml`。当前 online 使用 `wt-media/vars/cloud/online.json`，未来 pre 使用 `wt-media/vars/cloud/pre.json`。Tag 标识代码版本，部署参数决定运行环境，不能根据 RC 或正式 Tag 隐式猜测环境。
+
+编译和打包前必须双向核对 `config/` 与 `config_online/` 的运行配置路径。以最终运行文件名为准，`foo.toml`、`foo.toml.tpl` 以及可选凭据的 `foo.toml.example` 归一为同一个 `foo.toml`；每个路径在两棵树中必须各有且仅有一个对应文件。README 等说明文件不参与核对。任一侧缺失、多出或同一路径存在多个候选时，构建立即失败。
 
 部署脚本支持 HTTPS 拉取远程变量表，也支持已下载的本地变量表用于故障恢复。变量表作为数据解析，不能使用 Shell `source` 执行；替换工具在临时目录中复制固定 `.toml`、把 `.toml.tpl` 渲染为 `.toml`，并只接受模板实际声明的变量。缺少变量、存在未知变量、残留占位符或生成非法 TOML 时必须失败。生成后还必须调用 Cloud 自身的配置解析和业务校验入口；全部通过后才原子替换模板状态的 `config/`，校验失败时不能迁移或切换。
 
@@ -103,7 +105,7 @@ Server 必须同时提供 `current/web` 中的 Cloud Web。访问真实静态文
 1. 下载并校验 GitHub Artifact 和 SHA-256。
 2. 解压到新的 `releases/<product-tag>/`；已存在的同名版本不得覆盖。
 3. 创建该版本的 `config/`、`logs/` 和 `data/tmp/`，设置所有者和权限。
-4. 指定 `staging` 或 `production`，拉取对应变量表，在新版本内渲染配置并执行语法与业务校验。
+4. 指定 `pre` 或 `online`，拉取对应变量表，在新版本内渲染配置并执行语法与业务校验。
 5. 在维护状态下备份 MySQL 和需要保护的对象存储数据。
 6. 使用新版本的 `bin/migrate` 对显式目标数据库执行 Migration；重复执行应为零个新增迁移。
 7. 依次停止 Scheduler、Worker、Server，等待进程完全退出。
