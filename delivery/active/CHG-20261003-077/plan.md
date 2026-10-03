@@ -1,31 +1,164 @@
-# CHG-20261003-077 实施计划
+# CHG-20261003-077 追加部署逻辑实施计划
 
-## 技术方案
+> **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-- Cloud Linux 包继续由既有 `build-release-linux.sh` 生成程序和 Web，再由 `package_release_linux.py` 组装。
-- 包内新增 `migrations/`、`deploy/`、`config-template/` 和 `release-info.json`；敏感运行配置仍只在服务器 `shared/config` 注入，不由 GitHub 制品携带。
-- 服务器采用固定安装根目录、按版本只读目录和 `current` 软链：
-  - `releases/<product-tag>/`：包内容，不现场编译；
-  - `shared/config/`：私有 TOML；
-  - `shared/logs/`：进程日志；
-  - `current`：当前版本软链。
-- 数据库迁移使用包内 `bin/migrate --dir migrations --create-database=false`，目标库、账号和密码只来自服务器配置；数据库和账号由用户先用 SQL 模板创建。
-- 初始管理员使用用户裁定的 RC 固定值 `admin / admin123`；部署时由操作者在 `deploy/init-config.sh` 的终端提示中输入，脚本只把实际输入写入服务器私有配置，不在 Cloud 制品中预填口令。
-- 进程管理提供 systemd 模板，分别守护 Server、Discovery Scheduler、Discovery Worker；宝塔反向代理只转发到 Server HTTP 地址。
+**Goal:** 将 Cloud RC 部署改为版本自包含目录，并通过宝塔 Go 项目与进程管理器运行 Server、Scheduler、Worker，同时由 Server 提供 Cloud Web。
 
-## 有序任务
+**Architecture:** 每个产品 Tag 安装为 `/www/wt-media-cloud/releases/<tag>`，内部包含程序、Web、Migration、实际私有配置、日志和临时目录；`current` 是宝塔唯一稳定运行入口。Server 在已有 API 路由之后为非 API GET/HEAD 请求提供静态资源和 SPA 回退；Scheduler/Worker 继续是无端口独立进程。
 
-1. 记录 Q-01 裁定并激活 CHG。
-2. 在 Cloud 新增部署脚本、配置初始化、进程模板、数据库 SQL 模板和部署手册，并扩展 Linux 包内容。
-3. 增加包结构/脚本测试；在本地 MySQL 空库执行一次与重复迁移，启动 Server 验证健康和 `admin/admin123` 登录。
-4. 提交并推送 Cloud 新组件 Tag；Workspace 固定新 Manifest 并推送产品 Tag，观察 GitHub Run。
-5. 下载新 Cloud Artifact 核验包结构与摘要，输出服务器人工部署验收记录模板。
-6. 用户在宝塔按手册执行；部署证据回填 CHG 后再判定是否完成。
+**Tech Stack:** Go 1.26、CloudWeGo Hertz、Bash、Python `unittest`、GitHub Actions、宝塔 Go 项目和进程管理器。
 
-## 验证计划
+**Spec:** `docs/superpowers/specs/2026-10-04-baota-cloud-deployment-layout-design.md`
 
-- Cloud 单元/脚本测试：包内容、无敏感配置、部署脚本语法与配置生成。
-- 本地 MySQL：预先创建空库，执行迁移两次；查询 `schema_migrations` 与 `users`。
-- 本地 Server：`/healthz`、`/api/v1/health`、`admin/admin123` 登录。
-- GitHub：新组件 Tag 主干 CI 和产品 Tag Release Workflow 全部通过。
-- 服务器人工验收：包摘要、配置权限、三进程状态、健康接口、登录和回退边界。
+## Global Constraints
+
+- 只修改 `wt-media-cloud` 和 Workspace 的 CHG-077/Release 记录。
+- GitHub 制品不得包含数据库密码、对象存储密钥、平台凭据或实际管理员口令。
+- 三个进程都使用 `/www/wt-media-cloud/current` 工作目录并以 `www` 用户运行。
+- Server 由宝塔 Go 项目管理；Scheduler 和 Worker 由宝塔进程管理器管理。
+- 不使用 `shared/`、systemd 或 Scheduler/Worker 虚假端口。
+- 数据库迁移失败时不得切换 `current` 或启动新版本。
+- 软链回退不能替代不兼容数据库 Migration 和外部数据的恢复。
+
+## Review Focus
+
+- 未构建或缺失 `web/index.cloud.html` 时 Server 必须启动失败并给出明确错误，不能只运行 API 后造成首页 404。
+- `/api/` 未知路径必须保留 JSON/API 404 语义，不能被 SPA 回退为 HTTP 200 HTML。
+- 静态文件请求必须阻止目录穿越，并且非 GET/HEAD 请求不能返回前端页面。
+- 升级安装时配置复制失败、目标配置非空或版本目录已存在都必须停止且不改变 `current`。
+- 密钥轮换后旧版本是否仍具回退资格必须在部署验收中显式记录。
+
+---
+
+### Task 1: 固化 CHG-077 的部署裁定
+
+**Files:**
+- Add: `docs/superpowers/specs/2026-10-04-baota-cloud-deployment-layout-design.md`
+- Modify: `delivery/active/CHG-20261003-077/change.md`
+- Modify: `delivery/active/CHG-20261003-077/plan.md`
+- Modify: `delivery/active/CHG-20261003-077/checkpoint.md`
+- Modify: `delivery/active/CHG-20261003-077/status/cloud.md`
+- Modify: `delivery/active/CHG-20261003-077/status/workspace.md`
+
+**Interfaces:**
+- Consumes: 用户确认的版本自包含目录、`current` 单入口和宝塔进程分工。
+- Produces: 后续 Cloud 实现和 Release 验收的唯一执行合同。
+
+- [x] 更新 CHG 范围、任务、验收和明确排除项。
+- [x] 运行 `python3 scripts/verify_delivery_governance.py` 和 `python3 scripts/verify_ai_workspace.py`。
+- [ ] 提交 Workspace 规划变更。
+
+### Task 2: Server 提供 Cloud Web 与 SPA 回退
+
+**Files:**
+- Create: `wt-media-cloud/internal/bootstrap/cloud_web.go`
+- Create: `wt-media-cloud/internal/bootstrap/cloud_web_test.go`
+- Modify: `wt-media-cloud/internal/bootstrap/routes.go`
+
+**Interfaces:**
+- Consumes: 包内工作目录下的 `web/index.cloud.html` 和现有 Hertz 路由。
+- Produces: `registerCloudWeb(engine *server.Hertz, webRoot string) error`，在 API/健康/模块路由之后注册 NoRoute 处理器。
+
+- [ ] 先写失败测试：`/` 返回入口页、真实 asset 返回文件、`/login` 回退入口页、未知 `/api/` 返回 404、POST 深层路由不回退、目录穿越不读取根目录外文件、缺少入口页返回错误。
+- [ ] 运行 `go test ./internal/bootstrap -run 'TestCloudWeb|TestRegisterModuleRoutes' -count=1`，确认新增测试失败。
+- [ ] 实现安全的静态文件解析和 SPA 回退，并从 `registerRoutes` 调用 `registerCloudWeb(engine, "web")`。
+- [ ] 重新运行目标测试和 `go test ./internal/bootstrap -count=1`。
+- [ ] 提交 Cloud Web 服务变更。
+
+### Task 3: 改为版本自包含安装和配置复制
+
+**Files:**
+- Modify: `wt-media-cloud/deploy/install.sh`
+- Modify: `wt-media-cloud/deploy/init-config.sh`
+- Modify: `wt-media-cloud/deploy/activate.sh`
+- Modify: `wt-media-cloud/deploy/rollback.sh`
+- Modify: `wt-media-cloud/deploy/verify-package.sh`
+- Modify: `wt-media-cloud/scripts/verify/test_deployment_package.py`
+
+**Interfaces:**
+- Consumes: 解压后的只含模板和程序的 Cloud 包，以及可选的现有 `current/config`。
+- Produces: `releases/<tag>/{config,logs,data/tmp}`；升级时复制当前配置，首次部署时由 `init-config.sh` 生成；`activate.sh` 只原子切换完整版本。
+
+- [ ] 先改测试断言：安装后目录均为真实目录而非软链；第二版本复制当前配置；复制失败或目标非空时停止；安装不改变 `current`；切换和回退只改变单一软链；权限符合设计。
+- [ ] 运行 `python3 -m unittest scripts.verify.test_deployment_package -v`，确认旧实现失败。
+- [ ] 修改安装和配置脚本，以 `current/config` 为升级来源并拒绝覆盖已有版本。
+- [ ] 更新激活/回退检查，要求目标版本拥有有效私有配置和必要目录。
+- [ ] 重新运行部署脚本测试和 `bash -n deploy/*.sh`。
+- [ ] 提交版本自包含部署脚本。
+
+### Task 4: 替换宝塔部署手册和制品清单
+
+**Files:**
+- Modify: `wt-media-cloud/deploy/DEPLOYMENT.md`
+- Delete: `wt-media-cloud/deploy/nginx-site-locations.conf.example`
+- Delete: `wt-media-cloud/deploy/systemd/wt-media-cloud-server.service`
+- Delete: `wt-media-cloud/deploy/systemd/wt-media-cloud-scheduler.service`
+- Delete: `wt-media-cloud/deploy/systemd/wt-media-cloud-worker.service`
+- Modify: `wt-media-cloud/deploy/config-template/credentials/object_storage.toml.example`
+- Modify: `wt-media-cloud/scripts/dev/package_release_linux.py`
+- Modify: `wt-media-cloud/scripts/verify/test_package_release_linux.py`
+- Modify: `wt-media-cloud/scripts/verify/test_deployment_package.py`
+
+**Interfaces:**
+- Consumes: Tasks 2-3 的 Server/Web 和目录行为。
+- Produces: 宝塔 Go 项目 Server 配置、进程管理器 Scheduler/Worker 配置、发布顺序和验收步骤；制品不再携带 systemd/Nginx 示例。
+
+- [ ] 先修改包和手册测试，要求新目录/宝塔进程说明存在，禁止 `shared/`、systemd、虚假端口和真实凭据。
+- [ ] 运行两个 Python 测试模块，确认旧手册与打包清单失败。
+- [ ] 更新手册、模板注释、打包必需文件和包结构校验。
+- [ ] 运行 `python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_deployment_package -v`。
+- [ ] 提交宝塔部署文档和打包清单变更。
+
+### Task 5: 重新执行 Cloud 端到端验证
+
+**Files:**
+- Create: `delivery/active/CHG-20261003-077/evidence/cloud-self-contained-deployment.md`
+- Modify: `delivery/active/CHG-20261003-077/checkpoint.md`
+- Modify: `delivery/active/CHG-20261003-077/status/cloud.md`
+
+**Interfaces:**
+- Consumes: 新 Cloud 包、空 MySQL 8.4 数据库和三个本地进程。
+- Produces: 首次迁移、重复迁移、Server Web/API、管理员登录、Scheduler/Worker 存活和回退边界的事实证据。
+
+- [ ] 运行 Cloud Go 目标测试及两个部署/打包测试模块。
+- [ ] 构建 Linux 结构等价测试包并执行 `deploy/verify-package.sh`。
+- [ ] 在临时 MySQL 库执行首次和重复 Migration，确认管理员登录。
+- [ ] 从 `current` 路径启动三个进程，验证 `/`、`/login`、健康接口和后台进程；切换到第二版本后重启验证。
+- [ ] 删除临时数据库和账号，记录命令、预期、实际结果和结论。
+- [ ] 提交 Workspace Evidence 和状态记录。
+
+### Task 6: 生成新的 GitHub RC 候选
+
+**Files:**
+- Modify: `wt-media-workspace/releases/manifests/<new-product-rc>.yaml`
+- Modify: `wt-media-workspace/scripts/release/package_assets.py`
+- Modify: `wt-media-workspace/scripts/release/test_package_assets.py`
+- Modify: `delivery/active/CHG-20261003-077/server-acceptance.md`
+- Modify: `delivery/active/CHG-20261003-077/checkpoint.md`
+- Modify: `delivery/active/CHG-20261003-077/status/workspace.md`
+
+**Interfaces:**
+- Consumes: 新 Cloud 组件 Tag、未变化的 Agent/Desktop 组件 Tag，以及产品 RC Tag。
+- Produces: 新 Cloud Artifact、摘要、来源 Commit 和服务器验收记录；旧 RC8 保持不变。
+
+- [ ] 更新 Workspace Cloud 包结构校验，移除旧 systemd/Nginx 文件要求，增加自包含部署文件要求。
+- [ ] 运行 Manifest、Release 打包、Delivery 和 AI Workspace 校验。
+- [ ] 提交并推送新的 Cloud 组件 Tag，不移动旧 Tag。
+- [ ] 创建新的产品 Manifest 和产品 RC Tag，观察 GitHub Actions。
+- [ ] 下载 Cloud Artifact，核对 SHA-256、Tag、Commit、架构、Migration、无敏感配置和包内验证脚本。
+- [ ] 回写新的 Run、Artifact 和摘要，提交 Workspace 状态。
+
+### Task 7: 宝塔服务器人工验收
+
+**Files:**
+- Modify: `delivery/active/CHG-20261003-077/server-acceptance.md`
+- Modify: `delivery/active/CHG-20261003-077/checkpoint.md`
+
+**Interfaces:**
+- Consumes: Task 6 的新 Cloud Artifact 和用户持有的服务器、数据库、对象存储凭据。
+- Produces: 真实宝塔部署、HTTPS、Web/API、登录、后台进程、回退边界和维护窗口证据。
+
+- [ ] 用户按新手册上传并安装到新版本目录，配置宝塔 Go 项目和两个进程管理器条目。
+- [ ] 用户执行数据库准备、Migration、`current` 切换和三个进程启动。
+- [ ] 验证外部 HTTPS、Cloud Web、登录、数据库和后台进程，并回填验收记录。
+- [ ] 只有实际服务器验收全部通过后，才评估 CHG-077 完成和归档。
