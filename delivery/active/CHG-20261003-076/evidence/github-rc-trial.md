@@ -38,3 +38,11 @@
 - Workspace Run：[37089104559](https://github.com/piqiu96/wt-media-workspace/actions/runs/37089104559)，全部 Job 通过并曾创建 Pre-release。
 - 手工下载附件复核发现：GitHub 将附件名中的中文「起飞」替换为 `_`；`SHA256SUMS` 仍指向中文名，三个安装包下载后无法按清单打开/校验。Job 未做发布后下载复核，不能把该 Run 判为最终通过。
 - 处置：已删除无效 `v0.1.0-rc.5` Release（保留 Tag 与 Actions 证据）；Workspace 将公共附件统一重命名为 ASCII `WT-Media_<tag>_<platform>`，并在发布后核对 GitHub 实际附件名与下载字节摘要。
+
+## 候选 v0.1.0-rc.6 结果
+
+- Workspace Run：[37091241538](https://github.com/piqiu96/wt-media-workspace/actions/runs/37091241538)，结论：失败，未创建 Pre-release。
+- 固定来源：Workspace `3ea6f12`；Cloud `ed5a3c9`（`v0.1.0-rc.3`）；Agent `ac7f0b6`（`v0.2.2-rc.2`）；Desktop `0b919b0`（`v0.1.0-rc.3`）。
+- 通过：Manifest/跨仓读取；Cloud Linux；三平台 Agent；三平台 Desktop，包括 Windows NSIS 与 Desktop 版本/SHA-256 门禁。七个受控构建 Artifact 均已存在。
+- 阻断：`package` Job 未启动，GitHub Annotation 报告账号近期付款失败或 Spending limit 需要提高；`publish-pre` 因此跳过。这不是代码失败。
+- 恢复方式：账号所有者在 GitHub Billing & plans 修复付款/额度后，优先对 Run `37091241538` 执行 rerun failed jobs，以复用已成功构建的 Artifacts；随后继续发布后附件名与 SHA-256 复核。
