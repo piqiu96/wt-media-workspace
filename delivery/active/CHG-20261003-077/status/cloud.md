@@ -7,3 +7,10 @@
 - wtmctl: `release`/`package_root` are derived from the extracted package's `release-info.json` (installed-release commands fall back to `current`), so the profile no longer pins a version.
 - Verification: full `go test ./...`, `go vet`, packaging tests, and `git diff --check` pass; Cloud CI `37198945138` succeeded; a local `wtmctl` fixture verified `artifact verify`/`doctor`/`deploy plan` with a profile that omits `release` and `package_root`.
 - Remaining: real BaoTa installation and server acceptance; RC13 artifact SHA-256 recorded after the product release.
+
+## Task 10 commit `620cf89` (not tagged)
+
+- `WT_MEDIA_CLOUD_HOME` must be absolute when set. Released binaries derive the root from their own `bin/` directory even when `config/app.toml` is missing; local development falls back to cwd.
+- Config, logs, Web, and default Migration paths derive from one resolved root. Relative `WT_MEDIA_CLOUD_{CONFIG,LOG,WEB}_PATH` overrides are relative to that root, not cwd.
+- Startup records the resolved paths before loading config. Resource initialization failure records the failing step and error; the app logger records its effective path once ready. Early failures go to the process manager's stderr log.
+- Verification: path/bootstrap tests observed RED then GREEN; `go test ./... -count=1`, target `go vet`, package tests, and a released-binary missing-config smoke check passed. Evidence: `evidence/cloud-runtime-paths-and-startup-logs.md`.

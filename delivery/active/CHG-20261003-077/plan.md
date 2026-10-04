@@ -215,6 +215,26 @@
 - [x] `wtmctl` 从包的 `release-info.json` 推导 `release`/`package_root`，安装类命令回退 `current`，示例 profile 不再固化版本。
 - [ ] 发布 Cloud `v0.1.0-rc.11` 与产品 `v0.1.0-rc.13`，回读 Artifact 摘要。
 
+### Task 10: 固定运行根路径并补全启动诊断
+
+**Files:**
+- Modify: `wt-media-cloud/internal/config/root.go`、`root_test.go`、`config.go`
+- Modify: `wt-media-cloud/internal/bootstrap/resource.go`、`bootstrap_test.go`
+- Modify: `wt-media-cloud/cmd/migrate/main.go`、`cmd/config-check/main.go`
+- Modify: `wt-media-cloud/deploy/DEPLOYMENT.md`、`README.md`
+- Modify: `delivery/active/CHG-20261003-077/checkpoint.md`、`status/cloud.md`
+
+**Interfaces:**
+- Consumes: Task 9 的 `WT_MEDIA_CLOUD_HOME` 与 `WT_MEDIA_CLOUD_{CONFIG,LOG,WEB}_PATH`。
+- Produces: 单一绝对 Cloud 根路径；默认 `config/`、`logs/`、`web/`、`migrations/` 均由该根路径派生，子路径覆盖值相对根路径解析；启动错误和成功路径可在宝塔进程日志与应用日志中定位。
+
+- [x] 先写失败测试：发布目录 `bin/` 内缺少 `config/app.toml` 时仍从二进制位置确定根路径；任意 cwd 下相对子路径覆盖值锚定根路径；根路径覆盖值必须是绝对路径；迁移默认目录不依赖 cwd；资源初始化错误带步骤名。
+- [x] 运行目标测试，确认针对上述缺口失败。
+- [x] 实现路径解析与显式错误，不在发布布局中静默退回 cwd；本地开发继续使用 cwd；将迁移默认目录锚定根路径。
+- [x] 启动时记录解析后的根、配置、日志、Web 路径，资源步骤失败时记录步骤与错误；日志不得包含口令、令牌或配置内容。
+- [x] 运行目标 Go 测试、全仓 Go 测试、静态检查及部署包测试；核对从其他 cwd 启动的实际错误路径和日志。
+- [x] 回写 Cloud 状态与 Evidence；发布新组件/产品 Tag 由本次验证结果和服务器验收决定，不移动既有 Tag。
+
 
 ## 2026-10-04 最终部署收敛方案（用户已确认）
 
