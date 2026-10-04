@@ -6,11 +6,11 @@
 
 | 项目 | 实际值 / 证据 |
 | --- | --- |
-| 产品 Tag | `v0.1.0-rc.10` |
-| Cloud 组件 Tag | `v0.1.0-rc.7` |
-| GitHub Actions Run URL | [RC10 Run 37153380541](https://github.com/piqiu96/wt-media-workspace/actions/runs/37153380541)，结论 success |
-| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.10_linux-amd64.tar.gz`；`5844a1e2da2bc95b40135d74e6fa58c400584959a4a5cc063ba64e7df1a4c0d1` |
-| Cloud 源码 Commit | `99eaf30cdf08fdaa87c6799dce5cc8ca56b336cd` |
+| 产品 Tag | `v0.1.0-rc.11` |
+| Cloud 组件 Tag | `v0.1.0-rc.8` |
+| GitHub Actions Run URL | [RC11 Run 37175924935](https://github.com/piqiu96/wt-media-workspace/actions/runs/37175924935)，结论 success |
+| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.11_linux-amd64.tar.gz`；`205ff8434bca8192e43ce4fc1e7eac206e98b95f767cc38791d34bde194c7d22` |
+| Cloud 源码 Commit | `48d57d8d4d85ebaaa8eb89d1ad0bf474e5dd7962` |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
 | 安装路径与 `current` 指向 | 待填写 |
 | 维护提示开始/结束时间 | 待填写 |

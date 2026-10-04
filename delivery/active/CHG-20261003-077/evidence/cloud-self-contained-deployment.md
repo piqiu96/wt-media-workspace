@@ -52,4 +52,5 @@
 - 固定配置不再使用变量：app/admin/server、Agent API endpoint、抖音 endpoint、对象存储 endpoint/bucket/region/use_ssl。
 - 当前模板变量 11 个：Primary DB 5 个、Agent/抖音/对象存储凭据 5 个、对象存储环境前缀 1 个。
 - Cloud `v0.1.0-rc.8` 基于 `48d57d8`，CI `37175720841` 通过。
-- 本地 online 变量 dry-run 通过：11 keys，SHA-256 `6da408b7314f29392e550c767289dc4ca103291ad9160fd525486f72d14b5bfe`；未上传真实变量。
+- 本地 online/pre 变量已从测试凭据补齐共享凭据；Agent token 在测试配置中为空，因此保持空值。变量文件仍为 11 keys，仅 dry-run，未上传真实变量。
+- RC11 Run `37175924935` 全部成功；Cloud tar SHA-256 `205ff8434bca8192e43ce4fc1e7eac206e98b95f767cc38791d34bde194c7d22`，Pre-release 三平台附件和 SHA256SUMS 回读通过。
