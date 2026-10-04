@@ -45,3 +45,11 @@
 - Desktop Web SHA-256 `628ab41e68874da643b85d7610d077b92a4c4a7be51cea61388940a7ca4ffebb`。
 - Pre-release 三平台附件、Manifest、build-info 和 SHA256SUMS 下载校验全部通过。
 - Workspace source commit `25ee3110f2613083346f30653032848371518ef6`；Manifest environment=`online`。
+
+## 变量缩减与旧目录清理
+
+- 用户要求核对 `/Users/aqiuye/.wt-media/config-variables`：该目录已失效，已删除；当前只使用 `/Users/aqiuye/.wt-media/vars/cloud/{pre,online}.json`。
+- 固定配置不再使用变量：app/admin/server、Agent API endpoint、抖音 endpoint、对象存储 endpoint/bucket/region/use_ssl。
+- 当前模板变量 11 个：Primary DB 5 个、Agent/抖音/对象存储凭据 5 个、对象存储环境前缀 1 个。
+- Cloud `v0.1.0-rc.8` 基于 `48d57d8`，CI `37175720841` 通过。
+- 本地 online 变量 dry-run 通过：11 keys，SHA-256 `6da408b7314f29392e550c767289dc4ca103291ad9160fd525486f72d14b5bfe`；未上传真实变量。

@@ -62,7 +62,9 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
             "deploy/verify-database.sh",
             "deploy/verify-runtime.sh",
             "deploy/rollback.sh",
-            "config/app.toml.tpl",
+            "config/app.toml",
+            "config/clients/http/agent.toml",
+            "config/clients/http/douyin.toml",
             "config/database/primary.toml.tpl",
             "config/credentials/agent.toml.tpl",
             "config/credentials/douyin.toml.tpl",
@@ -84,7 +86,6 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
             "deploy/systemd",
             "deploy/nginx-site-locations.conf.example",
             "config/.render-info.json",
-            "config/app.toml",
             "config/database/primary.toml",
             "config/credentials/agent.toml",
             "config/credentials/douyin.toml",
@@ -106,12 +107,11 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
         if info.get("configuration") != "template-state config/ rendered by deploy/init-config.sh":
             raise ValueError("Cloud package does not identify its template-state configuration")
         placeholders = {
-            "config/app.toml.tpl": "{{WT_INITIAL_ADMIN_PASSWORD}}",
-            "config/database/primary.toml.tpl": "{{WT_DB_PASSWORD}}",
+            "config/database/primary.toml.tpl": "{{WT_PRIMARY_DB_PASSWORD}}",
             "config/credentials/agent.toml.tpl": "{{WT_AGENT_AUTH_TOKEN}}",
             "config/credentials/douyin.toml.tpl": "{{WT_DOUYIN_API_KEY}}",
             "config/credentials/object_storage.toml.tpl": "{{WT_OBJECT_STORAGE_SECRET_KEY}}",
-            "config/storage/object_storage.toml.tpl": "{{WT_OBJECT_STORAGE_ENDPOINT}}",
+            "config/storage/object_storage.toml.tpl": "{{WT_OBJECT_STORAGE_PREFIX}}",
         }
         for relative, placeholder in placeholders.items():
             if placeholder.encode("utf-8") not in read(relative):

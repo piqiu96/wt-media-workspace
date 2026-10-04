@@ -37,12 +37,14 @@ class ReleasePackageAssetsTest(unittest.TestCase):
             }),
             "deploy/DEPLOYMENT.md": "# Deployment\n",
             "deploy/prepare-database.sql.example": "-- prepare\n",
-            "config/app.toml.tpl": "password = {{WT_INITIAL_ADMIN_PASSWORD}}\n",
-            "config/database/primary.toml.tpl": "password = {{WT_DB_PASSWORD}}\n",
+            "config/app.toml": "password = 'admin123'\n",
+            "config/clients/http/agent.toml": "host = '127.0.0.1'\n",
+            "config/clients/http/douyin.toml": "host = 'api.itfaba.com'\n",
+            "config/database/primary.toml.tpl": "password = {{WT_PRIMARY_DB_PASSWORD}}\n",
             "config/credentials/agent.toml.tpl": "auth_token = {{WT_AGENT_AUTH_TOKEN}}\n",
             "config/credentials/douyin.toml.tpl": "api_key = {{WT_DOUYIN_API_KEY}}\n",
             "config/credentials/object_storage.toml.tpl": "secret_key = {{WT_OBJECT_STORAGE_SECRET_KEY}}\n",
-            "config/storage/object_storage.toml.tpl": "endpoint = {{WT_OBJECT_STORAGE_ENDPOINT}}\n",
+            "config/storage/object_storage.toml.tpl": "prefix = {{WT_OBJECT_STORAGE_PREFIX}}\n",
             "migrations/001_identity.sql": "CREATE TABLE users (id INT);\n",
         }
         for relative, content in files.items():

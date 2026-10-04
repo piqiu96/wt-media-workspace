@@ -25,12 +25,14 @@ class CloudPayloadTest(unittest.TestCase):
             else f"auth_token = '{credential}'\n".encode()
         )
         config_templates = {
-            "config/app.toml.tpl": b"password = {{WT_INITIAL_ADMIN_PASSWORD}}\n",
-            "config/database/primary.toml.tpl": b"password = {{WT_DB_PASSWORD}}\n",
+            "config/app.toml": b"password = 'admin123'\n",
+            "config/clients/http/agent.toml": b"host = '127.0.0.1'\n",
+            "config/clients/http/douyin.toml": b"host = 'api.itfaba.com'\n",
+            "config/database/primary.toml.tpl": b"password = {{WT_PRIMARY_DB_PASSWORD}}\n",
             "config/credentials/agent.toml.tpl": agent_template,
             "config/credentials/douyin.toml.tpl": b"api_key = {{WT_DOUYIN_API_KEY}}\n",
             "config/credentials/object_storage.toml.tpl": b"secret_key = {{WT_OBJECT_STORAGE_SECRET_KEY}}\n",
-            "config/storage/object_storage.toml.tpl": b"endpoint = {{WT_OBJECT_STORAGE_ENDPOINT}}\n",
+            "config/storage/object_storage.toml.tpl": b"prefix = {{WT_OBJECT_STORAGE_PREFIX}}\n",
         }
         files = {
             "bin/server": b"ELF", "bin/discovery-scheduler": b"ELF",
