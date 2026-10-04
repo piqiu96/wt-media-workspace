@@ -35,7 +35,7 @@ class CloudPayloadTest(unittest.TestCase):
             "config/storage/object_storage.toml.tpl": b"prefix = {{WT_OBJECT_STORAGE_PREFIX}}\n",
         }
         files = {
-            "bin/server": b"ELF", "bin/discovery-scheduler": b"ELF",
+            "bin/wt-media-cloud": b"ELF", "bin/discovery-scheduler": b"ELF",
             "bin/discovery-worker": b"ELF", "bin/migrate": b"ELF",
             "bin/config-check": b"ELF", "bin/wtmctl": b"ELF", "bin/ffmpeg": b"ELF", "bin/ffprobe": b"ELF",
             "web/index.cloud.html": b"<html></html>",

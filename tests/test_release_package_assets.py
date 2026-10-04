@@ -54,7 +54,7 @@ class ReleasePackageAssetsTest(unittest.TestCase):
             file = package_root / relative
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text(content, encoding="utf-8")
-        for binary in ("server", "discovery-scheduler", "discovery-worker", "migrate", "config-check", "wtmctl", "ffmpeg", "ffprobe"):
+        for binary in ("wt-media-cloud", "discovery-scheduler", "discovery-worker", "migrate", "config-check", "wtmctl", "ffmpeg", "ffprobe"):
             file = package_root / "bin" / binary
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("#!/bin/sh\n", encoding="utf-8")

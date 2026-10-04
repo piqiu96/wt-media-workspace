@@ -195,6 +195,26 @@
 - [x] 核对 Cloud Artifact：`bin/wtmctl`、无 `deploy/*.py|*.sh`、SHA-256 `90026317...6fb6`、Tag、Commit 均由 `package` 作业与 `build-info.json` 确认。
 - [x] 回写 Run、Artifact 摘要与服务器一键部署命令。
 
+### Task 9: 修正线上启动路径、二进制名与认证日志并发布 RC13
+
+**Files:**
+- Modify: `wt-media-cloud/internal/config/{root.go,config.go}`、`internal/bootstrap/routes.go`、`cmd/config-check/main.go`
+- Modify: `wt-media-cloud/scripts/dev/*`、`internal/deploy/*`、`deploy/examples/online-deploy.toml.example`、`deploy/DEPLOYMENT.md`
+- Modify: `wt-media-cloud/internal/middleware/identity.go`、`internal/modules/identity/handler.go`
+- Add: `wt-media-cloud/internal/middleware/identity_test.go`、`internal/modules/identity/login_log_test.go`
+- Add: `wt-media-workspace/releases/manifests/v0.1.0-rc.13.yaml`
+
+**Interfaces:**
+- Consumes: 用户报告的线上启动失败与 `auth/me` 401。
+- Produces: Cloud `v0.1.0-rc.11` 与产品 `v0.1.0-rc.13`。
+
+- [x] Server/Worker/Scheduler 从 `WT_MEDIA_CLOUD_HOME` → 二进制所在 `<home>/bin` → cwd 解析绝对根路径；`config/log/web` 由根路径派生并可用 `WT_MEDIA_CLOUD_{CONFIG,LOG,WEB}_PATH` 覆盖。
+- [x] 发布二进制改名 `bin/server` → `bin/wt-media-cloud`（`cmd/server` 源目录不变），同步更新打包、包结构校验、`wtmctl` 进程检查与手册。
+- [x] 相对 logger 路径锚定到日志目录，模板由 `logs/x.log` 改为 `x.log`。
+- [x] 登录成功/失败与鉴权失败写入稳定 reason（invalid_credentials、session_replace_needed、session_invalid、missing_credential），带 IP/Origin/路径，不写密码或 token。
+- [x] `wtmctl` 从包的 `release-info.json` 推导 `release`/`package_root`，安装类命令回退 `current`，示例 profile 不再固化版本。
+- [ ] 发布 Cloud `v0.1.0-rc.11` 与产品 `v0.1.0-rc.13`，回读 Artifact 摘要。
+
 
 ## 2026-10-04 最终部署收敛方案（用户已确认）
 

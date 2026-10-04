@@ -41,7 +41,7 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
         names = set(members)
         root = f"wt-media-cloud_{tag}_linux-amd64/"
         required = (
-            "bin/server",
+            "bin/wt-media-cloud",
             "bin/discovery-scheduler",
             "bin/discovery-worker",
             "bin/migrate",

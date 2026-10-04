@@ -6,11 +6,11 @@
 
 | 项目 | 实际值 / 证据 |
 | --- | --- |
-| 产品 Tag | `v0.1.0-rc.12` |
-| Cloud 组件 Tag | `v0.1.0-rc.9` |
-| GitHub Actions Run URL | [RC12 Run 37182978601](https://github.com/piqiu96/wt-media-workspace/actions/runs/37182978601)，结论 success |
-| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.12_linux-amd64.tar.gz`；`90026317ef333c6609a7bedd5d51aadfbdedc056a3365c1be00bb1dfab956fb6` |
-| Cloud 源码 Commit | `1d6457f97006742d5e4d743a01a06767de66b2c6` |
+| 产品 Tag | `v0.1.0-rc.13` |
+| Cloud 组件 Tag | `v0.1.0-rc.11` |
+| GitHub Actions Run URL | 待填写（RC13 Run） |
+| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.13_linux-amd64.tar.gz`；待 RC13 回读 |
+| Cloud 源码 Commit | 待填写（`v0.1.0-rc.11`） |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
 | 安装路径与 `current` 指向 | 待填写 |
 | 维护提示开始/结束时间 | 待填写 |
@@ -46,7 +46,7 @@
 Cloud 包内步骤见 `wt-media-cloud/deploy/DEPLOYMENT.md`。服务器操作只需准备 profile 与预签名 URL 文件，随后由 `wtmctl` 一键完成：
 
 ```bash
-cd /home/www/wt-media-cloud/output/wt-media-cloud_v0.1.0-rc.12_linux-amd64
+cd /home/www/wt-media-cloud/output/wt-media-cloud_v0.1.0-rc.13_linux-amd64
 ./bin/wtmctl artifact verify --profile /home/www/wt-media-cloud/output/online-deploy.toml
 ./bin/wtmctl doctor        --profile /home/www/wt-media-cloud/output/online-deploy.toml
 ./bin/wtmctl deploy plan   --profile /home/www/wt-media-cloud/output/online-deploy.toml
@@ -57,3 +57,5 @@ sudo /home/www/wt-media-cloud/current/bin/wtmctl deploy verify --profile /home/w
 ```
 
 变量表：`wt-media/vars/cloud/online.toml`（服务器仅保存 `online.url` 预签名地址）；本地私有上传工具 `/Users/aqiuye/.wt-media/upload-config-variables.py`（不入 Git）。初始管理员保持 `admin/admin123`。
+
+Server 启动文件为 `current/bin/wt-media-cloud`（不再是 `server`）。程序按 `WT_MEDIA_CLOUD_HOME` → 二进制所在 `<home>/bin` → 当前工作目录解析根路径，`config`/`logs`/`web` 默认由根路径派生，并可用 `WT_MEDIA_CLOUD_CONFIG_PATH`、`WT_MEDIA_CLOUD_LOG_PATH`、`WT_MEDIA_CLOUD_WEB_PATH` 覆盖，因此宝塔从 `current/bin` 启动也能找到配置。
