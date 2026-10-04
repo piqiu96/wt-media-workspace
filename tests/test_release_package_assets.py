@@ -33,10 +33,13 @@ class ReleasePackageAssetsTest(unittest.TestCase):
             "release-info.json": json.dumps({
                 "product_tag": TAG,
                 "source_commit": SOURCES["cloud"],
-                "configuration": "template-state config/ rendered by deploy/init-config.sh",
+                "configuration": "template-state config/ rendered by wtmctl",
             }),
             "deploy/DEPLOYMENT.md": "# Deployment\n",
+            "deploy/config-variable-schema.toml": "schema_version = 1\n",
             "deploy/prepare-database.sql.example": "-- prepare\n",
+            "deploy/examples/online.toml.example": "# online\n",
+            "deploy/examples/online-deploy.toml.example": "# profile\n",
             "config/app.toml": "password = 'admin123'\n",
             "config/clients/http/agent.toml": "host = '127.0.0.1'\n",
             "config/clients/http/douyin.toml": "host = 'api.itfaba.com'\n",
@@ -51,13 +54,8 @@ class ReleasePackageAssetsTest(unittest.TestCase):
             file = package_root / relative
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text(content, encoding="utf-8")
-        for binary in ("server", "discovery-scheduler", "discovery-worker", "migrate", "config-check", "ffmpeg", "ffprobe"):
+        for binary in ("server", "discovery-scheduler", "discovery-worker", "migrate", "config-check", "wtmctl", "ffmpeg", "ffprobe"):
             file = package_root / "bin" / binary
-            file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text("#!/bin/sh\n", encoding="utf-8")
-            file.chmod(0o755)
-        for script in ("render-config.py", "install.sh", "init-config.sh", "migrate.sh", "activate.sh", "verify-package.sh", "verify-database.sh", "verify-runtime.sh", "rollback.sh"):
-            file = package_root / "deploy" / script
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("#!/bin/sh\n", encoding="utf-8")
             file.chmod(0o755)

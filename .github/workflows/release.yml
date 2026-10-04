@@ -95,7 +95,7 @@ jobs:
         run: bash scripts/dev/build-release-linux.sh
         working-directory: wt-media-cloud
       - name: Verify Cloud packaging tests
-        run: python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_deployment_package scripts.verify.test_stamp_desktop_web -v
+        run: python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_stamp_desktop_web -v
         working-directory: wt-media-cloud
       - name: Assemble Linux Cloud package and Desktop Web
         shell: bash

@@ -167,3 +167,42 @@
 - [ ] 用户执行数据库准备、Migration、`current` 切换和三个进程启动。
 - [ ] 验证外部 HTTPS、Cloud Web、登录、数据库和后台进程，并回填验收记录。
 - [ ] 只有实际服务器验收全部通过后，才评估 CHG-077 完成和归档。
+
+### Task 8: 用 wtmctl 收敛部署控制面并发布 RC12
+
+**Files:**
+- Add: `wt-media-cloud/cmd/wtmctl/main.go`
+- Add: `wt-media-cloud/internal/deploy/*.go`
+- Add: `wt-media-cloud/deploy/config-variable-schema.toml`
+- Add: `wt-media-cloud/deploy/examples/*.toml.example`
+- Delete: `wt-media-cloud/deploy/init-config.sh`、`render-config.py`、`install.sh`、`activate.sh`、`rollback.sh`、`migrate.sh`、`verify-package.sh`、`verify-database.sh`、`verify-runtime.sh`
+- Delete: `wt-media-cloud/scripts/verify/test_deployment_package.py`
+- Modify: `wt-media-cloud/README.md`、`deploy/DEPLOYMENT.md`、`.github/workflows/m0-cloud.yml`、`scripts/dev/build-release-linux.sh`、`scripts/dev/package_release_linux.py`、`scripts/verify/test_package_release_linux.py`
+- Add: `wt-media-workspace/releases/manifests/v0.1.0-rc.12.yaml`
+- Modify: `delivery/active/CHG-20261003-077/plan.md`、`checkpoint.md`、`server-acceptance.md`、`status/cloud.md`、`status/workspace.md`
+
+**Interfaces:**
+- Consumes: 用户确认的 wtmctl 收敛方案、TOML 变量表、online 预签名 URL。
+- Produces: Cloud `v0.1.0-rc.9`（wtmctl 自包含部署）与产品 `v0.1.0-rc.12` Artifact、SHA-256 和服务器一键部署命令。
+
+- [x] 实现并测试 `bin/wtmctl`：远程变量拉取、Schema/取值校验、Artifact 校验、渲染、Migration、数据库验证、安装、`current` 原子切换、只读验收、回退。
+- [x] 移除依赖 Python/curl/mysql CLI 的逐条部署脚本；包内不再包含 `deploy/*.py`、`deploy/*.sh`。
+- [x] 变量文件切换为 TOML，迁移本地 helper 与 `~/.wt-media/vars/cloud/{online,pre}.toml` 并上传，远端回读 SHA-256 一致。
+- [x] 更新 Cloud `README.md` 与 `deploy/DEPLOYMENT.md`，新增 `/home/www/wt-media-cloud/output` 一键部署命令，目录可配置不写死。
+- [x] 运行 Cloud Go/打包测试、变量拉取渲染端到端验证和 `git diff --check`。
+- [ ] 提交并推送 Cloud 组件 Tag `v0.1.0-rc.9`，`M0 Cloud` CI 通过。
+- [ ] 创建产品 Manifest `v0.1.0-rc.12` 与产品 Tag，观察 Release 工作流。
+- [ ] 下载 Cloud Artifact，核对 `bin/wtmctl`、无 `deploy/*.py|*.sh`、SHA-256、Tag、Commit。
+- [ ] 回写 Run、Artifact 摘要与服务器一键部署命令。
+
+
+## 2026-10-04 最终部署收敛方案（用户已确认）
+
+- 部署控制二进制命名为 `bin/wtmctl`，不得使用 `wt-media-cloud`，避免与 Server 混淆。
+- 变量文件从 JSON 改为 TOML：`online.toml`、`pre.toml`；支持注释和完整性 Schema。
+- 服务器输出目录统一为 `/home/www/wt-media-cloud/output`，不再使用 `incoming`。
+- `wtmctl` 支持远程变量拉取、变量完整性校验、Artifact 校验、配置渲染、Migration、数据库验证、版本安装、`current` 原子切换、只读部署验收和回退。
+- `deploy apply` 是一键部署入口，内部自动拉取远程 TOML 变量；不启动、停止或重启任何服务。
+- Server、Worker、Scheduler 继续由宝塔管理，`wtmctl` 不实现进程守护或 service 子命令。
+- Cloud README 增加 `wtmctl` 部署命令；旧 Python 渲染器和逐条 shell 部署入口不再作为发布路径。
+- 发布前必须完成变量 Schema 与模板一致性检查；部署前必须检查实际 TOML 必填值和 Secret。

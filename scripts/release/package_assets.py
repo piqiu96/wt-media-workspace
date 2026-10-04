@@ -46,22 +46,17 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
             "bin/discovery-worker",
             "bin/migrate",
             "bin/config-check",
+            "bin/wtmctl",
             "bin/ffmpeg",
             "bin/ffprobe",
             "web/index.cloud.html",
             "ffmpeg-source.json",
             "release-info.json",
             "deploy/DEPLOYMENT.md",
+            "deploy/config-variable-schema.toml",
             "deploy/prepare-database.sql.example",
-            "deploy/render-config.py",
-            "deploy/install.sh",
-            "deploy/init-config.sh",
-            "deploy/migrate.sh",
-            "deploy/activate.sh",
-            "deploy/verify-package.sh",
-            "deploy/verify-database.sh",
-            "deploy/verify-runtime.sh",
-            "deploy/rollback.sh",
+            "deploy/examples/online.toml.example",
+            "deploy/examples/online-deploy.toml.example",
             "config/app.toml",
             "config/clients/http/agent.toml",
             "config/clients/http/douyin.toml",
@@ -94,6 +89,8 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
         )
         if any(root + relative in names for relative in forbidden):
             raise ValueError("Cloud package contains superseded or private runtime configuration")
+        if any(name.endswith((".py", ".sh")) for name in names if name.startswith(root + "deploy/")):
+            raise ValueError("Cloud package still contains superseded deployment scripts")
 
         def read(relative: str) -> bytes:
             stream = archive.extractfile(root + relative)
@@ -104,7 +101,7 @@ def verify_cloud(path: Path, tag: str, source_commit: str) -> None:
         info = json.loads(read("release-info.json"))
         if info.get("product_tag") != tag or info.get("source_commit") != source_commit:
             raise ValueError("Cloud package Tag or source Commit differs from Release Manifest")
-        if info.get("configuration") != "template-state config/ rendered by deploy/init-config.sh":
+        if info.get("configuration") != "template-state config/ rendered by wtmctl":
             raise ValueError("Cloud package does not identify its template-state configuration")
         placeholders = {
             "config/database/primary.toml.tpl": "{{WT_PRIMARY_DB_PASSWORD}}",

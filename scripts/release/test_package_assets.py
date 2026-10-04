@@ -37,25 +37,19 @@ class CloudPayloadTest(unittest.TestCase):
         files = {
             "bin/server": b"ELF", "bin/discovery-scheduler": b"ELF",
             "bin/discovery-worker": b"ELF", "bin/migrate": b"ELF",
-            "bin/config-check": b"ELF", "bin/ffmpeg": b"ELF", "bin/ffprobe": b"ELF",
+            "bin/config-check": b"ELF", "bin/wtmctl": b"ELF", "bin/ffmpeg": b"ELF", "bin/ffprobe": b"ELF",
             "web/index.cloud.html": b"<html></html>",
             "ffmpeg-source.json": b"{}",
             "migrations/001_identity.sql": b"CREATE TABLE users (id INT);",
             "deploy/DEPLOYMENT.md": b"# Deployment",
             "deploy/prepare-database.sql.example": b"CREATE DATABASE example;",
-            "deploy/render-config.py": b"#!/usr/bin/python3\n",
-            "deploy/install.sh": b"#!/bin/bash\n",
-            "deploy/init-config.sh": b"#!/bin/bash\n",
-            "deploy/migrate.sh": b"#!/bin/bash\n",
-            "deploy/activate.sh": b"#!/bin/bash\n",
-            "deploy/verify-package.sh": b"#!/bin/bash\n",
-            "deploy/verify-database.sh": b"#!/bin/bash\n",
-            "deploy/verify-runtime.sh": b"#!/bin/bash\n",
-            "deploy/rollback.sh": b"#!/bin/bash\n",
+            "deploy/config-variable-schema.toml": b"schema_version = 1\n",
+            "deploy/examples/online.toml.example": b"# online\n",
+            "deploy/examples/online-deploy.toml.example": b"# profile\n",
             "release-info.json": json.dumps({
                 "product_tag": TAG,
                 "source_commit": commit,
-                "configuration": "template-state config/ rendered by deploy/init-config.sh",
+                "configuration": "template-state config/ rendered by wtmctl",
             }).encode(),
             **config_templates,
         }
@@ -66,7 +60,7 @@ class CloudPayloadTest(unittest.TestCase):
             for relative, content in files.items():
                 header = tarfile.TarInfo(root + relative)
                 header.size = len(content)
-                if relative in {"deploy/render-config.py", "deploy/install.sh", "deploy/init-config.sh", "deploy/migrate.sh", "deploy/activate.sh", "deploy/verify-package.sh", "deploy/verify-database.sh", "deploy/verify-runtime.sh", "deploy/rollback.sh"}:
+                if relative.startswith("bin/"):
                     header.mode = 0o755
                 archive.addfile(header, io.BytesIO(content))
         return archive_path

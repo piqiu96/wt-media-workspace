@@ -6,11 +6,11 @@
 
 | 项目 | 实际值 / 证据 |
 | --- | --- |
-| 产品 Tag | `v0.1.0-rc.11` |
-| Cloud 组件 Tag | `v0.1.0-rc.8` |
-| GitHub Actions Run URL | [RC11 Run 37175924935](https://github.com/piqiu96/wt-media-workspace/actions/runs/37175924935)，结论 success |
-| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.11_linux-amd64.tar.gz`；`205ff8434bca8192e43ce4fc1e7eac206e98b95f767cc38791d34bde194c7d22` |
-| Cloud 源码 Commit | `48d57d8d4d85ebaaa8eb89d1ad0bf474e5dd7962` |
+| 产品 Tag | `v0.1.0-rc.12` |
+| Cloud 组件 Tag | `v0.1.0-rc.9` |
+| GitHub Actions Run URL | 待填写（RC12 Run） |
+| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.12_linux-amd64.tar.gz`；待填写后回读 SHA-256 |
+| Cloud 源码 Commit | 待填写（`v0.1.0-rc.9` 对应 Commit） |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
 | 安装路径与 `current` 指向 | 待填写 |
 | 维护提示开始/结束时间 | 待填写 |
@@ -41,4 +41,19 @@
 
 此记录只覆盖 Cloud 预发布安装与基础运行。对象存储业务写入、BitBrowser、真实发布流程和正式版上线另行验收。
 
-变量表：`wt-media/vars/cloud/online.json`；本地私有上传工具 `/Users/aqiuye/.wt-media/upload-config-variables.py`（不入 Git）。
+## 服务器一键部署命令
+
+Cloud 包内步骤见 `wt-media-cloud/deploy/DEPLOYMENT.md`。服务器操作只需准备 profile 与预签名 URL 文件，随后由 `wtmctl` 一键完成：
+
+```bash
+cd /home/www/wt-media-cloud/output/wt-media-cloud_v0.1.0-rc.12_linux-amd64
+./bin/wtmctl artifact verify --profile /home/www/wt-media-cloud/output/online-deploy.toml
+./bin/wtmctl doctor        --profile /home/www/wt-media-cloud/output/online-deploy.toml
+./bin/wtmctl deploy plan   --profile /home/www/wt-media-cloud/output/online-deploy.toml
+# 宝塔先停止 Server、Worker、Scheduler
+sudo ./bin/wtmctl deploy apply --profile /home/www/wt-media-cloud/output/online-deploy.toml
+# 宝塔再按 Server -> Worker -> Scheduler 启动
+sudo /home/www/wt-media-cloud/current/bin/wtmctl deploy verify --profile /home/www/wt-media-cloud/output/online-deploy.toml
+```
+
+变量表：`wt-media/vars/cloud/online.toml`（服务器仅保存 `online.url` 预签名地址）；本地私有上传工具 `/Users/aqiuye/.wt-media/upload-config-variables.py`（不入 Git）。初始管理员保持 `admin/admin123`。
