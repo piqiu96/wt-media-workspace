@@ -190,10 +190,10 @@
 - [x] 变量文件切换为 TOML，迁移本地 helper 与 `~/.wt-media/vars/cloud/{online,pre}.toml` 并上传，远端回读 SHA-256 一致。
 - [x] 更新 Cloud `README.md` 与 `deploy/DEPLOYMENT.md`，新增 `/home/www/wt-media-cloud/output` 一键部署命令，目录可配置不写死。
 - [x] 运行 Cloud Go/打包测试、变量拉取渲染端到端验证和 `git diff --check`。
-- [ ] 提交并推送 Cloud 组件 Tag `v0.1.0-rc.9`，`M0 Cloud` CI 通过。
-- [ ] 创建产品 Manifest `v0.1.0-rc.12` 与产品 Tag，观察 Release 工作流。
-- [ ] 下载 Cloud Artifact，核对 `bin/wtmctl`、无 `deploy/*.py|*.sh`、SHA-256、Tag、Commit。
-- [ ] 回写 Run、Artifact 摘要与服务器一键部署命令。
+- [x] 提交并推送 Cloud 组件 Tag `v0.1.0-rc.9`，`M0 Cloud` CI `37182796598` 通过。
+- [x] 创建产品 Manifest `v0.1.0-rc.12` 与产品 Tag，Run `37182978601` 全绿。
+- [x] 核对 Cloud Artifact：`bin/wtmctl`、无 `deploy/*.py|*.sh`、SHA-256 `90026317...6fb6`、Tag、Commit 均由 `package` 作业与 `build-info.json` 确认。
+- [x] 回写 Run、Artifact 摘要与服务器一键部署命令。
 
 
 ## 2026-10-04 最终部署收敛方案（用户已确认）

@@ -8,9 +8,9 @@
 | --- | --- |
 | 产品 Tag | `v0.1.0-rc.12` |
 | Cloud 组件 Tag | `v0.1.0-rc.9` |
-| GitHub Actions Run URL | 待填写（RC12 Run） |
-| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.12_linux-amd64.tar.gz`；待填写后回读 SHA-256 |
-| Cloud 源码 Commit | 待填写（`v0.1.0-rc.9` 对应 Commit） |
+| GitHub Actions Run URL | [RC12 Run 37182978601](https://github.com/piqiu96/wt-media-workspace/actions/runs/37182978601)，结论 success |
+| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.12_linux-amd64.tar.gz`；`90026317ef333c6609a7bedd5d51aadfbdedc056a3365c1be00bb1dfab956fb6` |
+| Cloud 源码 Commit | `1d6457f97006742d5e4d743a01a06767de66b2c6` |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
 | 安装路径与 `current` 指向 | 待填写 |
 | 维护提示开始/结束时间 | 待填写 |
