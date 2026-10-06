@@ -20,3 +20,8 @@
 - Cloud 路径在进程启动时解析并保存一次，`config.GetRuntimePaths()` 是运行时唯一读取入口；未初始化读取和根路径解析失败均 panic。初始化后环境变量变化不会改变路径。
 - Server、Worker、Scheduler 的 Bootstrap、Migration 与配置检查入口使用已保存路径；直接调用 `config.Initialize()` 也先初始化路径。
 - 完整 Go 测试、目标 `go vet`、任意 cwd 启动与非法根路径 panic 检查通过。证据：`evidence/cloud-runtime-path-initialization.md`。尚未 Tag 或执行宝塔服务器验收。
+
+## 2026-10-07 本机打包启动演练
+
+- 基于 commit `be1d1a1` 组装 macOS arm64 本机演练包，从 `/Users/aqiuye` 启动；根路径仍锚定包内，配置检查、健康接口、Web 深层路由、日志及退出清理通过。
+- 本次不构成 Linux 发布制品或宝塔服务器验收。证据：`evidence/cloud-local-package-start-from-home.md`。

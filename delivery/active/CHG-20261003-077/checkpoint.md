@@ -6,7 +6,7 @@
 - 已完成：`wtmctl`（含从包推导 release/package_root）、TOML 变量、路径绝对化、二进制改名、认证日志。
 - 未完成：RC13 Artifact 摘要回读；Task 10/11 新制品发布裁定；宝塔实际服务器验收（用户执行）。
 - 阻塞：当前无代码阻塞；最终服务器数据库/账号创建与宝塔操作需要用户执行。
-- 最近验证：Task 11 的 Cloud `go test ./... -count=1`、目标 `go vet`、Cloud/Workspace `git diff --check` 和 Workspace 交付治理校验通过；临时发布二进制从无关 cwd 启动时，缺失配置错误指向发布目录，非法根路径直接 panic。细节见 `evidence/cloud-runtime-path-initialization.md`。Task 10 原证据见 `evidence/cloud-runtime-paths-and-startup-logs.md`。
+- 最近验证：2026-10-07 在 macOS arm64 本地组装 6 个程序与 Cloud Web 演练包，从 `/Users/aqiuye` 启动 Server，健康接口与 `/login` 均返回 200，日志落在包内 `logs/`，停止后原有服务仍监听；见 `evidence/cloud-local-package-start-from-home.md`。Task 11 的 Go 测试、静态检查及失败路径证据见 `evidence/cloud-runtime-path-initialization.md`，Task 10 原证据见 `evidence/cloud-runtime-paths-and-startup-logs.md`。
 
 - 本地私有变量：已删除旧 `~/.wt-media/config-variables/` 与 `*.json`；当前使用 `~/.wt-media/upload-config-variables.py`（TOML）和 `~/.wt-media/vars/cloud/{online,pre}.toml`，两者各 11 个变量，上传对象为 `wt-media/vars/cloud/{online,pre}.toml`，远端回读 SHA-256 一致，脚本不入 Git。
 
