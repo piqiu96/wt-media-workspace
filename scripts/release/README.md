@@ -14,4 +14,4 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.14
 uv run scripts/release/submit_tag.py v0.1.0-rc.14 --push
 ```
 
-脚本要求 Manifest 已提交且当前 Workspace 分支已推送到 `origin`；检查 Manifest 结构、三个组件 Tag、已有产品 Tag 和远端分支提交。`--push` 创建不可移动的 annotated Tag，推送后回读远端指向的 Commit。构建进度与制品摘要仍需在 GitHub Actions 和 Pre-release 中核对。
+脚本要求 Manifest 已提交且当前 Workspace 分支已推送到 `origin`；检查 Manifest 结构、三个组件 Tag、已有产品 Tag 和远端分支提交。`--push` 创建不可移动的 annotated Tag，推送后通过 GitHub API 回读 Tag 对象。若网络在推送前中断，已创建但尚未推送、且仍指向当前 Commit 的本地 Tag 可用同一命令重试。构建进度与制品摘要仍需在 GitHub Actions 和 Pre-release 中核对。

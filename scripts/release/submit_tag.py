@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -36,6 +37,22 @@ def _git(repo_root: Path, *args: str, allow_failure: bool = False) -> subprocess
     return _command(["git", "-c", "http.version=HTTP/1.1", *args], repo_root, allow_failure=allow_failure)
 
 
+def _github_ref(repo_root: Path, ref: str) -> str | None:
+    result = _command(
+        ["gh", "api", f"repos/piqiu96/wt-media-workspace/git/ref/{ref}", "--jq", ".object.sha"],
+        repo_root,
+        allow_failure=True,
+    )
+    if result.returncode == 0:
+        sha = result.stdout.strip()
+        if re.fullmatch(r"[0-9a-f]{40}", sha):
+            return sha
+        raise ReleaseError(f"GitHub returned an invalid object SHA for {ref}")
+    if "HTTP 404" in result.stderr:
+        return None
+    raise ReleaseError(f"could not inspect GitHub ref {ref}: {result.stderr.strip()}")
+
+
 def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
     """Check fixed release inputs, then optionally create and push the product Tag."""
     repo_root = repo_root.resolve()
@@ -48,13 +65,16 @@ def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
 
     head = _git(repo_root, "rev-parse", "HEAD").stdout.strip()
     branch = _git(repo_root, "symbolic-ref", "--quiet", "--short", "HEAD").stdout.strip()
-    remote_branch = _git(repo_root, "ls-remote", "--heads", "origin", f"refs/heads/{branch}").stdout.strip()
-    if not remote_branch or remote_branch.split()[0] != head:
+    remote_branch = _github_ref(repo_root, f"heads/{branch}")
+    if remote_branch != head:
         raise ReleaseError(f"push the workspace branch {branch} before submitting the product Tag")
 
-    if _git(repo_root, "show-ref", "--verify", "--quiet", f"refs/tags/{tag}", allow_failure=True).returncode == 0:
-        raise ReleaseError(f"product Tag {tag} already exists locally")
-    if _git(repo_root, "ls-remote", "--tags", "origin", f"refs/tags/{tag}").stdout.strip():
+    local_tag_exists = _git(repo_root, "show-ref", "--verify", "--quiet", f"refs/tags/{tag}", allow_failure=True).returncode == 0
+    if local_tag_exists:
+        local_tag_commit = _git(repo_root, "rev-parse", f"refs/tags/{tag}^{{}}").stdout.strip()
+        if local_tag_commit != head:
+            raise ReleaseError(f"product Tag {tag} already exists locally at a different commit")
+    if _github_ref(repo_root, f"tags/{tag}") is not None:
         raise ReleaseError(f"product Tag {tag} already exists on origin")
 
     for component, component_tag in data["components"].items():
@@ -69,11 +89,15 @@ def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
     if not push:
         return f"validated {tag} at {head}; use --push to submit the Tag and trigger release.yml"
 
-    _git(repo_root, "tag", "-a", tag, "-m", f"WT Media {tag}")
-    _git(repo_root, "push", "origin", f"refs/tags/{tag}")
-    remote_commit = _git(repo_root, "ls-remote", "--tags", "origin", f"refs/tags/{tag}^{{}}").stdout.strip()
-    if not remote_commit or remote_commit.split()[0] != head:
-        raise ReleaseError(f"pushed product Tag {tag}, but remote commit read-back differs from {head}")
+    if not local_tag_exists:
+        _git(repo_root, "tag", "-a", tag, "-m", f"WT Media {tag}")
+    local_tag_object = _git(repo_root, "rev-parse", f"refs/tags/{tag}").stdout.strip()
+    push_result = _git(repo_root, "push", "origin", f"refs/tags/{tag}", allow_failure=True)
+    remote_tag_object = _github_ref(repo_root, f"tags/{tag}")
+    if remote_tag_object != local_tag_object:
+        if push_result.returncode != 0:
+            raise ReleaseError(f"product Tag push failed: {push_result.stderr.strip()}")
+        raise ReleaseError(f"pushed product Tag {tag}, but remote Tag object read-back differs")
     return f"pushed {tag} at {head}; GitHub Tag push triggers release.yml"
 
 

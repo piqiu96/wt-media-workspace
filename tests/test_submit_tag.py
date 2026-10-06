@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -48,9 +49,27 @@ class SubmitTagTest(unittest.TestCase):
         self.git("commit", "-m", "Add release manifest")
         self.git("push", "origin", "HEAD:refs/heads/codex/release-test")
         stub = self.bin / "gh"
-        stub.write_text("#!/bin/sh\ncase \"$*\" in\n  *wt-media-cloud*) [ \"${MISSING_CLOUD_TAG:-0}\" != 1 ];;\n  *) exit 0;;\nesac\n", encoding="utf-8")
+        stub.write_text(
+            "#!/bin/sh\n"
+            "case \"$2\" in\n"
+            "  repos/piqiu96/wt-media-workspace/git/ref/*)\n"
+            "    ref=${2#*/git/ref/}\n"
+            "    if git --git-dir \"$FAKE_GH_BARE\" rev-parse --verify \"refs/$ref\" >/dev/null 2>&1; then\n"
+            "      git --git-dir \"$FAKE_GH_BARE\" rev-parse \"refs/$ref\"\n"
+            "    else\n"
+            "      echo 'gh: Not Found (HTTP 404)' >&2\n"
+            "      exit 1\n"
+            "    fi;;\n"
+            "  *wt-media-cloud*) [ \"${MISSING_CLOUD_TAG:-0}\" != 1 ];;\n"
+            "  *) exit 0;;\n"
+            "esac\n",
+            encoding="utf-8",
+        )
         stub.chmod(0o755)
-        self.environment = patch.dict(os.environ, {"PATH": str(self.bin) + os.pathsep + os.environ["PATH"]})
+        self.environment = patch.dict(os.environ, {
+            "PATH": str(self.bin) + os.pathsep + os.environ["PATH"],
+            "FAKE_GH_BARE": str(self.bare),
+        })
         self.environment.start()
         self.addCleanup(self.environment.stop)
 
@@ -98,6 +117,26 @@ class SubmitTagTest(unittest.TestCase):
         with self.assertRaisesRegex(ReleaseError, "already exists"):
             submit_tag(TAG, self.work, push=True)
         self.assertEqual(self.remote_tag_commit(), self.git("rev-parse", "HEAD"))
+
+    def test_can_retry_matching_local_tag_after_network_failure(self) -> None:
+        self.git("tag", "-a", TAG, "-m", "prepared release Tag")
+        self.assertIsNone(self.remote_tag_commit())
+        submit_tag(TAG, self.work, push=True)
+        self.assertEqual(self.remote_tag_commit(), self.git("rev-parse", "HEAD"))
+
+    def test_remote_preflight_works_when_git_ls_remote_is_unavailable(self) -> None:
+        real_git = shutil.which("git")
+        assert real_git is not None
+        wrapper = self.bin / "git"
+        wrapper.write_text(
+            "#!/bin/sh\n"
+            "case \"$*\" in *ls-remote*) exit 88;; esac\n"
+            f"exec '{real_git}' \"$@\"\n",
+            encoding="utf-8",
+        )
+        wrapper.chmod(0o755)
+        self.addCleanup(wrapper.unlink)
+        submit_tag(TAG, self.work, push=False)
 
 
 if __name__ == "__main__":
