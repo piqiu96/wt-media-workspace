@@ -235,6 +235,24 @@
 - [x] 运行目标 Go 测试、全仓 Go 测试、静态检查及部署包测试；核对从其他 cwd 启动的实际错误路径和日志。
 - [x] 回写 Cloud 状态与 Evidence；发布新组件/产品 Tag 由本次验证结果和服务器验收决定，不移动既有 Tag。
 
+### Task 11: 启动时一次初始化运行路径
+
+**Files:**
+- Modify: `wt-media-cloud/internal/config/root.go`、`config.go` 及对应测试
+- Modify: `wt-media-cloud/internal/bootstrap/resource.go`、`routes.go`、`bootstrap_test.go`
+- Modify: `wt-media-cloud/cmd/migrate/main.go`、`cmd/config-check/main.go`
+- Modify: `wt-media-cloud/README.md`、`deploy/DEPLOYMENT.md`
+- Modify: 本 CHG 的 Evidence、checkpoint 和 Cloud status
+
+**Interfaces:**
+- Consumes: Task 10 的单一根路径解析规则。
+- Produces: 启动时解析并保存一次路径，运行代码通过 `config.GetRuntimePaths()` 读取；解析失败 panic，未初始化读取 panic。
+
+- [x] 先写失败测试，确认未初始化的 `Load()` 不能回退到 cwd，根路径无效时启动资源必须 panic。
+- [x] 使用进程级缓存与 getter 替换运行调用方的按需解析；保留现有 Server、Worker、Scheduler、Migration、配置检查入口的相同根路径规则。
+- [x] 验证环境变化不会改变已保存路径；执行目标与全仓 Go 测试、静态检查、任意 cwd 的实际二进制启动检查。
+- [x] 回写部署说明、Evidence、checkpoint 和 Cloud status；新发布与宝塔验收仍按 CHG 原有门槛处理。
+
 
 ## 2026-10-04 最终部署收敛方案（用户已确认）
 

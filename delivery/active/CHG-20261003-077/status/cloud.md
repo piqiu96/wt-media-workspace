@@ -14,3 +14,9 @@
 - Config, logs, Web, and default Migration paths derive from one resolved root. Relative `WT_MEDIA_CLOUD_{CONFIG,LOG,WEB}_PATH` overrides are relative to that root, not cwd.
 - Startup records the resolved paths before loading config. Resource initialization failure records the failing step and error; the app logger records its effective path once ready. Early failures go to the process manager's stderr log.
 - Verification: path/bootstrap tests observed RED then GREEN; `go test ./... -count=1`, target `go vet`, package tests, and a released-binary missing-config smoke check passed. Evidence: `evidence/cloud-runtime-paths-and-startup-logs.md`.
+
+## Task 11 commit `be1d1a1`（未 Tag）
+
+- Cloud 路径在进程启动时解析并保存一次，`config.GetRuntimePaths()` 是运行时唯一读取入口；未初始化读取和根路径解析失败均 panic。初始化后环境变量变化不会改变路径。
+- Server、Worker、Scheduler 的 Bootstrap、Migration 与配置检查入口使用已保存路径；直接调用 `config.Initialize()` 也先初始化路径。
+- 完整 Go 测试、目标 `go vet`、任意 cwd 启动与非法根路径 panic 检查通过。证据：`evidence/cloud-runtime-path-initialization.md`。尚未 Tag 或执行宝塔服务器验收。
