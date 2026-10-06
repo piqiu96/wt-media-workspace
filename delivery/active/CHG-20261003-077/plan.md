@@ -253,6 +253,22 @@
 - [x] 验证环境变化不会改变已保存路径；执行目标与全仓 Go 测试、静态检查、任意 cwd 的实际二进制启动检查。
 - [x] 回写部署说明、Evidence、checkpoint 和 Cloud status；新发布与宝塔验收仍按 CHG 原有门槛处理。
 
+### Task 12: 提交新组件 Tag 并手动触发产品打包发布
+
+**Files:**
+- Add: `wt-media-workspace/scripts/release/submit_tag.py`、`tests/test_submit_tag.py`
+- Add: `wt-media-workspace/releases/manifests/v0.1.0-rc.14.yaml`
+- Modify: 本 CHG 的 Evidence、checkpoint、status 与服务器验收版本信息
+
+**Interfaces:**
+- Consumes: Cloud Task 10/11 commits、已有 Agent/Desktop 固定 Tag、产品 Tag push 触发的 `release.yml`。
+- Produces: Cloud `v0.1.0-rc.12` 与产品 `v0.1.0-rc.14`，后者由手动脚本提交 Tag，触发既有 GitHub Actions 构建/打包/预发布流水线。
+
+- [x] 先写失败验证：未提交或未推送的 Manifest、重复 Tag、缺失组件 Tag 不得推送产品 Tag；显式 `--push` 时才提交 Tag。
+- [x] 实现 Tag 提交脚本并验证 dry-run 和本地裸仓库的真实推送。
+- [ ] 校验并推送 Cloud 源码分支和新组件 Tag；校验并推送 Workspace 源码分支、新 Manifest 与产品 Tag。Cloud 分支与 `v0.1.0-rc.12` 已推送并回读指向 `be1d1a1`。
+- [ ] 回读 GitHub Actions Run、构建结果、Cloud Artifact 和摘要，回写交付证据。
+
 
 ## 2026-10-04 最终部署收敛方案（用户已确认）
 

@@ -25,3 +25,8 @@
 
 - 基于 commit `be1d1a1` 组装 macOS arm64 本机演练包，从 `/Users/aqiuye` 启动；根路径仍锚定包内，配置检查、健康接口、Web 深层路由、日志及退出清理通过。
 - 本次不构成 Linux 发布制品或宝塔服务器验收。证据：`evidence/cloud-local-package-start-from-home.md`。
+
+## Task 12 Cloud 组件 Tag
+
+- `codex/cloud-runtime-paths-logs` 已推送 GitHub，远端 HEAD 为 `be1d1a11a603da475b4d6ce16244927adc8d8486`。
+- `v0.1.0-rc.12` 已提交 GitHub，远端 peeled Tag 指向同一 Commit；本地完整 Go 测试、目标 `go vet` 与打包脚本测试通过。正式 Linux Artifact 等待产品 Tag 工作流构建。
