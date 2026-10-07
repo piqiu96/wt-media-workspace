@@ -6,11 +6,11 @@
 
 | 项目 | 实际值 / 证据 |
 | --- | --- |
-| 产品 Tag | `v0.1.0-rc.13` |
-| Cloud 组件 Tag | `v0.1.0-rc.11` |
-| GitHub Actions Run URL | 待填写（RC13 Run） |
-| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.13_linux-amd64.tar.gz`；待 RC13 回读 |
-| Cloud 源码 Commit | 待填写（`v0.1.0-rc.11`） |
+| 产品 Tag | `v0.1.0-rc.14` |
+| Cloud 组件 Tag | `v0.1.0-rc.12` |
+| GitHub Actions Run URL | `https://github.com/piqiu96/wt-media-workspace/actions/runs/37581481877`（全部发布作业成功） |
+| Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.14_linux-amd64.tar.gz`；`e7ea73b3984c4735d3e61db1a008ff1e8ea0c48966cf50cc39b0323485d9ac4e` |
+| Cloud 源码 Commit | `be1d1a11a603da475b4d6ce16244927adc8d8486` |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
 | 安装路径与 `current` 指向 | 待填写 |
 | 维护提示开始/结束时间 | 待填写 |
@@ -45,8 +45,10 @@
 
 Cloud 包内步骤见 `wt-media-cloud/deploy/DEPLOYMENT.md`。服务器操作只需准备 profile 与预签名 URL 文件，随后由 `wtmctl` 一键完成：
 
+Cloud tar 位于上述 Run 的 `cloud-linux-amd64` Actions Artifact ZIP 内（Artifact ID `11463834682`，ZIP SHA-256 `db9f52f0e1e64225d8522ad78888bac8957612fbb2d374423fdc4659deb79b12`）；下载、解压、校验 tar SHA-256 后上传并解压到 `/home/www/wt-media-cloud/output`。Cloud tar 不是 GitHub Pre-release 的直接附件。
+
 ```bash
-cd /home/www/wt-media-cloud/output/wt-media-cloud_v0.1.0-rc.13_linux-amd64
+cd /home/www/wt-media-cloud/output/wt-media-cloud_v0.1.0-rc.14_linux-amd64
 ./bin/wtmctl artifact verify --profile /home/www/wt-media-cloud/output/online-deploy.toml
 ./bin/wtmctl doctor        --profile /home/www/wt-media-cloud/output/online-deploy.toml
 ./bin/wtmctl deploy plan   --profile /home/www/wt-media-cloud/output/online-deploy.toml

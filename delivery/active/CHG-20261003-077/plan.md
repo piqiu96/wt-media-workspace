@@ -213,7 +213,7 @@
 - [x] 相对 logger 路径锚定到日志目录，模板由 `logs/x.log` 改为 `x.log`。
 - [x] 登录成功/失败与鉴权失败写入稳定 reason（invalid_credentials、session_replace_needed、session_invalid、missing_credential），带 IP/Origin/路径，不写密码或 token。
 - [x] `wtmctl` 从包的 `release-info.json` 推导 `release`/`package_root`，安装类命令回退 `current`，示例 profile 不再固化版本。
-- [ ] 发布 Cloud `v0.1.0-rc.11` 与产品 `v0.1.0-rc.13`，回读 Artifact 摘要。
+- [x] 发布 Cloud `v0.1.0-rc.11` 与产品 `v0.1.0-rc.13`，回读 Artifact 摘要；RC13 Cloud tar SHA-256 见 `evidence/rc14-manual-tag-and-build.md`，服务器候选已升级为 RC14。
 
 ### Task 10: 固定运行根路径并补全启动诊断
 
@@ -266,8 +266,8 @@
 
 - [x] 先写失败验证：未提交或未推送的 Manifest、重复 Tag、缺失组件 Tag 不得推送产品 Tag；显式 `--push` 时才提交 Tag。
 - [x] 实现 Tag 提交脚本并验证 dry-run 和本地裸仓库的真实推送。
-- [ ] 校验并推送 Cloud 源码分支和新组件 Tag；校验并推送 Workspace 源码分支、新 Manifest 与产品 Tag。Cloud 分支与 `v0.1.0-rc.12` 已推送并回读指向 `be1d1a1`。
-- [ ] 回读 GitHub Actions Run、构建结果、Cloud Artifact 和摘要，回写交付证据。
+- [x] 校验并推送 Cloud 源码分支和新组件 Tag；校验并推送 Workspace 源码分支、新 Manifest 与产品 Tag。Cloud `v0.1.0-rc.12` 指向 `be1d1a1`，产品 `v0.1.0-rc.14` 指向 `7a781c3`。
+- [x] 回读 GitHub Actions Run `37581481877`、全部构建结果、Cloud Artifact 和摘要，回写 `evidence/rc14-manual-tag-and-build.md`。
 
 
 ## 2026-10-04 最终部署收敛方案（用户已确认）
