@@ -10,6 +10,7 @@
 | Cloud 组件 Tag | `v0.1.0-rc.12` |
 | GitHub Actions Run URL | `https://github.com/piqiu96/wt-media-workspace/actions/runs/37581481877`（全部发布作业成功） |
 | Cloud Artifact 文件名与 SHA-256 | `wt-media-cloud_v0.1.0-rc.14_linux-amd64.tar.gz`；`e7ea73b3984c4735d3e61db1a008ff1e8ea0c48966cf50cc39b0323485d9ac4e` |
+| 服务器直拉与校验结果 | 待填写：只读 GitHub 权限、下载目录、`SHA256SUMS` 和固定摘要核验输出 |
 | Cloud 源码 Commit | `be1d1a11a603da475b4d6ce16244927adc8d8486` |
 | 服务器系统、CPU 架构、宝塔版本 | 待填写 |
 | 安装路径与 `current` 指向 | 待填写 |
@@ -45,7 +46,31 @@
 
 Cloud 包内步骤见 `wt-media-cloud/deploy/DEPLOYMENT.md`。服务器操作只需准备 profile 与预签名 URL 文件，随后由 `wtmctl` 一键完成：
 
-Cloud tar 位于上述 Run 的 `cloud-linux-amd64` Actions Artifact ZIP 内（Artifact ID `11463834682`，ZIP SHA-256 `db9f52f0e1e64225d8522ad78888bac8957612fbb2d374423fdc4659deb79b12`）；下载、解压、校验 tar SHA-256 后上传并解压到 `/home/www/wt-media-cloud/output`。Cloud tar 不是 GitHub Pre-release 的直接附件。
+Cloud tar 位于上述 Run 的 `cloud-linux-amd64` Actions Artifact ZIP 内（Artifact ID `11463834682`，ZIP SHA-256 `db9f52f0e1e64225d8522ad78888bac8957612fbb2d374423fdc4659deb79b12`），不是 GitHub Pre-release 的直接附件。在服务器上安装 GitHub CLI，并通过受控环境提供 `GH_TOKEN`：令牌仅需对私有 `piqiu96/wt-media-workspace` 仓库具有 Actions 读取权限，不写入仓库、部署 profile 或命令历史。下面的命令直接在服务器拉取、核验并解压固定 RC14 制品，不经本地电脑中转：
+
+```bash
+set -euo pipefail
+: "${GH_TOKEN:?需要 GitHub Actions 只读令牌}"
+command -v gh
+test "$(uname -m)" = x86_64
+output=/home/www/wt-media-cloud/output
+package=wt-media-cloud_v0.1.0-rc.14_linux-amd64
+mkdir -p "$output"
+test ! -e "$output/$package"
+download_dir="$(mktemp -d "$output/.download-rc14.XXXXXX")"
+gh run download 37581481877 \
+  --repo piqiu96/wt-media-workspace \
+  --name cloud-linux-amd64 \
+  --dir "$download_dir"
+(cd "$download_dir" && sha256sum -c SHA256SUMS)
+printf '%s  %s\n' \
+  e7ea73b3984c4735d3e61db1a008ff1e8ea0c48966cf50cc39b0323485d9ac4e \
+  "$download_dir/$package.tar.gz" | sha256sum -c -
+tar -xzf "$download_dir/$package.tar.gz" -C "$output"
+test -x "$output/$package/bin/wtmctl"
+```
+
+`gh run download` 会解开 Actions Artifact ZIP，因此此处直接验证包内 `SHA256SUMS` 和预先固定的 Cloud tar SHA-256。下载失败或任一校验失败时，`set -e` 会停止执行；此时不运行 `wtmctl deploy apply`。保留 `download_dir` 供事后核对，成功验收后再清理。
 
 ```bash
 cd /home/www/wt-media-cloud/output/wt-media-cloud_v0.1.0-rc.14_linux-amd64

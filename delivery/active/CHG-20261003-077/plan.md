@@ -269,6 +269,22 @@
 - [x] 校验并推送 Cloud 源码分支和新组件 Tag；校验并推送 Workspace 源码分支、新 Manifest 与产品 Tag。Cloud `v0.1.0-rc.12` 指向 `be1d1a1`，产品 `v0.1.0-rc.14` 指向 `7a781c3`。
 - [x] 回读 GitHub Actions Run `37581481877`、全部构建结果、Cloud Artifact 和摘要，回写 `evidence/rc14-manual-tag-and-build.md`。
 
+### Task 13: 宝塔服务器直拉固定 Cloud Artifact
+
+**Files:**
+- Modify: `delivery/milestones/M-first-production-release.md`
+- Modify: `delivery/active/CHG-20261003-077/change.md`、`server-acceptance.md`、`checkpoint.md`、`status/workspace.md`
+- Add: `delivery/active/CHG-20261003-077/evidence/server-direct-pull.md`
+
+**Interfaces:**
+- Consumes: 成功的 RC14 Run `37581481877`、私有 Workspace 仓库 Actions 只读权限、固定 Cloud tar SHA-256。
+- Produces: 用户在服务器通过 GitHub CLI 直接拉取、核验和解压 Cloud 包，再执行现有 `wtmctl` 的可操作步骤。
+
+- [x] 明确服务器直拉仍使用固定 RC14 Cloud Artifact；不在服务器重新编译源码或改变产品 Tag。
+- [x] 在服务器验收记录中加入只读凭据、Run/Artifact 固定值、两层摘要核验和失败停止命令。
+- [x] 执行文档命令的静态及本地制品核验，回写 `evidence/server-direct-pull.md` 和 checkpoint。
+- [ ] 用户在宝塔服务器实际执行直拉和后续验收，回填结果。
+
 
 ## 2026-10-04 最终部署收敛方案（用户已确认）
 

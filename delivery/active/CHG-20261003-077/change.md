@@ -5,7 +5,7 @@
 - Milestone: `delivery/milestones/M-first-production-release.md#cloud-预发布部署与数据库初始化`
 - References: `docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md` §5.1、§7；`docs/superpowers/specs/2026-10-04-baota-cloud-deployment-layout-design.md`；`docs/decisions/0020-tagged-release-and-environment-config.md`；已完成 [CHG-20261003-076](../../completed/CHG-20261003-076/change.md)。
 - Affected repositories: `wt-media-cloud`、`wt-media-workspace`。
-- 用户目标：基于 RC6 后的固定源码产出可上传宝塔的 Cloud 独立部署包、可执行数据库初始化/迁移步骤，并初始化管理员。
+- 用户目标：基于 RC6 后的固定源码产出可由宝塔服务器直接拉取的 Cloud 独立部署包、可执行数据库初始化/迁移步骤，并初始化管理员。
 
 ## 目标与范围
 
@@ -36,6 +36,7 @@
 6. Workspace 固定新 Cloud 组件 Tag 与产品 Tag，重新运行 GitHub 打包工作流。
 7. 输出服务器部署手册和人工验收记录模板；用户按手册在宝塔执行并回填实际结果。
 8. 将 Cloud 运行路径在启动初始化阶段解析并保存一次，提供全局 getter；初始化失败直接 panic，未初始化读取不得回退到工作目录。Server、Scheduler、Worker、Migration 和配置检查入口使用同一已初始化路径。用单元测试和任意工作目录启动检查验证。
+9. 服务器直接以只读 GitHub 权限拉取固定产品 Tag 的 Cloud Actions Artifact，核对包摘要后运行已有 `wtmctl`；不再要求本地下载、上传或服务器现场编译源码。
 
 ## 验收
 
@@ -48,6 +49,7 @@
 - 新版本安装后拥有独立配置、日志和临时目录；部署脚本能按显式环境拉取变量表、渲染 `.toml.tpl`、拒绝缺失/未知/残留变量，并通过 Cloud 配置校验；`current` 切换前不改变正在使用的版本。
 - 宝塔 Go 项目与两个进程管理器条目使用固定 `current` 路径、`www` 用户和正确工作目录，不依赖 systemd 或虚假端口。
 - 部署手册明确备份、校验、失败停止、回退和未验证业务边界。
+- 服务器拉取流程固定 Run/Artifact 与 SHA-256；缺少权限、下载失败或摘要不符时停止，不进入迁移和 `current` 切换。
 
 ## Open Questions
 
