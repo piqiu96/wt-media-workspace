@@ -50,6 +50,6 @@
 ## Windows Agent 下载提交故障增量
 
 - 当前工作：用户在 Windows RC16 下载时观察到 99% 停滞、`.part` 留存、两个任务重复报 `[Errno 9] Bad file descriptor`；三个任务的合并文件长度均等于其分片总和。问题归于 Agent 文件提交阶段，已将 Agent 纳入本 CHG 范围。
-- 已完成：Agent commit `106f6ff` 修复 Windows 文件 `fsync` 句柄模式及目录同步分支；故障注入测试由红转绿，下载 Sink 61 项、执行器 78 项、Agent 全量 701 项通过。证据见 `evidence/windows-agent-download-commit.md`，Agent 状态见 `status/agent.md`。
+- 已完成：Agent commit `106f6ff` 修复 Windows 文件 `fsync` 句柄模式及目录同步分支；故障注入测试由红转绿，下载 Sink 61 项、执行器 78 项、Agent 当前工作区全量 701 项及干净克隆的发布源 690 项通过。证据见 `evidence/windows-agent-download-commit.md`，Agent 状态见 `status/agent.md`。
 - 未完成：Windows 构建与真机复测最终文件、Cloud 成功状态；旧任务的 Cloud 状态未取得，原 `.part` 不移动、不改名。旧任务可能已用尽三次领取上限。
 - 下一步：发布包含 Agent 修复的新 RC，在 Windows D: 目录复测单流和分片下载；按实际任务状态决定重新下载或受控恢复，确认最终文件与 Cloud 状态后清理旧分片。
