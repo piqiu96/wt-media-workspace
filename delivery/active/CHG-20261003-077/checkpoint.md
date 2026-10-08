@@ -12,3 +12,9 @@
 
 - 最终方案：单一 `bin/wtmctl` 负责远程变量拉取、校验、Artifact 校验、渲染、Migration、安装、current 切换和只读验收；宝塔独占服务启停。
 - 路径裁定：在线服务器统一使用 `/home/www/wt-media-cloud/output`；变量文件使用 TOML（`online.toml`/`pre.toml`）；运行端口 `127.0.0.1:8188`。
+
+## 2026-10-08 增量
+
+- 用户裁定：Windows Desktop 控制台、日志、路径与下载设置问题并入本 CHG，不再另立 CHG-20261008-078。
+- 当前增量范围：按已批准设计修复 Windows release GUI subsystem、每用户 Windows 路径、日志读写一致性、侧车 Agent 数据目录传递、旧数据保护，以及 Cloud Web 下载目录提示。
+- 当前边界：Windows 实机和 CI 证据尚未回填；本地实现和单元测试不能单独宣布部署闭环。

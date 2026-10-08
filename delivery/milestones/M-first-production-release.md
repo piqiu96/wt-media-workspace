@@ -33,4 +33,4 @@
 - 系统动作：发布 Windows 主进程使用 GUI 子系统；Desktop 解析 `%LOCALAPPDATA%\WTMedia\Desktop\{data,logs,cache}`；侧车传入 `%LOCALAPPDATA%\WTMedia\Agent`；旧数据仅在旧目录存在且新目录为空时复制，不删除或覆盖。
 - 成功事实：Windows CI 主 EXE subsystem 为 `WINDOWS_GUI`；Desktop/Agent 文件日志与诊断路径一致；干净与旧数据场景路径测试通过；Windows 设置文件跨启动保留。
 - 失败行为：不从 `HOME`、cwd 或安装目录猜测 Windows 运行根；不删除旧数据；不用虚假默认下载目录；日志故障不静默吞掉。
-- 当前实施单元：[CHG-20261008-078](../active/CHG-20261008-078/change.md)。
+- 当前实施单元：[CHG-20261003-077](../active/CHG-20261003-077/change.md)。

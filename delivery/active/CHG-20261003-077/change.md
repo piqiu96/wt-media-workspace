@@ -1,10 +1,11 @@
-# CHG-20261003-077：Cloud 预发布部署包与数据库初始化
+# CHG-20261003-077：Cloud 预发布部署与 Windows Desktop 部署问题修复
 
 - Status: IMPLEMENTING
 - Level: L
 - Milestone: `delivery/milestones/M-first-production-release.md#cloud-预发布部署与数据库初始化`
-- References: `docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md` §5.1、§7；`docs/superpowers/specs/2026-10-04-baota-cloud-deployment-layout-design.md`；`docs/decisions/0020-tagged-release-and-environment-config.md`；已完成 [CHG-20261003-076](../../completed/CHG-20261003-076/change.md)。
-- Affected repositories: `wt-media-cloud`、`wt-media-workspace`。
+- References: `docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md` §5.1、§7；`docs/superpowers/specs/2026-10-04-baota-cloud-deployment-layout-design.md`；`docs/superpowers/specs/2026-10-08-windows-desktop-console-logging-design.md`；`docs/superpowers/plans/2026-10-08-windows-desktop-console-logging-plan.md`；`docs/decisions/0020-tagged-release-and-environment-config.md`；已完成 [CHG-20261003-076](../../completed/CHG-20261003-076/change.md)。
+- Affected repositories: `wt-media-cloud`、`wt-media-desktop`、`wt-media-workspace`。
+- Current repository: `wt-media-workspace`
 - 用户目标：基于 RC6 后的固定源码产出可由宝塔服务器直接拉取的 Cloud 独立部署包、可执行数据库初始化/迁移步骤，并初始化管理员。
 
 ## 目标与范围
@@ -15,6 +16,7 @@
 4. 用新的 Cloud 组件 Tag 和产品 Tag 重新生成可部署 Cloud Artifact；客户端无变更时沿用已验证组件 Tag。
 5. 记录预发布部署边界：不宣称对象存储、BitBrowser、业务发布或正式稳定版上线通过。
 6. Cloud Server 提供包内 Cloud Web 静态文件与 Vue history 路由回退，使宝塔 Go 项目能统一管理域名、反向代理与 HTTPS。
+7. 处置部署回归发现的 Windows Desktop 问题：发布构建不弹控制台；Windows Desktop 与 Agent 使用一致的每用户数据、日志和缓存路径；下载目录设置可跨启动保留。
 
 ## Explicitly Not Doing
 
@@ -25,6 +27,8 @@
 - 不使用 `shared/` 保存跨版本配置或日志。
 - 不使用 systemd 管理 Cloud 三个常驻进程。
 - 不为 Scheduler/Worker 配置虚假监听端口。
+- 不修改 Agent 的 PyInstaller console 模式或下载目录拒绝规则。
+- 不在 Local AppData 不可用时伪装成功或回退到安装目录/cwd。
 
 ## 有序任务
 
@@ -37,6 +41,8 @@
 7. 输出服务器部署手册和人工验收记录模板；用户按手册在宝塔执行并回填实际结果。
 8. 将 Cloud 运行路径在启动初始化阶段解析并保存一次，提供全局 getter；初始化失败直接 panic，未初始化读取不得回退到工作目录。Server、Scheduler、Worker、Migration 和配置检查入口使用同一已初始化路径。用单元测试和任意工作目录启动检查验证。
 9. 服务器直接以只读 GitHub 权限拉取固定产品 Tag 的 Cloud Actions Artifact，核对包摘要后运行已有 `wtmctl`；不再要求本地下载、上传或服务器现场编译源码。
+10. Windows Desktop release 主进程声明 GUI subsystem；Desktop 统一解析 `%LOCALAPPDATA%\WTMedia\Desktop\{data,logs,cache}`，Windows 侧车显式接收 Agent 默认数据目录；旧数据只在旧目录存在且新目录为空时复制，不删除、不覆盖。
+11. Cloud Web 本机设置下载目录提示改为“请先选择下载目录”，并配合 Desktop 验证 Windows 设置文件跨启动保留。
 
 ## 验收
 
@@ -54,3 +60,15 @@
 ## Open Questions
 
 - **Q-01（RESOLVED）**：用户于 2026-10-03 裁定保留 6 位密码下限，RC 初始管理员固定为 `admin / admin123`。该值由部署脚本写入服务器私有配置，不进入 Git。
+
+## 部署发现的 Windows Desktop 验收补充
+
+- Windows release 主 EXE 的 PE subsystem 为 `WINDOWS_GUI`；debug 构建保留终端输出。
+- Desktop 路径测试覆盖 Windows `LOCALAPPDATA` 目标目录、macOS 原路径保留、显式 Agent 数据目录优先、旧数据不覆盖、缺失 `LOCALAPPDATA` 时日志使用明确临时目录并可见报告故障。
+- Windows Desktop/Agent 文件日志与诊断读取路径一致；应用内“打开日志文件夹”定位同一目录。
+- Windows 设置文件可落盘，下载保存目录重启后保留；未配置时页面提示“请先选择下载目录”且不启动本机下载。
+- Windows 实机/CI 回归证据未回填前，不得宣称本 CHG 的 Windows 部署问题闭环。
+
+## 7. Pending Questions
+
+None.
