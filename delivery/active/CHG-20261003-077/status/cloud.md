@@ -30,3 +30,9 @@
 
 - `codex/cloud-runtime-paths-logs` 已推送 GitHub，远端 HEAD 为 `be1d1a11a603da475b4d6ce16244927adc8d8486`。
 - `v0.1.0-rc.12` 已提交 GitHub，远端 peeled Tag 指向同一 Commit；本地完整 Go 测试、目标 `go vet` 与打包脚本测试通过。产品 RC14 工作流已构建 Linux Artifact 并完成摘要核对，详见 `evidence/rc14-manual-tag-and-build.md`。
+
+## 2026-10-08 Windows 部署问题 Web 提示
+
+- Commit `9478a64` 将本机设置保存位置提示改为 `请先选择下载目录`；未新增默认下载目录。
+- `npm test -- src/localSettingsWiring.test.js` 通过（9 项）；Cloud Web 全量 `npm test` 通过（50 个测试文件 / 488 项）。
+- 证据：`evidence/cloud-web-download-prompt.md`。Windows 实机下载持久化仍待回归。

@@ -11,4 +11,10 @@
 
 - Cloud `v0.1.0-rc.12` has been pushed and read back at `be1d1a1`; the new product Manifest pins it with the existing Agent `v0.2.2-rc.2` and Desktop `v0.1.0-rc.3` Tags.
 - `scripts/release/submit_tag.py` adds a manual preflight and an explicit `--push` action. Workspace branch and annotated product `v0.1.0-rc.14` Tag were pushed and read back at `7a781c3`; the Tag push triggered Run `37581481877`.
+
+## 2026-10-08 Windows deployment fix increment
+
+- Desktop and Cloud Web fixes are implemented in `5deebf9` and `9478a64`, and recorded in `evidence/windows-desktop-console-logging.md` and `evidence/cloud-web-download-prompt.md`.
+- Desktop verification passed `cargo check`, full `cargo test` (527 passed / 6 ignored), `git diff --check`, and the release-only GUI subsystem source check. Cloud Web full `npm test` passed (50 files / 488 tests).
+- Windows PE subsystem inspection and real-machine regression remain open; the CHG stays IMPLEMENTING.
 - RC versions are fixed by the product Manifest; `config/release-matrix.yaml` remains the historical engineering release matrix for earlier milestone records.

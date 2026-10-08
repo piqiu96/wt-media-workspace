@@ -18,3 +18,9 @@
 - 用户裁定：Windows Desktop 控制台、日志、路径与下载设置问题并入本 CHG，不再另立 CHG-20261008-078。
 - 当前增量范围：按已批准设计修复 Windows release GUI subsystem、每用户 Windows 路径、日志读写一致性、侧车 Agent 数据目录传递、旧数据保护，以及 Cloud Web 下载目录提示。
 - 当前边界：Windows 实机和 CI 证据尚未回填；本地实现和单元测试不能单独宣布部署闭环。
+
+## 2026-10-08 Windows 修复执行状态
+
+- Desktop：Commit `5deebf9` 实现 Windows release-only GUI subsystem、统一 `SystemPaths`、Windows per-user Desktop/Agent 路径、日志临时回退、Sidecar 环境变量和旧数据保护。`cargo check --all-targets --message-format=short`、`cargo test`（527 通过 / 0 失败 / 6 忽略）、`git diff --check`、`python3 tests/windows_release_subsystem.py` 均通过。证据：`evidence/windows-desktop-console-logging.md`。
+- Cloud Web：Commit `9478a64` 将保存位置提示改为 `请先选择下载目录`，无默认下载目录。局部 wiring 测试与全量 `npm test`（50 个文件 / 488 项）通过。证据：`evidence/cloud-web-download-prompt.md`。
+- 未闭环：尚未构建并检查 Windows 主 EXE PE subsystem，也未执行 Windows 实机/CI 安装与下载、日志、重复启动、卸载回归。
