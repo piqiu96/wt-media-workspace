@@ -24,4 +24,10 @@
 - [`release.yml` Run 37743439203](https://github.com/piqiu96/wt-media-workspace/actions/runs/37743439203) succeeded and published the RC15 Pre-release.
 - All release assets passed `SHA256SUMS`; the Windows installer was unpacked and its main EXE PE subsystem was verified as `WINDOWS_GUI`.
 - Remaining: Windows real-machine regression. Evidence: `evidence/rc15-windows-verification-build.md`.
+
+## RC16 Windows free-space fix
+
+- Desktop `v0.1.0-rc.5` fixed Windows free-space measurement at commit `2231944`; product `v0.1.0-rc.16` uses Cloud `v0.1.0-rc.13`, Agent `v0.2.2-rc.2`, and that Desktop Tag.
+- [`release.yml` Run 37767071497](https://github.com/piqiu96/wt-media-workspace/actions/runs/37767071497) succeeded. All release assets passed checksum verification.
+- Remaining: real-machine confirmation that 本机设置 shows disk free space without the former `statvfs` error. Evidence: `evidence/rc16-windows-free-space-fix.md`.
 - RC versions are fixed by the product Manifest; `config/release-matrix.yaml` remains the historical engineering release matrix for earlier milestone records.

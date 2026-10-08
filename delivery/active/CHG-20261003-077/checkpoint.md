@@ -39,3 +39,10 @@
 - 根因：`storage::available_bytes` 只实现了 Unix `statvfs`；`#[cfg(not(unix))]` 分支按旧假设“Desktop 从不构建 Windows”直接拒绝。RC15 已正式构建 Windows，遗留平台假设暴露。
 - 修复：Desktop commit `2231944` 为 Windows 增加 `GetDiskFreeSpaceExW` 实现，保留 Unix `statvfs`；`available_bytes_for` 的最近存在祖先规则不变。
 - 验证：`cargo check --all-targets --message-format=short`、完整 `cargo test`（527 通过 / 0 失败 / 6 忽略）、`git diff --check` 通过。Windows 分支由 RC16 release job 编译，并由真机复测设置页。
+
+## RC16 构建状态
+
+- [`release.yml` Run 37767071497](https://github.com/piqiu96/wt-media-workspace/actions/runs/37767071497) 全部发布作业成功；RC16 Pre-release 已生成。
+- Windows 安装包 SHA-256：`23d98b6da9b3ac6d2949b1658c59a9712f84bcba780cb189f09bee19e46d9998`。
+- 全部发布资产通过 `SHA256SUMS` 校验；`build-info.json` 固定 Desktop `2231944`。
+- 下一步：Windows 真机安装 RC16，确认本机设置可显示磁盘可用空间且无 `statvfs` 报错，并继续执行原有 CHG-077 回归。

@@ -1,0 +1,28 @@
+# RC16 Windows free-space fix
+
+- Real-machine symptom: opening 本机设置 returned `读取可用空间失败: free space is not measurable on this platform: free space is read with statvfs, which this target does not provide`.
+- Root cause:
+  - `storage::available_bytes` only implemented Unix `statvfs`.
+  - The `#[cfg(not(unix))]` branch returned `StorageError::Unsupported` based on the obsolete assumption that Desktop was never built for Windows.
+  - RC15 began shipping an official Windows build, exposing the platform gap.
+- Fix:
+  - Desktop commit `223194486da935a432f1324c48606a502589d922`.
+  - Windows now calls `GetDiskFreeSpaceExW` through `windows-sys` and reports `lpFreeBytesAvailableToCaller`.
+  - Unix keeps the existing `statvfs` path.
+  - `available_bytes_for` keeps its nearest-existing-ancestor rule for not-yet-created directories.
+- Local verification:
+  - `cargo check --all-targets --message-format=short` passed.
+  - `cargo test` passed: 527 tests, 0 failed, 6 ignored.
+  - `git diff --check` passed.
+- Product build:
+  - Product Tag: `v0.1.0-rc.16`
+  - Manifest: `releases/manifests/v0.1.0-rc.16.yaml`
+  - GitHub Actions: [`release.yml` Run 37767071497](https://github.com/piqiu96/wt-media-workspace/actions/runs/37767071497) completed with `success`.
+  - Pre-release: [`v0.1.0-rc.16`](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.16)
+  - Windows installer: `WT-Media_v0.1.0-rc.16_windows-x64-setup.exe`
+  - Windows installer SHA-256: `23d98b6da9b3ac6d2949b1658c59a9712f84bcba780cb189f09bee19e46d9998`
+  - All five release assets downloaded and passed `shasum -a 256 -c SHA256SUMS`.
+  - `build-info.json` fixes Desktop to `2231944`, Cloud to `9478a64`, Agent to `ac7f0b6`, and Workspace to `e40869a`.
+  - The installer unpacks successfully with 7-Zip; the Desktop main EXE remains PE32+ `WINDOWS_GUI`, and the Agent remains PE32+ `WINDOWS_CUI` as required.
+- Remaining:
+  - The real Windows machine must install RC16 and confirm 本机设置 shows a positive disk-available value without the previous error.
