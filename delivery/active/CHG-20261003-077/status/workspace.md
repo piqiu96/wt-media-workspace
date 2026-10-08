@@ -31,3 +31,9 @@
 - [`release.yml` Run 37767071497](https://github.com/piqiu96/wt-media-workspace/actions/runs/37767071497) succeeded. All release assets passed checksum verification.
 - Remaining: real-machine confirmation that 本机设置 shows disk free space without the former `statvfs` error. Evidence: `evidence/rc16-windows-free-space-fix.md`.
 - RC versions are fixed by the product Manifest; `config/release-matrix.yaml` remains the historical engineering release matrix for earlier milestone records.
+
+## Windows Agent download commit fix
+
+- Windows RC16 real-machine download reached 99% and Agent logged `[Errno 9] Bad file descriptor` after all shards were merged. Agent is now included in CHG-077 scope.
+- Agent commit `106f6ff` fixes Windows part-file fsync and directory handling; local 701-test suite and Workspace governance checks pass. Evidence: `evidence/windows-agent-download-commit.md`.
+- New Agent component Tag, product Manifest/Tag, Windows installer build and real-machine final-file/Cloud-success verification remain pending. Existing `.part` files are untouched.

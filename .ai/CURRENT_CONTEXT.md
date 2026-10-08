@@ -1,6 +1,6 @@
 # WT Media Current AI Context
 
-- Generated: 2026-10-08T11:32:20Z
+- Generated: 2026-10-08T15:03:21Z
 - Active CHG: `CHG-20261003-077` — Cloud 预发布部署与 Windows Desktop 部署问题修复
 - Status: `IMPLEMENTING`
 - Current milestone: `delivery/milestones/M-first-production-release.md#cloud-预发布部署与数据库初始化`
@@ -28,6 +28,7 @@ this file exists in the outer execution root.
 ## Affected Repositories
 
 - `wt-media-cloud`
+- `wt-media-agent`
 - `wt-media-desktop`
 - `wt-media-workspace`
 
