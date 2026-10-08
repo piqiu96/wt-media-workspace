@@ -32,3 +32,10 @@
 - 全部发布资产通过 `SHA256SUMS` 校验；Windows 安装包 SHA-256 为 `3e53887ac1e86e3fd4a436f7845cb3e01fa61dbb61757afa4cc04a4cf790be7d`。
 - 解包检查确认 `wt-media-desktop-shell.exe` subsystem 为 `WINDOWS_GUI`；`wt-media-agent.exe` 保持 `WINDOWS_CUI`，符合边界。
 - 下一步：用户在 Windows 真机下载并执行 RC15 安装包回归；结果回填前 CHG 保持 `IMPLEMENTING`。
+
+## Windows 可用空间问题增量
+
+- 真机现象：打开本机设置时返回「读取可用空间失败: free space is not measurable on this platform: free space is read with statvfs, which this target does not provide」。
+- 根因：`storage::available_bytes` 只实现了 Unix `statvfs`；`#[cfg(not(unix))]` 分支按旧假设“Desktop 从不构建 Windows”直接拒绝。RC15 已正式构建 Windows，遗留平台假设暴露。
+- 修复：Desktop commit `2231944` 为 Windows 增加 `GetDiskFreeSpaceExW` 实现，保留 Unix `statvfs`；`available_bytes_for` 的最近存在祖先规则不变。
+- 验证：`cargo check --all-targets --message-format=short`、完整 `cargo test`（527 通过 / 0 失败 / 6 忽略）、`git diff --check` 通过。Windows 分支由 RC16 release job 编译，并由真机复测设置页。

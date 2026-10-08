@@ -41,7 +41,7 @@
 7. 输出服务器部署手册和人工验收记录模板；用户按手册在宝塔执行并回填实际结果。
 8. 将 Cloud 运行路径在启动初始化阶段解析并保存一次，提供全局 getter；初始化失败直接 panic，未初始化读取不得回退到工作目录。Server、Scheduler、Worker、Migration 和配置检查入口使用同一已初始化路径。用单元测试和任意工作目录启动检查验证。
 9. 服务器直接以只读 GitHub 权限拉取固定产品 Tag 的 Cloud Actions Artifact，核对包摘要后运行已有 `wtmctl`；不再要求本地下载、上传或服务器现场编译源码。
-10. Windows Desktop release 主进程声明 GUI subsystem；Desktop 统一解析 `%LOCALAPPDATA%\WTMedia\Desktop\{data,logs,cache}`，Windows 侧车显式接收 Agent 默认数据目录；旧数据只在旧目录存在且新目录为空时复制，不删除、不覆盖。
+10. Windows Desktop release 主进程声明 GUI subsystem；Desktop 统一解析 `%LOCALAPPDATA%\WTMedia\Desktop\{data,logs,cache}`，Windows 侧车显式接收 Agent 默认数据目录，Windows 磁盘可用空间使用 `GetDiskFreeSpaceExW` 读取；旧数据只在旧目录存在且新目录为空时复制，不删除、不覆盖。
 11. Cloud Web 本机设置下载目录提示改为“请先选择下载目录”，并配合 Desktop 验证 Windows 设置文件跨启动保留。
 
 ## 验收
@@ -66,6 +66,7 @@
 - Windows release 主 EXE 的 PE subsystem 为 `WINDOWS_GUI`；debug 构建保留终端输出。
 - Desktop 路径测试覆盖 Windows `LOCALAPPDATA` 目标目录、macOS 原路径保留、显式 Agent 数据目录优先、旧数据不覆盖、缺失 `LOCALAPPDATA` 时日志使用明确临时目录并可见报告故障。
 - Windows Desktop/Agent 文件日志与诊断读取路径一致；应用内“打开日志文件夹”定位同一目录。
+- Windows 本机设置页能读取数据所在磁盘的可用空间，不再触发非 Unix 平台拒绝。
 - Windows 设置文件可落盘，下载保存目录重启后保留；未配置时页面提示“请先选择下载目录”且不启动本机下载。
 - Windows 实机/CI 回归证据未回填前，不得宣称本 CHG 的 Windows 部署问题闭环。
 
