@@ -24,3 +24,11 @@
 - Desktop：Commit `5deebf9` 实现 Windows release-only GUI subsystem、统一 `SystemPaths`、Windows per-user Desktop/Agent 路径、日志临时回退、Sidecar 环境变量和旧数据保护。`cargo check --all-targets --message-format=short`、`cargo test`（527 通过 / 0 失败 / 6 忽略）、`git diff --check`、`python3 tests/windows_release_subsystem.py` 均通过。证据：`evidence/windows-desktop-console-logging.md`。
 - Cloud Web：Commit `9478a64` 将保存位置提示改为 `请先选择下载目录`，无默认下载目录。局部 wiring 测试与全量 `npm test`（50 个文件 / 488 项）通过。证据：`evidence/cloud-web-download-prompt.md`。
 - 未闭环：尚未构建并检查 Windows 主 EXE PE subsystem，也未执行 Windows 实机/CI 安装与下载、日志、重复启动、卸载回归。
+
+## RC15 构建状态
+
+- 已创建并推送 Cloud `v0.1.0-rc.13`、Desktop `v0.1.0-rc.4` 与产品 `v0.1.0-rc.15`。
+- [`release.yml` Run 37743439203](https://github.com/piqiu96/wt-media-workspace/actions/runs/37743439203) 全部发布作业成功；RC15 Pre-release 已生成。
+- 全部发布资产通过 `SHA256SUMS` 校验；Windows 安装包 SHA-256 为 `3e53887ac1e86e3fd4a436f7845cb3e01fa61dbb61757afa4cc04a4cf790be7d`。
+- 解包检查确认 `wt-media-desktop-shell.exe` subsystem 为 `WINDOWS_GUI`；`wt-media-agent.exe` 保持 `WINDOWS_CUI`，符合边界。
+- 下一步：用户在 Windows 真机下载并执行 RC15 安装包回归；结果回填前 CHG 保持 `IMPLEMENTING`。

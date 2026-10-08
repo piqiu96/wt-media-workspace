@@ -36,3 +36,8 @@
 - Commit `9478a64` 将本机设置保存位置提示改为 `请先选择下载目录`；未新增默认下载目录。
 - `npm test -- src/localSettingsWiring.test.js` 通过（9 项）；Cloud Web 全量 `npm test` 通过（50 个测试文件 / 488 项）。
 - 证据：`evidence/cloud-web-download-prompt.md`。Windows 实机下载持久化仍待回归。
+
+## RC15 组件 Tag
+
+- Cloud `v0.1.0-rc.13` 指向 `9478a64`，已推送并回读。
+- RC15 产品构建使用该 Cloud 提交，`build-cloud` 与 Cloud packaging tests 通过。

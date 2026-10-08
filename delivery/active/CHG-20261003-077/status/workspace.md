@@ -17,4 +17,11 @@
 - Desktop and Cloud Web fixes are implemented in `5deebf9` and `9478a64`, and recorded in `evidence/windows-desktop-console-logging.md` and `evidence/cloud-web-download-prompt.md`.
 - Desktop verification passed `cargo check`, full `cargo test` (527 passed / 6 ignored), `git diff --check`, and the release-only GUI subsystem source check. Cloud Web full `npm test` passed (50 files / 488 tests).
 - Windows PE subsystem inspection and real-machine regression remain open; the CHG stays IMPLEMENTING.
+
+## RC15 Windows verification build
+
+- Product `v0.1.0-rc.15` Manifest fixed Cloud `v0.1.0-rc.13`, Agent `v0.2.2-rc.2`, and Desktop `v0.1.0-rc.4`; Workspace commit `30cc1eb` pushed the Tag.
+- [`release.yml` Run 37743439203](https://github.com/piqiu96/wt-media-workspace/actions/runs/37743439203) succeeded and published the RC15 Pre-release.
+- All release assets passed `SHA256SUMS`; the Windows installer was unpacked and its main EXE PE subsystem was verified as `WINDOWS_GUI`.
+- Remaining: Windows real-machine regression. Evidence: `evidence/rc15-windows-verification-build.md`.
 - RC versions are fixed by the product Manifest; `config/release-matrix.yaml` remains the historical engineering release matrix for earlier milestone records.

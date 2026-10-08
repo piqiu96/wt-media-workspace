@@ -16,6 +16,6 @@
   - `python3 tests/windows_release_subsystem.py` passed and confirmed the conditional declaration with no unconditional GUI subsystem.
   - `git diff --check` passed.
 - Not proven yet:
-  - No Windows PE binary was built or inspected in this local run, so the main EXE's `WINDOWS_GUI` subsystem remains a release/CI verification item.
+  - ~~No Windows PE binary was built or inspected in this local run, so the main EXE's `WINDOWS_GUI` subsystem remains a release/CI verification item.~~ RC15 build evidence confirms the packaged main EXE uses `WINDOWS_GUI`.
   - No Windows real-machine installation, double-launch, WebView2, download persistence, log reveal, or uninstall regression has been executed.
   - macOS source-level tests cover unchanged path behavior, but no packaged macOS regression is claimed by this evidence.
