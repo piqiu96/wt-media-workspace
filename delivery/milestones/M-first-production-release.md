@@ -23,4 +23,14 @@
 - 系统动作：校验固定版本与摘要，注入服务器私有配置，对显式目标库应用 Migration，启动 API Server、Discovery Scheduler、Discovery Worker，并验证健康、登录和关键表。
 - 成功事实：Cloud 包、迁移、配置模板、进程模板和验收脚本齐全；空库迁移与重复迁移通过；初始管理员可登录；三个 Cloud 进程健康。
 - 失败行为：不隐式创建或猜测生产库；迁移失败不得启动服务；不得把敏感凭据写入仓库或制品；不得把打包、部署或登录成功扩大为业务发布或正式稳定版上线。
-- 当前实施单元：[CHG-20261003-077](../active/CHG-20261003-077/change.md)。
+- 当前实施单元：[CHG-20261003-077](../planned/CHG-20261003-077/change.md)（暂停，状态 `PLANNED`）。
+
+## Windows Desktop 控制台与日志修复
+
+- 用户目标：Windows 发布版启动只显示应用窗口，不弹黑色控制台；Desktop 与 Agent 日志落在明确的每用户 Windows 目录，应用内诊断读取并打开同一批日志；下载目录选择跨启动保留。
+- 前置：已批准的修复设计完成；Agent 保持现有 override 与下载目录拒绝规则；Cloud Backend API 不变更。
+- 用户操作：安装测试版后双击启动，检查无控制台、登录/绑定/下载、日志路径与打开入口；在 Windows 上设置保存目录并重启验证保留。
+- 系统动作：发布 Windows 主进程使用 GUI 子系统；Desktop 解析 `%LOCALAPPDATA%\WTMedia\Desktop\{data,logs,cache}`；侧车传入 `%LOCALAPPDATA%\WTMedia\Agent`；旧数据仅在旧目录存在且新目录为空时复制，不删除或覆盖。
+- 成功事实：Windows CI 主 EXE subsystem 为 `WINDOWS_GUI`；Desktop/Agent 文件日志与诊断路径一致；干净与旧数据场景路径测试通过；Windows 设置文件跨启动保留。
+- 失败行为：不从 `HOME`、cwd 或安装目录猜测 Windows 运行根；不删除旧数据；不用虚假默认下载目录；日志故障不静默吞掉。
+- 当前实施单元：[CHG-20261008-078](../active/CHG-20261008-078/change.md)。

@@ -2,6 +2,10 @@
 
 更新：2026-10-03。**当前无活跃记录**——[CHG-20261002-074](../completed/CHG-20261002-074/change.md) 已于 2026-10-03 关闭归档（`DONE`），此前 [CHG-20260930-069](../completed/CHG-20260930-069/change.md)、[CHG-20261001-072](../completed/CHG-20261001-072/change.md)、[CHG-20261001-073](../completed/CHG-20261001-073/change.md) 亦已归档；本目录的 `DISCUSSION` / `PLANNED` 均未激活，不自动批准待决建议。M4-A 的 [CHG-20260924-061](../completed/CHG-20260924-061/change.md) 已于 2026-09-27 关闭归档为 `DONE`；台账见 [delivery/LEDGER.md](../LEDGER.md)。此前的 [CHG-20260923-056](../completed/CHG-20260923-056/change.md)～[CHG-20260923-059](../completed/CHG-20260923-059/change.md) 均已归档 `DONE`，属上线前工程加固程序。团队级内容隔离已由 ADR-0014 确认；M3 内容挖掘执行边界由 ADR-0015 收敛为 Cloud-owned Crawler；Agent 分层与配置目录约定由 ADR-0016 确认；M4-M5 Cloud 视频生产边界由 ADR-0017 确认。
 
+## 暂停记录
+
+- [CHG-20261003-077](CHG-20261003-077/change.md)：Cloud 预发布部署包与数据库初始化，状态 `PLANNED`。2026-10-08 用户裁定暂停，等待外部服务器验收条件恢复后再激活。
+
 ## 联合工程优化程序（2026-09-23 立项）
 
 程序总纲：[launch-engineering-optimization-program.md](../../docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md)。按依赖顺序激活，最多一项 active：
