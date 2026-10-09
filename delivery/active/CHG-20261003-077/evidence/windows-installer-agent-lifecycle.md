@@ -7,3 +7,4 @@
 - Desktop commits：`9f11d27` 添加路径限定停止与 NSIS hook，`d705451` 补充进程消失竞争处理、Sidecar 删除后核验及 Windows 安装/重装/卸载回归脚本。组件 Tag `v0.1.0-rc.7` 已推送并回读指向 `d7054519a0b60a858165398bb2d65c29522ec919`。
 - 用户范围裁定：2026-10-09 明确用户自选目录的视频一律不删除。卸载器仅在“删除应用数据”选项选中时清理确认归属的 WTMedia 目录；覆盖安装保留设置与数据。
 - 尚未验证：Windows PowerShell 进程路径筛选、安装包真实执行、Sidecar 文件覆盖/删除、原生数据复选框与本项目目录清理，均需 Windows 发布作业及真机复测。此记录不声明运行时验收通过。
+- 真机卸载验收入口：先记下一个用户下载视频的绝对路径，卸载时勾选“删除应用数据”，然后在 Workspace 运行 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/verify/windows_uninstall.ps1 -InstallDir '<安装目录>' -VideoPath '<视频绝对路径>'`。脚本只读，检查本安装路径的 Agent 进程与 EXE、当前/旧版应用目录均不存在，视频仍可读；不提供视频路径时跳过视频断言。

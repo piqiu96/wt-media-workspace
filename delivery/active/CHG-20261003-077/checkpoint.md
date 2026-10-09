@@ -78,4 +78,5 @@
 - Desktop `9f11d27`、`d705451` 已分别提交，组件 Tag `v0.1.0-rc.7` 已推送并回读指向 `d7054519a0b60a858165398bb2d65c29522ec919`；未包含 Desktop 工作区原有 `src-tauri/src/sidecar/readiness.rs` 修改。
 - Workspace 新增 `v0.1.0-rc.18` Manifest，固定 Cloud `v0.1.0-rc.13`、Agent `v0.2.2-rc.3`、Desktop `v0.1.0-rc.7`；发布工作流 Windows 作业接入按路径停进程和安装/重装/卸载回归脚本。
 - 已验证：NSIS 探针编译、Desktop `cargo check --all-targets`、Workspace Delivery governance 和局部发布测试通过；Windows 发布作业与真机卸载数据选项仍未验证，见 `evidence/windows-installer-agent-lifecycle.md`。
+- 真机只读验收脚本已准备于 `scripts/verify/windows_uninstall.ps1`；卸载时需勾选原生“删除应用数据”，脚本检查应用目录已清理且指定视频保留。
 - 下一步：推送 Workspace RC18 产品 Tag，等待 Windows 构建与安装器回归，核对 Release 资产，再回填真机卸载数据选项结果。
