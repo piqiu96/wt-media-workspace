@@ -7,8 +7,9 @@
 脚本按 `config/repository-map.yaml` 找到组件仓库，检查指定 commit 在本地和 GitHub 都存在。预检只读；`--push` 才创建 annotated Tag、推送并回读远端 Tag 对象。以下以 Agent 为例，Cloud、Desktop 将第一个参数分别改为 `cloud`、`desktop`。
 
 ```bash
-uv run scripts/release/submit_component_tag.py agent v0.2.2-rc.4 <完整40位Agent提交SHA>
-uv run scripts/release/submit_component_tag.py agent v0.2.2-rc.4 <完整40位Agent提交SHA> --push
+AGENT_COMMIT='在此填写完整40位Agent提交SHA'
+uv run scripts/release/submit_component_tag.py agent v0.2.2-rc.4 "$AGENT_COMMIT"
+uv run scripts/release/submit_component_tag.py agent v0.2.2-rc.4 "$AGENT_COMMIT" --push
 ```
 
 若 Tag 已在远端且与本地对象一致，脚本会报告已发布。若 Tag 名称已被其他对象使用，脚本拒绝覆盖。Git 推送超过 45 秒或失败时，脚本会使用已登录的 `gh` 通过 GitHub API 创建相同的 Tag 对象，并再次回读其 SHA。只更新确实变更的组件。
