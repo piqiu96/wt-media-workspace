@@ -60,3 +60,22 @@
 - 已完成：新增组件 Tag 预检与显式推送脚本；产品 Tag 脚本新增 `--verify`，等待 Tag 对应的发布作业并下载核验全部资产；Git Tag 推送失败时通过 GitHub API 提交精确一致的 Tag 对象；`scripts/release/README.md` 给出人工执行命令。证据见 `evidence/release-operator-scripts.md`。
 - 最近验证：Tag/发布脚本测试 16 项通过；RC17 Agent Tag 实际预检返回远端对象一致。RC17 六项资产本地 SHA-256 校验通过，Windows 安装包解包并核对 Agent 二进制摘要和 PE subsystem。
 - 当前阻塞：无发布脚本代码阻塞；Windows D: 真机下载验收和 Cloud 最终成功状态仍待用户操作回填。
+
+## 2026-10-09 Windows 安装/卸载增量
+
+- 用户已确认 RC17 下载问题修好；原 Windows 99% 故障可按该真机反馈记为通过，Cloud 旧任务状态仍未取得，不据此宣布整个 CHG 完成。
+- 当前工作：Windows 卸载或重装后 Agent 仍运行，可能导致 Sidecar 文件无法覆盖/移除；卸载应处理应用私有历史数据和日志，视频应由用户选择。Milestone 新增对应闭环，CHG 增加 Task 13–14。
+- 已核实：Tauri NSIS 只对 Desktop 主程序执行运行检查；原生“删除应用数据”复选框只处理 bundle id 目录，不处理 `%LOCALAPPDATA%\WTMedia\{Desktop,Agent}`；Desktop 设置只记住下载目录，没有逐文件归属清单。
+- 已实现待 Windows 验证：Desktop NSIS 安装/卸载前钩子先关闭主进程，再由 PowerShell 按可执行文件完整路径停止本安装实例 Agent；停止失败中止流程。原生“删除应用数据”复选框选中时，后钩子补充清理 WTMedia Desktop/Agent 当前与旧式每用户数据、日志、缓存目录，保留自选下载目录。Workspace Windows 发布作业接入同名不同路径的 Agent 停止测试。证据见 `evidence/windows-installer-agent-lifecycle.md`。
+- 用户裁定：自选下载目录中的视频一律保留，只清理应用对应的进程、安装文件、配置、数据、日志和缓存。覆盖安装按既有升级规则保留设置与数据；显式卸载使用原生“删除应用数据”选项。Q-02、Q-03 已结案。
+- 当前边界：本地仅完成 NSIS 宏编译与 Desktop `cargo check`；Windows 实际进程和卸载行为未验收。
+- 下一步：构建 Windows NSIS 并执行进程/文件/数据实测；在此之前不宣称卸载问题修复。
+- 阻塞：无代码范围阻塞；Windows 真机安装/卸载验收尚待执行。
+- 最近验证：已阅读 Tauri v2 NSIS 模板中 `PREINSTALL`、`PREUNINSTALL`、`POSTUNINSTALL` 触发位置，以及 Windows 默认目录与 Agent 路径代码；运行时代码未修改。
+
+## RC18 Windows 安装器候选
+
+- Desktop `9f11d27`、`d705451` 已分别提交，组件 Tag `v0.1.0-rc.7` 已推送并回读指向 `d7054519a0b60a858165398bb2d65c29522ec919`；未包含 Desktop 工作区原有 `src-tauri/src/sidecar/readiness.rs` 修改。
+- Workspace 新增 `v0.1.0-rc.18` Manifest，固定 Cloud `v0.1.0-rc.13`、Agent `v0.2.2-rc.3`、Desktop `v0.1.0-rc.7`；发布工作流 Windows 作业接入按路径停进程和安装/重装/卸载回归脚本。
+- 已验证：NSIS 探针编译、Desktop `cargo check --all-targets`、Workspace Delivery governance 和局部发布测试通过；Windows 发布作业与真机卸载数据选项仍未验证，见 `evidence/windows-installer-agent-lifecycle.md`。
+- 下一步：推送 Workspace RC18 产品 Tag，等待 Windows 构建与安装器回归，核对 Release 资产，再回填真机卸载数据选项结果。

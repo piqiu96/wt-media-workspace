@@ -18,6 +18,7 @@
 6. Cloud Server 提供包内 Cloud Web 静态文件与 Vue history 路由回退，使宝塔 Go 项目能统一管理域名、反向代理与 HTTPS。
 7. 处置部署回归发现的 Windows Desktop 问题：发布构建不弹控制台；Windows Desktop 与 Agent 使用一致的每用户数据、日志和缓存路径；下载目录设置可跨启动保留。
 8. 处置 Windows 真机下载卡在 99% 的提交错误：Agent 保留 .part 与摘要校验语义，使用 Windows 可用的文件同步方式完成重命名和 Cloud 成功回报。
+9. 修复 Windows 安装与卸载生命周期：在覆盖 Sidecar 或卸载前停止并核实该安装目录下的 Agent；显式卸载选择清理应用数据时删除应用私有配置、数据、日志与缓存，用户自选下载目录及视频始终保留。
 
 ## Explicitly Not Doing
 
@@ -45,6 +46,8 @@
 10. Windows Desktop release 主进程声明 GUI subsystem；Desktop 统一解析 `%LOCALAPPDATA%\WTMedia\Desktop\{data,logs,cache}`，Windows 侧车显式接收 Agent 默认数据目录，Windows 磁盘可用空间使用 `GetDiskFreeSpaceExW` 读取；旧数据只在旧目录存在且新目录为空时复制，不删除、不覆盖。
 11. Cloud Web 本机设置下载目录提示改为“请先选择下载目录”，并配合 Desktop 验证 Windows 设置文件跨启动保留。
 12. Agent 修复 Windows 下载提交时对只读文件句柄及目录执行 fsync 的不兼容路径；覆盖单流与分片提交、失败保留 .part，并在 Windows 真机复测最终文件与 Cloud 状态。
+13. Desktop Windows NSIS 安装和卸载钩子停止本安装实例的 Agent，失败则中止文件覆盖/卸载；覆盖安装、显式卸载分别验证进程与文件结果。
+14. Desktop 卸载器的应用数据选项清理当前及旧版应用私有配置、数据、日志和缓存；覆盖安装保留现有设置与数据；验证用户自选目录的视频及其他文件不受影响。
 
 ## 验收
 
@@ -62,6 +65,8 @@
 ## Open Questions
 
 - **Q-01（RESOLVED）**：用户于 2026-10-03 裁定保留 6 位密码下限，RC 初始管理员固定为 `admin / admin123`。该值由部署脚本写入服务器私有配置，不进入 Git。
+- **Q-02（RESOLVED）**：覆盖安装沿用既有升级保留设置与数据规则；显式卸载选择“删除应用数据”时清理应用私有配置、数据、日志和缓存。
+- **Q-03（RESOLVED）**：用户于 2026-10-09 明确自选目录的视频不删除；本 CHG 不清理用户下载目录。
 
 ## 部署发现的 Windows Desktop 验收补充
 
@@ -72,6 +77,7 @@
 - Windows 设置文件可落盘，下载保存目录重启后保留；未配置时页面提示“请先选择下载目录”且不启动本机下载。
 - Windows Agent 对已下载并通过大小、摘要校验的单流及分片文件成功提交为最终文件，并向 Cloud 报成功；提交失败时保留可恢复的 .part，不误报成功。
 - Windows 实机/CI 回归证据未回填前，不得宣称本 CHG 的 Windows 部署问题闭环。
+- Windows 安装与卸载需验证 Agent 已退出且 Sidecar 文件实际被覆盖/移除；卸载数据清理和视频选择需 Windows 实机验收。
 
 ## 7. Pending Questions
 
