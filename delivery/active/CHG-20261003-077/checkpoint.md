@@ -51,6 +51,12 @@
 
 - 当前工作：用户在 Windows RC16 下载时观察到 99% 停滞、`.part` 留存、两个任务重复报 `[Errno 9] Bad file descriptor`；三个任务的合并文件长度均等于其分片总和。问题归于 Agent 文件提交阶段，已将 Agent 纳入本 CHG 范围。
 - 已完成：Agent commit `106f6ff` 修复 Windows 文件 `fsync` 句柄模式及目录同步分支；故障注入测试由红转绿，下载 Sink 61 项、执行器 78 项、Agent 当前工作区全量 701 项及干净克隆的发布源 690 项通过。证据见 `evidence/windows-agent-download-commit.md`，Agent 状态见 `status/agent.md`。
-- 未完成：Windows 构建与真机复测最终文件、Cloud 成功状态；旧任务的 Cloud 状态未取得，原 `.part` 不移动、不改名。旧任务可能已用尽三次领取上限。
-- 发布进度：Agent `v0.2.2-rc.3` 已推送并回读至 `106f6ff`；产品 `v0.1.0-rc.17` Manifest 已准备并通过本地校验，Cloud 与 Desktop 组件沿用 RC16。
-- 下一步：提交并推送产品 Manifest 与 Tag 以触发新 RC，在 Windows D: 目录复测单流和分片下载；按实际任务状态决定重新下载或受控恢复，确认最终文件与 Cloud 状态后清理旧分片。
+- 未完成：Windows 真机复测最终文件、Cloud 成功状态；旧任务的 Cloud 状态未取得，原 `.part` 不移动、不改名。旧任务可能已用尽三次领取上限。
+- 发布进度：Agent `v0.2.2-rc.3` 与产品 `v0.1.0-rc.17` 均已推送；[`release.yml` Run 37804164020](https://github.com/piqiu96/wt-media-workspace/actions/runs/37804164020) 全部作业成功并发布 [RC17 Pre-release](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.17)。`build-info.json` 固定 Agent `106f6ff`，Windows 安装包 SHA-256 为 `28b9e48548c0fc59997ea4b1f6ef008fddf00f213a8c09c16f2dd06ebd416ac1`；发布作业已回读校验资产。
+- 下一步：在 Windows D: 目录安装 RC17 并重新发起下载，复测单流和分片任务；按实际任务状态决定重新下载或受控恢复，确认最终文件与 Cloud 状态后清理旧分片。
+
+## RC 发布人工脚本增量
+
+- 已完成：新增组件 Tag 预检与显式推送脚本；产品 Tag 脚本新增 `--verify`，等待 Tag 对应的发布作业并下载核验全部资产；`scripts/release/README.md` 给出人工执行命令。证据见 `evidence/release-operator-scripts.md`。
+- 最近验证：组件与产品脚本测试 12 项通过；RC17 Agent Tag 实际预检返回远端对象一致。RC17 六项资产本地 SHA-256 校验通过，Windows 安装包解包并核对 Agent 二进制摘要和 PE subsystem。
+- 当前阻塞：无发布脚本代码阻塞；Windows D: 真机下载验收和 Cloud 最终成功状态仍待用户操作回填。
