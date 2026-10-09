@@ -91,3 +91,9 @@
 
 - 产品 Tag `v0.1.0-rc.19` 已推送，固定 Desktop `v0.1.0-rc.8`。[`release.yml` Run 37884126668](https://github.com/piqiu96/wt-media-workspace/actions/runs/37884126668) 的 Windows Desktop 作业已成功：按路径停止 Agent、首装、覆盖安装和卸载烟测通过；真实安装目录由注册表确认为 `C:\Users\runneradmin\AppData\Local\起飞`。RC18 失败点是烟测脚本误判路径。
 - 首次 Run 的 macOS Intel DMG 已构建并校验，但上传 Artifact 时 GitHub `CreateArtifact` 连续超时；第二次尝试在 macOS runner 的 `hdiutil` 创建 DMG 时遇到 `Resource busy`。第三次尝试成功，RC19 [Pre-release](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.19) 已生成；`uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify` 校验 6 项资产通过，Windows 安装包 SHA-256 `c8e11e013f584892f507f825d05a7f3fc8b9076bbcef7b4f3439ee537f417593`。真机勾选“删除应用数据”后的目录清理与用户视频保留仍需人工验收。证据见 `evidence/windows-installer-agent-lifecycle.md`。
+
+## 2026-10-09 人工验收与正式版准备
+
+- 用户逐项确认 Cloud 部署、数据库当前态、Cloud 运行、Windows 基础功能/下载、覆盖安装、显式卸载和 macOS 两架构走查；确认按 RC19 固定源码组合制作正式版。原始答复与证据边界见 `evidence/2026-10-09-manual-acceptance.md`。
+- 当前例外：用户说明尚未发生跨版本升级，真实旧版本到新版本的 Cloud 数据库迁移与回退延至下一次升级；本次不将其记作已通过。具体服务器输出、安装路径和真机脚本输出未提供，不补造。
+- 流水线无需补充 CHG-077 的构建能力；现有正式 Tag 流程会重新构建并先创建 Draft Release，随后核验资产再公开发布。`v0.1.0` Manifest 固定 RC19 的 Cloud/Agent/Desktop 组件 Tag，环境为 `online`。

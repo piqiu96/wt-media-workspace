@@ -33,3 +33,7 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify
 ```
 
 脚本不会自动部署 Cloud 或代替 Windows 真机验收。对 RC17 已发布资产可用 `v0.1.0-rc.17 --verify` 回读校验。
+
+## 正式版
+
+人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。正式版工作流先创建 **Draft Release**；核验 Draft 的资产、来源和摘要后，人工用 `gh release edit vX.Y.Z --draft=false --prerelease=false` 公开发布，并回读 Release 状态。正式版从 Tag 重新构建，不把 RC 附件改名。
