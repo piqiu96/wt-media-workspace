@@ -10,6 +10,7 @@
 | 运营 | 把本地环境跑起来 / 确认在跑 / 停下 | 见 [`../bin/control.sh`](../bin/control.sh) |
 | 开发 | 改完东西之后重建 / 重生成 / 迁移 / 分发 | `sync_skills.py`、`prepare_ai_workspace.py`、`build-desktop-frontend.sh` |
 | 验收 | 证明某件事成立 / 不成立 | `verify_delivery_governance.py`、`verify_ai_workspace.py`、`verify_skills.py`、`verify_m0_config.py`、`verify_product_master_alignment.py`、`verify_m1_integration.py`、`verify_m2_acceptance.py`、`verify_m3_acceptance.py`、`verify_m0_local.sh`、`verify-control.sh` |
+| 发布 | 固定产品版本并提交 Tag | `release/submit_tag.py`；使用方式见 `release/README.md` |
 | 运行台 | 上面几类共用的执行体，本身不是入口 | `m2b-local-acceptance.sh`、`m2b_local_acceptance.py`（含 `start` 与 `verify` 两类动词，故同时属运营与验收）、`workspace_config.py` |
 
 多归属是特性，不是错误：`verify-control.sh` 是 `bin/control.sh` 的验收件；

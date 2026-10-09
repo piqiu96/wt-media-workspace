@@ -1,0 +1,28 @@
+# RC15 Windows verification build
+
+- Product Tag: `v0.1.0-rc.15`
+- Manifest: `releases/manifests/v0.1.0-rc.15.yaml`
+- Fixed sources:
+  - Workspace `30cc1ebb025a37e1b9ede0b65e16d345db2834a3`
+  - Cloud `9478a6478bdcbe4e2c518326c5e25dbc8bed72b7` (`v0.1.0-rc.13`)
+  - Agent `ac7f0b670b40be50fd2e5dad0f6ba69450370106` (`v0.2.2-rc.2`, unchanged)
+  - Desktop `5deebf9b445c6835402bdcf70cd86db697c76840` (`v0.1.0-rc.4`)
+- GitHub Actions: [`release.yml` Run 37743439203](https://github.com/piqiu96/wt-media-workspace/actions/runs/37743439203) completed with `success`.
+  - `validate`, `build-cloud`, all three `build-agent` jobs, all three `build-desktop` jobs, `package`, and `publish-pre` succeeded.
+  - `publish-release` was skipped as designed for the RC channel.
+- Pre-release: [`v0.1.0-rc.15`](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.15)
+- Windows installer:
+  - `WT-Media_v0.1.0-rc.15_windows-x64-setup.exe`
+  - Size: 14,987,795 bytes
+  - SHA-256: `3e53887ac1e86e3fd4a436f7845cb3e01fa61dbb61757afa4cc04a4cf790be7d`
+- Full release asset verification:
+  - Downloaded all five release assets.
+  - `shasum -a 256 -c SHA256SUMS` passed for every asset.
+- PE subsystem verification:
+  - Extracted the NSIS installer with 7-Zip.
+  - `wt-media-desktop-shell.exe`: PE32+ x86-64, subsystem `2 (WINDOWS_GUI)`.
+  - `wt-media-agent.exe`: PE32+ x86-64, subsystem `3 (WINDOWS_CUI)`.
+  - The Desktop result closes the automated PE subsystem check. The Agent console result is expected and matches the CHG boundary that Agent PyInstaller console behavior must not change.
+- Remaining:
+  - Windows real-machine install, launch, path/log, download persistence, repeated launch, upgrade/uninstall, and WebView2 regression are pending user execution.
+  - No real-machine result is claimed by this build evidence.

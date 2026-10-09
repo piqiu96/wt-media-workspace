@@ -6,6 +6,7 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261003-077 | Cloud 预发布部署包与数据库初始化 | IMPLEMENTING | workspace / cloud |
+
+当前无活动 CHG。
 
 历史叙述（按需回溯）：[LEDGER 历史说明](reports/2026-09-29-ledger-historical-notes.md)。

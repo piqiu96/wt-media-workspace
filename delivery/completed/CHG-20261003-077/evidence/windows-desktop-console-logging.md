@@ -1,0 +1,21 @@
+# Windows Desktop console and path fix evidence
+
+- Implementation commit: `wt-media-desktop` `codex/windows-desktop-console-logging` @ `5deebf9`.
+- Scope completed locally:
+  - Windows release main process uses the conditional GUI subsystem; debug builds keep the console.
+  - One `SystemPaths` value is resolved at startup and used by Desktop path, logging, settings, storage, cleanup, reveal, and diagnostic resolvers.
+  - Windows Desktop production paths are `%LOCALAPPDATA%\WTMedia\Desktop\{data,logs,cache}`; macOS retains its existing `HOME`-based layout.
+  - Windows production logging without a usable system root uses the explicit temporary tree `wt-media-desktop-logs`, never cwd or the install directory.
+  - Windows Agent startup passes `WT_MEDIA_AGENT_DATA_DIR=%LOCALAPPDATA%\WTMedia\Agent` unless an explicit Agent data directory is configured; macOS continues to omit the variable when unset.
+  - Legacy Windows Desktop data is copied only when the old directory exists and the new data directory is empty; existing files are skipped and neither tree is deleted.
+  - Legacy migration runs in Tauri `setup` after the single-instance guard initializes and before the main window/front end can issue commands; the report is emitted after the logging sink is installed.
+- Implementation ruling: rather than threading Tauri managed state through every helper, startup initializes one `SystemPaths` global and also manages a copy for future Tauri consumers. Commands read the same launch snapshot through `SystemPaths::current()`. This preserves one launch decision while avoiding a broad state-parameter refactor.
+- Verification:
+  - `cargo check --all-targets --message-format=short` passed.
+  - `cargo test` passed: 527 tests passed, 0 failed, 6 ignored.
+  - `python3 tests/windows_release_subsystem.py` passed and confirmed the conditional declaration with no unconditional GUI subsystem.
+  - `git diff --check` passed.
+- Not proven yet:
+  - ~~No Windows PE binary was built or inspected in this local run, so the main EXE's `WINDOWS_GUI` subsystem remains a release/CI verification item.~~ RC15 build evidence confirms the packaged main EXE uses `WINDOWS_GUI`.
+  - No Windows real-machine installation, double-launch, WebView2, download persistence, log reveal, or uninstall regression has been executed.
+  - macOS source-level tests cover unchanged path behavior, but no packaged macOS regression is claimed by this evidence.

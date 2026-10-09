@@ -1,0 +1,105 @@
+# CHG-20261003-077 实施进度
+
+- Status: DONE
+- 当前：Cloud `v0.1.0-rc.12` 和产品 `v0.1.0-rc.14` 已推送；产品 [`release.yml` Run 37581481877](https://github.com/piqiu96/wt-media-workspace/actions/runs/37581481877) 全部发布作业成功，Pre-release 已生成。Cloud Linux tar SHA-256 `e7ea73b3984c4735d3e61db1a008ff1e8ea0c48966cf50cc39b0323485d9ac4e` 已与 `build-info.json`、Actions Artifact 与本地下载核对。
+- 已完成：`bin/wtmctl`（Go）实现远程变量拉取、Schema/取值校验、Artifact 校验、配置渲染、Migration、数据库验证、版本安装、`current` 原子切换、只读验收和回退；Python/shell 逐条部署入口全部删除，包内不再包含 `deploy/*.py`、`deploy/*.sh`；变量从 JSON 切换为 TOML 并上传远端回读校验通过；Cloud `README.md` 与 `deploy/DEPLOYMENT.md` 收敛为 `/home/www/wt-media-cloud/output` 一键部署命令。
+- 已完成：`wtmctl`（含从包推导 release/package_root）、TOML 变量、路径绝对化、二进制改名、认证日志。
+- 未完成：宝塔服务器直接拉取 RC14 Artifact、实际安装、数据库迁移、三进程与 HTTPS/登录验收（用户执行并回填 `server-acceptance.md`）。直拉命令及本地校验见 `evidence/server-direct-pull.md`；RC13 历史摘要见 `evidence/rc14-manual-tag-and-build.md`。
+- 阻塞：当前无代码阻塞；服务器需准备私有 Workspace 仓库 Actions 只读凭据，最终数据库/账号创建与宝塔操作需要用户执行。
+- 最近验证：Task 12 的 Cloud `go test ./... -count=1`、目标 `go vet` 与 4 项打包脚本测试通过；Workspace 发布相关 18 项测试、Delivery governance、AI workspace 校验通过。Workspace 全量 106 项测试有 5 项失败，均为既有 M0/跨仓 Contract/交付对齐断言，未修改相应检查文件；详情见 `evidence/rc14-manual-tag-and-build.md`。此前本地启动演练见 `evidence/cloud-local-package-start-from-home.md`。
+
+- 本地私有变量：已删除旧 `~/.wt-media/config-variables/` 与 `*.json`；当前使用 `~/.wt-media/upload-config-variables.py`（TOML）和 `~/.wt-media/vars/cloud/{online,pre}.toml`，两者各 11 个变量，上传对象为 `wt-media/vars/cloud/{online,pre}.toml`，远端回读 SHA-256 一致，脚本不入 Git。
+
+- 最终方案：单一 `bin/wtmctl` 负责远程变量拉取、校验、Artifact 校验、渲染、Migration、安装、current 切换和只读验收；宝塔独占服务启停。
+- 路径裁定：在线服务器统一使用 `/home/www/wt-media-cloud/output`；变量文件使用 TOML（`online.toml`/`pre.toml`）；运行端口 `127.0.0.1:8188`。
+
+## 2026-10-08 增量
+
+- 用户裁定：Windows Desktop 控制台、日志、路径与下载设置问题并入本 CHG，不再另立 CHG-20261008-078。
+- 当前增量范围：按已批准设计修复 Windows release GUI subsystem、每用户 Windows 路径、日志读写一致性、侧车 Agent 数据目录传递、旧数据保护，以及 Cloud Web 下载目录提示。
+- 当前边界：Windows 实机和 CI 证据尚未回填；本地实现和单元测试不能单独宣布部署闭环。
+
+## 2026-10-08 Windows 修复执行状态
+
+- Desktop：Commit `5deebf9` 实现 Windows release-only GUI subsystem、统一 `SystemPaths`、Windows per-user Desktop/Agent 路径、日志临时回退、Sidecar 环境变量和旧数据保护。`cargo check --all-targets --message-format=short`、`cargo test`（527 通过 / 0 失败 / 6 忽略）、`git diff --check`、`python3 tests/windows_release_subsystem.py` 均通过。证据：`evidence/windows-desktop-console-logging.md`。
+- Cloud Web：Commit `9478a64` 将保存位置提示改为 `请先选择下载目录`，无默认下载目录。局部 wiring 测试与全量 `npm test`（50 个文件 / 488 项）通过。证据：`evidence/cloud-web-download-prompt.md`。
+- 未闭环：尚未构建并检查 Windows 主 EXE PE subsystem，也未执行 Windows 实机/CI 安装与下载、日志、重复启动、卸载回归。
+
+## RC15 构建状态
+
+- 已创建并推送 Cloud `v0.1.0-rc.13`、Desktop `v0.1.0-rc.4` 与产品 `v0.1.0-rc.15`。
+- [`release.yml` Run 37743439203](https://github.com/piqiu96/wt-media-workspace/actions/runs/37743439203) 全部发布作业成功；RC15 Pre-release 已生成。
+- 全部发布资产通过 `SHA256SUMS` 校验；Windows 安装包 SHA-256 为 `3e53887ac1e86e3fd4a436f7845cb3e01fa61dbb61757afa4cc04a4cf790be7d`。
+- 解包检查确认 `wt-media-desktop-shell.exe` subsystem 为 `WINDOWS_GUI`；`wt-media-agent.exe` 保持 `WINDOWS_CUI`，符合边界。
+- 下一步：用户在 Windows 真机下载并执行 RC15 安装包回归；结果回填前 CHG 保持 `IMPLEMENTING`。
+
+## Windows 可用空间问题增量
+
+- 真机现象：打开本机设置时返回「读取可用空间失败: free space is not measurable on this platform: free space is read with statvfs, which this target does not provide」。
+- 根因：`storage::available_bytes` 只实现了 Unix `statvfs`；`#[cfg(not(unix))]` 分支按旧假设“Desktop 从不构建 Windows”直接拒绝。RC15 已正式构建 Windows，遗留平台假设暴露。
+- 修复：Desktop commit `2231944` 为 Windows 增加 `GetDiskFreeSpaceExW` 实现，保留 Unix `statvfs`；`available_bytes_for` 的最近存在祖先规则不变。
+- 验证：`cargo check --all-targets --message-format=short`、完整 `cargo test`（527 通过 / 0 失败 / 6 忽略）、`git diff --check` 通过。Windows 分支由 RC16 release job 编译，并由真机复测设置页。
+
+## RC16 构建状态
+
+- [`release.yml` Run 37767071497](https://github.com/piqiu96/wt-media-workspace/actions/runs/37767071497) 全部发布作业成功；RC16 Pre-release 已生成。
+- Windows 安装包 SHA-256：`23d98b6da9b3ac6d2949b1658c59a9712f84bcba780cb189f09bee19e46d9998`。
+- 全部发布资产通过 `SHA256SUMS` 校验；`build-info.json` 固定 Desktop `2231944`。
+- 下一步：Windows 真机安装 RC16，确认本机设置可显示磁盘可用空间且无 `statvfs` 报错，并继续执行原有 CHG-077 回归。
+
+## Windows Agent 下载提交故障增量
+
+- 当前工作：用户在 Windows RC16 下载时观察到 99% 停滞、`.part` 留存、两个任务重复报 `[Errno 9] Bad file descriptor`；三个任务的合并文件长度均等于其分片总和。问题归于 Agent 文件提交阶段，已将 Agent 纳入本 CHG 范围。
+- 已完成：Agent commit `106f6ff` 修复 Windows 文件 `fsync` 句柄模式及目录同步分支；故障注入测试由红转绿，下载 Sink 61 项、执行器 78 项、Agent 当前工作区全量 701 项及干净克隆的发布源 690 项通过。证据见 `evidence/windows-agent-download-commit.md`，Agent 状态见 `status/agent.md`。
+- 未完成：Windows 真机复测最终文件、Cloud 成功状态；旧任务的 Cloud 状态未取得，原 `.part` 不移动、不改名。旧任务可能已用尽三次领取上限。
+- 发布进度：Agent `v0.2.2-rc.3` 与产品 `v0.1.0-rc.17` 均已推送；[`release.yml` Run 37804164020](https://github.com/piqiu96/wt-media-workspace/actions/runs/37804164020) 全部作业成功并发布 [RC17 Pre-release](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.17)。`build-info.json` 固定 Agent `106f6ff`，Windows 安装包 SHA-256 为 `28b9e48548c0fc59997ea4b1f6ef008fddf00f213a8c09c16f2dd06ebd416ac1`；发布作业已回读校验资产。
+- 下一步：在 Windows D: 目录安装 RC17 并重新发起下载，复测单流和分片任务；按实际任务状态决定重新下载或受控恢复，确认最终文件与 Cloud 状态后清理旧分片。
+
+## RC 发布人工脚本增量
+
+- 已完成：新增组件 Tag 预检与显式推送脚本；产品 Tag 脚本新增 `--verify`，等待 Tag 对应的发布作业并下载核验全部资产；Git Tag 推送失败时通过 GitHub API 提交精确一致的 Tag 对象；`scripts/release/README.md` 给出人工执行命令。证据见 `evidence/release-operator-scripts.md`。
+- 最近验证：Tag/发布脚本测试 16 项通过；RC17 Agent Tag 实际预检返回远端对象一致。RC17 六项资产本地 SHA-256 校验通过，Windows 安装包解包并核对 Agent 二进制摘要和 PE subsystem。
+- 当前阻塞：无发布脚本代码阻塞；Windows D: 真机下载验收和 Cloud 最终成功状态仍待用户操作回填。
+
+## 2026-10-09 Windows 安装/卸载增量
+
+- 用户已确认 RC17 下载问题修好；原 Windows 99% 故障可按该真机反馈记为通过，Cloud 旧任务状态仍未取得，不据此宣布整个 CHG 完成。
+- 当前工作：Windows 卸载或重装后 Agent 仍运行，可能导致 Sidecar 文件无法覆盖/移除；卸载应处理应用私有历史数据和日志，视频应由用户选择。Milestone 新增对应闭环，CHG 增加 Task 13–14。
+- 已核实：Tauri NSIS 只对 Desktop 主程序执行运行检查；原生“删除应用数据”复选框只处理 bundle id 目录，不处理 `%LOCALAPPDATA%\WTMedia\{Desktop,Agent}`；Desktop 设置只记住下载目录，没有逐文件归属清单。
+- 已实现待 Windows 验证：Desktop NSIS 安装/卸载前钩子先关闭主进程，再由 PowerShell 按可执行文件完整路径停止本安装实例 Agent；停止失败中止流程。原生“删除应用数据”复选框选中时，后钩子补充清理 WTMedia Desktop/Agent 当前与旧式每用户数据、日志、缓存目录，保留自选下载目录。Workspace Windows 发布作业接入同名不同路径的 Agent 停止测试。证据见 `evidence/windows-installer-agent-lifecycle.md`。
+- 用户裁定：自选下载目录中的视频一律保留，只清理应用对应的进程、安装文件、配置、数据、日志和缓存。覆盖安装按既有升级规则保留设置与数据；显式卸载使用原生“删除应用数据”选项。Q-02、Q-03 已结案。
+- 当前边界：本地仅完成 NSIS 宏编译与 Desktop `cargo check`；Windows 实际进程和卸载行为未验收。
+- 下一步：构建 Windows NSIS 并执行进程/文件/数据实测；在此之前不宣称卸载问题修复。
+- 阻塞：无代码范围阻塞；Windows 真机安装/卸载验收尚待执行。
+- 最近验证：已阅读 Tauri v2 NSIS 模板中 `PREINSTALL`、`PREUNINSTALL`、`POSTUNINSTALL` 触发位置，以及 Windows 默认目录与 Agent 路径代码；运行时代码未修改。
+
+## RC18 Windows 安装器候选
+
+- Desktop `9f11d27`、`d705451` 已分别提交，组件 Tag `v0.1.0-rc.7` 已推送并回读指向 `d7054519a0b60a858165398bb2d65c29522ec919`；未包含 Desktop 工作区原有 `src-tauri/src/sidecar/readiness.rs` 修改。
+- Workspace 新增 `v0.1.0-rc.18` Manifest，固定 Cloud `v0.1.0-rc.13`、Agent `v0.2.2-rc.3`、Desktop `v0.1.0-rc.7`；发布工作流 Windows 作业接入按路径停进程和安装/重装/卸载回归脚本。
+- 已验证：NSIS 探针编译、Desktop `cargo check --all-targets`、Workspace Delivery governance 和局部发布测试通过；Windows 发布作业与真机卸载数据选项仍未验证，见 `evidence/windows-installer-agent-lifecycle.md`。
+- 真机只读验收脚本已准备于 `scripts/verify/windows_uninstall.ps1`；卸载时需勾选原生“删除应用数据”，脚本检查应用目录已清理且指定视频保留。
+- 下一步：推送 Workspace RC18 产品 Tag，等待 Windows 构建与安装器回归，核对 Release 资产，再回填真机卸载数据选项结果。
+
+## RC18 失败与 RC19 修正
+
+- RC18 [`release.yml` Run 37880952823](https://github.com/piqiu96/wt-media-workspace/actions/runs/37880952823) 失败：Windows 安装包已由 NSIS 成功构建，按路径停止同名 Agent 的 Windows 测试通过；后续安装器往返烟测在第一次安装后用硬编码中文目录查找 Sidecar 时失败。Cloud、Agent 和 macOS Desktop 作业通过，package/publish 未运行，不能把 RC18 当成已发布安装包。
+- 桌面烟测改为从首装后的卸载注册表读取真实 `InstallLocation`，打印实际路径；移除无 BOM PowerShell 5.1 脚本中的中文产品名字面量。Desktop commit `dcf3144`、组件 Tag `v0.1.0-rc.8` 已推送。Workspace 的真机只读卸载脚本改为要求显式 `-InstallDir`，避免同一编码风险。
+- 下一步：以新产品 Tag RC19 重跑发布；如果注册表显示真实安装目录仍缺 Sidecar，再根据诊断路径修安装器。真机卸载数据选项仍需用户执行。
+
+## RC19 Windows 安装器回归
+
+- 产品 Tag `v0.1.0-rc.19` 已推送，固定 Desktop `v0.1.0-rc.8`。[`release.yml` Run 37884126668](https://github.com/piqiu96/wt-media-workspace/actions/runs/37884126668) 的 Windows Desktop 作业已成功：按路径停止 Agent、首装、覆盖安装和卸载烟测通过；真实安装目录由注册表确认为 `C:\Users\runneradmin\AppData\Local\起飞`。RC18 失败点是烟测脚本误判路径。
+- 首次 Run 的 macOS Intel DMG 已构建并校验，但上传 Artifact 时 GitHub `CreateArtifact` 连续超时；第二次尝试在 macOS runner 的 `hdiutil` 创建 DMG 时遇到 `Resource busy`。第三次尝试成功，RC19 [Pre-release](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.19) 已生成；`uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify` 校验 6 项资产通过，Windows 安装包 SHA-256 `c8e11e013f584892f507f825d05a7f3fc8b9076bbcef7b4f3439ee537f417593`。真机勾选“删除应用数据”后的目录清理与用户视频保留仍需人工验收。证据见 `evidence/windows-installer-agent-lifecycle.md`。
+
+## 2026-10-09 人工验收与正式版准备
+
+- 用户逐项确认 Cloud 部署、数据库当前态、Cloud 运行、Windows 基础功能/下载、覆盖安装、显式卸载和 macOS 两架构走查；确认按 RC19 固定源码组合制作正式版。原始答复与证据边界见 `evidence/2026-10-09-manual-acceptance.md`。
+- 当前例外：用户说明尚未发生跨版本升级，真实旧版本到新版本的 Cloud 数据库迁移与回退延至下一次升级；本次不将其记作已通过。具体服务器输出、安装路径和真机脚本输出未提供，不补造。
+- 流水线无需补充 CHG-077 的构建能力；现有正式 Tag 流程会重新构建并先创建 Draft Release，随后核验资产再公开发布。`v0.1.0` Manifest 固定 RC19 的 Cloud/Agent/Desktop 组件 Tag，环境为 `online`。
+
+## v0.1.0 正式版结果
+
+- [`release.yml` Run 37941192999](https://github.com/piqiu96/wt-media-workspace/actions/runs/37941192999) 全部必需作业成功；发布作业对 GitHub 回读附件执行摘要校验通过。[`v0.1.0` 正式版](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0) 已公开，回读 `draft=false`、`prerelease=false`，6 项资产齐全。Windows 安装包 SHA-256 `5087f76f1f0e0b7ff39b91436dad3c87058b1bffc1ad2c58d98fed865c520ac1`；详细证据见 `evidence/v0.1.0-formal-release.md`。
+- CHG-077 人工验收由用户逐项确认。唯一明确延期项目为真实旧版本到新版本的 Cloud 数据库升级和回退；这是下次升级的验收风险，不宣称本次已验证。发布流水线的构建、打包、安装器烟测与 GitHub 资产回读均已完成；生产服务升级仍由 `wtmctl` 和宝塔人工操作。
+- 最终裁定：原 CHG 首次预发布部署及 Windows 修复范围验收通过；正式版 `v0.1.0` 已公开。本 CHG 可归档；后续真实跨版本升级以新版本部署时的备份、迁移、切换与回退记录验收。
