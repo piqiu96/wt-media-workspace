@@ -11,7 +11,7 @@ uv run scripts/release/submit_component_tag.py agent v0.2.2-rc.4 <完整40位Age
 uv run scripts/release/submit_component_tag.py agent v0.2.2-rc.4 <完整40位Agent提交SHA> --push
 ```
 
-若 Tag 已在远端且与本地对象一致，脚本会报告已发布。若 Tag 名称已被其他对象使用，脚本拒绝覆盖。只更新确实变更的组件。
+若 Tag 已在远端且与本地对象一致，脚本会报告已发布。若 Tag 名称已被其他对象使用，脚本拒绝覆盖。Git 推送超过 45 秒或失败时，脚本会使用已登录的 `gh` 通过 GitHub API 创建相同的 Tag 对象，并再次回读其 SHA。只更新确实变更的组件。
 
 ## 2. 推送产品 Tag 并等待发布
 
@@ -23,7 +23,7 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.18
 uv run scripts/release/submit_tag.py v0.1.0-rc.18 --push --verify
 ```
 
-产品脚本预检 Manifest 结构、三个远端组件 Tag、当前 Workspace 分支提交和重复 Tag。`--push` 创建并推送 annotated 产品 Tag；`--verify` 等待该 Tag 的 `release.yml` 成功，再从 GitHub Release 下载全部六项资产，检查资产清单、`SHA256SUMS`、`build-info.json` 的产品 Tag，并输出 Windows 安装包 SHA-256。发布任务失败或任一资产不符时命令返回非零。
+产品脚本预检 Manifest 结构、三个远端组件 Tag、当前 Workspace 分支提交和重复 Tag。`--push` 创建并推送 annotated 产品 Tag；Git 推送失败时也使用相同的 GitHub API 备用路径。`--verify` 等待该 Tag 的 `release.yml` 成功，再从 GitHub Release 下载全部六项资产，检查资产清单、`SHA256SUMS`、`build-info.json` 的产品 Tag，并输出 Windows 安装包 SHA-256。发布任务失败或任一资产不符时命令返回非零。
 
 如果 Tag 已推送而本机等待或下载中断，仅重做只读发布校验：
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import hashlib
+import importlib
 import json
 import shutil
 import subprocess
@@ -124,6 +125,24 @@ class SubmitTagTest(unittest.TestCase):
         self.git("tag", "-a", TAG, "-m", "prepared release Tag")
         self.assertIsNone(self.remote_tag_commit())
         submit_tag(TAG, self.work, push=True)
+        self.assertEqual(self.remote_tag_commit(), self.git("rev-parse", "HEAD"))
+
+    def test_git_transport_failure_falls_back_to_github_api(self) -> None:
+        module = importlib.import_module("scripts.release.submit_tag")
+        real_git = module._git
+
+        def blocked_push(repo_root: Path, *args: str, **kwargs: object) -> subprocess.CompletedProcess[str]:
+            if args[0] == "push":
+                return subprocess.CompletedProcess(args, 1, "", "Git transport unavailable")
+            return real_git(repo_root, *args, **kwargs)
+
+        def api_push(repo_name: str, tag: str, repo_root: Path) -> None:
+            self.assertEqual(repo_name, "wt-media-workspace")
+            self.git("push", "origin", f"refs/tags/{tag}")
+
+        with patch.object(module, "_git", side_effect=blocked_push), patch.object(module, "push_annotated_tag_by_api", side_effect=api_push) as fallback:
+            submit_tag(TAG, self.work, push=True)
+        fallback.assert_called_once()
         self.assertEqual(self.remote_tag_commit(), self.git("rev-parse", "HEAD"))
 
     def test_remote_preflight_works_when_git_ls_remote_is_unavailable(self) -> None:

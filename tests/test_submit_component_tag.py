@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import importlib
 import subprocess
 import tempfile
 import unittest
@@ -85,6 +86,23 @@ class SubmitComponentTagTest(unittest.TestCase):
         self.git("push", "origin", "HEAD:refs/heads/main")
         with self.assertRaisesRegex(ComponentTagError, "different commit"):
             submit_component_tag("agent", "v0.2.2-rc.99", new_commit, self.work, push=True)
+
+    def test_git_transport_failure_falls_back_to_github_api(self) -> None:
+        module = importlib.import_module("scripts.release.submit_component_tag")
+        real_git = module._git
+
+        def blocked_push(repo_root: Path, *args: str, **kwargs: object) -> subprocess.CompletedProcess[str]:
+            if args[0] == "push":
+                return subprocess.CompletedProcess(args, 1, "", "Git transport unavailable")
+            return real_git(repo_root, *args, **kwargs)
+
+        def api_push(repo_name: str, tag: str, repo_root: Path) -> None:
+            self.assertEqual(repo_name, "wt-media-agent")
+            self.git("push", "origin", f"refs/tags/{tag}")
+
+        with patch.object(module, "_git", side_effect=blocked_push), patch.object(module, "push_annotated_tag_by_api", side_effect=api_push) as fallback:
+            submit_component_tag("agent", "v0.2.2-rc.99", self.commit, self.work, push=True)
+        fallback.assert_called_once()
 
 
 if __name__ == "__main__":

@@ -57,6 +57,6 @@
 
 ## RC 发布人工脚本增量
 
-- 已完成：新增组件 Tag 预检与显式推送脚本；产品 Tag 脚本新增 `--verify`，等待 Tag 对应的发布作业并下载核验全部资产；`scripts/release/README.md` 给出人工执行命令。证据见 `evidence/release-operator-scripts.md`。
-- 最近验证：组件与产品脚本测试 12 项通过；RC17 Agent Tag 实际预检返回远端对象一致。RC17 六项资产本地 SHA-256 校验通过，Windows 安装包解包并核对 Agent 二进制摘要和 PE subsystem。
+- 已完成：新增组件 Tag 预检与显式推送脚本；产品 Tag 脚本新增 `--verify`，等待 Tag 对应的发布作业并下载核验全部资产；Git Tag 推送失败时通过 GitHub API 提交精确一致的 Tag 对象；`scripts/release/README.md` 给出人工执行命令。证据见 `evidence/release-operator-scripts.md`。
+- 最近验证：Tag/发布脚本测试 16 项通过；RC17 Agent Tag 实际预检返回远端对象一致。RC17 六项资产本地 SHA-256 校验通过，Windows 安装包解包并核对 Agent 二进制摘要和 PE subsystem。
 - 当前阻塞：无发布脚本代码阻塞；Windows D: 真机下载验收和 Cloud 最终成功状态仍待用户操作回填。

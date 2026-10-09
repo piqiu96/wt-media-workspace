@@ -24,21 +24,27 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.release.manifest import validate_manifest  # noqa: E402
+from scripts.release.tag_transport import TagTransportError, push_annotated_tag_by_api  # noqa: E402
 
 
 class ReleaseError(Exception):
     """A release preflight or Tag submission failed."""
 
 
-def _command(args: list[str], repo_root: Path, *, allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
-    result = subprocess.run(args, cwd=repo_root, capture_output=True, text=True, check=False)
+def _command(args: list[str], repo_root: Path, *, allow_failure: bool = False, timeout: int | None = None) -> subprocess.CompletedProcess[str]:
+    try:
+        result = subprocess.run(args, cwd=repo_root, capture_output=True, text=True, check=False, timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        if allow_failure:
+            return subprocess.CompletedProcess(args, 124, "", f"timed out after {timeout}s")
+        raise ReleaseError(f"{args[0]} command timed out after {timeout}s") from exc
     if result.returncode != 0 and not allow_failure:
         raise ReleaseError(f"{args[0]} command failed ({result.returncode}): {result.stderr.strip()}")
     return result
 
 
-def _git(repo_root: Path, *args: str, allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
-    return _command(["git", "-c", "http.version=HTTP/1.1", *args], repo_root, allow_failure=allow_failure)
+def _git(repo_root: Path, *args: str, allow_failure: bool = False, timeout: int | None = None) -> subprocess.CompletedProcess[str]:
+    return _command(["git", "-c", "http.version=HTTP/1.1", *args], repo_root, allow_failure=allow_failure, timeout=timeout)
 
 
 def _github_ref(repo_root: Path, ref: str) -> str | None:
@@ -96,8 +102,15 @@ def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
     if not local_tag_exists:
         _git(repo_root, "tag", "-a", tag, "-m", f"WT Media {tag}")
     local_tag_object = _git(repo_root, "rev-parse", f"refs/tags/{tag}").stdout.strip()
-    push_result = _git(repo_root, "push", "origin", f"refs/tags/{tag}", allow_failure=True)
+    push_result = _git(repo_root, "push", "origin", f"refs/tags/{tag}", allow_failure=True, timeout=45)
     remote_tag_object = _github_ref(repo_root, f"tags/{tag}")
+    if remote_tag_object is None and push_result.returncode != 0:
+        try:
+            push_annotated_tag_by_api("wt-media-workspace", tag, repo_root)
+        except TagTransportError as exc:
+            if _github_ref(repo_root, f"tags/{tag}") != local_tag_object:
+                raise ReleaseError(f"product Tag push failed: {exc}") from exc
+        remote_tag_object = _github_ref(repo_root, f"tags/{tag}")
     if remote_tag_object != local_tag_object:
         if push_result.returncode != 0:
             raise ReleaseError(f"product Tag push failed: {push_result.stderr.strip()}")

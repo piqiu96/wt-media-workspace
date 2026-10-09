@@ -16,6 +16,11 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.release.tag_transport import TagTransportError, push_annotated_tag_by_api  # noqa: E402
+
 COMPONENTS = {"cloud", "agent", "desktop"}
 TAG_RE = re.compile(r"v\d+\.\d+\.\d+(?:-rc\.[1-9]\d*)?")
 SHA_RE = re.compile(r"[0-9a-f]{40}")
@@ -25,15 +30,20 @@ class ComponentTagError(Exception):
     """Component Tag input or remote state is unsafe to publish."""
 
 
-def _command(args: list[str], cwd: Path, *, allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
-    result = subprocess.run(args, cwd=cwd, capture_output=True, text=True, check=False)
+def _command(args: list[str], cwd: Path, *, allow_failure: bool = False, timeout: int | None = None) -> subprocess.CompletedProcess[str]:
+    try:
+        result = subprocess.run(args, cwd=cwd, capture_output=True, text=True, check=False, timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        if allow_failure:
+            return subprocess.CompletedProcess(args, 124, "", f"timed out after {timeout}s")
+        raise ComponentTagError(f"{args[0]} command timed out after {timeout}s") from exc
     if result.returncode != 0 and not allow_failure:
         raise ComponentTagError(f"{args[0]} command failed ({result.returncode}): {result.stderr.strip()}")
     return result
 
 
-def _git(repo_root: Path, *args: str, allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
-    return _command(["git", "-c", "http.version=HTTP/1.1", *args], repo_root, allow_failure=allow_failure)
+def _git(repo_root: Path, *args: str, allow_failure: bool = False, timeout: int | None = None) -> subprocess.CompletedProcess[str]:
+    return _command(["git", "-c", "http.version=HTTP/1.1", *args], repo_root, allow_failure=allow_failure, timeout=timeout)
 
 
 def _remote_tag(component: str, tag: str, repo_root: Path) -> str | None:
@@ -82,8 +92,16 @@ def submit_component_tag(component: str, tag: str, commit: str, repo_root: Path,
     if not local_tag_exists:
         _git(repo_root, "tag", "-a", tag, commit, "-m", f"WT Media {component} {tag}")
     local_tag_object = _git(repo_root, "rev-parse", f"refs/tags/{tag}").stdout.strip()
-    push_result = _git(repo_root, "push", "origin", f"refs/tags/{tag}", allow_failure=True)
-    if _remote_tag(component, tag, repo_root) != local_tag_object:
+    push_result = _git(repo_root, "push", "origin", f"refs/tags/{tag}", allow_failure=True, timeout=45)
+    remote_tag = _remote_tag(component, tag, repo_root)
+    if remote_tag is None and push_result.returncode != 0:
+        try:
+            push_annotated_tag_by_api(f"wt-media-{component}", tag, repo_root)
+        except TagTransportError as exc:
+            if _remote_tag(component, tag, repo_root) != local_tag_object:
+                raise ComponentTagError(f"component Tag push failed: {exc}") from exc
+        remote_tag = _remote_tag(component, tag, repo_root)
+    if remote_tag != local_tag_object:
         raise ComponentTagError(f"component Tag push failed or remote read-back differs: {push_result.stderr.strip()}")
     return f"pushed {component} {tag} at {commit}"
 
