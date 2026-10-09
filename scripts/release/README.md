@@ -34,6 +34,24 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify
 
 脚本不会自动部署 Cloud 或代替 Windows 真机验收。对 RC17 已发布资产可用 `v0.1.0-rc.17 --verify` 回读校验。
 
+## 更新官网桌面安装包下载链接
+
+正式版 Release 已公开、Cloud 新版本已部署后，在可访问 GitHub 的环境执行。`gh` 需已登录且可读取 `piqiu96/wt-media-workspace`。脚本核对正式版 Tag、非 Draft/非 Pre-release 及 Windows x64、macOS Intel、macOS Apple 芯片三项资产，然后原子写入**指定文件**；失败时不覆盖旧清单。
+
+```bash
+python3 scripts/release/update_desktop_downloads.py v0.1.0 \
+  --output /home/www/wt-media-cloud/current/web/desktop-downloads.json
+```
+
+在开发机更新下一次 Cloud Web 打包所用的初始清单：
+
+```bash
+python3 scripts/release/update_desktop_downloads.py v0.1.0 \
+  --output ../wt-media-cloud/web/public/desktop-downloads.json
+```
+
+每次 Cloud 版本目录切换后，重新执行第一条命令更新新的 `current/web`。清单仅保存公开 GitHub Release 的 URL，访客下载时直接前往 GitHub；不会下载安装包到 Cloud 服务器。可用 `curl https://<Cloud域名>/desktop-downloads.json` 回读当前版本与三项 URL，并在目标用户网络中分别点击验证下载。
+
 ## 正式版
 
 人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。正式版工作流先创建 **Draft Release**；核验 Draft 的资产、来源和摘要后，人工用 `gh release edit vX.Y.Z --draft=false --prerelease=false` 公开发布，并回读 Release 状态。正式版从 Tag 重新构建，不把 RC 附件改名。
