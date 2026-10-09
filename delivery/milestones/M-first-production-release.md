@@ -3,6 +3,16 @@
 - 状态：执行中；RC 打包、Cloud 首次预发布部署和 Windows 部署修复已通过验收，`v0.1.0` 正式版制品已发布。真实 Cloud 跨版本升级及回退待下次升级验证。
 - 依据：[首次全端上线部署计划](../../docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md)。
 
+## 公开官网与桌面安装包下载
+
+- 用户目标：未登录访客可在 `/home` 了解起飞并获取与当前公开正式版一致的 Windows x64、macOS Intel、macOS Apple 芯片安装包；登录页与官网使用统一品牌视觉。
+- 前置：Cloud Web 已有静态服务和登录页；GitHub 产品正式版 Release 已公开且三平台资产齐全。
+- 用户操作：访问 `/home`、选择平台并点击下载；已有账号从官网进入登录页。升级时运维人员在新 Cloud Web 部署后，用固定产品 Tag 执行下载清单更新脚本。
+- 系统动作：Cloud 公开官网而业务路由继续受认证保护；登录页保持现有会话语义；脚本核验 GitHub Release 是已公开正式版及三种实际安装包 URL，再原子更新指定清单文件。
+- 成功事实：三个按钮分别指向同一个正式版的真实平台资产；清单更新失败保留旧版可用内容；宽窄屏可用；Cloud 与 Desktop 登录可用。
+- 失败行为：不把 Draft、RC、缺失资产或外部 URL 写入清单；不将未登录访客引入业务页；不将 GitHub API 回读冒充用户网络实际下载或安装成功。
+- 实施记录：[CHG-20261010-078](../active/CHG-20261010-078/change.md)。
+
 ## RC 打包验证闭环
 
 - 用户目标：仅用 GitHub 托管 Runner，从固定的四仓 Tag 生成 Cloud Linux 包和 Windows x64、macOS Intel、macOS ARM 客户端包，并发布可核对的 GitHub RC Pre-release。

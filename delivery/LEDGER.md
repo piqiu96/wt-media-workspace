@@ -6,7 +6,6 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-
-当前无活动 CHG。
+| CHG-20261010-078 | 公开官网与桌面安装包下载 | IN_PROGRESS | wt-media-workspace |
 
 历史叙述（按需回溯）：[LEDGER 历史说明](reports/2026-09-29-ledger-historical-notes.md)。
