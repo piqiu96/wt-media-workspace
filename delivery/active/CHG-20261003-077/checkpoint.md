@@ -86,3 +86,8 @@
 - RC18 [`release.yml` Run 37880952823](https://github.com/piqiu96/wt-media-workspace/actions/runs/37880952823) 失败：Windows 安装包已由 NSIS 成功构建，按路径停止同名 Agent 的 Windows 测试通过；后续安装器往返烟测在第一次安装后用硬编码中文目录查找 Sidecar 时失败。Cloud、Agent 和 macOS Desktop 作业通过，package/publish 未运行，不能把 RC18 当成已发布安装包。
 - 桌面烟测改为从首装后的卸载注册表读取真实 `InstallLocation`，打印实际路径；移除无 BOM PowerShell 5.1 脚本中的中文产品名字面量。Desktop commit `dcf3144`、组件 Tag `v0.1.0-rc.8` 已推送。Workspace 的真机只读卸载脚本改为要求显式 `-InstallDir`，避免同一编码风险。
 - 下一步：以新产品 Tag RC19 重跑发布；如果注册表显示真实安装目录仍缺 Sidecar，再根据诊断路径修安装器。真机卸载数据选项仍需用户执行。
+
+## RC19 Windows 安装器回归
+
+- 产品 Tag `v0.1.0-rc.19` 已推送，固定 Desktop `v0.1.0-rc.8`。[`release.yml` Run 37884126668](https://github.com/piqiu96/wt-media-workspace/actions/runs/37884126668) 的 Windows Desktop 作业已成功：按路径停止 Agent、首装、覆盖安装和卸载烟测通过；真实安装目录由注册表确认为 `C:\Users\runneradmin\AppData\Local\起飞`。RC18 失败点是烟测脚本误判路径。
+- 首次 Run 的 macOS Intel DMG 已构建并校验，但上传 Artifact 时 GitHub `CreateArtifact` 连续超时；第二次尝试在 macOS runner 的 `hdiutil` 创建 DMG 时遇到 `Resource busy`。第三次尝试成功，RC19 [Pre-release](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0-rc.19) 已生成；`uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify` 校验 6 项资产通过，Windows 安装包 SHA-256 `c8e11e013f584892f507f825d05a7f3fc8b9076bbcef7b4f3439ee537f417593`。真机勾选“删除应用数据”后的目录清理与用户视频保留仍需人工验收。证据见 `evidence/windows-installer-agent-lifecycle.md`。
