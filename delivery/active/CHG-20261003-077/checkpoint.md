@@ -80,3 +80,9 @@
 - 已验证：NSIS 探针编译、Desktop `cargo check --all-targets`、Workspace Delivery governance 和局部发布测试通过；Windows 发布作业与真机卸载数据选项仍未验证，见 `evidence/windows-installer-agent-lifecycle.md`。
 - 真机只读验收脚本已准备于 `scripts/verify/windows_uninstall.ps1`；卸载时需勾选原生“删除应用数据”，脚本检查应用目录已清理且指定视频保留。
 - 下一步：推送 Workspace RC18 产品 Tag，等待 Windows 构建与安装器回归，核对 Release 资产，再回填真机卸载数据选项结果。
+
+## RC18 失败与 RC19 修正
+
+- RC18 [`release.yml` Run 37880952823](https://github.com/piqiu96/wt-media-workspace/actions/runs/37880952823) 失败：Windows 安装包已由 NSIS 成功构建，按路径停止同名 Agent 的 Windows 测试通过；后续安装器往返烟测在第一次安装后用硬编码中文目录查找 Sidecar 时失败。Cloud、Agent 和 macOS Desktop 作业通过，package/publish 未运行，不能把 RC18 当成已发布安装包。
+- 桌面烟测改为从首装后的卸载注册表读取真实 `InstallLocation`，打印实际路径；移除无 BOM PowerShell 5.1 脚本中的中文产品名字面量。Desktop commit `dcf3144`、组件 Tag `v0.1.0-rc.8` 已推送。Workspace 的真机只读卸载脚本改为要求显式 `-InstallDir`，避免同一编码风险。
+- 下一步：以新产品 Tag RC19 重跑发布；如果注册表显示真实安装目录仍缺 Sidecar，再根据诊断路径修安装器。真机卸载数据选项仍需用户执行。

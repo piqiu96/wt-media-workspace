@@ -20,8 +20,8 @@ uv run scripts/release/submit_component_tag.py agent v0.2.2-rc.4 "$AGENT_COMMIT"
 
 ```bash
 git push origin HEAD
-uv run scripts/release/submit_tag.py v0.1.0-rc.18
-uv run scripts/release/submit_tag.py v0.1.0-rc.18 --push --verify
+uv run scripts/release/submit_tag.py v0.1.0-rc.19
+uv run scripts/release/submit_tag.py v0.1.0-rc.19 --push --verify
 ```
 
 产品脚本预检 Manifest 结构、三个远端组件 Tag、当前 Workspace 分支提交和重复 Tag。`--push` 创建并推送 annotated 产品 Tag；Git 推送失败时也使用相同的 GitHub API 备用路径。`--verify` 等待该 Tag 的 `release.yml` 成功，再从 GitHub Release 下载全部六项资产，检查资产清单、`SHA256SUMS`、`build-info.json` 的产品 Tag，并输出 Windows 安装包 SHA-256。发布任务失败或任一资产不符时命令返回非零。
@@ -29,7 +29,7 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.18 --push --verify
 如果 Tag 已推送而本机等待或下载中断，仅重做只读发布校验：
 
 ```bash
-uv run scripts/release/submit_tag.py v0.1.0-rc.18 --verify
+uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify
 ```
 
 脚本不会自动部署 Cloud 或代替 Windows 真机验收。对 RC17 已发布资产可用 `v0.1.0-rc.17 --verify` 回读校验。

@@ -1,5 +1,6 @@
 param(
-    [string] $InstallDir = (Join-Path $env:LOCALAPPDATA '起飞'),
+    [Parameter(Mandatory = $true)]
+    [string] $InstallDir,
     [string] $VideoPath
 )
 
