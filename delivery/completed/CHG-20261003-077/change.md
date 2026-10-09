@@ -1,6 +1,6 @@
 # CHG-20261003-077：Cloud 预发布部署与 Windows Desktop 部署问题修复
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: L
 - Milestone: `delivery/milestones/M-first-production-release.md#cloud-预发布部署与数据库初始化`
 - References: `docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md` §5.1、§7；`docs/superpowers/specs/2026-10-04-baota-cloud-deployment-layout-design.md`；`docs/superpowers/specs/2026-10-08-windows-desktop-console-logging-design.md`；`docs/superpowers/plans/2026-10-08-windows-desktop-console-logging-plan.md`；`docs/decisions/0020-tagged-release-and-environment-config.md`；已完成 [CHG-20261003-076](../../completed/CHG-20261003-076/change.md)。
@@ -82,3 +82,16 @@
 ## 7. Pending Questions
 
 None.
+
+## 最终验收裁定（2026-10-10）
+
+| 范围 | 结果 | 依据与边界 |
+| --- | --- | --- |
+| Cloud 固定来源、Linux 包与三平台客户端打包 | PASS | `v0.1.0` Run 37941192999 必需作业全绿，GitHub 回读附件摘要通过；见 `evidence/v0.1.0-formal-release.md`。 |
+| 宝塔预发布部署、当前数据库迁移、三进程、HTTPS/Web/登录 | PASS（用户确认） | 用户对清单 1–3 答复「完成」「完成」「正常」；实际服务器 Tag、命令输出与回退细节未提供，不补造。见 `evidence/2026-10-09-manual-acceptance.md`。 |
+| Windows 路径、日志、磁盘空间、D: 下载最终文件与 Cloud 状态 | PASS（用户确认） | 用户对清单 4–5 答复「完成」；原 99% 问题已由用户确认修复。 |
+| Windows 覆盖安装、设备身份保留、Agent 停止、显式卸载清理与视频保留 | PASS | 正式版 Windows CI 安装器往返烟测通过；用户对清单 6–7 答复「确认可以」「确认」。 |
+| macOS Intel 与 Apple Silicon | PASS（用户确认） | 正式版 CI 两平台打包通过；用户对清单 8 答复「确认」。 |
+| 正式版 `v0.1.0` | PASS | Release 已公开，回读 `draft=false`、`prerelease=false`，6 项资产齐全。 |
+
+剩余风险：真实旧版本到新版本的 Cloud 数据库升级及回退尚未发生，用户明确延至下次升级验收。它不是本 CHG 的首次预发布部署验收项，也不记作本次通过。生产服务升级继续由 `wtmctl` 与宝塔人工管理，发布工作流只构建和核验制品。

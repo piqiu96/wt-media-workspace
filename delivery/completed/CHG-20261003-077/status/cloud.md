@@ -1,5 +1,7 @@
 # Cloud status
 
+- Final status: DONE。用户于 2026-10-09 确认宝塔首次部署、数据库当前态、三进程、HTTPS/Web/登录正常；服务器输出与实际安装 Tag 未提供。正式版 `v0.1.0` 固定 Cloud `v0.1.0-rc.13`，发布作业通过。真实旧版本到新版本数据库升级及回退延至下次升级，未记作本次通过。
+
 - Current component: `v0.1.0-rc.12` → `be1d1a1`; prior tags remain immutable.
 - Path resolution: Server/Worker/Scheduler resolve the release root from `WT_MEDIA_CLOUD_HOME`, then the running binary's `<home>/bin/<binary>`, then the working directory, and every derived path is absolute. `config`/`logs`/`web` default to `<home>/...` and can be overridden with `WT_MEDIA_CLOUD_CONFIG_PATH`, `WT_MEDIA_CLOUD_LOG_PATH`, `WT_MEDIA_CLOUD_WEB_PATH`. BaoTa's generated `server.sh` (`cd <home>/bin`) therefore starts cleanly.
 - Binary name: the HTTP entrypoint ships as `bin/wt-media-cloud` (source directory stays `cmd/server`); packaging, package checks, and `wtmctl` process checks were updated.

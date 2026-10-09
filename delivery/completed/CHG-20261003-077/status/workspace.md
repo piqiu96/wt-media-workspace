@@ -1,5 +1,7 @@
 # Workspace status
 
+- Final status: DONE。`v0.1.0` Tag 固定 Cloud `v0.1.0-rc.13`、Agent `v0.2.2-rc.3`、Desktop `v0.1.0-rc.8`；Run 37941192999 必需作业全绿，正式版公开后 GitHub 资产与摘要回读通过。用户逐项确认 CHG-077 预发和真机验收，证据见 `evidence/2026-10-09-manual-acceptance.md`、`evidence/v0.1.0-formal-release.md`。真实跨版本 Cloud 升级与回退延至下次升级。
+
 - Current: product `v0.1.0-rc.14` GitHub Actions Run `37581481877` completed successfully with Cloud `v0.1.0-rc.12`, Agent `v0.2.2-rc.2`, Desktop `v0.1.0-rc.3`, environment `online`; Cloud Artifact has been downloaded and verified. Server acceptance remains pending.
 - Manifest: `releases/manifests/v0.1.0-rc.14.yaml` validated (channel `rc`, environment `online`, origin `https://wt.longyanyue.cn`).
 - Cloud payload checks: `scripts/release/package_assets.py` and its tests now require `bin/wt-media-cloud`; the fixture packages were updated to match.

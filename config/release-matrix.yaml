@@ -608,3 +608,26 @@ releases:
       - "manual_acceptance item 1 (macOS customer-machine install without system Python) adjudicated 2026-09-25 (CHG-20260923-059 D-09): registered as NOT DONE, and status stays `verifying` -- this host is a development machine carrying Python/Node/Rust and a `.local/` dev tree, so installing here cannot show a Python-free machine."
       - "CHG-20260923-059 T-08 re-ran the M2 chain against the post-A/B/C/D tree: 13/13 stages green with a real MySQL and a real BitBrowser, and the release flow itself (`build-release-macos.sh`) ran to exit 0 with the DMG digest re-verified after mount. Coverage gaps stay stated: no real network, no real supplier credentials, no GUI click-through."
       - "CHG-20260923-059 T-06 records where each of the five release version classes comes from. No `version_classes:` block is added here on purpose (D-22): the sources are declared once in `scripts/release-versions.sh` and once inside each artifact's own `versions.json`; a third copy in this file would be a declaration nothing validates."
+  - release: "v0.1.0"
+    status: published
+    date: "2026-10-10"
+    scope: first_formal_release_after_chg_20261003_077
+    environment: online
+    cloud_origin: https://wt.longyanyue.cn
+    components:
+      cloud: "v0.1.0-rc.13"
+      cloud_agent: "v0.2.2-rc.3"
+      local_agent: "v0.2.2-rc.3"
+      desktop: "v0.1.0-rc.8"
+    cloud_migrations: "50 in the RC14 Cloud package; initial and repeat application attested by the user for CHG-077 without server output"
+    contract_state: "provider versions and consumer lock checked by release.yml Run 37941192999"
+    verification:
+      release: "release.yml Run 37941192999 succeeded; Draft GitHub asset read-back SHA256SUMS passed; public Release has six assets"
+      manual: "CHG-077 evidence/2026-10-09-manual-acceptance.md records user confirmation; detailed machine and server outputs were not supplied"
+    target_status:
+      windows_x64: "CI NSIS install/reinstall/uninstall passed; user confirmed Windows download and lifecycle acceptance"
+      macos_x86_64: "CI DMG and bundled Agent verification passed; user confirmed manual walkthrough"
+      macos_arm64: "CI DMG and bundled Agent verification passed; user confirmed manual walkthrough"
+    residual_risks:
+      - "Real Cloud database migration and rollback from an older installed version are deferred to the next upgrade."
+      - "Release artifacts do not automatically deploy Cloud or restart BaoTa processes."

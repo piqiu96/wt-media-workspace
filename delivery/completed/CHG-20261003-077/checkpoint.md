@@ -1,6 +1,6 @@
 # CHG-20261003-077 实施进度
 
-- Status: IMPLEMENTING
+- Status: DONE
 - 当前：Cloud `v0.1.0-rc.12` 和产品 `v0.1.0-rc.14` 已推送；产品 [`release.yml` Run 37581481877](https://github.com/piqiu96/wt-media-workspace/actions/runs/37581481877) 全部发布作业成功，Pre-release 已生成。Cloud Linux tar SHA-256 `e7ea73b3984c4735d3e61db1a008ff1e8ea0c48966cf50cc39b0323485d9ac4e` 已与 `build-info.json`、Actions Artifact 与本地下载核对。
 - 已完成：`bin/wtmctl`（Go）实现远程变量拉取、Schema/取值校验、Artifact 校验、配置渲染、Migration、数据库验证、版本安装、`current` 原子切换、只读验收和回退；Python/shell 逐条部署入口全部删除，包内不再包含 `deploy/*.py`、`deploy/*.sh`；变量从 JSON 切换为 TOML 并上传远端回读校验通过；Cloud `README.md` 与 `deploy/DEPLOYMENT.md` 收敛为 `/home/www/wt-media-cloud/output` 一键部署命令。
 - 已完成：`wtmctl`（含从包推导 release/package_root）、TOML 变量、路径绝对化、二进制改名、认证日志。
@@ -97,3 +97,9 @@
 - 用户逐项确认 Cloud 部署、数据库当前态、Cloud 运行、Windows 基础功能/下载、覆盖安装、显式卸载和 macOS 两架构走查；确认按 RC19 固定源码组合制作正式版。原始答复与证据边界见 `evidence/2026-10-09-manual-acceptance.md`。
 - 当前例外：用户说明尚未发生跨版本升级，真实旧版本到新版本的 Cloud 数据库迁移与回退延至下一次升级；本次不将其记作已通过。具体服务器输出、安装路径和真机脚本输出未提供，不补造。
 - 流水线无需补充 CHG-077 的构建能力；现有正式 Tag 流程会重新构建并先创建 Draft Release，随后核验资产再公开发布。`v0.1.0` Manifest 固定 RC19 的 Cloud/Agent/Desktop 组件 Tag，环境为 `online`。
+
+## v0.1.0 正式版结果
+
+- [`release.yml` Run 37941192999](https://github.com/piqiu96/wt-media-workspace/actions/runs/37941192999) 全部必需作业成功；发布作业对 GitHub 回读附件执行摘要校验通过。[`v0.1.0` 正式版](https://github.com/piqiu96/wt-media-workspace/releases/tag/v0.1.0) 已公开，回读 `draft=false`、`prerelease=false`，6 项资产齐全。Windows 安装包 SHA-256 `5087f76f1f0e0b7ff39b91436dad3c87058b1bffc1ad2c58d98fed865c520ac1`；详细证据见 `evidence/v0.1.0-formal-release.md`。
+- CHG-077 人工验收由用户逐项确认。唯一明确延期项目为真实旧版本到新版本的 Cloud 数据库升级和回退；这是下次升级的验收风险，不宣称本次已验证。发布流水线的构建、打包、安装器烟测与 GitHub 资产回读均已完成；生产服务升级仍由 `wtmctl` 和宝塔人工操作。
+- 最终裁定：原 CHG 首次预发布部署及 Windows 修复范围验收通过；正式版 `v0.1.0` 已公开。本 CHG 可归档；后续真实跨版本升级以新版本部署时的备份、迁移、切换与回退记录验收。
