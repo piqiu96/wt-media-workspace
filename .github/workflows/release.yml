@@ -75,6 +75,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          path: wt-media-workspace
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
           repository: piqiu96/wt-media-cloud
           ref: ${{ needs.validate.outputs.cloud_tag }}
           path: wt-media-cloud
@@ -97,6 +101,13 @@ jobs:
       - name: Verify Cloud packaging tests
         run: python3 -m unittest scripts.verify.test_package_release_linux scripts.verify.test_stamp_desktop_web -v
         working-directory: wt-media-cloud
+      - name: Stamp desktop download manifest (stable only)
+        if: needs.validate.outputs.channel == 'stable'
+        working-directory: wt-media-workspace
+        run: |
+          python3 -m scripts.release.desktop_downloads \
+            --tag "$GITHUB_REF_NAME" \
+            --output "$GITHUB_WORKSPACE/wt-media-cloud/web/dist-cloud/desktop-downloads.json"
       - name: Assemble Linux Cloud package and Desktop Web
         shell: bash
         run: |
@@ -273,7 +284,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verify Cloud release payload checks
-        run: python3 -m unittest scripts.release.test_package_assets -v
+        run: python3 -m unittest scripts.release.test_package_assets scripts.release.test_desktop_downloads -v
       - uses: actions/download-artifact@v4
         with:
           pattern: desktop-*

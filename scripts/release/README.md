@@ -34,6 +34,23 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify
 
 脚本不会自动部署 Cloud 或代替 Windows 真机验收。对 RC17 已发布资产可用 `v0.1.0-rc.17 --verify` 回读校验。
 
+## 官网桌面安装包下载清单
+
+清单 `desktop-downloads.json` 由 CI 在构建期自动生成：正式版（`channel: stable`）的 `release.yml` 在 vite 产出 `web/dist-cloud` 之后、打入 Cloud 包之前，按产品 Tag 生成清单覆盖 `web/dist-cloud/desktop-downloads.json`，随后随 Cloud 包部署到 `current/web/` 生效。RC/预览构建不执行该步骤，预览包保留仓库初始清单。清单仅保存公开 GitHub Release 的 URL，访客下载时直接前往 GitHub；不会下载安装包到 Cloud 服务器。
+
+部署顺序约束：**先公开发布 Release（`gh release edit vX.Y.Z --draft=false --prerelease=false`），再部署 Cloud 包**。顺序颠倒时官网下载链接在 Release 公开前指向 404，公开后自愈。每次部署后用 `curl https://<Cloud域名>/desktop-downloads.json` 回读版本号与三项 URL，并在目标用户网络中分别点击验证下载。
+
+### 手动兜底
+
+只更新桌面端而不重新部署 Cloud 包，或回滚后需要钉住指定版本时，在服务器上直接运行生成脚本（单文件、纯标准库、无需 `gh`）：
+
+```bash
+python3 desktop_downloads.py --tag v0.1.0 \
+  --output /home/www/wt-media-cloud/current/web/desktop-downloads.json
+```
+
+`desktop_downloads.py` 位于 Workspace 仓 `scripts/release/`；目标 Web 目录以 `wtmctl` 实际布局为准（执行前 `readlink -f current` 确认）。写入为临时文件原子替换，Tag 非正式版或目录不存在时不触碰旧清单。
+
 ## 正式版
 
-人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。正式版工作流先创建 **Draft Release**；核验 Draft 的资产、来源和摘要后，人工用 `gh release edit vX.Y.Z --draft=false --prerelease=false` 公开发布，并回读 Release 状态。正式版从 Tag 重新构建，不把 RC 附件改名。
+人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。正式版工作流先创建 **Draft Release**；核验 Draft 的资产、来源和摘要后，人工用 `gh release edit vX.Y.Z --draft=false --prerelease=false` 公开发布，并回读 Release 状态。正式版从 Tag 重新构建，不把 RC 附件改名；构建期已把对应版本的官网下载清单烙入 Cloud 包，公开发布后按上一节部署即可。
