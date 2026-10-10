@@ -6,11 +6,11 @@
 - References: `docs/superpowers/specs/2026-10-10-public-home-and-desktop-downloads-design.md`；`docs/superpowers/plans/2026-10-10-public-home-and-desktop-downloads.md`。
 - Affected repositories: `wt-media-cloud`、`wt-media-workspace`。
 - Current repository: `wt-media-workspace`
-- 用户可见结果：公开 `/home` 提供官网、登录入口及三种桌面安装包链接；登录页与品牌图一致，升级时可更新下载清单。
+- 用户可见结果：公开 `/home` 提供官网及三种桌面安装包链接，不展示登录入口或登录引导；独立登录页与品牌图一致，升级时可更新下载清单。
 
 ## 范围与边界
 
-1. Cloud Web 增加公开官网路由与响应式页面，认证守卫只放行 `/home` 和 `/login`；Desktop 路由不增加官网。
+1. Cloud Web 增加公开官网路由与响应式页面，认证守卫只放行 `/home` 和 `/login`；官网不展示登录入口或登录引导，桌面顶部导航悬浮并可点击或滚动到四个独立区域，Desktop 路由不增加官网。
 2. Cloud 与 Desktop 共用登录页按参考图改版，不改变登录、角色检查、会话替换和版本显示逻辑。
 3. Workspace 脚本从显式 Tag 的 GitHub Release 读取资产 URL，拒绝非公开正式版及缺失、重复、异源资产；更新目标 JSON 文件时保留旧内容直至校验完成。
 4. Cloud Web 从同源清单展示 Windows x64、macOS Intel、macOS Apple 芯片下载链接；首次清单对应公开 `v0.1.0`。
@@ -34,6 +34,8 @@
 | 项 | 验收方法 | 状态 |
 | --- | --- | --- |
 | `/home` 公开且业务页仍需登录 | 路由与守卫测试、浏览器访问 | AUTOMATED PASS；部署环境待验收 |
+| 官网不出现登录入口或登录引导 | 首页宽窄屏浏览器及页面 DOM 检查 | 本地 PASS；部署环境待验收 |
+| 官网悬浮导航可点击、上下滚动及指示当前区域 | 桌面浏览器锚点、上下滚动与活动态检查 | 本地浏览器 PASS；实际鼠标滚轮及部署环境待验收 |
 | 三平台下载链接与正式版资产一致 | 脚本测试、GitHub Release 回读、页面测试 | AUTOMATED PASS；终端下载待验收 |
 | 错误 Release 不覆盖旧清单 | 脚本失败场景测试 | PASS |
 | 共享登录流程与视觉可用 | Cloud/Desktop 构建、登录测试、人工宽窄屏走查 | 本地 PASS；真实账号登录待验收 |
