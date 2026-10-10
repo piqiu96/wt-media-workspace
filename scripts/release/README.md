@@ -38,6 +38,8 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify
 
 正式版 Release 已公开、Cloud 新版本已部署后，在可访问 GitHub 的环境执行。`gh` 需已登录且可读取 `piqiu96/wt-media-workspace`。脚本核对正式版 Tag、非 Draft/非 Pre-release 及 Windows x64、macOS Intel、macOS Apple 芯片三项资产，然后原子写入**指定文件**；失败时不覆盖旧清单。
 
+如果服务器也有 Workspace 脚本和 `gh`，且执行用户有目标 Web 目录写权限，可直接指定服务器路径：
+
 ```bash
 python3 scripts/release/update_desktop_downloads.py v0.1.0 \
   --output /home/www/wt-media-cloud/current/web/desktop-downloads.json
@@ -51,6 +53,16 @@ python3 scripts/release/update_desktop_downloads.py v0.1.0 \
 ```
 
 每次 Cloud 版本目录切换后，重新执行第一条命令更新新的 `current/web`。清单仅保存公开 GitHub Release 的 URL，访客下载时直接前往 GitHub；不会下载安装包到 Cloud 服务器。可用 `curl https://<Cloud域名>/desktop-downloads.json` 回读当前版本与三项 URL，并在目标用户网络中分别点击验证下载。
+
+服务器没有 Workspace 或 `gh` 时，在开发机生成清单，然后先传到服务器临时路径，再由有 Web 目录写权限的账号把文件复制到目标目录的临时文件并原子替换：
+
+```bash
+python3 scripts/release/update_desktop_downloads.py v0.1.0 --output /tmp/desktop-downloads.json
+scp /tmp/desktop-downloads.json <用户>@<服务器>:/tmp/desktop-downloads.json
+ssh <用户>@<服务器> 'sudo cp /tmp/desktop-downloads.json /home/www/wt-media-cloud/current/web/.desktop-downloads.json.tmp && sudo chmod 644 /home/www/wt-media-cloud/current/web/.desktop-downloads.json.tmp && sudo mv /home/www/wt-media-cloud/current/web/.desktop-downloads.json.tmp /home/www/wt-media-cloud/current/web/desktop-downloads.json'
+```
+
+将示例 Tag、用户、服务器换成实际值；先完成新 Cloud 版本部署，再更新其 `current/web`。传输后通过 HTTPS 回读版本号与三项 URL。
 
 ## 正式版
 
