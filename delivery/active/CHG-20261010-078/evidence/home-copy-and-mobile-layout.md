@@ -5,5 +5,5 @@
 - Cloud 提交：`7c725c3`。
 - 自动验证：`npm run build:cloud` 退出码 0；`git diff --check` 退出码 0。
 - 浏览器验证：Chrome DevTools 视口 1672×941、390×844、320×844；390 与 320 px 文档宽度分别为 390 与 320，无水平溢出。390 px 下四张功能卡底部为 817.25 px，320 px 下为 832.23 px，均位于 844 px 视口内；四张卡的标题和副文案均在页面中可见。手机端「Windows / macOS 支持」和「本地与云端协同」均可见。
-- 截图：`screenshots/wt-home-wide.png`、`screenshots/wt-home-mobile-cdp.png`、`screenshots/wt-home-mobile-320.png`、`screenshots/wt-home-mobile-full.png`。
+- 截图：`screenshots/wt-home-mobile-full.png`（其余轮次截图已随 2026-10-11 记录清理移除）。
 - 边界：只验证本地页面与构建；线上部署和目标用户网络下载仍待验收。

@@ -5,5 +5,5 @@
 - Cloud 提交：`0ec44a4`。
 - 命令：`npm run build:cloud` 与 `npm run build:desktop`，均退出码 0；`git diff --check` 退出码 0。
 - 浏览器验证：Chrome DevTools 390×844 与 320×844 首页截图，1440×900 登录截图；圆形徽章计算背景尺寸为 `110% auto`。手机顶部登录链接可见、文字为空、无障碍名称为「登录平台」；页脚文字链接计算样式为 `display:none`。390/320 px 文档宽度与视口宽度相同。
-- 截图：`screenshots/wt-home-mobile-cdp.png`、`screenshots/wt-home-mobile-320.png`、`screenshots/wt-home-mobile-full.png`、`screenshots/wt-login-wide.png`。
+- 截图：`screenshots/wt-home-mobile-full.png`（其余轮次截图已随 2026-10-11 记录清理移除）。
 - 边界：这是本地页面和构建验证；线上部署与真实账号登录仍待验收。

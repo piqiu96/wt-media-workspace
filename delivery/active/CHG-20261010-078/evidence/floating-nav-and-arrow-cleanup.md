@@ -6,5 +6,5 @@
 - 构建：`npm run build:cloud`、`npm run build:desktop` 均退出码 0；两处 Vue 文件 `git diff --check` 退出码 0。
 - Chrome DevTools 1672×941：产品功能、定价、帮助中心、联系管理员依次点击后页面滚动位置为 574、700、901、1102 px，四处目标顶部均为 128 px，悬浮导航顶端均为 16 px；活动项分别对应点击项。
 - 程序驱动滚动：向下滚动时活动项依次为产品功能、定价、帮助中心、联系管理员；从 1250 px 逐步向上到页面顶部时依次为联系管理员、帮助中心、定价、产品功能、无活动项，导航保持顶端 16 px。
-- 截图：`screenshots/wt-home-wide.png`、`screenshots/wt-home-nav-pricing.png`、`screenshots/wt-home-mobile-cdp.png`、`screenshots/wt-home-mobile-320.png`、`screenshots/wt-home-mobile-full.png`、`screenshots/wt-login-wide.png`。
+- 截图：`screenshots/wt-home-mobile-full.png`（其余轮次截图已随 2026-10-11 记录清理移除）。
 - 边界：无头浏览器的合成滚轮事件未移动页面，不能据此判断真实鼠标滚轮；实际滚轮操作与线上页面仍待部署验收。

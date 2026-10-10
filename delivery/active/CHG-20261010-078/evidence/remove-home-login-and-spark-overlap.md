@@ -6,5 +6,5 @@
 - Cloud 提交：`26d85b1`。
 - 命令：`npm run build:cloud` 退出码 0；`git diff --check` 退出码 0。
 - 浏览器验证：Chrome DevTools 在 1672×941、390×844、320×844 首页视口中，`/login` 链接数与可见「登录」字数均为 0，三平台下载卡数均为 3，左下装饰星元素数为 0。390/320 px 文档宽度等于视口宽度；390 px 截图中播放图标完整可见。直接访问 `/login` 仍显示登录页。
-- 截图：`screenshots/wt-home-wide.png`、`screenshots/wt-home-mobile-cdp.png`、`screenshots/wt-home-mobile-320.png`、`screenshots/wt-home-mobile-full.png`。
+- 截图：`screenshots/wt-home-mobile-full.png`（其余轮次截图已随 2026-10-11 记录清理移除）。
 - 边界：这是本地页面和构建验证；线上部署、真实登录和目标用户网络下载仍待验收。
