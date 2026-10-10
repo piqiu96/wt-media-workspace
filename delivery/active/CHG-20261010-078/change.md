@@ -1,6 +1,6 @@
 # CHG-20261010-078：公开官网与桌面安装包下载
 
-- Status: IN_PROGRESS
+- Status: VERIFYING
 - Level: M
 - Milestone: `delivery/milestones/M-first-production-release.md#公开官网与桌面安装包下载`
 - References: `docs/superpowers/specs/2026-10-10-public-home-and-desktop-downloads-design.md`；`docs/superpowers/plans/2026-10-10-public-home-and-desktop-downloads.md`。
@@ -33,10 +33,10 @@
 
 | 项 | 验收方法 | 状态 |
 | --- | --- | --- |
-| `/home` 公开且业务页仍需登录 | 路由与守卫测试、浏览器访问 | PENDING |
-| 三平台下载链接与正式版资产一致 | 脚本测试、GitHub Release 回读、页面测试 | PENDING |
-| 错误 Release 不覆盖旧清单 | 脚本失败场景测试 | PENDING |
-| 共享登录流程与视觉可用 | Cloud/Desktop 构建、登录测试、人工宽窄屏走查 | PENDING |
+| `/home` 公开且业务页仍需登录 | 路由与守卫测试、浏览器访问 | AUTOMATED PASS；部署环境待验收 |
+| 三平台下载链接与正式版资产一致 | 脚本测试、GitHub Release 回读、页面测试 | AUTOMATED PASS；终端下载待验收 |
+| 错误 Release 不覆盖旧清单 | 脚本失败场景测试 | PASS |
+| 共享登录流程与视觉可用 | Cloud/Desktop 构建、登录测试、人工宽窄屏走查 | 本地 PASS；真实账号登录待验收 |
 
 ## 提交边界
 

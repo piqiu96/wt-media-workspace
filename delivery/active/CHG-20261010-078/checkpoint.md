@@ -1,7 +1,7 @@
 # CHG-20261010-078 Checkpoint
 
-- 已完成：用户确认方案；设计、计划与交付记录已建立；Task 1 脚本和测试通过，已由 GitHub Release 生成初始 `v0.1.0` 清单。
-- 当前工作：Task 2 Cloud `/home`、清单读取和下载按钮。
-- 下一步：实现公开页并验证 Cloud 静态服务，然后重设计登录页。
-- 阻塞：无。浏览器视觉和终端用户网络可达性需要部署环境后续回读。
-- 最近验证：`python3 -m unittest scripts.release.test_update_desktop_downloads -v` 4 项通过；`gh api` 及脚本真实回读 `v0.1.0` 成功。本机对资产直连 HEAD 曾超时，尚不代表用户网络不可下载。
+- 已完成：Task 1 脚本与初始清单；Task 2 Cloud `/home` 与三平台按钮；Task 3 共享登录页及品牌视觉，宽屏与 390 px 无头浏览器截图已留证。
+- 当前工作：代码完成，状态 VERIFYING；等待新 Cloud Web 部署后的 `/home`、真实账号登录与目标用户网络三平台下载验收。
+- 下一步：运维在升级/部署后执行固定 Tag 清单更新命令，回读在线 JSON，逐个平台点击下载；收到结果后关闭 CHG。
+- 阻塞：无代码阻塞。在线部署和终端网络验收依赖目标环境人工执行。
+- 最近验证：Web 全量 490 项、Cloud/Desktop 双构建、Go 静态测试、下载脚本 4 项均通过；重新从 GitHub 生成的 `v0.1.0` 清单与 Cloud 初始文件逐字节一致；390 px 首页和登录页无水平滚动；Delivery governance 通过。本机对 GitHub 资产直连 HEAD 曾超时，尚不代表用户网络不可下载。
