@@ -348,3 +348,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: bash scripts/release/publish.sh stable "$GITHUB_REF_NAME" release-assets
+      - name: Publish stable Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease=false
+          state="$(gh release view "$GITHUB_REF_NAME" --json isDraft,isPrerelease --jq '"\(.isDraft) \(.isPrerelease)"')"
+          echo "Release state: $state"
+          [ "$state" = "false false" ]

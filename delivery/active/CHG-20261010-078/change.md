@@ -46,3 +46,7 @@
 
 - Workspace：设计、计划、CHG、脚本和发布文档。
 - Cloud：公开首页、登录视觉、品牌资产、初始下载清单及相关测试。
+
+## 6. Pending Questions
+
+None.

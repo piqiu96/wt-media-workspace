@@ -20,3 +20,7 @@ Accepted（2026-10-03；用户确认 RC / 正式 Tag 规则及 GitHub 预发布�
 
 - 旧本地发布配置中的 Cloud loopback 值只代表本地验收，不再是线上 Desktop/Agent 成品的固定地址。本决策在这点上取代 ADR-0016 中与本地 Cloud 地址绑定的发布解释；ADR-0016 的运行时配置加载和 Sidecar 目录规则继续有效。
 - 首次 RC 打包试跑只验证 GitHub 制品链。宝塔部署、真实登录和对象存储连接另行验收。
+
+## Revision 2026-10-11：正式版改为 CI 自动公开
+
+Decision 第 1 条中「`vX.Y.Z` 先走 Draft Release」的人工公开门禁自本日起作废：`publish-release` job 在 `publish.sh stable` 建草稿并复验资产名与 SHA256 之后，由 CI 直接 `gh release edit --draft=false --prerelease=false` 公开并回读断言状态。用户裁定取消人工环节；安全底线由 `submit_tag.py --verify` 的自动核验（六资产精确集合、SHA256SUMS、build-info 版本一致）与 `publish.sh` 上传复验承担，官网下载按钮跟随 Cloud 部署、公开时序不影响用户。RC 通道（Pre-release）行为不变。v0.1.1 及之前的正式版 Release 仍由当时的人工流程公开。
