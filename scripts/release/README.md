@@ -34,36 +34,23 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify
 
 脚本不会自动部署 Cloud 或代替 Windows 真机验收。对 RC17 已发布资产可用 `v0.1.0-rc.17 --verify` 回读校验。
 
-## 更新官网桌面安装包下载链接
+## 官网桌面安装包下载清单
 
-正式版 Release 已公开、Cloud 新版本已部署后，在可访问 GitHub 的环境执行。`gh` 需已登录且可读取 `piqiu96/wt-media-workspace`。脚本核对正式版 Tag、非 Draft/非 Pre-release 及 Windows x64、macOS Intel、macOS Apple 芯片三项资产，然后原子写入**指定文件**；失败时不覆盖旧清单。
+清单 `desktop-downloads.json` 由 CI 在构建期自动生成：正式版（`channel: stable`）的 `release.yml` 在 vite 产出 `web/dist-cloud` 之后、打入 Cloud 包之前，按产品 Tag 生成清单覆盖 `web/dist-cloud/desktop-downloads.json`，随后随 Cloud 包部署到 `current/web/` 生效。RC/预览构建不执行该步骤，预览包保留仓库初始清单。清单仅保存公开 GitHub Release 的 URL，访客下载时直接前往 GitHub；不会下载安装包到 Cloud 服务器。
 
-如果服务器也有 Workspace 脚本和 `gh`，且执行用户有目标 Web 目录写权限，可直接指定服务器路径：
+部署顺序约束：**先公开发布 Release（`gh release edit vX.Y.Z --draft=false --prerelease=false`），再部署 Cloud 包**。顺序颠倒时官网下载链接在 Release 公开前指向 404，公开后自愈。每次部署后用 `curl https://<Cloud域名>/desktop-downloads.json` 回读版本号与三项 URL，并在目标用户网络中分别点击验证下载。
+
+### 手动兜底
+
+只更新桌面端而不重新部署 Cloud 包，或回滚后需要钉住指定版本时，在服务器上直接运行生成脚本（单文件、纯标准库、无需 `gh`）：
 
 ```bash
-python3 scripts/release/update_desktop_downloads.py v0.1.0 \
+python3 desktop_downloads.py --tag v0.1.0 \
   --output /home/www/wt-media-cloud/current/web/desktop-downloads.json
 ```
 
-在开发机更新下一次 Cloud Web 打包所用的初始清单：
-
-```bash
-python3 scripts/release/update_desktop_downloads.py v0.1.0 \
-  --output ../wt-media-cloud/web/public/desktop-downloads.json
-```
-
-每次 Cloud 版本目录切换后，重新执行第一条命令更新新的 `current/web`。清单仅保存公开 GitHub Release 的 URL，访客下载时直接前往 GitHub；不会下载安装包到 Cloud 服务器。可用 `curl https://<Cloud域名>/desktop-downloads.json` 回读当前版本与三项 URL，并在目标用户网络中分别点击验证下载。
-
-服务器没有 Workspace 或 `gh` 时，在开发机生成清单，然后先传到服务器临时路径，再由有 Web 目录写权限的账号把文件复制到目标目录的临时文件并原子替换：
-
-```bash
-python3 scripts/release/update_desktop_downloads.py v0.1.0 --output /tmp/desktop-downloads.json
-scp /tmp/desktop-downloads.json <用户>@<服务器>:/tmp/desktop-downloads.json
-ssh <用户>@<服务器> 'sudo cp /tmp/desktop-downloads.json /home/www/wt-media-cloud/current/web/.desktop-downloads.json.tmp && sudo chmod 644 /home/www/wt-media-cloud/current/web/.desktop-downloads.json.tmp && sudo mv /home/www/wt-media-cloud/current/web/.desktop-downloads.json.tmp /home/www/wt-media-cloud/current/web/desktop-downloads.json'
-```
-
-将示例 Tag、用户、服务器换成实际值；先完成新 Cloud 版本部署，再更新其 `current/web`。传输后通过 HTTPS 回读版本号与三项 URL。
+`desktop_downloads.py` 位于 Workspace 仓 `scripts/release/`；目标 Web 目录以 `wtmctl` 实际布局为准（执行前 `readlink -f current` 确认）。写入为临时文件原子替换，Tag 非正式版或目录不存在时不触碰旧清单。
 
 ## 正式版
 
-人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。正式版工作流先创建 **Draft Release**；核验 Draft 的资产、来源和摘要后，人工用 `gh release edit vX.Y.Z --draft=false --prerelease=false` 公开发布，并回读 Release 状态。正式版从 Tag 重新构建，不把 RC 附件改名。
+人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。正式版工作流先创建 **Draft Release**；核验 Draft 的资产、来源和摘要后，人工用 `gh release edit vX.Y.Z --draft=false --prerelease=false` 公开发布，并回读 Release 状态。正式版从 Tag 重新构建，不把 RC 附件改名；构建期已把对应版本的官网下载清单烙入 Cloud 包，公开发布后按上一节部署即可。

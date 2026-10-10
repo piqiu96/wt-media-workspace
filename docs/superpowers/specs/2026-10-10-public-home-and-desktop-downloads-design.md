@@ -39,3 +39,7 @@ Cloud Web 提供公开的 `/home` 官网入口，按用户提供的三张参考�
 - 前端单元验证公开路由、登录行为不变、三个目标按清单生成；Cloud Web 和 Desktop Web 均构建通过。
 - 脚本用模拟 Release 回包验证正常、Draft、RC、缺少平台资产、异常 URL、写入失败等情况；对 `v0.1.0` 实际 Release 回读资产清单。
 - Cloud 静态服务验证 `/home` 和 JSON 路径可访问，API 404 不被前端路由吞掉。真实浏览器视觉、三平台完整安装和终端用户网络可达性须在部署环境验收；本地直连 GitHub 资产的 HEAD 请求曾超时，不将 GitHub API 回读等同于终端下载成功。
+
+## 补记（2026-10-11）：清单改为正式版 CI 构建期烙入 Cloud 包，更新脚本退役
+
+上述「下载清单与更新脚本」一节描述的部署后人工执行脚本，已替换为构建期自动生成：正式版（`channel: stable`）的 `release.yml` 在 vite 产出 `web/dist-cloud` 之后、打入 Cloud 包之前，按产品 Tag 确定性生成清单（`scripts/release/desktop_downloads.py`），覆盖 `dist-cloud/desktop-downloads.json`，随 Cloud 包部署到 `current/web/` 生效。RC/预览构建不执行该步骤。理由：清单内容完全由 Tag 决定，无需回读 Release 即可生成；部署即生效，服务器不再需要 GitHub 访问或 `gh`；原「先回读校验已公开 Release 再写入」的职责由发布链既有环节（package job 资产校验、publish.sh 上传复验）与部署顺序约束承接。代价：runbook 钉死「先公开 Release 再部署 Cloud 包」，顺序颠倒时官网链接在公开前指向 404、公开后自愈；官网清单版本始终跟随部署的 Cloud 包版本。原 `update_desktop_downloads.py` 及其测试删除；手动兜底（只更新桌面端不重新部署 Cloud、或回滚后钉住指定版本）由新脚本在服务器直接执行承担（单文件、纯标准库、无 `gh`）。清单 schema、文件名与前端校验不变，Cloud 仓零改动。
