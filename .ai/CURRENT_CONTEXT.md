@@ -1,6 +1,6 @@
 # WT Media Current AI Context
 
-- Generated: 2026-10-10T00:46:27Z
+- Generated: 2026-10-10T02:10:29Z
 - Active CHG: `CHG-20261010-078` — 公开官网与桌面安装包下载
 - Status: `VERIFYING`
 - Current milestone: `delivery/milestones/M-first-production-release.md#公开官网与桌面安装包下载`
