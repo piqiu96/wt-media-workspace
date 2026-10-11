@@ -6,6 +6,6 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20260930-070 | 内容池交互对齐前端交互规范 | IMPLEMENTING | wt-media-cloud |
+| CHG-20260930-070 | 内容池交互对齐前端交互规范 | VERIFYING | wt-media-cloud |
 
 历史叙述（按需回溯）：[LEDGER 历史说明](reports/2026-09-29-ledger-historical-notes.md)。

@@ -1,6 +1,6 @@
 # CHG-20260930-070：内容池交互对齐前端交互规范
 
-- Status: IMPLEMENTING（2026-10-12 激活）
+- Status: VERIFYING（2026-10-12 自动验证与桌面包准备完成，待用户走查）
 - Level: S
 - Milestone: `delivery/milestones/M3-content-discovery-v2.md`
 - 依据基线：`docs/standards/前端交互规范.md`（稳定规范）；业务闭环不变——内容池发现、筛选、转素材与忽略的业务事实以 M3 闭环（`delivery/milestones/M3-content-discovery-v2.md`）与既有代码为准，本 CHG 只对齐交互层。
