@@ -12,7 +12,7 @@
 | Architecture / Contracts | 模块职责、调用和实现接口；提供方拥有正式业务 enum |
 | Milestone | 当前阶段交付、验收和实际进度 |
 
-当前说明：[内容发现](content-discovery.md)、[内容生产](content-production.md)。本次整理以 [M3 有效产品基线 V2](../../docs/product/M3-content-mining-v2.md)、[第五章 PRD V2](../../docs/product/prd/详细文档/第五章_素材生产.md)、[M4](../../delivery/milestones/M4-content-production.md)、[M5](../../delivery/milestones/M5-automatic-production.md) 及对应 Decision 为依据。旧[第四章 PRD](../../docs/product/prd/详细文档/第四章_内容发现.md)已标记“历史 V1”，仅用于识别被取代的定义。
+当前说明：[内容发现](content-discovery.md)、[内容生产](content-production.md)。本次整理以 [M3 有效产品基线 V2](../../product/M3-content-mining-v2.md)、[第五章 PRD V2](../../product/prd/详细文档/第五章_素材生产.md)、[M4](../../../delivery/milestones/M4-content-production.md)、[M5](../../../delivery/milestones/M5-automatic-production.md) 及对应 Decision 为依据。旧[第四章 PRD](../../product/prd/详细文档/第四章_内容发现.md)已标记“历史 V1”，仅用于识别被取代的定义。
 
 ## 全局规则
 
