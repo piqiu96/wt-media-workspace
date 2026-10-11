@@ -103,20 +103,22 @@ wt-media-workspace/
 
 状态词只有下表这些；写记录时从表里取，不造新词。读数列是**实测**值，两种写入形式（`- Status:` 与更早的 `> 状态：`）各自计数后相加。
 
-两张表加历史词汇应凑齐分母：活列 **21**（退役词在活记录里已归零）；归档列 **38** ＋ 退役 `CLOSED` 4 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **48**。对不上就说明有词没被登记。
+两张表加历史词汇应凑齐分母：活列 **8**（退役词在活记录里已归零）；归档列 **40** ＋ 退役 `CLOSED` 4 ＋ `HANDOFF` 2 ＋ `IN_PROGRESS` 4 ＝ **50**。对不上就说明有词没被登记。
 
 **CHG**，变迁为 `DISCUSSION → PLANNED → IMPLEMENTING → VERIFYING → DONE`（`SUPERSEDED` 可从除 `DONE` 外的任何状态进入）：
 
 | 状态 | 含义 | 活记录 | 归档记录 |
 |---|---|---|---|
-| `DISCUSSION` | 草案，方向待裁定；不激活 | 7 | 0 |
+| `DISCUSSION` | 草案，方向待裁定；不激活 | 2 | 0 |
 | `PLANNED` | 方向已定、已拆分，可激活 | 5 | 0 |
 | `IMPLEMENTING` | 实施中 | 0 | 1 |
-| `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 36 |
-| `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 9 | 0 |
+| `VERIFYING` | 实施完成，待验收 | 1 | 1 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 38 |
+| `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` **21** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **48** 篇。本行读数由 CHG-20260925-066 的 T-06、CHG-20260926-067 的 T-00 与 T-07、CHG-20260926-068 的 T-00 与 **T-06**、CHG-20260924-061 的 T-09、**CHG-20260930-069 关闭**、**CHG-20261002-074 关闭**各刷新一次并逐词复测（量法**直接 import 门禁自己的 `status_word()`**；本轮读数与分母见 `delivery/completed/CHG-20260924-061/evidence/20260927-closeout.md` 与 `delivery/completed/CHG-20261002-074/change.md` §8.3）；该数列**每次归档即过期**的机制只登记不设通用对策（CHG-064 §14 第 7 项、CHG-20260925-066 §14 第 2 项）。
+分母：活记录＝`delivery/planned/*/change.md` **7** 篇 ＋ `delivery/active/*/change.md` **1** 篇；归档记录＝`delivery/completed/*/change.md` **50** 篇。本行读数由 CHG-20260925-066 的 T-06、CHG-20260926-067 的 T-00 与 T-07、CHG-20260926-068 的 T-00 与 **T-06**、CHG-20260924-061 的 T-09、**CHG-20260930-069 关闭**、**CHG-20261002-074 关闭**、**2026-10-10 planned 清理**各刷新一次并逐词复测（量法**直接 import 门禁自己的 `status_word()`**；本轮读数与分母见 `delivery/completed/CHG-20260924-061/evidence/20260927-closeout.md`、`delivery/completed/CHG-20261002-074/change.md` §8.3 与下一条勘误）；该数列**每次归档即过期**的机制只登记不设通用对策（CHG-064 §14 第 7 项、CHG-20260925-066 §14 第 2 项）。
+
+> **2026-10-10 就地勘误（planned 清理时实测，同一仪器）**：本次是**人工清理**，不是归档——用户核对后删除了 `delivery/planned/` 里 14 篇作废草案（9 篇自身状态词即 `SUPERSEDED`：023、037～043、053；5 篇工作已由 `CHG-20260916-052` 交付完毕：045、046、048、049、051），清单与理由见 `delivery/planned/README.md`。由此产生：活 `DISCUSSION` **7→2**、活 `SUPERSEDED` **9→0**、分母 planned **21→7**、活列 **21→8**（planned 7 ＋ active 1）。**同一次实测还量到两处与本次清理无关的既有漂移**：活 `VERIFYING` **0→1**（`CHG-20261010-078` 处于 `VERIFYING`）、归档 `DONE` **36→38**、归档列 **38→40** 与分母 completed **48→50**（`CHG-20261003-076`／`077` 归档）。闭合式：归档列 40（`DONE` 38＋`VERIFYING` 1＋`IMPLEMENTING` 1）＋退役 `CLOSED` 4＋`HANDOFF` 2＋`IN_PROGRESS` 4 ＝ 50 ✓。**上一版 38＋4＋2＋4＝48 在当时是对的**（那个 38 已是 36＋1＋1），不是漏项——本条只改由归档造成的增量。保留 4 篇的理由：047／050 是用户 2026-09-23 裁定的暂停（ADR-0013），034 等真实受限账号样本，054 是 M3 验收期 11 项未修缺陷与安全问题的唯一跟踪处。
 
 > **2026-10-03 就地勘误（CHG-20261002-074 关闭时实测，同一仪器）**：活侧 `PLANNED` **2→5**、分母 planned **22→21**；归档侧 `DONE` **35→36**、`CLOSED` **2→4**、分母 completed **45→48**、归档列 **37→38**。动作面是 072/073/074 三篇归档（+3）与本草案 `CHG-20261003-075`（+1 planned），其中 `DONE` 只 +1（074），072/073 归档时写的是 `CLOSED`——**即上一条勘误漏的那一格**（那时 `CLOSED` 已实际是 4 处，表里写 2）。同一实测还**推翻 069 那次登记的一个现象**：当时 planned 22 篇里只有 18 篇读出词，因为 070/071 把状态写成带反引号的 `` `PLANNED` ``；本轮 21 篇**全部**读出词、无不可解析项（070/071 已写裸词，072/073 移入归档）。反引号使词读不出的机制仍在，只是当前没有记录踩到；`Level` 行的同类缺口（68 篇里 6 篇正则匹配不到，导致里程碑引用检查整段跳过）登记在 `delivery/planned/CHG-20261003-075/change.md` §2 第 10 项。
 
@@ -135,7 +137,7 @@ wt-media-workspace/
 
 里程碑文件内部的子项状态（如 M2-D 的 `DEFERRED`）不是里程碑状态词，不占上表，只在其所属里程碑文件内自述。
 
-**历史词汇**（不再取用；**归档记录**保持原样、不回改，**活记录一律改用上表的词**）：作为 **CHG 状态值**的 `TODO`、`IMPLEMENTED` 与 `VERIFIED` 在 58 篇记录中**零处使用**——它们只在本文档的旧版本里被列出过。（`TODO` 在**任务表**的状态列仍是合法值，那是另一个轴，见 §8 的任务表。）`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 0 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处）为已退役写法。落到 `delivery/active/` 的记录只有一个合法状态：`IMPLEMENTING`（实施中）或 `VERIFYING`（待验收）——由 `scripts/verify_product_master_alignment.py::validate_active_change` 强制。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
+**历史词汇**（不再取用；**归档记录**保持原样、不回改，**活记录一律改用上表的词**）：作为 **CHG 状态值**的 `TODO`、`IMPLEMENTED` 与 `VERIFIED` 在 58 篇记录中**零处使用**（2026-10-10 在 `planned/`＋`active/`＋`completed/` 全语料上重测：**58 篇、零命中**。该数并非未受本次清理影响——清理前实测 **72** 篇，删 14 篇后恰好回到 58，属巧合，不是这句话一直是对的）。（`TODO` 在**任务表**的状态列仍是合法值，那是另一个轴，见 §8 的任务表。）`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 0 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处）为已退役写法。落到 `delivery/active/` 的记录只有一个合法状态：`IMPLEMENTING`（实施中）或 `VERIFYING`（待验收）——由 `scripts/verify_product_master_alignment.py::validate_active_change` 强制。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
 
 **「归档记录保持原样」与「移除已完成 CHG」不矛盾，因为两者说的不是同一件事**：§2 完成清单第 7 项的「移除」指的是把记录**移出** `delivery/active/` 与 `delivery/LEDGER.md`；记录**本身**移入 `delivery/completed/` 并保持原样，**不删除、不重写、不合并**。`delivery/completed/` 的完整只读边界（含新增原始捕获的入库阈值与已知例外）唯一落点是 `delivery/completed/README.md`，本节不复述其正文。
 
@@ -402,7 +404,7 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 | M3-E2 | 作者周期任务与真实增量入池（**已暂停**，后续版本再评估） | CHG-20260915-050 |
 | M3-E3 | 综合验收与用户签收；独立的只读运行视图本期不做（2026-09-23 裁定移出交付要求） | CHG-20260915-051 |
 
-A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停（本期不做，后续版本再做），移出验收范围。E3 的独立验收草案 CHG-20260915-051 仍为 DISCUSSION、未启动，其执行草案位于 `delivery/planned`；E3 的**综合验收走查已于 2026-09-23 在 Cloud `aaf66c5` 上执行**（106 步中 87 PASS / 7 FAIL，唯一硬阻断为 D-scheduler：无人值守的真实周期触发未交付），D-scheduler 同日修复并复验通过，Desktop 走查与 `material_failed` 注入两项覆盖缺口同补，**验收矩阵第 1～7 项全部通过并经用户签收**，结论见 CHG-052 `checkpoint.md` 与 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`。原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。C 阶段由 C1 完成，M3-E 由 E1 与 E3 完成。逐阶段状态见 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1、2.2 节。
+A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停（本期不做，后续版本再做），移出验收范围。E3 的独立验收草案 CHG-20260915-051 从未启动，其草案已于 2026-10-10 随 planned 清理删除（见 §3 勘误）；E3 的**综合验收走查已于 2026-09-23 在 Cloud `aaf66c5` 上执行**（106 步中 87 PASS / 7 FAIL，唯一硬阻断为 D-scheduler：无人值守的真实周期触发未交付），D-scheduler 同日修复并复验通过，Desktop 走查与 `material_failed` 注入两项覆盖缺口同补，**验收矩阵第 1～7 项全部通过并经用户签收**，结论见 CHG-052 `checkpoint.md` 与 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`。原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。C 阶段由 C1 完成，M3-E 由 E1 与 E3 完成。逐阶段状态见 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1、2.2 节。
 
 明确不做：视频下载/存储/校验、剪辑、AI 评分、自动生产/发布/互动/数据分析、其他渠道真实采集、工作流引擎、可视化调度器、任意脚本执行、crawl_result、完整历史原始 JSON。
 

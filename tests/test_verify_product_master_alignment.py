@@ -197,7 +197,8 @@ class ProductMasterAlignmentTests(unittest.TestCase):
             [],
         )
 
-        # Verbatim from `delivery/planned/CHG-20260923-053/change.md`: bolded.
+        # Verbatim from `CHG-20260923-053` (its `planned/` record was deleted
+        # 2026-10-10): bolded.
         bold = "**SUPERSEDED（2026-09-23 并入联合工程优化程序，不再独立激活）**"
         self.assertEqual(
             self.module.validate_active_change(
