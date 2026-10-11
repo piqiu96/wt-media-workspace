@@ -48,7 +48,8 @@
 | --- | --- |
 | `docs/product/` | 产品需求、用户场景、功能目标和产品验收 |
 | `docs/engineering/architecture/` | 系统架构、模块边界、分层和通信设计 |
-| `docs/engineering/specs/` | 工程规范、技术标准和开发约束 |
+| `docs/engineering/specs/` | 长期有效的专题工程设计 |
+| `docs/standards/` | 跨领域的研发、设计与产品实践规范；代码演进细则在此维护 |
 | `docs/contracts/` | 跨仓 API、协议、Event Schema 和数据契约 |
 | `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
 | `docs/devops/` | 端口与部署总账：各组件监听端口、连接链路和本地/线上接法的索引 |
@@ -279,7 +280,29 @@ Workspace 和各运行仓分别维护：
 禁止手工编辑，也不在 Workspace 外建立第二份副本。
 
 
-## 7. Skills 与验证
+## 7. AI 协作原则
+
+AI 执行任务时，应优先理解已有系统事实和规范，而不是基于局部上下文自行扩展规则。
+
+执行原则：
+
+- 优先确认任务目标、所属工程和事实来源；
+- 根据任务类型读取对应 Product、Architecture、Contract、Decision 和 Standard；
+- 优先复用已有能力和规范，不重复创建规则；
+- 修改范围与任务范围匹配，不因局部问题扩大无关范围；
+- 发现系统边界变化时，更新对应正式定义，不通过临时方案绕过。
+
+避免：
+
+- 根据历史材料推断未确认需求；
+- 将讨论过程作为当前规则；
+- 创建第二套事实来源；
+- 为未来可能需求提前增加复杂度。
+
+具体实践规范按任务从 [Standards 索引](docs/standards/README.md)选读。
+
+
+## 8. Skills 与验证
 
 ### Skills
 
@@ -291,9 +314,7 @@ Workspace 和各运行仓分别维护：
 - `desktop/`
 
 由现有脚本分发到对应 Harness 目录。
-
 正常任务使用已经分发的 Skills，不默认扫描源 `skills/`。
-
 只有以下任务才读取 Skill 源目录：
 
 - Skill 开发；
@@ -304,7 +325,6 @@ Workspace 和各运行仓分别维护：
 ### 验证
 
 验证范围与修改范围匹配。
-
 优先使用：
 
 - 目标仓已有测试；
@@ -313,16 +333,13 @@ Workspace 和各运行仓分别维护：
 - 已有构建和验收入口。
 
 不默认执行全部仓库、全部构建和全部测试。
-
 涉及跨仓 Contract、Schema 或运行边界时，必须同时核对提供方和消费方。
 
-具体命令和脚本行为以：
+具体命令和脚本行为以如下为准：
 
 - Workspace `README.md`
 - `scripts/README.md`
 - 目标运行仓 `DIRECTORY_MAP.md`
 - 当前代码和测试配置
-
-为准。
 
 验证结果以本次实际执行输出为准。

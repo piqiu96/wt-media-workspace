@@ -6,6 +6,7 @@ This tree contains current governance baselines and durable governance records.
 
 - `product`: current effective product facts.
 - `engineering`: current effective engineering facts.
+- `standards`: shared engineering, design, and product practice standards.
 - `contracts`: human-readable Cloud, Agent, and Desktop contract governance.
 - `decisions`: durable decisions and reasons.
 - `devops`: 端口与部署总账——各组件监听端口、连接链路，以及本地与线上的接法索引。

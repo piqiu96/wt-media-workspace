@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify_m0_config.py"
@@ -39,6 +42,25 @@ class VerifyM0ConfigTests(unittest.TestCase):
     def test_release_matrix_matches_m0_and_m1_c1_releases(self) -> None:
         errors = self.module.validate_release_matrix()
         self.assertEqual(errors, [])
+
+    def test_release_matrix_allows_local_toolchain_observations_to_change(self) -> None:
+        source = (self.module.ROOT / "config" / "release-matrix.yaml").read_text(
+            encoding="utf-8"
+        )
+        updated, count = re.subn(
+            r'(?m)^(    local_observed_(?:node|npm|rustc|cargo): ).*$',
+            r'\g<1>"99.0.0"',
+            source,
+        )
+        self.assertEqual(count, 4)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "config").mkdir()
+            (root / "config" / "release-matrix.yaml").write_text(
+                updated, encoding="utf-8"
+            )
+            with patch.object(self.module, "ROOT", root):
+                self.assertEqual(self.module.validate_release_matrix(), [])
 
     def test_ci_workflows_cover_revised_m0_gates(self) -> None:
         errors = self.module.validate_ci_workflows(allow_missing_repos=True)

@@ -4,7 +4,7 @@
 
 WT Media Workspace 是多工程系统的研发控制中心（Engineering Control Plane），负责系统级产品、架构、跨仓协议、技术决策、Delivery 和 AI 协作。
 
-本仓保存研发知识和交付状态，不承载业务运行时代码，也不成为运行时依赖。
+本仓保存研发知识和交付状态，不承载业务运行时代码，也不成为运行时依赖。本仓中的文档用于指导工程演进，但代码修改应以目标工程实际职责和已有架构边界为准。
 
 ## 关联工程
 
@@ -38,7 +38,8 @@ WT Media Workspace 是多工程系统的研发控制中心（Engineering Control
 | 内容 | 位置 |
 | --- | --- |
 | 产品 | `docs/product/` |
-| 架构与工程规范 | `docs/engineering/` |
+| 架构与专题工程设计 | `docs/engineering/` |
+| 研发、设计与产品实践规范 | `docs/standards/` |
 | 跨仓协议 | `docs/contracts/` |
 | 技术决策 | `docs/decisions/` |
 | 可引用的状态说明 | `reference/state-models/` |
