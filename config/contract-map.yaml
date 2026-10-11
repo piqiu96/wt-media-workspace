@@ -9,7 +9,9 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.09.06.1"
+    # 2026.09.06.1 → 2026.10.02.1：cloud-api 的 v1/file-transfer.openapi.yaml
+    # 已由 cloud 仓推进（该值此前与定义脱节，由 verify_m0_config 的活源对比抓出）。
+    contract_revision: "2026.10.02.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -29,7 +31,9 @@ contracts:
     path: ../wt-media-cloud/contracts/business-schemas
     state: active
     formal_definition: active
-    schema_revision: "2026.07.14.4"
+    # 2026.07.14.4 → 2026.10.02.1：三个定义文件早已推进（identity/browser-profile/
+    # media-account），map 停在旧值上无人可见，由活源对比抓出。
+    schema_revision: "2026.10.02.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -48,7 +52,9 @@ contracts:
     path: ../wt-media-cloud/contracts/business-enums
     state: active
     formal_definition: active
-    enum_revision: "2026.07.14.3"
+    # 2026.07.14.3 → 2026.09.26.2：identity.yaml（2026.07.22.1）与
+    # content-production.yaml（2026.09.26.2，CHG-20260930-069）已推进。
+    enum_revision: "2026.09.26.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -58,7 +64,9 @@ contracts:
     path: ../wt-media-cloud/contracts/cloud-error-codes
     state: active
     formal_definition: active
-    error_revision: "2026.07.14.5"
+    # 2026.07.14.5 → 2026.10.02.1：agent-runtime/browser-profile/profile-guard
+    # 三个错误码文件已推进，map 停在旧值，由活源对比抓出。
+    error_revision: "2026.10.02.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent

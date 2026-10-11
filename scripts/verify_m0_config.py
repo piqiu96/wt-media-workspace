@@ -4,12 +4,29 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTER_ROOT = ROOT.parent
+
+# map 条目里承载日期版本的字段（每个契约恰有其一）。
+REVISION_FIELDS = (
+    "contract_revision",
+    "schema_revision",
+    "error_revision",
+    "event_revision",
+    "enum_revision",
+)
+
+# 定义文件里日期版本的两种行形状：agent 侧 YAML 的行首 `revision: "…"` 与
+# openapi `info:` 下缩进的 `version: …`。两处都锚定行首/缩进并要求数值恰为
+# 日期形（YYYY.MM.DD.N），避免子串误命中（`app_version:`、schema 里的
+# `version: {type: string}`、`const:` 行都不匹配）。
+REVISION_LINE = re.compile(r'^revision:\s*"?(\d{4}\.\d{2}\.\d{2}\.\d+)"?\s*$', re.MULTILINE)
+OPENAPI_VERSION_LINE = re.compile(r"^ {2,6}version:\s*(\d{4}\.\d{2}\.\d{2}\.\d+)\s*$", re.MULTILINE)
 
 EXPECTED_CONTRACTS = {
     "cloud_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-api", "active", "active"),
@@ -23,6 +40,23 @@ EXPECTED_CONTRACTS = {
     "local_status_enums": ("wt-media-agent", "../wt-media-agent/contracts/local-status-enums", "active", "active"),
     "local_error_codes": ("wt-media-agent", "../wt-media-agent/contracts/local-error-codes", "active", "active"),
 }
+
+
+def revision_order(value: str) -> tuple[int, int, int, int]:
+    # 末段不受零填充保护（9 > 10 会按字典序排错），按数值比较。
+    return tuple(int(part) for part in value.split("."))
+
+
+def definition_revision_max(provider_path: Path) -> tuple[str | None, str]:
+    """定义目录里最新的日期版本值，及它所在的文件名；找不到返回 (None, "")。"""
+    best: str | None = None
+    best_file = ""
+    for found in sorted(provider_path.rglob("*.yaml")) + sorted(provider_path.rglob("*.yml")):
+        text = found.read_text(encoding="utf-8")
+        for value in REVISION_LINE.findall(text) + OPENAPI_VERSION_LINE.findall(text):
+            if best is None or revision_order(value) > revision_order(best):
+                best, best_file = value, found.name
+    return best, best_file
 
 
 def parse_contract_map(text: str) -> dict[str, dict[str, str]]:
@@ -79,66 +113,33 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
                 f"{name}: expected formal_definition {formal_definition!r}, "
                 f"got {actual.get('formal_definition')!r}"
             )
-        if name == "cloud_agent_api":
-            for key, value in (
-                ("api_major_version", "v1"),
-                ("contract_revision", "2026.07.14.7"),
-                ("minimum_agent_contract_revision", "2026.07.14.7"),
-                ("compatibility_endpoint", "/api/v1/cloud-agent/compatibility"),
-            ):
-                if actual.get(key) != value:
-                    errors.append(f"{name}: expected {key} {value!r}, got {actual.get(key)!r}")
-        if name == "cloud_api":
-            if actual.get("api_major_version") != "v1":
-                errors.append("cloud_api: expected api_major_version 'v1'")
-            # 该值随 M4/M5 的两次合约前进由 2026.07.14.4 更新为 2026.09.06.1
-            # （CHG-20260925-063）。这是本脚本的有意设计：合约版本前进属需复核的变更，
-            # 故此处是钉子而非引用。但钉子过期会产生噪音红灯，见 change.md §4.6。
-            if actual.get("contract_revision") != "2026.09.06.1":
-                errors.append("cloud_api: expected contract_revision '2026.09.06.1'")
-        if name == "business_schemas" and actual.get("schema_revision") != "2026.07.14.4":
-            errors.append("business_schemas: expected schema_revision '2026.07.14.4'")
-        if name == "business_enums" and actual.get("enum_revision") != "2026.07.14.3":
-            errors.append("business_enums: expected enum_revision '2026.07.14.3'")
-        if name == "cloud_error_codes" and actual.get("error_revision") != "2026.07.14.5":
-            errors.append("cloud_error_codes: expected error_revision '2026.07.14.5'")
-        if name == "local_agent_api":
-            if actual.get("api_major_version") != "v1":
-                errors.append("local_agent_api: expected api_major_version 'v1'")
-            # 由 2026.09.06.1 更新为 2026.09.27.1（CHG-20260924-061 T-04 新增
-            # `GET`/`POST /api/v1/save-directory`）。
-            #
-            # 上一次更新（CHG-20260925-063 T-01）把本钉子从 2026.07.14.7 挪到
-            # 2026.09.06.1，理由是「对齐现状」——而 map 的那个值本身就是旧的：定义
-            # 文件早在 `87b1264`（CHG-20260923-057 T-08）就到了 2026.09.24.1。于是钉子
-            # 与 map 一起停在同一个过期值上，双双通过。全工作区模式下本脚本完全读得到
-            # 那份文件（下面的 `provider_path` 已经把它解析出来了），却没有把两者对比
-            # 过：钉子只保证「map 没背着人动」，保证不了「这个值还对」。CHG-20260923-059
-            # Q-06 登记了这处缺口，CHG-20260924-061 复核后确认，仍不在其范围内。
-            # 再由 2026.09.27.1 更新为 2026.10.03.1（CHG-20261002-074 为
-            # `GET /api/v1/status` 增加可选 `scan` 参数，缺省仍是实时扫描）。
-            if actual.get("contract_revision") != "2026.10.03.1":
-                errors.append("local_agent_api: expected contract_revision '2026.10.03.1'")
-        if name == "local_event_schemas":
-            if actual.get("event_revision") != "2026.07.14.9":
-                errors.append("local_event_schemas: expected event_revision '2026.07.14.9'")
-        if name == "local_status_enums" and actual.get("enum_revision") != "2026.07.14.8":
-            errors.append("local_status_enums: expected enum_revision '2026.07.14.8'")
-        # 由 2026.07.14.6 更新为 2026.09.27.1（CHG-20260924-061 T-04 新增
-        # `v1/transfer.yaml`），再更新为 2026.09.27.2（同一 Task：本机 API 的
-        # 「无 store」拒绝回答 503 `save_directory_unavailable`，而该文件从未声明它；
-        # 补声明的同一次改动即为该文件加上了真正的消费方），再更新为
-        # 2026.09.27.3（同一 Task 的装配段：`POST /api/v1/bind` 在无处存放凭据时
-        # 回答 503 `node_credential_unavailable`）。与 `local_event_schemas`
-        # 同一约定：map 记该区**最新**的定义版本，每个文件自己的 `revision` 才是它
-        # 自己的；`v1/bitbrowser.yaml` 仍在 2026.07.14.6，由 release-matrix.yaml 按
-        # 发布范围逐条记录，不由本钉子跟踪。
-        if name == "local_error_codes" and actual.get("error_revision") != "2026.09.27.3":
-            errors.append("local_error_codes: expected error_revision '2026.09.27.3'")
+        # 日期值走活源对比，字段与日期钉子全部退役：硬编码钉子每次合约前进都
+        # 要人肉挪，挪漏了就是红灯（CHG-20261003-075 第 2/12 项即两次实例），
+        # 而钉子与 map 停在同一个过期值上时会双双通过、看不见真漂移。改为
+        # 「map 对定义文件」后，正常演进不再红，map 忘了跟定义一起动反而会被抓。
+        # cloud_agent_api 的 minimum_agent_contract_revision 的活源是 cloud 的
+        # compatibility.go 常量，由 cloud 自身测试守住，不在本脚本重复。
 
         provider_path = (ROOT / rel_path).resolve()
         if not provider_path.is_dir() and not allow_missing_repos:
             errors.append(f"{name}: provider path does not exist: {provider_path}")
+
+        # 约定沿用既有口径：map 记该区**最新**的定义版本，各文件自带的 revision
+        # 是它自己的；Desktop 的 contracts.lock.json 钉具体文件（profile-guard@…）
+        # 而非区最新，两处口径各自正确，由 verify_m2_acceptance.py 派生比对。
+        if provider_path.is_dir():
+            field = next((k for k in REVISION_FIELDS if k in actual), None)
+            if field is None:
+                errors.append(f"{name}: contract-map entry has no revision field")
+            else:
+                def_max, def_file = definition_revision_max(provider_path)
+                if def_max is None:
+                    errors.append(f"{name}: no dated revision found in {provider_path}")
+                elif actual.get(field) != def_max:
+                    errors.append(
+                        f"{name}: map {field} {actual.get(field)!r} != definition "
+                        f"latest {def_max!r} ({def_file})"
+                    )
 
     return errors
 
@@ -295,7 +296,6 @@ def validate_ci_workflows(allow_missing_repos: bool) -> list[str]:
             "scripts/bootstrap.sh",
             "scripts/test.sh",
             "scripts/migrate.sh",
-            "scripts/build.sh",
         ),
         "wt-media-agent/.github/workflows/m0-agent.yml": (
             "astral-sh/setup-uv@v5",

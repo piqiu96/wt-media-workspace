@@ -25,7 +25,12 @@ asserts the schema that makes it enforceable, in the applied migration.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+# 复用 m0 门禁的锚定抽取器与版本排序，避免两处正则各自漂移。
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from verify_m0_config import REVISION_LINE, definition_revision_max, revision_order
 
 
 WORKSPACE = Path(__file__).resolve().parents[1]
@@ -49,6 +54,15 @@ def require_contains(errors: list[str], path: Path, needles: tuple[str, ...]) ->
             errors.append(f"{path}: missing {needle!r}")
 
 
+def pinned_file_revision(contracts_dir: Path, stem: str) -> str | None:
+    """`v1/<stem>.yaml` 自己的 revision——Desktop 锁具体文件时的期望值来源。"""
+    path = contracts_dir / "v1" / f"{stem}.yaml"
+    if not path.is_file():
+        return None
+    values = REVISION_LINE.findall(path.read_text(encoding="utf-8"))
+    return max(values, key=revision_order) if values else None
+
+
 def validate_static_matrix() -> list[str]:
     errors: list[str] = []
     for path in required_repository_paths():
@@ -57,17 +71,12 @@ def validate_static_matrix() -> list[str]:
     if errors:
         return errors
 
+    # contract-map 的日期值不再在此钉字面量：值的一致性由 verify_m0_config 的
+    # 「map 对定义文件」活源对比负责，这里只留 M2 范围声明本身。
     require_contains(
         errors,
         WORKSPACE / "config" / "contract-map.yaml",
-        (
-            "contract_state: m2_sensitive_profile_guard",
-            'cloud_agent_api:',
-            'contract_revision: "2026.07.14.7"',
-            'error_revision: "2026.07.14.5"',
-            'event_revision: "2026.07.14.9"',
-            'enum_revision: "2026.07.14.8"',
-        ),
+        ("contract_state: m2_sensitive_profile_guard",),
     )
     require_contains(
         errors,
@@ -96,7 +105,7 @@ def validate_static_matrix() -> list[str]:
     require_contains(
         errors,
         CLOUD / "contracts" / "cloud-agent-api" / "v1" / "sensitive-profile-guard.openapi.yaml",
-        ("version: 2026.07.14.6", "review_required", "X-Profile-Permit"),
+        ("review_required", "X-Profile-Permit"),
     )
     # Removed by CHG-20260925-063: asserted the literal
     # `REQUIRED_CONTRACT_REVISION = "2026.07.15.1"` in
@@ -104,28 +113,61 @@ def validate_static_matrix() -> list[str]:
     # that exact value; its definition moved to `clients/cloud/contract.py` and
     # the old module now re-exports it. The revision is asserted at the contract
     # layer instead (contract-map.yaml, and the contract YAML below).
-    require_contains(errors, AGENT / "pyproject.toml", ('version = "0.2.2"',))
+    # Removed by CHG-20261003-075: the agent `pyproject.toml` version snapshot
+    # and the two dated-revision literals above. M2 was accepted on 2026-09-14;
+    # a released-version snapshot in a standing suite goes red on every honest
+    # bump, and the revision linkage is enforced by the derived lock checks
+    # below instead.
     require_contains(
         errors,
         AGENT / "contracts" / "local-event-schemas" / "v1" / "profile-guard.yaml",
-        ('revision: "2026.07.14.8"', "result_uncertain"),
+        ("result_uncertain",),
     )
 
+    # Desktop contract lock 不再对硬编码基线（基线会随每次合约前进过期，
+    # CHG-20261003-075 第 1 项），改从定义文件派生期望值：
+    # - `v1@` 条目对定义目录的最新版本，与 contract-map 同口径；
+    # - `<文件>@<版本>` 条目对被指文件自己的 revision——锁具体文件就意味着
+    #   区内其他文件（如 runtime-environment）的前进不强迫消费方跟进。
     lock_path = DESKTOP / "contracts.lock.json"
     try:
         lock = json.loads(lock_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         errors.append(f"could not parse {lock_path}: {error}")
+        lock = {}
+    consumes = lock.get("consumes")
+    if not isinstance(consumes, dict):
+        errors.append(f"{lock_path}: missing consumes map")
     else:
-        expected = {
-            "cloud_agent_api": "v1@2026.07.15.1",
-            "task_schemas": "v1@2026.07.15.1",
-            "local_agent_api": "v1@2026.07.14.7",
-            "local_event_schemas": "profile-guard@2026.07.14.8",
-            "local_status_enums": "status@2026.07.14.8",
-        }
-        if lock.get("consumes") != expected:
-            errors.append(f"Desktop contract lock mismatch: {lock.get('consumes')!r}")
+        for name, contracts_dir in (
+            ("cloud_agent_api", CLOUD / "contracts" / "cloud-agent-api"),
+            ("task_schemas", CLOUD / "contracts" / "task-schemas"),
+            ("local_agent_api", AGENT / "contracts" / "local-agent-api"),
+        ):
+            def_max, def_file = definition_revision_max(contracts_dir)
+            if def_max is None:
+                errors.append(f"{name}: no dated revision found in {contracts_dir}")
+            elif consumes.get(name) != f"v1@{def_max}":
+                errors.append(
+                    f"{name}: Desktop lock {consumes.get(name)!r} != v1@{def_max} "
+                    f"(latest definition: {def_file})"
+                )
+        for name, contracts_dir in (
+            ("local_event_schemas", AGENT / "contracts" / "local-event-schemas"),
+            ("local_status_enums", AGENT / "contracts" / "local-status-enums"),
+        ):
+            pinned = consumes.get(name, "")
+            stem, sep, rev = pinned.partition("@")
+            if not sep or not stem or not rev:
+                errors.append(f"{name}: Desktop lock entry {pinned!r} is not <file>@<revision>")
+                continue
+            actual = pinned_file_revision(contracts_dir, stem)
+            if actual is None:
+                errors.append(
+                    f"{name}: {stem}.yaml missing or has no dated revision in {contracts_dir}"
+                )
+            elif actual != rev:
+                errors.append(f"{name}: Desktop lock pins {stem}@{rev}, definition says {actual}")
     # Binding-ticket single use, asserted at the layer that can actually stay
     # true. CHG-20260925-063 removed assertions on Desktop source text
     # (`main.rs` carrying "wt-media-agent"; `local_agent/mod.rs` carrying
