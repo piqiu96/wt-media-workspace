@@ -670,9 +670,9 @@ releases:
       release: "release.yml Run 38138153403 succeeded after one failed attempt: Windows agent CA-bundle hash mismatched because '* text=auto' rewrote ca-bundle.pem to CRLF on checkout; fixed by '-text' pin in agent 8e27531 and the component tag re-pinned before any artifact was consumed. Six-asset SHA256SUMS, build-info product_tag and cloud_origin read back locally; stable Release auto-published (draft=false). Evidence: CHG-078 evidence/v012-release-and-deploy-20261011.md"
       manual: "user deployed v0.1.2 via BaoTa on 2026-10-11 (precheck, deploy apply, Server-Worker-Scheduler restart); online probes returned /api/v1/health 200, / /login /home 200, unauthenticated /api/v1/auth/me 401+11001, and the three new login codes 10005/10006/11004 (same evidence file)"
     target_status:
-      windows_x64: "installer published and SHA-verified; interactive download from target network pending user"
-      macos_x86_64: "installer published and SHA-verified; interactive download from target network pending user"
-      macos_arm64: "installer published and SHA-verified; interactive download from target network pending user"
+      windows_x64: "installer published and SHA-verified; user confirmed download click-through on 2026-10-11"
+      macos_x86_64: "installer published and SHA-verified; user confirmed download click-through on 2026-10-11"
+      macos_arm64: "installer published and SHA-verified; user confirmed download click-through on 2026-10-11"
     residual_risks:
       - "build-info.json records agent source 1d6c883 while the Windows agent artifact was built after the component tag moved to 8e27531; the delta is .gitattributes-only and enters no artifact bytes."
       - "The presigned variables URL on the server (output/online.url) expires in at most 7 days; every deploy must regenerate it with ~/.wt-media/upload-config-variables.py and refresh the server copy, or deploy plan fails with HTTP 400."

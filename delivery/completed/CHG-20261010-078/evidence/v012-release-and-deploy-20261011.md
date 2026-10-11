@@ -9,3 +9,4 @@
 - 边界一：build-info `source_commits.agent` 记 `1d6c883`（首跑读的 tag），Windows agent 实产自重跑的 `8e27531`；两提交仅差 `.gitattributes` 三行，不进任何产物字节。
 - 边界二：`deploy plan` 期间服务器 `output/online.url` 预签名过期致 HTTP 400；用户重新预签并更新后恢复。预签名最长 7 天，属每次部署的常态物料（见 `~/.wt-media/upload-config-variables.py`）。
 - 剩余人工验收：真实账号登录走查、官网视觉与滚动走查、目标用户网络三平台下载。
+- 关闭（2026-10-11）：用户完成上述三项线上走查并确认通过，CHG-078 关闭。
