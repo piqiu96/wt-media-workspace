@@ -137,19 +137,19 @@ GitHub Release 支持 Pre-release 与 Draft 两种状态；本计划分别用来
 
 | 配置项 | 开发 | 预发布候选（RC） | 正式生产 |
 | --- | --- | --- | --- |
-| 客户端访问 Cloud | 当前本机 `http://127.0.0.1:18080` | 预发布 HTTPS 域名/443，待核实 | 生产 HTTPS 域名/443，待核实 |
-| Cloud 进程入口 | 本机 `127.0.0.1:18080` | 宝塔内网/本机监听端口，拟 8080，待核实 | 宝塔内网/本机监听端口，拟 8080，待核实 |
+| 客户端访问 Cloud | 当前本机 `http://127.0.0.1:8188` | 预发布 HTTPS 域名/443，待核实 | 生产 HTTPS 域名/443，待核实 |
+| Cloud 进程入口 | 本机 `127.0.0.1:8188` | 宝塔内网/本机监听端口，拟 8188，待核实 | 宝塔内网/本机监听端口，拟 8188，待核实 |
 | 用户电脑本地服务 | Agent `127.0.0.1:8765`；比特 `127.0.0.1:54345` | 保持用户电脑本机地址 | 保持用户电脑本机地址 |
 | MySQL | 开发库 `wt_media_cloud` | 独立预发布库、专用账号/私有密码 | 生产库 `wt_media`（核实名称）、专用账号/私有密码 |
 | 云端对象文件 | 当前同一 endpoint/bucket 下 `dev/` 前缀 | 独立 bucket 或必填 `staging/` 前缀 | 独立 bucket 或必填 `prod/` 前缀 |
 | 媒体暂存/日志 | 开发机本地目录 | 预发布服务器独立可写目录 | 宝塔 `shared/` 下受控可写目录 |
 
-客户端只配置 Cloud **公开 HTTPS 地址**；用户机器的 `8765/54345` 不经宝塔暴露；MySQL `3306` 和 Cloud 内部 `8080` 也不作为客户端下载地址。对象存储的 endpoint/bucket/prefix 和 Cloud Worker 暂存磁盘是两种不同路径，分别验证。
+客户端只配置 Cloud **公开 HTTPS 地址**；用户机器的 `8765/54345` 不经宝塔暴露；MySQL `3306` 和 Cloud 内部 `8188` 也不作为客户端下载地址。对象存储的 endpoint/bucket/prefix 和 Cloud Worker 暂存磁盘是两种不同路径，分别验证。
 
 | 优先级 | 配置/代码位置与现状 | 目标规则和验收 |
 | --- | --- | --- |
-| 上线阻断 | Cloud `config_online/app.toml` 监听 `:8080`，开发配置监听 `127.0.0.1:18080`。 | 宝塔对外统一走有有效证书的 HTTPS 域名/443，反向代理 Cloud Web 与 `/api`；Cloud 进程只接受宝塔可达的内网/本机地址（同机优先 `127.0.0.1:8080`），不要把 8080 作为客户端入口。核对端口占用、代理路径、转发头、真实健康检查和维护页/API 维护状态。 |
-| 上线阻断 | Agent `config_online/agent.toml` 的 `cloud.base_url`、Desktop `src-tauri/resources/desktop.production.toml` 的 `cloud.base_url` 与 `browser.csp_connect_src` 都仍指向 `http://127.0.0.1:18080`。Desktop 生产配置还编进 Rust 二进制，不能指望部署后用环境变量修正。 | 由一次发布的环境清单生成同一个公开 Cloud HTTPS origin；RC 指预发布，正式版指生产。打包前注入并校验 Desktop 原生配置、CSP、Agent 发布配置和包内最终值一致，且生产包没有作为 Cloud 地址的回环地址。变更域名必须重打新 Tag 与安装包。 |
+| 上线阻断 | Cloud `config_online/app.toml` 监听 `:8188`，开发配置监听 `127.0.0.1:8188`。 | 宝塔对外统一走有有效证书的 HTTPS 域名/443，反向代理 Cloud Web 与 `/api`；Cloud 进程只接受宝塔可达的内网/本机地址（同机优先 `127.0.0.1:8188`），不要把 8188 作为客户端入口。核对端口占用、代理路径、转发头、真实健康检查和维护页/API 维护状态。 |
+| 上线阻断 | Agent `config_online/agent.toml` 的 `cloud.base_url`、Desktop `src-tauri/resources/desktop.production.toml` 的 `cloud.base_url` 与 `browser.csp_connect_src` 都仍指向 `http://127.0.0.1:8188`。Desktop 生产配置还编进 Rust 二进制，不能指望部署后用环境变量修正。 | 由一次发布的环境清单生成同一个公开 Cloud HTTPS origin；RC 指预发布，正式版指生产。打包前注入并校验 Desktop 原生配置、CSP、Agent 发布配置和包内最终值一致，且生产包没有作为 Cloud 地址的回环地址。变更域名必须重打新 Tag 与安装包。 |
 | 上线阻断 | Cloud Web `web/src/shared/api/http.js`、`web/src/modules/accounts/pages/AccountsPage.vue`、`web/src/modules/profiles/pages/ProfilesPage.vue` 的 Desktop 分支仍硬编码本机 Cloud URL，尽管 `web/src/apps/desktop/features/local-agent/init.js` 已能向原生层读取公开配置。 | Desktop Web 的所有 Cloud API 和本机状态刷新统一使用一个受控的公开 Cloud 地址来源；生产打包扫描不能出现有效运行路径上的旧本机 Cloud URL。Vite 开发代理仍可保留本机地址，不应被误改成线上地址。验证登录、账号/窗口检查、文件授权与 API 请求实际落在目标域名。 |
 | 上线阻断 | Cloud `config_online/database/primary.toml` 为 `127.0.0.1:3306`、库 `wt_media`、用户 `root`、空密码；开发库名不同。Cloud `config_online/app.toml` 的首次管理员用户名/密码也均为空；空值会跳过建管理员。 | 根据宝塔 MySQL 的实际部署决定主机/端口/库名，使用最小权限专用数据库账号及服务器私有密码；先验证连接和迁移目标。新库必须有安全的一次性管理员初始化或等效已验证建号流程，首次登录通过后清除一次性密码。任何口令都不写入仓库、Manifest、安装包或 Actions Artifact。 |
 | 上线阻断 | Cloud `config/storage/object_storage.toml` 与 `config_online/storage/object_storage.toml` 当前使用相同 endpoint 和 bucket；开发前缀为 `dev/`，线上前缀为空。对象写入与预签名 URL 均由 `internal/infra/storage/minio.go` 对逻辑 key 加配置前缀；逻辑 key 如 `materials/<id>/...`。 | 在首发前锁定明确的 `dev/`、`staging/`、`prod/` 隔离方案；优先独立 bucket 与最小权限密钥，若共用 bucket 则三个环境必须有非空独立前缀和各自权限，生产不能落在根目录。业务代码继续使用逻辑 key，不把环境名写进数据库 key。核对 endpoint 的 HTTPS、地域、bucket、读写权限、过期时间；从 Cloud 写入后由外部 Agent 实际用预签名 URL 下载，证明生成的主机名对客户端可达。若已有对象，改前缀前先迁移或保留旧 key 的读取路径。 |

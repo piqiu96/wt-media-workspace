@@ -57,7 +57,7 @@ SHOT_DIR = RUN_DIR / "screenshots"
 COOKIE_DIR = CLOUD_ROOT / ".cache" / "m3-acc"
 STATE_FILE = RUN_DIR / "state.json"
 MANIFEST_FILE = RUN_DIR / "run-manifest.json"
-BASE = os.environ.get("WT_MEDIA_M3_BASE", "http://127.0.0.1:18080/api/v1")
+BASE = os.environ.get("WT_MEDIA_M3_BASE", "http://127.0.0.1:8188/api/v1")
 
 ADMIN = os.environ.get("WT_MEDIA_M3_ADMIN", "admin")
 ADMIN_PASSWORD = os.environ.get("WT_MEDIA_M3_ADMIN_PASSWORD", "admin123")
@@ -431,9 +431,9 @@ def phase_g0():
     record("G0.2", phase, "freeze", "toolchain versions", "记录工具链版本",
            json.dumps(vers, ensure_ascii=False), "INFO")
 
-    listeners = subprocess.run(["lsof", "-nP", "-iTCP:18080", "-sTCP:LISTEN"],
+    listeners = subprocess.run(["lsof", "-nP", "-iTCP:8188", "-sTCP:LISTEN"],
                                capture_output=True, text=True).stdout.strip()
-    record("G0.3", phase, "freeze", "lsof -iTCP:18080", "18080 上只有本轮启动的进程",
+    record("G0.3", phase, "freeze", "lsof -iTCP:8188", "8188 上只有本轮启动的进程",
            listeners or "(无监听者)", "INFO")
 
     cred_rows = []
@@ -455,7 +455,7 @@ def phase_g0():
 
     record("G0.5", phase, "freeze", "端口占用表", "记录 5173/5174/8765/8899 现状",
            subprocess.run(["bash", "-lc",
-                           "lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(5173|5174|8765|8899|18080) ' || echo '(none)'"],
+                           "lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(5173|5174|8765|8899|8188) ' || echo '(none)'"],
                           capture_output=True, text=True).stdout.strip() or "(none)", "INFO")
 
 

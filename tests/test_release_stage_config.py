@@ -13,13 +13,13 @@ DESKTOP = '''environment = "production"
 host = "127.0.0.1"
 port = 8765
 [cloud]
-base_url = "http://127.0.0.1:18080"
+base_url = "http://127.0.0.1:8188"
 [browser]
-csp_connect_src = "ipc: http://ipc.localhost http://127.0.0.1:18080"
+csp_connect_src = "ipc: http://ipc.localhost http://127.0.0.1:8188"
 '''
 AGENT = '''environment = "production"
 [cloud]
-base_url = "http://127.0.0.1:18080"
+base_url = "http://127.0.0.1:8188"
 [local_api]
 host = "127.0.0.1"
 port = 8765
@@ -46,7 +46,7 @@ class ReleaseStageConfigTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             desktop = Path(temporary) / "desktop.toml"
             agent = Path(temporary) / "agent.toml"
-            desktop.write_text(DESKTOP.replace('base_url = "http://127.0.0.1:18080"', ''), encoding="utf-8")
+            desktop.write_text(DESKTOP.replace('base_url = "http://127.0.0.1:8188"', ''), encoding="utf-8")
             agent.write_text(AGENT, encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "cloud.base_url"):
                 stage_config(desktop, agent, "https://wt.longyanyue.cn")

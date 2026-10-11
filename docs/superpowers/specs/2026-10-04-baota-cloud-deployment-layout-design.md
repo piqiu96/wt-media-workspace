@@ -60,10 +60,10 @@ Cloud 通过 GitHub 生成 Linux amd64 部署包，由操作者上传宝塔服�
 - 启动命令：直接执行上述文件
 - 工作目录：`/www/wt-media-cloud/current`
 - 运行用户：`www`
-- 应用端口：`8080`
+- 应用端口：`8188`
 - 对外域名：实际 Cloud 域名
 - HTTPS：由宝塔站点配置和续期
-- 防火墙：不直接向公网开放 `8080`
+- 防火墙：不直接向公网开放 `8188`
 
 Server 必须同时提供 `current/web` 中的 Cloud Web。访问真实静态文件时返回文件；访问 `/login` 等前端路由时回退到 `index.cloud.html`；API 和健康接口不能被前端回退覆盖。
 
