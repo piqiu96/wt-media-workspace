@@ -8,8 +8,8 @@
 #      那样写的检查与「执行位」这个缺陷正好错开一格（CHG-20260926-068 的起因）。
 #   3. usage 逐字断言——动词清单改了而 usage 没跟着改，这里红。
 #   4. 未知名词退出码 2 且 usage 落到 stderr——分派被短路成「总是打印 usage」时，这里红。
-#   5. `status` 端到端跑通并给出三行读数（cloud/agent/worker）——HARNESS 路径写错时，
-#      这里红（命令找不到）；worker 行缺少时也红。
+#   5. `status` 端到端跑通并给出五行读数（cloud/agent/worker/web-dev/desktop-dev）——
+#      HARNESS 路径写错时，这里红（命令找不到）；任一行缺少时也红。
 #   6. 本文件不含端口字面量——把端口搬进 control.sh 时，这里红。
 #
 # 判据 1／2 的 `index 模式` 与 `磁盘执行位` 是**两件事**：磁盘 `+x` 而 index `100644` 在本机
@@ -48,7 +48,7 @@ assert_line() {
 }
 assert_line 'Usage: bin/control.sh <start|stop|restart|status|verify|help>'
 assert_line '  start    Rebuild and start the full local end-to-end environment.'
-assert_line '  stop     Stop the Cloud, Local Agent and Cloud worker processes started for local review.'
+assert_line '  stop     Stop the Cloud, Local Agent, Cloud worker and front-end dev servers started for local review.'
 assert_line '  restart  Stop those processes, then rebuild and start the environment again.'
 assert_line '  status   Report whether those processes are alive and, where they serve one, answering.'
 assert_line '  verify   Run end-to-end readiness checks against the running environment.'
@@ -64,11 +64,10 @@ set -e
 [ -z "$UNKNOWN_OUT" ] || die "unknown verb wrote usage to stdout"
 grep -Fq 'Usage: bin/control.sh' <<<"$UNKNOWN_ERR" || die "unknown verb: no usage on stderr"
 
-# 5. status 端到端：先证明 harness 在，再跑，再验三行读数
+# 5. status 端到端：先证明 harness 在，再跑，再验五行读数
 #
-# worker 那一行单独断言：它是唯一没有健康端点的组件（`health=pid-only`、`url=-`）。
-# 少了这条，把 worker 从 status 里删掉仍然全绿——而「status 看不见 worker」正是这个
-# 组件此前不存在时的读法。
+# 每一行都单独断言，不是一个 grep 盖住全部：少了某一条，把该组件从 status 里删掉仍然
+# 全绿——而「status 看不见它」正是该组件此前不存在时的读法（worker 就是这样）。
 test -f "$HARNESS" || die "harness missing at $HARNESS"
 set +e
 STATUS_OUT="$("$CONTROL" status 2>&1)"
@@ -77,14 +76,19 @@ set -e
 case "$STATUS_RC" in 0|1) ;; *) die "status exit=$STATUS_RC, want 0 or 1" ;; esac
 grep -Eq '^cloud: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
   || die "no cloud status line"
-grep -Eq '^agent: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
+# `refused` 也要认：`all` 跑完 app 接管 8765 后，`cmd_status` 给的就是这个读数。
+grep -Eq '^agent: pid=[^ ]* alive=(yes|no) health=(ok|down|refused) url=' <<<"$STATUS_OUT" \
   || die "no agent status line"
 grep -Eq '^worker: pid=[^ ]* alive=(yes|no) health=pid-only url=-$' <<<"$STATUS_OUT" \
   || die "no worker status line"
+grep -Eq '^web-dev: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
+  || die "no web-dev status line"
+grep -Eq '^desktop-dev: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
+  || die "no desktop-dev status line"
 
 # 6. control.sh 不得复述端口值
 if grep -nE ':[0-9]{4,5}([^0-9]|$)' "$CONTROL"; then
   die "bin/control.sh carries a port literal; it belongs to the harness config"
 fi
 
-echo "PASS: bin/control.sh entry (tracked, index 100755, executable, directly invocable), usage, dispatch, status wiring (cloud/agent/worker), and no-port-literal"
+echo "PASS: bin/control.sh entry (tracked, index 100755, executable, directly invocable), usage, dispatch, status wiring (cloud/agent/worker/web-dev/desktop-dev), and no-port-literal"

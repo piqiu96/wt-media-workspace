@@ -28,11 +28,12 @@ Run the acceptance harness end to end: `wt-media-workspace/scripts/m2b-local-acc
 
 Before relying on any process, enforce freshness:
 
-1. **Force-stop stale processes.** Kill any running Cloud (`127.0.0.1:18080`) and Local Agent (`127.0.0.1:8765`) and remove their PID files. A "healthy" process is NOT fresh just because it answers health checks.
+1. **Force-stop stale processes.** Kill any running Cloud (`127.0.0.1:8188`) and Local Agent (`127.0.0.1:8765`) and remove their PID files. A "healthy" process is NOT fresh just because it answers health checks.
 2. **Rebuild from latest source.** In order:
    - Cloud migrations (`wt-media-cloud/scripts/migrate.sh`);
    - Cloud server (`go run ./cmd/server`);
    - Local Agent (`wt-media-agent/.venv/bin/python -m wt_media_agent.local_api.server`);
+   - Front-end dev servers: Cloud Web (`npm run dev`, port 5173) and Desktop (`npm run dev:desktop`, port 5174);
    - Desktop frontend via `wt-media-workspace/scripts/build-desktop-frontend.sh` and DMG via `cargo tauri build --bundles dmg --no-sign`;
    - Regenerate Cloud desktop artifacts (`npm run build:desktop`).
 3. **Freshness gate.** Confirm each running artifact was built after the latest source commit it contains (compare process start time and build artifact mtime against `git log -1 --format=%ci` in the owning repo). If any artifact is older than its source, restart/re-build it. Do not proceed with a stale Cloud or Agent.
@@ -40,7 +41,8 @@ Before relying on any process, enforce freshness:
 5. **Verification gates** — all must pass, no partial-pass shortcut:
    - Cloud `GET /api/v1/health` → `{"errcode":0}`;
    - Agent `GET /healthz` and `GET /api/v1/status` → `bitbrowser_status == "normal"`;
-   - Desktop assets present and the built chunk contains the local Cloud API base (`127.0.0.1:18080/api/v1`);
+   - Both dev servers answer with their own entry (`/src/apps/cloud/main.ts` on 5173, `/src/apps/desktop/main.ts` on 5174) plus Vite's `@vite/client` marker;
+   - Desktop assets present, and **no** loopback Cloud API base baked into the built chunks — the packaged app resolves its origin at run time from `Contents/Resources/resources/desktop.production.toml` (`cloud.base_url`, injected via `get_public_config`). Measured 2026-10-10 on a clean-tree build: 0 hits across all 34 `assets/*.js`;
    - DMG exists, non-empty, freshly built, and mounted;
    - CORS preflight from `Origin: http://tauri.localhost` returns `Access-Control-Allow-Origin: http://tauri.localhost` + credentials;
    - **Login smoke** `POST /api/v1/auth/login` with a known-good account and `replace_existing: true` → `errcode 0`. Known convention: `admin/admin123`; acceptance operator is `operator01` with password reset to `operator01`. If the credential is unknown, reset it via the admin `POST /api/v1/users/:user_id/reset-password` flow before continuing.
@@ -49,10 +51,10 @@ Before relying on any process, enforce freshness:
 
 Reuse these prior conclusions instead of re-debugging them:
 
-- UI shows `服务器返回格式错误` / `服务器响应格式错误`: the packaged Desktop resolved a relative `/api/v1` against the Tauri asset protocol instead of Cloud. Fix: packaged builds must embed the absolute base `http://127.0.0.1:18080/api/v1` in the generated `http-*.js` chunk.
+- UI shows `服务器返回格式错误` / `服务器响应格式错误`: the packaged Desktop resolved a relative `/api/v1` against the Tauri asset protocol instead of Cloud. The base is **not** baked into the chunk — it arrives at run time through `get_public_config`. Check the shell injected it before the WebView mounted: a missing `cloud.base_url` in the bundle's `desktop.production.toml`, or a `setDesktopCloudOrigin` that never ran, makes `defaultApiBase()` throw rather than fall back to a local default.
 - Wrong password / account disabled returns `errcode 11001` with message `请先登录或凭证已过期` — this is the generic auth-failed message, NOT a session message. If the operator cannot log in, the credential is wrong or disabled; reset via admin `POST /api/v1/users/:user_id/reset-password` (convention: reset password equals the username, e.g. `operator01`/`operator01`).
 - Valid credentials with an existing session return `errcode 20010 当前账号已在其他位置登录`; the client must resend with `replace_existing: true`. The Desktop `LoginPage` already handles this — verify the flow, do not treat 20010 as a hard failure.
-- Login "works from curl but fails in the packaged app": check the embedded API base, CORS preflight from `http://tauri.localhost`, and that the running Cloud is the latest build (stale `go run` process serves old routes).
+- Login "works from curl but fails in the packaged app": check the Cloud origin the app resolved against `csp_connect_src` in its bundled config, the CORS preflight from `http://tauri.localhost`, and that the running Cloud is the latest build (stale `go run` process serves old routes).
 - Before reopening a rebuilt DMG: kill old `wt-media-desktop-shell` processes and detach any leftover mount — the harness's `.local/m2b/dmg-mount`, or a manually attached `/Volumes/起飞*`.
 - Environment non-determinism from multiple historical databases: always use the single fixed DSN `wt_media_cloud` and never switch to `wt-media-cloud`, `wt_media_acceptance`, or other schemas.
 

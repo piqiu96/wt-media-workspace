@@ -8,8 +8,8 @@
 # 这条约束由 scripts/verify-control.sh 机检。
 #
 # 与 `AGENT-INDEX.md` §6「修改 Agent Sidecar 启停 → Desktop」的分工：本文件管的是
-# **本地开发环境**里 Cloud 与 Local Agent 的进程启停，sidecar 的生命周期由 Desktop
-# 的 Rust 实现持有，是另一件事。
+# **本地开发环境**里 Cloud、Local Agent、Cloud worker 与两个前端 dev server 的进程
+# 启停，sidecar 的生命周期由 Desktop 的 Rust 实现持有，是另一件事。
 set -euo pipefail
 
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,7 +20,7 @@ usage() {
 Usage: bin/control.sh <start|stop|restart|status|verify|help>
 
   start    Rebuild and start the full local end-to-end environment.
-  stop     Stop the Cloud, Local Agent and Cloud worker processes started for local review.
+  stop     Stop the Cloud, Local Agent, Cloud worker and front-end dev servers started for local review.
   restart  Stop those processes, then rebuild and start the environment again.
   status   Report whether those processes are alive and, where they serve one, answering.
   verify   Run end-to-end readiness checks against the running environment.

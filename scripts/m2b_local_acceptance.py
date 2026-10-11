@@ -4,12 +4,14 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
 import sys
 import tempfile
 import time
+import tomllib
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -26,7 +28,7 @@ LOG_DIR = RUNTIME_DIR / "logs"
 PID_DIR = RUNTIME_DIR / "pids"
 
 CLOUD_HOST = os.environ.get("WT_MEDIA_CLOUD_HOST", "127.0.0.1")
-CLOUD_PORT = os.environ.get("WT_MEDIA_CLOUD_PORT", "18080")
+CLOUD_PORT = os.environ.get("WT_MEDIA_CLOUD_PORT", "8188")
 CLOUD_ADDR = f"{CLOUD_HOST}:{CLOUD_PORT}"
 CLOUD_BASE_URL = f"http://{CLOUD_ADDR}"
 MYSQL_DSN = os.environ.get(
@@ -38,6 +40,17 @@ AGENT_HOST = os.environ.get("WT_MEDIA_AGENT_HOST", "127.0.0.1")
 AGENT_PORT = os.environ.get("WT_MEDIA_AGENT_PORT", "8765")
 AGENT_ADDR = f"{AGENT_HOST}:{AGENT_PORT}"
 AGENT_BASE_URL = f"http://{AGENT_ADDR}"
+
+# 两个前端 dev server，复述 wt-media-cloud/web 两个 vite 配置的 server.port。
+WEB_DEV_HOST = os.environ.get("WT_MEDIA_WEB_DEV_HOST", "127.0.0.1")
+WEB_DEV_PORT = os.environ.get("WT_MEDIA_WEB_DEV_PORT", "5173")
+WEB_DEV_URL = f"http://{WEB_DEV_HOST}:{WEB_DEV_PORT}"
+DESKTOP_DEV_PORT = os.environ.get("WT_MEDIA_DESKTOP_DEV_PORT", "5174")
+DESKTOP_DEV_URL = f"http://{WEB_DEV_HOST}:{DESKTOP_DEV_PORT}"
+
+# 两者共用同一个 index.html，靠 `desktop-html` 插件换入口——只有入口能分辨它们在哪个端口。
+WEB_DEV_ENTRY = "/src/apps/cloud/main.ts"
+DESKTOP_DEV_ENTRY = "/src/apps/desktop/main.ts"
 BIT_API_URL = os.environ.get("WT_MEDIA_BITBROWSER_API_URL", "http://127.0.0.1:54345")
 DOUYIN_ENV_FILE = Path(
     os.environ.get("WT_MEDIA_DOUYIN_ENV_FILE", CLOUD_DIR / ".env.local")
@@ -176,6 +189,32 @@ def wait_http(url: str, name: str, timeout_seconds: float = 20.0) -> None:
             last_error = str(exc)
             time.sleep(0.25)
     raise RuntimeError(f"{name}: FAIL {url}: {last_error}")
+
+
+def dev_server_answers(url: str, entry: str, timeout: float = 2.0) -> bool:
+    """`url` 是否由入口为 `entry` 的 Vite dev server 服务。
+
+    `@vite/client` 只在 dev HTML 里（实测 dev 1 命中 / 打包产物 0），据此挡住 Cloud
+    的 SPA 回退送来的打包 index.html。不能用 `wait_http`：它解析 JSON，这里回 HTML。
+    """
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            if response.status != 200:
+                return False
+            body = response.read().decode("utf-8", errors="ignore")
+    except Exception:  # noqa: BLE001 - no answer is the reading this reports.
+        return False
+    return "@vite/client" in body and entry in body
+
+
+def wait_dev_server(url: str, name: str, entry: str, timeout_seconds: float = 60.0) -> None:
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        if dev_server_answers(url, entry):
+            print(f"{name}: PASS {url}")
+            return
+        time.sleep(0.5)
+    raise RuntimeError(f"{name}: FAIL {url}: no dev server serving {entry}")
 
 
 def process_alive(pid: int) -> bool:
@@ -359,6 +398,49 @@ def start_agent() -> None:
     wait_http(f"{AGENT_BASE_URL}/healthz", "Agent")
 
 
+def start_dev_server(name: str, script: str, url: str, entry: str, port: str) -> None:
+    """起一个前端 dev server。先清端口：Vite 带 strictPort，被占时子进程立刻退出，
+    而 `start_background` 照样写 pid——随后探到的是别人的应答。"""
+    if pid_alive(PID_DIR / f"{name}.pid"):
+        return
+    stop_listener(port, name)
+    wait_port_free(port)
+    log(f"Starting {name} on {url}")
+    start_background(name, ["npm", "run", script], CLOUD_DIR / "web", env_with())
+    wait_dev_server(url, name, entry)
+
+
+def start_web_dev() -> None:
+    """网页端 dev server：浏览器入口，`/home` 在这里。"""
+    start_dev_server(
+        "web-dev", "dev", f"{WEB_DEV_URL}/", WEB_DEV_ENTRY, WEB_DEV_PORT
+    )
+
+
+def start_desktop_dev() -> None:
+    """桌面端 dev server：`http.js` 认 `location.port === '5174'`，交给这个 Vite 代理。"""
+    start_dev_server(
+        "desktop-dev",
+        "dev:desktop",
+        f"{DESKTOP_DEV_URL}/",
+        DESKTOP_DEV_ENTRY,
+        DESKTOP_DEV_PORT,
+    )
+
+
+def verify_dev_servers() -> None:
+    log("Verifying front-end dev servers")
+    for name, url, entry in (
+        ("Web dev server", f"{WEB_DEV_URL}/", WEB_DEV_ENTRY),
+        ("Desktop dev server", f"{DESKTOP_DEV_URL}/", DESKTOP_DEV_ENTRY),
+    ):
+        if not dev_server_answers(url, entry):
+            raise RuntimeError(
+                f"{name}: FAIL {url}: no dev server serving {entry}"
+            )
+        print(f"{name}: PASS {url}")
+
+
 def verify_bitbrowser() -> None:
     log("Verifying BitBrowser through Agent")
     if not pid_alive(PID_DIR / "agent.pid"):
@@ -378,20 +460,64 @@ def verify_bitbrowser() -> None:
     print("BitBrowser via Agent: PASS")
 
 
+def built_app_bundle() -> Path:
+    """The one `.app` `cargo tauri build` wrote.
+
+    Globbed rather than named, for the same reason `current_dmg()` globs: the
+    bundle is named after `productName` in `tauri.conf.json` (起飞 today), so a
+    rename must not break this script.
+    """
+    apps = sorted(APP_BUNDLE_DIR.glob("*.app"))
+    if len(apps) != 1:
+        raise RuntimeError(
+            f"Desktop app bundle: expected one .app under {APP_BUNDLE_DIR}, "
+            f"found {[p.name for p in apps]}"
+        )
+    return apps[0]
+
+
+def shipped_desktop_config(app: Path) -> Path:
+    """The Cloud settings the packaged app resolves its origin from.
+
+    `bundle.resources` in `tauri.conf.json` puts this file into the app's
+    `Resources/`; the shell compiles it in with `include_str!` and hands
+    `cloud.base_url` to the front end through `get_public_config`. The origin is
+    therefore resolved at run time and absent from the JavaScript assets by
+    design -- which is why `verify_assets` reads it here.
+    """
+    return app / "Contents" / "Resources" / "resources" / "desktop.production.toml"
+
+
 def verify_assets() -> None:
     log("Verifying Desktop assets")
     index = DESKTOP_DIR / ".generated" / "frontend" / "index.html"
     if not index.is_file() or index.stat().st_size == 0:
         raise RuntimeError(f"Desktop assets: missing {index}")
-    assets_dir = DESKTOP_DIR / ".generated" / "frontend" / "assets"
-    javascript_assets = assets_dir.glob("*.js")
-    if not any(
-        "127.0.0.1:18080/api/v1" in path.read_text(encoding="utf-8", errors="ignore")
-        for path in javascript_assets
-    ):
-        raise RuntimeError("Desktop assets: packaged API base not found in JavaScript assets")
+
+    config_path = shipped_desktop_config(built_app_bundle())
+    if not config_path.is_file():
+        raise RuntimeError(f"Desktop assets: missing {config_path}")
+    config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+    origin = (config.get("cloud") or {}).get("base_url", "").strip()
+    if not origin:
+        raise RuntimeError(f"Desktop assets: cloud.base_url is empty in {config_path}")
+    csp = (config.get("browser") or {}).get("csp_connect_src", "")
+    if origin not in csp:
+        raise RuntimeError(
+            f"Desktop assets: csp_connect_src does not allow {origin}, so the "
+            f"packaged WebView would block the Cloud address the app resolves: {csp!r}"
+        )
+    for path in (DESKTOP_DIR / ".generated" / "frontend" / "assets").glob("*.js"):
+        if re.search(
+            r"127\.0\.0\.1:\d+/api/v1|localhost:\d+/api/v1",
+            path.read_text(encoding="utf-8", errors="ignore"),
+        ):
+            raise RuntimeError(
+                f"Desktop assets: a loopback Cloud base is baked into {path.name}"
+            )
+
     check_fresh(index, [(CLOUD_DIR, ("web",))], "Desktop assets")
-    print("Desktop assets: PASS")
+    print(f"Desktop assets: PASS (origin {origin} from the packaged config)")
 
 
 def current_dmg() -> Path:
@@ -454,13 +580,7 @@ def build_dmg() -> None:
     run(["bash", str(SCRIPT_DIR / "build-desktop-frontend.sh")])
     log("Building Desktop app bundle")
     run(["cargo", "tauri", "build", "--bundles", "app", "--no-sign"], cwd=DESKTOP_DIR)
-    apps = sorted(APP_BUNDLE_DIR.glob("*.app"))
-    if len(apps) != 1:
-        raise RuntimeError(
-            f"Desktop app bundle: expected one .app under {APP_BUNDLE_DIR}, "
-            f"found {[p.name for p in apps]}"
-        )
-    app = apps[0]
+    app = built_app_bundle()
     log("Writing the sidecar record into the bundle and re-signing")
     run(["bash", str(DESKTOP_DIR / "scripts" / "repair-macos-signing.sh"), str(app)])
     dmg = _dmg_path(app)
@@ -563,6 +683,7 @@ def verify_all() -> None:
     verify_worker()
     verify_bitbrowser()
     verify_assets()
+    verify_dev_servers()
     verify_dmg()
 
 
@@ -593,10 +714,17 @@ def cmd_status() -> int:
     """
     log("Local M2-B environment status")
     all_healthy = True
-    for name, pid_file, url in (
-        ("cloud", PID_DIR / "cloud.pid", f"{CLOUD_BASE_URL}/api/v1/health"),
-        ("agent", PID_DIR / "agent.pid", f"{AGENT_BASE_URL}/healthz"),
-        ("worker", PID_DIR / "worker.pid", None),
+    for name, pid_file, url, entry in (
+        ("cloud", PID_DIR / "cloud.pid", f"{CLOUD_BASE_URL}/api/v1/health", None),
+        ("agent", PID_DIR / "agent.pid", f"{AGENT_BASE_URL}/healthz", None),
+        ("worker", PID_DIR / "worker.pid", None, None),
+        ("web-dev", PID_DIR / "web-dev.pid", f"{WEB_DEV_URL}/", WEB_DEV_ENTRY),
+        (
+            "desktop-dev",
+            PID_DIR / "desktop-dev.pid",
+            f"{DESKTOP_DEV_URL}/",
+            DESKTOP_DEV_ENTRY,
+        ),
     ):
         pid_text = (
             pid_file.read_text(encoding="utf-8").strip() if pid_file.exists() else "-"
@@ -604,6 +732,8 @@ def cmd_status() -> int:
         alive = pid_alive(pid_file)
         if url is None:
             health = "pid-only"
+        elif entry is not None:
+            health = "ok" if dev_server_answers(url, entry) else "down"
         else:
             try:
                 http_json(url, timeout=2.0)
@@ -667,7 +797,7 @@ def stop_started() -> None:
     # that would start the Agent again.
     close_desktop_app()
     signalled: list[tuple[str, int]] = []
-    for name in ["cloud", "agent", "worker"]:
+    for name in ["cloud", "agent", "worker", "web-dev", "desktop-dev"]:
         pid_file = PID_DIR / f"{name}.pid"
         if pid_alive(pid_file):
             pid = int(pid_file.read_text(encoding="utf-8").strip())
@@ -679,6 +809,10 @@ def stop_started() -> None:
     wait_port_free(CLOUD_PORT)
     stop_listener(AGENT_PORT, "agent")
     wait_port_free(AGENT_PORT)
+    stop_listener(WEB_DEV_PORT, "web-dev")
+    wait_port_free(WEB_DEV_PORT)
+    stop_listener(DESKTOP_DEV_PORT, "desktop-dev")
+    wait_port_free(DESKTOP_DEV_PORT)
     # Cloud and the Agent are each swept a second time by port above, so a
     # SIGTERM they ignored still gets caught. The worker holds no port and the
     # pid file is gone by now, which makes this wait the only thing standing
@@ -768,6 +902,8 @@ def main() -> int:
             start_cloud()
             start_worker()
             start_agent()
+            start_web_dev()
+            start_desktop_dev()
             verify_bitbrowser()
         elif args.command == "verify":
             verify_all()
@@ -784,6 +920,8 @@ def main() -> int:
             start_cloud()
             start_worker()
             start_agent()
+            start_web_dev()
+            start_desktop_dev()
             verify_bitbrowser()
             build_dmg()
             rebuild_cloud_dist()
