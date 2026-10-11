@@ -631,3 +631,49 @@ releases:
     residual_risks:
       - "Real Cloud database migration and rollback from an older installed version are deferred to the next upgrade."
       - "Release artifacts do not automatically deploy Cloud or restart BaoTa processes."
+  - release: "v0.1.1"
+    status: published
+    date: "2026-10-11"
+    scope: cloud_only_patch_for_public_home_launch
+    environment: online
+    cloud_origin: https://wt.longyanyue.cn
+    components:
+      cloud: "v0.1.1-rc.1"
+      cloud_agent: "v0.2.2-rc.3"
+      local_agent: "v0.2.2-rc.3"
+      desktop: "v0.1.0-rc.8"
+    cloud_migrations: "no new migrations between v0.1.0-rc.13 and v0.1.1-rc.1 (diff of migrations/ is empty)"
+    contract_state: "provider versions and consumer lock checked by release.yml Run 38073520974"
+    verification:
+      release: "release.yml Run 38073520974 succeeded; submit_tag.py --verify passed on six assets; stamped desktop-downloads.json matched the golden manifest byte-for-byte (CHG-078 evidence/v011-release-stamping-20261011.md)"
+      manual: "user deployed the Cloud package to BaoTa on 2026-10-11; online read-back returned version v0.1.1 with / and /home at 200 (same evidence file); desktop unchanged from v0.1.0 so no separate interactive walkthrough was run"
+    target_status:
+      windows_x64: "installer published; CI asset verification passed; download click-through not separately re-attested (assets unchanged from v0.1.0)"
+      macos_x86_64: "installer published; CI asset verification passed; download click-through not separately re-attested (assets unchanged from v0.1.0)"
+      macos_arm64: "installer published; CI asset verification passed; download click-through not separately re-attested (assets unchanged from v0.1.0)"
+    residual_risks:
+      - "Registered on 2026-10-11 together with the v0.1.2 entry; the release was never entered here when published."
+  - release: "v0.1.2"
+    status: published
+    date: "2026-10-11"
+    scope: login_error_clarification_patch_after_live_testing
+    environment: online
+    cloud_origin: https://wt.longyanyue.cn
+    components:
+      cloud: "v0.1.2-rc.1"
+      cloud_agent: "v0.2.2-rc.4"
+      local_agent: "v0.2.2-rc.4"
+      desktop: "v0.1.0-rc.9"
+    cloud_migrations: "no new migrations between v0.1.1-rc.1 and v0.1.2-rc.1 (diff of migrations/ is empty)"
+    contract_state: "provider versions and consumer lock checked by release.yml Run 38138153403"
+    verification:
+      release: "release.yml Run 38138153403 succeeded after one failed attempt: Windows agent CA-bundle hash mismatched because '* text=auto' rewrote ca-bundle.pem to CRLF on checkout; fixed by '-text' pin in agent 8e27531 and the component tag re-pinned before any artifact was consumed. Six-asset SHA256SUMS, build-info product_tag and cloud_origin read back locally; stable Release auto-published (draft=false). Evidence: CHG-078 evidence/v012-release-and-deploy-20261011.md"
+      manual: "user deployed v0.1.2 via BaoTa on 2026-10-11 (precheck, deploy apply, Server-Worker-Scheduler restart); online probes returned /api/v1/health 200, / /login /home 200, unauthenticated /api/v1/auth/me 401+11001, and the three new login codes 10005/10006/11004 (same evidence file)"
+    target_status:
+      windows_x64: "installer published and SHA-verified; interactive download from target network pending user"
+      macos_x86_64: "installer published and SHA-verified; interactive download from target network pending user"
+      macos_arm64: "installer published and SHA-verified; interactive download from target network pending user"
+    residual_risks:
+      - "build-info.json records agent source 1d6c883 while the Windows agent artifact was built after the component tag moved to 8e27531; the delta is .gitattributes-only and enters no artifact bytes."
+      - "The presigned variables URL on the server (output/online.url) expires in at most 7 days; every deploy must regenerate it with ~/.wt-media/upload-config-variables.py and refresh the server copy, or deploy plan fails with HTTP 400."
+      - "Release artifacts still do not automatically deploy Cloud or restart BaoTa processes."

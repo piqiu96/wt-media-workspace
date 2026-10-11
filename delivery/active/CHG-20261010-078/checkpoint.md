@@ -1,7 +1,7 @@
 # CHG-20261010-078 Checkpoint
 
-- 已完成：Task 1 脚本与初始清单；Task 2 Cloud `/home` 与三平台按钮；Task 3 共享登录页及品牌视觉；Task 5 新设计稿单页收敛及宽窄屏截图、滚动交互本地验证；2026-10-11 发布产品 Tag `v0.1.1` 并已完成 CI 构建、六资产校验、包内清单烙入逐字节验证与 Release 公开（证据：`evidence/v011-release-stamping-20261011.md`）。
-- 当前工作：等待把 `wt-media-cloud_v0.1.1_linux-amd64.tar.gz` 部署到宝塔服务器（包已置于用户 `~/Downloads/`）。状态仍为 VERIFYING；部署后的 `/home`、真实账号登录与目标用户网络三平台下载验收待执行。
-- 下一步：用户按 `wt-media-cloud/deploy/DEPLOYMENT.md` §4-§7 执行服务器部署；部署后回读 `https://wt.longyanyue.cn/desktop-downloads.json` 应为 v0.1.1，再逐个平台点击下载；收到结果后关闭 CHG。
-- 阻塞：无代码阻塞。在线部署和终端网络验收依赖目标环境人工执行。
-- 最近验证：v0.1.1 run 38073520974 全绿；`submit_tag.py v0.1.1 --verify` 通过；包内 `web/desktop-downloads.json` 与黄金清单 SHA-256 一致（`7b23dba2…`）；Release 已公开（`isDraft=false`），资产匿名 HEAD 302。此前的登录页与官网本地验证记录仍有效。
+- 已完成：Task 1 脚本与初始清单；Task 2 Cloud `/home` 与三平台按钮；Task 3 共享登录页及品牌视觉；Task 5 新设计稿单页收敛及宽窄屏截图、滚动交互本地验证。`v0.1.1` 发布、烙入校验、部署与线上回读闭环（`evidence/v011-release-stamping-20261011.md`）。`v0.1.2`（登录错误提示拆分补丁）发布、部署、线上探针闭环（`evidence/v012-release-and-deploy-20261011.md`）。
+- 当前工作：v0.1.2 已在生产服务：`desktop-downloads.json` 翻为 v0.1.2，`/home`、`/login` 200，未认证业务 API 401+11001，登录错误码 10005/10006/11004 线上生效。两条 release-matrix 记录（v0.1.1、v0.1.2）已回填。
+- 剩余验收（依赖用户人工）：真实账号登录走查（重点三种登录错误提示）；官网视觉与悬浮导航滚动走查；目标用户网络三平台下载点击。
+- 阻塞：无代码阻塞。
+- 最近验证：release.yml run 38138153403 全绿（首跑 Windows agent CA-bundle CRLF 哈希不匹配，agent `8e27531` 修复后组件 tag 重钉重跑）；六资产 SHA256SUMS 通过；部署包 SHA-256 与 build-info 记录一致；部署后探针见 v0.1.2 证据文件。
