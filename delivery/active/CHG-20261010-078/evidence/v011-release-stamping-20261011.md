@@ -6,3 +6,4 @@
 - 公开：草稿复验通过后人工执行 `gh release edit v0.1.1 --draft=false --prerelease=false`（本版 workflow 尚无自动公开，属预期），回读 `isDraft=false isPrerelease=false`；资产 URL 匿名 HEAD 返回 302（草稿期会 404）。
 - 边界：本机直连 GitHub 曾超时，302 只证明 Release 已公开可达，真实下载速度与完整性以目标用户网络验收为准；线上 `curl https://wt.longyanyue.cn/desktop-downloads.json` 回读 v0.1.1 待 Cloud 包部署后执行。
 - 后续正式版（v0.1.2+）由 PR #4 的 CI 自动公开取代本版的人工 `gh release edit`。
+- 部署回读（2026-10-11，用户在宝塔完成 v0.1.1 Cloud 包部署后）：`https://wt.longyanyue.cn/desktop-downloads.json` 的 SHA-256 与烙入黄金清单完全一致（`7b23dba2…`），`version v0.1.1`；`/home` 与 `/` 均返回 200。CI 烙入 → 包 → 部署 → 线上读取全链路闭环。剩余人工验收：真实账号登录、目标用户网络三平台下载。
