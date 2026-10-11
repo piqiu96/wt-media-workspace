@@ -51,6 +51,7 @@
 | `docs/engineering/specs/` | 工程规范、技术标准和开发约束 |
 | `docs/contracts/` | 跨仓 API、协议、Event Schema 和数据契约 |
 | `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
+| `docs/devops/` | 端口与部署总账：各组件监听端口、连接链路和本地/线上接法的索引 |
 | `reference/state-models/` | 可引用的业务状态说明与一致性索引；不独立裁定产品状态或接口枚举 |
 | `delivery/` | Milestone、CHG、执行状态、验证和完成交付 |
 | `config/` | 仓库映射、Skill 分发、Contract 映射和发布配置等治理配置 |
