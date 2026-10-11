@@ -9,11 +9,11 @@
 
 ## 1. 独立结果
 
-CHG-074 关闭时登记的技术债逐条有裁定与处置：契约锁与 M2 硬编码基线对齐、m0 钉子与 map 一致、`docs/standards/` 进索引且既有死链修掉、`node_id` 悬置类缺陷收口、会话 cookie 生命周期明确、`scan=reuse` 在真实安装包上验证过一次、「仅用反引号写 Level 会让门禁静默跳过」的缺口被堵住。workspace 测试套件回到 0 红。
+CHG-074 关闭时登记的技术债逐条有裁定与处置：契约锁与 M2 硬编码基线对齐、m0 钉子与 map 及 CI 现行构建入口一致、`docs/standards/` 进索引且既有死链修掉、`node_id` 悬置类缺陷收口、会话 cookie 生命周期明确、`scan=reuse` 在真实安装包上验证过一次、「仅用反引号写 Level 会让门禁静默跳过」的缺口被堵住。workspace 测试套件回到 0 红。
 
 ## 2. 范围与边界
 
-登记时的实测读数（2026-10-03，CHG-074 关闭读数：workspace `python3 -m unittest discover -s tests` **92 用例 / 3 红**，其中 2 条即第 1/2 项的产物）：
+登记时的实测读数（2026-10-03，CHG-074 关闭读数：workspace `python3 -m unittest discover -s tests` **92 用例 / 3 红**，其中 2 条即第 1/2 项的产物；2026-10-11 复测 **117 用例 / 4 红**，新增的第 4 条即下面第 12 项）：
 
 1. **契约锁与 M2 静态矩阵不一致**——`wt-media-desktop/contracts.lock.json` 与 `scripts/verify_m2_acceptance.py:114-128` 里**硬编码**的 M2 冻结基线对不上，这正是 `test_static_cross_repo_contract_and_security_matrix` 的红。实测使该用例变红的是 **`cloud_agent_api`**（lock 钉 `v1@2026.10.01.1`，硬编码期望 `v1@2026.07.15.1`，漂移自 desktop `20e00d1`），**不是** `local_agent_api` / `local_event_schemas` 相对 `config/contract-map.yaml` 的陈旧（见第 3 项）。**待裁定**：是推进 lock，还是让该门禁改为读 `config/contract-map.yaml`（硬编码基线会在每次契约前进时复发）。注意 CHG-074 判过「不 bump」，故此处不是补动作，是重新裁定。
 2. **`scripts/verify_m0_config.py` 的 `cloud_agent_api` 钉子过期**——期望 `contract_revision '2026.07.14.7'`，map 写 `2026.10.01.1`；漂移引入于 `786fdeb docs(chg-069): 任务 21 落档`（只推 map 未同步钉子）。该门禁直接 `rc 1`，并使 workspace 的 `test_contract_map_matches_m1_cloud_agent_compatibility`、`test_contract_map_provider_paths_exist_in_full_workspace` 两条变红。同一条缺口在 CHG-20260923-059 Q-06 登记过：钉子只保证「map 没背着人动」，保证不了「这个值还对」，且从不与相邻定义文件对比。
@@ -26,6 +26,8 @@ CHG-074 关闭时登记的技术债逐条有裁定与处置：契约锁与 M2 �
 9. **两处测试在负载下会假红**：agent `test_reuse_serves_the_first_scan_to_the_second_request` 已定位并修（断言比较了整个响应体，而 `data.disk.free_megabytes` 是逐请求实测值；churn 下 8/8 红 → 修后 8/8 绿，变异对照仍红，见 agent `f7b8f11`）；**desktop `commands::agent::tests::a_tampered_sidecar_is_refused_and_an_intact_one_is_started` 未修**——它与三个重型套件并发时红（等 5 秒 marker 文件超时），单独跑 3/3 绿、整套单跑 507 通过 / 0 失败 / 6 ignored。两条是同一类：判据里含与负载相关的时序/主机事实。**待裁定**：修 desktop 那条（对齐 agent 的改法），还是按「负载相关、静默机上读数为准」登记。
 10. **门禁缺口：反引号把 `Level` 写成不可解析**——`verify_delivery_governance.py:14` 的 `LEVEL_RE = ^- Level:\s*([A-Z])\s*$` 不接受反引号；实测 `delivery/completed/*/change.md` 与 `planned/*/change.md` 共 68 篇里 **6 篇**的 `Level` 行正则匹配不到（`CHG-20260930-069` `` `S` ``、`070` `` `S` ``、`071` `` `M` ``、`CHG-20261001-072` `` `L` ``、`073` `` `M` ``、`CHG-20261002-074` `` `L`（…）``），即这 6 篇活跃期间 `validate_milestone_reference()` **整段被跳过**；同一实测还有 **28 篇**记录根本没有 `- Milestone:` 行（两者都会让该检查空转）。**待裁定**：放宽正则以容忍反引号/注解，还是统一记录写法（新记录一律写裸词）。
 11. **M2-F 里程碑基线回写**：`delivery/milestones/M2-account-runtime.md` §6 仍写「主账号仍按现有管理员解除流程处理」，已被 CHG-074 阶段 3 Item D 的用户自助「比特账号绑定」取代。CHG-074 只补了实施记录指针、**未动已签收的正文**，回写待裁定。
+
+12. **`scripts/verify_m0_config.py` 的 m0-cloud 构建钉子过期**（2026-10-11 排任务时实测，晚于本记录登记）：钉子串要求 `wt-media-cloud/.github/workflows/m0-cloud.yml` 含 `scripts/build.sh`，但 cloud `ed5a3c9`（2026-10-03「Exercise release build path in Cloud CI」）已把 CI 构建入口换成 `scripts/dev/build-release-linux.sh`（`scripts/build.sh` 本身仍在仓内，CI 不再调用）；`test_ci_workflows_cover_revised_m0_gates` 因此变红。性质同第 2 项：钉子跟随被钉对象的现行事实移动，不是放判据。
 
 边界：本记录不重开 CHG-074 的任何已交付范围；不改已归档记录（`delivery/completed/README.md:11`）；第 1/3/10 项的裁定结果若改变门禁行为，须同步登记在门禁自身或 `docs/engineering/` 的规范处，不建第二套台账（`AGENT-INDEX.md:40`）。
 
@@ -45,7 +47,7 @@ CHG-074 关闭时登记的技术债逐条有裁定与处置：契约锁与 M2 �
 ## 5. 有序任务
 
 1. 先裁定第 1 项（契约锁 vs 硬编码基线），因为它决定第 3 项的顺序；
-2. 按裁定对齐第 1/3 项，第 2 项随之把 m0 钉子移到 map 当前值（钉子移动即那次契约前进的复核动作）；
+2. 按裁定对齐第 1/3 项，第 2/12 项随之把 m0 钉子移到现行值（第 2 项对 map 当前值、第 12 项对 workflow 现行构建入口；钉子移动即那次契约/实现前进的复核动作）；
 3. 第 4 项：补索引 + 修死链（纯 workspace 文档，判据是链接 resolve 且字符串扫描无旧路径——两条都要，扫链前先剥代码跨）；
 4. 第 5/6/7/8 项逐处测定后处置或登记；
 5. 第 9/10/11 项按裁定收口。
