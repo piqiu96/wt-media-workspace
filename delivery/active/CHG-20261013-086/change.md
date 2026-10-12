@@ -1,6 +1,6 @@
 # CHG-20261013-086：M4-C8 综合验收（真实视频、对象存储、故障恢复与 UI 对账）
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3.1 M4-C8「真实视频、对象存储、故障恢复和 UI 综合验收」；§7 M4-AC-01～12 十二项逐项对账；§8 M4 DONE Gate
@@ -58,3 +58,11 @@ None.
 - **证据引用 vs 新鲜读数**：M4-C8 是对账不是重做——在 061/082/083/084/085 已留真实读数、且对应代码面在其后未再被改动的项，引用原读数并核对改动面；链路核心（合成→成片→下载）在本轮用最新代码再跑一遍最小集，防止「证据是真的、代码已经变了」。
 - **UI 腿**：AC-01/02/08 的 UI 部分与 M4 DONE Gate 的用户签收留待 2026-10-14 晨；本 CHG 把每条签收点写明（页面、路径、要点），不占用「PASS」。
 - **无新决策**： twelve AC 均有既有裁定与契约，无需新增决策记录。
+
+## 8. 验收记录
+
+- 2026-10-13 完成：T-01～T-06 全部执行并留证（`evidence/T-01.md`～`evidence/T-06.md`）。M4-AC-01～12 机器腿全部本轮真实读数或带日期引用 PASS，无 UNVERIFIED：真实采集下载（素材 157 not_downloaded→ready，本地 sha=声明 sha）、真实 FFmpeg 合成（h264+aac、快照切段、成片只在落盘校验后创建）、取消/失败/kill -9 重启四臂零假成片、usage 七探针与 8 并发去重、快照不变、越权九探针、边界扫描与契约测试。
+- 全量回归（无运行时代码改动，读数为对账时点值）：Cloud Go 71 包 ok exit 0、Agent unittest 705 OK、web 536/536（59 文件）、Desktop cargo 529/0/6 + 壳套件全绿。
+- 提交：本 CHG 零运行时代码提交；工作区记录独立提交（T-01～T-06 各一笔）。
+- M4 DONE Gate 剩余唯一未决项：用户 UI 走查与签收（`evidence/T-06.md` 签收清单七项，2026-10-14 晨统一验收）。
+- 诚实披露：AC-05 模板升级腿以快照钉住机制 + 082 停用探针为判据（dev 无 v2 二进制）；探针残留与 061 期清零环境残留见 `evidence/T-06.md` 与 `evidence/T-03.md`。
