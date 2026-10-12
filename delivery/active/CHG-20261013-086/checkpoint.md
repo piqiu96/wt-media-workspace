@@ -11,13 +11,15 @@
 
 - T-04 我的成片与下载中心机器腿完成（`evidence/T-04.md`）：列表/过滤/详情/追溯/归档/预览签名 URL 全对应；下载链 202 → integrity_sha=声明 sha=本地 sha 三方闭合、幂等去重单行。
 
+- T-05 权限矩阵/边界扫描/三仓测试完成（`evidence/T-05.md`）：九项越权探针全拒（401/403/404 不泄露）、Agent 仅下载执行器 + ffmpeg 仅依赖探针、Desktop 无执行路径（含契约测试）；四门读数 Go 71 包 ok / Agent 705 OK / vitest 536 全绿 / Desktop cargo 529+壳套件全绿、四仓工作树净。
+
 ## Current
 
-T-05 权限矩阵与边界扫描、三仓测试与提交核对（AC-10/11/12）。
+T-06 十二项汇总对账、用户签收清单、governance verify、归档提交。
 
 ## Next
 
-T-06 十二项汇总对账、用户签收清单、governance verify、归档提交。
+（收口中）
 
 ## Blockers
 
