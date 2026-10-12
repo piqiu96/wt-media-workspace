@@ -6,14 +6,15 @@
 - CHG 记录已建立（本文件与 `change.md`），范围裁定见 `change.md` §7。
 - T-01 迁移 053 + 合同 2026.10.13.2 完成：迁移片段测试红先绿后，四+六份合同 YAML 解析通过，15214~15217 错误码核查空闲后预留。证据见 `evidence/T-01.md`。Cloud commit `21ac3a3`。
 - T-02 模型与 Repository 完成：审计事务创建（MaxAttempts 缺省 3）、pending 单条件 UPDATE 取消、范围过滤列表、事务内 active usage 读回；sqlmock 5 例红先绿后。证据见 `evidence/T-02.md`。Cloud commit `1f1eb64`。
+- T-03 Service 完成：命令级门（策略可读且 active、模板可用、override 深合并过同一 schema 校验器、request_key/批内约束）先于逐素材处理且零写入；request_key 先于素材校验解析实现重试幂等；usage 校验与插入同事务（`CreateForUsage`）；取消=读取消同一可见性门 + 仅 pending 条件 UPDATE + 取消者审计（`cancelComposeTaskAudited` 取代 T-02 裸取消）；列表 admin 全局/senior 队内/operator 限本人。定向用例 11 组 + sqlmock 4 例红先绿后，具名失败全部零写入。证据见 `evidence/T-03.md`。
 
 ## Current
 
-T-03：Service 校验链、config 合并校验、快照原子保存、request_key 幂等、取消与审计。
+T-04：Handler、路由注册与合同映射（15214~15217 + 15213 错误映射、per-item 失败信封）。
 
 ## Next
 
-T-04 Handler/路由 → T-05 共用页面 → T-06 真实 MySQL/API 验收 → T-07 全量回归。
+T-05 共用页面 → T-06 真实 MySQL/API 验收 → T-07 全量回归。
 
 ## Blockers
 
@@ -21,5 +22,5 @@ None.
 
 ## Recent verification
 
-- Cloud 工作树干净（HEAD `1f1eb64`）。
-- `go test ./internal/modules/production/repository/ -count=1` 全绿、`go build ./...` 通过。
+- `go test ./internal/modules/... -count=1` 全 PASS；`go build ./...` / `go vet` 通过。
+- diff check：Cloud 仅 4 个 compose-task 文件变更，无范围外改动。
