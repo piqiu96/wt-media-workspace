@@ -12,11 +12,11 @@
 
 ## Current
 
-无进行中任务。
+CHG 已完成（DONE）：T-01～T-06 全部收口，2026-10-13 归档。
 
 ## Next
 
-T-06 全量回归与证据收口（Go 全量、web vitest 全量、governance exit code）→ 归档 CHG084。
+无（归档后按用户既定指示开启 CHG-20261013-085，M4-C7 下载中心）。
 
 ## Blockers
 
@@ -24,4 +24,4 @@ None.
 
 ## Recent verification
 
-- governance verify exit 0（归档 CHG083 后，Active CHG: none）。
+- Go 全量 exit 0（71 包）；web vitest 532/532；governance exit 0（Active CHG: CHG-20261013-084）。

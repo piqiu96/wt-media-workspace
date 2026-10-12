@@ -1,6 +1,6 @@
 # CHG-20261013-084：M4-C6 我的成片（查询、预览、来源追踪、归档与去发布入口）
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3.1 M4-C6「我的成片」；验收矩阵 M4-AC-05/06 的查询侧
@@ -65,3 +65,11 @@ None.
 - **去发布入口**：M4 交付信息传递界面（点击后展示将被发布的成片信息并进入发布衔接），不建发布表、不写发布事实；真实发布与重复风险属 M6。
 - **界面参考图** `05-my-outputs.png` 仅作视觉参考；与 PRD 文本、AdminUI 规范或既有列表页约定冲突处按文本与规范裁定并登记，不照搬图。
 - **错误码**：沿用 152xx production 冻结区间，新增冻结名随本 CHG 合同 revision 登记。
+
+## 8. 验收记录
+
+- 2026-10-13 完成：T-01～T-06 全部执行并留证（`evidence/T-01.md`～`evidence/T-06.md`）。真实环境探针（建任务→成片→读回一致且无对象地址、越权 404 同形、预签名 URL 全量下载 sha 一致、归档翻转+审计+409 零写入、无发布写入者、清零带正假对照）全部 PASS；发现的取消旗标类真实缺陷无（本 CHG 未引入新缺陷；T-05 环境披露见 `evidence/T-05.md`）。
+- 全量回归：Go 71 包全绿、web 532/532、governance exit 0。
+- 提交：wt-media-cloud `b106c06`/`37becc0`/`068aed7`/`27215ed`；工作区记录独立提交。
+- 页面视觉走查按用户指示并入 2026-10-14 M4 统一验收。
+
