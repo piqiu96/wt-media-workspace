@@ -12,10 +12,11 @@
 - T-06 已交付 Cloud Web/Desktop 共用合成策略页面（列表、创建、编辑、复制、启停；普通运营只读）与 compose API 客户端；两端路由指向同一页面，CHG079 占位守卫改写为 parity 守卫。补齐客户端缺失的 `listGames`。vitest 510 例全绿，两端构建通过。证据见 `evidence/T-06.md`。Cloud commit `58bb32a`。
 - T-07 真实 MySQL/API 验收完成：模板幂等重发布（id=3 不变）；admin 创建/修改/复制/停用读回一致且绑定版本不漂移；schema 外参数、非法区间、非法状态均 400 且零写入；临时账号实测普通运营只读+越权 403/404、高级运营范围内可写+越团队 403；页面路由 200。验收数据与临时账号/团队已精确清零，模板未动。证据见 `evidence/T-07.md`。基于 Cloud `58bb32a`，无代码改动。
 - T-08 全量回归通过：Go 71 包 0 FAIL、vitest 510 例全绿、两端 Web 构建通过、diff check 与 delivery 治理 PASS。验收矩阵 §5 五项全部 PASS。证据见 `evidence/T-08.md`。
+- T-09 走查修订已实施（范围见 `change.md` §7）：移除 `content_type`（合同/迁移 052/模型/服务/页面全链，旧字段请求被 400 拒绝）；表单分「基础信息」+「模板参数」两节，参数区由所选模板 schema 动态渲染（schema 增补 `title`，模板行已重发布 id=6）；启停外置为列表行内开关。T-08 同口径回归全绿，PRD §5.5.4 已回写。证据见 `evidence/T-09.md`。Cloud commit `916e070`。
 
 ## Current
 
-待用户要求的统一走查（GUI 级页面操作走查）；走查通过后 CHG 转 DONE 并归档。
+待用户对修订后页面的复查（GUI 级统一走查）；通过后 CHG 转 DONE 并归档。
 
 ## Next
 
@@ -35,3 +36,4 @@ None.
 - `go test ./internal/modules/production/... -count=1` 与 `go build ./...` 通过；合同 YAML 与注册路由 6 条精确相等。
 - T-07：真实 MySQL/API 全对照（读回一致、故障零写入）后残留清零。
 - T-08：`go test ./... -count=1`（71 包 0 FAIL）、`go build ./...`、vitest 510 例、`build:cloud`/`build:desktop`、diff check、delivery 治理全部通过。
+- T-09：修订后同口径重测全绿；迁移 052 实跑（1 applied, 54 total）；模板行重发布 id=6 basic_cut v1（schema 带 title）；真实 API 复验「无 content_type 创建 201、旧字段 400、schema 标题下发」，验收数据清零。
