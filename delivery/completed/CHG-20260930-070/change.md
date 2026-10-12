@@ -1,6 +1,6 @@
 # CHG-20260930-070：内容池交互对齐前端交互规范
 
-- Status: VERIFYING（2026-10-12 自动验证与桌面包准备完成，待用户走查）
+- Status: DONE
 - Level: S
 - Milestone: `delivery/milestones/M3-content-discovery-v2.md`
 - 依据基线：`docs/standards/前端交互规范.md`（稳定规范）；业务闭环不变——内容池发现、筛选、转素材与忽略的业务事实以 M3 闭环（`delivery/milestones/M3-content-discovery-v2.md`）与既有代码为准，本 CHG 只对齐交互层。
@@ -49,3 +49,7 @@
 ## 7. Pending Questions
 
 None.
+
+## 8. 验收与关闭（2026-10-12）
+
+用户确认 CHG070 内容池页面走查通过。三种状态的行操作、素材详情入口与批量操作的自动验证见 `evidence/2026-10-12-implementation.md`；用户走查结论按本次回复记录，不把自动测试替代为人工结论。本 CHG 关闭，M4-A 的用户走查与签收另在 M4 里程碑记录。
