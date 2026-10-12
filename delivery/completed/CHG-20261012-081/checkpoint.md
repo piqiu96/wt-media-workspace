@@ -20,11 +20,11 @@
 
 ## Current
 
-待用户对修订后页面的复查（GUI 级统一走查）；通过后 CHG 转 DONE 并归档。
+CHG-20261012-081 已收口：用户于 2026-10-13 确认统一走查通过，§5 验收标准五项 PASS，记录归档至 `delivery/completed/CHG-20261012-081/`。
 
 ## Next
 
-统一走查 → 处理走查发现（如有）→ 归档 CHG-20261012-081（移出 `delivery/active` 与 LEDGER）。
+None（后续工作由 M4-C3 新记录承接）。
 
 ## Blockers
 
