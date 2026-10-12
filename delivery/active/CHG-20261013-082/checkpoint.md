@@ -10,13 +10,15 @@
 
 - T-04 Handler 与路由完成：`composeTaskErrorFor` 单点映射哨兵→（状态/errcode/冻结名），整命令错误与 per-item 信封共用；四条路由注册；冻结名单入 `content-production.yaml`（revision 2026.10.13.1）。四例红先绿后。证据见 `evidence/T-04.md`。
 
+- T-05 共用页面完成：compose client 四命令；创建对话框（选策略 + schema 覆盖参数 + 打开时生成稳定 request_key）；我的素材勾选列（非 active disabled）+ 行内/批量两个入口 + created/failed 分列提示；合成任务页（服务端筛选、五状态、pending 阶段钉「等待源素材」、DialogPlugin 确认取消、详情含快照全文）；两端 compose 路由换真实页并加 parity 守卫。8 处断言红先绿后。证据见 `evidence/T-05.md`。
+
 ## Current
 
-T-05：共用页面——「我的素材」多选创建入口（选策略 + schema 渲染可覆盖参数）+「合成任务」页（列表/筛选/详情/排队中取消）。
+T-06：真实 MySQL/API 验收——幂等对照、快照不变对照、故障矩阵、验收数据清零。
 
 ## Next
 
-T-06 真实 MySQL/API 验收 → T-07 全量回归。
+T-07 全量回归。
 
 ## Blockers
 
@@ -27,4 +29,5 @@ None.
 - `go test ./internal/modules/... -count=1` 全 PASS；`go build ./...` / `go vet` 通过。
 - diff check：Cloud 仅 4 个 compose-task 文件变更，无范围外改动。
 - `go test ./internal/modules/production/ -count=1` 全 PASS；路由⇄合同比对一致。
+- `npx vitest run` 58 文件 524 例全 PASS；`npm run build:desktop` / `npm run build` 通过。
 - `verify_delivery_governance.py` PASS（exit 0）。T-03 工作区提交时 Milestone 行带括号注记未匹配校验器正则，已把注记移入 Closure anchor 行修复；此前 T-01/T-02 提交携带同一问题但未记录治理结论。
