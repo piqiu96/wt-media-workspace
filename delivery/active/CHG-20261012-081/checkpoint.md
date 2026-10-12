@@ -16,7 +16,7 @@
 - T-10 个人信息卡新增「所属分组」「游戏范围」（`change.md` §7 第 4 条）：运营可从自己页面看出策略归属分组；管理员显示不受限，游戏 ID 映射为名称。两端共用页自动同源，vitest 510 例与两端构建全绿。证据见 `evidence/T-10.md`。Cloud commit `da42edf`。
 - T-11 策略编辑弹窗与详情抽屉补「所属团队」「所属游戏」（`change.md` §7 第 5 条）：编辑态只读展示（服务端不改归属），团队名全角色经团队列表映射。vitest 510 例与两端构建全绿。证据见 `evidence/T-11.md`。Cloud commit `374e03f`。
 - T-12 AdminUI 视觉规范贯彻（`change.md` §7 第 6 条）：规范文档与设计图入库 `docs/standards/`，约束 M4-M5 后续任务；合成策略页完成一轮优化——筛选区改共享 `filter-bar`/`wt-filter-field`/`wt-filter-actions` 约定、编辑容器 Dialog→Drawer 分组（基础信息/模板参数）、未保存关闭二次提示、校验错误就近提示、详情抽屉分区只读。vitest 510 例与两端构建全绿。证据见 `evidence/T-12.md`。Cloud commit `0cb2dd9`，Workspace 规范入库 commit `500584f`。
-- T-13 视觉优化第二轮（`change.md` §7 第 7 条，用户截图裁定）：筛选区与表格合并同卡（同内容池）、补分页与「合成模板」筛选、编辑弹窗改回与挖掘策略同构的 880px Dialog（分组卡片+配置说明面板）、移除统计区域。vitest 510 例与两端构建全绿。证据见 `evidence/T-13.md`。Cloud commit `ff6c60a`。
+- T-13 视觉优化第二轮（`change.md` §7 第 7 条，用户截图裁定）：筛选区与表格合并同卡（同内容池）、补分页与「合成模板」筛选、编辑弹窗改回与挖掘策略同构的 880px Dialog（分组卡片+配置说明面板）、移除统计区域；另修弹窗底部「取消/保存」高度不一（裸 outline 按钮缺 `wt-secondary-button` 约定类，36px vs 32px），合成策略与挖掘策略弹窗同修。vitest 510 例与两端构建全绿。证据见 `evidence/T-13.md`。Cloud commits `ff6c60a`、`41390a1`。
 
 ## Current
 
