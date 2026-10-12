@@ -12,14 +12,15 @@
 - T-02：Cloud 发布策略合同与命名错误；实现策略 Repository、Service、Handler。创建和修改在事务里写版本，修改用 `expected_version` 防止覆盖，列表在 SQL 层按团队和游戏过滤；未知请求字段被拒绝。顺手删去所改契约与 wire 测试开头的历史过程注释。
 - T-03：新增共用策略页面 `modules/compose/pages/ComposeStrategyPage.vue` 与 API Client `shared/api/compose.js`，替换两端 `/compose-strategy` 的 ComingSoon 占位。高级运营/管理员可创建、编辑（打开时定格 expected_version）、复制（只发名称）与查看版本；普通运营只读。表单选项全部来自模板目录接口，字幕/BGM/片尾呈禁用态；字段级报错用 FormError，15204 冲突具名处理并重拉列表。routerParity 与列表页规范测试同步钉住两端同页。
 
+- T-04（自动化部分）：真实 MySQL 迁移首次应用与幂等重跑 PASS；API 角色矩阵 15 组全部 PASS（创建读回、版本递增与不可变历史、陈旧版本 409、复制独立、普通运营只读与 inactive/范围外不可见、四类非法输入具名 15201、越权 15202/15203）；查库与 API 读回逐字段一致；`go test ./...` 68 包全绿。
+
 ## Current
 
-T-03 已完成实现与自动验证，待独立提交。
+T-04 剩页面走查：等用户在 Cloud Web / Desktop 上确认列表、创建、编辑、复制、版本与只读表现后关闭 CHG。server 在 8188 运行当前源码；验收数据（「CHG079验收-」前缀策略、chg079_senior / chg079_operator 用户，口令 `chg079-pass`）保留在开发库供走查。
 
 ## Next
 
-1. 提交 T-03（wt-media-cloud）。
-2. 执行 T-04：真实 MySQL 迁移、API 角色矩阵读回与页面走查、回归与证据。
+1. 用户页面走查与签收；签收后清理验收数据、停掉 8188 实例，按完成门禁归档 CHG-079。
 
 ## Blocked
 
@@ -37,3 +38,7 @@ T-03 已完成实现与自动验证，待独立提交。
 | T-02 合同 | Ruby YAML 解析四份 Cloud 合同 PASS；Go wire 测试对照返回字段 PASS |
 | T-03 单测 | web/ 下 `npx vitest run` 全量 58 文件 527 测试 PASS；新增测试先红（模块与页面不存在、parity 指向 ComingSoon）后绿 |
 | T-03 构建 | `npm run build:cloud`、`npm run build:desktop` PASS；两端 dist 均含 ComposeStrategyPage 分块并带 API 路径与页面标题 |
+| T-04 迁移 | 真实 MySQL：`20261012_049_compose_strategies` 首次应用，重复执行 0 applied；表结构与设计一致 |
+| T-04 API 矩阵 | 15 组全部 PASS（读回一致、版本不可变、409/15201/15202/15203 具名拒绝、范围外不可见）；查库与 API 一致 |
+| T-04 Go 回归 | `go test ./... -count=1` 68 包 ok / 0 FAIL |
+| T-04 页面走查 | 待用户执行（唯一未闭环项） |
