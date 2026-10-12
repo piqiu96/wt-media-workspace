@@ -431,7 +431,7 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 | 依赖 | M3 `DONE` |
 | 闭环 | `delivery/milestones/M4-content-production.md` |
 | 产品/决策 | 第五章素材生产；ADR-0017、ADR-0021；M4-M5 Cloud 内容生产工程设计 |
-| Active CHG | 无；`CHG-20260924-061`（M4-A）、`CHG-20261012-079`（M4-C2 基础）已归档 |
+| Active CHG | `CHG-20261012-080`（M4-C4 执行器验证）；`CHG-20260924-061`（M4-A）、`CHG-20261012-079`（M4-C2 基础）已归档 |
 | Evidence | M4-A 原功能证据见 `delivery/completed/CHG-20260924-061/evidence/`；2026-10-12 用户签收见 `delivery/reports/2026-10-12-m4-a-signoff.md`，原证据的未覆盖读数不回改 |
 | 完成日期 | None |
 | Commit/Tag | None |
