@@ -2,8 +2,8 @@
 
 - Status: IMPLEMENTING
 - Level: M
-- Milestone: `delivery/milestones/M4-content-production.md`（闭环卡 M4-B；§3.1 M4-C3 行）
-- Closure anchor: §3.1 M4-C3「任务创建」；验收矩阵 M4-AC-04 的创建侧
+- Milestone: `delivery/milestones/M4-content-production.md`
+- Closure anchor: §3.1 M4-C3「任务创建」；验收矩阵 M4-AC-04 的创建侧（M4-B 已闭环）
 - Product: `docs/product/prd/详细文档/第五章_素材生产.md` §5.4.4、§5.5.5、§5.5.6、§5.6
 - Engineering: `docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md` §3.4、§5.4
 - Decision: `docs/decisions/0021-compose-four-layer-model.md`

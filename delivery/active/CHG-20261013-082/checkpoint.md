@@ -24,3 +24,4 @@ None.
 
 - `go test ./internal/modules/... -count=1` 全 PASS；`go build ./...` / `go vet` 通过。
 - diff check：Cloud 仅 4 个 compose-task 文件变更，无范围外改动。
+- `verify_delivery_governance.py` PASS（exit 0）。T-03 工作区提交时 Milestone 行带括号注记未匹配校验器正则，已把注记移入 Closure anchor 行修复；此前 T-01/T-02 提交携带同一问题但未记录治理结论。
