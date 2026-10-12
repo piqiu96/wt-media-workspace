@@ -11,14 +11,15 @@
 - T-05 已注册六条策略路由并接 Service 层；错误映射为合同具名错误，成功走统一信封；旧版本端点保持 404。定向测试、合同⇄路由比对（6=6）和全仓构建通过。证据见 `evidence/T-05.md`。Cloud commit `bc9fa91`。
 - T-06 已交付 Cloud Web/Desktop 共用合成策略页面（列表、创建、编辑、复制、启停；普通运营只读）与 compose API 客户端；两端路由指向同一页面，CHG079 占位守卫改写为 parity 守卫。补齐客户端缺失的 `listGames`。vitest 510 例全绿，两端构建通过。证据见 `evidence/T-06.md`。Cloud commit `58bb32a`。
 - T-07 真实 MySQL/API 验收完成：模板幂等重发布（id=3 不变）；admin 创建/修改/复制/停用读回一致且绑定版本不漂移；schema 外参数、非法区间、非法状态均 400 且零写入；临时账号实测普通运营只读+越权 403/404、高级运营范围内可写+越团队 403；页面路由 200。验收数据与临时账号/团队已精确清零，模板未动。证据见 `evidence/T-07.md`。基于 Cloud `58bb32a`，无代码改动。
+- T-08 全量回归通过：Go 71 包 0 FAIL、vitest 510 例全绿、两端 Web 构建通过、diff check 与 delivery 治理 PASS。验收矩阵 §5 五项全部 PASS。证据见 `evidence/T-08.md`。
 
 ## Current
 
-T-08：全量回归、证据和交付收口。
+待用户要求的统一走查（GUI 级页面操作走查）；走查通过后 CHG 转 DONE 并归档。
 
 ## Next
 
-T-08 全量回归（Go、Web、两端构建）后收口；用户要求本 CHG 全部完成后统一走查（GUI 级页面走查在此时补）。
+统一走查 → 处理走查发现（如有）→ 归档 CHG-20261012-081（移出 `delivery/active` 与 LEDGER）。
 
 ## Blockers
 
@@ -32,3 +33,5 @@ None.
 - `go test ./internal/modules/production/model ./internal/modules/production/repository -count=1` 与 `git diff --check` 通过。
 - `go test ./internal/modules/production/repository ./internal/modules/production/service -count=1` 通过。
 - `go test ./internal/modules/production/... -count=1` 与 `go build ./...` 通过；合同 YAML 与注册路由 6 条精确相等。
+- T-07：真实 MySQL/API 全对照（读回一致、故障零写入）后残留清零。
+- T-08：`go test ./... -count=1`（71 包 0 FAIL）、`go build ./...`、vitest 510 例、`build:cloud`/`build:desktop`、diff check、delivery 治理全部通过。
