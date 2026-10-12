@@ -9,14 +9,15 @@
 - T-03 已实现策略当前态模型与 MySQL 创建、按 ID 读回、团队/游戏/可用状态过滤；定向数据层测试通过。证据见 `evidence/T-03.md`。Cloud commit `e62ff58`。
 - T-04 已实现按角色及团队/游戏授权、按已部署模板版本校验配置、创建/修改/复制/启停和事务内审计；定向测试通过。证据见 `evidence/T-04.md`。Cloud commit `056c0d6`。
 - T-05 已注册六条策略路由并接 Service 层；错误映射为合同具名错误，成功走统一信封；旧版本端点保持 404。定向测试、合同⇄路由比对（6=6）和全仓构建通过。证据见 `evidence/T-05.md`。Cloud commit `bc9fa91`。
+- T-06 已交付 Cloud Web/Desktop 共用合成策略页面（列表、创建、编辑、复制、启停；普通运营只读）与 compose API 客户端；两端路由指向同一页面，CHG079 占位守卫改写为 parity 守卫。补齐客户端缺失的 `listGames`。vitest 510 例全绿，两端构建通过。证据见 `evidence/T-06.md`。Cloud commit `58bb32a`。
 
 ## Current
 
-T-06：Cloud Web/Desktop 共用策略页面与客户端。
+T-07：真实 MySQL、API、页面读回和故障对照。
 
 ## Next
 
-依任务表推进 T-06～T-08。用户要求本 CHG 全部完成后统一走查。
+T-07 真实读回与故障对照，然后 T-08 全量回归收口。用户要求本 CHG 全部完成后统一走查。
 
 ## Blockers
 
