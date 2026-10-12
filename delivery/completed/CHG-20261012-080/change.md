@@ -1,6 +1,6 @@
 # CHG-20261012-080：M4-C4 云端合成执行器验证
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3.1 M4-C4；§5 闭环卡 M4-B
