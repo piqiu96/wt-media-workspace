@@ -7,6 +7,7 @@
 - T-01 完成：迁移 054（composite_outputs + compose_tasks.cancel_requested）红先绿后并已应用 dev 库（1 applied, 56 total）；openapi cancel 语义修订 + ComposeTask.cancel_requested + 错误码 revision 2026.10.14.1；migration/production 两包测试全绿。证据见 `evidence/T-01.md`。Cloud commit `151baed`。
 - T-02 完成：生命周期 Repository（领取 FOR UPDATE SKIP LOCKED + 条件翻转、续租/进度、running 取消请求+确认、CommitComposeOutput 同事务成片、requeue/终态失败、过期租约扫描）11 例 sqlmock；ComposeTask.CancelRequested 与 CompositeOutput 模型落位。证据见 `evidence/T-02.md`。Cloud commit `eb3ad0a`。
 - T-03 完成：执行状态机 `RunComposeAttempt`（快照预校验→输入就绪门→执行→校验上传→同事务提交）10 组用例；业务/临时失败分类、取消检查、孤儿清理；变异对照补「能红」证明。证据见 `evidence/T-03.md`。Cloud commit `be295ad`。
+- T-04 完成：Worker 运行时——`cmd/compose-worker` 升级为领取循环（`-input` 保留验证模式），心跳续租、cancel_requested 轮询受控终止、wait_input 原地重试不烧 attempt、超时同终止路径（预算尽终态化）、启动+周期恢复扫描（requeue/终态）、6+1 配置旋钮非法拒启（config-check 对真实树 PASS）；两处变异对照可红。证据见 `evidence/T-04.md`。Cloud commit `cb09319`。
 
 ## Current
 
@@ -14,7 +15,7 @@
 
 ## Next
 
-T-04 Worker 运行时（主循环、并发/超时/租约配置、取消终止、恢复扫描、配置缺失拒启）。
+T-05 API：running 取消语义、cancel_requested/进度投影、执行失败错误映射；合同与 handler 比对。
 
 ## Blockers
 
@@ -22,4 +23,4 @@ None.
 
 ## Recent verification
 
-- `go test ./internal/modules/production/... -count=1` 五包全 PASS；`go build ./...` 通过。
+- `go test ./internal/jobs/ ./internal/config/ ./internal/modules/production/... -count=1` 全 PASS；`go build ./...`、`go vet` 四包通过；`go run ./cmd/config-check` → configuration valid。
