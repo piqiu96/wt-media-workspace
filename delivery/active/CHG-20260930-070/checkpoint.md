@@ -12,7 +12,7 @@
 
 - 内容池行操作按 `pending / material_created / ignored` 展示，详情和跨对象跳转文案统一为“详情 / 素材详情”。
 - 选中内容后显示数量和批量操作，未选中时隐藏。素材详情跳转不再触发当前页的重复加载。
-- 定向测试 18/18 通过；全量前端测试 505/505 通过；Cloud 和 Desktop 前端构建均通过。确定性环境脚本完成，新 DMG 已启动。CHG 范围代码已在 Cloud 独立提交 `8d2247e`。
+- 定向测试 18/18 通过；全量前端测试 506/506 通过；Cloud 和 Desktop 前端构建均通过。确定性环境脚本已按最新源码重新运行，新 DMG 已启动。CHG 范围代码已在 Cloud 独立提交 `8d2247e`。
 
 ## Current
 
@@ -31,7 +31,7 @@
 | 判据 | 读数 |
 | --- | --- |
 | `ContentPoolPage.test.js` | 18/18 PASS |
-| `npm test` | 55 文件、505/505 PASS |
+| `npm test` | 55 文件、506/506 PASS |
 | `npm run build:cloud` | exit 0 |
 | `npm run build:desktop` | exit 0 |
 | `git diff --check` | exit 0 |
