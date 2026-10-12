@@ -8,6 +8,7 @@
 - T-02 完成：生命周期 Repository（领取 FOR UPDATE SKIP LOCKED + 条件翻转、续租/进度、running 取消请求+确认、CommitComposeOutput 同事务成片、requeue/终态失败、过期租约扫描）11 例 sqlmock；ComposeTask.CancelRequested 与 CompositeOutput 模型落位。证据见 `evidence/T-02.md`。Cloud commit `eb3ad0a`。
 - T-03 完成：执行状态机 `RunComposeAttempt`（快照预校验→输入就绪门→执行→校验上传→同事务提交）10 组用例；业务/临时失败分类、取消检查、孤儿清理；变异对照补「能红」证明。证据见 `evidence/T-03.md`。Cloud commit `be295ad`。
 - T-04 完成：Worker 运行时——`cmd/compose-worker` 升级为领取循环（`-input` 保留验证模式），心跳续租、cancel_requested 轮询受控终止、wait_input 原地重试不烧 attempt、超时同终止路径（预算尽终态化）、启动+周期恢复扫描（requeue/终态）、6+1 配置旋钮非法拒启（config-check 对真实树 PASS）；两处变异对照可红。证据见 `evidence/T-04.md`。Cloud commit `cb09319`。
+- T-05 完成：API——running 取消走 `RequestComposeCancel` 并以 `running + cancel_requested` 应答，终态才 409 15217（文案同步收窄）；openapi 409/stage 描述修订（stage 为 worker 有限枚举，pending 为空）；ComposeTask 投影键集合与 openapi schema 全等比对；红先确认后实现。证据见 `evidence/T-05.md`。Cloud commit `30bb4ff`。
 
 ## Current
 
@@ -15,7 +16,7 @@
 
 ## Next
 
-T-05 API：running 取消语义、cancel_requested/进度投影、执行失败错误映射；合同与 handler 比对。
+T-06 真实 MySQL/API/FFmpeg 验收：领取→准备→执行→成片全链路、快照遵循、取消 running、失败无假成片、租约恢复、双 Worker 不双执行；验收数据清零。
 
 ## Blockers
 
@@ -23,4 +24,4 @@ None.
 
 ## Recent verification
 
-- `go test ./internal/jobs/ ./internal/config/ ./internal/modules/production/... -count=1` 全 PASS；`go build ./...`、`go vet` 四包通过；`go run ./cmd/config-check` → configuration valid。
+- `go test ./internal/modules/production/... -count=1` 六包全 PASS；`go build ./...`、`go vet` 通过。
