@@ -8,14 +8,15 @@
 - T-02 已从执行器代码发布 `basic_cut` v1 到真实 MySQL；两次发布读回同一模板 ID 3、版本 1、状态 active，schema/执行器与代码一致。证据见 `evidence/T-02.md`。Cloud commit `6ff0331`。
 - T-03 已实现策略当前态模型与 MySQL 创建、按 ID 读回、团队/游戏/可用状态过滤；定向数据层测试通过。证据见 `evidence/T-03.md`。Cloud commit `e62ff58`。
 - T-04 已实现按角色及团队/游戏授权、按已部署模板版本校验配置、创建/修改/复制/启停和事务内审计；定向测试通过。证据见 `evidence/T-04.md`。Cloud commit `056c0d6`。
+- T-05 已注册六条策略路由并接 Service 层；错误映射为合同具名错误，成功走统一信封；旧版本端点保持 404。定向测试、合同⇄路由比对（6=6）和全仓构建通过。证据见 `evidence/T-05.md`。Cloud commit `bc9fa91`。
 
 ## Current
 
-T-05：策略 Handler、路由和统一响应。
+T-06：Cloud Web/Desktop 共用策略页面与客户端。
 
 ## Next
 
-依任务表推进 T-05～T-08。用户要求本 CHG 全部完成后统一走查。
+依任务表推进 T-06～T-08。用户要求本 CHG 全部完成后统一走查。
 
 ## Blockers
 
@@ -28,3 +29,4 @@ None.
 - `go test ./cmd/compose-template-publish ./internal/modules/production/executor ./internal/modules/production/repository -count=1` 通过；真实 MySQL 两次发布同一模板 ID。
 - `go test ./internal/modules/production/model ./internal/modules/production/repository -count=1` 与 `git diff --check` 通过。
 - `go test ./internal/modules/production/repository ./internal/modules/production/service -count=1` 通过。
+- `go test ./internal/modules/production/... -count=1` 与 `go build ./...` 通过；合同 YAML 与注册路由 6 条精确相等。
