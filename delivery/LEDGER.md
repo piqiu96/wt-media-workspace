@@ -6,6 +6,6 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261013-085 | M4-C7 下载中心（成片下载接入统一 file_transfer_task） | IMPLEMENTING | wt-media-cloud, wt-media-agent |
+| CHG-20261013-086 | M4-C8 综合验收（真实视频、对象存储、故障恢复与 UI 对账） | IMPLEMENTING | wt-media-cloud, wt-media-agent, wt-media-desktop |
 
 历史叙述（按需回溯）：[LEDGER 历史说明](reports/2026-09-29-ledger-historical-notes.md)。

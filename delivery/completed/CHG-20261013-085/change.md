@@ -1,6 +1,6 @@
 # CHG-20261013-085：M4-C7 下载中心（成片下载接入统一 file_transfer_task）
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: L
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3.1 M4-C7「下载中心」；§6 闭环卡 M4-C（下载与发布衔接）；验收矩阵 M4-AC-08 的下载侧
@@ -65,3 +65,10 @@ None.
 - **成片落盘命名**：沿用 `game_name/日期/文件名` 目录形状；成片无 title/published_at，文件名用「成片-<output_id>-<日期>.mp4」形（game_name 来自成片 game_id 的游戏名，缺省回退「未分类」）。Agent 常量 `TASK_TYPE_MATERIAL_DOWNLOAD` 泛化为按 asset_type 分派，不新建执行器文件。
 - **Drawer 详情**：成片行不打开 MaterialDetailDrawer；详情入口指向「我的成片」页（`/finished-media`）。
 - **Agent 任务类型**：不新增云端 task_type 字段值——领取返回的租约本身含 asset_type，Agent 侧按它分派到同一 MaterialDownloadExecutor（参数化命名与校验路径）。
+
+## 8. 验收记录
+
+- 2026-10-13 完成：T-01～T-06 全部执行并留证（`evidence/T-01.md`～`evidence/T-06.md`）。真实环境探针（compose-worker 真实合成→下载 202→Agent 真实领取落盘→sha 一致→success 读回；越权 404 同形；success 幂等零新增与 pending 并发折叠；pending 取消 `cancelled_by_user`；取消后再下 generation 前进、磁盘名避让；无可信节点 409 15105；清零带正假对照）全部 PASS；环境披露见 `evidence/T-05.md`。
+- 全量回归：Cloud Go 全量 exit 0、Agent unittest 705 全绿、web 536/536（59 文件）、governance exit 0。
+- 提交：wt-media-cloud `88aa46a`/`ec79845`/`4a3bee6`；wt-media-agent `e5bf71d`；工作区记录独立提交。
+- 运行→cancel_requested 臂未本轮实测（成片 21 KB 无 running 窗口），按未复测如实登记（见 `evidence/T-06.md` §矩阵 3）；页面视觉走查并入 2026-10-14 M4 统一验收。
