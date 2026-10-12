@@ -48,4 +48,10 @@
 
 ## 6. Pending Questions
 
-None.
+- Q-01（blocking，2026-10-12）：用户提出「compose_template → compose_strategy → compose_task → composite_output」四层模型修正。逐项冲突：
+  1. 「compose_strategy 不需要独立版本」与里程碑 M4-C2「查看版本记录」及本 CHG §2 / 验收 1 直接冲突——已交付并验证的 `compose_strategy_versions`、`expected_version`、版本历史页面将拆除；
+  2. 模板入库存表（整数自增版本、`schema_json`、`executor`）与 T-01 代码内目录设计不同，且 `executor` 在 M4-C4/C5 前无可绑定执行代码；
+  3. 策略 `schedule` 字段与本 CHG §3「不做自动调度」冲突；
+  4. `config` 资产键（intro/outro/bgm）与 T-01「无资源合同不启用」裁定冲突，资源接入属 M4-C4/C5；
+  5. `compose_task` 快照与执行语义属 M4-C3/C4/C5，不在本 CHG 范围。
+  待用户裁定处置路径（改范围重开本 CHG 或另开新 CHG）与逐项取舍后方可继续实施；版本记录若移除需同步回写里程碑 M4-C2 文本。
