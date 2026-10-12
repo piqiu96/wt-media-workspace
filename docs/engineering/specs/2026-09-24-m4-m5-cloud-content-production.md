@@ -58,17 +58,20 @@ material 1 ── n material_usage n ── 1 user
 
 同一用户与同一素材同一时间最多一个有效关系。移出“我的素材”不删除历史任务和成片。
 
-### 3.3 `compose_strategy`
+### 3.3 `compose_template` 与 `compose_strategy`
 
-保存：
+`compose_template` 是技术资产（ADR-0021）：固定执行动作、定义参数 `schema_json`、绑定 `executor`、管理版本。`version` 整数自增，唯一约束 `(code, version)`；升级只新增版本，旧版本永久保留。
 
-- 模板引用与模板版本；
-- 视频比例、字幕、BGM、片尾等参数；
-- 策略版本和变更审计；
-- 可选 `schedule`：`enabled`、调度表达式/周期、时区、单次上限、每日上限；
-- 启停状态与下次执行时间。
+`compose_strategy` 是业务配置，保存：
 
-自动规则不拆出 `production_rule`。每次创建 `compose_task` 时保存不可变策略快照；后续修改策略不改写历史任务。
+- 模板引用与模板版本（策略按 `(模板, 版本)` 绑定，模板升级不迁移旧策略）；
+- 由所绑定模板版本 `schema_json` 校验的业务参数；
+- 可选 `schedule`：`enabled`、调度表达式/周期、时区、单次上限、每日上限（M5 定时生产落地时引入，M4 不建此列）；
+- 启停状态。
+
+策略不保存版本记录（ADR-0021）：修改策略是配置变化，直接覆盖；策略变更走审计日志。历史追溯由 `compose_task` 的不可变策略快照承担——每次创建任务时保存 `template_code`、`template_version`、`config_snapshot`，后续修改策略不改写历史任务，执行只读快照。
+
+自动规则不拆出 `production_rule`。
 
 ### 3.4 `compose_task`
 
