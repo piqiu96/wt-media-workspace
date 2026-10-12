@@ -7,7 +7,7 @@
 
 ## Current
 
-T-01：`composite_output` 迁移 + 合同修订。
+无进行中任务。
 
 ## Next
 
@@ -19,4 +19,4 @@ None.
 
 ## Recent verification
 
-- 尚未开始实施。
+- T-01 完成：迁移 054（composite_outputs + compose_tasks.cancel_requested）红先绿后并已应用 dev 库（1 applied, 56 total）；openapi cancel 语义修订 + ComposeTask.cancel_requested + 错误码 revision 2026.10.14.1；migration/production 两包测试全绿。证据见 `evidence/T-01.md`。
