@@ -9,6 +9,7 @@
 - T-03 完成：执行状态机 `RunComposeAttempt`（快照预校验→输入就绪门→执行→校验上传→同事务提交）10 组用例；业务/临时失败分类、取消检查、孤儿清理；变异对照补「能红」证明。证据见 `evidence/T-03.md`。Cloud commit `be295ad`。
 - T-04 完成：Worker 运行时——`cmd/compose-worker` 升级为领取循环（`-input` 保留验证模式），心跳续租、cancel_requested 轮询受控终止、wait_input 原地重试不烧 attempt、超时同终止路径（预算尽终态化）、启动+周期恢复扫描（requeue/终态）、6+1 配置旋钮非法拒启（config-check 对真实树 PASS）；两处变异对照可红。证据见 `evidence/T-04.md`。Cloud commit `cb09319`。
 - T-05 完成：API——running 取消走 `RequestComposeCancel` 并以 `running + cancel_requested` 应答，终态才 409 15217（文案同步收窄）；openapi 409/stage 描述修订（stage 为 worker 有限枚举，pending 为空）；ComposeTask 投影键集合与 openapi schema 全等比对；红先确认后实现。证据见 `evidence/T-05.md`。Cloud commit `30bb4ff`。
+- T-06 完成：真实 MySQL/API/FFmpeg 验收全链路（成片、快照遵循、取消 running、失败无假成片、租约恢复、双实例拒启、数据清零）七探针全 PASS；过程中发现并修复「取消旗标骑进领取」真 bug（红先用例 + 实机确认，Cloud commit `3ea646d`）。残留与披露见 `evidence/T-06.md`（审计行保留、崩溃孤儿目录人工处置、161 源对象重播）。
 
 ## Current
 
@@ -16,7 +17,7 @@
 
 ## Next
 
-T-06 真实 MySQL/API/FFmpeg 验收：领取→准备→执行→成片全链路、快照遵循、取消 running、失败无假成片、租约恢复、双 Worker 不双执行；验收数据清零。
+T-07 全量回归（go build/vet/test 全量 + web/ 下 vitest + governance verify 记录退出码）→ 标记 DONE → 归档 CHG-20261013-083 至 `delivery/completed/`（git mv + LEDGER + 母计划 M4 收口行）→ 按用户既定指令开启 CHG084（M4-C6 我的成片）。
 
 ## Blockers
 
