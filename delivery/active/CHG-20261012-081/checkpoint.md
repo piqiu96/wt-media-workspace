@@ -15,6 +15,7 @@
 - T-09 走查修订已实施（范围见 `change.md` §7）：移除 `content_type`（合同/迁移 052/模型/服务/页面全链，旧字段请求被 400 拒绝）；表单分「基础信息」+「模板参数」两节，参数区由所选模板 schema 动态渲染（schema 增补 `title`，模板行已重发布 id=6）；启停外置为列表行内开关。T-08 同口径回归全绿，PRD §5.5.4 已回写。证据见 `evidence/T-09.md`。Cloud commit `916e070`。
 - T-10 个人信息卡新增「所属分组」「游戏范围」（`change.md` §7 第 4 条）：运营可从自己页面看出策略归属分组；管理员显示不受限，游戏 ID 映射为名称。两端共用页自动同源，vitest 510 例与两端构建全绿。证据见 `evidence/T-10.md`。Cloud commit `da42edf`。
 - T-11 策略编辑弹窗与详情抽屉补「所属团队」「所属游戏」（`change.md` §7 第 5 条）：编辑态只读展示（服务端不改归属），团队名全角色经团队列表映射。vitest 510 例与两端构建全绿。证据见 `evidence/T-11.md`。Cloud commit `374e03f`。
+- T-12 AdminUI 视觉规范贯彻（`change.md` §7 第 6 条）：规范文档与设计图入库 `docs/standards/`，约束 M4-M5 后续任务；合成策略页完成一轮优化——筛选区改共享 `filter-bar`/`wt-filter-field`/`wt-filter-actions` 约定、编辑容器 Dialog→Drawer 分组（基础信息/模板参数）、未保存关闭二次提示、校验错误就近提示、详情抽屉分区只读。vitest 510 例与两端构建全绿。证据见 `evidence/T-12.md`。Cloud commit `0cb2dd9`，Workspace 规范入库 commit `500584f`。
 
 ## Current
 
@@ -39,3 +40,4 @@ None.
 - T-07：真实 MySQL/API 全对照（读回一致、故障零写入）后残留清零。
 - T-08：`go test ./... -count=1`（71 包 0 FAIL）、`go build ./...`、vitest 510 例、`build:cloud`/`build:desktop`、diff check、delivery 治理全部通过。
 - T-09：修订后同口径重测全绿；迁移 052 实跑（1 applied, 54 total）；模板行重发布 id=6 basic_cut v1（schema 带 title）；真实 API 复验「无 content_type 创建 201、旧字段 400、schema 标题下发」，验收数据清零。
+- T-12：vitest 56 文件 510 用例全绿、`build:cloud`/`build:desktop` PASS；筛选区标签与 ContentPoolPage 逐一同构。
