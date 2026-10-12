@@ -1,6 +1,6 @@
 # CHG-20261013-082：M4-C3 合成任务创建与排队
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3.1 M4-C3「任务创建」；验收矩阵 M4-AC-04 的创建侧（M4-B 已闭环）
@@ -66,3 +66,15 @@ None.
 - **覆盖参数集合**：模板 schema 定义的全部参数均可通过 `config_override` 覆盖（当前 `basic_cut` v1 即 `start_seconds`/`end_seconds`）；不另建「可覆盖白名单」表。后续模板如需禁止覆盖，经模板新版本语义处理。
 - **幂等键粒度**：批量创建请求体逐素材携带 `request_key`（客户端 UUID）；库上 `uq_compose_tasks_request_key` 全局唯一，冲突时读回既有任务判定归属后返回。
 - **任务来源字段**：`material_id` 必填、`material_usage_id` 必填（人工创建必有有效使用关系；Scheduler 场景 M5 再放宽 usage 为可空，与工程规格「可选」一致）。
+
+## 8. 验收记录（2026-10-13）
+
+§5 验收标准五项全部 PASS（证据见 `evidence/T-06.md`、`evidence/T-07.md`）：
+
+1. 批量创建逐素材独立任务（任务 1/2 同批不同行、usage 9/13 各自回填），per-item 失败不回滚（矩阵 G/H3/J0）。
+2. 同 `request_key` 重发返回同 id（矩阵 D），无新行、无重复审计。
+3. `config_snapshot` 不可变：策略改 config（矩阵 E/F）、模板停用（P1）后旧快照读回不变；同素材换策略各自快照（P2）。
+4. schema 外覆盖/跨队策略/移出与无 usage/跨队素材/停用策略均具名失败零写入（A/B/G/H3/I2/I3/J0）；取消仅 pending（K/L）。
+5. 真实 MySQL/API 16+2 项矩阵全 PASS、审计 create+cancel 落库；Go 71 包、vitest 524 例、双构建、治理全绿（T-07）。
+
+任务 T-01～T-07 完成，Cloud 提交链 `21ac3a3`→`1f1eb64`→`ae0e36e`→`6754805`→`82a6975`。页面人工走查按用户指示并入 2026-10-14 M4 统一验收（用户已授权本 CHG 不等待单项走查继续推进）；验收数据已全部清零。
