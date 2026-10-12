@@ -14,13 +14,15 @@
 
 - T-06 真实 MySQL/API 验收完成：16 项矩阵全 PASS（幂等对照同 id 零新行、override 合并快照读回、策略改后快照不变、schema 外参数/跨队策略/移出与无 usage/跨队素材/停用策略/取消非 pending 全部具名失败且零写入、列表筛选与 admin 全局、列表↔详情一致、senior game 维度隔离）；审计 4 create + 1 cancel；验收后 compose_tasks 与 compose_task 审计清零、策略 11 config/status 与 usage 8/9/13 还原。两处如实登记：operator+inactive 策略折叠为 15216（canReadStrategy 对 operator 要求 active，admin 命中 15214 分支）；senior01 密码重置回约定值。证据见 `evidence/T-06.md`。本任务无代码变更，不产生 Cloud commit。
 
+- T-07 全量回归与证据收口完成：Go 71 包 ok 0 FAIL（vet 干净）、vitest 58 文件 524 例全 PASS、双构建通过、两仓 diff check 干净（workspace 仅既有 AGENTS.md 改动，未触碰）；change.md §5 五条验收标准逐条对照证据收口于 `evidence/T-07.md`。补测 T-06 矩阵遗漏的两条枚举（P1 模板停用后旧快照不变 + 新创建 15213；P2 同素材换策略各自快照），已并入 `evidence/T-06.md`，二次清零完成。CHG 置 DONE 待用户验收。
+
 ## Current
 
-无进行中任务。
+无进行中任务。CHG-20261013-082 七个任务全部完成，等待用户验收（页面人工走查 + §5 确认）后归档。
 
 ## Next
 
-T-07 全量回归（Go 全包、vitest 全量、双构建、diff check、治理）+ 证据收口。
+用户验收通过后：CHG 归档（移出 delivery/active、LEDGER 更新），随后按里程碑顺序进入 M4-C5（合成任务执行）。
 
 ## Blockers
 
@@ -34,3 +36,4 @@ None.
 - `npx vitest run` 58 文件 524 例全 PASS；`npm run build:desktop` / `npm run build` 通过。
 - `verify_delivery_governance.py` PASS（exit 0）。T-03 工作区提交时 Milestone 行带括号注记未匹配校验器正则，已把注记移入 Closure anchor 行修复；此前 T-01/T-02 提交携带同一问题但未记录治理结论。
 - T-06：真实 API 16 项矩阵全 PASS；清零后复测 compose_tasks 0 行、compose_task 审计 0 条、usage 8/9/13 active、策略 11 active 且 config 还原。
+- T-07：`go vet ./...` 干净、`go test ./... -count=1` 71 包 ok 0 FAIL；web/ 下 `npx vitest run` 58/524 全 PASS；`npm run build` 6.80s / `npm run build:desktop` 6.69s 通过；治理 exit 0。
