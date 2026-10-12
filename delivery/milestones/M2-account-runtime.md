@@ -589,4 +589,4 @@ M2只有在全部追踪项和真实Evidence通过，并由用户完成人工整�
 - Cloud Web、Desktop 共享登录页按用户提供的“起飞 / 内容运营平台”参考图优化：蓝色纸飞机 Logo、品牌名称、左右分栏的价值说明与登录卡片；保持现有账号、密码和替换会话流程。
 - 顶部、登录页、浏览器标题与 favicon 采用一致品牌；桌面应用的窗口标题、包名称与 macOS/Windows/Linux 应用图标使用同一 Logo。界面版本号读取实际应用版本，不把参考图中的 `v1.0.0` 当作发布版本。
 - 完成标准：Cloud Web 与 Desktop 双构建通过，登录及退出可用，桌面打包图标与页面 Logo 视觉一致，并进行实际打包应用走查。
-- 实施记录：[CHG-20261001-073](../completed/CHG-20261001-073/change.md)。参考图见 `docs/product/assets/qifei-brand-reference.png` 与 `qifei-login-reference.png`。
+- 实施记录：[CHG-20261001-073](../completed/CHG-20261001-073/change.md)。初版参考图已废弃；新版参考图见[官网](../../assets/images/brand/landing-page.png)和[登录页](../../assets/images/ui/login-page.png)，视觉验收记录见 [CHG-20261010-078](../completed/CHG-20261010-078/change.md)。
