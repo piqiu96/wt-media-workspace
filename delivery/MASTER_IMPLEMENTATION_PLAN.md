@@ -169,7 +169,7 @@ wt-media-workspace/
 | M1 | `DONE` | M1 任务链路闭环复验通过。创建→领取→执行→上报→查询完整链路跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：router 连接、mysql_registry 时间格式。 | M1 冻结。不扩建通用任务系统。 |
 | M2 | `DONE` | 2026-09-14 用户完成本轮综合人工验收并确认完整通过。M2-A/B/C/E 的真实依赖、构建、Desktop 与人工走查证据均已归档；M2-D 保持 `DEFERRED`。 | M2 冻结为当前运行环境与账号管理基线；后续内容发现从 M3 开始，M2-D 或真实受限样本校准须以独立 CHG 恢复。 |
 | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
-| M4 | `IN_PROGRESS` | M4-A（CHG-20260924-061）已于 2026-09-27 关闭归档，用户于 2026-10-12 确认走查通过；M4 整体验收尚未完成。 | M4-C2 的模板/策略模型按 ADR-0021 重做，验收后再启动 M4-C3；M5-M10 仍按顺序等待。 |
+| M4 | `IN_PROGRESS` | M4-A（CHG-20260924-061）已于 2026-09-27 关闭归档，用户于 2026-10-12 确认走查通过；CHG-20261012-079（M4-C2 基础：四层模型结构与合同）已于 2026-10-12 归档；M4 整体验收尚未完成。 | 下一步 M4-C4 验证执行器后发布模板并交付策略，再启动 M4-C3；M5-M10 仍按顺序等待。 |
 | M5-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
 > 2026-09-23 更正：本节原将 `M3-M10` 合并在同一行标记为 `NOT_STARTED`，与第 3 节 M3（内容挖掘自动化入口建设）的实际进度不一致，故拆为两行。各里程碑的当前状态以其在第 3 节的字段为准，本节只记这一行的拆分缘由，不重复断言任何状态。
@@ -431,7 +431,7 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 | 依赖 | M3 `DONE` |
 | 闭环 | `delivery/milestones/M4-content-production.md` |
 | 产品/决策 | 第五章素材生产；ADR-0017、ADR-0021；M4-M5 Cloud 内容生产工程设计 |
-| Active CHG | `CHG-20261012-079`（M4-C2 技术模板与业务策略重做中）；`CHG-20260924-061`（M4-A）已归档 |
+| Active CHG | 无；`CHG-20260924-061`（M4-A）、`CHG-20261012-079`（M4-C2 基础）已归档 |
 | Evidence | M4-A 原功能证据见 `delivery/completed/CHG-20260924-061/evidence/`；2026-10-12 用户签收见 `delivery/reports/2026-10-12-m4-a-signoff.md`，原证据的未覆盖读数不回改 |
 | 完成日期 | None |
 | Commit/Tag | None |
@@ -458,9 +458,10 @@ C2 已激活；C3～C8 尚未建立正式 CHG。下表保留执行顺序。
 
 ```text
 M4-C1 / CHG-20260924-061 素材库、material_usage 与原素材懒加载准备/下载（DONE，2026-09-27 归档）
-M4-C2 compose_template 技术模板版本、compose_strategy 业务参数和可用策略查询
-M4-C3 compose_task 模型、API、模板版本与配置快照、批量创建与排队中取消
+M4-C2 基础：compose_template / compose_strategy 结构与合同，撤下未就绪的旧策略操作
 M4-C4 对象存储、FFmpeg/FFprobe 与按模板版本执行的独立 Cloud Compose Worker 基础设施
+M4-C2 策略交付：发布已验证的 basic_cut 模板版本与 schema，策略 API 和共用页面可用
+M4-C3 compose_task 模型、API、模板版本与配置快照、批量创建与排队中取消
 M4-C5 人工任务从源视频准备到 composite_output 的真实闭环，含运行中取消与单任务安全恢复
 M4-C6 我的成片、来源追踪和去发布入口
 M4-C7 复用 file_transfer_task 与下载中心 Drawer，扩展成片的 Local Agent 本地文件落地

@@ -1,6 +1,6 @@
 # Checkpoint: CHG-20261012-079
 
-- CHG: `CHG-20261012-079`（M4-B 合成策略与版本）
+- CHG: `CHG-20261012-079`（M4-B 模板与策略结构）
 - Status: IMPLEMENTING
 - Updated: 2026-10-12
 
@@ -16,18 +16,15 @@
 
 ## Current
 
-Q-01 已裁定并按 ADR-0021 回写基线（工程规范 §3.3、里程碑 M4-C2、本 CHG 范围）。旧模型 T-01～T-04 交付物未签收，保留为被取代事实；开始执行 T-05（`compose_template` Migration 与种子、策略表调整、移除版本表）。
+CHG 关闭。补做 051 结构对齐（Cloud `3535f86`：`parameters_json → config_json`、删 `allowed_overrides_json`）后全量回归通过（Go 67 包、前端 507 测试、两端构建），Cloud 工作树干净；关闭记录见 `change.md` §7，本记录随 CHG 归档至 `delivery/completed/`。
 
 ## Next
 
-1. T-05：模板入库 Migration 与种子、策略表改列、移除 `compose_strategy_versions` 与 `current_version`。
-2. T-06：合同修订与 Repository/Service/Handler 按无版本模型重做。
-3. T-07：共用页面与客户端移除版本语义，模板选择改目录实体。
-4. T-08：重做真实 MySQL/API 矩阵与页面走查。
+1. 后继由 M4-C4（执行器验证）承接；模板发布与「M4-C2 策略交付」在其之后。
 
 ## Blocked
 
-- 无待决产品或架构问题；Q-01 已解决。旧模型验收数据（「CHG079验收-」策略与 chg079_* 用户）在 T-08 重验后按需清理。
+- 无待决问题；Q-02 已由用户裁定。
 
 ## Recent verification
 
@@ -44,4 +41,13 @@ Q-01 已裁定并按 ADR-0021 回写基线（工程规范 §3.3、里程碑 M4-C
 | T-04 迁移 | 真实 MySQL：`20261012_049_compose_strategies` 首次应用，重复执行 0 applied；表结构与设计一致 |
 | T-04 API 矩阵 | 15 组全部 PASS（读回一致、版本不可变、409/15201/15202/15203 具名拒绝、范围外不可见）；查库与 API 一致 |
 | T-04 Go 回归 | `go test ./... -count=1` 68 包 ok / 0 FAIL |
-| T-04 页面走查 | 待用户执行（唯一未闭环项） |
+| T-04 页面走查 | 旧模型走查中止，改由 T-08 验证当前缩小范围 |
+| 旧验收数据清理 | 本机 MySQL 精确删除策略 4、审计 2、会话 2、游戏范围 2、账号 2；目标策略与账号残留均为 0 |
+| 草稿模板清理 | 本机 MySQL 删除无引用 `basic_cut` v1 一条；模板残留 0；迁移重跑 0 applied |
+| T-05 迁移单测 | `go test ./internal/infra/database/migration -count=1` PASS |
+| T-05 全新升级 | 隔离临时 schema 实际执行 049→050 PASS；模板 0、旧版本表 0、新列 2、唯一索引列 2；临时 schema 已删除 |
+| T-06 Go/合同 | `go test ./internal/modules/production/... -count=1` PASS；四份 YAML 解析 PASS；旧策略端点 404 |
+| T-07 两端页面 | 路由测试 9/9 PASS；Cloud/Desktop 构建 PASS；旧 API Client 无引用 |
+| T-08 真实环境 | MySQL 新结构/空目录 PASS；登录后模板 API 空数组、旧策略端点 404；Go 全量和前端 55 文件/507 测试 PASS，详见 `evidence/T-08.md` |
+| 051 结构对齐 | `go test ./internal/infra/database/migration -count=1` 先红后绿；开发库首次 `1 applied, 53 total`、重跑 `0 applied`；`config_json` 在、覆盖列与版本列/表不在 |
+| 关闭回归（051 后重跑） | `go test ./... -count=1` 67 包 ok / 0 FAIL；web 507 测试 PASS；`build:cloud`、`build:desktop` PASS |
