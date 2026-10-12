@@ -1,6 +1,6 @@
 # CHG-20261013-083：M4-C5 成片执行（任务领取、FFmpeg 执行与 composite_output）
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: L
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3.1 M4-C5「成片执行」；验收矩阵 M4-AC-05/06/07 的执行侧
@@ -68,3 +68,11 @@ None.
 - **取消语义**：`POST /compose-tasks/:id/cancel` 对 running 返回 200 并置 cancel_requested，Worker 确认后任务才 cancelled；15217 仅对 success/failed/cancelled。取消请求状态由任务行上的取消标记承载，不建第二张表。
 - **进度模型**：stage 为有限枚举（`validating_input`/`cutting`/`probing_output`/`uploading`/`committing`），progress 在阶段边界推进，不做 FFmpeg 逐帧百分比。
 - **错误分类**：具名业务失败（输入缺失、快照模板不可用、编码器不支持、参数被执行器拒绝）不重试；其余按临时失败退避重试至上限，超限置 failed 并保留最后错误。
+
+## 8. 验收记录（2026-10-13）
+
+- T-01～T-05：逐任务红先实现、独立提交（cloud `151baed`→`eb3ad0a`→`be295ad`→`cb09319`→`30bb4ff`）。
+- T-06：真实 MySQL/API/FFmpeg 七探针（全链路成片、快照遵循、取消 running、失败无假成片、租约恢复、双实例拒启、数据清零）全 PASS；发现并修复「取消旗标骑进领取」真 bug（红先用例 + 实机确认，cloud `3ea646d`）。披露与残留（审计行保留、崩溃孤儿目录人工处置、素材 161 源对象重播）见 `evidence/T-06.md`。
+- T-07：全量回归抓出两处 T-04 模块级盲区——`config_online/scheduler/compose.toml` 缺必填旋钮（deploy 模板补齐）、`prepare` 用例断言已上移的拒绝（环境门抽为 `verifyWorkerEnvironment`）——修复后 Go 71 包全绿、web vitest 524 例全绿、governance verify exit 0（cloud `61880e9`）。
+- 验收标准逐条对照：①快照执行=探针 B（策略改后输出仍 1000ms）；②成片只在校验后创建=探针 A2/D（失败与 exhaustion 零成片行）；③取消/超时/崩溃恢复无假成片、无双执行=探针 C/E/F（含修复）；④输入未就绪等待=状态机用例 + T-03；⑤执行期不读最新策略=探针 B + execution.go 只读快照。
+- 用户单项验收按既定指示并入 2026-10-14 M4 统一验收。

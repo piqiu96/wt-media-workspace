@@ -17,7 +17,7 @@
 
 ## Next
 
-T-07 全量回归（go build/vet/test 全量 + web/ 下 vitest + governance verify 记录退出码）→ 标记 DONE → 归档 CHG-20261013-083 至 `delivery/completed/`（git mv + LEDGER + 母计划 M4 收口行）→ 按用户既定指令开启 CHG084（M4-C6 我的成片）。
+无——T-07 完成（Go 71 包全绿、web vitest 524 例全绿、governance verify exit 0），CHG 标记 DONE 并归档至 `delivery/completed/`。用户单项验收并入 2026-10-14 M4 统一验收；下一 CHG084（M4-C6 我的成片）随后开启。
 
 ## Blockers
 
