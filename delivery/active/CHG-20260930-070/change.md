@@ -45,3 +45,7 @@
 - `web/src/modules/contentpool/` 定向 vitest 覆盖上述断言；
 - 仅交互层改动，Cloud Go 代码与契约不触碰；
 - 独立提交，不与其他 CHG 混杂。
+
+## 7. Pending Questions
+
+None.
