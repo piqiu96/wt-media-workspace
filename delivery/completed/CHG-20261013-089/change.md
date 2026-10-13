@@ -49,3 +49,14 @@
 ## 6. Pending Questions
 
 None.
+
+## 验收结论
+
+T-01～T-04 均已完成，Cloud commit `2e99dfd`、`7468ff9`、`50561d5`，证据见 `evidence/`。验收逐项：
+
+1. PASS——执行记录来自独立端点逐行渲染（来源/结果/时间/阶段/失败原因），与任务摘要字段不混用；真实库 `compose_task_attempts` 结构读回正确。
+2. PASS——`storage_error`/`task_timeout`/`execution_failed` 可被高级运营重试（普通运营 403）；`input_missing`/`input_invalid`/`template_unavailable` 服务端拒绝且页面无入口只给新建任务引导。
+3. PASS——重试一条事务内 failed→pending、快照不变、attempt_count 保留、max_attempts+1，manual 尝试行与审计同时写入；非 failed 重试返回 409 compose_task_not_retryable。
+4. PASS——成功任务详情输出成片 ID 并跳转我的成片；Cloud/Desktop 双构建通过；全量 Go（71 包）与 Web（557 用例）回归全绿。
+
+真实失败任务的重试链路走查按计划留给 M4-H 用户走查。
