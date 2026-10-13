@@ -6,14 +6,15 @@
 - 已确认产品 §5.9.1/§5.9.9 与里程碑 §6 要求首次下载和清理显示，Cloud 拥有任务事实及会话 API。决定采用终态任务软隐藏，不删除任务或文件。
 - T-01 已补 Cloud 隐藏历史合同及 `hidden_at` 迁移，YAML 解析、迁移包测试和 diff 检查通过；证据 `evidence/T-01.md`。Cloud commit `922cd33`。
 - T-02 已实现本人终态下载记录软隐藏、会话列表过滤与错误映射；定向测试通过。证据 `evidence/T-02.md`。Cloud commit `21ff97c`。
+- T-03 已补共用 Vue 首次下载、清理显示和跨类型行键。71 个定向测试、Cloud/Desktop 双构建通过；证据 `evidence/T-03.md`。Cloud commit `7dab712`。
 
 ## Current
 
-T-03：共用 Vue 首次下载、清理显示与跨资产类型行键。
+T-04：真实环境迁移、API/数据库/本地文件读回与回归。
 
 ## Next
 
-依 T-03～T-04 实现、真实读回、回归与收口。
+执行 T-04 并记录真实走查结果；满足门槛后收口。
 
 ## Blockers
 
@@ -25,3 +26,4 @@ None.
 - Cloud、Agent、Desktop 运行仓工作树干净；Workspace 仅 `AGENTS.md` 为用户既有修改，不触碰。
 - `go test ./internal/infra/database/migration -count=1` 通过；合同 YAML 解析与路由键断言通过。
 - `go test ./internal/modules/filetransfer/... -count=1` 与 Cloud `git diff --check` 通过。
+- 前端定向 Vitest 71/71、`npm run build:cloud`、`npm run build:desktop` 通过。
