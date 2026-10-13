@@ -7,14 +7,15 @@
 - T-01 已补 Cloud 隐藏历史合同及 `hidden_at` 迁移，YAML 解析、迁移包测试和 diff 检查通过；证据 `evidence/T-01.md`。Cloud commit `922cd33`。
 - T-02 已实现本人终态下载记录软隐藏、会话列表过滤与错误映射；定向测试通过。证据 `evidence/T-02.md`。Cloud commit `21ff97c`。
 - T-03 已补共用 Vue 首次下载、清理显示和跨类型行键。71 个定向测试、Cloud/Desktop 双构建通过；证据 `evidence/T-03.md`。Cloud commit `7dab712`。
+- T-04 真实 MySQL/API/Agent 落盘对照完成，成片 8 三方 SHA-256 一致；全量 Go/Web 回归通过。证据 `evidence/T-04.md`。Cloud 后续修正 commit `0f782ef`、`98b956d`。
 
 ## Current
 
-T-04：真实环境迁移、API/数据库/本地文件读回与回归。
+机器实现与验证已完成；M4 人工 UI 签收仍待用户统一走查。
 
 ## Next
 
-执行 T-04 并记录真实走查结果；满足门槛后收口。
+归档 CHG087；M4 按既有签收清单继续 UI 走查。
 
 ## Blockers
 
@@ -27,3 +28,4 @@ None.
 - `go test ./internal/infra/database/migration -count=1` 通过；合同 YAML 解析与路由键断言通过。
 - `go test ./internal/modules/filetransfer/... -count=1` 与 Cloud `git diff --check` 通过。
 - 前端定向 Vitest 71/71、`npm run build:cloud`、`npm run build:desktop` 通过。
+- `go test ./... -count=1`、Web 全量 539/539、真实成片 8 大小与 SHA-256 三方一致、`scripts/verify_delivery_governance.py` 通过。

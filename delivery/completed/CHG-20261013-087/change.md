@@ -1,6 +1,6 @@
 # CHG-20261013-087：M4 下载走查缺口修复
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3.1 M4-C7；§6 下载与发布衔接；§7 M4-AC-08/09；§8 DONE Gate
@@ -37,3 +37,7 @@
 ## Pending Questions
 
 None.
+
+## 验收结论
+
+T-01～T-04 均已完成，证据见 `evidence/`。成片首次下载、本人显示记录清理、权限边界和本地文件完整性通过机器验收。M4 的人工页面走查与用户签收继续按里程碑 §8 执行。
