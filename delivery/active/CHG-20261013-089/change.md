@@ -1,11 +1,11 @@
 # CHG-20261013-089：M4-G 任务执行尝试记录与人工失败重试
 
-- Status: PLANNED
+- Status: IMPLEMENTING
 - Level: L
 - Milestone: `delivery/milestones/M4-content-production.md`
 - Closure anchor: §3 M4-G；§「页面缺口的独立闭环」M4-G 行
 - Product: `docs/product/prd/详细文档/第五章_素材生产.md` §5.8.4～§5.8.6、§5.10.3
-- Affected repository: `wt-media-cloud`（Cloud API、MySQL、Cloud Web/Desktop 共用 Vue）
+- Current repository: `wt-media-cloud`
 
 ## 目标
 
@@ -46,6 +46,6 @@
 3. 重试后任务回 pending、快照不变、`attempt_count` 保留、`max_attempts` 增加 1，审计与 `source=manual` 尝试行可见；对非 failed 任务重试得到明确冲突错误。
 4. 成功任务详情输出成片 ID 并能跳转；页面构建 Cloud/Desktop 通过。
 
-## Pending Questions
+## 6. Pending Questions
 
-None. 重试边界规则已由用户 2026-10-13 确认。
+None.
