@@ -1,6 +1,6 @@
 # CHG-20261014-094：M5-C3 Worker 全局容量与安全恢复
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M5-automatic-production.md`
 - Closure anchor: §5 M5-B（Worker 资源控制与恢复中的 C3）
@@ -46,3 +46,15 @@
 ## Pending Questions
 
 None.
+
+## 验收结论
+
+T-01～T-04 机器验收通过：
+
+1. 双进程真 MySQL 竞争下恰好领取上限数；配置与数据库容量不一致时拒绝启动/领取（容量测试 + 真实进程拒启）。
+2. 同任务单一代次有效；旧代次续租、进度、取消、失败和成片提交在同 node 复现场景下全部被拒绝，判别性变异确认测试会红。
+3. 真实进程 cutting 阶段中途取消：cancel watcher 停止 FFmpeg、确认 `cancelled`、无输出无 run 目录残留（任务 166）；任务超时与取消共用 attempt ctx 终止路径，单测覆盖。
+4. 过期租约启动恢复隔离为 `execution_uncertain`，attempt 记 failed，不自动重排，不产生双执行或假成片（真实进程任务 165）。
+5. 磁盘剩余空间低于阈值时真实进程暂停领取（任务 168 保持 pending，job.log 记录），恢复阈值后被重新领取。
+
+期间发现并修复 compose-worker 从未初始化 logger 的缺陷（SIGTERM panic、job.log 空写），修复后停机日志落盘。诚实边界：等待输入期取消在首轮真实进程通过（任务 158），最终复跑因素材均已就绪而 SKIP。Cloud 提交 `3a32d91`、`9765610`、`82a3fa3`。
