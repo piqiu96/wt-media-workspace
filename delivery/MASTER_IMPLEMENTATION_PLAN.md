@@ -504,8 +504,8 @@ M4-C8 真实视频、对象存储、故障恢复和 UI 综合验收
 | 依赖 | M4 机器闭环已验证；M4-H2 人工走查暂缓，与 M5 最后统一签收（2026-10-14 用户确认） |
 | 闭环 | `delivery/milestones/M5-automatic-production.md` |
 | 产品/决策 | 第五章素材生产；ADR-0017；M4-M5 Cloud 内容生产工程设计 |
-| Active CHG | None（M5-C1 已归档，下一项 M5-C2） |
-| Evidence | M5-C1 机器证据见 `delivery/completed/CHG-20261014-091/evidence/`；最终用户签收暂缓。 |
+| Active CHG | None；M5-C2 已完成，后续变更按当前需求建立。 |
+| Evidence | M5-C1/C2 机器证据分别见 `delivery/completed/CHG-20261014-091/evidence/`、`delivery/completed/CHG-20261014-092/evidence/`；最终用户签收暂缓。 |
 | 完成日期 | None |
 | Commit/Tag | None |
 

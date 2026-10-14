@@ -67,7 +67,8 @@ def validate_master_text(text: str) -> list[str]:
         2: "DONE",
         3: "DONE",
         4: "IN_PROGRESS",
-        **{number: "NOT_STARTED" for number in range(5, 11)},
+        5: "IN_PROGRESS",
+        **{number: "NOT_STARTED" for number in range(6, 11)},
     }
     statuses: dict[int, str | None] = {}
     for number, expected in expected_statuses.items():
@@ -335,7 +336,7 @@ def validate_active_change(root: Path) -> list[str]:
     if not current_repository:
         errors.append("active CHG current repository is missing")
     if not re.search(
-        r"^## \d+\. Pending Questions\s+None\.\s*$",
+        r"^## (?:\d+\. )?Pending Questions\s+None\.\s*$",
         change_text,
         flags=re.MULTILINE,
     ):
