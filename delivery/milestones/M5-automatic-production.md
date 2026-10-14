@@ -1,11 +1,12 @@
 # M5 策略自动生产与 Worker 资源控制
 
-- Milestone status: `NOT_STARTED`
+- Milestone status: `IN_PROGRESS`
 - Product baseline: `docs/product/prd/详细文档/第五章_素材生产.md`
 - Engineering baseline: `docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md`
 - Decision: `docs/decisions/0017-m4-m5-cloud-owned-content-production.md`
-- Dependency: M4 `DONE`
+- Dependency: M4 机器闭环已完成；M4-H2 用户走查暂缓，与 M5 最后统一签收
 - Confirmed: 2026-09-24，用户确认自动规则直接归 `compose_strategy`
+- Delivery order confirmed: 2026-10-14，用户要求先完成 M5 各 CHG，最后统一走查 M4 与 M5
 
 ## 1. 里程碑目标
 
@@ -25,11 +26,13 @@ M5 不创建 `production_rule`、`compose_pool_item`、成片池、成片领取�
 
 合成策略计划的页面表达参考已落地的挖掘策略：手动执行、每 N 分钟、每天 HH:MM，展示时区与下次执行时间。两类策略各自维护业务配置，不共享任务或调度数据。[合成策略参考图](../../assets/images/ui/content-production/compose-strategies-reference.png)只作为布局参考。
 
+首版素材范围固定为策略创建人的“我的素材”中仍有效、属于策略团队和游戏的素材；已经由该策略成功生产过的素材跳过。失败或取消的任务不算“已生产”，但待执行和执行中的同策略素材不能重复入队。页面明确展示这个范围，不提供尚无业务定义的自定义筛选表达式。用户于 2026-10-14 确认此口径。
+
 挖掘策略的自动转素材发布时间过滤已在[内容发现产品基线](../../docs/product/M3-content-mining-v2.md#4-挖掘策略)记录为 M3 验收后的独立增量；它不属于 `compose_strategy.schedule`，也不作为 M5 自动合成的隐式前置条件。后续单独交付时只让通过过滤的来源进入现有点赞／收藏判断。
 
 ## 2. 前置条件
 
-- M4 为 `DONE`；
+- M4 的人工生产、真实 FFmpeg、对象存储及下载机器闭环已有证据；M4-H2 人工页面签收暂缓，不作为 M5 开发的前置门槛；
 - 人工 `compose_task → composite_output` 已通过真实 FFmpeg 与对象存储验收；
 - `compose_strategy` 已有稳定版本、快照和权限；
 - Worker 单任务租约、heartbeat、取消、超时和重试底座已在 M4 验证；
@@ -39,7 +42,7 @@ M5 不创建 `production_rule`、`compose_pool_item`、成片池、成片领取�
 
 | 阶段 | 独立结果 | 候选 CHG | 状态 |
 | --- | --- | --- | --- |
-| M5-A | 高级运营设定合成策略的运行时间、适用素材和数量上限，并能启停 | M5-C1 | `NOT_STARTED` |
+| M5-A | 高级运营设定合成策略的运行时间、适用素材和数量上限，并能启停 | M5-C1 | `MACHINE_PASS`；真实到点属 C2 |
 | M5-B | 云端定时程序（Scheduler）到点创建任务；同一策略、同一计划时间、同一素材只创建一次，程序重启后也不重复 | M5-C2 | `NOT_STARTED` |
 | M5-C | 云端多个合成程序（Worker）按配置的数量上限工作；程序失联或任务超时后安全处理，不让同一任务同时执行两次 | M5-C3 | `NOT_STARTED` |
 | M5-D | 批量任务有成功也有失败时，运营能看到每条结果、重试可恢复的失败，并由技术人员处理结果不明确的任务 | M5-C4～M5-C6 | `NOT_STARTED` |
@@ -62,6 +65,7 @@ M5-C2 产生 `scheduled` 任务后，合成任务列表再增加触发方式筛�
 - 策略模板和参数已在 M4 人工任务中验证；
 - 用户拥有策略业务范围的高级运营权限；
 - 云端的时区与定时执行配置有效。
+- 策略创建人的“我的素材”仍有有效素材关系；素材必须属于策略团队和游戏。
 
 ### 用户操作顺序
 
@@ -82,6 +86,7 @@ M5-C2 产生 `scheduled` 任务后，合成任务列表再增加触发方式筛�
 - 云端校验设置并保存到 `compose_strategy`；
 - 定时程序检查哪些已启用的策略到了运行时间；
 - 按权限范围、素材可用性和上限筛选候选素材；
+- 跳过该策略已成功生产的素材，且不为尚在队列或执行中的同策略素材重复创建任务；
 - 对同一策略、同一计划时间和同一素材，只允许创建一次任务；
 - 为符合条件的素材分别创建待执行的 `compose_task`，并保存下一次计划时间；
 - “立即执行”复用同一任务创建入口，不同步合成。
@@ -105,7 +110,7 @@ M5-C2 产生 `scheduled` 任务后，合成任务列表再增加触发方式筛�
 
 ### 对应 CHG
 
-- M5-C1、M5-C2（待建立）。
+- M5-C1（计划配置和页面读回，机器验收通过）、M5-C2（真实调度与幂等，待建立）。
 
 ## 5. 闭环卡 M5-B：Worker 资源控制与恢复
 
@@ -226,4 +231,4 @@ M5-C2 产生 `scheduled` 任务后，合成任务列表再增加触发方式筛�
 
 ## 8. M5 DONE Gate
 
-M5 只有在 M5-AC-01～13 全部 PASS、M4 回归通过、真实 Scheduler/Worker/FFmpeg/Object Storage 证据齐全并经用户签收后才能进入 `DONE`。保存策略、调用“立即执行”、创建任务记录或 Mock Worker 都不能替代真实定时自动生产验收。
+M5 各 CHG 可先实施并逐项完成机器验收。M5 只有在 M5-AC-01～13 全部 PASS、M4 回归通过、真实 Scheduler/Worker/FFmpeg/Object Storage 证据齐全，并与 M4-H2 一起经用户最终走查签收后才能进入 `DONE`。保存策略、调用“立即执行”、创建任务记录或 Mock Worker 都不能替代真实定时自动生产验收。

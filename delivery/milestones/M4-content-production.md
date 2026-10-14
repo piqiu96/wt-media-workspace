@@ -26,6 +26,8 @@ compose_template（技术模板，按版本发布）
 
 M4 不包含定时自动创建合成任务；自动调度属于 M5。
 
+2026-10-14 用户调整交付顺序：M4-H2 的真实页面走查和人工签收暂缓，待 M5 各 CHG 完成后统一走查。M4 仍为 `IN_PROGRESS`，既有机器证据不冒充用户验收；此项暂缓不阻止 M5 的开发与逐 CHG 机器验收。
+
 一次选择多个素材仍逐素材创建多个独立 `compose_task`。未来的任务归并只用于列表展示和筛选，可由任务名称或分组 code 标识；不合并执行、状态、重试或成片。本轮 M4-F 不预设分组字段。
 
 页面走查以[Admin UI 视觉规范](../../docs/standards/前端视觉-AdminUI规范.md)和[用户反馈交互规范](../../docs/standards/feedback-system.md)为准。[合成策略](../../assets/images/ui/content-production/compose-strategies-reference.png)、[合成任务](../../assets/images/ui/content-production/compose-tasks-reference.png)、[我的成片](../../assets/images/ui/content-production/my-outputs-reference.png)三张图只供布局参考，不能据图扩大业务状态和数据模型。
@@ -49,7 +51,7 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 | M4-F | 任务与成片可按时间查找，成片可按来源素材查找；预览失败仍可看详情 | CHG-20261013-088 | `DONE`（2026-10-13 归档，Cloud commit `b5cdffc`；机器验收见其 `evidence/`，页面真实数据走查并入 M4-H） |
 | M4-G | 任务执行详情与人工失败重试：先补可审计的服务端能力，再开放页面操作 | CHG-20261013-089 | `DONE`（2026-10-13 归档，Cloud commits `2e99dfd`/`7468ff9`/`50561d5`；尝试记录、人工重试与成片关联机器验收见其 `evidence/`，页面真实数据走查并入 M4-H） |
 | M4-H1 | 按 Admin UI 与参考图修正策略、任务、成片及创建任务的视觉与信息层级 | CHG-20261014-090 | `DONE`；2026-10-14 归档，Cloud commit `c92264b`；布局样本、定向测试和双端构建通过，不增加参考图中的未交付业务能力 |
-| M4-H2 | 按真实数据完成 Cloud Web/Desktop 页面走查与用户签收 | M4-H1 完成后 | `NOT_STARTED` |
+| M4-H2 | 按真实数据完成 Cloud Web/Desktop 页面走查与用户签收 | M4-H1 完成后，与 M5 最后统一走查 | `DEFERRED`；用户 2026-10-14 暂缓，M4 保持 `IN_PROGRESS` |
 
 M4-C2～C8 的原实施与机器验收均已归档；CHG-20261013-087 已修复并完成下载体验缺口的机器验收。M4-A 已获用户签收，见 [M4-A 验收补记](../reports/2026-10-12-m4-a-signoff.md)。M4 整体仍待 UI 走查与签收。
 
