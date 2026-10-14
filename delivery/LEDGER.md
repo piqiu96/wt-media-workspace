@@ -6,6 +6,7 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20261014-094 | M5-C3 Worker 全局容量与安全恢复 | IMPLEMENTING | wt-media-cloud |
 
 M4-H2 真实数据 UI 走查与 M5 最后统一签收。
 
