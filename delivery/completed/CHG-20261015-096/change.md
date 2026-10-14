@@ -1,6 +1,6 @@
 # CHG-20261015-096：M5-C5 技术退避重试与存储异常安全处置
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M5-automatic-production.md`
 - Closure anchor: §5 M5-B 的技术失败恢复与临时资源清理；§7 M5-AC-08
@@ -48,6 +48,14 @@
 
 None.
 
-## 验收记录
+## 验收结论
 
-尚未验收；逐任务事实记录在 `evidence/`，进度见 `checkpoint.md`。
+T-01～T-04 机器验收通过；逐项事实与命令见 `evidence/`：
+
+1. **PASS**：真库 `next_attempt_at` 控制所有领取者；真实 Worker 重启前后保留等待时间，到期后同一任务第 2 次尝试生成正式成片，尝试记录与对象键均可追溯。
+2. **PASS**：30 秒起步、15 分钟封顶的指数退避和最大尝试次数由 Repository/Service/Worker 测试覆盖；达到上限写为终态失败。
+3. **PASS**：缺失输入、媒体校验与非法模板不重试；`execution_uncertain` 保持隔离，旧领取代次不能写入新尝试。真实双进程领取与真库旧代次回归通过。
+4. **PASS**：真实 FFmpeg cutting 阶段取消后进程退出，任务为 `cancelled`，无成片和工作目录残留；上下文取消单测证明不会再排重试。
+5. **PASS**：每代次独立 staging/正式对象键；真实对象存储删除失败后留下待扫记录，恢复后对象删除并标记；已知提交回滚才删除正式键，未知提交结果保留正式键。
+
+验证边界：等待输入时取消的旧用例因本地缺少对应素材而跳过；真实 FFmpeg 中途取消已通过。三次连续真实存储故障的耗尽过程由单测覆盖状态机，未做破坏本地对象存储服务的连续故障实验。M5-C7 仍负责全链与页面最终签收。Cloud 提交 `12604a0`、`eb89eab`、`05a7cf0`、`70c93ce`。

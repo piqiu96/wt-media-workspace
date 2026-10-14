@@ -6,7 +6,6 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261015-096 | M5-C5 技术退避重试与存储异常安全处置 | IMPLEMENTING | wt-media-cloud |
 
 M4-H2 真实数据 UI 走查与 M5 最后统一签收。
 
