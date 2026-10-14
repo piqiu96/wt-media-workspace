@@ -1,6 +1,6 @@
 # CHG-20261015-095：M5-C4 批次结果归集与部分失败对账
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M5-automatic-production.md`
 - Closure anchor: §3 M5-D 的批次结果归集段（批次仅按计划时间、策略汇总展示，不合并执行实体）与 §8 M5-AC-09
@@ -47,3 +47,15 @@
 ## Pending Questions
 
 None.
+
+## 验收结论
+
+T-01～T-04 机器验收通过：
+
+1. 同策略同 `schedule_slot` 批次逐素材列出，任务状态、错误与成片关联读自库内行（先红测试播种真值比对）。
+2. 批次统计来自服务端 `GROUP BY`，部分失败读作部分失败（1 成功 + 1 失败播种形态下计数诚实；stub 返回空时测试先红）。
+3. 跳过原因随该槽最新运行记录透传，页面沿用 `skipped_json` 渲染。
+4. 防重与数量控制回归通过：真实 scheduler 二进制双进程 + 重启后 runs=1 / tasks=1；`WT_MEDIA_TEST_LIVE_DB` 门禁套件（到点扫描、单次/每日上限路径）全绿。
+5. 无新增迁移、无批次实体、无第二套任务状态；页面统计直接渲染服务端 view，不二次推算。
+
+诚实边界：真库证据覆盖 success/failed 形态（dev 库策略最多 2 个素材）；pending/running/cancelled 与之共用同一 `GROUP BY` 分支。Cloud 提交 `fcc297f`。
