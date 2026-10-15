@@ -231,7 +231,7 @@ M5-C6 人工处置口径（2026-10-15 用户确认）：仅管理员在任务详
 
 | AC | 验收要求 | 最低证据 | 状态 |
 | --- | --- | --- | --- |
-| M5-AC-01 | `compose_strategy.schedule` 配置、启停、时区和下一次执行时间正确；手动／间隔／每天模式可用，启用不立即触发 | API/数据库/UI 对照 | `TODO` |
+| M5-AC-01 | `compose_strategy.schedule` 配置、启停、时区和下一次执行时间正确；手动／间隔／每天模式可用，启用不立即触发 | API/数据库/UI 对照 | `PASS`（机器腿）；CHG092 间隔/每日/上限与启停即时性；CHG098 T-02 真实到点、T-03 API=DB 逐字段对账；UI 对照随 M5-AC-13 用户走查 |
 | M5-AC-02 | 真实到期扫描创建任务 | 独立 Scheduler 进程证据 | `PASS`；CHG092 双进程本地数据库测试 |
 | M5-AC-03 | 同时间槽并发/重启扫描防重 | 并发测试 + 唯一键证据 | `PASS`；CHG092 1 run / 1 task，重启仍 1 task |
 | M5-AC-04 | 单次和每日上限生效 | 边界值测试 | `PASS`；CHG092 本地数据库边界测试 |
@@ -241,9 +241,9 @@ M5-C6 人工处置口径（2026-10-15 用户确认）：仅管理员在任务详
 | M5-AC-07 | 超时/取消真实终止 FFmpeg | 进程与任务对照 | `PASS`；CHG094 真实进程 cutting 阶段中途取消任务 166，无输出无残留；超时路径与取消共用 attempt ctx 终止，单测覆盖 |
 | M5-AC-08 | 技术失败退避重试、业务失败不盲目重试 | 错误分类测试 | `PASS`；CHG096 真 Worker 重启跨进程退避与第 2 次成片读回、真库资格读回、分类和耗尽单测；连续真实存储故障耗尽未单独注入 |
 | M5-AC-09 | 批量部分失败统计准确；每条素材的任务和结果独立可追溯 | 数据库/API/UI 对账 | `PASS`；CHG095 播种混合状态批次对账（先红后绿），CHG097 真库批次计划时间槽与双进程调度幂等回归保持绿 |
-| M5-AC-10 | 自动任务生成真实可播放成片 | FFprobe + 对象存储 | `TODO` |
-| M5-AC-11 | M4 人工生产和下载完整回归 | M4 验收矩阵复跑 | `TODO` |
-| M5-AC-12 | 不存在旧对象或 Agent 合成路径 | Migration/代码/Contract 扫描 | `TODO` |
+| M5-AC-10 | 自动任务生成真实可播放成片 | FFprobe + 对象存储 | `PASS`；CHG098 T-02 成片 40/41 真实对象 SHA256+FFprobe 1.000s；T-03 人工成片 42 同链路 Local Agent 落盘三方闭合 |
+| M5-AC-11 | M4 人工生产和下载完整回归 | M4 验收矩阵复跑 | `PASS`；CHG098 T-03 operator01 人工任务 252→成片 42→`transfer_02cfdc38…`→本地文件 SHA=声明 SHA=FFprobe 1.000s |
+| M5-AC-12 | 不存在旧对象或 Agent 合成路径 | Migration/代码/Contract 扫描 | `PASS`；CHG098 T-04 `production_rule`/`compose_pool_item` 三仓 0 命中（带阳性对照）；Agent 执行器仅下载、合同无 compose；Desktop 仅状态 DTO |
 | M5-AC-13 | 用户按真实计划流程签收；任务页可按触发方式查找人工与自动任务，页面操作与反馈遵循 `docs/standards/` | 人工验收记录 | `TODO` |
 
 ## 8. M5 DONE Gate

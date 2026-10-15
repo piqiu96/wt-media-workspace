@@ -49,4 +49,6 @@ None.
 
 ## 验收记录
 
-实施中；逐任务事实在 `evidence/`，进度在 `checkpoint.md`。
+- T-01～T-04 机器腿全部 PASS，逐项事实见 `evidence/T-01.md`～`evidence/T-04.md`；进度与残留见 `checkpoint.md`。
+- M5-AC-01～12 已在 `delivery/milestones/M5-automatic-production.md` 收口为 PASS（含证据出处）。
+- M5-AC-13 与 M4-H2 用户走查签收为唯一未决项；已探明的归属事实（本机设备绑定仅 operator01，自动成片 created_by 为策略创建者）在 `evidence/T-03.md` 如实登记，交用户走查时裁定。
