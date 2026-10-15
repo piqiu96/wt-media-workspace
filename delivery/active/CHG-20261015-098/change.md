@@ -10,7 +10,7 @@
 - Current repository: `wt-media-workspace`
 - Affected repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-desktop`（验收目标，运行时代码修改以复现缺陷为前提）
 - Verification repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-desktop`
-- Runtime implementation: none planned; any discovered defect is localized to its owner and recorded before repair
+- Runtime implementation: Cloud owns the M4/M5 compose-task acceptance corrections confirmed on 2026-10-16; Agent and Desktop remain verification targets
 
 ## 目标
 
@@ -18,8 +18,8 @@
 
 ## 当前事实与差距
 
-- M5-C1～C6（含 C2a）已机器验证并归档，当前没有 Active CHG，四个仓库工作区干净。
-- M5-AC-01、10～13 仍为 `TODO`；此前单项测试和人工触发均不替代真实计划时间的全链证据。
+- M5-C1～C6（含 C2a）已机器验证并归档；C7 是当前唯一 Active CHG。
+- M5-AC-01～12 机器证据已 PASS；M5-AC-13 与 M4-H2 的页面走查及签收仍未完成。
 - C7 需固定运行环境、明确真实对象和跨进程读回；不能只以 HTTP 200、任务行或模拟依赖判定通过。
 
 ## 有序任务
@@ -30,6 +30,7 @@
 | T-02 | 真实时间触发一批自动任务；核对计划时区、素材范围、上限、幂等、停用、混合结果和 Worker 容量/恢复 | 独立进程、MySQL、对象存储、FFprobe、API 对账 |
 | T-03 | 自动成片在 Cloud Web 和打包 Desktop 可预览并经 Local Agent 下载；复跑 M4 人工生产/下载 | 页面与文件读回、Cloud/Agent 状态对账、M4-H2 走查记录 |
 | T-04 | 代码/Migration/Contract 排除旧对象和 Agent 合成路径，按 M5 验收矩阵逐项收口并完成用户签收 | 扫描结果、差异复审、用户走查结论 |
+| T-05 | 收口合成任务列表与详情走查结论：创建时稳定名称、实体追溯、状态/阶段、执行记录与配置快照 | Cloud schema/API/Web 测试及 Cloud Web/Desktop 共用页面走查 |
 
 ## 验收
 
@@ -52,3 +53,4 @@ None.
 - T-01～T-04 机器腿全部 PASS，逐项事实见 `evidence/T-01.md`～`evidence/T-04.md`；进度与残留见 `checkpoint.md`。
 - M5-AC-01～12 已在 `delivery/milestones/M5-automatic-production.md` 收口为 PASS（含证据出处）。
 - M5-AC-13 与 M4-H2 用户走查签收为唯一未决项；已探明的归属事实（本机设备绑定仅 operator01，自动成片 created_by 为策略创建者）在 `evidence/T-03.md` 如实登记，交用户走查时裁定。
+- 2026-10-16 用户给出合成任务页面走查整改结论；T-05 进入实施，改动只归 Cloud 业务事实与共用 Vue 页面，完成后重新走查 M4-H2/M5-AC-13。

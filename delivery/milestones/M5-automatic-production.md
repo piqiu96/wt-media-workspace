@@ -244,7 +244,7 @@ M5-C6 人工处置口径（2026-10-15 用户确认）：仅管理员在任务详
 | M5-AC-10 | 自动任务生成真实可播放成片 | FFprobe + 对象存储 | `PASS`；CHG098 T-02 成片 40/41 真实对象 SHA256+FFprobe 1.000s；T-03 人工成片 42 同链路 Local Agent 落盘三方闭合 |
 | M5-AC-11 | M4 人工生产和下载完整回归 | M4 验收矩阵复跑 | `PASS`；CHG098 T-03 operator01 人工任务 252→成片 42→`transfer_02cfdc38…`→本地文件 SHA=声明 SHA=FFprobe 1.000s |
 | M5-AC-12 | 不存在旧对象或 Agent 合成路径 | Migration/代码/Contract 扫描 | `PASS`；CHG098 T-04 `production_rule`/`compose_pool_item` 三仓 0 命中（带阳性对照）；Agent 执行器仅下载、合同无 compose；Desktop 仅状态 DTO |
-| M5-AC-13 | 用户按真实计划流程签收；任务页可按触发方式查找人工与自动任务，页面操作与反馈遵循 `docs/standards/` | 人工验收记录 | `TODO` |
+| M5-AC-13 | 用户按真实计划流程签收；任务页按“任务→触发方式→关联素材/策略/成片→状态/阶段→操作”展示人工与自动任务，执行记录区分创建触发与 Worker 尝试，页面操作与反馈遵循 `docs/standards/` | 人工验收记录 | `TODO`；2026-10-16 页面走查结论整改中 |
 
 ## 8. M5 DONE Gate
 

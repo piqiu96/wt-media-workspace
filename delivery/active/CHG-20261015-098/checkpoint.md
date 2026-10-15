@@ -11,12 +11,13 @@
 
 ## Current
 
-- 等待用户最终走查签收（M5-AC-13 + M4-H2，同场完成）。
+- 2026-10-16 用户提交合成任务页面走查整改结论；T-05 已完成代码与自动验证，待迁移应用、真实页面复查及 M5-AC-13/M4-H2 同场签收。详见 `evidence/T-05.md`。
 
 ## Next
 
-1. 用户按真实计划流程在 Cloud Web 与打包 Desktop 走查：策略页（启停/计划）、任务页（按触发方式筛人工/自动）、我的成片（预览自动成片 40/41 与人工成片 42）、下载中心（transfer_02cfdc38 进度与 hash 徽标、本地文件 `20261015/三角洲-42-成片-42.mp4`）。
-2. 用户签收后：更新 M5-AC-13 与 M4-H2、归档本 CHG、按需处理归属事实（如需 senior/admin 本机演示自动成片下载，先做设备绑定供给）。
+1. 在当前验证环境应用 Cloud migration 063 并从最新源码重建后，复查新任务名称的数据库/API/UI 一致性；原任务按 ID 回退。
+2. 用户按真实计划流程在 Cloud Web 与打包 Desktop 走查：策略页（启停/计划）、任务页（按触发方式筛人工/自动、实体链接、执行记录、配置快照）、我的成片（预览自动成片 40/41 与人工成片 42）、下载中心（transfer_02cfdc38 进度与 hash 徽标、本地文件 `20261015/三角洲-42-成片-42.mp4`）。
+3. 用户签收后：更新 M5-AC-13 与 M4-H2、归档本 CHG、按需处理归属事实（如需 senior/admin 本机演示自动成片下载，先做设备绑定供给）。
 
 ## Blockers
 
@@ -27,3 +28,4 @@
 - T-03：`transfer_02cfdc38af2b573063ab72de` success，278362/278362 字节；三方 SHA 闭合 `39025ff4…ca600`；FFprobe 1.000000 秒；重复下载幂等单行。
 - T-04：三仓 `production_rule`/`compose_pool_item` 0 命中（阳性对照命中）；`compose_tasks` running=0；策略 23/24/25 `next_run_at=NULL`。
 - 治理与产品主计划对齐校验在提交时随脚本复跑。
+- T-05：Cloud `go test ./...`、Web `npm test`（569/569）、`npm run build:cloud`、`npm run build:desktop`、Workspace delivery governance 均通过；未把自动测试当作用户签收。
