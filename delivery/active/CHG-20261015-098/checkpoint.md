@@ -11,11 +11,11 @@
 
 ## Current
 
-- 2026-10-16 用户提交合成任务页面走查整改结论；T-05 已完成代码与自动验证，待迁移应用、真实页面复查及 M5-AC-13/M4-H2 同场签收。详见 `evidence/T-05.md`。
+- 2026-10-16 用户提交合成任务页面走查整改结论；T-05 已完成代码、自动验证和本机 migration 063/环境重建，待真实页面复查及 M5-AC-13/M4-H2 同场签收。详见 `evidence/T-05.md`。
 
 ## Next
 
-1. 在当前验证环境应用 Cloud migration 063 并从最新源码重建后，复查新任务名称的数据库/API/UI 一致性；原任务按 ID 回退。
+1. 在当前已重建环境复查新任务名称的数据库/API/UI 一致性；原任务按 ID 回退。
 2. 用户按真实计划流程在 Cloud Web 与打包 Desktop 走查：策略页（启停/计划）、任务页（按触发方式筛人工/自动、实体链接、执行记录、配置快照）、我的成片（预览自动成片 40/41 与人工成片 42）、下载中心（transfer_02cfdc38 进度与 hash 徽标、本地文件 `20261015/三角洲-42-成片-42.mp4`）。
 3. 用户签收后：更新 M5-AC-13 与 M4-H2、归档本 CHG、按需处理归属事实（如需 senior/admin 本机演示自动成片下载，先做设备绑定供给）。
 
@@ -29,3 +29,4 @@
 - T-04：三仓 `production_rule`/`compose_pool_item` 0 命中（阳性对照命中）；`compose_tasks` running=0；策略 23/24/25 `next_run_at=NULL`。
 - 治理与产品主计划对齐校验在提交时随脚本复跑。
 - T-05：Cloud `go test ./...`、Web `npm test`（569/569）、`npm run build:cloud`、`npm run build:desktop`、Workspace delivery governance 均通过；未把自动测试当作用户签收。
+- T-05：`scripts/m2b-local-acceptance.sh all --force-restart` 通过；migration 063 在首次运行应用，第二次读回 0 待应用；Cloud 旧 PID 2464 停止，新监听 PID 11545 于 01:50:40 启动；Cloud/Agent/BitBrowser/Web/Desktop/DMG/登录 gate 全部 PASS。
