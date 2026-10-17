@@ -11,7 +11,10 @@ contracts:
     api_major_version: v1
     # 2026.09.06.1 → 2026.10.02.1：cloud-api 的 v1/file-transfer.openapi.yaml
     # 已由 cloud 仓推进（该值此前与定义脱节，由 verify_m0_config 的活源对比抓出）。
-    contract_revision: "2026.10.02.1"
+    # 2026.10.17.1：目录内最新值来自 v1/content-production.openapi.yaml 的
+    # info.version——T-09 已提交的 2026.10.16.1 之后，T-10 契约改动再推进一格；
+    # 中间的漂移没有逐次回填，这次一并对齐到活源。
+    contract_revision: "2026.10.17.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -21,7 +24,9 @@ contracts:
     state: active
     formal_definition: active
     api_major_version: v1
-    contract_revision: "2026.10.01.1"
+    # 2026.10.13.1：v1/file-transfer.openapi.yaml 已推进（map 停在 2026.10.01.1，
+    # 由活源对比抓出）。
+    contract_revision: "2026.10.13.1"
     minimum_agent_contract_revision: "2026.07.14.7"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:
@@ -33,7 +38,8 @@ contracts:
     formal_definition: active
     # 2026.07.14.4 → 2026.10.02.1：三个定义文件早已推进（identity/browser-profile/
     # media-account），map 停在旧值上无人可见，由活源对比抓出。
-    schema_revision: "2026.10.02.1"
+    # 2026.10.14.3：v1/content-production.yaml 继续推进，本次对齐。
+    schema_revision: "2026.10.14.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -54,7 +60,8 @@ contracts:
     formal_definition: active
     # 2026.07.14.3 → 2026.09.26.2：identity.yaml（2026.07.22.1）与
     # content-production.yaml（2026.09.26.2，CHG-20260930-069）已推进。
-    enum_revision: "2026.09.26.2"
+    # 2026.10.12.3：v1/content-production.yaml 再次推进，本次对齐。
+    enum_revision: "2026.10.12.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -66,7 +73,9 @@ contracts:
     formal_definition: active
     # 2026.07.14.5 → 2026.10.02.1：agent-runtime/browser-profile/profile-guard
     # 三个错误码文件已推进，map 停在旧值，由活源对比抓出。
-    error_revision: "2026.10.02.1"
+    # 2026.10.14.1（已提交）与 2026.10.16.1（T-10 新增错误码）：
+    # v1/content-production.yaml 两次推进，本次对齐到 2026.10.16.1。
+    error_revision: "2026.10.16.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent

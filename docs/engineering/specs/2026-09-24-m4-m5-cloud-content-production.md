@@ -72,12 +72,13 @@ material 1 ── n material_usage n ── 1 user
 
 - 模板引用与模板版本（策略按 `(模板, 版本)` 绑定，模板升级不迁移旧策略）；
 - 由所绑定模板版本 `schema_json` 校验的业务参数；
-- 可选 `schedule`：`enabled`、调度表达式/周期、时区、单次上限、每日上限（M5 定时生产落地时引入，M4 不建此列）；
-- 启停状态。
+- `execution_mode = manual | scheduled`；仅定时模式的 `schedule` 保存当前支持的间隔或每日时间及时区；
+- 持久化的优先级规则组（`match | filter`、`all | any`、白名单条件），以及单次与每日上限；
+- `enabled | disabled` 策略状态，控制整条策略能否产生新任务。
 
 策略不保存版本记录（ADR-0021）：修改策略是配置变化，直接覆盖；策略变更走审计日志。历史追溯由 `compose_task` 的不可变策略快照承担——每次创建任务时保存 `template_code`、`template_version`、`config_snapshot`，后续修改策略不改写历史任务，执行只读快照。
 
-自动规则不拆出 `production_rule`。
+自动规则不拆出 `production_rule`，也不以 `schedule.enabled` 保存第二个业务开关。手动触发与 Scheduler 共用同一候选选择及任务创建实现；`filter` 对整组谓词取反，不消耗额度；`match` 消耗额度。历史任务仍按不可变快照执行。
 
 ### 3.4 `compose_task`
 
@@ -135,11 +136,11 @@ HTTP 请求创建任务后立即返回，不等待下载或 FFmpeg 完成。
 
 独立 `cmd/compose-scheduler`，通过 `internal/scheduler` 运行周期扫描：
 
-1. 读取启用且到期的 `compose_strategy`；
+1. 读取状态为 `enabled`、执行方式为 `scheduled` 且到期的 `compose_strategy`；
 2. 基于业务范围选择可生产 `material`；
-3. 应用素材状态、策略上限和已存在任务防重；
+3. 应用系统固定资格、策略优先级规则、数量上限和已存在任务防重；
 4. 用 `strategy_id + schedule_slot + material_id` 形成唯一调度键；
-5. 事务创建 `pending compose_task`；
+5. 为选中素材逐项创建 `pending compose_task`，单项失败不回滚此前成功项，并记录真实运行结果；
 6. 更新策略下一次执行时间。
 
 Scheduler 不下载文件、不调用 FFmpeg、不推进任务为 `running`。
