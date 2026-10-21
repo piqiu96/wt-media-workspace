@@ -71,6 +71,7 @@ DMG_MOUNT = RUNTIME_DIR / "dmg-mount"
 # parent as an orphan (pid 42569) still holding the same job loops. The build
 # output lives under the tree's `.cache`, next to the server binary.
 WORKER_BIN = CLOUD_DIR / ".cache" / "wt-media-discovery-worker"
+COMPOSE_WORKER_BIN = CLOUD_DIR / ".cache" / "wt-media-compose-worker"
 
 # Where `cargo tauri build` writes the app bundle and where this script assembles
 # the DMG from it. The app bundle's own name is the product name from
@@ -361,6 +362,24 @@ def start_worker() -> None:
         ),
     )
     start_background("worker", [str(WORKER_BIN)], CLOUD_DIR, env_with())
+
+
+def start_compose_worker() -> None:
+    """Build and run the claim loop that drains pending compose tasks."""
+    log("Building and starting Compose worker")
+    run(
+        [str(GO_BIN), "build", "-o", str(COMPOSE_WORKER_BIN), "./cmd/compose-worker"],
+        cwd=CLOUD_DIR,
+        env=env_with(
+            GOROOT=GOROOT,
+            GOPATH=GOPATH,
+            GOCACHE=str(CLOUD_DIR / ".cache" / "go-build"),
+        ),
+    )
+    start_background(
+        "compose-worker", [str(COMPOSE_WORKER_BIN)], CLOUD_DIR,
+        cloud_runtime_env(WT_MEDIA_MYSQL_DSN=MYSQL_DSN),
+    )
 
 
 def start_agent() -> None:
@@ -657,6 +676,15 @@ def verify_worker() -> None:
     print(f"Cloud worker: PASS pid={pid_file.read_text(encoding='utf-8').strip()}")
 
 
+def verify_compose_worker() -> None:
+    """A healthy API alone cannot drain pending compose tasks."""
+    log("Verifying Compose worker")
+    pid_file = PID_DIR / "compose-worker.pid"
+    if not pid_alive(pid_file):
+        raise RuntimeError(f"Compose worker: not running (pid file {pid_file})")
+    print(f"Compose worker: PASS pid={pid_file.read_text(encoding='utf-8').strip()}")
+
+
 def verify_agent() -> None:
     """The Agent endpoint, accepting either of the two providers that can hold it.
 
@@ -681,6 +709,7 @@ def verify_all() -> None:
     wait_http(f"{CLOUD_BASE_URL}/api/v1/health", "Cloud")
     verify_agent()
     verify_worker()
+    verify_compose_worker()
     verify_bitbrowser()
     verify_assets()
     verify_dev_servers()
@@ -718,6 +747,7 @@ def cmd_status() -> int:
         ("cloud", PID_DIR / "cloud.pid", f"{CLOUD_BASE_URL}/api/v1/health", None),
         ("agent", PID_DIR / "agent.pid", f"{AGENT_BASE_URL}/healthz", None),
         ("worker", PID_DIR / "worker.pid", None, None),
+        ("compose-worker", PID_DIR / "compose-worker.pid", None, None),
         ("web-dev", PID_DIR / "web-dev.pid", f"{WEB_DEV_URL}/", WEB_DEV_ENTRY),
         (
             "desktop-dev",
@@ -797,7 +827,7 @@ def stop_started() -> None:
     # that would start the Agent again.
     close_desktop_app()
     signalled: list[tuple[str, int]] = []
-    for name in ["cloud", "agent", "worker", "web-dev", "desktop-dev"]:
+    for name in ["cloud", "agent", "worker", "compose-worker", "web-dev", "desktop-dev"]:
         pid_file = PID_DIR / f"{name}.pid"
         if pid_alive(pid_file):
             pid = int(pid_file.read_text(encoding="utf-8").strip())
@@ -819,13 +849,13 @@ def stop_started() -> None:
     # between "asked to stop" and "did stop" -- and a surviving worker would go
     # on draining queues with nothing left to find it by.
     for name, pid in signalled:
-        if name != "worker":
+        if name not in ("worker", "compose-worker"):
             continue
         deadline = time.time() + 10.0
         while time.time() < deadline and process_alive(pid):
             time.sleep(0.2)
         if process_alive(pid):
-            print(f"worker: pid {pid} ignored SIGTERM and is still running", file=sys.stderr)
+            print(f"{name}: pid {pid} ignored SIGTERM and is still running", file=sys.stderr)
 
 
 def source_commit_epoch(repo_dir: Path, paths: tuple[str, ...] = ()) -> float:
@@ -901,6 +931,7 @@ def main() -> int:
             run_migrations()
             start_cloud()
             start_worker()
+            start_compose_worker()
             start_agent()
             start_web_dev()
             start_desktop_dev()
@@ -919,6 +950,7 @@ def main() -> int:
             run_migrations()
             start_cloud()
             start_worker()
+            start_compose_worker()
             start_agent()
             start_web_dev()
             start_desktop_dev()

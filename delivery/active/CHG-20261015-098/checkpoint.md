@@ -16,6 +16,7 @@
 
 ## Current
 
+- 2026-10-21 用户反馈合成任务 316～319 持续排队：本地启动脚本只启动 Discovery Worker，遗漏 Compose Worker，且原 `verify/status` 未检查它。已补构建、启动、状态/验收、停止链路；当前托管进程 PID 91351。316/318 已成功，317 正在执行长视频 FFmpeg，319～321 已领取但因源对象不存在而 `input_missing` 失败；单节点/全局/数据库上限均为 2。证据见 `evidence/T-01-compose-worker-followup.md`。
 - 2026-10-21 本地未提交工作已收尾：Cloud 的列表筛选、策略运行记录分页、素材规则与成片管理页面改动提交为 `43d3779`；Desktop 的公开读域名 CSP 提交为 `1726433`；Workspace 前端规范归位及产品页面裁定提交为 `2e764d3`。自动验证见下方；这些代码变动尚未经过当前源码的真实页面和打包 Desktop 走查，不能据此将 M5-AC-13 或 M4-H2 签收。
 - CHG 保持 `IMPLEMENTING`。T-01～T-10 的历史证据有效，但 2026-10-17 03:23 的 DMG 早于本轮 Cloud Web 与 Desktop 改动，不能用它验收本轮界面和视频读取行为。
 
@@ -26,6 +27,8 @@
 3. 在新打包 Desktop 上核对公开读域名的视频播放与 CSP，以及「已下载但本机缺文件 → 重新下载」；本轮只验证了 URL 转换、Rust CSP 测试和双端 Web 构建，尚无新安装包的可视与真实文件证据。
 4. Linux 发布链路（`build-release-linux.sh` / `package_release_linux.py`）仍未在 Linux 环境执行；compose-worker 清单修复的既有证据止于静态一致性、交叉编译和单测变异。
 5. 保留待裁定项：调度跳过原因合并为 `previously_run` 后不再区分上次成功/失败/在途；人工重试的执行编号不回退；重试确认框与 `compose_task_not_retryable` 的中文措辞；`tokens.css` 的 `--wt-status-*` 是否全站接入；OpenAPI「改策略状态」的 `put:` 与实际 PATCH 路由不一致（生成客户端可能 404）。这些未在本轮顺手改动。
+6. 若后续走查包含自动定时触发，需独立启动 `compose-scheduler` 并复核进程与到点 run；本地 M2-B 启动脚本目前只托管人工任务消费所需的 `compose-worker`。
+7. 任务 319/320/321 的素材 154/160/159 所指对象存储 key 不存在；若要重试这三条，先恢复源对象或重新选择有效素材，再做真实合成验证。317 的长视频合成结果仍需读回。
 
 ## Blockers
 
@@ -33,6 +36,7 @@
 
 ## Recent verification
 
+- 2026-10-21 合成队列启动补验：`status` 在未启动 Compose Worker 时 exit 1，启动后 exit 0；MySQL 读回 316/317 同时领取，316 成功后 318 接替；配置与 `compose_worker_capacity.max_running` 均为 2。Workspace 生命周期单测、全套测试与治理校验结果见 `evidence/T-01-compose-worker-followup.md`。
 - 2026-10-21 本地收尾：Cloud `go test ./...` exit 0；Web `npm test -- --maxWorkers 2` 77 文件/720 测试 PASS；`npm run build:cloud` 与 `npm run build:desktop` 均 exit 0；Desktop `cargo test --manifest-path src-tauri/Cargo.toml` 529 PASS、6 ignored、0 failed。Web 首次默认并行运行的 `localSettingsWiring.test.js` import 扫描超过 5 秒，单独运行 9/9 PASS（扫描约 0.9 秒），限制 worker 后全套通过；未据此宣称实机验收。Workspace 规范相关 8 个 Markdown 文件的本地链接检查 0 缺失；五个治理脚本 exit 0；临时 venv 装 PyYAML 后 Workspace 118 项单测 PASS（系统 `python3` 缺该依赖，首次直接运行在导入阶段报 3 个错误）。
 - T-03：`transfer_02cfdc38af2b573063ab72de` success，278362/278362 字节；三方 SHA 闭合 `39025ff4…ca600`；FFprobe 1.000000 秒；重复下载幂等单行。
 - T-04：三仓 `production_rule`/`compose_pool_item` 0 命中（阳性对照命中）；`compose_tasks` running=0；策略 23/24/25 `next_run_at=NULL`。
