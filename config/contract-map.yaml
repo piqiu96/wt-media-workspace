@@ -11,10 +11,9 @@ contracts:
     api_major_version: v1
     # 2026.09.06.1 → 2026.10.02.1：cloud-api 的 v1/file-transfer.openapi.yaml
     # 已由 cloud 仓推进（该值此前与定义脱节，由 verify_m0_config 的活源对比抓出）。
-    # 2026.10.17.1：目录内最新值来自 v1/content-production.openapi.yaml 的
-    # info.version——T-09 已提交的 2026.10.16.1 之后，T-10 契约改动再推进一格；
-    # 中间的漂移没有逐次回填，这次一并对齐到活源。
-    contract_revision: "2026.10.17.1"
+    # 2026.10.21.1：筛选条件与策略运行记录分页加入 Cloud API；
+    # 目录内 browser-profiles、identity、content-production 的 info.version 已同步。
+    contract_revision: "2026.10.21.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop

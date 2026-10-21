@@ -16,22 +16,16 @@
 
 ## Current
 
-- 2026-10-17 T-10 已完成全链与页面走查，**待用户签收**（不代签、不归档）。本轮手工起的 `.cache/m5c7b-compose-scheduler`(79707) 与 `m5c7b-compose-worker`(79709) 走查后已停；旧 DMG 挂载实例与其 sidecar 已结束并卸载，新 DMG 为 03:23 构建。开发库残留：策略 36/38/39 `enabled` 且 `next_run_at` 在 2026-10-18 02:32～02:35，37/42 `disabled`；任务 10 / 成片 7 / run 13 原样保留作证据。
-- 2026-10-16 用户提交合成任务页面走查整改结论；T-05 已完成代码、自动验证和本机 migration 063/环境重建，待真实页面复查及 M5-AC-13/M4-H2 同场签收。详见 `evidence/T-05.md`。
-- 2026-10-16 第二轮整改 T-06 已完成机器腿与 Cloud Web 页面走查；“本机实测缺文件 → 重新下载”一格只在本机打包 Desktop 里出现，登记为未验事实。
-- 2026-10-16 第三轮整改 T-07 已完成机器腿与 Cloud Web 页面走查，待用户按同样流程复查并签收。
-- 2026-10-16 第四轮整改 T-08 已完成机器腿、真实库并发实测与 Cloud Web 页面走查；Cloud 以新代码在 17:19 重启（PID 53220），Vite 5173 未动，走查用的临时任务行与临时会话已清理。待用户复查签收。
-- 2026-10-16 第五轮整改 T-09 已完成机器腿、真实库重试三连与创建守卫三态实测、Cloud Web 页面走查；Cloud 以本轮代码在 18:51 经 `bin/control.sh start` 重启（PID 61770，旧进程是 17:34 的过时二进制，已先停），手工起的 compose-worker 在走查结束后已停掉（用户要再看它跑需再起一次）；走查用的临时会话 `r5-t09-admin` 已删。待用户复查签收。
+- 2026-10-21 本地未提交工作已收尾：Cloud 的列表筛选、策略运行记录分页、素材规则与成片管理页面改动提交为 `43d3779`；Desktop 的公开读域名 CSP 提交为 `1726433`；Workspace 前端规范归位及产品页面裁定提交为 `2e764d3`。自动验证见下方；这些代码变动尚未经过当前源码的真实页面和打包 Desktop 走查，不能据此将 M5-AC-13 或 M4-H2 签收。
+- CHG 保持 `IMPLEMENTING`。T-01～T-10 的历史证据有效，但 2026-10-17 03:23 的 DMG 早于本轮 Cloud Web 与 Desktop 改动，不能用它验收本轮界面和视频读取行为。
 
 ## Next
 
-1. 用户按真实计划流程走查并签收 M5-AC-13 与 M4-H2：Cloud Web 与 03:23 的新 DMG 上复查策略页（状态/执行方式/条件/额度/启停/执行反馈）、任务页（触发方式筛选与实体追溯）、我的成片（预览/下载/来源追溯）、下载中心；打包 Desktop 的视觉逐屏只能由用户肉眼确认（本机无法程序化驱动/截取 GUI）。
-2. 第五轮合成任务三处体验（候选排序、已使用过只读、重试确认措辞）继续由用户 review；打包 Desktop 上“已下载且本机缺文件 → 重新下载”也待补验。
-3. 用户签收且 M5-AC-01～13 全绿后，更新验收矩阵并归档本 CHG。
-4. 待裁定：调度跳过原因合并为 `previously_run` 后不再区分「上次成功/上次失败/在途」（历史 run 仍按旧 key 渲染）；人工重试后执行编号不回退（要回到从 1 重数需要新列或清 attempt 表 = 新迁移）；重试确认框与 `compose_task_not_retryable` 的中文措辞。
-5. 待裁定：`web/src/shared/styles/tokens.css` 的 `--wt-status-*` 语义表从未被任何入口引入（全历史零命中），接上会把 TDesign 的 success 色从 `#2ba471` 换成 `#00a870`，属全站换色，需用户决定接不接。
-6. 待裁定：OpenAPI 把「改策略状态」写成 `put:`，实际路由是 PATCH（Web 也用 PATCH），按契约生成的客户端会 404；本轮只登记未改契约。
-7. 未验事实：Linux 发布链路（`build-release-linux.sh`/`package_release_linux.py`）本机跑不了，compose-worker 清单修复的证据止于静态一致性 + 交叉编译 + 单测变异。
+1. 从当前已提交源码重新打包 Desktop，并与 Cloud Web 同场走查合成策略的概览/运行记录、合成任务、成片管理、来源追溯、预览与下载中心；用户签收 M5-AC-13 与 M4-H2 后才能更新验收矩阵和归档 CHG。
+2. 对本轮跨页面增量做真实数据走查：Cloud 列表筛选（团队/用户、Profile、内容池、素材、代理和合成策略）、策略运行记录的真实总数与分页、成片管理的下载状态与批量下载。自动测试和构建通过不替代这些页面及 API 读回。
+3. 在新打包 Desktop 上核对公开读域名的视频播放与 CSP，以及「已下载但本机缺文件 → 重新下载」；本轮只验证了 URL 转换、Rust CSP 测试和双端 Web 构建，尚无新安装包的可视与真实文件证据。
+4. Linux 发布链路（`build-release-linux.sh` / `package_release_linux.py`）仍未在 Linux 环境执行；compose-worker 清单修复的既有证据止于静态一致性、交叉编译和单测变异。
+5. 保留待裁定项：调度跳过原因合并为 `previously_run` 后不再区分上次成功/失败/在途；人工重试的执行编号不回退；重试确认框与 `compose_task_not_retryable` 的中文措辞；`tokens.css` 的 `--wt-status-*` 是否全站接入；OpenAPI「改策略状态」的 `put:` 与实际 PATCH 路由不一致（生成客户端可能 404）。这些未在本轮顺手改动。
 
 ## Blockers
 
@@ -39,6 +33,7 @@
 
 ## Recent verification
 
+- 2026-10-21 本地收尾：Cloud `go test ./...` exit 0；Web `npm test -- --maxWorkers 2` 77 文件/720 测试 PASS；`npm run build:cloud` 与 `npm run build:desktop` 均 exit 0；Desktop `cargo test --manifest-path src-tauri/Cargo.toml` 529 PASS、6 ignored、0 failed。Web 首次默认并行运行的 `localSettingsWiring.test.js` import 扫描超过 5 秒，单独运行 9/9 PASS（扫描约 0.9 秒），限制 worker 后全套通过；未据此宣称实机验收。Workspace 规范相关 8 个 Markdown 文件的本地链接检查 0 缺失；五个治理脚本 exit 0；临时 venv 装 PyYAML 后 Workspace 118 项单测 PASS（系统 `python3` 缺该依赖，首次直接运行在导入阶段报 3 个错误）。
 - T-03：`transfer_02cfdc38af2b573063ab72de` success，278362/278362 字节；三方 SHA 闭合 `39025ff4…ca600`；FFprobe 1.000000 秒；重复下载幂等单行。
 - T-04：三仓 `production_rule`/`compose_pool_item` 0 命中（阳性对照命中）；`compose_tasks` running=0；策略 23/24/25 `next_run_at=NULL`。
 - 治理与产品主计划对齐校验在提交时随脚本复跑。
