@@ -60,3 +60,15 @@ M3 已通过 ADR-0015 验证 Cloud Scheduler 只创建业务任务、Cloud Worke
   - Local Agent API 需增加受控的本地下载执行契约，但不得增加合成契约；
   - M4 和 M5 必须分别以真实视频、真实对象存储、失败恢复和 UI 操作完成验收。
 
+## 增补记录
+
+2026-10-22：M4-M5 走查中合成任务 319/320/321 因「源文件不见了」失败（素材 154/160/159 的 `video_status=ready` 与 `source_object_key` 均在，但对象存储中对应对象已不存在）。据此补充以下实现契约，不改变本 ADR 第 1-12 条主张：
+
+1. **`video_status=ready` 是投影，不是对象存在的证明。** 两条消费链路——Cloud Compose Worker 合成、用户下载/预览——在读取正式对象前必须用 `Stat` 确认对象存在；不得仅凭数据库状态直接签发预签名下载地址或开始合成。
+2. **消费前缺失的处置（合成）。** 每次任务领取持有一份只属于该次领取的 `ComposeInputGate`：发现 ready 但对象 404、或素材 `failed`/`not_downloaded`/ready 但无 key 时，最多触发一次重新准备，然后等待；准备结束仍不可用则任务以 `input_missing`/`input_invalid` 终态明确失败，不循环重试。人工重试产生新领取，得到新的一次自愈预算。`MarkVideoRepreparing` 只回退「亲眼观察到的 key + `video_prepared_at`」，避免并发准备刚成功时误回退新结果。
+3. **消费前缺失的处置（用户下载/预览）。** 下载：对象缺失且有 `source_url` → 创建云端准备依赖并回退素材状态，准备完成后由 `AttachCompletedDependency` 与周期对账把文件事实挂到等待中的下载任务，再由运营电脑直连云端下载（Cloud 不中转文件字节）；对象缺失且无 `source_url` → 明确拒绝（409）。预览：对象缺失 → 明确拒绝，不签发 404 链接。
+4. **素材准备的重试边界。** 平台临时播放地址解析或下载失败时，同一准备任务内重新解析地址并再下载一次；`codeAddressMissing`、租约丢失、探测/提交/写「已就绪」失败不重试；上下文取消不写终态，任务留给租约到期后的重新领取。失败写入以 `FailTask` 成功为前提，避免旧进程覆盖新进程结果。
+5. **上传完整性证明。** 对象上传使用 Content-MD5（`PutObjectOptions.SendContentMd5`），由对象存储对收到的字节自行校验，并保留 `Stat` 大小作为第二事实；不再把对象回读下载后比对 SHA256。前提是目标对象存储实现 Content-MD5 校验（MinIO、阿里云 OSS 支持；Garage 需实测，若不校验则记为仅大小校验）。
+6. **清理边界。** 合成 attempt 结束后删除 Cloud 本地 run 目录与临时对象（素材 `.staging` 对象、成片临时对象）；正式素材对象与正式成片对象长期保留。对象存储生命周期治理另开专项。
+7. **合同不变。** 本补充不改 `file_transfer_task` 的字段、枚举与 OpenAPI；`source_object_key` 在完成时写入属于已有字段的语义补全。
+
