@@ -28,6 +28,7 @@ class ChangeMetadata:
     legacy: bool
     merge_commits: dict[str, str]
     dependency_merge_commits: dict[str, dict[str, str]]
+    verify_scenarios: tuple[str, ...]
 
 
 def _frontmatter(text: str) -> tuple[dict[str, str] | None, str]:
@@ -105,7 +106,7 @@ def read_change(path: Path) -> ChangeMetadata:
         return ChangeMetadata(
             change_id, title, parent_match.group(1) if parent_match else "none",
             status_match.group(1) if status_match else "UNKNOWN", (),
-            tuple(dict.fromkeys(affected)), "M", path, True, {}, {},
+            tuple(dict.fromkeys(affected)), "M", path, True, {}, {}, (),
         )
 
     missing = [key for key in REQUIRED if not values.get(key)]
@@ -134,7 +135,10 @@ def read_change(path: Path) -> ChangeMetadata:
         if dependency not in depends or not isinstance(commits, dict):
             raise ValueError("dependency_merge_commits must refer to depends_on entries")
         parsed_dependencies[dependency] = _commits({"commits": json.dumps(commits)}, "commits")
+    verify_scenarios = _string_list(values, "verify_scenarios")
+    if any(scenario not in {"fast", "repo", "integration", "e2e", "real"} for scenario in verify_scenarios):
+        raise ValueError("verify_scenarios contains an unknown scenario")
     return ChangeMetadata(
         change_id, title, values["parent"], values["status"], depends, affected,
-        values["risk"], path, False, merges, parsed_dependencies,
+        values["risk"], path, False, merges, parsed_dependencies, verify_scenarios,
     )
