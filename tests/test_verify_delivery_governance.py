@@ -100,6 +100,25 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
 
         self.assertEqual(errors, [])
 
+    def test_two_independent_active_changes_share_ledger_but_context_selects_one(self) -> None:
+        first, second = "CHG-20260722-021", "CHG-20260722-022"
+        milestone = "delivery/milestones/M2-account-runtime.md#m2-b"
+        self.write_context(first)
+        self.write_active_change(first, milestone)
+        self.write_active_change(second, milestone)
+        (self.workspace / "delivery" / "milestones" / "M2-account-runtime.md").write_text(
+            "# M2\n\n## M2-B\n", encoding="utf-8"
+        )
+        ledger = self.workspace / "delivery" / "LEDGER.md"
+        ledger.write_text(
+            "# Delivery Ledger\n\n| Change | Title | Status | Current Repository |\n"
+            "|---|---|---|---|\n"
+            f"| {first} | Test | IMPLEMENTING | wt-media-workspace |\n"
+            f"| {second} | Test | IMPLEMENTING | wt-media-workspace |\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(self.module.validate_delivery_governance(self.workspace), [])
+
     def test_stale_context_and_missing_milestone_are_reported(self) -> None:
         self.write_context("CHG-20260715-010")
         self.write_ledger("CHG-20260721-020")

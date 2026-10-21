@@ -62,7 +62,7 @@ Milestone is the current execution baseline. PRD is the long-term product baseli
    - success facts that must all hold;
    - failure behavior that must not occur;
    - linked CHGs.
-5. Propose CHGs in dependency order. Activate at most one M/L CHG.
+5. Propose CHGs in dependency order. Independent M/L CHGs may both be active; select one per execution and do not start unmet dependencies or conflicting shared infrastructure work.
 6. For the next CHG, define one independently verifiable vertical result, explicit exclusions, ordered Tasks, real acceptance, Evidence, and commit boundaries.
 7. Synchronize `delivery/LEDGER.md` with the actual active directory, then regenerate `wt-media-workspace/.ai/CURRENT_CONTEXT.md` with `python3 scripts/prepare_ai_workspace.py --change <CHG>`. Never edit the snapshot by hand, and never keep a second copy at the execution root.
 8. Stop before runtime implementation and hand off to `executing-wt-media-change`.

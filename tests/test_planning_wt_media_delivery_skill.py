@@ -40,7 +40,7 @@ class PlanningWtMediaDeliverySkillTests(unittest.TestCase):
         )
 
     def test_new_milestone_stops_before_runtime_implementation(self) -> None:
-        self.assertIn("Activate at most one M/L CHG", self.text)
+        self.assertIn("Independent M/L CHGs may both be active", self.text)
         self.assertIn("Stop before runtime implementation", self.text)
         self.assertIn("executing-wt-media-change", self.text)
 

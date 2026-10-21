@@ -30,7 +30,8 @@ Do not treat chat history, generated summaries, or legacy root `docs/` files as 
 Before coding, verify and report:
 
 - active CHG ID and status;
-- `wt-media-workspace/.ai/CURRENT_CONTEXT.md`, `delivery/LEDGER.md`, and `delivery/active` all identify the same single CHG;
+- `wt-media-workspace/.ai/CURRENT_CONTEXT.md` selects this CHG and `delivery/LEDGER.md` indexes the same active set as `delivery/active`;
+- this CHG has one executor, its dependencies are merged, and its branch does not collide with another active CHG's shared infrastructure work;
 - Milestone file and closure anchor for M/L work, or stable requirement reference for a planning-classified small Bug;
 - the user-visible vertical result delivered by this CHG;
 - required database change, external side effect, read-back, business projection, and page result inherited from the closure;

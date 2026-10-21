@@ -184,7 +184,7 @@ class VerifyAIWorkspaceTests(unittest.TestCase):
 
     def test_snapshot_and_ledger_disagreement_is_an_error(self) -> None:
         self.write_ledger("CHG-20260722-999")
-        self.assertTrue(any("execution snapshot and LEDGER disagree" in error for error in self.errors()))
+        self.assertTrue(any("LEDGER and delivery/active disagree" in error for error in self.errors()))
 
     def test_repository_and_skill_target_paths_must_agree(self) -> None:
         body = (self.workspace / "config" / "skills-distribution.yaml").read_text()

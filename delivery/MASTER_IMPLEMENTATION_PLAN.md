@@ -2,7 +2,7 @@
 
 > 日期：2026-07-15
 > 适用项目：WT Media 模块化自媒体运营平台  
-> 执行方式：一个总路线、一个当前变更、一次只完成一个可验证闭环  
+> 执行方式：一个总路线、当前工作树选一个 CHG、每个 CHG 一次只完成一个可验证闭环
 > 运行仓库：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop`  
 > 治理仓库：`wt-media-workspace`
 
@@ -801,7 +801,7 @@ M10-C10 全系统生产发布综合验收
 - 不包含未确认的产品或架构分叉；
 - 发现范围扩大时立即拆分。
 
-一次只允许一个 Active CHG。普通 S 级变更可以走 Issue/Commit/测试；M/L 级必须有 `delivery/active/<CHG>/change.md`。
+允许多个独立 Active CHG，但当前工作树一次只选一个执行，同一 CHG 同时只有一个执行器，CHG 内部默认串行；`depends_on` 未归档或合并证据不足时不得启动。共享 Contract / Infrastructure 的变更先交付共同 Foundation CHG，不能未协调并行修改。普通 S 级变更可以走 Issue/Commit/测试；M/L 级必须有 `delivery/active/<CHG>/change.md`。新 CHG 原则上使用短期分支、独立 Review、引用 CHG ID 的 PR 和合并 `main`；旧 CHG-20261015-098 的 `main` 历史不追溯迁移。
 
 ## 5. Codex 执行协议
 

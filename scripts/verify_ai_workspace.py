@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify AI entry documents and workspace execution invariants.
 
-This read-only check verifies file presence, navigable references, the single
+This read-only check verifies file presence, navigable references, the selected
 execution snapshot, and configuration agreement. It does not enforce prose,
 section counts, or size limits on the repository entries.
 """
@@ -89,7 +89,7 @@ def check_context_budget() -> tuple[list[str], str]:
 
 
 def check_delivery_pointers() -> list[str]:
-    """The snapshot, the LEDGER, and delivery/active must name the same CHG."""
+    """The snapshot selects one CHG; the LEDGER indexes every active CHG."""
     governance = load_governance_module()
     context_change = governance.parse_context_change(
         ROOT / CONTEXT_RELATIVE
@@ -100,23 +100,15 @@ def check_delivery_pointers() -> list[str]:
     )
 
     errors: list[str] = []
-    if len(ledger_changes) > 1:
+    if len(ledger_changes) != len(set(ledger_changes)):
+        errors.append("LEDGER table contains duplicate CHG rows")
+    if set(ledger_changes) != set(active_ids):
         errors.append(
-            "LEDGER table lists more than one active CHG: " + ", ".join(ledger_changes)
-        )
-    if len(active_ids) > 1:
-        errors.append("delivery/active contains more than one CHG: " + ", ".join(active_ids))
-
-    ledger_change = ledger_changes[0] if len(ledger_changes) == 1 else None
-    if context_change != ledger_change:
-        errors.append(
-            "execution snapshot and LEDGER disagree: "
-            f"{context_change or 'none'} != {ledger_change or 'none'}"
+            "LEDGER and delivery/active disagree: "
+            f"ledger={sorted(set(ledger_changes))}, active={active_ids}"
         )
     if context_change and context_change not in active_ids:
         errors.append(f"execution snapshot references missing CHG: {context_change}")
-    if ledger_change and ledger_change not in active_ids:
-        errors.append(f"LEDGER references missing active CHG: {ledger_change}")
     return errors
 
 

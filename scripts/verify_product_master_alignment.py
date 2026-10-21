@@ -9,6 +9,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from scripts.change_metadata import read_change
 
 
 def milestone_sections(text: str) -> dict[int, str]:
@@ -303,24 +306,28 @@ def status_word(change_text: str) -> str | None:
 def validate_active_change(root: Path) -> list[str]:
     errors: list[str] = []
     active_paths = sorted((root / "delivery" / "active").glob("*/change.md"))
-    active_ids = [path.parent.name for path in active_paths]
-    if not active_ids:
-        return errors
-    if len(active_ids) > 1:
-        errors.append(f"expected at most one active CHG, got {active_ids!r}")
-        return errors
+    for active_path in active_paths:
+        errors.extend(_validate_one_active_change(root, active_path))
+    return errors
 
-    active_change = active_ids[0]
-    change_text = active_paths[0].read_text(encoding="utf-8")
+
+def _validate_one_active_change(root: Path, active_path: Path) -> list[str]:
+    errors: list[str] = []
+    active_change = active_path.parent.name
+    change_text = active_path.read_text(encoding="utf-8")
+    try:
+        metadata = read_change(active_path)
+    except ValueError as exc:
+        return [f"invalid CHG metadata {active_change}: {exc}"]
     # Canonical change.md records use the dash form (`- Status:`, `- Current
     # repository:`); older records use a blockquote header (`> 状态：`,
     # `> 当前仓库：`).  Accept both.  The status word itself must be one the
     # vocabulary in `MASTER_IMPLEMENTATION_PLAN.md` §3 defines.
     title_match = re.search(rf"^# {re.escape(active_change)}[：:] ?(.+)$", change_text, flags=re.MULTILINE)
     title = title_match.group(1) if title_match else None
-    status = status_word(change_text)
+    status = status_word(change_text) if metadata.legacy else metadata.status
     repo_match = re.search(r"^(?:- Current repository:|> 当前仓库[：:])\s*`([^`]+)`\s*$", change_text, flags=re.MULTILINE)
-    current_repository = repo_match.group(1) if repo_match else None
+    current_repository = (repo_match.group(1) if repo_match else None) if metadata.legacy else metadata.affected_repos[0]
     # A CHG sits in `delivery/active/` only while it is being executed, so only
     # the two non-terminal execution words are legal here.  `DISCUSSION` and
     # `PLANNED` are pre-activation states (their home is `delivery/planned/`),
@@ -335,7 +342,7 @@ def validate_active_change(root: Path) -> list[str]:
         errors.append(f"active CHG title is missing or does not match {active_change}")
     if not current_repository:
         errors.append("active CHG current repository is missing")
-    if not re.search(
+    if metadata.legacy and not re.search(
         r"^## (?:\d+\. )?Pending Questions\s+None\.\s*$",
         change_text,
         flags=re.MULTILINE,

@@ -141,6 +141,10 @@ Workspace 不复制运行仓局部规则。
 
 `delivery/active/<change-id>/`
 
+允许多个相互独立的 Active CHG；当前会话只选一个 CHG 执行，同一 CHG 同时只有一个执行器，CHG 内部默认串行。`depends_on` 的前置 CHG 未归档且未确认其各仓提交进入本地 `main` 时不得启动。共享 Contract 或基础设施需要共同修改时先交付 Foundation CHG，不并行写同一基础设施。没有 Parallel Group、Wave 或 Conflict Matrix 人工字段。
+
+新 CHG 使用 `id`、`parent`、`status`、`depends_on`、`affected_repos`、`risk` 最小元数据，以及 `Change` / `Done When` 两段正文；旧 CHG 保持可读。`parent` 指 Milestone 文档锚点，独立治理变更用 `none`。模板见 `templates/delivery/change.md`。
+
 文件职责：
 
 - `change.md`
@@ -160,6 +164,8 @@ Workspace 不复制运行仓局部规则。
   - 未完成内容；
   - 阻塞；
   - 下一步。
+
+正式 checkpoint 已承担跨执行器接力；本期不增加 `.ai/WORK_STATE.md` 或 `.chg/`，避免维护重复进度。
 
 - `status/<repo>.md`
   - 仅同一 CHG 需要多个工程并行实施时使用；
@@ -259,7 +265,7 @@ Workspace 和各运行仓分别维护：
 
 生成。
 
-它用于提供：
+它是每个工作树当前选中 CHG 的可再生导航，由 `wt chg start/resume` 或原脚本按需生成；多个 Active CHG 不共享一个执行选中状态。它用于提供：
 
 - 当前 Milestone；
 - 当前 CHG；
@@ -278,6 +284,10 @@ Workspace 和各运行仓分别维护：
 - 历史执行记录。
 
 禁止手工编辑，也不在 Workspace 外建立第二份副本。
+
+### 新 CHG 的分支与 Review
+
+一个可独立交付的 CHG 原则上走短期分支 → 实施 → 验证 → 独立 Review → 引用 CHG ID 的 PR → 合并 `main`。跨仓 CHG 可对应多个仓库的 PR/Commit，但仍是同一逻辑 CHG。现有 CHG-20261015-098 的既有 `main` 历史不追溯迁移；新规则从后续 CHG 起执行。
 
 
 ## 7. AI 协作原则
