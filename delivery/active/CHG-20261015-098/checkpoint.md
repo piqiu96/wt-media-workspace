@@ -16,6 +16,7 @@
 
 ## Current
 
+- 2026-10-22 用户完成 M4–M5 基础功能第一轮走查，反馈基础功能正常；重点产品边界能力仍待下一轮核查。此为阶段性结论，M4-H2 与 M5-AC-13 未最终签收，CHG 保持 `IMPLEMENTING`。见 `evidence/2026-10-22-m4-m5-walkthrough-round-1.md`。
 - 2026-10-21 用户反馈合成任务 316～319 持续排队：本地启动脚本只启动 Discovery Worker，遗漏 Compose Worker，且原 `verify/status` 未检查它。已补构建、启动、状态/验收、停止链路；当前托管进程 PID 91351。316/318 已成功，317 正在执行长视频 FFmpeg，319～321 已领取但因源对象不存在而 `input_missing` 失败；单节点/全局/数据库上限均为 2。证据见 `evidence/T-01-compose-worker-followup.md`。
 - 2026-10-21 本地未提交工作已收尾：Cloud 的列表筛选、策略运行记录分页、素材规则与成片管理页面改动提交为 `43d3779`；Desktop 的公开读域名 CSP 提交为 `1726433`；Workspace 前端规范归位及产品页面裁定提交为 `2e764d3`。自动验证见下方；这些代码变动尚未经过当前源码的真实页面和打包 Desktop 走查，不能据此将 M5-AC-13 或 M4-H2 签收。
 - CHG 保持 `IMPLEMENTING`。T-01～T-10 的历史证据有效，但 2026-10-17 03:23 的 DMG 早于本轮 Cloud Web 与 Desktop 改动，不能用它验收本轮界面和视频读取行为。
