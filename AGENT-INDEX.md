@@ -283,7 +283,7 @@ Workspace 和各运行仓分别维护：
 - 技术实施方案；
 - 历史执行记录。
 
-禁止手工编辑，也不在 Workspace 外建立第二份副本。
+该文件被 Git 忽略；新检出用 `python3 scripts/prepare_ai_workspace.py --change <CHG>` 重新生成。禁止手工编辑，也不在 Workspace 外建立第二份副本。
 
 ### 新 CHG 的分支与 Review
 

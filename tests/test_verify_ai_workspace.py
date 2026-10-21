@@ -182,6 +182,10 @@ class VerifyAIWorkspaceTests(unittest.TestCase):
         self.module.CONTEXT_CHAR_BUDGET = 10
         self.assertTrue(any("execution snapshot exceeds budget" in error for error in self.errors()))
 
+    def test_fresh_checkout_without_generated_snapshot_is_valid(self) -> None:
+        (self.workspace / ".ai" / "CURRENT_CONTEXT.md").unlink()
+        self.assertEqual(self.errors(), [])
+
     def test_snapshot_and_ledger_disagreement_is_an_error(self) -> None:
         self.write_ledger("CHG-20260722-999")
         self.assertTrue(any("LEDGER and delivery/active disagree" in error for error in self.errors()))

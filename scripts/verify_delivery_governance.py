@@ -198,12 +198,7 @@ def check_completed_has_boundary(workspace: Path) -> tuple[list[str], str]:
 
 
 def current_context_path(workspace: Path) -> Path:
-    """Return the single execution snapshot owned by the workspace repository.
-
-    The snapshot lives inside the workspace repository so that a worktree
-    checkout carries it, and so that no second copy can drift in the outer
-    execution root.
-    """
+    """Return this checkout's generated, Git-ignored CHG navigation snapshot."""
     return workspace / ".ai" / "CURRENT_CONTEXT.md"
 
 

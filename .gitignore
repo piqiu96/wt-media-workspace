@@ -1,4 +1,5 @@
 .cache/
+.ai/CURRENT_CONTEXT.md
 .worktrees/
 *.log
 __pycache__/

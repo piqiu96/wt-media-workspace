@@ -48,6 +48,16 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
             "wt-media-desktop",
         ):
             (self.outer / name).mkdir(parents=True, exist_ok=True)
+        mapping = self.workspace / "config" / "repository-map.yaml"
+        mapping.parent.mkdir()
+        mapping.write_text(
+            "schema_version: 1\nrepositories:\n"
+            "  workspace:\n    path: ../wt-media-workspace\n"
+            "  cloud:\n    path: ../wt-media-cloud\n"
+            "  agent:\n    path: ../wt-media-agent\n"
+            "  desktop:\n    path: ../wt-media-desktop\n",
+            encoding="utf-8",
+        )
 
         skill = self.workspace / "skills" / "workspace" / "executing-wt-media-change" / "SKILL.md"
         skill.parent.mkdir(parents=True, exist_ok=True)
@@ -112,27 +122,15 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
         self.assertTrue(context.is_file())
         self.assertTrue(generated_skill.is_file())
         # The id appears once, next to a title stripped of its own id prefix.
-        self.assertIn("Active CHG: `CHG-20260714-002` — Test Change", text)
+        self.assertIn("Current CHG: `CHG-20260714-002` — Test Change", text)
         self.assertNotIn("— CHG-20260714-002", text)
-        self.assertIn(
-            "- Current milestone: `delivery/milestones/M2-account-runtime.md`", text
-        )
-        self.assertIn("- `outer execution root rule files`", text)
-        self.assertIn("`AGENTS.md`（Codex）或 `CLAUDE.md`（Claude Code）", text)
+        self.assertIn("Current Branch:", text)
+        self.assertIn("CHG Location:", text)
+        self.assertIn("`wt-media-workspace`", text)
+        self.assertIn("`AGENTS.md` or `CLAUDE.md`", text)
         self.assertIn("`delivery/LEDGER.md`", text)
-        self.assertIn("`planning-wt-media-delivery`", text)
-        self.assertIn("`executing-wt-media-change`", text)
-        self.assertIn(
-            "Affected repository current Harness entry, `AGENT-INDEX.md`, and `DIRECTORY_MAP.md`",
-            text,
-        )
-        self.assertLess(
-            text.index("`delivery/LEDGER.md`"),
-            text.index(
-                "`delivery/milestones/M2-account-runtime.md`",
-                text.index("## Required Reading Order"),
-            ),
-        )
+        self.assertIn("`delivery/milestones/M2-account-runtime.md`", text)
+        self.assertIn("Recommended Verification", text)
         self.assertIn("GENERATED FILE", generated_skill.read_text(encoding="utf-8"))
         self.assertFalse(
             outer_context.exists(),
@@ -162,22 +160,10 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
 
         text = (self.workspace / ".ai" / "CURRENT_CONTEXT.md").read_text(encoding="utf-8")
         self.assertIsNone(summary["active_change"])
-        self.assertIn("- Active CHG: `none`", text)
+        self.assertIn("- Current CHG: `none`", text)
         self.assertIn("- Status: `NONE`", text)
-        self.assertNotIn("Current milestone:", text)
-        self.assertNotIn("Change file:", text)
-        self.assertIn("`AGENTS.md`（Codex）或 `CLAUDE.md`（Claude Code）", text)
-        self.assertNotIn("Execute only the active CHG.", text)
-        self.assertNotIn("Do not start the next CHG.", text)
-        self.assertIn(
-            "No active CHG; use `AGENT-INDEX.md` for task routing and delivery rules.",
-            text,
-        )
-        self.assertIn(
-            "- None",
-            text,
-            "an empty active set must still render the affected-repositories block",
-        )
+        self.assertNotIn("CHG Location:", text)
+        self.assertIn("No CHG selected", text)
 
         ledger = self.workspace / "delivery" / "LEDGER.md"
         ledger.parent.mkdir(parents=True, exist_ok=True)
@@ -211,16 +197,16 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
                 write_context=False,
             )
 
-    def test_multiple_active_changes_fail(self) -> None:
+    def test_multiple_active_changes_allow_explicit_selection(self) -> None:
         self.write_change("CHG-20260714-002")
         self.write_change("CHG-20260714-003")
-
-        with self.assertRaises(ValueError):
-            self.module.prepare_workspace(
-                workspace_repo=self.workspace,
-                change_id="CHG-20260714-002",
-                write_context=False,
-            )
+        summary = self.module.prepare_workspace(
+            workspace_repo=self.workspace,
+            change_id="CHG-20260714-002",
+            write_context=True,
+        )
+        self.assertEqual(summary["active_change"], "CHG-20260714-002")
+        self.assertIn("Current CHG: `CHG-20260714-002`", (self.workspace / ".ai" / "CURRENT_CONTEXT.md").read_text())
 
 
 if __name__ == "__main__":

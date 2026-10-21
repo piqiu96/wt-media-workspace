@@ -57,8 +57,6 @@ def check_entry_files() -> list[str]:
     for name in ENTRY_FILES:
         if not (ROOT / name).is_file():
             errors.append(f"missing agent entry file: wt-media-workspace/{name}")
-    if not (ROOT / CONTEXT_RELATIVE).is_file():
-        errors.append(f"missing execution snapshot: {CONTEXT_RELATIVE.as_posix()}")
     return errors
 
 
