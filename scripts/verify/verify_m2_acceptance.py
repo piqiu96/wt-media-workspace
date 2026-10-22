@@ -4,16 +4,15 @@
 Real MySQL and BitBrowser checks are intentionally separate: this verifier
 must never turn fixture evidence into a real-integration PASS.
 
-Assertion scope (set by CHG-20260925-063, do not widen without a CHG):
+Assertion scope (do not widen without a CHG):
 
 Only DURABLE, contract-layer facts about the runtime repositories are asserted
 here: contract revision maps, release-matrix pins, migration files, published
 contract YAML, the Desktop contract lock's `consumes` map, and the
 secret-persistence invariant. Assertions on the TEXT OF A SOURCE FILE that a
-later refactor may legitimately move or rename are deliberately NOT made --
-that is what made this script red for months while nothing was actually wrong.
-A refactor moving a symbol between files must not be able to turn this gate
-red; a contract or schema change must.
+later refactor may legitimately move or rename are deliberately NOT made: a
+refactor moving a symbol between files must not be able to turn this gate red;
+a contract or schema change must.
 
 Each repository asserts its own implementation in its own test suite. For
 example the binding-ticket single-use rule is covered behaviourally by
@@ -92,12 +91,10 @@ def validate_static_matrix() -> list[str]:
             )
         ),
     )
-    # Removed by CHG-20260925-063: asserted two Go constants in
-    # `cloudagent/compatibility.go`. The file moved to
-    # `cloudagent/service/compatibility.go` and both values are unchanged --
-    # i.e. the gate went red for a pure file move. The revision values are
-    # asserted at the contract layer instead (contract-map.yaml, the published
-    # contract YAML, and the Desktop contract lock below).
+    # Revision values and version snapshots stay out of this suite: a released
+    # version bump must not turn it red. The contract layer enforces the
+    # linkage instead (contract-map.yaml, the published contract YAML, and the
+    # Desktop contract lock below).
     for migration in range(1, 6):
         matches = list((CLOUD / "migrations").glob(f"20260714_00{migration}_*.sql"))
         if len(matches) != 1:
@@ -107,25 +104,14 @@ def validate_static_matrix() -> list[str]:
         CLOUD / "contracts" / "cloud-agent-api" / "v1" / "sensitive-profile-guard.openapi.yaml",
         ("review_required", "X-Profile-Permit"),
     )
-    # Removed by CHG-20260925-063: asserted the literal
-    # `REQUIRED_CONTRACT_REVISION = "2026.07.15.1"` in
-    # `wt_media_agent/cloud_agent_contract.py`. The constant still exists with
-    # that exact value; its definition moved to `clients/cloud/contract.py` and
-    # the old module now re-exports it. The revision is asserted at the contract
-    # layer instead (contract-map.yaml, and the contract YAML below).
-    # Removed by CHG-20261003-075: the agent `pyproject.toml` version snapshot
-    # and the two dated-revision literals above. M2 was accepted on 2026-09-14;
-    # a released-version snapshot in a standing suite goes red on every honest
-    # bump, and the revision linkage is enforced by the derived lock checks
-    # below instead.
     require_contains(
         errors,
         AGENT / "contracts" / "local-event-schemas" / "v1" / "profile-guard.yaml",
         ("result_uncertain",),
     )
 
-    # Desktop contract lock 不再对硬编码基线（基线会随每次合约前进过期，
-    # CHG-20261003-075 第 1 项），改从定义文件派生期望值：
+    # Desktop contract lock 不对硬编码基线：基线会随每次合约前进过期。期望值
+    # 从定义文件派生：
     # - `v1@` 条目对定义目录的最新版本，与 contract-map 同口径；
     # - `<文件>@<版本>` 条目对被指文件自己的 revision——锁具体文件就意味着
     #   区内其他文件（如 runtime-environment）的前进不强迫消费方跟进。
@@ -168,15 +154,9 @@ def validate_static_matrix() -> list[str]:
                 )
             elif actual != rev:
                 errors.append(f"{name}: Desktop lock pins {stem}@{rev}, definition says {actual}")
-    # Binding-ticket single use, asserted at the layer that can actually stay
-    # true. CHG-20260925-063 removed assertions on Desktop source text
-    # (`main.rs` carrying "wt-media-agent"; `local_agent/mod.rs` carrying
-    # `fn consume_binding_ticket(` and
-    # `pub fn bind_session<T: BindingTransport>(`). CHG-056 split `main.rs` into
-    # layered modules and the ticket consume path moved to `commands/bind.rs`
-    # as a `#[tauri::command]`; the enforcement itself moved ACROSS a repo
-    # boundary to Cloud, which consumes the ticket atomically. Desktop source
-    # text was the wrong place to assert that. An APPLIED MIGRATION is
+    # Binding-ticket single use is asserted at the layer that stays true. The
+    # enforcement lives in Cloud, which consumes the ticket atomically; Desktop
+    # source text can legitimately move in any refactor. An APPLIED MIGRATION is
     # append-only, so its text is stable in a way a refactorable source file is
     # not: `used_at` (nullable marker, set once on consume) plus a UNIQUE key on
     # `token_hash` is the schema that makes single use enforceable at all.

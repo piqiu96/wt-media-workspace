@@ -43,12 +43,9 @@ CLOUD_ROOT = Path(
     os.environ.get("WT_MEDIA_CLOUD_ROOT", str(WS_ROOT.parent / "wt-media-cloud"))
 )
 # 本脚本的产物（manifest／state／raw／截图／proc-*.log／基线快照）一律写这里。
-# 2026-09-23 那次 M3 全量验收的原始产物在
-# delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/ —— 那是**历史**，
-# 人可查阅，本脚本既不写也不读它（归档区只读；边界唯一落点 delivery/completed/README.md）。
-# 旧版本把产物直接写在归档包里（路径随记录从 active/ 移到 completed/），
-# 后果是「已归档记录」在事实层面仍可被重跑改写——CHG-20260925-066 把写入面移到了这里。
-# 产物落在 .cache/（本仓 .gitignore 第 1 行）下，故一次运行不可能脏化工作树。
+# 归档包里的历史验收产物只供人查阅，本脚本既不写也不读（归档区只读；边界唯一落点
+# delivery/completed/README.md）。产物落在 .cache/（本仓 .gitignore 第 1 行）下，
+# 故一次运行不可能脏化工作树。
 RUN_DIR = WS_ROOT / ".cache" / "m3-acceptance"
 RAW_DIR = RUN_DIR / "raw"
 SHOT_DIR = RUN_DIR / "screenshots"
@@ -409,8 +406,7 @@ def phase_g0():
     _state["cloud_head"], _state["ws_head"] = cloud_head, ws_head
 
     # 本轮产物全部落在 .cache/（已忽略），故 `git status` 里唯一可能出现的就是本脚本自身。
-    # 原列表里的 `scripts/m3-acceptance.sh` **从未存在过**（已在 CHG-055 登记为「未处理的
-    # 空悬标记」），且旧列表还列过归档目录——写入面移出归档后那条也不可能再匹配，一并去掉。
+    # 只列确实会被改动的路径；列入不存在或不匹配的路径只会掩盖真正的越界改动。
     own_artifacts = ("scripts/verify/verify_m3_acceptance.py",)
     ws_lines = [line for line in ws_status.splitlines() if line.strip()]
     foreign = [line for line in ws_lines
@@ -579,7 +575,7 @@ def phase_g2():
         after = samples[-1]
         record("G2.2", phase, "bringup",
                "只跑 cmd/server，采样 100s 的 pending+running 任务数",
-               "服务端不自动执行：计数保持不变（反驳 scripts/README.md 旧文与 resource.go 事实）",
+               "服务端不自动执行：计数保持不变（对照 resource.go 的实际行为）",
                "before=%d after=%d samples=%s" % (before, after, samples),
                "PASS" if before == after else "FAIL",
                note="task 33 属既有 pending 任务，不是本次验收产物")
@@ -1601,9 +1597,8 @@ def phase_p9():
 def phase_p10():
     phase = "10"
     # P10 是**转录**阶段：它自己不跑测试，只把本轮由 shell 产出的 raw/*.log 与截图
-    # 转成清单行。输入缺任一项就整体记 BLOCKED —— **不**回退去读归档包里 2026-09-23 的
-    # 同名旧产物顶替：旧版正是这么做的，于是「重跑 P10」并不重跑任何东西，只会把
-    # 上一次的结论重新盖一个今天的日期。
+    # 转成清单行。输入缺任一项就整体记 BLOCKED —— **不**回退去读归档包里的同名旧产物
+    # 顶替，否则「重跑 P10」并不重跑任何东西，只会把上一次的结论重新盖一个今天的日期。
     needs = ["p10-cloud-test.log", "p10-m2-regression.log",
              "p10-m2-corrected.log", "p10-flowview-grep.txt"]
     missing = [n for n in needs if not (RAW_DIR / n).exists()]

@@ -59,11 +59,9 @@ def validate_master_text(text: str) -> list[str]:
         )
         return errors
 
-    # Status words track the CURRENT Master Plan, not the plan as it stood when
-    # this script was written. M2 closed 2026-09-14 and M3 closed 2026-09-23
-    # (both user-signed); the expectations here were left behind at closure,
-    # which is why this gate reported them as errors for as long as they have
-    # been closed.
+    # Status words track the CURRENT Master Plan. Move an entry here in the same
+    # change that moves the milestone; a milestone that closed earlier is not an
+    # exemption.
     expected_statuses = {
         0: "DONE",
         1: "DONE",
@@ -133,11 +131,10 @@ def validate_master_text(text: str) -> list[str]:
         )
     )
 
-    # M2 is DONE and its candidate block was retired at closure, so its record
-    # is asserted against the section itself. The old form resolved this with
-    # `candidate_block(sections[2]) or sections[2]`, which silently redirected
-    # the assertion target whenever the block went missing -- that is why a
-    # stale needle showed up as "missing ..." rather than as a structural error.
+    # A DONE milestone has no candidate block, so its record is asserted against
+    # the section itself. Do not fall back to `candidate_block(...) or section`:
+    # a missing block would silently redirect the assertions and report stale
+    # needles instead of a structural error.
     m2_record = sections[2]
     errors.extend(
         require_all(
@@ -165,16 +162,8 @@ def validate_master_text(text: str) -> list[str]:
         )
     )
 
-    # Removed by CHG-20260925-063: M3's candidate-block assertions. M3 closed on
-    # 2026-09-23 and retired its candidate block, so `candidate_block(sections[3])`
-    # returned "" and the two groups fared differently -- the four content
-    # needles were PERMANENTLY missing (guaranteed red on every run, i.e. the
-    # noise that made this gate ignorable), while the forbidden-object loop was
-    # PERMANENTLY passing (`forbidden in ""` is never true, so it could not have
-    # caught `crawl_result` even if the block came back carrying it). Neither
-    # group covered anything, so nothing is lost by dropping them. M3 is now
-    # covered by its status word plus the common milestone acceptance needles,
-    # which is what D-04 prescribes for a DONE milestone.
+    # M3 has no candidate block: a DONE milestone is covered by its status word
+    # plus the common milestone acceptance needles (D-04).
 
     m8_candidates = candidate_block(sections[8])
     forbid_all(errors, m8_candidates, "M8 candidate", ("interaction_batch", "interaction_item"))
@@ -286,14 +275,11 @@ STATUS_LINE_RE = re.compile(
 def status_word(change_text: str) -> str | None:
     """The bare status word of a `change.md`, with any annotation stripped.
 
-    Records habitually annotate the word — `- Status: IMPLEMENTING（2026-09-25
-    由 ... 激活）`, `- Status: **SUPERSEDED（...）**`. The annotation is a
-    note about the word, not part of it. A regex that demands the word alone
-    does not merely reject those records: it fails to match at all, so the
-    status reads as `None`. CHG-20260923-059 hit exactly that — it was
-    legitimately active, and its own gate output carried
-    `active CHG status must be ... got None` (`evidence/task-08-gate.out`),
-    which names a status the record never had. Strip first, then judge.
+    Records may annotate the word — `- Status: IMPLEMENTING（说明）`,
+    `- Status: **SUPERSEDED（...）**`. The annotation is a note about the word,
+    not part of it. A regex that demands the word alone does not merely reject
+    those records: it fails to match at all, so the status reads as `None` and
+    the gate names a status the record never had. Strip first, then judge.
     """
     match = STATUS_LINE_RE.search(change_text)
     if not match:

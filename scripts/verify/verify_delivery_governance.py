@@ -30,9 +30,8 @@ ARCHIVE_SEGMENT = "completed"
 ARCHIVE_MARKER_RE = re.compile(r"^-\s*归档边界：\s*`READ-ONLY`\s*$", re.MULTILINE)
 
 # 判据锚在**字符串字面量**上，不锚在接收者变量名上。名字式判据两头都不准且看不出来：
-# 对改前的 verify_m3_acceptance.py 只报 3/6 处归档写（漏掉 `EVIDENCE / "state.json"`
-# 这种一跳间接），改成定点传播后又因名字空间跨函数共用而把污染集爆到约 180 个名字。
-# 详见 CHG-20260925-066 §14 第 11 项与 evidence/task-03-writer-moved.md §4。
+# 只认直接拼出的路径会漏掉 `EVIDENCE / "state.json"` 这类一跳间接，做定点传播又会
+# 因名字空间跨函数共用而把污染集放大到整份脚本。
 ARCHIVE_WRITE_METHODS = frozenset({
     "write_text", "write_bytes", "mkdir", "unlink", "rmdir", "touch",
     "chmod", "rename", "replace", "remove",
@@ -84,7 +83,7 @@ def write_target(call: ast.Call) -> ast.AST | None:
 
     `x.open(mode)`（方法形式，mode 是第 0 个实参）与 `open(path, mode)`（内建，
     mode 是第 1 个实参）的 mode 位置不同。两者混用会把手读的 `path.open("rb")`
-    读成写——T-04 的阳性对照就是这么抓出这一处错的。
+    当成写操作，归档只读判据会因此误报。
     """
     func = call.func
     if isinstance(func, ast.Attribute):
@@ -132,14 +131,11 @@ def archive_tainted_names(tree: ast.AST) -> set[str]:
 def check_archive_readonly(workspace: Path) -> tuple[list[str], str]:
     """归档区不得被 `scripts/` 下的脚本写入。
 
-    扫描面是**递归**的（`rglob`）：`scripts/verify/` 与 `scripts/dev/` 是
-    CHG-20260926-067 新设的落点，非递归的 glob 会让落在其中的脚本**静默滑出**
-    这条判据——门禁照绿、分母缩小，而报告里看不出来。同一份写归档的探针
-    放在 `scripts/verify/` 下的两臂对照见该 CHG 的
-    `evidence/artifacts/t01-scan-surface-arm-{a,b}.out`（臂 A 报 0 处、臂 B 点名）。
+    扫描面是**递归**的（`rglob`）：落在 `scripts/verify/`、`scripts/dev/` 等
+    子目录里的脚本同样受判据约束，非递归的 glob 会让它们**静默滑出**——门禁照绿、
+    分母缩小，而报告里看不出来。
 
-    覆盖面仍然只到 `*.py`：`scripts/` 下的 shell 脚本与 `tests/` 不在判据内
-    （CHG-20260925-066 §14 第 15 项）。
+    覆盖面只到 `*.py`：`scripts/` 下的 shell 脚本与 `tests/` 不在判据内。
     """
     scripts_dir = workspace / "scripts"
     scripts = sorted(scripts_dir.rglob("*.py")) if scripts_dir.is_dir() else []
@@ -218,9 +214,8 @@ LEDGER_ROW_RE = re.compile(r"^\|\s*(CHG-\d{8}-\d{3})\s*\|")
 def parse_ledger_changes(ledger: Path) -> list[str]:
     """Return the CHG ids listed in the LEDGER table.
 
-    Only table rows count. Prose in the LEDGER body may mention a CHG id
-    (for example to point at where earlier work was folded in), and that
-    mention must not be read as a second active change.
+    Only table rows count. A CHG id in the LEDGER body is prose, not a second
+    active change, and must not be read as one.
     """
     if not ledger.is_file():
         return []
