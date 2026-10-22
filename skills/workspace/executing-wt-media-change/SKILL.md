@@ -23,7 +23,7 @@ When facts conflict, resolve them in this order:
 6. Affected repository `AGENTS.md` files.
 7. Current code and tests.
 
-Do not treat chat history, generated summaries, or legacy root `docs/` files as stronger than the active CHG and stable Workspace baselines.
+Do not treat chat history or generated summaries as stronger than the active CHG and stable Workspace baselines.
 
 ## Start Gate
 
@@ -43,6 +43,8 @@ Before coding, verify and report:
 - risks and blockers;
 - proposed commit boundaries;
 - current Git status for affected repositories.
+
+When presenting a plan to the user, use the five headings in `docs/standards/文档与知识事实治理规范.md` §5 (任务理解 / 当前事实与约束 / 计划修改 / 明确不修改 / 冲突与未确认项); this Skill does not restate them.
 
 Do not implement if:
 
