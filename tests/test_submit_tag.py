@@ -14,24 +14,28 @@ from unittest.mock import patch
 from scripts.release.submit_tag import ReleaseError, submit_tag, verify_publication
 
 
-TAG = "v0.1.0-rc.99"
-MANIFEST = f"""schema_version: 1
-product_tag: {TAG}
-channel: rc
+def manifest_text(tag: str, channel: str) -> str:
+    return f"""schema_version: 1
+product_tag: {tag}
+channel: {channel}
 environment: online
 cloud_origin: https://wt.longyanyue.cn
 network_smoke: false
 components:
-  cloud: v0.1.0-rc.12
-  agent: v0.2.2-rc.2
-  desktop: v0.1.0-rc.3
+  cloud: v0.1.2-rc.1
+  agent: v0.2.2-rc.4
+  desktop: v0.1.0-rc.9
 targets:
   cloud: linux-amd64
   desktop: [windows-x64, macos-x64, macos-arm64]
 """
 
 
-class SubmitTagTest(unittest.TestCase):
+class _SubmitTagFixture(unittest.TestCase):
+    TAG = ""
+    CHANNEL = ""
+    BRANCH = ""
+
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -41,16 +45,16 @@ class SubmitTagTest(unittest.TestCase):
         self.bin = base / "bin"
         self.bin.mkdir()
         subprocess.run(["git", "init", "--bare", str(self.bare)], check=True, capture_output=True)
-        subprocess.run(["git", "init", "-b", "codex/release-test", str(self.work)], check=True, capture_output=True)
+        subprocess.run(["git", "init", "-b", self.BRANCH, str(self.work)], check=True, capture_output=True)
         self.git("config", "user.name", "Release Test")
         self.git("config", "user.email", "release-test@example.invalid")
         self.git("remote", "add", "origin", str(self.bare))
-        manifest = self.work / "releases" / "manifests" / f"{TAG}.yaml"
-        manifest.parent.mkdir(parents=True)
-        manifest.write_text(MANIFEST, encoding="utf-8")
+        self.manifest = self.work / "releases" / "manifests" / f"{self.TAG}.yaml"
+        self.manifest.parent.mkdir(parents=True)
+        self.manifest.write_text(manifest_text(self.TAG, self.CHANNEL), encoding="utf-8")
         self.git("add", "releases")
         self.git("commit", "-m", "Add release manifest")
-        self.git("push", "origin", "HEAD:refs/heads/codex/release-test")
+        self.git("push", "origin", f"HEAD:refs/heads/{self.BRANCH}")
         stub = self.bin / "gh"
         stub.write_text(
             "#!/bin/sh\n"
@@ -79,52 +83,74 @@ class SubmitTagTest(unittest.TestCase):
     def git(self, *args: str) -> str:
         return subprocess.run(["git", *args], cwd=self.work, check=True, capture_output=True, text=True).stdout.strip()
 
-    def remote_tag_commit(self) -> str | None:
+    def remote_ref(self, ref: str) -> str | None:
         result = subprocess.run(
-            ["git", "--git-dir", str(self.bare), "rev-parse", "--verify", f"refs/tags/{TAG}^{{}}"],
+            ["git", "--git-dir", str(self.bare), "rev-parse", "--verify", ref],
             capture_output=True,
             text=True,
         )
         return result.stdout.strip() if result.returncode == 0 else None
 
+    def local_ref(self, ref: str) -> str | None:
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", ref],
+            cwd=self.work,
+            capture_output=True,
+            text=True,
+        )
+        return result.stdout.strip() if result.returncode == 0 else None
+
+    def remote_tag_commit(self) -> str | None:
+        return self.remote_ref(f"refs/tags/{self.TAG}^{{}}")
+
+
+class SubmitTagTest(_SubmitTagFixture):
+    TAG = "v0.1.0-rc.99"
+    CHANNEL = "rc"
+    BRANCH = "release-test"
+
     def test_dry_run_does_not_create_tag_and_explicit_push_does(self) -> None:
         head = self.git("rev-parse", "HEAD")
-        submit_tag(TAG, self.work, push=False)
+        submit_tag(self.TAG, self.work, push=False)
         self.assertIsNone(self.remote_tag_commit())
-        submit_tag(TAG, self.work, push=True)
+        submit_tag(self.TAG, self.work, push=True)
         self.assertEqual(self.remote_tag_commit(), head)
+
+    def test_rc_tag_does_not_create_release_branch(self) -> None:
+        submit_tag(self.TAG, self.work, push=True)
+        self.assertIsNone(self.local_ref(f"refs/heads/release/{self.TAG}"))
+        self.assertIsNone(self.remote_ref(f"refs/heads/release/{self.TAG}"))
 
     def test_rejects_unpushed_source_commit(self) -> None:
         (self.work / "notes.txt").write_text("new commit\n", encoding="utf-8")
         self.git("add", "notes.txt")
         self.git("commit", "-m", "Local only")
         with self.assertRaisesRegex(ReleaseError, "push.*branch"):
-            submit_tag(TAG, self.work, push=True)
+            submit_tag(self.TAG, self.work, push=True)
         self.assertIsNone(self.remote_tag_commit())
 
     def test_rejects_dirty_manifest(self) -> None:
-        manifest = self.work / "releases" / "manifests" / f"{TAG}.yaml"
-        manifest.write_text(MANIFEST + "# uncommitted\n", encoding="utf-8")
+        self.manifest.write_text(manifest_text(self.TAG, self.CHANNEL) + "# uncommitted\n", encoding="utf-8")
         with self.assertRaisesRegex(ReleaseError, "uncommitted"):
-            submit_tag(TAG, self.work, push=True)
+            submit_tag(self.TAG, self.work, push=True)
         self.assertIsNone(self.remote_tag_commit())
 
     def test_rejects_missing_component_tag(self) -> None:
         with patch.dict(os.environ, {"MISSING_CLOUD_TAG": "1"}):
             with self.assertRaisesRegex(ReleaseError, "cloud.*Tag"):
-                submit_tag(TAG, self.work, push=True)
+                submit_tag(self.TAG, self.work, push=True)
         self.assertIsNone(self.remote_tag_commit())
 
     def test_rejects_existing_product_tag(self) -> None:
-        submit_tag(TAG, self.work, push=True)
+        submit_tag(self.TAG, self.work, push=True)
         with self.assertRaisesRegex(ReleaseError, "already exists"):
-            submit_tag(TAG, self.work, push=True)
+            submit_tag(self.TAG, self.work, push=True)
         self.assertEqual(self.remote_tag_commit(), self.git("rev-parse", "HEAD"))
 
     def test_can_retry_matching_local_tag_after_network_failure(self) -> None:
-        self.git("tag", "-a", TAG, "-m", "prepared release Tag")
+        self.git("tag", "-a", self.TAG, "-m", "prepared release Tag")
         self.assertIsNone(self.remote_tag_commit())
-        submit_tag(TAG, self.work, push=True)
+        submit_tag(self.TAG, self.work, push=True)
         self.assertEqual(self.remote_tag_commit(), self.git("rev-parse", "HEAD"))
 
     def test_git_transport_failure_falls_back_to_github_api(self) -> None:
@@ -141,7 +167,7 @@ class SubmitTagTest(unittest.TestCase):
             self.git("push", "origin", f"refs/tags/{tag}")
 
         with patch.object(module, "_git", side_effect=blocked_push), patch.object(module, "push_annotated_tag_by_api", side_effect=api_push) as fallback:
-            submit_tag(TAG, self.work, push=True)
+            submit_tag(self.TAG, self.work, push=True)
         fallback.assert_called_once()
         self.assertEqual(self.remote_tag_commit(), self.git("rev-parse", "HEAD"))
 
@@ -157,18 +183,18 @@ class SubmitTagTest(unittest.TestCase):
         )
         wrapper.chmod(0o755)
         self.addCleanup(wrapper.unlink)
-        submit_tag(TAG, self.work, push=False)
+        submit_tag(self.TAG, self.work, push=False)
 
     def test_verify_publication_checks_exact_release_assets_and_checksums(self) -> None:
         names = [
-            f"WT-Media_{TAG}_macos-arm64.zip",
-            f"WT-Media_{TAG}_macos-x64.zip",
-            f"WT-Media_{TAG}_windows-x64-setup.exe",
+            f"WT-Media_{self.TAG}_macos-arm64.zip",
+            f"WT-Media_{self.TAG}_macos-x64.zip",
+            f"WT-Media_{self.TAG}_windows-x64-setup.exe",
             "build-info.json",
-            f"{TAG}.yaml",
+            f"{self.TAG}.yaml",
         ]
         payloads = {name: name.encode() for name in names}
-        payloads["build-info.json"] = json.dumps({"product_tag": TAG}).encode()
+        payloads["build-info.json"] = json.dumps({"product_tag": self.TAG}).encode()
         payloads["SHA256SUMS"] = "".join(
             f"{hashlib.sha256(payloads[name]).hexdigest()}  {name}\n" for name in names
         ).encode()
@@ -178,7 +204,7 @@ class SubmitTagTest(unittest.TestCase):
         def fake_command(args: list[str], repo_root: Path, *, allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
             calls.append(args)
             if args[:3] == ["gh", "run", "list"]:
-                return subprocess.CompletedProcess(args, 0, json.dumps([{"databaseId": 123, "headBranch": TAG}]), "")
+                return subprocess.CompletedProcess(args, 0, json.dumps([{"databaseId": 123, "headBranch": self.TAG}]), "")
             if args[:3] == ["gh", "run", "watch"]:
                 return subprocess.CompletedProcess(args, 0, "", "")
             if args[:3] == ["gh", "release", "view"]:
@@ -191,39 +217,106 @@ class SubmitTagTest(unittest.TestCase):
             raise AssertionError(args)
 
         with patch("scripts.release.submit_tag._command", side_effect=fake_command):
-            summary = verify_publication(TAG, self.work)
+            summary = verify_publication(self.TAG, self.work)
         self.assertIn("123", summary)
-        self.assertIn(hashlib.sha256(payloads[f"WT-Media_{TAG}_windows-x64-setup.exe"]).hexdigest(), summary)
+        self.assertIn(hashlib.sha256(payloads[f"WT-Media_{self.TAG}_windows-x64-setup.exe"]).hexdigest(), summary)
         self.assertTrue(any(args[:3] == ["gh", "run", "watch"] for args in calls))
 
     def test_verify_publication_rejects_bad_download(self) -> None:
         def fake_command(args: list[str], repo_root: Path, *, allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
             if args[:3] == ["gh", "run", "list"]:
-                return subprocess.CompletedProcess(args, 0, json.dumps([{"databaseId": 123, "headBranch": TAG}]), "")
+                return subprocess.CompletedProcess(args, 0, json.dumps([{"databaseId": 123, "headBranch": self.TAG}]), "")
             if args[:3] == ["gh", "run", "watch"]:
                 return subprocess.CompletedProcess(args, 0, "", "")
             if args[:3] == ["gh", "release", "view"]:
                 return subprocess.CompletedProcess(args, 0, json.dumps({"isPrerelease": True, "assets": [
-                    {"name": f"WT-Media_{TAG}_macos-arm64.zip"},
-                    {"name": f"WT-Media_{TAG}_macos-x64.zip"},
-                    {"name": f"WT-Media_{TAG}_windows-x64-setup.exe"},
+                    {"name": f"WT-Media_{self.TAG}_macos-arm64.zip"},
+                    {"name": f"WT-Media_{self.TAG}_macos-x64.zip"},
+                    {"name": f"WT-Media_{self.TAG}_windows-x64-setup.exe"},
                     {"name": "build-info.json"},
-                    {"name": f"{TAG}.yaml"},
+                    {"name": f"{self.TAG}.yaml"},
                     {"name": "SHA256SUMS"},
                 ]}), "")
             if args[:3] == ["gh", "release", "download"]:
                 directory = Path(args[args.index("--dir") + 1])
                 (directory / "SHA256SUMS").write_text("0" * 64 + "  build-info.json\n")
-                (directory / "build-info.json").write_text(json.dumps({"product_tag": TAG}))
-                (directory / f"{TAG}.yaml").write_text(MANIFEST)
+                (directory / "build-info.json").write_text(json.dumps({"product_tag": self.TAG}))
+                (directory / f"{self.TAG}.yaml").write_text(self.manifest.read_text(encoding="utf-8"))
                 for platform, suffix in (("macos-arm64", "zip"), ("macos-x64", "zip"), ("windows-x64-setup", "exe")):
-                    (directory / f"WT-Media_{TAG}_{platform}.{suffix}").write_bytes(b"asset")
+                    (directory / f"WT-Media_{self.TAG}_{platform}.{suffix}").write_bytes(b"asset")
                 return subprocess.CompletedProcess(args, 0, "", "")
             raise AssertionError(args)
 
         with patch("scripts.release.submit_tag._command", side_effect=fake_command):
             with self.assertRaisesRegex(ReleaseError, "SHA-256"):
-                verify_publication(TAG, self.work)
+                verify_publication(self.TAG, self.work)
+
+
+class StableSubmitTagTest(_SubmitTagFixture):
+    TAG = "v0.1.3"
+    CHANNEL = "stable"
+    BRANCH = "main"
+
+    def test_dry_run_reports_release_branch_without_creating_it(self) -> None:
+        summary = submit_tag(self.TAG, self.work, push=False)
+        self.assertIn(f"release/{self.TAG}", summary)
+        self.assertIsNone(self.local_ref(f"refs/heads/release/{self.TAG}"))
+        self.assertIsNone(self.remote_ref(f"refs/heads/release/{self.TAG}"))
+        self.assertIsNone(self.remote_tag_commit())
+
+    def test_creates_release_branch_at_tag_commit(self) -> None:
+        head = self.git("rev-parse", "HEAD")
+        summary = submit_tag(self.TAG, self.work, push=True)
+        self.assertIn(f"release/{self.TAG}", summary)
+        self.assertEqual(self.local_ref(f"refs/heads/release/{self.TAG}"), head)
+        self.assertEqual(self.remote_ref(f"refs/heads/release/{self.TAG}"), head)
+        self.assertEqual(self.remote_tag_commit(), head)
+
+    def test_rejects_stable_tag_outside_main(self) -> None:
+        self.git("switch", "-c", "release-work")
+        with self.assertRaisesRegex(ReleaseError, "main"):
+            submit_tag(self.TAG, self.work, push=True)
+        self.assertIsNone(self.local_ref(f"refs/heads/release/{self.TAG}"))
+        self.assertIsNone(self.remote_tag_commit())
+
+    def test_rejects_existing_release_branch_at_other_commit(self) -> None:
+        earlier = self.git("rev-parse", "HEAD")
+        (self.work / "earlier.txt").write_text("earlier\n", encoding="utf-8")
+        self.git("add", "earlier.txt")
+        self.git("commit", "-m", "Later main commit")
+        self.git("push", "origin", "HEAD:refs/heads/main")
+        self.git("branch", f"release/{self.TAG}", earlier)
+        with self.assertRaisesRegex(ReleaseError, "different commit"):
+            submit_tag(self.TAG, self.work, push=True)
+        self.assertIsNone(self.remote_tag_commit())
+
+    def test_reuses_matching_release_branch(self) -> None:
+        head = self.git("rev-parse", "HEAD")
+        self.git("branch", f"release/{self.TAG}", head)
+        self.git("push", "origin", f"refs/heads/release/{self.TAG}:refs/heads/release/{self.TAG}")
+        submit_tag(self.TAG, self.work, push=True)
+        self.assertEqual(self.remote_ref(f"refs/heads/release/{self.TAG}"), head)
+        self.assertEqual(self.remote_tag_commit(), head)
+
+    def test_branch_push_failure_falls_back_to_github_api(self) -> None:
+        module = importlib.import_module("scripts.release.submit_tag")
+        real_git = module._git
+
+        def blocked_branch_push(repo_root: Path, *args: str, **kwargs: object) -> subprocess.CompletedProcess[str]:
+            if args[0] == "push" and any("refs/heads/" in arg for arg in args):
+                return subprocess.CompletedProcess(args, 1, "", "Git transport unavailable")
+            return real_git(repo_root, *args, **kwargs)
+
+        def api_branch(repo_name: str, branch: str, sha: str, repo_root: Path) -> None:
+            self.assertEqual(repo_name, "wt-media-workspace")
+            self.git("push", "origin", f"{sha}:refs/heads/{branch}")
+
+        head = self.git("rev-parse", "HEAD")
+        with patch.object(module, "_git", side_effect=blocked_branch_push), patch.object(module, "create_branch_by_api", side_effect=api_branch) as fallback:
+            submit_tag(self.TAG, self.work, push=True)
+        fallback.assert_called_once()
+        self.assertEqual(self.remote_ref(f"refs/heads/release/{self.TAG}"), head)
+        self.assertEqual(self.remote_tag_commit(), head)
 
 
 if __name__ == "__main__":

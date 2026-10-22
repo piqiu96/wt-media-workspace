@@ -24,7 +24,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.release.manifest import validate_manifest  # noqa: E402
-from scripts.release.tag_transport import TagTransportError, push_annotated_tag_by_api  # noqa: E402
+from scripts.release.tag_transport import (  # noqa: E402
+    TagTransportError,
+    create_branch_by_api,
+    push_annotated_tag_by_api,
+)
 
 
 class ReleaseError(Exception):
@@ -63,6 +67,38 @@ def _github_ref(repo_root: Path, ref: str) -> str | None:
     raise ReleaseError(f"could not inspect GitHub ref {ref}: {result.stderr.strip()}")
 
 
+def _ensure_release_branch(repo_root: Path, tag: str, head: str) -> str:
+    """Create or reuse the stable release branch at `head`, then push it to origin."""
+    branch = f"release/{tag}"
+    local = _git(repo_root, "rev-parse", "--verify", "--quiet", f"refs/heads/{branch}", allow_failure=True)
+    local_sha = local.stdout.strip() if local.returncode == 0 else None
+    if local_sha is not None and local_sha != head:
+        raise ReleaseError(f"release branch {branch} already exists locally at a different commit")
+    remote_sha = _github_ref(repo_root, f"heads/{branch}")
+    if remote_sha is not None and remote_sha != head:
+        raise ReleaseError(f"release branch {branch} already exists on origin at a different commit")
+    if local_sha is None:
+        _git(repo_root, "branch", branch, head)
+    if remote_sha is None:
+        push_result = _git(
+            repo_root, "push", "origin", f"refs/heads/{branch}:refs/heads/{branch}",
+            allow_failure=True, timeout=45,
+        )
+        pushed = _github_ref(repo_root, f"heads/{branch}")
+        if pushed is None and push_result.returncode != 0:
+            try:
+                create_branch_by_api("wt-media-workspace", branch, head, repo_root)
+            except TagTransportError as exc:
+                if _github_ref(repo_root, f"heads/{branch}") != head:
+                    raise ReleaseError(f"release branch push failed: {exc}") from exc
+            pushed = _github_ref(repo_root, f"heads/{branch}")
+        if pushed != head:
+            if push_result.returncode != 0:
+                raise ReleaseError(f"release branch push failed: {push_result.stderr.strip()}")
+            raise ReleaseError(f"pushed release branch {branch}, but remote ref read-back differs")
+    return branch
+
+
 def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
     """Check fixed release inputs, then optionally create and push the product Tag."""
     repo_root = repo_root.resolve()
@@ -75,6 +111,8 @@ def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
 
     head = _git(repo_root, "rev-parse", "HEAD").stdout.strip()
     branch = _git(repo_root, "symbolic-ref", "--quiet", "--short", "HEAD").stdout.strip()
+    if data["channel"] == "stable" and branch != "main":
+        raise ReleaseError("stable product Tags must be submitted from main")
     remote_branch = _github_ref(repo_root, f"heads/{branch}")
     if remote_branch != head:
         raise ReleaseError(f"push the workspace branch {branch} before submitting the product Tag")
@@ -97,8 +135,11 @@ def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
             raise ReleaseError(f"{component} component Tag {component_tag} is absent or inaccessible on GitHub")
 
     if not push:
+        if data["channel"] == "stable":
+            return f"validated {tag} at {head}; use --push to create release/{tag} and submit the Tag"
         return f"validated {tag} at {head}; use --push to submit the Tag and trigger release.yml"
 
+    release_branch = _ensure_release_branch(repo_root, tag, head) if data["channel"] == "stable" else None
     if not local_tag_exists:
         _git(repo_root, "tag", "-a", tag, "-m", f"WT Media {tag}")
     local_tag_object = _git(repo_root, "rev-parse", f"refs/tags/{tag}").stdout.strip()
@@ -115,7 +156,8 @@ def submit_tag(tag: str, repo_root: Path, *, push: bool) -> str:
         if push_result.returncode != 0:
             raise ReleaseError(f"product Tag push failed: {push_result.stderr.strip()}")
         raise ReleaseError(f"pushed product Tag {tag}, but remote Tag object read-back differs")
-    return f"pushed {tag} at {head}; GitHub Tag push triggers release.yml"
+    where = f" on {release_branch}" if release_branch else ""
+    return f"pushed {tag} at {head}{where}; GitHub Tag push triggers release.yml"
 
 
 def verify_publication(tag: str, repo_root: Path) -> str:

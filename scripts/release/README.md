@@ -24,7 +24,7 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.19
 uv run scripts/release/submit_tag.py v0.1.0-rc.19 --push --verify
 ```
 
-产品脚本预检 Manifest 结构、三个远端组件 Tag、当前 Workspace 分支提交和重复 Tag。`--push` 创建并推送 annotated 产品 Tag；Git 推送失败时也使用相同的 GitHub API 备用路径。`--verify` 等待该 Tag 的 `release.yml` 成功，再从 GitHub Release 下载全部六项资产，检查资产清单、`SHA256SUMS`、`build-info.json` 的产品 Tag，并输出 Windows 安装包 SHA-256。发布任务失败或任一资产不符时命令返回非零。
+产品脚本预检 Manifest 结构、三个远端组件 Tag、当前分支已推送到 origin 和重复 Tag；正式版还要求当前分支为 `main`。`--push` 创建并推送 annotated 产品 Tag；Git 推送失败时也使用相同的 GitHub API 备用路径。`--verify` 等待该 Tag 的 `release.yml` 成功，再从 GitHub Release 下载全部六项资产，检查资产清单、`SHA256SUMS`、`build-info.json` 的产品 Tag，并输出 Windows 安装包 SHA-256。发布任务失败或任一资产不符时命令返回非零。
 
 如果 Tag 已推送而本机等待或下载中断，仅重做只读发布校验：
 
@@ -33,6 +33,28 @@ uv run scripts/release/submit_tag.py v0.1.0-rc.19 --verify
 ```
 
 脚本不会自动部署 Cloud 或代替 Windows 真机验收。对 RC17 已发布资产可用 `v0.1.0-rc.17 --verify` 回读校验。
+
+## 版本差异 Review（GitHub Compare）
+
+完整产品差异由四个 GitHub Compare 页面组成。GitHub 的 Compare 和自动生成的 Release Notes 都是单仓能力，没有跨仓聚合页面；发布分支与产品 Tag 指向同一 commit，不增加 diff 信息。
+
+先取两个 Manifest 的组件 Tag：基线用 `git show <上一个产品Tag>:releases/manifests/<上一个产品Tag>.yaml`，本次用工作树中的 `releases/manifests/<本次产品Tag>.yaml`。然后打开：
+
+```text
+https://github.com/piqiu96/wt-media-workspace/compare/<上一个产品Tag>...<本次产品Tag>
+https://github.com/piqiu96/wt-media-cloud/compare/<上一个cloud组件Tag>...<本次cloud组件Tag>
+https://github.com/piqiu96/wt-media-agent/compare/<上一个agent组件Tag>...<本次agent组件Tag>
+https://github.com/piqiu96/wt-media-desktop/compare/<上一个desktop组件Tag>...<本次desktop组件Tag>
+```
+
+产品 Tag 尚未推送时，Workspace 一栏用 `compare/<上一个产品Tag>...main`；组件 Tag 已在产品 Tag 之前推送，可直接对比。推送产品 Tag 后把 `main` 换成产品 Tag，得到不可变链接。例如 `v0.1.1 → v0.1.2`：
+
+```text
+https://github.com/piqiu96/wt-media-workspace/compare/v0.1.1...v0.1.2
+https://github.com/piqiu96/wt-media-cloud/compare/v0.1.1-rc.1...v0.1.2-rc.1
+https://github.com/piqiu96/wt-media-agent/compare/v0.2.2-rc.3...v0.2.2-rc.4
+https://github.com/piqiu96/wt-media-desktop/compare/v0.1.0-rc.8...v0.1.0-rc.9
+```
 
 ## 官网桌面安装包下载清单
 
@@ -53,4 +75,6 @@ python3 desktop_downloads.py --tag v0.1.0 \
 
 ## 正式版
 
-人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。正式版工作流先创建 Draft Release 并复验资产名与 SHA256，校验全部通过后**自动公开发布**（`publish-release` job 内 `gh release edit --draft=false --prerelease=false` 并回读断言状态），无需人工执行公开命令；`submit_tag.py --verify` 只核对资产与摘要、不区分草稿与公开状态。正式版从 Tag 重新构建，不把 RC 附件改名；构建期已把对应版本的官网下载清单烙入 Cloud 包，CI 绿即公开，按上一节部署即可。
+人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，先按上一节 Review 四个 Compare 页面，再用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。
+
+正式版只能从 `main` 提交：`--push` 先创建并推送 `release/vX.Y.Z`（与产品 Tag 同一 commit），再创建并推送产品 Tag。分支或 Tag 已存在且指向同一 commit 时重试幂等；指向不同 commit 时拒绝。发布分支不移动、不删除、不触发工作流；RC 不建发布分支。Tag 仍是唯一发布触发器。正式版工作流先创建 Draft Release 并复验资产名与 SHA256，校验全部通过后**自动公开发布**（`publish-release` job 内 `gh release edit --draft=false --prerelease=false` 并回读断言状态），无需人工执行公开命令；`submit_tag.py --verify` 只核对资产与摘要、不区分草稿与公开状态。正式版从 Tag 重新构建，不把 RC 附件改名；构建期已把对应版本的官网下载清单烙入 Cloud 包，CI 绿即公开，按上一节部署即可。

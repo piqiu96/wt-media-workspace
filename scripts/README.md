@@ -31,7 +31,7 @@
 | `scripts/verify/verify_m0_local.sh` | 聚合验收 | M0 本地全套：单测、治理门禁、文档检查、三仓构建/测试 | `sh scripts/verify/verify_m0_local.sh` |
 | `scripts/verify/windows_uninstall.ps1` | 验收 | Windows 安装包卸载验收 | 在 Windows 上执行；见脚本头 |
 | `scripts/release/__init__.py` | 库 | 发布工具包标记 | 不直接执行 |
-| `scripts/release/submit_tag.py` | 发布入口 | 校验并手动推送一个产品 Tag | `uv run scripts/release/submit_tag.py <tag> --push --verify` |
+| `scripts/release/submit_tag.py` | 发布入口 | 校验并手动推送一个产品 Tag；正式版先建同名发布分支 | `uv run scripts/release/submit_tag.py <tag> --push --verify` |
 | `scripts/release/submit_component_tag.py` | 发布入口 | 为指定源码提交预检或推送不可变组件 Tag | `python3 scripts/release/submit_component_tag.py ...` |
 | `scripts/release/manifest.py` | 发布入口 | 校验产品 Release Manifest | `python3 scripts/release/manifest.py ...` |
 | `scripts/release/stage_config.py` | 发布入口 | 向客户端构建输入写入公开 Cloud origin | `python3 scripts/release/stage_config.py ...` |
