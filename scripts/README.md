@@ -69,4 +69,4 @@
 | `scripts/change_metadata.py` | `scripts/lib/change_metadata.py` |
 | `scripts/workspace_config.py` | `scripts/lib/workspace_config.py` |
 
-`scripts/wt.py` 仍是入口；新增 `scripts/chg/` 只是把三个 CHG 动词和共享前置条件归位。历史归档（`delivery/completed/`、`docs/superpowers/`、`delivery/reports/`）中的旧路径是历史叙述，不追改。
+`scripts/wt.py` 仍是入口；新增 `scripts/chg/` 只是把三个 CHG 动词和共享前置条件归位。历史归档（`delivery/completed/`、`delivery/reports/`）中的旧路径是历史叙述，不追改。

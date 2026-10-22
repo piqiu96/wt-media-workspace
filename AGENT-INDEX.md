@@ -56,7 +56,6 @@
 | `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
 | `docs/devops/` | 端口与部署总账：各组件监听端口、连接链路和本地/线上接法的索引 |
 | `docs/reference/state-models/` | 可引用的业务状态说明与一致性索引；不独立裁定产品状态或接口枚举 |
-| `docs/superpowers/` | 旧计划与旧设计的混合集合；按内容判断，不默认加载 |
 | `delivery/active/` | 当前正在执行的 CHG；只含当前交付事实 |
 | `delivery/planned/` | 已确认但尚未启动的交付项；不属于历史 |
 | `delivery/milestones/` | 当前 Milestone 的业务闭环定义；不存开发流水账 |
@@ -113,7 +112,6 @@ Workspace 不复制运行仓局部规则。
 
 - 全量代码扫描；
 - `delivery/completed/` 扫描；
-- `docs/superpowers/` 中的过程和分析内容扫描；被当前任务明确引用、且判断仍然有效的方法可单篇读取；
 - `delivery/reports/` 扫描；
 - 历史分析和旧 Evidence 扫描；
 - `.ai/WORK_STATE.md` 中未经确认的推测；

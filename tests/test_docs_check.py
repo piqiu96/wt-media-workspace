@@ -52,7 +52,6 @@ class DocsCheckTests(unittest.TestCase):
 - [Decisions](decisions/README.md)
 - [DevOps](devops/README.md)
 - [Reference](reference/README.md)
-- [History](superpowers/README.md)
 """)
         for directory in (
             "docs/product", "docs/engineering", "docs/standards",
@@ -67,7 +66,6 @@ class DocsCheckTests(unittest.TestCase):
         self.write("docs/engineering/specs/alpha.md", "# Alpha\n")
         self.write("docs/standards/frontend/README.md", INDEX + "\n# Frontend\n")
         self.write("docs/reference/state-models/README.md", STABLE + "\n# State models\n")
-        self.write("docs/superpowers/README.md", HISTORICAL + "\n# History\n")
         for directory in ("delivery/milestones", "delivery/planned"):
             self.write(f"{directory}/README.md", INDEX + "\n# Index\n")
         self.write("delivery/reports/README.md", HISTORICAL + "\n# Reports\n")
@@ -88,7 +86,6 @@ class DocsCheckTests(unittest.TestCase):
 
 ### 默认不加载
 
-- `docs/superpowers/`
 - `delivery/reports/`
 """)
 
@@ -113,11 +110,11 @@ class DocsCheckTests(unittest.TestCase):
 
     def test_historical_marker_requires_never(self) -> None:
         self.write(
-            "docs/superpowers/README.md",
-            "<!-- governance: class=historical default_load=task -->\n# History\n",
+            "delivery/reports/README.md",
+            "<!-- governance: class=historical default_load=task -->\n# Reports\n",
         )
         self.assertIn(
-            "docs/superpowers/README.md: historical documents must use default_load=never",
+            "delivery/reports/README.md: historical documents must use default_load=never",
             self.check(),
         )
 
@@ -152,7 +149,6 @@ class DocsCheckTests(unittest.TestCase):
 
 ### 默认不加载
 
-- `docs/superpowers/`
 - `delivery/reports/`
 """)
         self.assertIn(
@@ -175,10 +171,6 @@ class DocsCheckTests(unittest.TestCase):
 - `delivery/completed/`
 """)
         errors = self.check()
-        self.assertIn(
-            "AGENT-INDEX.md section 4 must list docs/superpowers/ as not loaded by default",
-            errors,
-        )
         self.assertIn(
             "AGENT-INDEX.md section 4 must list delivery/reports/ as not loaded by default",
             errors,
@@ -223,7 +215,7 @@ class DocsCheckTests(unittest.TestCase):
         )
 
     def test_index_may_be_excluded_from_default_load(self) -> None:
-        self.write("docs/superpowers/README.md", NEVER_INDEX + "\n# History\n")
+        self.write("docs/reference/state-models/README.md", NEVER_INDEX + "\n# State models\n")
         self.assertEqual(self.check(), [])
 
     def test_broken_link_in_non_index_current_document_is_reported(self) -> None:
@@ -253,7 +245,7 @@ class DocsCheckTests(unittest.TestCase):
 
     def test_superseded_marker_in_historical_directory_is_ignored(self) -> None:
         self.write(
-            "docs/superpowers/old.md",
+            "delivery/reports/old.md",
             "# Old\n\n> **SUPERSEDED**: no replacement named.\n",
         )
         self.assertEqual(self.check(), [])

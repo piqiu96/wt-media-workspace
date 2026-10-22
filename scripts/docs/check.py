@@ -28,7 +28,6 @@ REQUIRED_INDEXES = (
     "docs/devops/README.md",
     "docs/reference/README.md",
     "docs/reference/state-models/README.md",
-    "docs/superpowers/README.md",
     "delivery/milestones/README.md",
     "delivery/planned/README.md",
     "delivery/reports/README.md",
@@ -176,7 +175,7 @@ def check(root: Path = ROOT) -> list[str]:
             errors.append("AGENT-INDEX.md section 4 is missing the default-load subsection")
         else:
             excluded = load.split("默认不加载", 1)[1]
-            for required in ("docs/superpowers/", "delivery/reports/"):
+            for required in ("delivery/reports/",):
                 if required not in excluded:
                     errors.append(
                         f"AGENT-INDEX.md section 4 must list {required} as not loaded by default"

@@ -13,7 +13,6 @@ This file is the entry index for the documentation tree. It defines directory ro
 - [Decisions](decisions/README.md): accepted architecture choices and ADRs, with their reasons.
 - [DevOps](devops/README.md): port and deployment ledger; the configuration/provider file owns each value.
 - [Reference](reference/README.md): reference material such as business state models; it does not independently decide product or interface facts.
-- [Legacy plans](superpowers/README.md): mixed old plans and specs. Not current facts, not loaded by default; judge each file by content.
 
 Temporary execution state belongs in `.ai/WORK_STATE.md` (optional, gitignored, not a fact source). A CHG's formal record is `../delivery/active/<change-id>/change.md`; `evidence/` is added only when needed. Do not put plans, progress, handoffs, or temporary analysis under `docs`.
 
@@ -24,7 +23,6 @@ This tree is the only documentation location. The execution root `wt-media/` car
 - **Current facts**: `docs/product/`, `docs/engineering/`, `docs/contracts/`, `docs/decisions/`, `docs/devops/`, `docs/standards/`. Each answers a different question; there is no single global priority across them. `docs/reference/` is citable explanation, not an independent decision source.
 - **Delivery state**: `delivery/LEDGER.md` is the Active CHG index; `delivery/active/<CHG>/change.md` is the status source; `delivery/milestones/` holds milestone closure cards. `delivery/planned/` is confirmed work that has not started.
 - **Traceable history**: `delivery/completed/` keeps completed records with audit value; `delivery/reports/` keeps reports with independent value. Neither is current fact or loaded by default.
-- **Legacy material**: `docs/superpowers/` is a mixed collection, not automatically historical. Effective methods belong in `docs/`; old analysis and process content exit the default context.
 - **Generated content**: `.ai/CURRENT_CONTEXT.md` is regenerable navigation; `.ai/WORK_STATE.md` is optional local memory and is gitignored.
 - **Provider definitions**: OpenAPI, schemas, DTOs, and events are owned by the provider repository. `docs/contracts/` governs them in human-readable form and does not copy the definitions.
 
@@ -38,10 +36,9 @@ Conflict resolution follows fact ownership, not a global product/engineering/imp
 
 ## Lifecycle and history
 
-- `docs/` holds current facts only. The `docs/superpowers/` legacy collection below is a temporary exception, not a place for new facts. Git keeps old versions; do not keep a second current copy for history.
+- `docs/` holds current facts only. Git keeps old versions; do not keep a second current copy for history.
 - `delivery/active/` holds the current CHG; `delivery/planned/` holds confirmed work not yet started; `delivery/milestones/` holds current business closure.
 - `delivery/completed/` and `delivery/reports/` hold only material with independent traceability value. Both exit the default context.
-- `docs/superpowers/` is judged by content. Promote still-effective methods to `docs/`; delete or retire content without continuing value.
 - The temporary marker `SUPERSEDED` is only for an old document that cannot be deleted yet because external references remain. It must name a resolvable replacement and is removed after references migrate.
 - No long-term Draft / Current / Superseded / Historical status vocabulary is maintained. Directory position expresses lifecycle.
 

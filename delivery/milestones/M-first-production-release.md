@@ -1,7 +1,7 @@
 # M-first-production-release：首次全端上线
 
 - 状态：执行中；RC 打包、Cloud 首次预发布部署和 Windows 部署修复已通过验收，`v0.1.0` 正式版制品已发布。真实 Cloud 跨版本升级及回退待下次升级验证。
-- 依据：[首次全端上线部署计划](../../docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md)。
+- 依据：[服务部署说明书](../../docs/devops/服务部署.md)、[ADR-0020](../../docs/decisions/0020-tagged-release-and-environment-config.md)；实施记录见 [CHG-20261003-077](../completed/CHG-20261003-077/change.md) 与 [CHG-20261010-078](../completed/CHG-20261010-078/change.md)。
 
 ## 公开官网与桌面安装包下载
 

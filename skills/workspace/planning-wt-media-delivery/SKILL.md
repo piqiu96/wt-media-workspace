@@ -15,10 +15,9 @@ Read in order:
 2. `docs/product`, `docs/engineering`, `docs/contracts`, `docs/decisions`;
 3. `delivery/MASTER_IMPLEMENTATION_PLAN.md`;
 4. applicable `delivery/milestones/M*.md`;
-5. AI analysis under `docs/superpowers/specs`;
-6. current CHGs, Evidence, code, tests, and Git status.
+5. current CHGs, Evidence, code, tests, and Git status.
 
-AI Specs are analysis material. Product and Engineering remain stable facts; Milestones contain the human-confirmed business closure; CHGs are execution contracts.
+Product and Engineering remain stable facts; Milestones contain the human-confirmed business closure; CHGs are execution contracts.
 
 ## Classify Before Writing
 
