@@ -1,10 +1,12 @@
+<!-- governance: class=index default_load=task -->
+
 # Milestone 业务闭环
 
 本目录保存每个 M 由人工确认的业务闭环基线。
 
 尚未确认的拆分必须显式标注 DRAFT，不能作为已批准的实现依据。
 
-当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：**M3 已于 2026-09-23 通过 E3 综合验收并由用户签收，状态为 `DONE`**（验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED）。A～E1 有真实证据；C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围；逐阶段状态见该文件第 2.1 节，签收记录见第 2.2 节。M3 产品事实源为 [Product M3 内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
+当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：**M3 已于 2026-09-23 通过 E3 综合验收并由用户签收，状态为 `DONE`**（验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED）。A～E1 有真实证据；C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围；逐阶段状态见该文件第 2.1 节，签收记录见第 2.2 节。M3 产品事实源为 [PRD 第四章：内容挖掘](../../docs/product/prd/详细文档/第四章_内容挖掘.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
 
 M4-M5 于 2026-09-24 按用户确认方向完成闭环重划。M4 于 2026-09-26 进入 `IN_PROGRESS`；用户 2026-10-14 暂缓 M4-H2 人工走查，要求先执行 M5，M5 进入 `IN_PROGRESS`：
 
@@ -49,3 +51,11 @@ Milestone 执行过程中发现的小变更、验收细节、页面口径、操�
 | 代码实现缺陷且不改变业务闭环 | 当前 CHG，不改 Milestone，不改 PRD |
 
 一个 Milestone 完整验收后，再把已经稳定的产品规则按需回写 PRD。未稳定的执行细节不进入 PRD。
+
+## Milestone 关闭检查
+
+- 目标、用户路径、成功条件和验收矩阵已闭环，没有未解释的失败或遗漏。
+- 没有遗留的 Active CHG、未收口阻塞或“只登记未处理”的当前事项。
+- 下一 Milestone 的范围、依赖和未决事项清楚；没有把下一阶段内容混进当前闭环卡。
+- 闭环卡只保留当前业务事实和验收结论，不写开发流水账、过程报告或临时分析。
+- 已经稳定的产品事实已回写 PRD；执行过程记录按历史处置规则退出默认上下文。

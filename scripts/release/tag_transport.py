@@ -1,4 +1,4 @@
-"""Fallback transport for pushing an exact local annotated Tag through GitHub Git Data API."""
+"""Fallback transport for release Tag refs and release branch refs through GitHub Git Data API."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 class TagTransportError(Exception):
-    """The local Tag cannot be represented exactly by the GitHub API."""
+    """A release ref cannot be represented exactly by the GitHub API."""
 
 
 def _api(endpoint: str, payload: dict, repo_root: Path) -> dict:
@@ -22,7 +22,7 @@ def _api(endpoint: str, payload: dict, repo_root: Path) -> dict:
         check=False,
     )
     if result.returncode != 0:
-        raise TagTransportError(f"GitHub API Tag push failed: {result.stderr.decode(errors='replace').strip()}")
+        raise TagTransportError(f"GitHub API request failed: {result.stderr.decode(errors='replace').strip()}")
     try:
         response = json.loads(result.stdout)
     except ValueError as exc:
@@ -72,3 +72,17 @@ def push_annotated_tag_by_api(repo_name: str, tag: str, repo_root: Path) -> None
     if created.get("sha") != local_object:
         raise TagTransportError("GitHub API Tag object differs from the local annotated Tag")
     _api(f"{prefix}/refs", {"ref": tag_ref, "sha": local_object}, repo_root)
+
+
+def create_branch_by_api(repo_name: str, branch: str, sha: str, repo_root: Path) -> None:
+    """Create one release branch ref pointing at an existing commit."""
+    if not re.fullmatch(r"wt-media-(?:workspace|cloud|agent|desktop)", repo_name):
+        raise TagTransportError(f"invalid release repository: {repo_name}")
+    if not re.fullmatch(r"release/v\d+\.\d+\.\d+", branch):
+        raise TagTransportError(f"invalid release branch: {branch}")
+    if not re.fullmatch(r"[0-9a-f]{40}", sha):
+        raise TagTransportError(f"invalid release commit: {sha}")
+    branch_ref = f"refs/heads/{branch}"
+    created = _api(f"repos/piqiu96/{repo_name}/git/refs", {"ref": branch_ref, "sha": sha}, repo_root)
+    if created.get("ref") != branch_ref or created.get("object", {}).get("sha") != sha:
+        raise TagTransportError("GitHub API branch ref differs from the requested release branch")

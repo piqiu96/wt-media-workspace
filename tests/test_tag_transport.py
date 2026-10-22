@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.release.tag_transport import TagTransportError, push_annotated_tag_by_api
+from scripts.release.tag_transport import TagTransportError, create_branch_by_api, push_annotated_tag_by_api
 
 
 class TagTransportTest(unittest.TestCase):
@@ -46,6 +46,37 @@ class TagTransportTest(unittest.TestCase):
         with patch("scripts.release.tag_transport._api", return_value={"sha": "0" * 40}):
             with self.assertRaisesRegex(TagTransportError, "differs"):
                 push_annotated_tag_by_api("wt-media-workspace", self.tag, self.repo)
+
+    def test_api_creates_release_branch_ref(self) -> None:
+        calls: list[tuple[str, dict]] = []
+
+        def fake_api(endpoint: str, payload: dict, repo_root: Path) -> dict:
+            calls.append((endpoint, payload))
+            return {"ref": payload["ref"], "object": {"sha": payload["sha"]}}
+
+        with patch("scripts.release.tag_transport._api", side_effect=fake_api):
+            create_branch_by_api("wt-media-workspace", "release/v0.1.3", self.commit, self.repo)
+        self.assertEqual(calls, [(
+            "repos/piqiu96/wt-media-workspace/git/refs",
+            {"ref": "refs/heads/release/v0.1.3", "sha": self.commit},
+        )])
+
+    def test_rejects_api_branch_ref_that_differs(self) -> None:
+        with patch("scripts.release.tag_transport._api", return_value={
+            "ref": "refs/heads/release/other", "object": {"sha": self.commit},
+        }):
+            with self.assertRaisesRegex(TagTransportError, "differs"):
+                create_branch_by_api("wt-media-workspace", "release/v0.1.3", self.commit, self.repo)
+
+    def test_rejects_invalid_release_branch_inputs(self) -> None:
+        for repo, branch, sha in (
+            ("wt-media-other", "release/v0.1.3", self.commit),
+            ("wt-media-workspace", "release/main", self.commit),
+            ("wt-media-workspace", "release/v0.1.3", "0" * 39),
+        ):
+            with self.subTest(repo=repo, branch=branch, sha=sha):
+                with self.assertRaises(TagTransportError):
+                    create_branch_by_api(repo, branch, sha, self.repo)
 
 
 if __name__ == "__main__":

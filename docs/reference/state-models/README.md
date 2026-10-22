@@ -1,3 +1,5 @@
+<!-- governance: class=stable default_load=task -->
+
 # 业务状态模型
 
 本目录整理业务对象的状态及流转语义，供 Product、Engineering、Delivery 和具体任务**引用为状态说明**，减少重复描述。它不是独立的产品或合同事实源；状态的新增、变更与冲突裁定仍归 `docs/product/`、已接受 Decision 和提供方维护的 Contract / Schema。引用本目录不代替更新正式基线，也不使 Workspace 成为运行时依赖。
@@ -12,7 +14,7 @@
 | Architecture / Contracts | 模块职责、调用和实现接口；提供方拥有正式业务 enum |
 | Milestone | 当前阶段交付、验收和实际进度 |
 
-当前说明：[内容发现](content-discovery.md)、[内容生产](content-production.md)。本次整理以 [M3 有效产品基线 V2](../../product/M3-content-mining-v2.md)、[第五章 PRD V2](../../product/prd/详细文档/第五章_素材生产.md)、[M4](../../../delivery/milestones/M4-content-production.md)、[M5](../../../delivery/milestones/M5-automatic-production.md) 及对应 Decision 为依据。旧[第四章 PRD](../../product/prd/详细文档/第四章_内容发现.md)已标记“历史 V1”，仅用于识别被取代的定义。
+状态说明已退役：原 `content-discovery.md`、`content-production.md` 的状态内容已并入产品基线，原文保留在 Git 历史。当前状态依据为 [PRD 第四章：内容挖掘](../../product/prd/详细文档/第四章_内容挖掘.md)、[第五章 PRD V2](../../product/prd/详细文档/第五章_素材生产.md)、[M4](../../../delivery/milestones/M4-content-production.md)、[M5](../../../delivery/milestones/M5-automatic-production.md) 及对应 Decision。
 
 ## 全局规则
 

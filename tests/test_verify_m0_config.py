@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify_m0_config.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify" / "verify_m0_config.py"
 
 
 def load_module():

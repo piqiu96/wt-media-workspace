@@ -8,10 +8,19 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
-from scripts import m2b_local_acceptance as harness
+from scripts.dev import local_env as harness
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class ComposeWorkerLifecycleTests(unittest.TestCase):
+    def test_path_constants_match_the_new_location(self):
+        self.assertEqual(harness.SCRIPTS_DIR, REPO_ROOT / "scripts")
+        self.assertEqual(harness.WORKSPACE_DIR, REPO_ROOT)
+        self.assertEqual(harness.WORKSPACE_DIR.name, "wt-media-workspace")
+        self.assertEqual(harness.CLOUD_DIR, REPO_ROOT.parent / "wt-media-cloud")
+
     def test_up_and_all_build_and_start_the_compose_claim_loop(self):
         for command in ("up", "all"):
             with self.subTest(command=command), ExitStack() as stack:

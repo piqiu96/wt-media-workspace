@@ -20,7 +20,7 @@ WT Media Workspace 是多工程系统的研发控制中心（Engineering Control
 
 ## 任务执行
 
-开始任务时先读 `AGENT-INDEX.md`；需要当前交付状态时读取 `.ai/CURRENT_CONTEXT.md`。
+开始任务时先读 `AGENT-INDEX.md`；需要当前交付状态时先看 `delivery/LEDGER.md` 与 `delivery/active/` 选定 CHG，再运行 `python3 scripts/wt.py chg resume <CHG>` 生成并读取 `.ai/CURRENT_CONTEXT.md`。没有 Active CHG 时不需要该快照。
 
 根据任务选择执行方式：
 
@@ -42,8 +42,10 @@ WT Media Workspace 是多工程系统的研发控制中心（Engineering Control
 | 研发、设计与产品实践规范 | `docs/standards/` |
 | 跨仓协议 | `docs/contracts/` |
 | 技术决策 | `docs/decisions/` |
+| 文档树分类、索引与校验 | `docs/README.md` |
+| 脚本用途与落位规则 | `scripts/README.md` |
 | Milestone / CHG / 交付状态 | `delivery/` |
-| 当前执行快照 | `.ai/CURRENT_CONTEXT.md` |
+| 当前执行快照 | `.ai/CURRENT_CONTEXT.md`（生成，勿手改） |
 
 ## 相关约束
 

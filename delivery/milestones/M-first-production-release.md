@@ -1,7 +1,7 @@
 # M-first-production-release：首次全端上线
 
 - 状态：执行中；RC 打包、Cloud 首次预发布部署和 Windows 部署修复已通过验收，`v0.1.0` 正式版制品已发布。真实 Cloud 跨版本升级及回退待下次升级验证。
-- 依据：[首次全端上线部署计划](../../docs/superpowers/specs/2026-10-02-first-production-deployment-plan.md)。
+- 依据：[服务部署说明书](../../docs/devops/服务部署.md)、[ADR-0020](../../docs/decisions/0020-tagged-release-and-environment-config.md)；实施记录见 [CHG-20261003-077](../completed/CHG-20261003-077/change.md) 与 [CHG-20261010-078](../completed/CHG-20261010-078/change.md)。
 
 ## 公开官网与桌面安装包下载
 
@@ -21,7 +21,7 @@
 - 系统动作：同一 `build → verify → package` 链路检查版本组合、平台、配置、Sidecar 和摘要，任何平台失败都不公开整组 Pre-release。
 - 成功事实：Cloud、Agent、Desktop 目标制品及来源和摘要齐全，GitHub Pre-release 中三平台客户端附件完整，试跑报告说明烟测边界。
 - 失败行为：不得从 `main` 或 `latest` 偷取源码；不得以编译成功宣称真实登录、BitBrowser、对象存储或宝塔部署通过；不得移动旧 Tag 或混用不同 RC 的包。
-- 当前实施单元：[CHG-20261003-076](../completed/CHG-20261003-076/change.md)。
+- 实施记录：[CHG-20261003-076](../completed/CHG-20261003-076/change.md)。
 
 后续预发布环境与首次生产切换按部署计划另行实施，不由本闭环的打包通过自动宣布完成。
 

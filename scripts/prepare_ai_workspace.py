@@ -6,32 +6,19 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE_ROOT = ROOT.parent
-REQUIRED_DIRS = [
-    "wt-media-workspace",
-    "wt-media-cloud",
-    "wt-media-agent",
-    "wt-media-desktop",
-]
-CHANGE_ID_RE = re.compile(r"^CHG-\d{8}-\d{3}$")
-EXECUTION_SKILL = "executing-wt-media-change"
-MILESTONE_RE = re.compile(r"^-\s*Milestone:\s*`([^`]+)`\s*$")
-AFFECTED_KEY_RE = re.compile(r"^-\s*(?:Affected repositories|当前仓库)\s*[:：]\s*(.*)$")
-REPO_TOKEN_RE = re.compile(r"wt-media-[a-z]+")
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from scripts.lib.change_metadata import CHANGE_ID_RE, read_change
+from scripts.lib.workspace_config import read_section
 
-OWNERSHIP_BOUNDARIES = (
-    "Cloud owns business state, orchestration, and the Cloud runtime.",
-    "Agent owns local execution and external side effects.",
-    "Desktop owns user interaction and the local bridge.",
-    "Workspace owns governance and never becomes a runtime dependency.",
-)
+WORKSPACE_ROOT = ROOT.parent
+EXECUTION_SKILL = "executing-wt-media-change"
 
 
 @dataclass(frozen=True)
@@ -45,7 +32,7 @@ class ChangeInfo:
 
 
 def read_change_info(change_id: str, workspace_repo: Path) -> ChangeInfo:
-    if not CHANGE_ID_RE.match(change_id):
+    if not CHANGE_ID_RE.fullmatch(change_id):
         raise ValueError(f"invalid change id: {change_id}")
 
     active_root = workspace_repo / "delivery" / "active"
@@ -53,59 +40,30 @@ def read_change_info(change_id: str, workspace_repo: Path) -> ChangeInfo:
     if not change_path.is_file():
         raise FileNotFoundError(f"active change not found: {change_path}")
 
-    active_changes = sorted(path.parent.name for path in active_root.glob("*/change.md"))
-    if active_changes != [change_id]:
-        raise ValueError(
-            "expected exactly one active change "
-            f"{change_id!r}, found: {', '.join(active_changes) or 'none'}; "
-            "move every non-active CHG out of delivery/active first"
-        )
-
-    text = change_path.read_text(encoding="utf-8")
-    title = change_id
-    status = "UNKNOWN"
-    milestone: str | None = None
-    affected: list[str] = []
-    in_affected = False
-    for line in text.splitlines():
-        if line.startswith("# "):
-            title = line.removeprefix("# ").strip()
-        elif line.startswith("- Status:"):
-            status = line.split(":", 1)[1].strip()
-        elif milestone is None and (match := MILESTONE_RE.match(line)):
-            milestone = match.group(1).strip()
-        elif in_affected and line.startswith("  - "):
-            affected.append(line.removeprefix("  - ").strip().strip("`"))
-        elif match := AFFECTED_KEY_RE.match(line):
-            # Two record shapes are in use: a structured bullet list under
-            # `- Affected repositories:`, and a prose `- 当前仓库：` line that
-            # names the repositories inline before explaining the split.
-            in_affected = not match.group(1).strip()
-            affected.extend(REPO_TOKEN_RE.findall(match.group(1)))
-        elif in_affected and line and not line.startswith("  "):
-            in_affected = False
-
-    affected = list(dict.fromkeys(affected))
-
-    if status == "DONE":
+    metadata = read_change(change_path)
+    if metadata.status == "DONE":
         raise ValueError(f"active change must not be DONE: {change_id}")
-
-    # Record headings usually repeat the id (`# CHG-...052：Title`). Drop that
-    # prefix so the snapshot can render the id once, next to the title.
-    title = re.sub(rf"^{re.escape(change_id)}\s*[:：]\s*", "", title).strip() or change_id
-
     return ChangeInfo(
         change_id=change_id,
-        title=title,
-        status=status,
+        title=metadata.title,
+        status=metadata.status,
         path=change_path,
-        milestone=milestone,
-        affected_repositories=tuple(affected),
+        milestone=metadata.parent if metadata.parent != "none" else None,
+        affected_repositories=metadata.affected_repos,
     )
 
 
-def required_directory_errors(workspace_root: Path) -> list[str]:
-    return [name for name in REQUIRED_DIRS if not (workspace_root / name).is_dir()]
+def repository_paths(workspace_repo: Path) -> dict[str, Path]:
+    mapping = read_section(workspace_repo / "config" / "repository-map.yaml", "repositories")
+    return {
+        f"wt-media-{name}": (workspace_repo / settings["path"]).resolve()
+        for name, settings in mapping.items()
+    }
+
+
+def _git(repo: Path, *args: str) -> str:
+    result = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True, check=False)
+    return result.stdout.strip() if result.returncode == 0 else "unavailable"
 
 
 def generated_skill_text(source: Path, workspace_repo: Path) -> str:
@@ -128,106 +86,59 @@ def write_execution_skill(workspace_root: Path, workspace_repo: Path) -> Path:
 
 
 def build_context(change: ChangeInfo | None, workspace_repo: Path) -> str:
-    """Render the single execution snapshot.
-
-    Every path is workspace-relative: the snapshot lives inside the workspace
-    repository and must stay readable when that repository is checked out on
-    its own, for example in a worktree.
-
-    ``change`` may be None: closing the last active CHG legitimately leaves no
-    active change, and `verify_delivery_governance.py` already accepts the
-    empty state by rendering it as ``Active CHG: `none` ``. The snapshot stays
-    generated in that state too, so it must still be renderable here.
-    """
-    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    # The textual landing point for the reading order is the workspace
-    # AGENT-INDEX.md section "读取顺序与上下文加载". This constant is its
-    # generated mirror in the snapshot's "Required Reading Order".
-    # Changing that section without changing this list — or the reverse — recreates
-    # exactly the multi-landing-point conflict CHG-20260925-064 removed.
-    reading_order = [
-        "`AGENTS.md`（Codex）或 `CLAUDE.md`（Claude Code）",
-        "`AGENT-INDEX.md`",
-        "`.ai/CURRENT_CONTEXT.md`",
-    ]
+    """Render a rebuildable navigation page for this checkout's selected CHG."""
+    branch = _git(workspace_repo, "branch", "--show-current") or "detached"
+    paths = repository_paths(workspace_repo)
     if change is None:
-        header_lines = "- Active CHG: `none`\n- Status: `NONE`\n"
-        affected = "- None"
-        reading_order.append("交付规划或状态查询时：`delivery/LEDGER.md`")
-        required_skill = "- Plan delivery changes with `planning-wt-media-delivery` when applicable."
-        execution_boundaries = (
-            "- No active CHG; use `AGENT-INDEX.md` for task routing and delivery rules."
+        return (
+            "# WT Media Current AI Context\n\n"
+            "Generated by `scripts/prepare_ai_workspace.py`; rebuild, do not edit.\n\n"
+            f"- Current CHG: `none`\n- Current Branch: `{branch}`\n"
+            "- CHG Location: `none`\n- Affected Repositories: `none`\n\n"
+            "## Required References\n\n- `AGENT-INDEX.md`\n- `delivery/LEDGER.md`\n\n"
+            "## Repository Status\n\n- No CHG selected.\n\n"
+            "## Recommended Verification\n\n- `python3 scripts/verify/verify_delivery_governance.py`\n"
         )
-    else:
-        change_path = change.path.relative_to(workspace_repo)
-        header_lines = (
-            f"- Active CHG: `{change.change_id}` — {change.title}\n"
-            f"- Status: `{change.status}`\n"
-        )
-        reading_order.append("`delivery/LEDGER.md`")
-        if change.milestone:
-            header_lines += f"- Current milestone: `{change.milestone}`\n"
-            reading_order.append(f"`{change.milestone}`")
-        header_lines += f"- Change file: `{change_path}`\n"
-        affected = "\n".join(f"- `{repo}`" for repo in change.affected_repositories) or "- None"
-        reading_order.append(f"`{change_path}`")
-        reading_order.append(
-            "Affected repository current Harness entry, `AGENT-INDEX.md`, and `DIRECTORY_MAP.md`"
-        )
-        change_dir_token = change.change_id
-        required_skill = (
-            "- Plan delivery scope changes with `planning-wt-media-delivery` when applicable.\n"
-            "- Implement, resume, review, and complete a CHG with `executing-wt-media-change`."
-        )
-        execution_boundaries = f"""- Execute only the active CHG.
-- Do not start the next CHG.
-- Do not modify Cloud, Agent, or Desktop business code unless listed in the active CHG.
-- Stop and record `Q-xx` if scope, contracts, facts, or responsibilities need a new decision.
-- Multi-repository CHGs record per-repository status under
-  `delivery/active/{change_dir_token}/status/<repo>.md`. Never edit this
-  snapshot concurrently from more than one agent."""
-    reading_order_text = "\n".join(
-        f"{index}. {entry}" for index, entry in enumerate(reading_order, start=1)
+
+    change_path = change.path.relative_to(workspace_repo).as_posix()
+    references = ["`AGENTS.md` or `CLAUDE.md`", "`AGENT-INDEX.md`", "`delivery/LEDGER.md`", f"`{change_path}`"]
+    if change.milestone:
+        references.append(f"`{change.milestone}`")
+    body = change.path.read_text(encoding="utf-8")
+    for label in ("Product", "Engineering", "Decision"):
+        for match in re.finditer(rf"^- {label}: `([^`]+)`", body, re.MULTILINE):
+            references.append(f"`{match.group(1)}`")
+    if "## References" in body:
+        section = body.split("## References", 1)[1].split("\n## ", 1)[0]
+        for value in re.findall(r"`([^`]+)`", section):
+            if value.startswith(("docs/", "delivery/", "AGENT-")):
+                references.append(f"`{value}`")
+    references = list(dict.fromkeys(references))
+    status_lines = []
+    for repo_name in change.affected_repositories:
+        repo = paths.get(repo_name)
+        if repo is None or not repo.is_dir():
+            status_lines.append(f"- `{repo_name}`: unavailable in repository map")
+            continue
+        repo_branch = _git(repo, "branch", "--show-current") or "detached"
+        changes = _git(repo, "status", "--porcelain")
+        state = "unavailable" if changes == "unavailable" else (f"{len(changes.splitlines())} changed entries" if changes else "clean")
+        status_lines.append(f"- `{repo_name}` (`{repo_branch}`): {state}")
+    return (
+        "# WT Media Current AI Context\n\n"
+        "Generated by `scripts/prepare_ai_workspace.py`; rebuild, do not edit.\n\n"
+        f"- Current CHG: `{change.change_id}` — {change.title}\n"
+        f"- Current Branch: `{branch}`\n"
+        f"- CHG Location: `{change_path}`\n\n"
+        "## Affected Repositories\n\n"
+        + "\n".join(f"- `{repo}`" for repo in change.affected_repositories)
+        + "\n\n## Required References\n\n"
+        + "\n".join(f"- {reference}" for reference in references)
+        + "\n\n## Repository Status\n\n"
+        + "\n".join(status_lines)
+        + "\n\n## Recommended Verification\n\n"
+        + f"- `python3 scripts/wt.py chg verify {change.change_id}`\n"
     )
-    return f"""# WT Media Current AI Context
-
-- Generated: {generated_at}
-{header_lines}
-This is the only execution snapshot. It is generated by
-`scripts/prepare_ai_workspace.py` and must not be edited by hand. No copy of
-this file exists in the outer execution root.
-
-## Required Skill
-
-{required_skill}
-
-## Required Reading Order
-
-{reading_order_text}
-
-## Affected Repositories
-
-{affected}
-
-## Stable Baselines
-
-- Product: `docs/product`
-- Engineering: `docs/engineering`
-- Contracts: `docs/contracts`
-- Decisions: `docs/decisions`
-- Master route: `delivery/MASTER_IMPLEMENTATION_PLAN.md`
-
-## Stable Ownership Boundaries
-
-{chr(10).join(f"- {line}" for line in OWNERSHIP_BOUNDARIES)}
-
-Milestone-specific decisions are not copied here. The active CHG names the
-decision records it depends on; read those files instead of this summary.
-
-## Execution Boundaries
-
-{execution_boundaries}
-"""
 
 
 def write_current_context(change: ChangeInfo | None, workspace_repo: Path) -> Path:
@@ -246,10 +157,6 @@ def prepare_workspace(
 ) -> dict[str, object]:
     workspace_repo = workspace_repo.resolve()
     workspace_root = workspace_repo.parent
-
-    missing = required_directory_errors(workspace_root)
-    if missing:
-        raise FileNotFoundError(f"missing required directories: {', '.join(missing)}")
 
     if change_id and no_active:
         raise ValueError("pass either --change or --no-active, not both")
@@ -270,7 +177,7 @@ def prepare_workspace(
     summary: dict[str, object] = {
         "workspace_root": str(workspace_root),
         "mode": "workspace-governance-active",
-        "runtime_repositories": REQUIRED_DIRS[1:],
+        "runtime_repositories": [name for name in repository_paths(workspace_repo) if name != "wt-media-workspace"],
         "docs_location": str(workspace_repo / "docs"),
         "delivery_active": str(workspace_repo / "delivery" / "active"),
         "workspace_repository": str(workspace_repo),

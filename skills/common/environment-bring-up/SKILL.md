@@ -11,7 +11,7 @@ Use this skill at the start of any acceptance, manual verification, or manual-fi
 
 Leftover processes and stale builds cause non-reproducible failures ("works in API, fails in the packaged app", "different error every login"). The two concrete hazards this skill eliminates:
 
-- `scripts/m2b_local_acceptance.py` historically returned early when a service was already healthy, so **an old Cloud/Agent process kept running after new commits**.
+- `scripts/dev/local_env.py` historically returned early when a service was already healthy, so **an old Cloud/Agent process kept running after new commits**.
 - Multiple historical databases and ad-hoc DSNs make runs non-identical.
 
 ## Preconditions
@@ -24,7 +24,7 @@ Leftover processes and stale builds cause non-reproducible failures ("works in A
 
 ## Procedure
 
-Run the acceptance harness end to end: `wt-media-workspace/scripts/m2b-local-acceptance.sh all`.
+Run the local environment end to end: `wt-media-workspace/bin/control.sh start`.
 
 Before relying on any process, enforce freshness:
 

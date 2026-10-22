@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify_m2_acceptance.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify" / "verify_m2_acceptance.py"
 
 
 def load_module():
