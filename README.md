@@ -111,4 +111,4 @@ python3 scripts/wt.py test fast|repo|integration|e2e|real [--repo wt-media-cloud
 | `e2e` | Workspace `bin/control.sh start` | Workspace `bin/control.sh verify` |
 | `real` | Print real-environment preparation | Print the external-effect and manual-evidence checklist |
 
-`--plan` prints the commands without starting services or running tests. `integration`, `e2e` and `real` are cross-repository scenarios; omit `--repo` for them. Real acceptance remains recorded in the CHG evidence. The optional `.ai/WORK_STATE.md` is local and ignored; the formal `checkpoint.md` is the handoff record.
+`--plan` prints the commands without starting services or running tests. `integration`, `e2e` and `real` are cross-repository scenarios; omit `--repo` for them. Real acceptance remains recorded in the CHG evidence. The optional `.ai/WORK_STATE.md` is local and ignored; `checkpoint.md` is optional and is the handoff record when a CHG needs one.

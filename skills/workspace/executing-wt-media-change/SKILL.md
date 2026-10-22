@@ -93,7 +93,7 @@ Do not duplicate product requirements in evidence files.
 
 ## Checkpoints
 
-Update the active `checkpoint.md` before pausing, committing, or finishing a Task. It sits beside `change.md` and is a **required** file: `scripts/verify/verify_delivery_governance.py` rejects an active CHG that has only the plan, because a plan with no checkpoint is an active change nobody can resume. Keep `change.md` for the plan and the acceptance record; put progress in `checkpoint.md`.
+`checkpoint.md` is optional. Create it when the CHG spans executors or pauses for a long handoff, and update it before pausing or committing. It sits beside `change.md`; its absence is not an error. Keep `change.md` for the plan and the acceptance record; for short-lived local state use the gitignored `WORK_STATE.md` under `.ai/` instead of adding another formal file.
 
 Checkpoint text must include:
 

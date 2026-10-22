@@ -4,7 +4,7 @@
 
 Long-lived engineering specs belong here only when they describe current system design.
 
-Do not place implementation plans, progress notes, session handoffs, or temporary code-delivery records in this directory. Current implementation work belongs under `delivery/active/<change-id>/` (`plan.md`, `checkpoint.md`, `evidence/`).
+Do not place implementation plans, progress notes, session handoffs, or temporary code-delivery records in this directory. A CHG's formal record is `delivery/active/<change-id>/change.md`; use optional `.ai/WORK_STATE.md` for temporary execution state and add `evidence/` only when needed.
 
 This file is the index. Every other `*.md` in this directory must be listed below; keep the list complete when a spec is added or removed.
 

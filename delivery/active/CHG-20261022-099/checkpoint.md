@@ -19,10 +19,11 @@ Status stays in `change.md`; this file records progress, not a second state copy
 - **T-10 稳定版发布分支**: 稳定版必须从 `main` 提交；`--push` 先创建并推送 `release/<产品Tag>`（与 Tag 同 commit），再推 Tag；同 commit 幂等、异 commit 拒绝、Git 推送失败走 GitHub API；RC 不建分支。提交 `d2d826d`。
 - **T-11 发布差异 Review**: 不新增自研 diff 工具；`scripts/release/README.md` 固定四个 GitHub Compare 页面（Workspace + 三组件），用相邻稳定版 Manifest 的组件 Tag 取值；`v0.1.1 → v0.1.2` 四端点实测可解析。
 - **T-12 文档与知识事实治理**: 新增 `docs/standards/文档与知识事实治理规范.md`；`docs/` 用目录位置表达生命周期，冲突按事实归属裁定，历史默认退场；`docs/check.py` 增加当前文档断链和 `SUPERSEDED` 替代指针检查，`docs/superpowers/` 改为 `index/never`；入口文档去掉四词生命周期与旧 `change.md` 路由；修复架构、ADR-0007、第四章及 completed/planned 的失效引用。实现提交 `735dafe`、`12017ad`。
+- **T-13 治理规范收敛**: 规范压缩为 9 节；明确 Git / PR 只保存历史与变更证据；取消每需求/每问题强制拆文档、每 CHG 强制 `plan.md` / `checkpoint.md`、固定 20 篇 / 20k 字阅读上限与固定周期人工治理；新增 AI Plan 来源边界与五段式输出、L/M/H 证据分级、KEEP/MERGE/MOVE/DELETE/SUPERSEDE/REVIEW 处置；代码注释规则收口到本规范 §7。同步移除 `verify_delivery_governance.py` 的 checkpoint 硬检查，更新入口文档与 Skill。工具改动 `88a8a5c`，文档与记录随本提交。
 
 ## Current
 
-- 实现与文档已提交（`3112d22`、`d2d826d`、`735dafe`、`12017ad`）；本记录提交后 CHG 保持 `VERIFYING`，等待独立 Review 与 PR 合并。
+- T-13 规范收敛已提交（`88a8a5c` + 文档提交）；此前实现已提交（`3112d22`、`d2d826d`、`735dafe`、`12017ad`）。CHG 保持 `VERIFYING`，等待 Review 与 PR 合并。
 
 ## Next
 
@@ -45,11 +46,12 @@ Status stays in `change.md`; this file records progress, not a second state copy
 
 | 判据 | 读数 |
 |---|---|
-| Workspace 全量单测 | `Ran 174 tests — OK`（T-08 基线 158，T-09–T-11 +10，T-12 +6；最后一次文档改动后重跑） |
-| 定向单测 | `Ran 37 tests — OK`（`test_wt_cli` + `test_submit_tag` + `test_tag_transport`） |
+| Workspace 全量单测 | `Ran 174 tests — OK`（T-13 最后一次改动后重跑；T-08 基线 158，T-09–T-12 +16） |
+| 定向单测 | `Ran 47 tests — OK`（T-13：`test_docs_check` + `test_verify_delivery_governance` + `test_wt_cli`）；`Ran 37 tests — OK`（T-09–T-12） |
 | 文档检查单测 | `Ran 19 tests — OK`（新增 6 项：非索引断链、`SUPERSEDED` 正反例、历史目录豁免、`index/never`） |
 | `verify_m0_config` / `verify_delivery_governance` / `verify_ai_workspace` | exit 0；AI snapshot 在 8000 字符预算内 |
-| `verify_skills` / `verify_product_master_alignment` / `verify_m2_acceptance` | exit 0；10 个 Skill 源 |
+| `verify_skills` / `verify_product_master_alignment` / `verify_m2_acceptance` | exit 0；10 个 Skill 源（T-12 读数） |
+| T-13 同步与门禁 | `docs/check.py` 16 indexes；`verify_m0_config` / `verify_delivery_governance`（34 scripts，0 writes）/ `verify_ai_workspace`（660 字符）/ `verify_skills`（10 源）/ `verify_product_master_alignment` exit 0；`sync_skills.py check` up to date；`verify-control.sh` PASS；`verify_m2_acceptance` 未重跑 |
 | `scripts/docs/check.py` | `docs governance ok (16 indexes)`；扫描 91 篇当前文档，0 断链 |
 | 链接与 `SUPERSEDED` 阳性对照 | 临时探针输出 2 条 ERROR、exit 1；删除探针后 exit 0 |
 | 旧路径清扫 | 当前文档 93 个跟踪文件 0 命中；全树阳性对照 13 个历史文件命中 |

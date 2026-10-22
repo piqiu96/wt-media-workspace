@@ -116,6 +116,7 @@ Workspace 不复制运行仓局部规则。
 - `docs/superpowers/` 中的过程和分析内容扫描；被当前任务明确引用、且判断仍然有效的方法可单篇读取；
 - `delivery/reports/` 扫描；
 - 历史分析和旧 Evidence 扫描；
+- `.ai/WORK_STATE.md` 中未经确认的推测；
 - 全量 Skills 源码扫描；
 - 与任务无关的工程扫描；
 - 构建、缓存、临时和生成目录扫描。
@@ -162,35 +163,33 @@ CHG 状态为 `DISCUSSION / PLANNED / IMPLEMENTING / VERIFYING / DONE / SUPERSED
 
 文件职责：
 
-- `change.md`
-  - 为什么做；
-  - 做什么；
-  - 范围；
-  - References；
-  - Acceptance Criteria。
+- `change.md`（必需）
+  - 为什么做、做什么、范围、References、Acceptance Criteria；
+  - 唯一状态源。
 
-- `plan.md`
-  - 如何实现；
-  - 复杂或中大型 CHG 使用；
-  - 记录技术方案、实施顺序和验证计划。
+- `evidence/`（按风险）
+  - 仅在需要保留验证事实时创建；
+  - L 可只用 PR / CI / 定向测试，M 保存关键测试摘要，H 保存正式 evidence。
 
-- `checkpoint.md`
-  - 当前完成情况；
-  - 未完成内容；
-  - 阻塞；
-  - 下一步。
+- `plan.md`（可选）
+  - 技术方案复杂到 `change.md` 放不下时使用；
+  - 不是每个 CHG 必需。
 
-正式 checkpoint 已承担跨执行器接力；本期不主动创建 `.ai/WORK_STATE.md` 或 `.chg/`。若执行器临时写本地 WORK_STATE，它必须被 Git 忽略，不能代替 checkpoint。
+- `checkpoint.md`（可选）
+  - 仅用于跨执行器或长期接力的进度记录；
+  - 不是每个 CHG 必需。
 
-- `status/<repo>.md`
+- `status/<repo>.md`（可选）
   - 仅同一 CHG 需要多个工程并行实施时使用；
   - 记录对应工程的当前进度、修改和验证结果。
 
+- `.ai/WORK_STATE.md`（可选、gitignored）
+  - Codex / Claude Code 的临时接力状态；
+  - 不作为正式事实源，不能代替 `change.md`。
+
 单仓 CHG 不创建 `status/`。
 
-不创建独立 `context.md`。
-
-任务上下文由当前 CHG、相关事实源和 `.ai/CURRENT_CONTEXT.md` 共同提供。
+不创建独立 `context.md`。任务上下文由当前 CHG、相关事实源和 `.ai/CURRENT_CONTEXT.md` 共同提供。
 
 从 Workspace 运行 `python3 scripts/wt.py chg start <CHG>` 做依赖、Git 与分支预检并生成当前上下文；接手时运行 `python3 scripts/wt.py chg resume <CHG>` 读取局部交接。`wt status`、`wt chg verify`、`wt dev/test <scenario>` 的完整用法见根 `README.md`。`start` 检测到其他 Active CHG 涉及同一仓库会提示协调；同一 CHG 只交给一个执行器。
 
@@ -214,7 +213,7 @@ Workspace 发起跨仓任务时，直接通过当前 Workspace 上下文访问�
 运行仓完成自己的 CHG 工作后：
 
 - 多仓 CHG 更新对应 `status/<repo>.md`；
-- 整体状态由 Workspace 汇总到 `checkpoint.md`。
+- 整体状态汇总到当前 CHG 的 `change.md`、必要 evidence 或可选的 `.ai/WORK_STATE.md`。
 
 如果实施过程中发现需要改变：
 
@@ -232,7 +231,7 @@ CHG 完成前确认：
 - Acceptance Criteria 满足；
 - 必要验证通过；
 - 相关 Contract / Architecture 已同步；
-- checkpoint 和多仓状态已收口；
+- 过程状态（`change.md`、可选 checkpoint / WORK_STATE、多仓状态）已收口；
 - 当前产品、工程、Contract、Decision 事实已回写正式文档；
 - 没有残留的过期“当前”描述，`SUPERSEDED` 指针已处理；
 - 相关索引已更新，过程记录退出默认上下文。

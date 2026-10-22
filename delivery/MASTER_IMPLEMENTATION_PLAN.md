@@ -45,7 +45,7 @@ wt-media-workspace/
 │   ├── active/
 │   │   └── CHG-YYYYMMDD-NNN/
 │   │       ├── change.md           # 当前变更唯一执行依据
-│   │       ├── checkpoint.md       # 已完成 / 未完成 / 阻塞 / 下一步
+│   │       ├── checkpoint.md       # 可选：跨执行器接力的进度记录
 │   │       └── evidence/           # 测试、Spike、Diff、人工验证事实
 │   ├── milestones/                 # 人工确认的业务闭环基线
 │   ├── planned/                    # 待规划与待决记录

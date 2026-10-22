@@ -15,7 +15,7 @@ This file is the entry index for the documentation tree. It defines directory ro
 - [Reference](reference/README.md): reference material such as business state models; it does not independently decide product or interface facts.
 - [Legacy plans](superpowers/README.md): mixed old plans and specs. Not current facts, not loaded by default; judge each file by content.
 
-Temporary implementation plans, progress, handoffs, and verification notes belong under `../delivery/active/<change-id>/` (`plan.md`, `checkpoint.md`, `evidence/`), not under `docs`.
+Temporary execution state belongs in `.ai/WORK_STATE.md` (optional, gitignored, not a fact source). A CHG's formal record is `../delivery/active/<change-id>/change.md`; `evidence/` is added only when needed. Do not put plans, progress, handoffs, or temporary analysis under `docs`.
 
 This tree is the only documentation location. The execution root `wt-media/` carries no `docs/` directory of its own, so there is no second copy to fall back to: when a document here is wrong or stale, fix it here.
 
@@ -58,7 +58,7 @@ CHG status still uses only `DISCUSSION / PLANNED / IMPLEMENTING / VERIFYING / DO
 
 ## Writing rules
 
-- Do not put implementation plans, handoffs, progress, or temporary analysis under `docs/`; put them under `delivery/active`.
+- Do not put implementation plans, handoffs, progress, or temporary analysis under `docs/`; use `.ai/WORK_STATE.md` or the current CHG's `change.md`.
 - Do not create a second copy of a stable fact, and do not copy OpenAPI or schema definitions.
 - Default to exit: delete old versions fully absorbed by current facts and records without audit value; keep only what has continuing traceability value. Do not rewrite archived bodies.
 - Use the temporary `SUPERSEDED` marker only while external references still require the old document; do not turn it into a permanent status.

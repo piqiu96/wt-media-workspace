@@ -96,7 +96,7 @@
 
 | 项 | 结果 |
 |---|---|
-| 权威规范 | 新增 `docs/standards/文档与知识事实治理规范.md`，覆盖分类、事实归属、冲突裁定、生命周期、历史处置、关闭检查、默认加载、责任与质量判据 |
+| 权威规范 | 新增 `docs/standards/文档与知识事实治理规范.md`，覆盖分类、事实归属、冲突裁定、生命周期、历史处置、关闭检查、默认加载、治理节奏与质量判据 |
 | 目录职责 | `docs/` 当前事实；`delivery/active/` 当前 CHG；`delivery/planned/` 未启动；`delivery/milestones/` 当前闭环；`delivery/completed/` 有追溯价值的完成记录；`delivery/reports/` 有独立价值的报告；不新增 `archive/` |
 | 状态模型 | 不新增 Draft / Current / Superseded / Historical 状态字段；目录位置表达生命周期；`SUPERSEDED` 仅临时迁移标记且必须指向替代文档 |
 | 冲突裁定 | 先确定事实所属领域与 SSOT，再按“当前正式事实 > 上层摘要 > CHG 临时描述 > 历史/AI 临时内容”裁定；跨领域冲突不由 AI 合成第三种解释 |
@@ -130,4 +130,36 @@
 - `docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md` 是否移出 specs；本轮仅在索引中标注“已结束，非当前设计”。
 - `delivery/reports/` 11 篇报告的“结论已回写、无长期价值则删除”审计。
 - 第四章等 `SUPERSEDED` 文档在引用迁移后的最终删除。
-- 20 篇 / 20k 字默认阅读上限：本轮只写为目标，不新增硬门禁；唯一机检仍是生成快照 8000 字符。
+- 固定 20 篇 / 20k 字默认阅读上限已在 T-13 取消；仅保留 `.ai/CURRENT_CONTEXT.md` 的 8000 字符工具预算。
+
+## 9. 治理规范收敛（T-13）
+
+### 9.1 规则变化
+
+| 项 | 结果 |
+|---|---|
+| 结构 | 规范收敛为 9 节：核心原则、文档与事实归属、当前事实与历史退场、冲突裁定、AI 默认加载与 Plan 规则、CHG / Milestone 收口、AI 对话与代码注释、自动检查、质量判据 |
+| 事实边界 | 明确“Git / PR 保存历史与变更证据，不是当前事实的 Owner”；当前事实由各自正式 SSOT 保存，代码只证明当前实现 |
+| 文档粒度 | 一份文档负责一个边界清晰、Owner 单一的主题；拆文件由可维护性决定，不按需求或问题数量机械拆分 |
+| CHG 文件 | `change.md` 必需；`evidence/` 按风险；`plan.md`、`checkpoint.md`、`.ai/WORK_STATE.md` 均可选；证据按 L / M / H 分级 |
+| 历史处置 | 默认退场；KEEP / MERGE / MOVE / DELETE / SUPERSEDE / REVIEW 六选一；`docs/superpowers/` 不作为自动归档，也不整体迁移 |
+| 治理节奏 | 事件驱动：CHG Close、Milestone Done 强制；CI / docs check 自动；Fact Drift、大 Milestone、大版本、文档显著增长时人工专项；月度检查仅推荐 |
+| 阅读预算 | 删除固定篇数与字数门槛，改为渐进式加载；8000 字符仅是 `.ai/CURRENT_CONTEXT.md` 的工具配置 |
+| AI Plan | 限定默认决策来源，禁止把 completed / reports / 历史 Milestone / `SUPERSEDED` / 旧 AI 材料作为当前需求依据；规定五段式 Plan 输出与四类事实区分 |
+| 代码注释 | 项目维护的注释默认中文；只保留非显然的 Why、业务 / 安全约束、并发与副作用风险、兼容性条件和易误改边界；删除代码复述、变更史、过程叙述、AI 痕迹与失效 TODO |
+| 去重 | `代码演进评估规范` §4 的注释规则改为指向本规范 §7，避免同一事实两处定义 |
+
+### 9.2 冲突同步与验证
+
+| 判据 | 读数 |
+|---|---|
+| `verify_delivery_governance.py` | 删除 Active CHG 必须存在 `checkpoint.md` 的硬检查；`test_active_change_without_checkpoint_is_valid` 覆盖缺失仍有效 |
+| 入口文档 | `AGENT-INDEX.md`、`docs/README.md`、`docs/engineering/README.md`、`docs/engineering/specs/README.md`、`delivery/MASTER_IMPLEMENTATION_PLAN.md`、根 `README.md` 同步可选 checkpoint 与 `WORK_STATE` 边界 |
+| Skill | `executing-wt-media-change` 的 checkpoint 段改为可选；`sync_skills.py check` 输出 `skill outputs are up to date` |
+| `scripts/wt.py` | verify 完成提醒改为对照 evidence 与验收记录，checkpoint 仅在存在时读取，不再暗示必需 |
+| Workspace 全量单测 | `Ran 174 tests — OK`（最后一次改动后重跑） |
+| 定向单测 | `Ran 47 tests — OK`（`test_docs_check` + `test_verify_delivery_governance` + `test_wt_cli`） |
+| `scripts/docs/check.py` | `docs governance ok (16 indexes)`，exit 0 |
+| 治理门禁 | `verify_m0_config`、`verify_delivery_governance`、`verify_ai_workspace`（660 字符）、`verify_skills`（10 个源）、`verify_product_master_alignment` 均 exit 0；`verify-control.sh` PASS |
+| 未执行 | 本轮未重跑 `verify_m2_acceptance.py` 与三个运行仓业务套件；未改运行时代码 |
+| 提交 | 工具改动 `88a8a5c`；规范、入口文档与 CHG 记录随 T-13 文档提交；未推送、未建 PR、未打 Tag |
