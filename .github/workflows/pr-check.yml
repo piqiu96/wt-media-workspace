@@ -1,0 +1,55 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Workspace checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: wt-media-workspace
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: wt-media-workspace
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check pyyaml==6.0.3
+
+      - name: Docs governance
+        run: python scripts/docs/check.py
+
+      - name: Delivery governance
+        run: python scripts/verify/verify_delivery_governance.py
+
+      - name: Product and master plan alignment
+        run: python scripts/verify/verify_product_master_alignment.py
+
+      - name: AI workspace
+        run: python scripts/verify/verify_ai_workspace.py
+
+      - name: Skills
+        run: python scripts/verify/verify_skills.py
+
+      - name: Workspace config (single-repo checkout)
+        run: python scripts/verify/verify_m0_config.py --allow-missing-repos
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests
