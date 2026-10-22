@@ -11,6 +11,7 @@ CHECKER_PATH = Path(__file__).resolve().parents[1] / "scripts" / "docs" / "check
 STABLE = "<!-- governance: class=stable default_load=task -->"
 INDEX = "<!-- governance: class=index default_load=task -->"
 ALWAYS = "<!-- governance: class=index default_load=always -->"
+NEVER_INDEX = "<!-- governance: class=index default_load=never -->"
 HISTORICAL = "<!-- governance: class=historical default_load=never -->"
 
 
@@ -220,6 +221,49 @@ class DocsCheckTests(unittest.TestCase):
             "(- 归档边界：`READ-ONLY`)",
             self.check(),
         )
+
+    def test_index_may_be_excluded_from_default_load(self) -> None:
+        self.write("docs/superpowers/README.md", NEVER_INDEX + "\n# History\n")
+        self.assertEqual(self.check(), [])
+
+    def test_broken_link_in_non_index_current_document_is_reported(self) -> None:
+        self.write("docs/product/prd/broken.md", "# Broken\n\n[Missing](../missing.md)\n")
+        self.assertIn(
+            "broken relative link: docs/product/prd/broken.md -> ../missing.md",
+            self.check(),
+        )
+
+    def test_superseded_marker_without_replacement_is_reported(self) -> None:
+        self.write(
+            "docs/product/old.md",
+            "# Old\n\n> **SUPERSEDED**: no replacement named.\n",
+        )
+        self.assertIn(
+            "SUPERSEDED document must name a replacement: docs/product/old.md",
+            self.check(),
+        )
+
+    def test_superseded_marker_with_replacement_is_valid(self) -> None:
+        self.write("docs/product/new.md", "# New\n")
+        self.write(
+            "docs/product/old.md",
+            "# Old\n\n> **SUPERSEDED**: use [New](new.md).\n",
+        )
+        self.assertEqual(self.check(), [])
+
+    def test_superseded_marker_in_historical_directory_is_ignored(self) -> None:
+        self.write(
+            "docs/superpowers/old.md",
+            "# Old\n\n> **SUPERSEDED**: no replacement named.\n",
+        )
+        self.assertEqual(self.check(), [])
+
+    def test_superseded_marker_in_decisions_is_ignored(self) -> None:
+        self.write(
+            "docs/decisions/0001-old.md",
+            "# Old\n\n> **SUPERSEDED**: ADRs use their own convention.\n",
+        )
+        self.assertEqual(self.check(), [])
 
 
 if __name__ == "__main__":

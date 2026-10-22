@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Check the documentation governance index, markers, and relative links.
+"""Check documentation governance indexes, markers, links, and supersession.
 
-Rules live in `docs/README.md`. This script only enforces them: required
-indexes exist, every index carries one valid governance marker, the docs
-directory is registered once, `AGENT-INDEX.md` facts resolve, and relative
-links in active indexes point at real files.
+Rules live in `docs/README.md` and `docs/standards/文档与知识事实治理规范.md`.
+This script only enforces them: required indexes exist, every index carries
+one valid governance marker, the docs directory is registered once,
+`AGENT-INDEX.md` facts resolve, current documents have resolvable relative
+links, and an in-place `SUPERSEDED` marker names its replacement.
 """
 
 from __future__ import annotations
@@ -44,10 +45,47 @@ FENCED_CODE_RE = re.compile(r"```.*?```", re.DOTALL)
 INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 HEADING_RE = re.compile(r"^## \d+\.", re.MULTILINE)
+SUPERSEDED_RE = re.compile(r"^\s*(?:>\s*)?(?:\*\*)?SUPERSEDED(?:\*\*)?\b", re.MULTILINE)
+
+CURRENT_DOC_ROOTS = (
+    "docs/product",
+    "docs/engineering",
+    "docs/standards",
+    "docs/contracts",
+    "docs/decisions",
+    "docs/devops",
+    "docs/reference",
+    "delivery/active",
+    "delivery/planned",
+    "delivery/milestones",
+)
+# ADRs use the Accepted/Superseded convention in docs/decisions/README.md.
+SUPERSEDED_ROOTS = tuple(root for root in CURRENT_DOC_ROOTS if root != "docs/decisions")
+EXTERNAL_PREFIXES = ("http://", "https://", "mailto:", "#", "/")
 
 
 def strip_code(text: str) -> str:
     return INLINE_CODE_RE.sub("", FENCED_CODE_RE.sub("", text))
+
+
+def current_documents(root: Path) -> list[Path]:
+    documents = [root / "docs/README.md"]
+    for relative in CURRENT_DOC_ROOTS:
+        directory = root / relative
+        if directory.is_dir():
+            documents.extend(sorted(directory.rglob("*.md")))
+    return [path for path in documents if path.is_file()]
+
+
+def broken_links(path: Path, text: str) -> list[str]:
+    broken: list[str] = []
+    for target in links_in(text):
+        clean = target.split("#", 1)[0]
+        if not clean or clean.startswith(EXTERNAL_PREFIXES):
+            continue
+        if not (path.parent / clean).exists():
+            broken.append(target)
+    return broken
 
 
 def links_in(text: str) -> list[str]:
@@ -94,8 +132,10 @@ def check(root: Path = ROOT) -> list[str]:
         kind, default_load = markers[0]
         if kind == "historical" and default_load != "never":
             errors.append(f"{relative}: historical documents must use default_load=never")
-        if kind == "index" and default_load not in {"always", "task"}:
-            errors.append(f"{relative}: index documents must use default_load=always or task")
+        if kind == "index" and default_load not in {"always", "task", "never"}:
+            errors.append(
+                f"{relative}: index documents must use default_load=always, task, or never"
+            )
 
     docs_root = root / "docs"
     docs_readme = texts.get("docs/README.md", "")
@@ -142,17 +182,35 @@ def check(root: Path = ROOT) -> list[str]:
                         f"AGENT-INDEX.md section 4 must list {required} as not loaded by default"
                     )
 
-    for relative, text in texts.items():
-        if relative == "delivery/completed/README.md":
+    for path in current_documents(root):
+        relative = path.relative_to(root).as_posix()
+        for target in broken_links(path, path.read_text(encoding="utf-8")):
+            errors.append(f"broken relative link: {relative} -> {target}")
+
+    for relative_root in SUPERSEDED_ROOTS:
+        directory = root / relative_root
+        if not directory.is_dir():
             continue
-        path = root / relative
-        for target in links_in(text):
-            clean = target.split("#", 1)[0]
-            if not clean or clean.startswith(("http://", "https://", "mailto:", "#", "/")):
+        for path in sorted(directory.rglob("*.md")):
+            relative = path.relative_to(root).as_posix()
+            text = path.read_text(encoding="utf-8")
+            header = "\n".join(
+                line for line in text.splitlines() if line.strip()
+            )
+            header = "\n".join(header.splitlines()[:40])
+            if not SUPERSEDED_RE.search(strip_code(header)):
                 continue
-            candidate = path.parent / clean
-            if not candidate.exists():
-                errors.append(f"broken relative link: {relative} -> {target}")
+            replacement = False
+            for target in links_in(header):
+                clean = target.split("#", 1)[0]
+                if clean and not clean.startswith(EXTERNAL_PREFIXES):
+                    if (path.parent / clean).exists():
+                        replacement = True
+                        break
+            if not replacement:
+                errors.append(
+                    f"SUPERSEDED document must name a replacement: {relative}"
+                )
 
     specs_relative = "docs/engineering/specs/README.md"
     specs_dir = root / "docs" / "engineering" / "specs"

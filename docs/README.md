@@ -13,7 +13,7 @@ This file is the entry index for the documentation tree. It defines how document
 - [Decisions](decisions/README.md): accepted architecture choices and ADRs, with their reasons.
 - [DevOps](devops/README.md): port and deployment ledger; the configuration/provider file owns each value.
 - [Reference](reference/README.md): reference material such as business state models; it does not independently decide product or interface facts.
-- [History](superpowers/README.md): historical plans and specs. Not current facts, not loaded by default.
+- [Legacy plans](superpowers/README.md): mixed old plans and specs. Not current facts, not loaded by default; judge each file by content.
 
 Temporary implementation plans, progress, handoffs, and verification notes belong under `../delivery/active/<change-id>/change.md`, not under `docs`.
 
@@ -52,7 +52,7 @@ Stable documents may be revised in place, but the CHG or ADR must record why. Hi
 
 - Every required index carries exactly one marker:
   `<!-- governance: class=stable|historical|index default_load=task|never|always -->`.
-- `historical` requires `default_load=never`; `index` requires `default_load=always` or `task`.
+- `historical` requires `default_load=never`; `index` allows `default_load=always`, `task`, or `never`.
 - `delivery/completed/README.md` uses its existing `- 归档边界：READ-ONLY` line as the historical/never equivalent; it does not carry a second marker.
 - Every top-level `docs/` directory must be linked in this file as `<dir>/README.md`, and that README must exist.
 - A new long-lived spec under `docs/engineering/specs/` must be listed in that directory's index.
@@ -65,7 +65,7 @@ Stable documents may be revised in place, but the CHG or ADR must record why. Hi
 
 ## Validation
 
-- `scripts/docs/check.py` checks required indexes, markers, the top-level directory registration, `AGENT-INDEX.md` fact paths, relative links, and spec-index completeness.
+- `scripts/docs/check.py` checks required indexes, markers, the top-level directory registration, `AGENT-INDEX.md` fact paths, relative links in current documents, `SUPERSEDED` replacement pointers, and spec-index completeness.
 - `scripts/verify/verify_delivery_governance.py` checks delivery/archive boundaries.
 - `scripts/verify/verify_product_master_alignment.py` checks status vocabulary and LEDGER rows.
 - When a check fails, fix the fact or the index; do not bypass it with wording.
