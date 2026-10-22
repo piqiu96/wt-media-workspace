@@ -10,5 +10,3 @@ Completed delivery records are removed after their final product, engineering, c
 | CHG-20261022-100 | 存量文档、AI 上下文与知识事实治理 | IMPLEMENTING | wt-media-workspace |
 
 M4-H2 真实数据 UI 走查与 M5 最后统一签收。
-
-历史叙述（按需回溯）：[LEDGER 历史说明](reports/2026-09-29-ledger-historical-notes.md)。
