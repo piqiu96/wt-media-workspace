@@ -15,10 +15,13 @@ Status stays in `change.md`; this file records progress, not a second state copy
 - **T-06 文档治理**: `docs/README.md` 写明分类、权威、生命周期与默认加载；补齐 16 个必需索引与标记；历史目录 `historical/never`；修 G22/G23 死链；新增 `scripts/docs/check.py`。
 - **T-07 入口与模板收口**: `AGENT-INDEX` §3–§6、`AGENTS.md`/`CLAUDE.md`、MASTER §5、根 README、devops、架构/前端文档、checkpoint 模板、Review Gate、状态词映射全部对齐。
 - **T-08 验证**: 全量单测 `Ran 158 tests — OK`；六个治理门禁与 `docs/check.py` 全 exit 0；`verify-control.sh` PASS；旧路径活文件 0 命中（历史叙述阳性对照 25 个文件）。实现与文档提交 `e4347c9`。
+- **T-09 CHG 分支命名**: 新 CHG 分支改为 `chg/<CHG-ID>`；本地 `codex/CHG-20261022-099` 改名为 `chg/CHG-20261022-099`；旧记录不追溯。提交 `3112d22`。
+- **T-10 稳定版发布分支**: 稳定版必须从 `main` 提交；`--push` 先创建并推送 `release/<产品Tag>`（与 Tag 同 commit），再推 Tag；同 commit 幂等、异 commit 拒绝、Git 推送失败走 GitHub API；RC 不建分支。提交 `d2d826d`。
+- **T-11 发布差异 Review**: 不新增自研 diff 工具；`scripts/release/README.md` 固定四个 GitHub Compare 页面（Workspace + 三组件），用相邻稳定版 Manifest 的组件 Tag 取值；`v0.1.1 → v0.1.2` 四端点实测可解析。
 
 ## Current
 
-- 实现与文档已提交；本记录提交后 CHG 保持 `VERIFYING`，等待独立 Review 与 PR 合并。
+- 实现与文档已提交（`3112d22`、`d2d826d`）；本记录提交后 CHG 保持 `VERIFYING`，等待独立 Review 与 PR 合并。
 
 ## Next
 
@@ -41,11 +44,15 @@ Status stays in `change.md`; this file records progress, not a second state copy
 
 | 判据 | 读数 |
 |---|---|
-| Workspace 全量单测 | `Ran 158 tests — OK`（记录变更后重跑） |
-| `verify_m0_config` / `verify_delivery_governance` / `verify_ai_workspace` | exit 0；AI snapshot 701 chars |
+| Workspace 全量单测 | `Ran 168 tests — OK`（T-08 基线 158，新增 10；记录变更后重跑） |
+| 定向单测 | `Ran 37 tests — OK`（`test_wt_cli` + `test_submit_tag` + `test_tag_transport`） |
+| `verify_m0_config` / `verify_delivery_governance` / `verify_ai_workspace` | exit 0；AI snapshot 677 chars |
 | `verify_skills` / `verify_product_master_alignment` / `verify_m2_acceptance` | exit 0；10 个 Skill 源 |
 | `scripts/docs/check.py` | `docs governance ok (16 indexes)` |
 | `scripts/verify/verify-control.sh` | PASS；status 六行含 compose-worker；无端口字面量 |
 | 旧路径清扫 | 活文件 0 命中；历史叙述阳性对照 25 个文件 |
+| 旧分支前缀 | 活引用 0 命中；本记录保留 2 处改名叙述；阳性对照排除本记录后 6 个历史文件；当前分支 `chg/CHG-20261022-099` |
+| GitHub Compare | `v0.1.1 → v0.1.2` 四仓：48 / 29 / 24 / 9 files，均 exit 0 |
+| 远端 ref | 仅 `refs/heads/main`；未推送分支或 Tag |
 
 详细命令、输出与未覆盖项见 [`evidence/verification.md`](evidence/verification.md)。
