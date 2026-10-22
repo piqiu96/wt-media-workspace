@@ -301,6 +301,8 @@ Workspace 和各运行仓分别维护：
 
 一个可独立交付的 CHG 原则上走短期分支 → 实施 → 验证 → 独立 Review → 引用 CHG ID 的 PR → 合并 `main`。跨仓 CHG 可对应多个仓库的 PR/Commit，但仍是同一逻辑 CHG。现有 CHG-20261015-098 的既有 `main` 历史不追溯迁移；新规则从后续 CHG 起执行。
 
+新 CHG 的工作分支统一命名为 `chg/<CHG-ID>`，以工作单元命名，不写入执行器、工具名或人名；旧 CHG 与历史记录不追溯改名。稳定版发布从 `main` 创建 `release/<产品Tag>`，分支与产品 Tag 指向同一 commit；Tag 仍是唯一发布触发器。稳定版发布前，按上一个稳定版与本次 Manifest 的组件 Tag 打开四个 GitHub Compare 页面，Review 四仓完整差异。
+
 
 ## 7. AI 协作原则
 

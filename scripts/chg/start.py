@@ -22,7 +22,7 @@ from scripts.prepare_ai_workspace import prepare_workspace
 def cmd_start(change: ChangeMetadata, plan: bool = False, root: Path = ROOT) -> None:
     verify_merged_dependencies(change, root)
     paths = repositories(root)
-    target = f"codex/{change.change_id}"
+    target = f"chg/{change.change_id}"
     actions: list[tuple[Path, str]] = []
     warnings: list[str] = []
     for other_path in sorted((root / "delivery" / "active").glob("CHG-*/change.md")):

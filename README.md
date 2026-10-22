@@ -101,7 +101,7 @@ python3 scripts/wt.py dev fast|repo|integration|e2e|real [--repo wt-media-cloud]
 python3 scripts/wt.py test fast|repo|integration|e2e|real [--repo wt-media-cloud] [--plan]
 ```
 
-`start` checks archived dependencies against recorded commits in each repository's local `main`, checks Git state and local `origin/main`, and selects `codex/<CHG-ID>` without creating a worktree. An old archive without reviewable commit evidence blocks start; put the reviewed per-repository SHAs in the new CHG's optional `dependency_merge_commits`. `resume` regenerates the local context and prints the checkpoint, references, branch, status and diff summary. `verify` uses risk, affected repositories and optional `verify_scenarios` from the CHG; it also reminds the executor to verify the CHG's own acceptance criteria.
+`start` checks archived dependencies against recorded commits in each repository's local `main`, checks Git state and local `origin/main`, and selects `chg/<CHG-ID>` without creating a worktree. An old archive without reviewable commit evidence blocks start; put the reviewed per-repository SHAs in the new CHG's optional `dependency_merge_commits`. `resume` regenerates the local context and prints the checkpoint, references, branch, status and diff summary. `verify` uses risk, affected repositories and optional `verify_scenarios` from the CHG; it also reminds the executor to verify the CHG's own acceptance criteria.
 
 | Scenario | `dev` | `test` |
 | --- | --- | --- |

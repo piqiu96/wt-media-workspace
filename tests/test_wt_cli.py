@@ -98,7 +98,7 @@ class WTCLITests(unittest.TestCase):
         with patch("scripts.chg.start.prepare_workspace") as prepare:
             with contextlib.redirect_stdout(io.StringIO()):
                 cmd_start(change, root=self.root)
-        self.assertEqual(self.git(self.root, "branch", "--show-current"), "codex/CHG-20261022-099")
+        self.assertEqual(self.git(self.root, "branch", "--show-current"), "chg/CHG-20261022-099")
         prepare.assert_called_once_with(workspace_repo=self.root, change_id=change.change_id)
 
     def test_start_plan_reports_recommended_scenarios(self) -> None:
