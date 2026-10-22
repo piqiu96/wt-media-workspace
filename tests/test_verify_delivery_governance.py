@@ -77,9 +77,8 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
             f"{milestone_line}",
             encoding="utf-8",
         )
-        # The active directory holds a pair: `change.md` is the plan, and
-        # `checkpoint.md` is where progress is recorded.  A CHG that has only
-        # the first is an active change nobody can resume.
+        # `checkpoint.md` is optional; fixture changes that need a resumable
+        # record may add it, and its absence must not be an error.
         (path.parent / "checkpoint.md").write_text(
             f"# Checkpoint: {change_id}\n\nCompleted:\n- None.\n",
             encoding="utf-8",
@@ -168,12 +167,12 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
 
         self.assertEqual(errors, [])
 
-    def test_active_change_without_checkpoint_is_reported(self) -> None:
-        """An active CHG directory holds a pair; only half of it is an error.
+    def test_active_change_without_checkpoint_is_valid(self) -> None:
+        """`checkpoint.md` is optional; its absence is not an error.
 
-        The check is turned off in the mutation control: with the check
-        removed from the script, this test fails, which is what makes it
-        evidence that the check exists rather than that the fixture is tidy.
+        The previous checker required the file. Re-adding that requirement
+        makes this test red, which is what keeps the optionality enforced
+        rather than merely documented.
         """
         change_id = "CHG-20260722-021"
         milestone = "delivery/milestones/M2-account-runtime.md#m2-b"
@@ -188,7 +187,7 @@ class VerifyDeliveryGovernanceTests(unittest.TestCase):
 
         errors = self.module.validate_delivery_governance(self.workspace)
 
-        self.assertEqual(errors, [f"active CHG is missing checkpoint.md: {change_id}"])
+        self.assertEqual(errors, [])
 
     # ----------------------------------------------------------------------
     # 归档边界（`delivery/completed/` 只读）

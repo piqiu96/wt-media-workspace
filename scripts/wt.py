@@ -128,7 +128,7 @@ def cmd_verify(change: ChangeMetadata, plan: bool, root: Path = ROOT) -> None:
     note = risk_note(change)
     if note:
         print(note)
-    print("Verify CHG-specific regression and Done When against its checkpoint/evidence before marking DONE")
+    print("Verify CHG-specific regression and Done When against its evidence and acceptance record (plus checkpoint when present) before marking DONE")
 
 
 def main(argv: list[str] | None = None) -> int:

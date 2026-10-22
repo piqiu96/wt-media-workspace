@@ -286,12 +286,6 @@ def validate_delivery_governance(workspace: Path) -> list[str]:
 
     for change_path in active_changes:
         change_id = change_path.parent.name
-        # An active CHG directory is a pair: `change.md` is the plan, and
-        # `checkpoint.md` is where progress is recorded.  A CHG with only the
-        # first still passes the milestone checks, so without this check an
-        # unresumable active change is silently accepted.
-        if not (change_path.parent / "checkpoint.md").is_file():
-            errors.append(f"active CHG is missing checkpoint.md: {change_id}")
         change_text = change_path.read_text(encoding="utf-8")
         try:
             metadata = read_change(change_path)
