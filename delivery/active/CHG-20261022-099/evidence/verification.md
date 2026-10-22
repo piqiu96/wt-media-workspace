@@ -3,21 +3,22 @@
 - 日期：2026-10-22
 - 分支：`chg/CHG-20261022-099`（T-09 从 `codex/CHG-20261022-099` 本地改名；未推送）
 - 环境：macOS arm64；Workspace 工作树；三个运行仓同级的 `wt-media/` 根
-- 实现提交：`e4347c9`（原治理实现）、`3112d22`（CHG 分支命名）、`d2d826d`（稳定版发布分支）；本记录单独提交
+- 实现提交：`e4347c9`（原治理实现）、`3112d22`（CHG 分支命名）、`d2d826d`（稳定版发布分支）、`735dafe`（文档链接与替代指针检查）、`12017ad`（文档事实治理规范与入口收敛）；本记录单独提交
 
 ## 1. 单元测试与门禁
 
 | 判据 | 命令 | 读数 |
 |---|---|---|
-| 全量单测 | `uv run --with pyyaml==6.0.3 --no-project python -B -X pycache_prefix=/tmp/wtmedia-pycache -m unittest discover -s tests -q` | `Ran 168 tests` → `OK`（T-08 基线 158，新增 10 项；记录变更后重跑） |
+| 全量单测 | `uv run --with pyyaml==6.0.3 --no-project python -B -X pycache_prefix=/tmp/wtmedia-pycache -m unittest discover -s tests -q` | `Ran 174 tests` → `OK`（T-08 基线 158，T-09–T-11 +10，T-12 +6；最后一次文档改动后重跑） |
 | 定向单测 | 同解释器 `-m unittest tests.test_wt_cli tests.test_submit_tag tests.test_tag_transport -q` | `Ran 37 tests` → `OK` |
+| 文档检查单测 | 同解释器 `-m unittest tests.test_docs_check -q` | `Ran 19 tests` → `OK` |
 | 契约与配置 | `python3 scripts/verify/verify_m0_config.py` | exit 0；`Workspace config verification ok` |
 | 交付治理 | `python3 scripts/verify/verify_delivery_governance.py` | exit 0；Active CHGs: `CHG-20261015-098`, `CHG-20261022-099` |
-| AI 入口 | `python3 scripts/verify/verify_ai_workspace.py` | exit 0；snapshot 701 characters，0 warnings |
+| AI 入口 | `python3 scripts/verify/verify_ai_workspace.py` | exit 0；快照在 8000 字符预算内，0 warnings |
 | Skill 源 | `python3 scripts/verify/verify_skills.py` | exit 0；`verified 10 skill source files` |
 | 状态词与主计划 | `python3 scripts/verify/verify_product_master_alignment.py` | exit 0 |
 | M2 静态矩阵 | `python3 scripts/verify/verify_m2_acceptance.py` | exit 0 |
-| 文档治理 | `python3 scripts/docs/check.py` | exit 0；`docs governance ok (16 indexes)` |
+| 文档治理 | `python3 scripts/docs/check.py` | exit 0；`docs governance ok (16 indexes)`；扫描 91 篇当前文档，0 断链 |
 | `control.sh` 判别式 | `bash scripts/verify/verify-control.sh` | PASS；usage 逐字、status 六行（cloud/agent/worker/compose-worker/web-dev/desktop-dev）、无端口字面量 |
 | Skill 分发 | `python3 scripts/sync_skills.py check` | `sync` 后 exit 0；`skill outputs are up to date` |
 
@@ -48,7 +49,7 @@
 
 ## 4. 文档治理正反例
 
-`tests/test_docs_check.py`（13 项）覆盖：合规树为绿；缺索引、缺标记、`historical` 配 `task`、未登记顶层目录、登记目录缺 README、`AGENT-INDEX` 缺路径、历史目录未被默认排除、断链、specs 未登记、`delivery/completed` 缺 READ-ONLY 各为红；`#anchor`、目录链接、`https://` 与代码块内断链不误报。
+`tests/test_docs_check.py`（19 项）覆盖：合规树为绿；缺索引、缺标记、`historical` 配 `task`、未登记顶层目录、登记目录缺 README、`AGENT-INDEX` 缺路径、历史目录未被默认排除、断链、specs 未登记、`delivery/completed` 缺 READ-ONLY 各为红；`#anchor`、目录链接、`https://` 与代码块内断链不误报。新增 6 项：`index/never` 为绿；非索引当前文档断链为红；`SUPERSEDED` 无替代为红、有可解析替代为绿；历史目录与 `docs/decisions` 的 `SUPERSEDED` 不误报。
 
 `tests/test_scripts_index.py`（3 项）覆盖：每个脚本已登记；从 README 删除 `scripts/docs/check.py` 后能被检出；必需条目存在。
 
@@ -83,4 +84,50 @@
 - 新 CHG 分支为 `chg/<CHG-ID>`：`scripts/chg/start.py` 与 `tests/test_wt_cli.py` 覆盖，分支已本地改名。
 - 稳定版发布分支：`submit_tag.py` 预检 `main`、先建/推 `release/<产品Tag>` 再推 Tag；RC 不建分支；单测覆盖幂等、冲突与 API 兜底。
 - 发布前 Review：`scripts/release/README.md` 固定四个 GitHub Compare 页面；`v0.1.1 → v0.1.2` 四个端点实测可解析。
-- 既有入口未破坏：全量单测 168 项、六个门禁、`verify-control.sh` 与四仓入口测试覆盖。
+- 文档生命周期：`docs/` 只保留当前事实，目录位置表达生命周期，不新增长期状态字段；`SUPERSEDED` 只作临时迁移标记。
+- 冲突裁定：按事实归属确定 SSOT，不设产品/工程/实现全局顺序；用户裁定回写正式事实源。
+- 文档机检：当前文档相对链接、`SUPERSEDED` 替代指针、索引标记和 specs 索引均由 `scripts/docs/check.py` 检查；历史目录不追改。
+- 历史目录：`docs/superpowers/` 改为 `index/never` 并按内容判断；`delivery/completed/`、`delivery/reports/` 职责收敛；不新增 `archive/`。
+- 既有入口未破坏：全量单测 174 项、六个门禁、`verify-control.sh` 与四仓入口测试覆盖。
+
+## 8. 文档与知识事实治理（T-12）
+
+### 8.1 实现与范围
+
+| 项 | 结果 |
+|---|---|
+| 权威规范 | 新增 `docs/standards/文档与知识事实治理规范.md`，覆盖分类、事实归属、冲突裁定、生命周期、历史处置、关闭检查、默认加载、责任与质量判据 |
+| 目录职责 | `docs/` 当前事实；`delivery/active/` 当前 CHG；`delivery/planned/` 未启动；`delivery/milestones/` 当前闭环；`delivery/completed/` 有追溯价值的完成记录；`delivery/reports/` 有独立价值的报告；不新增 `archive/` |
+| 状态模型 | 不新增 Draft / Current / Superseded / Historical 状态字段；目录位置表达生命周期；`SUPERSEDED` 仅临时迁移标记且必须指向替代文档 |
+| 冲突裁定 | 先确定事实所属领域与 SSOT，再按“当前正式事实 > 上层摘要 > CHG 临时描述 > 历史/AI 临时内容”裁定；跨领域冲突不由 AI 合成第三种解释 |
+| 机检 | `docs/check.py` 扩展当前文档断链、`SUPERSEDED` 替代指针、`index/never`；保留原索引、标记、目录注册、`AGENT-INDEX` 路径和 specs 检查 |
+| 未做 | 未迁移或合并 `docs/superpowers/`、`delivery/reports/`、`delivery/completed/`；未删除任何现有文档；未新增 CHG、检查脚本或 workflow；未推送、未建 PR、未打 Tag |
+
+### 8.2 链接与 `SUPERSEDED` 读数
+
+| 判据 | 命令 | 读数 |
+|---|---|---|
+| 当前文档链接 | `python3 scripts/docs/check.py` | exit 0；扫描 91 篇当前文档，0 断链 |
+| 断链阳性对照 | 临时在 `docs/product/` 放一篇指向不存在文件的文档后运行检查器 | `ERROR broken relative link: docs/product/__link_probe__.md -> __missing_probe__.md`；exit 1 |
+| `SUPERSEDED` 阳性对照 | 同一轮放一篇无替代链接的 `SUPERSEDED` 文档 | `ERROR SUPERSEDED document must name a replacement: docs/product/__superseded_probe__.md`；exit 1 |
+| 清理后复验 | 删除两篇探针后运行检查器 | `docs governance ok (16 indexes)`；exit 0 |
+| `SUPERSEDED` 当前分布 | 当前文档扫描 | 仅 `docs/product/prd/详细文档/第四章_内容发现.md` 文首带标记，替代链接可解析；`docs/decisions` 按 ADR 约定豁免 |
+| 旧路径清扫 | `git grep -E 'engineering-evolution-standard|web-desktop-visual-system'` 限定当前文档 | 93 个跟踪文件 0 命中（exit 1） |
+| 旧路径阳性对照 | 同一模式扫全树 | 13 个历史文件命中（exit 0），证明模式不是空转 |
+
+### 8.3 结构与环境
+
+| 判据 | 读数 |
+|---|---|
+| 目录未迁移 | `git diff --name-status b59b889..HEAD`：M 18 / A 1 / D 0 / R 0；新增仅为治理规范 |
+| 归档只读 | `verify_delivery_governance.py`：扫描 34 个脚本，0 个写操作到达 `delivery/completed/` |
+| 远端 ref | `git ls-remote --heads origin` 仅 `refs/heads/main`；未推送分支或 Tag |
+| 快照 | `python3 scripts/wt.py chg resume CHG-20261022-099` exit 0；`Current Branch: chg/CHG-20261022-099`；快照在 8000 字符预算内 |
+
+### 8.4 本轮登记、不处置
+
+- `docs/superpowers/` 30 篇旧计划/设计（另 README）的逐项内容处置（删除 / 提升为当前方法 / 移入 completed 或 reports）。
+- `docs/engineering/specs/2026-09-23-launch-engineering-optimization-program.md` 是否移出 specs；本轮仅在索引中标注“已结束，非当前设计”。
+- `delivery/reports/` 11 篇报告的“结论已回写、无长期价值则删除”审计。
+- 第四章等 `SUPERSEDED` 文档在引用迁移后的最终删除。
+- 20 篇 / 20k 字默认阅读上限：本轮只写为目标，不新增硬门禁；唯一机检仍是生成快照 8000 字符。

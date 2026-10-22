@@ -38,7 +38,7 @@ Conflict resolution follows fact ownership, not a global product/engineering/imp
 
 ## Lifecycle and history
 
-- `docs/` holds current facts only. Git keeps old versions; do not keep a second current copy for history.
+- `docs/` holds current facts only. The `docs/superpowers/` legacy collection below is a temporary exception, not a place for new facts. Git keeps old versions; do not keep a second current copy for history.
 - `delivery/active/` holds the current CHG; `delivery/planned/` holds confirmed work not yet started; `delivery/milestones/` holds current business closure.
 - `delivery/completed/` and `delivery/reports/` hold only material with independent traceability value. Both exit the default context.
 - `docs/superpowers/` is judged by content. Promote still-effective methods to `docs/`; delete or retire content without continuing value.

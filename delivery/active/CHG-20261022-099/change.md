@@ -21,12 +21,17 @@ risk: M
 - 新 CHG 工作分支命名为 `chg/<CHG-ID>`，不写入执行器；旧记录不追溯改名。
 - 稳定版产品 Tag 从 `main` 提交并创建同 commit 的 `release/<产品Tag>`；RC 不建发布分支，Tag 仍是唯一发布触发器。
 - 稳定版发布前可通过四个 GitHub Compare 页面查看上一稳定版到本次的四仓完整差异。
+- 文档生命周期由目录位置表达，不新增长期状态字段；`docs/` 只保留当前事实，`SUPERSEDED` 仅作临时迁移标记。
+- 冲突按事实归属裁定，不设产品/工程/实现全局顺序；用户明确裁定必须回写正式事实源。
+- 当前文档链接与 `SUPERSEDED` 替代指针有机检；`docs/superpowers/` 不整体视为历史。
+- 现有历史目录职责已收敛，不新增 `archive/`。
 - 原有治理、Skill、四仓测试入口未被破坏；按用户方案执行指定演练并记录结果。
 
 ## Constraints / Not In Scope
 
 - 不创建 Dashboard、调度平台、复杂 DAG、Worktree Manager 或第二套 Delivery/Context/Test 事实源。
 - 不新增自研 diff 工具、跨仓聚合页面或 `release/*` 分支的独立 workflow 触发器；发布分支只服务稳定版。
+- 不批量迁移或合并历史文档，不删除现有文档，不新增文档状态字段，不引入产品/工程/实现全局优先级。
 - 本 CHG 不代签 M4-H2 / M5-AC-13，也不改变 CHG-098 的既有 `main` 提交历史。
 
 ## References

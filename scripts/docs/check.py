@@ -77,6 +77,10 @@ def current_documents(root: Path) -> list[Path]:
     return [path for path in documents if path.is_file()]
 
 
+def links_in(text: str) -> list[str]:
+    return LINK_RE.findall(strip_code(text))
+
+
 def broken_links(path: Path, text: str) -> list[str]:
     broken: list[str] = []
     for target in links_in(text):
@@ -86,10 +90,6 @@ def broken_links(path: Path, text: str) -> list[str]:
         if not (path.parent / clean).exists():
             broken.append(target)
     return broken
-
-
-def links_in(text: str) -> list[str]:
-    return LINK_RE.findall(strip_code(text))
 
 
 def section(text: str, prefix: str) -> str:
@@ -194,10 +194,8 @@ def check(root: Path = ROOT) -> list[str]:
         for path in sorted(directory.rglob("*.md")):
             relative = path.relative_to(root).as_posix()
             text = path.read_text(encoding="utf-8")
-            header = "\n".join(
-                line for line in text.splitlines() if line.strip()
-            )
-            header = "\n".join(header.splitlines()[:40])
+            lines = [line for line in text.splitlines() if line.strip()]
+            header = "\n".join(lines[:40])
             if not SUPERSEDED_RE.search(strip_code(header)):
                 continue
             replacement = False
