@@ -46,16 +46,22 @@
 
 | 位置 | 负责内容 |
 | --- | --- |
-| `docs/README.md` | 文档树入口：分类、权威边界、生命周期、索引与校验规则 |
+| `docs/README.md` | 文档树入口：目录索引、标记和校验规则；分类与冲突细则指向 `docs/standards/文档与知识事实治理规范.md` |
+| `docs/` | 当前有效的产品、工程、规范、契约、决策事实；不保存旧版本和过程历史 |
 | `docs/product/` | 产品需求、用户场景、功能目标和产品验收 |
 | `docs/engineering/architecture/` | 系统架构、模块边界、分层和通信设计 |
 | `docs/engineering/specs/` | 长期有效的专题工程设计 |
-| `docs/standards/` | 跨领域的研发、设计与产品实践规范；代码演进细则在此维护 |
+| `docs/standards/` | 跨领域的研发、设计、产品与文档实践规范；代码演进细则在此维护 |
 | `docs/contracts/` | 跨仓 API、协议、Event Schema 和数据契约 |
 | `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
 | `docs/devops/` | 端口与部署总账：各组件监听端口、连接链路和本地/线上接法的索引 |
 | `docs/reference/state-models/` | 可引用的业务状态说明与一致性索引；不独立裁定产品状态或接口枚举 |
-| `delivery/` | Milestone、CHG、执行状态、验证和完成交付 |
+| `docs/superpowers/` | 旧计划与旧设计的混合集合；按内容判断，不默认加载 |
+| `delivery/active/` | 当前正在执行的 CHG；只含当前交付事实 |
+| `delivery/planned/` | 已确认但尚未启动的交付项；不属于历史 |
+| `delivery/milestones/` | 当前 Milestone 的业务闭环定义；不存开发流水账 |
+| `delivery/completed/` | 确有追溯价值的已完成交付记录；历史，默认不加载 |
+| `delivery/reports/` | 阶段审计与专项检查报告；结论回写正式事实源，默认不加载 |
 | `config/` | 仓库映射、Skill 分发、Contract 映射和发布配置等治理配置 |
 | `skills/` | Claude Code / Codex Skill 源文件 |
 | `scripts/` | 上下文生成、Skill 分发和治理校验工具；按用途分层，逐文件用途见 `scripts/README.md` |
@@ -64,6 +70,8 @@
 历史分析、旧 Evidence 和已完成 Delivery 不作为当前任务的默认依据。
 
 分析结果只有在进入 Product、Architecture、Contract、Decision 或 Delivery 后，才成为正式项目事实。
+
+当前事实与历史冲突按事实归属裁定，不设产品/工程/实现的全局顺序；细则见 `docs/standards/文档与知识事实治理规范.md` §4。
 
 
 ## 4. 上下文加载
@@ -105,7 +113,7 @@ Workspace 不复制运行仓局部规则。
 
 - 全量代码扫描；
 - `delivery/completed/` 扫描；
-- `docs/superpowers/` 扫描；
+- `docs/superpowers/` 中的过程和分析内容扫描；被当前任务明确引用、且判断仍然有效的方法可单篇读取；
 - `delivery/reports/` 扫描；
 - 历史分析和旧 Evidence 扫描；
 - 全量 Skills 源码扫描；
@@ -225,12 +233,14 @@ CHG 完成前确认：
 - 必要验证通过；
 - 相关 Contract / Architecture 已同步；
 - checkpoint 和多仓状态已收口；
-- 稳定事实已经进入对应正式文档。
+- 当前产品、工程、Contract、Decision 事实已回写正式文档；
+- 没有残留的过期“当前”描述，`SUPERSEDED` 指针已处理；
+- 相关索引已更新，过程记录退出默认上下文。
 
-完成记录移入：
+只有确有追溯价值的完成记录才移入：
 
 `delivery/completed/`
-`delivery/completed/` 是历史归档，不作为当前状态依据，也不默认加载。
+`delivery/completed/` 是历史归档，不作为当前状态依据，也不默认加载。无独立价值的过程记录不归档。
 
 ## 6. Agent 入口与执行快照
 

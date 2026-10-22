@@ -2,8 +2,8 @@
 
 - 归档边界：`READ-ONLY`
 
-本目录是**已收口的交付记录**（Milestone／CHG 的 `change.md`、`checkpoint.md`、`evidence/`）的存放处。
-它不是活文档树，也不承载任何当前事实。
+本目录只保存**确有追溯价值的已收口交付记录**（Milestone／CHG 的 `change.md`、`checkpoint.md`、`evidence/`）。
+无独立价值的过程记录在关闭时直接退场，不因“曾经存在”而归档。本目录不是活文档树，也不承载任何当前事实。
 
 ## 边界
 
@@ -14,8 +14,9 @@
   与稳定基线（`docs/product`、`docs/engineering`、`docs/contracts`、`docs/decisions`）为准。
 - **可整目录排除**：全仓范围的扫描（grep、索引、审计）可以且应当排除本目录，以免历史噪声淹没活文档。
   没有任何静态门禁因本目录的存在与否而改变结论（CHG-20260925-066 `evidence/artifacts/t01-f07-completed-moved.out`）。
-- **归档 ≠ 删除**：收口一个 CHG 时，从 `delivery/active/` 与 `delivery/LEDGER.md` **移出**它，并把记录**移入**本目录。
-  记录本身**不删除**。`README.md` §Rules 与 `LEDGER.md` 首段里的 "remove" 指的正是这次「移出」，不是删文件。
+- **归档 ≠ 保留一切**：收口一个 CHG 时，先从 `delivery/active/` 与 `delivery/LEDGER.md` **移出**它；
+  只有确有追溯价值的记录才**移入**本目录，无独立价值的过程记录直接退场。已归档的记录保持原样，不重写。
+  `LEDGER.md` 首段里的 "remove" 对已归档记录指的是这次「移出」，不是删文件。
 
 ## 新增捕获的入库阈值
 
