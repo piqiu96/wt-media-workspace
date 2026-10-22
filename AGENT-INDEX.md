@@ -310,6 +310,10 @@ Workspace 和各运行仓分别维护：
 
 新 CHG 的工作分支统一命名为 `chg/<CHG-ID>`，以工作单元命名，不写入执行器、工具名或人名；旧 CHG 与历史记录不追溯改名。稳定版发布从 `main` 创建 `release/<产品Tag>`，分支与产品 Tag 指向同一 commit；Tag 仍是唯一发布触发器。稳定版发布前，按上一个稳定版与本次 Manifest 的组件 Tag 打开四个 GitHub Compare 页面，Review 四仓完整差异。
 
+工作分支从已推送的 `origin/main` 创建；本地 `main` 有未推送提交时先推送，暂不能推送则用独立 worktree，不从带未推送提交的本地 `main` 拉分支。一个 CHG 对应一个引用 CHG ID 的 PR；跨仓 CHG 每仓一个 PR，仍属同一逻辑 CHG。PR 以 merge commit 合入，保留双 parent 的合并提交与 PR 号；squash/rebase 会改变追溯方式，不作为默认。
+
+PR 合并后工作分支即退场：先确认分支已包含于 `origin/main`（或 PR 状态为 MERGED），再删除本地与远端分支。`release/<产品Tag>` 为发布分支，不按短期分支删除。已合并但未开 PR 的历史分支不补空 PR，以 commit / PR 历史作为追溯证据。
+
 
 ## 7. AI 协作原则
 
