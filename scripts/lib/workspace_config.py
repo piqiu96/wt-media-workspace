@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
 """Read the workspace repository and skill distribution configuration files.
+
+Shared library, not an entry point.
 
 `config/repository-map.yaml` and `config/skills-distribution.yaml` are small,
 hand-maintained files with a restricted shape. They are read with the standard

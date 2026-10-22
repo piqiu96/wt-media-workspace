@@ -21,9 +21,9 @@ CONFIG_PATH = ROOT / "config" / "skills-distribution.yaml"
 SKILLS_ROOT = ROOT / "skills"
 
 
-def load_sibling(name: str):
-    """Load a sibling script by file path, since scripts are not a package."""
-    path = Path(__file__).resolve().parent / f"{name}.py"
+def load_shared_library(name: str):
+    """Load a shared library under scripts/lib by file path."""
+    path = Path(__file__).resolve().parent / "lib" / f"{name}.py"
     spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"could not load {path}")
@@ -33,7 +33,7 @@ def load_sibling(name: str):
     return module
 
 
-workspace_config = load_sibling("workspace_config")
+workspace_config = load_shared_library("workspace_config")
 
 
 def execution_root(workspace: Path) -> Path:

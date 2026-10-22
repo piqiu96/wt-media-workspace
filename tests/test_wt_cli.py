@@ -8,8 +8,11 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.change_metadata import read_change
-from scripts.wt import WTError, cmd_resume, cmd_start, cmd_test, cmd_verify, verify_merged_dependencies
+from scripts.chg import WTError, verify_merged_dependencies
+from scripts.chg.resume import cmd_resume
+from scripts.chg.start import cmd_start
+from scripts.lib.change_metadata import read_change
+from scripts.wt import cmd_test, cmd_verify
 
 
 class WTCLITests(unittest.TestCase):
@@ -53,13 +56,25 @@ class WTCLITests(unittest.TestCase):
         *,
         depends: str = "[]",
         affected: str = '["wt-media-workspace"]',
+        risk: str = "M",
         extra: str = "",
+        legacy: bool = False,
     ) -> Path:
         path = self.root / "delivery" / "active" / change_id / "change.md"
         path.parent.mkdir(parents=True, exist_ok=True)
+        if legacy:
+            path.write_text(
+                f"# {change_id}: Test\n\n"
+                "- Status: IMPLEMENTING\n"
+                "- Milestone: `none`\n"
+                "- Affected repositories:\n"
+                "  - `wt-media-workspace`\n",
+                encoding="utf-8",
+            )
+            return path
         path.write_text(
             f"---\nid: {change_id}\nparent: none\nstatus: IMPLEMENTING\n"
-            f"depends_on: {depends}\naffected_repos: {affected}\nrisk: M\n{extra}---\n"
+            f"depends_on: {depends}\naffected_repos: {affected}\nrisk: {risk}\n{extra}---\n"
             f"# {change_id}: Test\n\n## Change\n\nTest.\n\n## Done When\n\nPass.\n",
             encoding="utf-8",
         )
@@ -80,11 +95,32 @@ class WTCLITests(unittest.TestCase):
     def test_start_creates_branch_after_preflight(self) -> None:
         change = read_change(self.change())
         self.commit(self.root)
-        with patch("scripts.wt.prepare_workspace") as prepare:
+        with patch("scripts.chg.start.prepare_workspace") as prepare:
             with contextlib.redirect_stdout(io.StringIO()):
                 cmd_start(change, root=self.root)
         self.assertEqual(self.git(self.root, "branch", "--show-current"), "codex/CHG-20261022-099")
         prepare.assert_called_once_with(workspace_repo=self.root, change_id=change.change_id)
+
+    def test_start_plan_reports_recommended_scenarios(self) -> None:
+        change = read_change(self.change())
+        self.commit(self.root)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            cmd_start(change, plan=True, root=self.root)
+        text = output.getvalue()
+        self.assertIn("Recommended verification: wt chg verify", text)
+        self.assertIn("scenarios: repo", text)
+
+    def test_legacy_start_skips_main_and_branch_switch(self) -> None:
+        change = read_change(self.change(legacy=True))
+        self.commit(self.root)
+        output = io.StringIO()
+        with patch("scripts.chg.start.prepare_workspace") as prepare:
+            with contextlib.redirect_stdout(output):
+                cmd_start(change, root=self.root)
+        self.assertEqual(self.git(self.root, "branch", "--show-current"), "main")
+        prepare.assert_called_once()
+        self.assertIn("no branch switch", output.getvalue())
 
     def test_start_rejects_uncommitted_record_before_switch(self) -> None:
         self.commit(self.root)
@@ -123,12 +159,50 @@ class WTCLITests(unittest.TestCase):
         self.assertIn("verify_delivery_governance.py", output.getvalue())
         self.assertIn("real: use environment-bring-up", output.getvalue())
 
+    def test_risk_l_runs_only_fast(self) -> None:
+        change = read_change(self.change(risk="L"))
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            cmd_verify(change, plan=True, root=self.root)
+        text = output.getvalue()
+        self.assertIn("unittest discover", text)
+        self.assertNotIn("verify_m1_integration.py", text)
+        self.assertNotIn("verify_m0_config.py", text)
+
+    def test_risk_h_adds_contract_gate_for_runtime_repo(self) -> None:
+        change = read_change(self.change(affected='["wt-media-cloud"]', risk="H"))
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            cmd_verify(change, plan=True, root=self.root)
+        text = output.getvalue()
+        self.assertIn("scripts/verify/verify_m1_integration.py", text)
+        self.assertIn("scripts/verify/verify_m0_config.py", text)
+        self.assertIn("H risk:", text)
+
+    def test_risk_h_workspace_repo_does_not_duplicate_contract_gate(self) -> None:
+        change = read_change(self.change(risk="H"))
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            cmd_verify(change, plan=True, root=self.root)
+        text = output.getvalue()
+        self.assertEqual(text.count("scripts/verify/verify_m0_config.py"), 1)
+
+    def test_workspace_repo_scenario_includes_governance_docs_and_control(self) -> None:
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            cmd_test("repo", "wt-media-workspace", True, self.root)
+        text = output.getvalue()
+        self.assertIn("scripts/verify/verify_delivery_governance.py", text)
+        self.assertIn("scripts/verify/verify_m0_config.py", text)
+        self.assertIn("scripts/docs/check.py", text)
+        self.assertIn("bash scripts/verify/verify-control.sh", text)
+
     def test_scenario_plan_maps_existing_entries(self) -> None:
         output = io.StringIO()
         with contextlib.redirect_stdout(output):
             cmd_test("integration", None, True, self.root)
             cmd_test("e2e", None, True, self.root)
-        self.assertIn("scripts/verify_m1_integration.py", output.getvalue())
+        self.assertIn("scripts/verify/verify_m1_integration.py", output.getvalue())
         self.assertIn("bin/control.sh verify", output.getvalue())
 
     def test_resume_reads_checkpoint_and_optional_state(self) -> None:
@@ -139,10 +213,25 @@ class WTCLITests(unittest.TestCase):
         local.parent.mkdir()
         local.write_text("Local note.\n", encoding="utf-8")
         output = io.StringIO()
-        with patch("scripts.wt.prepare_workspace"), contextlib.redirect_stdout(output):
+        with patch("scripts.chg.resume.prepare_workspace"), contextlib.redirect_stdout(output):
             cmd_resume(change, self.root)
         self.assertIn("At handoff.", output.getvalue())
         self.assertIn("Local note.", output.getvalue())
+
+    def test_resume_reports_main_drift_without_failing(self) -> None:
+        change = read_change(self.change(affected='["wt-media-cloud"]'))
+        self.git(self.cloud, "switch", "-c", "upstream")
+        (self.cloud / "upstream.txt").write_text("upstream\n", encoding="utf-8")
+        upstream = self.commit(self.cloud)
+        self.git(self.cloud, "switch", "main")
+        self.git(self.cloud, "update-ref", "refs/remotes/origin/main", upstream)
+        output = io.StringIO()
+        with patch("scripts.chg.resume.prepare_workspace"), contextlib.redirect_stdout(output):
+            cmd_resume(change, self.root)
+        self.assertIn(
+            "WARN wt-media-cloud: local main is behind origin/main by 1 commit(s)",
+            output.getvalue(),
+        )
 
 
 if __name__ == "__main__":

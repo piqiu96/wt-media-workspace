@@ -25,3 +25,5 @@ State one independently reviewable result and the smallest required scope.
      when closing it. For an older read-only archive without that field, the
      dependent CHG may record `dependency_merge_commits` after manual review.
      Both maps contain Git pointers, not a second status fact. -->
+<!-- Optional `verify_scenarios: ["repo", "integration"]` adds scenario checks
+     when the risk defaults do not cover this CHG's actual change surface. -->

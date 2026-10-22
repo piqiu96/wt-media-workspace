@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT_PATH = ROOT / "scripts" / "verify_product_master_alignment.py"
+SCRIPT_PATH = ROOT / "scripts" / "verify" / "verify_product_master_alignment.py"
 MASTER_PATH = ROOT / "delivery" / "MASTER_IMPLEMENTATION_PLAN.md"
 
 

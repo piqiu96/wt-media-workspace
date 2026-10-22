@@ -13,7 +13,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 EXECUTION_ROOT = ROOT.parent
 ENTRY_FILES = ("AGENTS.md", "CLAUDE.md", "AGENT-INDEX.md")
 RUNNING_REPO_ENTRY_FILES = ("AGENT-INDEX.md", "AGENTS.md", "CLAUDE.md", "DIRECTORY_MAP.md")
@@ -30,7 +30,7 @@ GOVERNANCE_SCRIPT = "verify_delivery_governance.py"
 
 def load_governance_module():
     """Load the delivery governance script so parsing rules stay in one place."""
-    path = ROOT / "scripts" / GOVERNANCE_SCRIPT
+    path = Path(__file__).resolve().parent / GOVERNANCE_SCRIPT
     spec = importlib.util.spec_from_file_location("verify_delivery_governance", path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"could not load {GOVERNANCE_SCRIPT}")
@@ -42,7 +42,7 @@ def load_governance_module():
 
 def load_workspace_config():
     """Load the shared configuration reader."""
-    path = ROOT / "scripts" / "workspace_config.py"
+    path = ROOT / "scripts" / "lib" / "workspace_config.py"
     spec = importlib.util.spec_from_file_location("workspace_config", path)
     if spec is None or spec.loader is None:
         raise RuntimeError("could not load workspace_config.py")

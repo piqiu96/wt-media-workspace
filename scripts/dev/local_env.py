@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""Start, stop, inspect, and verify the local WT Media environment.
+
+Implementation behind bin/control.sh. Verbs: up, all, stop, status, verify,
+build-dmg, launch-dmg.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -17,9 +23,9 @@ import urllib.request
 from pathlib import Path
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-WORKSPACE_DIR = SCRIPT_DIR.parent
-ROOT_DIR = WORKSPACE_DIR.parent
+SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+WORKSPACE_DIR = Path(__file__).resolve().parents[2]
+ROOT_DIR = Path(__file__).resolve().parents[3]
 CLOUD_DIR = ROOT_DIR / "wt-media-cloud"
 AGENT_DIR = ROOT_DIR / "wt-media-agent"
 DESKTOP_DIR = ROOT_DIR / "wt-media-desktop"
@@ -596,7 +602,7 @@ def build_dmg() -> None:
     """
     clean_artifacts()
     log("Building Desktop frontend")
-    run(["bash", str(SCRIPT_DIR / "build-desktop-frontend.sh")])
+    run(["bash", str(SCRIPTS_DIR / "build-desktop-frontend.sh")])
     log("Building Desktop app bundle")
     run(["cargo", "tauri", "build", "--bundles", "app", "--no-sign"], cwd=DESKTOP_DIR)
     app = built_app_bundle()

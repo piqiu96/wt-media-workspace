@@ -1,3 +1,5 @@
+<!-- governance: class=stable default_load=task -->
+
 # Engineering Documents
 
 Current effective engineering facts live here.

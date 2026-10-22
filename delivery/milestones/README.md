@@ -1,3 +1,5 @@
+<!-- governance: class=index default_load=task -->
+
 # Milestone 业务闭环
 
 本目录保存每个 M 由人工确认的业务闭环基线。

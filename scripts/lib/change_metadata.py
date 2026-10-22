@@ -1,4 +1,4 @@
-"""Read the small CHG metadata contract; keep legacy records readable."""
+"""Read the small CHG metadata contract; shared by wt and governance verifiers."""
 
 from __future__ import annotations
 

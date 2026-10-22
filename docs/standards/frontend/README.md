@@ -1,3 +1,5 @@
+<!-- governance: class=index default_load=task -->
+
 # 前端规范
 
 本目录存放 Web / Desktop 共用前端的规范，分两层：基础规范定义系统怎么搭，细则规范定义页面怎么组织、反馈怎么给。

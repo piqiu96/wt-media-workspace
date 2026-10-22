@@ -46,6 +46,7 @@
 
 | 位置 | 负责内容 |
 | --- | --- |
+| `docs/README.md` | 文档树入口：分类、权威边界、生命周期、索引与校验规则 |
 | `docs/product/` | 产品需求、用户场景、功能目标和产品验收 |
 | `docs/engineering/architecture/` | 系统架构、模块边界、分层和通信设计 |
 | `docs/engineering/specs/` | 长期有效的专题工程设计 |
@@ -53,11 +54,11 @@
 | `docs/contracts/` | 跨仓 API、协议、Event Schema 和数据契约 |
 | `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
 | `docs/devops/` | 端口与部署总账：各组件监听端口、连接链路和本地/线上接法的索引 |
-| `reference/state-models/` | 可引用的业务状态说明与一致性索引；不独立裁定产品状态或接口枚举 |
+| `docs/reference/state-models/` | 可引用的业务状态说明与一致性索引；不独立裁定产品状态或接口枚举 |
 | `delivery/` | Milestone、CHG、执行状态、验证和完成交付 |
 | `config/` | 仓库映射、Skill 分发、Contract 映射和发布配置等治理配置 |
 | `skills/` | Claude Code / Codex Skill 源文件 |
-| `scripts/` | 上下文生成、Skill 分发和治理校验工具 |
+| `scripts/` | 上下文生成、Skill 分发和治理校验工具；按用途分层，逐文件用途见 `scripts/README.md` |
 | `bin/` | 本地开发环境统一启停入口 |
 
 历史分析、旧 Evidence 和已完成 Delivery 不作为当前任务的默认依据。
@@ -104,6 +105,8 @@ Workspace 不复制运行仓局部规则。
 
 - 全量代码扫描；
 - `delivery/completed/` 扫描；
+- `docs/superpowers/` 扫描；
+- `delivery/reports/` 扫描；
 - 历史分析和旧 Evidence 扫描；
 - 全量 Skills 源码扫描；
 - 与任务无关的工程扫描；
@@ -113,6 +116,10 @@ Workspace 不复制运行仓局部规则。
 
 
 ## 5. Delivery 与跨仓执行
+
+### 状态词汇
+
+CHG 状态为 `DISCUSSION / PLANNED / IMPLEMENTING / VERIFYING / DONE / SUPERSEDED`。与早期四词的映射：`ACTIVE` → `IMPLEMENTING` 或 `VERIFYING`；`REVIEW` → `VERIFYING`；`CLOSED` → `DONE`。正式词表以 `delivery/MASTER_IMPLEMENTATION_PLAN.md` §3 与 `scripts/verify/verify_product_master_alignment.py` 为准；Active 记录只能是 `IMPLEMENTING` 或 `VERIFYING`。
 
 ### 任务类型
 
@@ -141,7 +148,7 @@ Workspace 不复制运行仓局部规则。
 
 `delivery/active/<change-id>/`
 
-允许多个相互独立的 Active CHG；当前会话只选一个 CHG 执行，同一 CHG 同时只有一个执行器，CHG 内部默认串行。`depends_on` 的前置 CHG 未归档且未确认其各仓提交进入本地 `main` 时不得启动。共享 Contract 或基础设施需要共同修改时先交付 Foundation CHG，不并行写同一基础设施。没有 Parallel Group、Wave 或 Conflict Matrix 人工字段。
+允许多个相互独立的 Active CHG；当前会话只选一个 CHG 执行，同一 CHG 同时只有一个执行器，CHG 内部默认串行。`depends_on` 的前置 CHG 未归档，或其各仓提交未确认进入本地 `main` 时不得启动；历史归档缺少可核对提交时由新 CHG 人工补齐证据。共享 Contract 或基础设施需要共同修改时先交付 Foundation CHG，不并行写同一基础设施。没有 Parallel Group、Wave 或 Conflict Matrix 人工字段。
 
 新 CHG 使用 `id`、`parent`、`status`、`depends_on`、`affected_repos`、`risk` 最小元数据，以及 `Change` / `Done When` 两段正文；旧 CHG 保持可读。`parent` 指 Milestone 文档锚点，独立治理变更用 `none`。模板见 `templates/delivery/change.md`。
 
@@ -165,7 +172,7 @@ Workspace 不复制运行仓局部规则。
   - 阻塞；
   - 下一步。
 
-正式 checkpoint 已承担跨执行器接力；本期不增加 `.ai/WORK_STATE.md` 或 `.chg/`，避免维护重复进度。
+正式 checkpoint 已承担跨执行器接力；本期不主动创建 `.ai/WORK_STATE.md` 或 `.chg/`。若执行器临时写本地 WORK_STATE，它必须被 Git 忽略，不能代替 checkpoint。
 
 - `status/<repo>.md`
   - 仅同一 CHG 需要多个工程并行实施时使用；
@@ -176,6 +183,8 @@ Workspace 不复制运行仓局部规则。
 不创建独立 `context.md`。
 
 任务上下文由当前 CHG、相关事实源和 `.ai/CURRENT_CONTEXT.md` 共同提供。
+
+从 Workspace 运行 `python3 scripts/wt.py chg start <CHG>` 做依赖、Git 与分支预检并生成当前上下文；接手时运行 `python3 scripts/wt.py chg resume <CHG>` 读取局部交接。`wt status`、`wt chg verify`、`wt dev/test <scenario>` 的完整用法见根 `README.md`。`start` 检测到其他 Active CHG 涉及同一仓库会提示协调；同一 CHG 只交给一个执行器。
 
 ### 跨仓执行
 
@@ -265,14 +274,17 @@ Workspace 和各运行仓分别维护：
 
 生成。
 
-它是每个工作树当前选中 CHG 的可再生导航，由 `wt chg start/resume` 或原脚本按需生成；多个 Active CHG 不共享一个执行选中状态。它用于提供：
+它是每个工作树当前选中 CHG 的可再生导航，由 `wt chg start/resume` 或原脚本按需生成；多个 Active CHG 不共享一个执行选中状态。它提供生成器固定输出的字段：
 
-- 当前 Milestone；
-- 当前 CHG；
-- 当前状态；
-- 受影响仓库；
-- 当前任务入口；
-- 稳定事实源位置。
+- `Current CHG`；
+- `Current Branch`；
+- `CHG Location`；
+- `Affected Repositories`；
+- `Required References`；
+- `Repository Status`；
+- `Recommended Verification`。
+
+状态只在 `delivery/active/<CHG>/change.md`；快照不输出独立的 `Status:` 行。
 
 它不是新的事实源，不复制：
 
@@ -283,7 +295,7 @@ Workspace 和各运行仓分别维护：
 - 技术实施方案；
 - 历史执行记录。
 
-该文件被 Git 忽略；新检出用 `python3 scripts/prepare_ai_workspace.py --change <CHG>` 重新生成。禁止手工编辑，也不在 Workspace 外建立第二份副本。
+该文件被 Git 忽略；进入一个 CHG 时优先运行 `python3 scripts/wt.py chg resume <CHG>`（同时读取 checkpoint 并报告 main 漂移）。只需重新生成快照、不做接手动作时，才直接运行 `python3 scripts/prepare_ai_workspace.py --change <CHG>`。禁止手工编辑，也不在 Workspace 外建立第二份副本。
 
 ### 新 CHG 的分支与 Review
 

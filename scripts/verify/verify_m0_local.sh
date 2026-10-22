@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-WORKSPACE_REPO="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+WORKSPACE_REPO="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
 OUTER_ROOT="$(CDPATH= cd -- "$WORKSPACE_REPO/.." && pwd)"
 
 GO_BIN="${GO_BIN:-$OUTER_ROOT/../devenv/go26/go/bin/go}"
@@ -10,9 +10,10 @@ WT_MEDIA_GO_PATH="${WT_MEDIA_GO_PATH:-$OUTER_ROOT/../devenv/go19/gopath}"
 AGENT_M0_DATA_DIR="${AGENT_M0_DATA_DIR:-/tmp/wt-media-agent-m0-local}"
 
 (cd "$WORKSPACE_REPO" && python3 -m unittest discover -s tests)
-(cd "$WORKSPACE_REPO" && python3 scripts/verify_skills.py)
-(cd "$WORKSPACE_REPO" && python3 scripts/verify_m0_config.py)
-(cd "$WORKSPACE_REPO" && python3 scripts/verify_product_master_alignment.py)
+(cd "$WORKSPACE_REPO" && python3 scripts/verify/verify_skills.py)
+(cd "$WORKSPACE_REPO" && python3 scripts/verify/verify_m0_config.py)
+(cd "$WORKSPACE_REPO" && python3 scripts/verify/verify_product_master_alignment.py)
+(cd "$WORKSPACE_REPO" && python3 scripts/docs/check.py)
 
 (
   cd "$OUTER_ROOT/wt-media-cloud"

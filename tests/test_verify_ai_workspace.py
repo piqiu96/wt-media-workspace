@@ -9,9 +9,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT_PATH = ROOT / "scripts" / "verify_ai_workspace.py"
-GOVERNANCE_SCRIPT = ROOT / "scripts" / "verify_delivery_governance.py"
-CONFIG_SCRIPT = ROOT / "scripts" / "workspace_config.py"
+SCRIPT_PATH = ROOT / "scripts" / "verify" / "verify_ai_workspace.py"
+GOVERNANCE_SCRIPT = ROOT / "scripts" / "verify" / "verify_delivery_governance.py"
+CONFIG_SCRIPT = ROOT / "scripts" / "lib" / "workspace_config.py"
 CHANGE_ID = "CHG-20260722-021"
 
 
@@ -83,9 +83,10 @@ class VerifyAIWorkspaceTests(unittest.TestCase):
             f"# {CHANGE_ID}: Test\n\n- Status: ACTIVE\n", encoding="utf-8"
         )
         self.write_ledger(CHANGE_ID)
-        (self.workspace / "scripts").mkdir()
         for script in (GOVERNANCE_SCRIPT, CONFIG_SCRIPT):
-            shutil.copy(script, self.workspace / "scripts" / script.name)
+            destination = self.workspace / script.relative_to(ROOT)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(script, destination)
         self.module = load_module()
         self.module.ROOT = self.workspace
         self.module.EXECUTION_ROOT = self.outer
@@ -224,7 +225,7 @@ class VerifyAIWorkspaceTests(unittest.TestCase):
 
     def test_config_reader_comes_from_workspace_under_test(self) -> None:
         config = self.module.load_workspace_config()
-        self.assertEqual(Path(config.__file__), self.workspace / "scripts" / "workspace_config.py")
+        self.assertEqual(Path(config.__file__), self.workspace / "scripts" / "lib" / "workspace_config.py")
 
 
 if __name__ == "__main__":

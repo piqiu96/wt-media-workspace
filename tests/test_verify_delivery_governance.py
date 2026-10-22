@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify_delivery_governance.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "verify" / "verify_delivery_governance.py"
 
 
 def load_module():

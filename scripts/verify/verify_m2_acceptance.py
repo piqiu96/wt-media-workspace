@@ -33,7 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from verify_m0_config import REVISION_LINE, definition_revision_max, revision_order
 
 
-WORKSPACE = Path(__file__).resolve().parents[1]
+WORKSPACE = Path(__file__).resolve().parents[2]
 ROOT = WORKSPACE.parent
 CLOUD = ROOT / "wt-media-cloud"
 AGENT = ROOT / "wt-media-agent"

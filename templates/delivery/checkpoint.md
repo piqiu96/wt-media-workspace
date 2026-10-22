@@ -1,15 +1,9 @@
 # Checkpoint: CHG-YYYYMMDD-NNN
 
 - CHG: `CHG-YYYYMMDD-NNN`（short title）
-- Level: S | M | L
 - Updated: YYYY-MM-DD
 
-## 状态
-
-`IMPLEMENTING`（activation date, or the note explaining the current state）
-
-State words come from §3 of `delivery/MASTER_IMPLEMENTATION_PLAN.md`. A record in
-`delivery/active/` may only be `IMPLEMENTING` or `VERIFYING`.
+Status stays in `change.md`; this file records progress, not a second state copy.
 
 ## Completed
 
@@ -28,7 +22,7 @@ Which Task was last completed and which one is next.
 1. **T-XX**: goal, landing points, and the verification this Task owes.
 2. …
 
-## Blocked
+## Blockers
 
 - None.
 

@@ -15,7 +15,7 @@ from typing import Any
 from urllib import error, request
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 OUTER_ROOT = ROOT.parent
 DEVELOP_WORKSPACE_ROOT = OUTER_ROOT.parent
 CLOUD_ROOT = OUTER_ROOT / "wt-media-cloud"

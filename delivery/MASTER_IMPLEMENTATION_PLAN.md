@@ -139,7 +139,7 @@ wt-media-workspace/
 
 里程碑文件内部的子项状态（如 M2-D 的 `DEFERRED`）不是里程碑状态词，不占上表，只在其所属里程碑文件内自述。
 
-**历史词汇**（不再取用；**归档记录**保持原样、不回改，**活记录一律改用上表的词**）：作为 **CHG 状态值**的 `TODO`、`IMPLEMENTED` 与 `VERIFIED` 在 58 篇记录中**零处使用**（2026-10-10 在 `planned/`＋`active/`＋`completed/` 全语料上重测：**58 篇、零命中**。该数并非未受本次清理影响——清理前实测 **72** 篇，删 14 篇后恰好回到 58，属巧合，不是这句话一直是对的）。（`TODO` 在**任务表**的状态列仍是合法值，那是另一个轴，见 §8 的任务表。）`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 0 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处）为已退役写法。落到 `delivery/active/` 的记录只有一个合法状态：`IMPLEMENTING`（实施中）或 `VERIFYING`（待验收）——由 `scripts/verify_product_master_alignment.py::validate_active_change` 强制。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
+**历史词汇**（不再取用；**归档记录**保持原样、不回改，**活记录一律改用上表的词**）：作为 **CHG 状态值**的 `TODO`、`IMPLEMENTED` 与 `VERIFIED` 在 58 篇记录中**零处使用**（2026-10-10 在 `planned/`＋`active/`＋`completed/` 全语料上重测：**58 篇、零命中**。该数并非未受本次清理影响——清理前实测 **72** 篇，删 14 篇后恰好回到 58，属巧合，不是这句话一直是对的）。（`TODO` 在**任务表**的状态列仍是合法值，那是另一个轴，见 §8 的任务表。）`CLOSED`（2 处）、`HANDOFF`（2 处，`CHG-044`／`CHG-052`，意为「工作并入后续门槛、其门槛本身尚未验收」）、`IN_PROGRESS`（活记录 0 处、归档 4 处——**里程碑层仍用此词，CHG 层不再用**）、`ACTIVE`（0 处）为已退役写法。落到 `delivery/active/` 的记录只有一个合法状态：`IMPLEMENTING`（实施中）或 `VERIFYING`（待验收）——由 `scripts/verify/verify_product_master_alignment.py::validate_active_change` 强制。另有 12 篇记录（11 篇归档 ＋ `CHG-20260903-034`）用更早的块引用形式 `> 状态：` 代替 `- Status:`，取值仍是上表中的词。
 
 **「归档记录保持原样」与「移除已完成 CHG」不矛盾，因为两者说的不是同一件事**：§2 完成清单第 7 项的「移除」指的是把记录**移出** `delivery/active/` 与 `delivery/LEDGER.md`；记录**本身**移入 `delivery/completed/` 并保持原样，**不删除、不重写、不合并**。`delivery/completed/` 的完整只读边界（含新增原始捕获的入库阈值与已知例外）唯一落点是 `delivery/completed/README.md`，本节不复述其正文。
 
@@ -811,9 +811,11 @@ M10-C10 全系统生产发布综合验收
 
 ```bash
 cd wt-media
-python3 wt-media-workspace/scripts/prepare_ai_workspace.py --change CHG-YYYYMMDD-NNN
+python3 wt-media-workspace/scripts/wt.py chg start CHG-YYYYMMDD-NNN   # 加 --plan 只预检，不切分支
 codex
 ```
+
+`chg start` 会完成依赖与 `main` 预检、切换/创建工作分支、生成 `.ai/CURRENT_CONTEXT.md` 并打印 handoff。恢复既有 CHG 用 `wt.py chg resume <CHG>`；直接运行 `prepare_ai_workspace.py` 只用于不切分支的纯快照重生成。
 
 Codex 每次必须按 `AGENT-INDEX.md` §4 的**读取顺序**执行——该节是全项目唯一落点（入口、执行快照、交付台账、里程碑、当前 CHG、目标仓库逐项列明），本节不重复其清单。
 

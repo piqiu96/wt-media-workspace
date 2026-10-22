@@ -49,8 +49,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_m0_config.py"
-        - "python3 scripts/verify_m2_acceptance.py"
+        - "python3 scripts/verify/verify_m0_config.py"
+        - "python3 scripts/verify/verify_m2_acceptance.py"
       cloud:
         - "go test ./internal/modules/cloudagent/..."
         - "curl POST /api/v1/tasks"
@@ -106,8 +106,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_m0_config.py"
-        - "python3 scripts/verify_product_master_alignment.py"
+        - "python3 scripts/verify/verify_m0_config.py"
+        - "python3 scripts/verify/verify_product_master_alignment.py"
       cloud:
         - "GO_BIN=../../devenv/go26/go/bin/go scripts/verify-health.sh"
         - "WT_MEDIA_MYSQL_DSN=... scripts/migrate.sh"
@@ -151,8 +151,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "GO_BIN=../../devenv/go26/go/bin/go scripts/verify-health.sh"
       agent:
@@ -185,8 +185,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "go test ./..."
         - "curl http://127.0.0.1:8188/api/v1/cloud-agent/compatibility"
@@ -220,8 +220,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "go test ./..."
         - "curl POST /api/v1/cloud-agent/agents/register"
@@ -256,8 +256,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "go test ./..."
         - "curl POST /api/v1/tasks/noop"
@@ -292,8 +292,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "go test ./..."
       agent:
@@ -326,8 +326,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       agent:
         - "PYTHONPATH=src python3 -m unittest discover -s tests"
         - "curl /api/v1/status"
@@ -360,8 +360,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       desktop:
         - "npm run verify"
         - "cargo check not run locally: cargo command not found"
@@ -390,10 +390,10 @@ releases:
       revision: "m1-three-end-integration-20260714.7"
     verification:
       workspace:
-        - "python3 scripts/verify_m1_integration.py"
+        - "python3 scripts/verify/verify_m1_integration.py"
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "real Cloud process health and compatibility"
         - "real Cloud noop task creation, claim, report, and lookup"
@@ -428,8 +428,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "go test ./..."
         - "GO_BIN=../../devenv/go26/go/bin/go scripts/verify-health.sh"
@@ -468,8 +468,8 @@ releases:
     verification:
       workspace:
         - "python3 -m unittest discover -s tests"
-        - "python3 scripts/verify_skills.py"
-        - "python3 scripts/verify_m0_config.py"
+        - "python3 scripts/verify/verify_skills.py"
+        - "python3 scripts/verify/verify_m0_config.py"
       cloud:
         - "go test ./..."
         - "GO_BIN=../../devenv/go26/go/bin/go scripts/verify-health.sh"
@@ -506,7 +506,7 @@ releases:
       local_error_codes: "bitbrowser@2026.07.14.6"
       revision: "m2-bitbrowser-profile-binding-20260714.3"
     verification:
-      workspace: ["python3 scripts/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify_skills.py"]
+      workspace: ["python3 scripts/verify/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify/verify_skills.py"]
       cloud: ["go test ./...", "go vet ./...", "scripts/verify-health.sh", "contract YAML parse"]
       web: ["npm test", "npm run build", "npm audit --audit-level=high"]
       agent: ["python3.12 -m unittest discover -s tests", "scripts/verify-health.sh", "contract YAML parse"]
@@ -535,7 +535,7 @@ releases:
       local_error_codes: "bitbrowser@2026.07.14.6"
       revision: "m2-agent-runtime-binding-20260714.4"
     verification:
-      workspace: ["python3 scripts/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify_skills.py"]
+      workspace: ["python3 scripts/verify/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify/verify_skills.py"]
       cloud: ["go test ./...", "go vet ./...", "scripts/verify-health.sh", "contract YAML parse"]
       agent: ["python3.12 -m unittest discover -s tests", "scripts/verify-health.sh", "contract YAML parse"]
       web: ["not affected in M2-C4"]
@@ -564,7 +564,7 @@ releases:
       local_error_codes: "bitbrowser@2026.07.14.6"
       revision: "m2-sensitive-profile-guard-20260714.5"
     verification:
-      workspace: ["python3 scripts/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify_skills.py"]
+      workspace: ["python3 scripts/verify/verify_m0_config.py", "python3 -m unittest discover -s tests", "python3 scripts/verify/verify_skills.py"]
       cloud: ["go test ./...", "go vet ./...", "scripts/verify-health.sh", "contract YAML parse"]
       agent: ["python3.12 -m unittest discover -s tests", "scripts/verify-health.sh", "contract YAML parse"]
       web: ["not affected in M2-C5"]

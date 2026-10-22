@@ -9,7 +9,7 @@ from pathlib import Path
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "prepare_ai_workspace.py"
 GOVERNANCE_SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1] / "scripts" / "verify_delivery_governance.py"
+    Path(__file__).resolve().parents[1] / "scripts" / "verify" / "verify_delivery_governance.py"
 )
 
 
@@ -126,6 +126,7 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
         self.assertNotIn("— CHG-20260714-002", text)
         self.assertIn("Current Branch:", text)
         self.assertIn("CHG Location:", text)
+        self.assertNotIn("- Status:", text)
         self.assertIn("`wt-media-workspace`", text)
         self.assertIn("`AGENTS.md` or `CLAUDE.md`", text)
         self.assertIn("`delivery/LEDGER.md`", text)
@@ -161,8 +162,9 @@ class PrepareAiWorkspaceTests(unittest.TestCase):
         text = (self.workspace / ".ai" / "CURRENT_CONTEXT.md").read_text(encoding="utf-8")
         self.assertIsNone(summary["active_change"])
         self.assertIn("- Current CHG: `none`", text)
-        self.assertIn("- Status: `NONE`", text)
-        self.assertNotIn("CHG Location:", text)
+        self.assertIn("- CHG Location: `none`", text)
+        self.assertIn("- Affected Repositories: `none`", text)
+        self.assertNotIn("- Status:", text)
         self.assertIn("No CHG selected", text)
 
         ledger = self.workspace / "delivery" / "LEDGER.md"

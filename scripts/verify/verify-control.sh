@@ -8,8 +8,9 @@
 #      那样写的检查与「执行位」这个缺陷正好错开一格（CHG-20260926-068 的起因）。
 #   3. usage 逐字断言——动词清单改了而 usage 没跟着改，这里红。
 #   4. 未知名词退出码 2 且 usage 落到 stderr——分派被短路成「总是打印 usage」时，这里红。
-#   5. `status` 端到端跑通并给出五行读数（cloud/agent/worker/web-dev/desktop-dev）——
-#      HARNESS 路径写错时，这里红（命令找不到）；任一行缺少时也红。
+#   5. `status` 端到端跑通并给出六行读数
+#      （cloud/agent/worker/compose-worker/web-dev/desktop-dev）——
+#      LOCAL_ENV 路径写错时，这里红（命令找不到）；任一行缺少时也红。
 #   6. 本文件不含端口字面量——把端口搬进 control.sh 时，这里红。
 #
 # 判据 1／2 的 `index 模式` 与 `磁盘执行位` 是**两件事**：磁盘 `+x` 而 index `100644` 在本机
@@ -17,10 +18,11 @@
 # （实测：无选项／`-u`／`pipefail` → 126，`-e`／`-eu` → 1），故下面断言**属性**（退 0）而非字面码。
 set -euo pipefail
 
-BIN_DIR="$(cd "$(dirname "$0")/../bin" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+BIN_DIR="$(cd "$SCRIPT_DIR/../../bin" && pwd)"
 ROOT_DIR="$(cd "$BIN_DIR/.." && pwd)"
 CONTROL="$BIN_DIR/control.sh"
-HARNESS="$BIN_DIR/../scripts/m2b-local-acceptance.sh"
+LOCAL_ENV="$ROOT_DIR/scripts/dev/local_env.py"
 
 # 每一条断言的失败都要自己说明是哪一条——裸 grep 在 set -e 下只给一个静默的非零退出码。
 die() { echo "FAIL: $1" >&2; exit 1; }
@@ -64,11 +66,11 @@ set -e
 [ -z "$UNKNOWN_OUT" ] || die "unknown verb wrote usage to stdout"
 grep -Fq 'Usage: bin/control.sh' <<<"$UNKNOWN_ERR" || die "unknown verb: no usage on stderr"
 
-# 5. status 端到端：先证明 harness 在，再跑，再验五行读数
+# 5. status 端到端：先证明实现文件在，再跑，再验六行读数
 #
 # 每一行都单独断言，不是一个 grep 盖住全部：少了某一条，把该组件从 status 里删掉仍然
 # 全绿——而「status 看不见它」正是该组件此前不存在时的读法（worker 就是这样）。
-test -f "$HARNESS" || die "harness missing at $HARNESS"
+test -f "$LOCAL_ENV" || die "local environment implementation missing at $LOCAL_ENV"
 set +e
 STATUS_OUT="$("$CONTROL" status 2>&1)"
 STATUS_RC=$?
@@ -81,6 +83,8 @@ grep -Eq '^agent: pid=[^ ]* alive=(yes|no) health=(ok|down|refused) url=' <<<"$S
   || die "no agent status line"
 grep -Eq '^worker: pid=[^ ]* alive=(yes|no) health=pid-only url=-$' <<<"$STATUS_OUT" \
   || die "no worker status line"
+grep -Eq '^compose-worker: pid=[^ ]* alive=(yes|no) health=pid-only url=-$' <<<"$STATUS_OUT" \
+  || die "no compose-worker status line"
 grep -Eq '^web-dev: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
   || die "no web-dev status line"
 grep -Eq '^desktop-dev: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
@@ -91,4 +95,4 @@ if grep -nE ':[0-9]{4,5}([^0-9]|$)' "$CONTROL"; then
   die "bin/control.sh carries a port literal; it belongs to the harness config"
 fi
 
-echo "PASS: bin/control.sh entry (tracked, index 100755, executable, directly invocable), usage, dispatch, status wiring (cloud/agent/worker/web-dev/desktop-dev), and no-port-literal"
+echo "PASS: bin/control.sh entry (tracked, index 100755, executable, directly invocable), usage, dispatch, status wiring (cloud/agent/worker/compose-worker/web-dev/desktop-dev), and no-port-literal"

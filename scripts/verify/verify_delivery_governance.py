@@ -8,10 +8,10 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from scripts.change_metadata import read_change
+from scripts.lib.change_metadata import read_change
 
 
 CHANGE_ID_RE = re.compile(r"CHG-\d{8}-\d{3}")
@@ -318,7 +318,7 @@ def validate_delivery_governance(workspace: Path) -> list[str]:
 
 
 def main() -> int:
-    workspace = Path(__file__).resolve().parents[1]
+    workspace = Path(__file__).resolve().parents[2]
     errors = validate_delivery_governance(workspace)
     # 两条归档判据各自报出分母，好让「0 命中」不是一句空话。
     for _, summary in (check_archive_readonly(workspace),

@@ -11,7 +11,7 @@ Maintain the path from stable project facts to one bounded executable CHG. This 
 
 Read in order:
 
-1. root `AGENT-INDEX.md` (the governance text; `AGENTS.md`/`CLAUDE.md` are thin pointers to it) and `wt-media-workspace/.ai/CURRENT_CONTEXT.md`;
+1. root `AGENT-INDEX.md` (the governance text; `AGENTS.md`/`CLAUDE.md` are thin pointers to it) and, when present, `wt-media-workspace/.ai/CURRENT_CONTEXT.md` (regenerate it for the selected CHG if absent);
 2. `docs/product`, `docs/engineering`, `docs/contracts`, `docs/decisions`;
 3. `delivery/MASTER_IMPLEMENTATION_PLAN.md`;
 4. applicable `delivery/milestones/M*.md`;
@@ -64,7 +64,7 @@ Milestone is the current execution baseline. PRD is the long-term product baseli
    - linked CHGs.
 5. Propose CHGs in dependency order. Independent M/L CHGs may both be active; select one per execution and do not start unmet dependencies or conflicting shared infrastructure work.
 6. For the next CHG, define one independently verifiable vertical result, explicit exclusions, ordered Tasks, real acceptance, Evidence, and commit boundaries.
-7. Synchronize `delivery/LEDGER.md` with the actual active directory, then regenerate `wt-media-workspace/.ai/CURRENT_CONTEXT.md` with `python3 scripts/prepare_ai_workspace.py --change <CHG>`. Never edit the snapshot by hand, and never keep a second copy at the execution root.
+7. Synchronize `delivery/LEDGER.md` with the actual active directory, then use `python3 scripts/wt.py chg start <CHG>` to preflight the selected CHG and regenerate local `CURRENT_CONTEXT` (or use `prepare_ai_workspace.py --change <CHG>` only when no branch change is intended). Never edit the snapshot by hand or keep a second copy at the execution root.
 8. Stop before runtime implementation and hand off to `executing-wt-media-change`.
 
 ## CHG Boundary

@@ -1,3 +1,5 @@
+<!-- governance: class=stable default_load=task -->
+
 # Product Documents
 
 Current effective product facts live here.

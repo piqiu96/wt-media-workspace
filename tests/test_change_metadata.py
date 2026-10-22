@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.change_metadata import read_change
+from scripts.lib.change_metadata import read_change
 
 
 class ChangeMetadataTests(unittest.TestCase):

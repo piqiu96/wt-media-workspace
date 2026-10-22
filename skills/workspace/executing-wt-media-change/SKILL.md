@@ -12,7 +12,7 @@ Use this Skill for any WT Media M/L CHG implementation, resume, review, or compl
 When facts conflict, resolve them in this order:
 
 1. Root `AGENT-INDEX.md` — the governance text and routing authority. `AGENTS.md` and `CLAUDE.md` are thin parallel pointers to it, not the text itself.
-2. `wt-media-workspace/.ai/CURRENT_CONTEXT.md` — the only execution snapshot; it never lives at the execution root.
+2. `wt-media-workspace/.ai/CURRENT_CONTEXT.md` — the generated local execution snapshot when present; regenerate it for the selected CHG if absent.
 3. Active `wt-media-workspace/delivery/active/<CHG>/change.md`.
 4. The exact Milestone closure referenced by an M/L CHG, or the stable requirement referenced by a small Bug CHG.
 5. Stable baselines referenced by the CHG:
@@ -30,7 +30,7 @@ Do not treat chat history, generated summaries, or legacy root `docs/` files as 
 Before coding, verify and report:
 
 - active CHG ID and status;
-- `wt-media-workspace/.ai/CURRENT_CONTEXT.md` selects this CHG and `delivery/LEDGER.md` indexes the same active set as `delivery/active`;
+- `python3 scripts/wt.py chg start <CHG>` has checked dependencies, Git state and branch; the generated `CURRENT_CONTEXT.md` selects this CHG, and `delivery/LEDGER.md` indexes the same active set as `delivery/active`;
 - this CHG has one executor, its dependencies are merged, and its branch does not collide with another active CHG's shared infrastructure work;
 - Milestone file and closure anchor for M/L work, or stable requirement reference for a planning-classified small Bug;
 - the user-visible vertical result delivered by this CHG;
@@ -93,7 +93,7 @@ Do not duplicate product requirements in evidence files.
 
 ## Checkpoints
 
-Update the active `checkpoint.md` before pausing, committing, or finishing a Task. It sits beside `change.md` and is a **required** file: `scripts/verify_delivery_governance.py` rejects an active CHG that has only the plan, because a plan with no checkpoint is an active change nobody can resume. Keep `change.md` for the plan and the acceptance record; put progress in `checkpoint.md`.
+Update the active `checkpoint.md` before pausing, committing, or finishing a Task. It sits beside `change.md` and is a **required** file: `scripts/verify/verify_delivery_governance.py` rejects an active CHG that has only the plan, because a plan with no checkpoint is an active change nobody can resume. Keep `change.md` for the plan and the acceptance record; put progress in `checkpoint.md`.
 
 Checkpoint text must include:
 
@@ -104,6 +104,19 @@ Checkpoint text must include:
 - recent verification.
 
 If a new decision is required, stop, add a `Q-xx`, mark whether it blocks, and do not infer the answer.
+
+## Review Gate
+
+Before asking for merge, review the change against the CHG:
+
+- every `Done When` item has a measured result, not a claim;
+- the diff stays inside the CHG scope and its affected repositories;
+- Architecture or Contract changes are written back to their Workspace source;
+- state, error handling, and read-back paths were exercised, not only the happy path;
+- regression risk matches the declared `risk` and the scenarios that were run;
+- tests cover the changed behavior at the level that risk requires.
+
+A small change may be reviewed lightly, but the `Done When` check cannot be skipped.
 
 ## Completion Gate
 
@@ -117,8 +130,8 @@ Only mark a CHG `DONE` when all apply:
 - diff checked for out-of-scope changes;
 - affected runtime repositories are touched only when listed in scope;
 - required baselines are updated;
-- affected repositories are committed independently;
-- completed active records are removed from `delivery/active` and `delivery/LEDGER.md` unless the user explicitly asks to keep an in-progress handoff.
+- affected repositories are committed independently and reviewed through PRs referencing the CHG ID for new CHGs;
+- after merge into each affected local `main`, completed records are removed from `delivery/active` and `delivery/LEDGER.md` and archived under `delivery/completed/`, unless the user explicitly asks to keep an in-progress handoff.
 
 Code presence, an HTTP success response, task creation, mock-only evidence, or a passing unit test cannot replace a required external side effect, read-back, business-state projection, and user-visible final result.
 

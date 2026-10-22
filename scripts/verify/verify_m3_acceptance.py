@@ -6,7 +6,7 @@
 判定写入 `run-manifest.json`，原始响应脱敏后落在 `raw/`。
 产物一律写在本机 `.cache/m3-acceptance/` 下，**不进仓库**：归档区是只读的。
 
-约定（沿用 `scripts/m2b_local_acceptance.py`）：
+约定（沿用 `scripts/dev/local_env.py`）：
 - 只读取 Cloud 仓库与配置，从不修改 Cloud 源码或配置；
 - 对本地 `wt_media_cloud` 库**只新增不删改**既有行（既有 3 策略 / 11 任务 /
   109 来源 / 26 素材在验收前后必须逐项一致）；
@@ -14,8 +14,8 @@
 - 凭据值（抖音 api_key / cookie、会话 cookie）绝不写入证据。
 
 用法：
-    python3 scripts/verify_m3_acceptance.py --phase g0
-    python3 scripts/verify_m3_acceptance.py --phase all
+    python3 scripts/verify/verify_m3_acceptance.py --phase g0
+    python3 scripts/verify/verify_m3_acceptance.py --phase all
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-WS_ROOT = SCRIPT_DIR.parent
+WS_ROOT = SCRIPT_DIR.parents[1]
 CLOUD_ROOT = Path(
     os.environ.get("WT_MEDIA_CLOUD_ROOT", str(WS_ROOT.parent / "wt-media-cloud"))
 )
@@ -411,7 +411,7 @@ def phase_g0():
     # 本轮产物全部落在 .cache/（已忽略），故 `git status` 里唯一可能出现的就是本脚本自身。
     # 原列表里的 `scripts/m3-acceptance.sh` **从未存在过**（已在 CHG-055 登记为「未处理的
     # 空悬标记」），且旧列表还列过归档目录——写入面移出归档后那条也不可能再匹配，一并去掉。
-    own_artifacts = ("scripts/verify_m3_acceptance.py",)
+    own_artifacts = ("scripts/verify/verify_m3_acceptance.py",)
     ws_lines = [line for line in ws_status.splitlines() if line.strip()]
     foreign = [line for line in ws_lines
                if not any(marker in line for marker in own_artifacts)]
@@ -1637,7 +1637,7 @@ def phase_p10():
     # 10.3 M2 静态矩阵：原样执行
     m2 = (RAW_DIR / "p10-m2-regression.log").read_text(encoding="utf-8", errors="replace")
     stale = [l for l in m2.splitlines() if "missing file" in l and "compatibility.go" in l]
-    record("10.3", phase, "regression", "python3 scripts/verify_m2_acceptance.py（原样）",
+    record("10.3", phase, "regression", "python3 scripts/verify/verify_m2_acceptance.py（原样）",
            "0 ERROR",
            "命中陈旧路径：%s" % (stale[0][:160] if stale else "无"),
            "FAIL" if stale else "PASS",
@@ -1652,10 +1652,10 @@ def phase_p10():
            note="用于把「脚本陈旧路径」与「M2 真实回归」两件事分开；原脚本未被修改")
 
     # 10.5/10.6 M2-B 本地验收
-    record("10.5", phase, "regression", "scripts/m2b-local-acceptance.sh verify",
+    record("10.5", phase, "regression", "python3 scripts/dev/local_env.py verify",
            "Cloud 与 Agent 健康检查通过",
            "Cloud=PASS Agent=PASS（见 p10-m2-regression.log）", "PASS")
-    record("10.6", phase, "regression", "scripts/m2b-local-acceptance.sh verify: BitBrowser 腿",
+    record("10.6", phase, "regression", "python3 scripts/dev/local_env.py verify: BitBrowser 腿",
            "Agent 经真实 BitBrowser 得到 bitbrowser_status=normal",
            "脚本对该 dev Agent 报 unreachable；原因为该 Agent 以 "
            "WT_MEDIA_BITBROWSER_API_URL=http://127.0.0.1:8899（mock，/browser/list 返回 404）启动；"
