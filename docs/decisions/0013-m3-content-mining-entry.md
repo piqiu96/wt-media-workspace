@@ -2,7 +2,7 @@
 
 - Status: Accepted（实现边界由 ADR-0015 进一步收敛；第 3、7 条与博主搜索范围于 2026-09-23 增补）
 - Date: 2026-09-15（增补 2026-09-23）
-- 来源：用户本轮提供的 M3 内容挖掘 Milestone 与页面参考图。
+- 依据：用户确认的 M3 内容挖掘 Milestone 与页面参考图。
 - Supersedes：原第四章和 M3 草案中“即时选择直接建素材、四个独立页面、crawl_strategy 命名”的 M3 规则；不改变 M2 权限或运行职责。M3 的 Cloud-owned 执行边界见 ADR-0015。
 - 2026-09-23 增补：原文对“策略自动转素材”与“五态业务任务”的否定已被用户确认撤销，见下方第 3、7 条；博主搜索与作者策略已暂停，见第 1、4 条与「增补记录」。
 
@@ -30,7 +30,7 @@ M3 从“内容发现功能开发”调整为“内容挖掘自动化入口建�
 
 - Positive：所有入口先入池；人工与自动发现共用身份/去重规则，生产边界清楚。
 - Negative：原七个 CHG 草案需撤销执行资格；新增渠道抽象及每日时间触发配置的设计核对。主动博主搜索与作者策略已于 2026-09-23 暂停，相应 CHG-047、CHG-050 不再激活。
-- Follow-up：以 Product 的 `docs/product/M3-content-mining-v2.md` 为有效基线；同步 Engineering、Master Plan 与 `delivery/milestones/M3-content-discovery-v2.md`；旧草案保留并标记 SUPERSEDED。实施进度见 M3 Milestone 记录，本 ADR 不跟踪。
+- Follow-up：以 Product 的 `docs/product/M3-content-mining-v2.md` 为有效基线；同步 Engineering、Master Plan 与 `delivery/milestones/M3-content-discovery-v2.md`；旧草案已由本基线与 V2 取代，历史见 Git。实施进度见 M3 Milestone 记录，本 ADR 不跟踪。
 
 ## 增补记录
 
