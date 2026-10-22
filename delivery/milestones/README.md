@@ -6,7 +6,7 @@
 
 尚未确认的拆分必须显式标注 DRAFT，不能作为已批准的实现依据。
 
-当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：**M3 已于 2026-09-23 通过 E3 综合验收并由用户签收，状态为 `DONE`**（验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED）。A～E1 有真实证据；C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围；逐阶段状态见该文件第 2.1 节，签收记录见第 2.2 节。M3 产品事实源为 [Product M3 内容挖掘 V2](../../docs/product/M3-content-mining-v2.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
+当前 M3 闭环见 [M3 内容挖掘 V2](M3-content-discovery-v2.md)：**M3 已于 2026-09-23 通过 E3 综合验收并由用户签收，状态为 `DONE`**（验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED）。A～E1 有真实证据；C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停并移出本期范围；逐阶段状态见该文件第 2.1 节，签收记录见第 2.2 节。M3 产品事实源为 [PRD 第四章：内容挖掘](../../docs/product/prd/详细文档/第四章_内容挖掘.md)。旧 M3-content-discovery.md 与 CHG-037～043 为 SUPERSEDED。M2 仍保持已验收 DONE。
 
 M4-M5 于 2026-09-24 按用户确认方向完成闭环重划。M4 于 2026-09-26 进入 `IN_PROGRESS`；用户 2026-10-14 暂缓 M4-H2 人工走查，要求先执行 M5，M5 进入 `IN_PROGRESS`：
 

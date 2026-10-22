@@ -12,9 +12,9 @@ Rules:
 
 ## Current M3 baseline
 
-[M3 内容挖掘 V2](M3-content-mining-v2.md) 是当前 M3 产品事实源（ADR-0013）。旧版“内容发现”规则已被其取代，历史由 Git 承担。已确认方向与待决细节在 V2 中分别标注。
+[PRD 第四章：内容挖掘](prd/详细文档/第四章_内容挖掘.md) 是当前 M3 产品事实源（ADR-0013）。旧版“内容发现”规则已被其取代，历史由 Git 承担。已确认要求见本章，实施状态与待决细节见 M3 Milestone。
 
-M3 范围内对旧规则的改动（自动转素材、`partial_success`）已回写本基线与 ADR-0013。按 `delivery/milestones/README.md` 的 Milestone-first 规则，稳定产品规则在 M3 完整验收后再融合回 PRD；在此之前 PRD 第四章指向本基线。
+M3 范围内对旧规则的改动（自动转素材、`partial_success`）已回写本章与 ADR-0013。M3 已完整验收并签收；按 `delivery/milestones/README.md` 的 Milestone-first 规则，稳定产品规则已融合回 PRD 第四章。
 
 ## Current M4-M5 baseline
 

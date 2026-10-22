@@ -4,7 +4,7 @@
 - Level: M
 - Milestone: `delivery/milestones/M3-content-discovery-v2.md#m3-c2-博主主动搜索`
 - 日期：2026-09-15
-- 基线：`docs/product/M3-content-mining-v2.md`；ADR-0013。
+- 基线：`docs/product/prd/详细文档/第四章_内容挖掘.md`；ADR-0013。
 - 当前仓库：wt-media-workspace；未开始运行时代码实施。
 - 暂停：2026-09-23 用户确认博主搜索本期不做、后续版本再做。本草案不再激活，博主搜索入口、字段与枚举保留；C 阶段由 C1（CHG-20260915-046）完成。见 ADR-0013 增补记录。
 

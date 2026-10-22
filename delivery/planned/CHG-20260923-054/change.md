@@ -4,7 +4,7 @@
 - Level: S
 - 锚点：`delivery/milestones/M3-content-discovery-v2.md` §2.1；验收登记 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`
 - 日期：2026-09-23
-- 基线：`docs/product/M3-content-mining-v2.md`；ADR-0013、ADR-0014、ADR-0015
+- 基线：`docs/product/prd/详细文档/第四章_内容挖掘.md`；ADR-0013、ADR-0014、ADR-0015
 - 当前仓库：`wt-media-cloud` 为主；`wt-media-workspace`（验收脚本与治理记录）为辅。
 - 未激活：本草案按用户 2026-09-23 裁定登记——「缺陷移入 planned，另立后续 CHG」。**不在 `CHG-20260916-052` 内修复**，也不抢占其 active 名额。
 
@@ -23,7 +23,7 @@
 | --- | --- | --- | --- |
 | D1 | 策略重名返回 `500`，而非 `409 / 14007` | 错误映射（仓储包私有错误未翻译） | 否 |
 | D2 | `schedule` 无服务端校验，`garbage` 可入库且永不触发 | 输入校验缺失 | 否 |
-| D3 | `POST /discovery-strategies/:id/run` 可重复排队，违反基线 §5 | **功能不达标** | **是**（基线 §5） |
+| D3 | `POST /discovery-strategies/:id/run` 可重复排队，违反 PRD 第四章 §4.5 | **功能不达标** | **是**（§4.5） |
 | D6 | UI 的「ID/链接发现」硬编码 `source_type:'search'`，来源方式失真 | 标签失真 | 否 |
 | D7 | `errCrawlTaskNotFound` 同族未翻译（仅代码观察，未复现） | 错误映射 | 否 |
 | D8 | `ErrCrawlerUnavailable` 未在 `writeDiscoveryError` 映射 | 错误映射 | 否 |

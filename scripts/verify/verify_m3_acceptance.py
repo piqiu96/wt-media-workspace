@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """M3 内容挖掘全量功能验收（E3，2026-09-23）。
 
-本脚本按 `docs/product/M3-content-mining-v2.md` 第 8 节的验收项，对
+本脚本按 `docs/product/prd/详细文档/第四章_内容挖掘.md` §4.7.4 的验收要求，对
 `wt-media-cloud` 的真实运行实例做端到端核验，并把每一步的请求、期望、实际与
 判定写入 `run-manifest.json`，原始响应脱敏后落在 `raw/`。
 产物一律写在本机 `.cache/m3-acceptance/` 下，**不进仓库**：归档区是只读的。
@@ -1145,7 +1145,7 @@ def phase_p6():
         raw_dump("p6-run-twice.json", json.dumps([first[1], second[1]], ensure_ascii=False))
         after_pending = table_count("crawl_tasks", "strategy_id=%d AND status='pending'" % sid)
         record("6.9", phase, "defect", "POST /discovery-strategies/<id>/run 连调两次",
-               "基线 §5：同策略已有 pending/running 时不重复排队",
+               "PRD 第四章 §4.5：同策略已有 pending/running 时不重复排队",
                "HTTP %s/%s，pending 行 %d -> %d" % (first[0], second[0], before_pending, after_pending),
                "FAIL" if after_pending - before_pending > 1 else "PASS",
                note="D3：/run 传空 schedule_key→NULL，唯一索引不拦 NULL，可重复排队")
@@ -1678,7 +1678,7 @@ def phase_p10():
            "Cloud 侧 0 命中；前端路由仅四个内容挖掘页面（content-pool / discovery-strategies / "
            "crawl-tasks / material-library）；原始记录见 raw/p10-flowview-grep.txt",
            "ADJUDICATED",
-           note="按裁定移出验收范围，基线 §6 相应改写为「本期交付功能链路而非视图」")
+           note="按裁定移出验收范围，PRD 第四章 §4.6 相应改写为「本期交付功能链路而非视图」")
     save_state()
 
 

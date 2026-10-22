@@ -30,7 +30,7 @@ M3 从“内容发现功能开发”调整为“内容挖掘自动化入口建�
 
 - Positive：所有入口先入池；人工与自动发现共用身份/去重规则，生产边界清楚。
 - Negative：原七个 CHG 草案需撤销执行资格；新增渠道抽象及每日时间触发配置的设计核对。主动博主搜索与作者策略已于 2026-09-23 暂停，相应 CHG-047、CHG-050 不再激活。
-- Follow-up：以 Product 的 `docs/product/M3-content-mining-v2.md` 为有效基线；同步 Engineering、Master Plan 与 `delivery/milestones/M3-content-discovery-v2.md`；旧草案已由本基线与 V2 取代，历史见 Git。实施进度见 M3 Milestone 记录，本 ADR 不跟踪。
+- Follow-up：以 `docs/product/prd/详细文档/第四章_内容挖掘.md` 为有效基线；同步 Engineering、Master Plan 与 `delivery/milestones/M3-content-discovery-v2.md`；旧草案已由本基线与 V2 取代，历史见 Git。实施进度见 M3 Milestone 记录，本 ADR 不跟踪。
 
 ## 增补记录
 
@@ -38,7 +38,7 @@ M3 从“内容发现功能开发”调整为“内容挖掘自动化入口建�
 
 2026-09-23（第二次）：用户确认博主搜索与作者策略「现在不做，改成暂停，以后再做」。第 1、4 条随之增补：本期只交付链接导入、关键词搜索与关键词策略；博主搜索入口、`author` 取值、作者字段与枚举全部保留，但移出 M3 验收范围，后续版本再评估。据此 CHG-20260915-047（M3-C2）与 CHG-20260915-050（M3-E2）标记为暂停，不再激活；M3-C 由 C1 完成、M3-E 由 E1 与 E3 完成。
 
-2026-09-23（第三次）：用户重申「挖掘策略根据条件可以自动转素材」。核对实施结果与第 3 条一致（`internal/modules/contentpool/service/discovery.go` 的 `shouldAutoMaterialize` 即按 `material_rule` + 正阈值判定），故本条不改变判定，只把条件集合封口为开关、连接方式与点赞/收藏两个阈值，并在基线 §4 写明「未配置阈值不得解释为全部命中」与「自动转素材失败不得记为成功」。新增条件（发布时间、时长、作者、是否带货等）不属本期范围。
+2026-09-23（第三次）：用户重申「挖掘策略根据条件可以自动转素材」。核对实施结果与第 3 条一致（`internal/modules/contentpool/service/discovery.go` 的 `shouldAutoMaterialize` 即按 `material_rule` + 正阈值判定），故本条不改变判定，只把条件集合封口为开关、连接方式与点赞/收藏两个阈值，并在 PRD 第四章 §4.4 写明「未配置阈值不得解释为全部命中」与「自动转素材失败不得记为成功」。新增条件（发布时间、时长、作者、是否带货等）不属本期范围。
 
 2026-09-23（第四次）：按用户指令「以 wt-media-cloud 执行的事实为准更新基线」，对本 ADR 作两处改写。
 其一，第 1 条的入口名称按实施事实更正——界面「发现内容」下拉只有 `ID/链接发现` 与 `关键词发现` 两个入口，

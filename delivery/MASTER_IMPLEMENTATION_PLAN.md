@@ -365,7 +365,7 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 | 依赖 | M2 `DONE`；按阶段解决接口、权限、周期与状态口径。 |
 | 规划状态 | A～E 与八个 CHG 草案已拆分；M3-B～E 由 CHG-20260916-052 承载并已实施，由 Cloud Scheduler + Cloud Crawler 承担，不创建 Agent 任务。 |
 | 闭环 | `delivery/milestones/M3-content-discovery-v2.md` |
-| 产品/决策 | `docs/product/M3-content-mining-v2.md`；ADR-0013（第 3、7 条已于 2026-09-23 增补）、ADR-0014（团队级隔离已确认）、ADR-0015（Cloud-owned 执行） |
+| 产品/决策 | `docs/product/prd/详细文档/第四章_内容挖掘.md`；ADR-0013（第 3、7 条已于 2026-09-23 增补）、ADR-0014（团队级隔离已确认）、ADR-0015（Cloud-owned 执行） |
 | Active CHG | None（M3 已关闭，active 名额为空） |
 | Evidence | Cloud `docs/superpowers/handoffs/`（2026-09-18、2026-09-21、2026-09-22）与 CHG-052 `checkpoint.md`/`evidence/`；关键词链路经真实凭据取得 `status=success`；E3 验收矩阵见 CHG-052 `evidence/m3-e3-acceptance-20260923/`（含 `14-verdict.md` 与 `15-`～`17-` 补验）。C2/E2 无真实外部证据。 |
 | 完成日期 | 2026-09-23（用户签收；记录见里程碑第 2.2 节） |
