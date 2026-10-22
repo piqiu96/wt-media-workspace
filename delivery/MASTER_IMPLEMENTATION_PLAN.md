@@ -109,12 +109,12 @@ wt-media-workspace/
 |---|---|---|---|
 | `DISCUSSION` | 草案，方向待裁定；不激活 | 2 | 0 |
 | `PLANNED` | 方向已定、已拆分，可激活 | 2 | 0 |
-| `IMPLEMENTING` | 实施中 | 2 | 2 |
+| `IMPLEMENTING` | 实施中 | 1 | 2 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 58 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 59 |
 | `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **2** 篇；归档记录＝`delivery/completed/*/change.md` **72** 篇。归档列 61（`DONE` 58＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 72。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
+分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **1** 篇；归档记录＝`delivery/completed/*/change.md` **73** 篇。归档列 62（`DONE` 59＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 73。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 

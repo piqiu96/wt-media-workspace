@@ -1,7 +1,7 @@
 ---
 id: CHG-20261022-100
 parent: none
-status: IMPLEMENTING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: M
@@ -45,7 +45,7 @@ risk: M
 | 当前正式文档链接可解析；docs check 通过 | `docs governance ok (15 indexes)`；19 项 `test_docs_check` 通过 |
 | 无当前文档引用已删除文件 | Workspace 删除路径 0 命中；唯一命中是 ADR-0013 指向 Cloud 仓的 `docs/superpowers/`；阳性对照 34 个归档文件 |
 | `SUPERSEDED` 引用迁移后删除 | 状态标记 0；第四章删除前确有标记（`4c7e960^` 第 3 行） |
-| Current Context 不加载历史 | 快照 1050 字符，仅当前 CHG 与 References |
+| Current Context 不加载历史 | 归档前 1050 字符，归档后按 Active CHG-098 重建为 967 字符；均仅含当前 CHG 与 References |
 | 核心规则不依赖 completed | 56 处引用均为实施/签收/证据追溯 |
 | LEDGER、active、MASTER 一致 | `verify_delivery_governance` 与 `verify_product_master_alignment` 均 exit 0 |
 | 注释清理未改业务逻辑 | Cloud build/vitest、Agent 74 项、Desktop 103 项全绿；`git diff -U0` 仅注释行 |

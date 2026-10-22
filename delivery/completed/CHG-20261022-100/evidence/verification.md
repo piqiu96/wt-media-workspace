@@ -9,14 +9,14 @@ Workspace 命令使用带 PyYAML 的 venv：`/private/tmp/wt-verify-venv/bin/pyt
 | --- | --- |
 | `python3 scripts/docs/check.py` | `docs governance ok (15 indexes)` |
 | `tests.test_docs_check` | 19 tests OK（历史目录标记、`index/never`、`SUPERSEDED` 三类正反例保留） |
-| `scripts/verify/verify_delivery_governance.py` | exit 0；归档写入 0 处；Active：098、100 |
+| `scripts/verify/verify_delivery_governance.py` | exit 0；归档写入 0 处；归档后 Active：098 |
 | `scripts/verify/verify_product_master_alignment.py` | exit 0 |
-| `scripts/verify/verify_ai_workspace.py` | exit 0；快照 1050 字符 |
+| `scripts/verify/verify_ai_workspace.py` | exit 0；归档前快照 1050 字符，归档后指向 098（967 字符） |
 | `scripts/verify/verify_skills.py` | exit 0；10 个源文件 |
 | `scripts/sync_skills.py check` | `skill outputs are up to date` |
 | `scripts/verify/verify_m0_config.py` | exit 0 |
 | `python3 -m unittest discover -s tests` | 174 tests OK |
-| `scripts/wt.py chg resume CHG-20261022-100` | 快照只含当前 CHG 元数据与 References；不含 completed／reports／历史材料 |
+| `scripts/wt.py chg resume CHG-20261022-100`（归档前） | 快照只含当前 CHG 元数据与 References；不含 completed／reports／历史材料。归档后快照按唯一 Active CHG-098 重建（967 字符） |
 
 ## 2. 引用闭合
 
