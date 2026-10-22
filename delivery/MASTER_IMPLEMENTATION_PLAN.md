@@ -393,7 +393,7 @@ Desktop 启动 → Local Agent 启动 → 登录 Cloud → 查看本地环境状
 | M3-E2 | 作者周期任务与真实增量入池（**已暂停**，后续版本再评估） | CHG-20260915-050 |
 | M3-E3 | 综合验收与用户签收；独立的只读运行视图本期不做（2026-09-23 裁定移出交付要求） | CHG-20260915-051 |
 
-A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停（本期不做，后续版本再做），移出验收范围。E3 的独立验收草案 CHG-20260915-051 从未启动，其草案已于 2026-10-10 随 planned 清理删除（见 §3 勘误）；E3 的**综合验收走查已于 2026-09-23 在 Cloud `aaf66c5` 上执行**（106 步中 87 PASS / 7 FAIL，唯一硬阻断为 D-scheduler：无人值守的真实周期触发未交付），D-scheduler 同日修复并复验通过，Desktop 走查与 `material_failed` 注入两项覆盖缺口同补，**验收矩阵第 1～7 项全部通过并经用户签收**，结论见 CHG-052 `checkpoint.md` 与 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`。原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。C 阶段由 C1 完成，M3-E 由 E1 与 E3 完成。逐阶段状态见 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1、2.2 节。
+A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停（本期不做，后续版本再做），移出验收范围。E3 的独立验收草案 CHG-20260915-051 从未启动，其草案已于 2026-10-10 随 planned 清理删除，历史见 Git；E3 的**综合验收走查已于 2026-09-23 在 Cloud `aaf66c5` 上执行**（106 步中 87 PASS / 7 FAIL，唯一硬阻断为 D-scheduler：无人值守的真实周期触发未交付），D-scheduler 同日修复并复验通过，Desktop 走查与 `material_failed` 注入两项覆盖缺口同补，**验收矩阵第 1～7 项全部通过并经用户签收**，结论见 CHG-052 `checkpoint.md` 与 `delivery/completed/CHG-20260916-052/evidence/m3-e3-acceptance-20260923/`。原 CHG-037～043 为 SUPERSEDED，不再执行，也不计为已完成。C 阶段由 C1 完成，M3-E 由 E1 与 E3 完成。逐阶段状态见 `delivery/milestones/M3-content-discovery-v2.md` 第 2.1、2.2 节。
 
 明确不做：视频下载/存储/校验、剪辑、AI 评分、自动生产/发布/互动/数据分析、其他渠道真实采集、工作流引擎、可视化调度器、任意脚本执行、crawl_result、完整历史原始 JSON。
 

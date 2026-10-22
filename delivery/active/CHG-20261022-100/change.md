@@ -38,6 +38,23 @@ risk: M
 - 全仓英文注释的中文化或机械删除所有复述型注释。
 - 历史 CHG、已完成记录与旧报告的正文重写。
 
+## 验收
+
+| Done When | 读数 |
+| --- | --- |
+| 当前正式文档链接可解析；docs check 通过 | `docs governance ok (15 indexes)`；19 项 `test_docs_check` 通过 |
+| 无当前文档引用已删除文件 | Workspace 删除路径 0 命中；唯一命中是 ADR-0013 指向 Cloud 仓的 `docs/superpowers/`；阳性对照 34 个归档文件 |
+| `SUPERSEDED` 引用迁移后删除 | 状态标记 0；第四章删除前确有标记（`4c7e960^` 第 3 行） |
+| Current Context 不加载历史 | 快照 1050 字符，仅当前 CHG 与 References |
+| 核心规则不依赖 completed | 56 处引用均为实施/签收/证据追溯 |
+| LEDGER、active、MASTER 一致 | `verify_delivery_governance` 与 `verify_product_master_alignment` 均 exit 0 |
+| 注释清理未改业务逻辑 | Cloud build/vitest、Agent 74 项、Desktop 103 项全绿；`git diff -U0` 仅注释行 |
+| 每仓独立提交，工作树干净 | 四个仓各自提交；未推送、未建 PR |
+
+## 验收记录
+
+2026-10-22：31 篇 `docs/superpowers/`、9 篇阶段报告、唯一 `SUPERSEDED` 章节与已结束的 launch-engineering 程序规格退出当前树；18 个当前文档就地压缩为当前事实；2 篇审计报告保留为 `historical/never`；`delivery/completed/` 未迁移、未重写。代码注释按 Cloud、Agent、Desktop、Workspace 四仓独立提交，仅改注释。完整机器清单与最后所在提交见 [evidence/governance-inventory.md](evidence/governance-inventory.md)，读数见 [evidence/verification.md](evidence/verification.md)。
+
 ## References
 
 - `docs/standards/文档与知识事实治理规范.md`
