@@ -28,6 +28,7 @@ risk: H
 - Task pending→leased→running→terminal、静默超时两分支、迟到结果、新 attempt 拒绝旧结果、重复上报幂等、用户范围 claim、同行走重试、结果投影用户范围全部有测试读数。
 - Agent 终态在调用 Cloud 前写入 SQLite outbox；重启先补报不重跑；无副作用可安全重跑，有副作用报 `RESULT_UNKNOWN`；`account_check` 按真实检查结果上报。
 - Cloud 068–071、Agent 0004 在 scratch schema 与实际 SQLite 上实跑并读回列/索引/约束/回填；破坏性迁移从旧 fixture 起跑。
+- `user_sessions` 过期行由 `session-cleanup` 按小时清理，过期后保留 7 天；未过期的失效行保留到过期，旧 Desktop 仍可区分 `AUTH_DESKTOP_REPLACED`。
 - Contract、Product、Architecture、Communication Spec、ADR-0022、M2-F、LEDGER 与 CHG 记录回写完成；Workspace 治理校验全绿。
 - 四仓测试、真实 Agent/BitBrowser/打包 Desktop 回归按测试矩阵留读数；未覆盖项如实登记。
 
@@ -45,10 +46,13 @@ risk: H
 | T-08 | Desktop/Web：登录冲突/替换 UI、Agent Token 配置、去设备化、下载与错误文案 |
 | T-09 | Contract 与正式文档回写、旧事实扫描 |
 | T-10 | 四仓全量验证、真实回归、证据与最终报告 |
+| T-11 | Cloud 过期会话清理：`session-cleanup` 作业、072 索引、配置与开发库实跑 |
 
 ## Verification
 
 - 四仓全量测试、068–071 迁移实跑、真实 Agent/BitBrowser/打包 Desktop 回归、断网补报与真实超时扫描读数见 `evidence/T-10-full-verification.md`；七项交付报告见 `report.md`。
+- T-11 会话清理：迁移 072、配置、批处理作业与开发库实跑读数见 `evidence/T-11-session-cleanup.md`（675→406，删除 269，保留带 55，有效 12 不变）。
+- T-10 风险复核裁定（2026-10-23）：第 3 项过期 session 清理纳入本 CHG（T-11）；第 7 项本地 API CORS/空 runtime token 不加固；第 4 项 071 同版本停服升级不做新旧兼容，线上处于体验期，破坏性变更直接执行。
 - T-10 期间发现并修复：非 Cloud 信封的网关 502 被记成 `executor_error`（Agent `8749193`）、070 对非数字历史 payload id 的 1292 中止（Cloud `cc2aacc`）、文件传输业务 schema 多声明内部标签 `claimed_by`（Cloud `98c08dd`）、两个测试夹具竞态（Agent `d5097f5`）。
 - 未覆盖：第二台物理 Desktop、GUI 逐屏视觉、真实发布/互动任务、真实下载双机交接、常驻 `discovery-scheduler` tick。
 - 状态保持 `IMPLEMENTING`，直至各仓 PR 合并与 GUI 视觉验收完成。

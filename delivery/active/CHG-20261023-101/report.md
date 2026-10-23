@@ -2,7 +2,7 @@
 
 日期：2026-10-23
 状态：实现完成，待合并与 GUI 视觉验收；CHG 保持 `IMPLEMENTING`
-证据：`delivery/active/CHG-20261023-101/evidence/T-02..T-10`
+证据：`delivery/active/CHG-20261023-101/evidence/T-02..T-11`
 
 ## 1. 变更摘要
 
@@ -20,6 +20,7 @@
 | `3f3b054` | Cloud/Agent/业务 Contract 与错误码推进到 `2026.10.23.1` |
 | `cc2aacc` | 070 迁移对非数字历史 payload id 加 `REGEXP + CAST` 守卫（T-10 发现） |
 | `98c08dd` | 文件传输业务 schema 删除内部审计标签 `claimed_by`（T-10 发现） |
+| `146f267` | `session-cleanup` 作业按保留期清理过期会话；072 为 `expires_at` 加索引（T-11） |
 
 ### wt-media-agent
 
@@ -46,7 +47,7 @@
 
 本轮不新增业务表。
 
-### Cloud 068–071
+### Cloud 068–072
 
 | 迁移 | 变更 | 读回 |
 | --- | --- | --- |
@@ -54,6 +55,7 @@
 | `069_browser_profile_scope` | 删除全局 `UNIQUE(bit_profile_id)` 与 `UNIQUE(user_id, bit_profile_id)`；新增 `UNIQUE(user_id, main_user_id, bit_profile_id)`、索引 `(user_id, main_user_id)` | 两个索引读回一致；迁移前三列重复 0 |
 | `070_task_execution_recovery` | `tasks` 增加 `user_id/attempt/attempt_id/started_at/last_report_at/finished_at/error_message/execution_timeout_seconds/external_side_effect/retryable/recovery_action/settled_by`；删除全局 `uq_idempotency_key`，改为 `UNIQUE(user_id, idempotency_key)`；新增 `(user_id,status,created_at)`、`(status,last_report_at)` | 13 列与 3 个索引读回；`attempt=1`、`attempt_id=legacy:<task_id>`、`last_report_at` 回填、`execution_timeout_seconds=300` |
 | `071_remove_agent_device_model` | 删除 `users.device_*`；删除 `local_agent_nodes`、`local_agent_binding_tickets`、`browser_profile_runtime_presence`、`agent_nodes`；删除 `sensitive_browser_tasks.node_id`、`sensitive_profile_permits.node_id` 与 permit `credential_hash`；`file_transfer_tasks` 删除 `assigned_node_id/assigned_device_id`，`claimed_by_node_id` 改名 `claimed_by`，新增 `attempt_id` | `remaining_dropped_tables=0`、`users_device_columns=0`、`sensitive_node_columns=0`；传输表列读回无 node/device |
+| `072_user_sessions_expires_at_index` | 新增 `idx_user_sessions_expires_at (expires_at)`，供过期会话清理按过期时间扫描 | `Non_unique=1`、`Seq_in_index=1`、`Column_name=expires_at` |
 
 历史数据处置：
 
@@ -156,6 +158,10 @@
 
 068–071 在 scratch schema、开发库副本、开发库、fixture 二次实跑四种起点执行，读回列、索引、约束、回填与终结行；070 的 1292 守卫由开发库副本真实触发后修复。
 
+### 过期会话清理（T-11）
+
+`session-cleanup` 在 `discovery-scheduler` 进程注册，默认每 1h 删除过期超过 7 天的会话。开发库实跑：675 → 406 行（删除 269），保留带 55 行（最近 7 天内过期），有效会话 12 行（Desktop 1 / Web 11）不变；第二次运行删除 0 行。迁移 072 实跑并读回索引。细节见 `evidence/T-11-session-cleanup.md`。
+
 ### 真实超时扫描
 
 `t10-real-timeout-noside` → `EXECUTION_INTERRUPTED / retryable=1 / retry`；`t10-real-timeout-side` → `RESULT_UNKNOWN / retryable=0 / check_platform_state`；均由 `settled_by=timeout` 收口。
@@ -187,14 +193,14 @@
 
 - **Agent Token 无吊销**：无服务端 Token 状态；停用/改密/替换只让严格档立即失败，上报档保留到原 session `exp`。需要立即吊销全部 Token 只能轮换签名密钥；密钥必须显式配置，轮换会使全部 Token 失效。
 - **信任边界**：BitBrowser/文件/可见性事实完全来自 Agent 的准入请求，服务端无法独立复核；排障依赖日志与 Agent 本地状态。
-- **过期 session 清理**：新增 `expires_at` 但没有清理 job，表会增长；作为后续运维项。
-- **破坏性迁移**：071 要求 Cloud/Agent/Desktop 同版本停服升级，不支持新旧混跑；生产需备份与维护窗口。
+- **过期 session 清理**：已由 T-11 的 `session-cleanup` 作业实现（过期后保留 7 天）；常驻调度器 tick 与生产 I/O 影响未在开发环境验证。
+- **破坏性迁移**：线上处于体验期，2026-10-23 用户裁定不做新旧版本兼容，071 等删除/修改直接执行；生产发布仍需备份，Cloud/Agent/Desktop 同版本部署。
 - **历史任务**：无法归属的历史行已终结为 `EXECUTION_INTERRUPTED`，不会恢复执行。
 - **发布/互动**：产品仍为 ComingSoon，Preflight 的登录态/文件检查没有真实发布任务读数。
 - **文件传输/合成任务**：保留各自 lease/reconcile 生命周期，只改认证、attempt 与设备/节点字段；其“运行中结果不回来”的收敛仍由既有机制负责。
 - **Agent 重启续跑**：只对声明可恢复的 executor 使用 checkpoint；无副作用任务从头重跑，有副作用任务报 `RESULT_UNKNOWN`。
 - **同机多 Cloud 用户**：一个 sidecar 同时只持有一个 Agent Token；切换 Cloud 用户时旧用户在途任务可能只能靠 Cloud 超时收敛。
-- **本地 API 既有边界**：CORS `*`、runtime token 为空时禁用认证是既有行为，本轮未扩展为公网服务。
+- **本地 API 既有边界**：CORS `*`、runtime token 为空时禁用认证是既有行为；2026-10-23 用户裁定不加固，继续只作为本机接口使用。
 - **GUI 验收**：打包 Desktop 已构建、登录 smoke 通过并启动；逐屏视觉与交互需用户确认（本机无法程序化驱动/截取 GUI）。
 - **开发环境差异**：`discovery-scheduler` 未启动，`task-recovery` 用一次性程序调用同一 job 验证；未测常驻调度器 tick。
 - **开发数据**：本轮写入的 `t10-real-%` 任务、admin 的 40 个扫描 Profile、扫描记录与真实 main 绑定已清理并读回为 0/NULL；admin 的 10 个测试 Web session 未失效（无法与用户自己的开发浏览器会话区分），按 30 天过期。清理细节见 T-10 证据。
