@@ -149,6 +149,7 @@ fixture 起跑前的旧事实与迁移后读回（`probe-before.out` / `probe-af
 ## 环境清理状态（交接）
 
 - 独立 Agent（18766/18767）、代理（18188）均已停止；两份临时数据目录保留在 `/tmp/wt-t10-run/` 供复核。
+- 验证期间使用的 Cloud 开发服务（pid 35950，15:49 启动的 go-build 临时二进制）不在 `bin/control.sh` 的 PID 跟踪内；交接前已停止，`8188` 无监听。需要时用 `bin/control.sh start` 重启受管实例。
 - 打包 Desktop 已退出：shell 与两个 sidecar（38880/38911/38913）均已终止，`8765` 无监听；DMG 已 `hdiutil detach`，`/Users/aqiuye/Develop/workspace/wt-media/.local/m2b/dmg-mount` 不再挂载。DMG 文件仍在 `target/release/bundle/dmg/`，用户可自行挂载做视觉验收。
 - 开发库夹具已清理并读回：`t10-real-%` 任务 0、admin `browser_profiles` 0、admin `profile_sync_scans` 0（含 80 行候选）、`users.bit_main_user_id=NULL`、admin 有效 Desktop session 0。operator01 的 40 个 Profile 未动。
 - 保留：admin 的 10 个有效 Web session 由测试登录产生，但无法与用户自己的开发浏览器会话区分，未批量失效；它们按 30 天过期，不影响 Desktop/Agent 边界。
