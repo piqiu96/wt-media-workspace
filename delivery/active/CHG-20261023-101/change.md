@@ -46,6 +46,13 @@ risk: H
 | T-09 | Contract 与正式文档回写、旧事实扫描 |
 | T-10 | 四仓全量验证、真实回归、证据与最终报告 |
 
+## Verification
+
+- 四仓全量测试、068–071 迁移实跑、真实 Agent/BitBrowser/打包 Desktop 回归、断网补报与真实超时扫描读数见 `evidence/T-10-full-verification.md`；七项交付报告见 `report.md`。
+- T-10 期间发现并修复：非 Cloud 信封的网关 502 被记成 `executor_error`（Agent `8749193`）、070 对非数字历史 payload id 的 1292 中止（Cloud `cc2aacc`）、文件传输业务 schema 多声明内部标签 `claimed_by`（Cloud `98c08dd`）、两个测试夹具竞态（Agent `d5097f5`）。
+- 未覆盖：第二台物理 Desktop、GUI 逐屏视觉、真实发布/互动任务、真实下载双机交接、常驻 `discovery-scheduler` tick。
+- 状态保持 `IMPLEMENTING`，直至各仓 PR 合并与 GUI 视觉验收完成。
+
 ## Constraints / Not In Scope
 
 - 不在 `users` 新增 `auth_version`、`desktop_login_version`、`active_session_id`；不建 `web_session` 表。
