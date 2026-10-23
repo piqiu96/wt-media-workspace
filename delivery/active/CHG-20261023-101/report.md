@@ -197,5 +197,5 @@
 - **本地 API 既有边界**：CORS `*`、runtime token 为空时禁用认证是既有行为，本轮未扩展为公网服务。
 - **GUI 验收**：打包 Desktop 已构建、登录 smoke 通过并启动；逐屏视觉与交互需用户确认（本机无法程序化驱动/截取 GUI）。
 - **开发环境差异**：`discovery-scheduler` 未启动，`task-recovery` 用一次性程序调用同一 job 验证；未测常驻调度器 tick。
-- **开发数据**：本轮在开发库写入 `t10-real-%` 任务、admin 的 40 个扫描 Profile 与真实 main 绑定、测试 session；清理/交接状态见 T-10 证据，不随代码提交。
+- **开发数据**：本轮写入的 `t10-real-%` 任务、admin 的 40 个扫描 Profile、扫描记录与真实 main 绑定已清理并读回为 0/NULL；admin 的 10 个测试 Web session 未失效（无法与用户自己的开发浏览器会话区分），按 30 天过期。清理细节见 T-10 证据。
 - **无关工作树差异**：Cloud 仓 `internal/modules/production/*` 存在与本 CHG 无关的纯 gofmt 差异（同一秒批量改写），未纳入提交、未还原，留给工作树所有者。
