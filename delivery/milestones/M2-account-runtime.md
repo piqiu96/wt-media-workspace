@@ -580,9 +580,9 @@ M2只有在全部追踪项和真实Evidence通过，并由用户完成人工整�
 - 统一 Execution Preflight 覆盖普通与敏感本地操作，至少检查用户启用、Desktop session 有效、主账号已绑定、BitBrowser 正在运行、实际主账号与绑定一致、Profile 双作用域、本地 Profile 存在、平台登录态与本地文件可用；错误统一为 `{code, message, retryable, recovery_action}`。
 - Task 不保存设备、节点、交接或迁移状态，也不保存主账号执行快照。Cloud `tasks` 使用 `user_id`、`attempt`、`attempt_id`、`started_at`、`last_report_at`、`finished_at`、`execution_timeout_seconds`、`external_side_effect`、`retryable`、`recovery_action`、`settled_by` 收敛执行。Scheduler 只有一个 `task-recovery` 扫描 `status='running'` 且 `last_report_at` 超过 `execution_timeout_seconds` 的任务；无外部副作用返回 `EXECUTION_INTERRUPTED` 且可重试，有外部副作用返回 `RESULT_UNKNOWN` 且不自动重试。
 - Agent SQLite 保存 checkpoint 与 result outbox；最终结果必须先写入本地 outbox，再调用 Cloud 上报。重启或网络恢复后先补报，不重跑已完成工作。迟到结果仅在没有新 attempt 时收敛；新 attempt 已启动时旧结果返回 `STALE_ATTEMPT`。
-- 右上角展示头像和昵称，点击后有“个人信息”“退出”。独立个人信息页展示个人资料、设备绑定与换绑信息；退出结束当前会话并返回登录页。昵称默认用户名且可修改；头像默认系统头像并可从系统头像中选择。
-- 完成标准：同机重启/重新登录自动恢复，不同设备拒绝，手动解绑后新设备可绑定且旧设备失效；所有下载及其他本机执行入口遵守同一设备与会话判断；真实 Cloud、Desktop、Agent、BitBrowser 走查通过。
-- 实施记录：[CHG-20261001-072](../completed/CHG-20261001-072/change.md)。产品规则见第三章 PRD §3.2.7，技术取舍见 ADR-0018。设备/会话主线的 v2 延续（会话层 client_type 解耦、执行凭据改绑设备、换机重投递、主账号自助确认）见 [CHG-20261002-074](../completed/CHG-20261002-074/change.md)：个人信息页已提供自助「比特账号绑定」；基线回写待裁定。
+- 右上角展示头像和昵称，点击后有“个人信息”“退出”。个人信息页展示个人资料、比特浏览器主账号绑定状态和当前电脑的执行环境检查结果，不提供设备绑定、换绑或解绑入口；退出结束当前会话并返回登录页。昵称默认用户名且可修改；头像默认系统头像并可从系统头像中选择。
+- 完成标准：两个 Web 会话并存；Web 与 Desktop 会话并存；第二台 Desktop 登录取消零写入、确认替换后旧 Desktop 收到 `AUTH_DESKTOP_REPLACED`，旧 Desktop 的 sidecar 仍上报已领取任务；Agent 只能调用受限 Agent API；BitBrowser 首绑、临时不一致、正式重绑、切回旧主账号与跨 UID 隔离有真实读数；统一 Preflight 与 Task 超时/outbox 恢复闭环；真实 Cloud、Desktop、Agent、BitBrowser 走查通过。
+- 实施记录：[CHG-20261023-101](../active/CHG-20261023-101/change.md)。产品规则见第三章 PRD §3.2.4、§3.2.7、§3.4.3、§3.4.4；技术取舍见 [ADR-0022](../../docs/decisions/0022-session-only-auth-and-agent-token.md)。
 
 ### M2-G 起飞品牌、登录页与桌面图标
 

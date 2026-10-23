@@ -8,7 +8,7 @@ Current state is mixed. The machine-readable map is authoritative for exact revi
 
 - Cloud API, Cloud-Agent API, business schemas, business enums and Cloud error codes are active formal definitions.
 - Local Agent API, local event schemas, local status enums and local error codes are active formal definitions.
-- `task_schemas` is active (M1-R1). Revision `2026.07.15.1` defines the universal task model, status state machine, task types, and error codes.
+- `task_schemas` is active. Revision `2026.10.23.1` defines the universal task model, status state machine, task types, execution defaults and error codes.
 
 Historical M0/M1 release entries remain valid evidence for their recorded scaffold/noop scope. They do not imply that the revised M0/M1 end-to-end milestone gates are complete.
 
@@ -44,6 +44,12 @@ ambiguous tuple matches are surfaced as conflicts and are never guessed.
 Cloud Web and Desktop consume the refreshed Web build output.
 
 Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extract` operation. Cloud owns the compatible proxy-address parse, dynamic extraction preview, dynamic refresh, and bound-window detail projections. The Agent fetches a manually requested provider URL and returns only the first supported plain-text proxy address to Cloud; it never writes BitBrowser. Cloud stores the source URL as a secret, exposes only a configured/masked indication, clears stale check facts when the extracted connection changes, and requires browser-window-side write/read-back before any bound Profile changes.
+
+### Session-only auth and Agent Token revision (CHG-20261023-101)
+
+Cloud owns revision `2026.10.23.1` across `cloud-api`, `cloud-agent-api`, `business-schemas`, `business-enums`, `task-schemas` and `cloud-error-codes`. `user_sessions` becomes the only authentication fact: Web allows multiple sessions, Desktop allows one valid session per user, and a second Desktop login returns `DESKTOP_LOGIN_CONFLICT` until the caller confirms with the current session id. Desktop exchanges a valid desktop session for a signed, stateless Agent Token at `POST /api/v1/local-agent/agent-token`; its `exp` equals the session `expires_at`, strict mode gates new work and report-safe mode closes already-claimed tasks. Device, node, presence and binding-ticket contracts are retired. Task claim/report requires the Agent Token plus `attempt_id`, and `task-recovery` settles silent `running` tasks as `EXECUTION_INTERRUPTED` or `RESULT_UNKNOWN` by external-side-effect flag.
+
+The Agent-owned `local-agent-api` and `local-error-codes` revisions are `2026.10.23.1`: the local Agent stores the Agent Token in memory only, accepts BitBrowser binding from Agent-read facts, and declares the profile CRUD, cookie-read, sensitive preflight/finish and agent-token routes it implements. Desktop `contracts.lock.json` pins `cloud_agent_api`, `task_schemas` and `local_agent_api` at this revision.
 
 ## Agent-Owned Contracts
 
