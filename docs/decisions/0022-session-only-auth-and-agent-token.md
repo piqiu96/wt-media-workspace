@@ -22,6 +22,7 @@ ADR-0018 引入稳定设备绑定，ADR-0019 又把执行在场从登录会话�
 6. **Agent 结果 outbox。** Agent 最终结果先写 SQLite checkpoint/outbox，再上报 Cloud；重启或网络恢复先补报，不重跑已完成工作。Cloud report 以 `task_id + attempt_id + user_id` 幂等收敛；迟到结果只在没有新 attempt 时生效。
 7. **统一 Preflight。** 普通与敏感本地操作复用同一 evaluator 和错误码；`sensitive_profile_permits` 只保留 Profile 互斥语义，不再保存 node 或独立 credential。
 8. **下载去设备化。** `file_transfer_tasks` 删除 `assigned_node_id` / `assigned_device_id`；领取按 `requested_by` 用户范围，写 `claimed_by` 审计字段和 `attempt_id`。去重键不再包含设备或节点。
+9. **仅用于本机展示的设备标识。** Desktop 可从操作系统机器标识派生应用专用的稳定哈希 ID，供已登录用户在个人信息页辨认当前电脑；重装应用后仍相同。原始机器标识不进入 Vue、Cloud、Agent Token 或日志。此 ID 不参与登录冲突、认证、任务领取、设备绑定和服务端持久状态；无法读取时明确显示不可用，不以 Agent ID 顶替。
 
 ## Consequences
 

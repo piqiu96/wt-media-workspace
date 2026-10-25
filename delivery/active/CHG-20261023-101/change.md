@@ -16,13 +16,15 @@ risk: H
 - 登录只以 `user_sessions` 为唯一认证事实源：Web 允许同一用户多条有效 session；Desktop 同一用户只允许一条有效 session，冲突由 session 行表达并支持取消/确认替换；密码修改、重置、停用、强制下线批量失效 session；不在 `users` 增加任何认证状态字段。
 - 删除固定设备/节点模型（`users.device_*`、Ed25519 设备证明、`local_agent_nodes`、binding ticket、runtime presence、`agent_nodes`、`file_transfer_tasks.assigned_device_id`）。Desktop 登录后用当前有效 desktop session 换取会话绑定、限权、无服务端状态的签名 Agent Token；Token 的 `exp` 等于该 session 的 `expires_at`，不设独立 TTL 或刷新定时器。
 - BitBrowser 首次绑定只接受 Agent 实读的 `main_user_id`；`browser_profiles` 按 `user_id + main_user_id` 双作用域；切换主账号不删除、不迁移旧数据。
+- 个人信息页把“绑定账号”“当前比特浏览器”分别标为“绑定比特账号”“当前比特账号”，并展示本机机器信息、Agent 状态及只用于辨认当前电脑的稳定设备 ID。该 ID 从原生机器标识派生，不恢复 Cloud 设备身份模型。
 - 统一 Execution Preflight 覆盖普通与敏感本地操作；Task 不绑定设备/节点，使用 `user_id`、`attempt_id`、`last_report_at`、`execution_timeout_seconds`、`external_side_effect` 统一收敛；Agent SQLite 实现 checkpoint + result outbox，终态先落盘再上报。
 
 ## Done When
 
 - 两个 Web 会话并存；Web 与 Desktop 会话并存；第二台 Desktop 登录先返回冲突，取消零写入，确认后旧 Desktop 收到 `AUTH_DESKTOP_REPLACED`；旧 Desktop 的 sidecar 仍可上报已领取任务。
 - Agent Token 只能调用受限 Agent API；严格档在 Desktop 被替换后拒绝 claim/bind/preflight，上报档在 `exp` 前仍可收敛已领取任务；Token `exp == session.expires_at`，登录/续期/app 或 sidecar 重启时重取，无独立刷新定时器。
-- 设备/节点相关表、列、路由、错误码、Tauri 设备身份、Web 设备入口与下载设备逻辑全部退场，无兼容旁路。
+- 设备/节点相关表、列、路由、错误码、用于认证的 Tauri 设备身份、Web 设备绑定入口与下载设备逻辑全部退场，无兼容旁路。
+- 本机展示用设备 ID 在同一物理电脑上重装 Desktop 后保持一致；无法读取时不显示伪造值，原始机器标识不出原生层；个人信息页在 Agent 不可达时仍可展示设备 ID 并如实显示 Agent 状态。
 - BitBrowser 首绑、同主验证、临时不一致、正式重绑、切回旧主账号、跨系统 UID 隔离、扫描缺失只标记不删除、媒体账号越界行为均有自动化与真实读数。
 - 统一 Preflight 的 11 项检查按 `code` 失败关闭；普通任务不能绕过；敏感 permit 只保留互斥语义。
 - Task pending→leased→running→terminal、静默超时两分支、迟到结果、新 attempt 拒绝旧结果、重复上报幂等、用户范围 claim、同行走重试、结果投影用户范围全部有测试读数。
@@ -47,6 +49,7 @@ risk: H
 | T-09 | Contract 与正式文档回写、旧事实扫描 |
 | T-10 | 四仓全量验证、真实回归、证据与最终报告 |
 | T-11 | Cloud 过期会话清理：`session-cleanup` 作业、072 索引、配置与开发库实跑 |
+| T-12 | 个人信息页 GUI 验收修正：比特账号文案、本机展示用设备 ID、机器与 Agent 信息；明确该 ID 不参与认证或任务归属 |
 
 ## Verification
 
@@ -64,7 +67,7 @@ risk: H
 - 不实现任务迁移、交接、换电脑恢复或设备接管状态机。
 - 不自动重试有外部副作用任务；不实现发布/互动业务。
 - 不重写 `file_transfer_tasks` / `compose_tasks` 既有 lease/reconcile 生命周期；只改认证、attempt 与设备/节点字段。
-- 不保留未认证 claim/report 或旧节点/设备兼容旁路；旧 Agent 在新 Cloud 上失败关闭。
+- 不保留未认证 claim/report 或旧节点/设备兼容旁路；旧 Agent 在新 Cloud 上失败关闭。仅本机展示用的设备 ID 不上传 Cloud，也不建立服务端设备对象。
 - 不重写历史 ADR / 已完成交付记录；只加取代指针。
 - 不建立第二套 Delivery、状态或 Context 源。
 
