@@ -3,7 +3,7 @@
 - Milestone status: `IN_PROGRESS`
 - Product baseline: `docs/product/prd/详细文档/第五章_素材生产.md`
 - Engineering baseline: `docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md`
-- Decision: `docs/decisions/0017-m4-m5-cloud-owned-content-production.md`、`docs/decisions/0021-compose-four-layer-model.md`
+- Decision: `docs/decisions/0017-m4-m5-cloud-owned-content-production.md`、`docs/decisions/0021-compose-four-layer-model.md`、`docs/decisions/0023-m3-m5-team-resources-and-production-operator.md`（2026-10-26 增量）
 - Confirmed: 2026-09-24，用户确认按 Cloud Scheduler / Worker / FFmpeg 方案直接更新并实施
 
 ## 1. 里程碑目标
@@ -32,6 +32,8 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 
 页面走查以 [AdminUI 页面规范](../../docs/standards/frontend/AdminUI页面规范.md) 和[用户反馈规范](../../docs/standards/frontend/用户反馈规范.md)为准。[合成策略](../../assets/images/ui/content-production/compose-strategies-reference.png)、[合成任务](../../assets/images/ui/content-production/compose-tasks-reference.png)、[我的成片](../../assets/images/ui/content-production/my-outputs-reference.png)三张图只供布局参考，不能据图扩大业务状态和数据模型。
 
+下文 M4-A～H 的“我的成片”、原有游戏授权和发布入口是对应历史验收时的称呼与范围，证据不改写。2026-10-26 新增 M4-I/J 后，当前产品入口统一叫“成片管理”；M3–M5 Cloud 范围按 ADR-0023，发布入口仍待 M6。新口径须另行验收，不借旧 PASS 宣称已交付。
+
 ## 2. 前置条件
 
 - M3 为 `DONE`，`source_content → material` 已有真实闭环；
@@ -52,6 +54,8 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 | M4-G | 任务执行详情与人工失败重试：先补可审计的服务端能力，再开放页面操作 | CHG-20261013-089 | `DONE`（2026-10-13 归档，Cloud commits `2e99dfd`/`7468ff9`/`50561d5`；尝试记录、人工重试与成片关联机器验收见其 `evidence/`，页面真实数据走查并入 M4-H） |
 | M4-H1 | 按 Admin UI 与参考图修正策略、任务、成片及创建任务的视觉与信息层级 | CHG-20261014-090 | `DONE`；2026-10-14 归档，Cloud commit `c92264b`；布局样本、定向测试和双端构建通过，不增加参考图中的未交付业务能力 |
 | M4-H2 | 按真实数据完成 Cloud Web/Desktop 页面走查与用户签收 | M4-H1 完成后，与 M5 最后统一走查 | `IN_PROGRESS`；2026-10-16 五轮合成任务整改已机器验收；2026-10-17 M5-C7 T-10 在新策略模型下复跑了人工任务创建、我的成片与 Local Agent 下载（任务 306/315、成片 53/59），Cloud Web 38 项走查通过；Desktop 视觉逐屏与用户签收待完成 |
+| M4-I | 策略、任务和成片有可追溯的最终运营负责人；管理角色可代创建并按负责人查找 | CHG-20261026-103 | `PLANNED`；2026-10-26 新增产品闭环，原 M4-A～H 验收不充当此项证据 |
+| M4-J | 团队素材库使用口径、个人工作集与本机下载入口收敛 | CHG-20261026-104 | `PLANNED`；依赖 M4-I 负责人事实，原 M4-A 签收不充当此项证据 |
 
 M4-A 已获用户签收，见 [M4-A 验收补记](../reports/2026-10-12-m4-a-signoff.md)；M4 整体仍待 UI 走查与签收。
 
@@ -260,6 +264,18 @@ M4 只有在 M4-AC-01～12 全部 PASS、自动测试与真实依赖验证完成
 十二项机器腿全部 PASS（真实读数或带日期引用，见 `delivery/completed/CHG-20261013-086/evidence/T-06.md`），无 UNVERIFIED；剩余唯一未决项为用户 UI 走查与签收（同文件签收清单七项）。
 
 M4-A 已签收；本表十二项机器部分与本轮下载缺口修复已对账，UI 部分仍待走查，不提前标记里程碑 `DONE`。
+
+## M4-I production-operator
+
+2026-10-26 增量，见 [CHG-20261026-103](../planned/CHG-20261026-103/change.md)。策略必须绑定团队、一个游戏及一个有效运营负责人；高级运营团队自动为本团队，管理员创建时选目标团队。人工任务仅从创建者自己的“我的素材”选材：普通运营负责人固定本人；高级运营和管理员可代创建，所选负责人必须匹配策略、团队与游戏。任务分别保存创建人及负责人快照，成片继承任务负责人；历史不明归属不伪造。合成任务和成片管理使用同一页面，普通运营固定本人，高级运营默认“我”并可筛本团队全部或指定运营，管理员按目标团队查看。代创建结果可直达。
+
+验收以正式 migration、Cloud 合同/API、真实任务与成片读回、普通运营越权拒绝、管理角色代创建及双端共用页面为证据；策略负责人修改不改历史。M2 本机资源与 M6 发布流程不在本项。
+
+## M4-J material-usage
+
+2026-10-26 增量，见 [CHG-20261026-104](../planned/CHG-20261026-104/change.md)。`material` 素材库按团队公共可见，游戏多选初次默认本人负责项；“我的素材”固定当前用户 `material_usage`。素材库分开显示加入状态、我的使用与使用情况：失败／取消任务不算使用，只有成功成片计入；普通运营只看使用人数和成片数，高级运营／管理员可在授权团队查看姓名明细。本机原素材下载必须从“我的素材”发起，直接请求 API 也要验证当前用户关系；Cloud Worker 的源文件准备继续可用。`/material-library` 应呈现正式 `material`，不是内容池只读别名。
+
+验收覆盖加入／移出／恢复、成功与失败、同策略任务防重与重试入口、跨团队统计隔离、直接下载越权、Cloud 自动任务源准备及双端页面。`已发布` 与发布次数只定义口径，待 M6 真实 `publication` 查询交付后再展示。M4 原有十二项 PASS 不代表此新项通过；最终 `DONE` 还需 M4-I/J 各自证据和用户签收。
 
 UI 走查补充检查：策略、任务、成片的列表和详情与实际合同一致；字段只展示当前模板支持的参数；操作和反馈遵循 `docs/standards/`。参考图中的策略版本、草稿、单任务多素材、批量发布及“发布中/发布失败”不能当作 M4 缺口。若走查发现已约定能力缺失，另开小范围修复 CHG，不改写已归档的机器验收。
 

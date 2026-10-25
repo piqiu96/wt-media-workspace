@@ -161,6 +161,8 @@ wt-media-workspace/
 | M5 | `IN_PROGRESS` | M4 的人工生产底座可复用；M4-H2 尚未签收。 | 用户已授权先完成 M5 各 CHG 并逐项机器验收，最后统一走查 M4/M5。 |
 | M6-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
+2026-10-26 M3–M5 易用性增量已确认：先待 CHG-101 合并，再按 [M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)开放团队公共内容池与 Desktop 共用 Cloud 页面入口；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)建立策略→任务→成片负责人事实；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)把自动候选改为团队素材库。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
+
 每个里程碑的最终综合验收至少包含：
 
 1. 自动单元、Contract、集成和回归测试；
