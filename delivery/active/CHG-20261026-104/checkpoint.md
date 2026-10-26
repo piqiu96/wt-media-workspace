@@ -31,7 +31,7 @@
 
 ## 下一步
 
-1. 提交并推送证据修订与 checkpoint，等 Workspace PR #13 CI。
+1. 证据修订与 checkpoint 已推送（`8c67059`），Workspace PR #13 CI 通过（12s）；等待用户走查。
 2. 保留 Cloud API（pid 53117，health ok）、Vite 5173、MySQL；compose worker 与无头 Chrome 已停，避免走查期间自动跑任务。
 3. 向用户交付修订后的人工验收清单（A5、A8 已按新行为改写；A1/A2/C1/C2 按当前 `hy,sjz` 默认调整）。
 4. 用户回报后，把结果写入 `evidence/T-08-operator-filter.md` 与 `T-06-role-scope.md`；不符项先修复并重走对应步骤。
@@ -50,5 +50,5 @@
 Cloud go test ./...            72 packages ok, 0 FAIL（11 个包无测试文件）
 Vitest (web/)                  79 files / 729 tests passed
 Cloud PR #11 CI                pass 2m47s（e741a12、fa41428）
-Workspace PR #13 CI            pass 10s（eede4db、3244079）；证据修订后重跑
+Workspace PR #13 CI            pass 12s（8c67059；含证据修订）
 ```
