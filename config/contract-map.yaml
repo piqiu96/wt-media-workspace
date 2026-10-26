@@ -15,7 +15,9 @@ contracts:
     # Profile 双作用域；identity 与 browser-profiles 一并推进。
     # 2026.10.26.1：content-production 增加策略/任务/成片 operator_id 与负责人
     # 目录 /compose-operators；历史行不回填。
-    contract_revision: "2026.10.26.1"
+    # 2026.10.26.2：素材库改为团队授权、游戏只做筛选；列表增加加入/我的使用/
+    # 团队使用三个维度的筛选与投影，下载只允许从当前用户有效「我的素材」发起。
+    contract_revision: "2026.10.26.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -42,7 +44,9 @@ contracts:
     # 2026.07.14.4 → 2026.10.02.1：三个定义文件早已推进（identity/browser-profile/
     # media-account），map 停在旧值上无人可见，由活源对比抓出。
     # 2026.10.23.1：UserSession/BitAccountView（掩码）与 FileTransferTask.claimed_by。
-    schema_revision: "2026.10.23.1"
+    # 2026.10.26.1：Material 增加查看者关系（usage_status/added_at）、我的使用
+    # （my_usage）与团队成功成片汇总（usage）；历史无负责人的成片只计总数。
+    schema_revision: "2026.10.26.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -80,7 +84,9 @@ contracts:
     # 三个错误码文件已推进，map 停在旧值，由活源对比抓出。
     # 2026.10.23.1：会话/Agent Token/BitBrowser 绑定/统一 Preflight 的错误码重写，
     # 新增 v1/execution.yaml；节点凭证与 permit credential 的错误码删除。
-    error_revision: "2026.10.23.1"
+    # 2026.10.26.1：content-production 补登记 compose_task_not_retryable（409）；
+    # 该错误码自 CHG-20261026-103 起已由服务返回，此前只存在于 OpenAPI 描述。
+    error_revision: "2026.10.26.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
