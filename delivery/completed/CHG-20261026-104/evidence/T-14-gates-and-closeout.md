@@ -56,4 +56,6 @@ Workspace PR #13 CI                pass 13s（b4153d0；T-13 记录提交后重�
 
 ## 合并与归档
 
-（合并后补记 Cloud #11 merge SHA、Workspace #13 merge SHA、`origin/main` 读回与分支删除。）
+- Cloud PR #11 已合并：`fc8504e75a69ac8010b053582be808cebfbb51f6`（2026-10-27，merge commit）。
+- Workspace 归档经 PR #13 合入 `main`；本记录随归档提交进入 `delivery/completed/CHG-20261026-104/`。按规则不在归档内容里预填本 PR 尚未产生的 merge SHA，`origin/main` 读回在合并后另行确认。
+- 归档前 `wt chg verify` 已在 `VERIFYING` 状态运行；`verify_m1_integration.py` 的基线失败见上。

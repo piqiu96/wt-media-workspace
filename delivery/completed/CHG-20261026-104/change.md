@@ -1,10 +1,11 @@
 ---
 id: CHG-20261026-104
 parent: delivery/milestones/M4-content-production.md#m4-j-material-usage
-status: VERIFYING
+status: DONE
 depends_on: ["CHG-20261026-103"]
 dependency_merge_commits: {"CHG-20261026-103": {"wt-media-workspace": "f2d0e3bfca3d3a732c0d65130b2a16383dd77a27"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
+merge_commits: {"wt-media-cloud": "fc8504e75a69ac8010b053582be808cebfbb51f6"}
 risk: H
 ---
 
