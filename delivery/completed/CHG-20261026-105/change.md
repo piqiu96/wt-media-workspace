@@ -1,9 +1,10 @@
 ---
 id: CHG-20261026-105
 parent: delivery/milestones/M5-automatic-production.md#m5-f-team-material-candidates
-status: VERIFYING
+status: DONE
 depends_on: ["CHG-20261026-103"]
 dependency_merge_commits: {"CHG-20261026-103": {"wt-media-workspace": "f2d0e3bfca3d3a732c0d65130b2a16383dd77a27"}}
+merge_commits: {"wt-media-cloud": "c509ee83a9985ff5d92ee3a720b53750b7c46be1"}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: H
 ---
