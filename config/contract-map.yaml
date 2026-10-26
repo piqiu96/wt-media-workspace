@@ -13,7 +13,9 @@ contracts:
     # 已由 cloud 仓推进（该值此前与定义脱节，由 verify_m0_config 的活源对比抓出）。
     # 2026.10.23.1：登录改为只认 user_sessions、BitBrowser 绑定走 Agent Token、
     # Profile 双作用域；identity 与 browser-profiles 一并推进。
-    contract_revision: "2026.10.23.1"
+    # 2026.10.26.1：content-production 增加策略/任务/成片 operator_id 与负责人
+    # 目录 /compose-operators；历史行不回填。
+    contract_revision: "2026.10.26.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
