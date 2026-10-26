@@ -17,7 +17,9 @@ contracts:
     # 目录 /compose-operators；历史行不回填。
     # 2026.10.26.2：素材库改为团队授权、游戏只做筛选；列表增加加入/我的使用/
     # 团队使用三个维度的筛选与投影，下载只允许从当前用户有效「我的素材」发起。
-    contract_revision: "2026.10.26.2"
+    # 2026.10.27.1：成片列表增加 game_id（只收窄，普通运营越界 403）；
+    # 执行结果不明确的核对从「仅管理员」放宽为管理员或同团队高级运营。
+    contract_revision: "2026.10.27.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop

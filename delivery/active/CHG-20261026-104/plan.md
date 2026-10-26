@@ -44,20 +44,26 @@ usage.operators         仅高级运营/管理员返回 [{id, name, output_count
 | T-06 | 真实 API/DB 验收：三角色、跨游戏/跨团队、加入/移出/恢复、失败/成功成片、筛选与统计、直连下载拒绝、Worker 准备回归 | 真实 MySQL/API 读数 + 数据前后对照 | 无代码；evidence |
 | T-07 | 真实页面读回：Cloud Web + Desktop 共用页面筛选项、三列状态、详情、从“我的素材”发起真实下载 | CDP/页面读回 + 传输任务/本地文件证据 | 无代码；evidence |
 | T-08 | 负责人筛选修订：任务/成片页只列团队成员（含本人）、未选即团队全部；高级运营列表/详情改为团队范围，普通运营与管理员不变；同步 PRD/产品主文档/里程碑 | Go service 用例 + Vitest + 真实页面走查 | Cloud 前后端 + Workspace 文档 |
-| T-09 | 门禁、PR、归档：Cloud PR + Workspace 记录 PR，更新 LEDGER/里程碑/MASTER | `go test`、Vitest、Workspace 全量、PR CI | Workspace 交付记录 |
+| T-09 | 空负责人守卫：新增 `web/src/modules/compose/operatorFilter.js`，统一解析 `op:<id>`；任务/成片两页改用 `operatorIdFromOption` / `missingOperatorOption`，`undefined`、`null`、空串和非法值按“全部”处理 | 纯函数单测覆盖空值与非法 id；两页源码断言不再直接 `.startsWith`；清空再筛选走查 | Cloud web |
+| T-10 | 素材库选项与使用情况：`gameOptions` 改为游戏管理启用的全量；默认选中本人负责且已启用的游戏；会话与字典加载后再取列表；普通运营不渲染使用情况列/筛选/详情段（`showUsage` 开关）；高级运营/管理员一行可点摘要 + 弹窗明细，无数据 `—`、无负责人只 `成片 N` | Vitest：选项来源、默认交集、字典失败不预选、普通运营隐藏、摘要、弹窗遍历、多人滚动、无占位文案 | Cloud web + PRD |
+| T-11 | 成片游戏筛选与列：`ListComposeOutputsInput.GameID` + handler 解析 `game_id`；service 校验 32 字符，普通运营选非本人负责游戏 403，选中复用 `GameIDs`，未选保留原范围；页面新增游戏筛选、重置、参数和游戏列；OpenAPI 增加 `game_id`/403，bump `2026.10.27.1`，Workspace contract-map 同步 | Go service/handler 用例；OpenAPI 解析；`verify_m0_config.py`；Vitest 页面与 `ListPageConventions` 10→11 列 | Cloud 后端/合同/Web + Workspace 合同映射 |
+| T-12 | 高级运营核对：`visibleAdminTask` 改为 `visibleReviewTask`，允许管理员或同团队高级运营；普通运营在可见范围内 403，跨团队高级运营 404；页面放行高级运营，文案统一为“人工核对/核对人”；成功任务不渲染残留失败块；同步 PRD、工程规格、M5-C6 与 ADR-0023 追加决议 | Go 用例：同团队高级运营成功、跨团队 404、普通运营 403、缺证据 400、重复处置 409；Vitest 角色门槛、文案、成功任务不渲染待核对区；不改 CHG-097 已完成证据 | Cloud 后端/Web + Workspace 文档/ADR |
+| T-13 | 数据清理：用户走查通过后，停 compose worker/scheduler，单事务按 `reviews → attempts → 输出下载 transfer → outputs → tasks → schedule_runs → strategies` 删除 19/16/7 条；审计全部保留（基线 51 条，走查新增也保留）；记录删除前 ID、对象键、计数与删除后复核 | 删除前后 `COUNT(*)`、外键依赖为 0、329/328/330/331、72/73/74、46/47/48 保留、素材 161 使用情况变为 `—`、API/页面 smoke | 无代码；`evidence/T-13-data-cleanup.md` |
+| T-14 | 门禁、PR、重新走查、归档：Go/Vitest/Workspace 全量、Cloud PR #11、Workspace PR #13，创建走查夹具 331（SQL，仅本地开发库）、更新 change/plan/checkpoint 与验收清单 | PR CI 全绿；331 夹具状态与守卫实测；用户按修订清单走查；`wt chg verify` | Workspace 交付记录 |
 
 ## 5. 验收映射
 
 - Done When 第 1 条：T-01 + T-06 三角色/跨团队读数。
 - 第 2 条：T-02 + T-06 加入/移出/恢复、失败/取消/成功对照；T-06 同时回归 `(策略,素材)` 防重与重试入口。
-- 第 3 条：T-02 + T-06 普通运营无姓名、高级运营/管理员有姓名、跨团队素材不合并。
+- 第 3 条：T-02 + T-06 普通运营隐藏使用情况、高级运营/管理员摘要与弹窗、跨团队素材不合并；T-10 覆盖页面可见性。
 - 第 4 条：T-03 + T-05 + T-07 页面无入口、直连下载 403、我的素材下载成功、Worker 准备回归。
 - 第 5 条：T-05 + T-07 共用页面；发布相关不展示；回归 M4-A 与 M5 生产链路。
-- 2026-10-27 修订：T-08 覆盖负责人筛选与高级运营团队范围；原 T-01/T-02 的团队与游戏授权口径不变。
+- 第 6 条：T-11 覆盖成片 `game_id` 只收窄与普通运营越界 403；T-08 覆盖负责人筛选与高级运营团队范围；原 T-01/T-02 的团队与游戏授权口径不变。
+- 2026-10-27 第二次修订：T-09 空负责人守卫；T-10 游戏选项与使用情况；T-12 高级运营核对（覆盖 M5-C6 仅管理员口径，ADR-0023 追加）；T-13 无负责人历史数据清理。
 
 ## 6. 风险
 
-- 历史成片无负责人：团队成片数含全部成功行，人数只含已知负责人；页面明示“历史负责人未记录”，不把 NULL 或 `created_by` 当负责人。
+- 历史成片无负责人：团队成片数含全部成功行，人数只含已知负责人；页面只显示 `成片 N`，不写“负责人未记录”，不把 NULL 或 `created_by` 当负责人。清理后历史无负责人行不再存在。
 - 普通运营默认游戏筛选可能隐藏其他游戏素材：筛选可清空，服务端仍按团队返回；真实验收覆盖清空后读回。
 - 下载新增 403 会改变既有直连行为：只影响无有效关系的请求；M4-A 从“我的素材”下载与 Worker 源准备两条路径必须同时实测。
 - 管理员跨团队列表：统计与姓名按素材所属团队；真实验收覆盖同外部作品在两团队分别计数。
