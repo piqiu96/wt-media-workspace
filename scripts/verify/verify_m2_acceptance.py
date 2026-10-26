@@ -15,10 +15,10 @@ refactor moving a symbol between files must not be able to turn this gate red;
 a contract or schema change must.
 
 Each repository asserts its own implementation in its own test suite. For
-example the binding-ticket single-use rule is covered behaviourally by
-`wt-media-cloud/internal/modules/runtimebinding/service/service_test.go`
-(`TestRegisterConsumesTicketOnceAndIssuesHashedCredential`); this script only
-asserts the schema that makes it enforceable, in the applied migration.
+example the stale-attempt rule is covered behaviourally in
+`wt-media-cloud/internal/modules/cloudagent/repository/`; this script only
+asserts the published contract and the applied migration that make it
+enforceable.
 """
 
 from __future__ import annotations
@@ -102,7 +102,7 @@ def validate_static_matrix() -> list[str]:
     require_contains(
         errors,
         CLOUD / "contracts" / "cloud-agent-api" / "v1" / "sensitive-profile-guard.openapi.yaml",
-        ("review_required", "X-Profile-Permit"),
+        ("review_required", "permit_id"),
     )
     require_contains(
         errors,
@@ -154,26 +154,15 @@ def validate_static_matrix() -> list[str]:
                 )
             elif actual != rev:
                 errors.append(f"{name}: Desktop lock pins {stem}@{rev}, definition says {actual}")
-    # Binding-ticket single use is asserted at the layer that stays true. The
-    # enforcement lives in Cloud, which consumes the ticket atomically; Desktop
-    # source text can legitimately move in any refactor. An APPLIED MIGRATION is
-    # append-only, so its text is stable in a way a refactorable source file is
-    # not: `used_at` (nullable marker, set once on consume) plus a UNIQUE key on
-    # `token_hash` is the schema that makes single use enforceable at all.
-    require_contains(
-        errors,
-        CLOUD / "migrations" / "20260714_004_agent_runtime.sql",
-        (
-            "CREATE TABLE local_agent_binding_tickets",
-            "used_at DATETIME(6) NULL",
-            "UNIQUE KEY uq_local_agent_binding_ticket_hash (token_hash)",
-        ),
-    )
-
+    # Secrets stay out of persistence. The binding-ticket model this block used to
+    # anchor is gone (the Agent Token is stateless and never stored); what remains
+    # true is that no Desktop or migration file may acquire a persisted credential
+    # column or browser storage for one.
     sensitive_files = [
         CLOUD / "migrations" / "20260714_004_agent_runtime.sql",
         CLOUD / "migrations" / "20260714_005_sensitive_profile_locks.sql",
-        DESKTOP / "src-tauri" / "src" / "local_agent" / "mod.rs",
+        DESKTOP / "src-tauri" / "src" / "commands" / "agent_token.rs",
+        DESKTOP / "src-tauri" / "src" / "state.rs",
     ]
     forbidden = ("binding_token varchar", "node_credential varchar", "permit_credential varchar", "localstorage", "sessionstorage")
     for path in sensitive_files:

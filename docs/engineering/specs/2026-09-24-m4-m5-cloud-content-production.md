@@ -125,7 +125,7 @@ material 1 ── n material_usage n ── 1 user
 | `execution_scope` | `cloud`、`local_agent` |
 | `status` | `pending`、`running`、`success`、`failed`、`cancelled` |
 
-进度字段包括总字节、完成字节、瞬时/平滑速度、预计剩余秒数、尝试次数和错误。正式业务表不保存本机绝对路径；本地路径由 Local Agent / Desktop 在本机可信存储中管理，Cloud 只保存目标节点、文件名和完成事实。
+进度字段包括总字节、完成字节、瞬时/平滑速度、预计剩余秒数、尝试次数和错误。正式业务表不保存本机绝对路径；本地路径由 Local Agent / Desktop 在本机可信存储中管理，Cloud 只保存请求用户、领取审计、文件名和完成事实。
 
 ## 4. 进程模型
 

@@ -11,9 +11,9 @@ contracts:
     api_major_version: v1
     # 2026.09.06.1 → 2026.10.02.1：cloud-api 的 v1/file-transfer.openapi.yaml
     # 已由 cloud 仓推进（该值此前与定义脱节，由 verify_m0_config 的活源对比抓出）。
-    # 2026.10.21.1：筛选条件与策略运行记录分页加入 Cloud API；
-    # 目录内 browser-profiles、identity、content-production 的 info.version 已同步。
-    contract_revision: "2026.10.21.1"
+    # 2026.10.23.1：登录改为只认 user_sessions、BitBrowser 绑定走 Agent Token、
+    # Profile 双作用域；identity 与 browser-profiles 一并推进。
+    contract_revision: "2026.10.23.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -25,8 +25,10 @@ contracts:
     api_major_version: v1
     # 2026.10.13.1：v1/file-transfer.openapi.yaml 已推进（map 停在 2026.10.01.1，
     # 由活源对比抓出）。
-    contract_revision: "2026.10.13.1"
-    minimum_agent_contract_revision: "2026.07.14.7"
+    # 2026.10.23.1：Agent Token、统一 Preflight、attempt 上报与 permit 互斥取代
+    # 节点凭证与无认证 claim/report；minimum 同步抬高，旧 Agent 失败关闭。
+    contract_revision: "2026.10.23.1"
+    minimum_agent_contract_revision: "2026.10.23.1"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:
       - wt-media-agent
@@ -37,8 +39,8 @@ contracts:
     formal_definition: active
     # 2026.07.14.4 → 2026.10.02.1：三个定义文件早已推进（identity/browser-profile/
     # media-account），map 停在旧值上无人可见，由活源对比抓出。
-    # 2026.10.14.3：v1/content-production.yaml 继续推进，本次对齐。
-    schema_revision: "2026.10.14.3"
+    # 2026.10.23.1：UserSession/BitAccountView（掩码）与 FileTransferTask.claimed_by。
+    schema_revision: "2026.10.23.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -48,7 +50,9 @@ contracts:
     path: ../wt-media-cloud/contracts/task-schemas
     state: active
     formal_definition: active
-    schema_revision: "2026.07.15.1"
+    # 2026.10.23.1：Task 增加 user/attempt/last_report_at/settled_by 等运行字段，
+    # 去掉设备/节点，并按任务类型给出静默超时与外部副作用默认值。
+    schema_revision: "2026.10.23.1"
     consumers:
       - wt-media-agent
       - wt-media-desktop
@@ -59,8 +63,8 @@ contracts:
     formal_definition: active
     # 2026.07.14.3 → 2026.09.26.2：identity.yaml（2026.07.22.1）与
     # content-production.yaml（2026.09.26.2，CHG-20260930-069）已推进。
-    # 2026.10.12.3：v1/content-production.yaml 再次推进，本次对齐。
-    enum_revision: "2026.10.12.3"
+    # 2026.10.23.1：identity 增加 client_type 与 invalidated_reason。
+    enum_revision: "2026.10.23.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -72,9 +76,9 @@ contracts:
     formal_definition: active
     # 2026.07.14.5 → 2026.10.02.1：agent-runtime/browser-profile/profile-guard
     # 三个错误码文件已推进，map 停在旧值，由活源对比抓出。
-    # 2026.10.14.1（已提交）与 2026.10.16.1（T-10 新增错误码）：
-    # v1/content-production.yaml 两次推进，本次对齐到 2026.10.16.1。
-    error_revision: "2026.10.16.1"
+    # 2026.10.23.1：会话/Agent Token/BitBrowser 绑定/统一 Preflight 的错误码重写，
+    # 新增 v1/execution.yaml；节点凭证与 permit credential 的错误码删除。
+    error_revision: "2026.10.23.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -94,7 +98,9 @@ contracts:
     # CHG-20260925-063 T-01 then moved that constant onto the stale value.
     # CHG-20261002-074 added the optional `scan` parameter to GET /api/v1/status,
     # which moves the definition to 2026.10.03.1, and synced that constant as well.
-    contract_revision: "2026.10.03.1"
+    # 2026.10.23.1：新增 Agent Token 交接、BitBrowser 绑定、敏感任务预检与许可
+    # 交还、Profile CRUD 与 Cookie 读取；扫描带 observed_at。
+    contract_revision: "2026.10.23.1"
     consumers:
       - wt-media-desktop
   local_event_schemas:
@@ -119,11 +125,9 @@ contracts:
     state: active
     formal_definition: active
     # The newest of the area's definitions, as `local_event_schemas` does: the
-    # files carry their own revisions and `v1/bitbrowser.yaml` is still at
-    # 2026.07.14.6. CHG-20260924-061 T-04 added `v1/transfer.yaml`, moved it to
-    # 2026.09.27.2 when the local API's missing-store refusal turned out to be
-    # returned without a line in the file, and to 2026.09.27.3 when the bind
-    # route's `node_credential_unavailable` was added the same way.
-    error_revision: "2026.09.27.3"
+    # files carry their own revisions. CHG-20261023-101 advanced both
+    # `v1/bitbrowser.yaml` (offline / Cloud-unreachable refusals, secret policy)
+    # and `v1/transfer.yaml` (save-directory and Agent Token refusals).
+    error_revision: "2026.10.23.1"
     consumers:
       - wt-media-desktop

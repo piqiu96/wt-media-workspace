@@ -1,6 +1,6 @@
 # ADR-0018: Stable Desktop device binding with session-scoped Agent authorization
 
-- Status: Accepted
+- Status: Superseded by [ADR-0022](0022-session-only-auth-and-agent-token.md)
 - Date: 2026-09-30
 - Scope: Desktop local execution, Cloud identity and runtime binding
 - Refines: ADR-0003 (session-bound ticket and node credential remain in force)

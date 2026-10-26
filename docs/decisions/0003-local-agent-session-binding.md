@@ -1,6 +1,6 @@
 # ADR-0003: Local Agent session binding and runtime attestation
 
-- Status: Accepted
+- Status: Accepted；设备证明、一次性票据与 node credential 部分由 [ADR-0022](0022-session-only-auth-and-agent-token.md) 取代
 - Date: 2026-07-14
 - Change: CHG-20260714-018
 

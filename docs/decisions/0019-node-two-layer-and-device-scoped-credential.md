@@ -1,6 +1,6 @@
 # ADR-0019：node 拆身份会话层与执行在场层，执行凭据绑定设备
 
-- Status: Accepted
+- Status: Superseded by [ADR-0022](0022-session-only-auth-and-agent-token.md)
 - Date: 2026-10-02
 - Scope: Cloud identity/runtimebinding/cloudagent/profileguard/filetransfer 执行层、Desktop 凭据落盘、契约 v2（runtime-binding、file-transfer、browser-profiles、agent-runtime、profile-guard、browser-profile）
 - Refines: ADR-0018（设备绑定、一次性票据与 node 凭据、审计边界不变）
