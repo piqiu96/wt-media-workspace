@@ -7,5 +7,6 @@ Completed delivery records are removed after their final product, engineering, c
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
 | CHG-20261015-098 | M5-C7 真实计划时间全链与 M4/M5 统一验收 | IMPLEMENTING | wt-media-workspace |
+| CHG-20261026-102 | M3 内容池公共范围与策略职责 | IMPLEMENTING | wt-media-workspace |
 
 M4-H2 真实数据 UI 走查与 M5 最后统一签收。

@@ -1,7 +1,7 @@
 ---
 id: CHG-20261026-102
 parent: delivery/milestones/M3-content-discovery-v2.md#m3-f-public-content-scope
-status: PLANNED
+status: IMPLEMENTING
 depends_on: ["CHG-20261023-101"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-desktop"]
 risk: H
