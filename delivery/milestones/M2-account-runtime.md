@@ -582,7 +582,7 @@ M2只有在全部追踪项和真实Evidence通过，并由用户完成人工整�
 - Agent SQLite 保存 checkpoint 与 result outbox；最终结果必须先写入本地 outbox，再调用 Cloud 上报。重启或网络恢复后先补报，不重跑已完成工作。迟到结果仅在没有新 attempt 时收敛；新 attempt 已启动时旧结果返回 `STALE_ATTEMPT`。
 - 右上角展示头像和昵称，点击后有“个人信息”“退出”。个人信息页展示个人资料、比特浏览器主账号绑定状态、当前电脑的操作系统与 CPU 架构、Agent 状态与版本，以及重装应用后不变的本机展示用设备 ID；此 ID 不参与认证或任务归属，不提供设备绑定、换绑或解绑入口；退出结束当前会话并返回登录页。昵称默认用户名且可修改；头像默认系统头像并可从系统头像中选择。
 - 完成标准：两个 Web 会话并存；Web 与 Desktop 会话并存；第二台 Desktop 登录取消零写入、确认替换后旧 Desktop 收到 `AUTH_DESKTOP_REPLACED`，旧 Desktop 的 sidecar 仍上报已领取任务；Agent 只能调用受限 Agent API；BitBrowser 首绑、临时不一致、正式重绑、切回旧主账号与跨 UID 隔离有真实读数；统一 Preflight 与 Task 超时/outbox 恢复闭环；真实 Cloud、Desktop、Agent、BitBrowser 走查通过。
-- 实施记录：[CHG-20261023-101](../active/CHG-20261023-101/change.md)。产品规则见第三章 PRD §3.2.4、§3.2.7、§3.4.3、§3.4.4；技术取舍见 [ADR-0022](../../docs/decisions/0022-session-only-auth-and-agent-token.md)。
+- 实施记录：[CHG-20261023-101](../completed/CHG-20261023-101/change.md)。产品规则见第三章 PRD §3.2.4、§3.2.7、§3.4.3、§3.4.4；技术取舍见 [ADR-0022](../../docs/decisions/0022-session-only-auth-and-agent-token.md)。
 
 ### M2-F 后续入口例外（2026-10-26）
 
