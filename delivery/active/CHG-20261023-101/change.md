@@ -50,11 +50,13 @@ risk: H
 | T-10 | 四仓全量验证、真实回归、证据与最终报告 |
 | T-11 | Cloud 过期会话清理：`session-cleanup` 作业、072 索引、配置与开发库实跑 |
 | T-12 | 个人信息页 GUI 验收修正：比特账号文案、本机展示用设备 ID、机器与 Agent 信息；明确该 ID 不参与认证或任务归属 |
+| T-13 | 批量验收反馈：记录 101-1/2/3 用户通过；修复 BitBrowser 未启动时窗口操作的错误提示；101-5 改用既有故障注入证据，不再要求人工复现 |
 
 ## Verification
 
 - 四仓全量测试、068–071 迁移实跑、真实 Agent/BitBrowser/打包 Desktop 回归、断网补报与真实超时扫描读数见 `evidence/T-10-full-verification.md`；七项交付报告见 `report.md`。
 - T-11 会话清理：迁移 072、配置、批处理作业与开发库实跑读数见 `evidence/T-11-session-cleanup.md`（675→406，删除 269，保留带 55，有效 12 不变）。
+- T-13 用户验收反馈与 BitBrowser 离线提示见 `evidence/T-13-bitbrowser-offline-feedback.md`；101-4 的更新包 GUI 复看仍待完成。
 - T-10 风险复核裁定（2026-10-23）：第 3 项过期 session 清理纳入本 CHG（T-11）；第 7 项本地 API CORS/空 runtime token 不加固；第 4 项 071 同版本停服升级不做新旧兼容，线上处于体验期，破坏性变更直接执行。
 - T-10 期间发现并修复：非 Cloud 信封的网关 502 被记成 `executor_error`（Agent `8749193`）、070 对非数字历史 payload id 的 1292 中止（Cloud `cc2aacc`）、文件传输业务 schema 多声明内部标签 `claimed_by`（Cloud `98c08dd`）、两个测试夹具竞态（Agent `d5097f5`）。
 - 未覆盖：第二台物理 Desktop、GUI 逐屏视觉、真实发布/互动任务、真实下载双机交接、常驻 `discovery-scheduler` tick。

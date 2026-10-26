@@ -1,7 +1,7 @@
 # CHG-20261023-101 最终交付报告
 
 日期：2026-10-23
-状态：实现完成，待合并与 GUI 视觉验收；CHG 保持 `IMPLEMENTING`
+状态：实现完成，待合并与 GUI 视觉验收；101-4 更新包 GUI 复看待完成；CHG 保持 `IMPLEMENTING`
 证据：`delivery/active/CHG-20261023-101/evidence/T-02..T-11`
 
 ## 1. 变更摘要
@@ -205,3 +205,7 @@
 - **开发环境差异**：`discovery-scheduler` 未启动，`task-recovery` 用一次性程序调用同一 job 验证；未测常驻调度器 tick。
 - **开发数据**：本轮写入的 `t10-real-%` 任务、admin 的 40 个扫描 Profile、扫描记录与真实 main 绑定已清理并读回为 0/NULL；admin 的 10 个测试 Web session 未失效（无法与用户自己的开发浏览器会话区分），按 30 天过期。清理细节见 T-10 证据。
 - **无关工作树差异**：Cloud 仓 `internal/modules/production/*` 存在与本 CHG 无关的纯 gofmt 差异（同一秒批量改写），未纳入提交、未还原，留给工作树所有者。
+
+## 8. 2026-10-26 批量验收补记
+
+用户反馈 101-1/2/3 为 OK；101-4 在 BitBrowser 未启动时暴露原始 502/JSON/连接拒绝错误，已在 Agent、Desktop、共用前端补上结构化错误和运营可执行提示，自动化验证通过，更新包 GUI 仍待复看。101-5 从人工验收清单撤下，以本报告第 5 节已有 17/17 故障注入与 64/64 真实回归为当前证据。详情见 `evidence/T-13-bitbrowser-offline-feedback.md`。
