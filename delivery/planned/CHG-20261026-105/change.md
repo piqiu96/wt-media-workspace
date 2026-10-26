@@ -24,6 +24,8 @@ risk: H
 
 - 不把策略创建者或负责人工作集关系作为自动候选条件；不改人工选材来源，也不新建 `compose_pool` 或核心 batch 表。
 - 不开放管理员或高级运营对他人本机文件、BitBrowser、Profile、Cookie 的访问；M6 发布不在范围。
+- 实施时同步合同缺口：`contracts/cloud-api/v1/content-production.openapi.yaml` 缺 `/runs/tasks`（策略运行记录下的任务列表）端点。
+- 真实并发（多个任务同时认领同一素材）的补验归本 CHG；CHG-098 只验证过单进程不重复执行。
 
 ## References
 
