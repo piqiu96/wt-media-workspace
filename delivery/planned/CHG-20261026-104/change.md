@@ -25,6 +25,8 @@ risk: H
 
 - 不新增平行素材、个人状态表或人工计数事实；不改变 `publication` 合同或发布流程。
 - 若直接下载权限涉及 Agent 或 Desktop 合同改动，实施前更新本 CHG 的影响仓和验证边界，不在代码里绕过 Workspace 定义。
+- 实施时同步合同缺口：`contracts/cloud-error-codes/v1/content-production.yaml` 未登记 `compose_task_not_retryable`（Cloud 已返回 HTTP 409／15217），补登记需 bump 该文件 revision。
+- 下载端到端验收必须实测三条：素材库列表与详情无本机下载入口、从「我的素材」发起下载成功、无当前用户有效 `material_usage` 时直连下载 API 失败关闭。
 
 ## References
 

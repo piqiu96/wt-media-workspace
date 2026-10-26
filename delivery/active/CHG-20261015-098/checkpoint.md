@@ -30,9 +30,24 @@
 3. 在新打包 Desktop 上核对公开读域名的视频播放与 CSP，以及「已下载但本机缺文件 → 重新下载」；本轮只验证了 URL 转换、Rust CSP 测试和双端 Web 构建，尚无新安装包的可视与真实文件证据。
 4. 在新打包 Desktop（有新鲜受信 Local Agent 节点）上补验 T-11 的用户下载 stale-ready 端到端：删一条可丢弃素材的云端对象 → 点「下载原视频」应创建一次云端准备并挂到下载任务 → 准备完成后运营电脑直连下载；同时确认预览返回「暂不可用」而不是 404 页面。
 5. Linux 发布链路（`build-release-linux.sh` / `package_release_linux.py`）仍未在 Linux 环境执行；compose-worker 清单修复的既有证据止于静态一致性、交叉编译和单测变异。
-6. 保留待裁定项：调度跳过原因合并为 `previously_run` 后不再区分上次成功/失败/在途；人工重试的执行编号不回退；重试确认框与 `compose_task_not_retryable` 的中文措辞；`tokens.css` 的 `--wt-status-*` 是否全站接入；OpenAPI「改策略状态」的 `put:` 与实际 PATCH 路由不一致（生成客户端可能 404）。这些未在本轮顺手改动。
+6. 待裁定项已于 2026-10-26 逐项确认，见下方「2026-10-26 待裁定项结论」；其中下载端到端与真实并发按结论转 CHG-104／CHG-105 补验，本轮不宣称通过。
 7. 若后续走查包含自动定时触发，需独立启动 `compose-scheduler` 并复核进程与到点 run；本地 M2-B 启动脚本目前只托管人工任务消费所需的 `compose-worker`。
 8. 任务 319/320/321 已于 2026-10-22 全部重试成功（成片 63/65/64），素材 154/160/159 的正式对象已恢复；317 的长视频合成结果此前已成功（`success/committing`），成片对象读回仍可补做。
+
+## 2026-10-26 待裁定项结论
+
+用户逐项确认，结论如下；本轮只改记录，不改代码。第 7 项属 M3，写入 M3-F／CHG-102。
+
+| 项 | 问题 | 结论 | 落地 |
+| --- | --- | --- | --- |
+| 1 | M5 定时调度跳过原因合并为 `previously_run` 后不区分上次成功/失败/在途 | 只显示 `previously_run`，不加上次状态列；要看上次成败点进该合成任务 | `skipped_json` 结构与页面列不变；PRD 第五章 §5.7.5 已是此口径 |
+| 2 | 人工重试后执行编号是否回退 | 复用同一条 `compose_task`，执行编号不回退；任务最终状态只看 `compose_task.status`，执行记录逐条展示 | `compose_task_attempts` 的 `UNIQUE(task_id, attempt)` 保留完整历史；PRD §5.8.5 |
+| 3 | 重试文案与 `compose_task_not_retryable` | 统一叫「重试」，不引入第二种叫法；文案维持现状 | 错误码目录缺 `compose_task_not_retryable` 登记，归 CHG-104 合同同步 |
+| 4 | `tokens.css` 的 `--wt-status-*` 从未被入口加载 | 单独开 UI 小 CHG 统一处理 | 新增 `delivery/planned/CHG-20261026-106/change.md` |
+| 5 | 改策略状态用 PATCH 而非 POST | 保持 PATCH；POST 用于创建资源或触发动作 | OpenAPI 缺 `/runs/tasks` 端点，归 CHG-105 合同同步 |
+| 6 | 用户下载端到端与真实并发未验 | 下载只从「我的素材」发起；素材库无下载入口；无 `material_usage` 直连 API 失败关闭 | 下载补验归 CHG-104，真实并发归 CHG-105；本轮不宣称通过 |
+
+M3 的 V2-Q07（忽略语义）已按第 7 项结论关闭：团队级忽略、重新发现不处理，见 M3 里程碑与 CHG-102。
 
 ## Blockers
 
