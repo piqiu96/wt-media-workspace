@@ -80,13 +80,15 @@ class WTCLITests(unittest.TestCase):
         )
         return path
 
-    def archived_dependency(self, merge_commits: str = "") -> str:
+    def archived_dependency(
+        self, merge_commits: str = "", affected: str = '["wt-media-cloud"]'
+    ) -> str:
         dep_id = "CHG-20261020-001"
         path = self.root / "delivery" / "completed" / dep_id / "change.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
             f"---\nid: {dep_id}\nparent: none\nstatus: DONE\n"
-            f"depends_on: []\naffected_repos: [\"wt-media-cloud\"]\nrisk: M\n"
+            f"depends_on: []\naffected_repos: {affected}\nrisk: M\n"
             f"{merge_commits}---\n# {dep_id}: Done\n## Change\nDone.\n## Done When\nPass.\n",
             encoding="utf-8",
         )
@@ -133,6 +135,25 @@ class WTCLITests(unittest.TestCase):
         sha = self.git(self.cloud, "rev-parse", "HEAD")
         dep_id = self.archived_dependency(f'merge_commits: {{"wt-media-cloud": "{sha}"}}\n')
         change = read_change(self.change(depends=f'["{dep_id}"]'))
+        verify_merged_dependencies(change, self.root)
+
+    def test_dependent_chg_supplements_archived_repository_commits(self) -> None:
+        self.commit(self.root)
+        workspace_sha = self.git(self.root, "rev-parse", "HEAD")
+        cloud_sha = self.git(self.cloud, "rev-parse", "HEAD")
+        dep_id = self.archived_dependency(
+            f'merge_commits: {{"wt-media-cloud": "{cloud_sha}"}}\n',
+            affected='["wt-media-cloud", "wt-media-workspace"]',
+        )
+        change = read_change(
+            self.change(
+                depends=f'["{dep_id}"]',
+                extra=(
+                    'dependency_merge_commits: {"'
+                    f'{dep_id}": {{"wt-media-workspace": "{workspace_sha}"}}}}\n'
+                ),
+            )
+        )
         verify_merged_dependencies(change, self.root)
 
     def test_dependency_without_commit_evidence_blocks(self) -> None:

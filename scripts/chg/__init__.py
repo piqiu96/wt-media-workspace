@@ -90,7 +90,12 @@ def verify_merged_dependencies(change: ChangeMetadata, root: Path = ROOT) -> Non
             dependency = read_change(archive)
         except ValueError as exc:
             raise WTError(f"cannot read archived {dep_id}: {exc}") from exc
-        commits = dependency.merge_commits or change.dependency_merge_commits.get(dep_id, {})
+        # An archived record can name only the repositories it actually changed;
+        # the dependent CHG supplies the remaining affected repositories from
+        # verifiable history (AGENT-INDEX §5). Supplements never replace the
+        # archive's own commits.
+        commits = dict(dependency.merge_commits)
+        commits.update(change.dependency_merge_commits.get(dep_id, {}))
         affected = dependency.affected_repos or tuple(commits)
         if not affected:
             raise WTError(

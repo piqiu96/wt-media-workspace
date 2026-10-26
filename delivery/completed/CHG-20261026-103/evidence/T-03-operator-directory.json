@@ -1,0 +1,84 @@
+{
+  "op01-team1-game-hy": {
+    "errcode": 15221,
+    "type": "compose_operator_forbidden",
+    "message": "没有权限查看可指派负责人"
+  },
+  "senior-default": {
+    "errcode": 0,
+    "data": [
+      {
+        "id": 9,
+        "username": "chg103senior",
+        "nickname": "CHG103高级",
+        "display_name": "CHG103高级"
+      },
+      {
+        "id": 3,
+        "username": "operator01",
+        "nickname": "pika",
+        "display_name": "pika"
+      },
+      {
+        "id": 2,
+        "username": "senior01",
+        "nickname": "senior01",
+        "display_name": "senior01"
+      }
+    ]
+  },
+  "senior-team2": {
+    "errcode": 15221,
+    "type": "compose_operator_forbidden",
+    "message": "没有权限查看可指派负责人"
+  },
+  "admin-no-team": {
+    "errcode": 15220,
+    "type": "compose_operator_invalid",
+    "message": "compose operator reference is invalid: team_id is required"
+  },
+  "admin-team1-hy": {
+    "errcode": 0,
+    "data": [
+      {
+        "id": 9,
+        "username": "chg103senior",
+        "nickname": "CHG103高级",
+        "display_name": "CHG103高级"
+      },
+      {
+        "id": 3,
+        "username": "operator01",
+        "nickname": "pika",
+        "display_name": "pika"
+      }
+    ]
+  },
+  "admin-team1-all": {
+    "errcode": 0,
+    "data": [
+      {
+        "id": 9,
+        "username": "chg103senior",
+        "nickname": "CHG103高级",
+        "display_name": "CHG103高级"
+      },
+      {
+        "id": 3,
+        "username": "operator01",
+        "nickname": "pika",
+        "display_name": "pika"
+      },
+      {
+        "id": 2,
+        "username": "senior01",
+        "nickname": "senior01",
+        "display_name": "senior01"
+      }
+    ]
+  },
+  "admin-team2": {
+    "errcode": 0,
+    "data": []
+  }
+}
