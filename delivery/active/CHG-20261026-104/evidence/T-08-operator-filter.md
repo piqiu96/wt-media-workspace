@@ -43,7 +43,7 @@ go test ./internal/modules/production/...
 go test ./...
 ```
 
-实际：两组均通过，`0 FAIL`。
+实际：`go test ./...` 72 个包 ok、0 FAIL（另有 11 个包无测试文件）；production 子集全通过。
 
 关键用例与读数：
 

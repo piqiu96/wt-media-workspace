@@ -10,7 +10,7 @@
   - 任务／成片页负责人下拉只列 `/compose-operators` 返回的团队成员（含本人），去掉“我的／团队全部”伪选项与默认 `mine`，不再发送 `operator_scope`。
   - 高级运营空 `operator_scope` 默认本团队全部；任务／成片列表、详情、取消与重试不再按本人负责游戏收窄；普通运营与管理员范围不变。
   - 同步 PRD 第五章、产品主文档、M4 里程碑；记录见 `change.md`、`plan.md`。
-- 自动门禁：Cloud `go test ./...` 全包通过；Vitest（`web/` 下）79 文件 / 729 用例通过。
+- 自动门禁：Cloud `go test ./...` 72 包通过、0 FAIL；Vitest（`web/` 下）79 文件 / 729 用例通过；Workspace 175 用例与全部校验通过。
 - 真实读数（修订前）：团队 1 素材 59（hy/sjz/other = 14/19/26）、跨团队 403、加入/移出/恢复、真实任务 328→成片 72、真实下载 2 次、Worker 在关系移出后完成素材 17 源准备、真实任务 330→成片 73 与跨团队同外部作品分别计数。
 - 证据：`evidence/T-06-team-scope-and-filters.md`、`T-06-usage-facts.md`、`T-06-download-and-worker-prep.md`、`T-06-role-scope.md`、`T-07-page-readback.md`、`T-08-operator-filter.md`。
 - PR：Cloud #11、Workspace #13 已创建；T-08 提交后需重新推送并等 CI。
@@ -43,7 +43,7 @@
 ## 最近验证
 
 ```text
-Cloud go test ./...            全包通过，0 FAIL
+Cloud go test ./...            72 packages ok, 0 FAIL（11 个包无测试文件）
 Vitest (web/)                  79 files / 729 tests passed
 Cloud PR #11 CI                待 T-08 提交后重跑
 Workspace PR #13 CI            待记录提交后重跑
