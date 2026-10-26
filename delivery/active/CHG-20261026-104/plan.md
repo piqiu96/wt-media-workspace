@@ -48,8 +48,8 @@ usage.operators         仅高级运营/管理员返回 [{id, name, output_count
 | T-10 | 素材库选项与使用情况：`gameOptions` 改为游戏管理启用的全量；默认选中本人负责且已启用的游戏；会话与字典加载后再取列表；普通运营不渲染使用情况列/筛选/详情段（`showUsage` 开关）；高级运营/管理员一行可点摘要 + 弹窗明细，无数据 `—`、无负责人只 `成片 N` | Vitest：选项来源、默认交集、字典失败不预选、普通运营隐藏、摘要、弹窗遍历、多人滚动、无占位文案 | Cloud web + PRD |
 | T-11 | 成片游戏筛选与列：`ListComposeOutputsInput.GameID` + handler 解析 `game_id`；service 校验 32 字符，普通运营选非本人负责游戏 403，选中复用 `GameIDs`，未选保留原范围；页面新增游戏筛选、重置、参数和游戏列；OpenAPI 增加 `game_id`/403，bump `2026.10.27.1`，Workspace contract-map 同步 | Go service/handler 用例；OpenAPI 解析；`verify_m0_config.py`；Vitest 页面与 `ListPageConventions` 10→11 列 | Cloud 后端/合同/Web + Workspace 合同映射 |
 | T-12 | 高级运营核对：`visibleAdminTask` 改为 `visibleReviewTask`，允许管理员或同团队高级运营；普通运营在可见范围内 403，跨团队高级运营 404；页面放行高级运营，文案统一为“人工核对/核对人”；成功任务不渲染残留失败块；同步 PRD、工程规格、M5-C6 与 ADR-0023 追加决议 | Go 用例：同团队高级运营成功、跨团队 404、普通运营 403、缺证据 400、重复处置 409；Vitest 角色门槛、文案、成功任务不渲染待核对区；不改 CHG-097 已完成证据 | Cloud 后端/Web + Workspace 文档/ADR |
-| T-13 | 数据清理：用户走查通过后，停 compose worker/scheduler，单事务按 `reviews → attempts → 输出下载 transfer → outputs → tasks → schedule_runs → strategies` 删除 19/16/7 条；审计全部保留（基线 51 条，走查新增也保留）；记录删除前 ID、对象键、计数与删除后复核 | 删除前后 `COUNT(*)`、外键依赖为 0、329/328/330/331、72/73/74、46/47/48 保留、素材 161 使用情况变为 `—`、API/页面 smoke | 无代码；`evidence/T-13-data-cleanup.md` |
-| T-14 | 门禁、PR、重新走查、归档：Go/Vitest/Workspace 全量、Cloud PR #11、Workspace PR #13，创建走查夹具 331（SQL，仅本地开发库）、更新 change/plan/checkpoint 与验收清单 | PR CI 全绿；331 夹具状态与守卫实测；用户按修订清单走查；`wt chg verify` | Workspace 交付记录 |
+| T-13 | 数据清理：用户走查通过后，停 compose worker/scheduler，单事务按 `reviews → attempts → 输出下载 transfer → outputs → tasks → schedule_runs → strategies` 删除 19/17/7 条；审计全部保留（基线 1213 条，其中 52 条引用被删 ID；走查新增也保留）；记录删除前 ID、对象键、计数与删除后复核 | 删除前后 `COUNT(*)`、外键依赖为 0、329/328/330/331、72/73/74/75、46/47/48 保留、素材 161 使用情况变为 `—`、API/页面 smoke | 无代码；`evidence/T-13-data-cleanup.md` |
+| T-14 | 门禁、合并与归档：Go/Vitest/Workspace 全量、`wt chg verify`（登记 `verify_m1_integration.py` 基线失败）、合并 Cloud PR #11、Workspace 置 DONE/归档、合并 PR #13、清理剩余夹具 | PR CI 全绿；`wt chg verify` 仅基线失败；归档后 LEDGER 无 104；`origin/main` 含归档提交 | Workspace 交付记录 |
 
 ## 5. 验收映射
 
