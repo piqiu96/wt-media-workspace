@@ -108,13 +108,13 @@ wt-media-workspace/
 | 状态 | 含义 | 活记录 | 归档记录 |
 |---|---|---|---|
 | `DISCUSSION` | 草案，方向待裁定；不激活 | 2 | 0 |
-| `PLANNED` | 方向已定、已拆分，可激活 | 3 | 0 |
-| `IMPLEMENTING` | 实施中 | 1 | 2 |
+| `PLANNED` | 方向已定、已拆分，可激活 | 2 | 0 |
+| `IMPLEMENTING` | 实施中 | 2 | 2 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
 | `DONE` | 已收口归档；**活记录不得取此词** | 0 | 64 |
 | `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` **5** 篇 ＋ `delivery/active/*/change.md` **1** 篇；归档记录＝`delivery/completed/*/change.md` **78** 篇。归档列 67（`DONE` 64＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 78。planned 5 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
+分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **2** 篇；归档记录＝`delivery/completed/*/change.md` **78** 篇。归档列 67（`DONE` 64＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 78。planned 4 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 
@@ -161,7 +161,7 @@ wt-media-workspace/
 | M5 | `IN_PROGRESS` | M4 的人工生产底座可复用；M4-H2 尚未签收。 | 用户已授权先完成 M5 各 CHG 并逐项机器验收，最后统一走查 M4/M5。 |
 | M6-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
-2026-10-26 M3–M5 易用性增量已确认：CHG-101 已合并；[M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)已完成并归档（Cloud PR #8，`cb26c66`），团队公共内容池与 Desktop 共用 Cloud 页面入口上线；CHG-106 前端状态色死表已删除并归档（Cloud PR #9，`d793d92`）；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)已完成并归档（Cloud PR #10，`2cd341d`），策略→任务→成片负责人事实与代创建链路已上线；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)已激活，以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)把自动候选改为团队素材库。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
+2026-10-26 M3–M5 易用性增量已确认：CHG-101 已合并；[M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)已完成并归档（Cloud PR #8，`cb26c66`），团队公共内容池与 Desktop 共用 Cloud 页面入口上线；CHG-106 前端状态色死表已删除并归档（Cloud PR #9，`d793d92`）；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)已完成并归档（Cloud PR #10，`2cd341d`），策略→任务→成片负责人事实与代创建链路已上线；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)已完成并归档（Cloud PR #11，`fc8504e`），以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)已激活，把自动候选改为团队素材库。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
 
 每个里程碑的最终综合验收至少包含：
 
