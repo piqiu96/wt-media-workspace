@@ -18,7 +18,7 @@
   - 文档：PRD 第五章、工程规格、M5-C6 追加、ADR-0023 2026-10-27 决议、M4/M5 里程碑增量。
 - 证据：`evidence/T-06-*`、`T-07-page-readback.md`、`T-08-operator-filter.md`、`T-09-operator-filter-guard.md`、`T-10-material-library-usage.md`、`T-11-output-game-filter.md`、`T-12-senior-uncertain-review.md`。
 - 自动门禁：Cloud `go test ./...` 72 包 ok、0 FAIL（11 个包无测试文件）；Vitest（`web/` 下）80 文件 / 736 用例通过；Workspace `verify_m0_config.py` 通过。
-- PR：Cloud #11、Workspace #13 已创建；T-08 代码提交 `e741a12`、`fa41428` 已推送，Cloud `verify` 通过（2m47s）；Workspace 文档提交 `eede4db`、`3244079` 已推送，`Workspace checks` 通过（10s）。
+- PR：Cloud #11、Workspace #13 已创建；T-08 代码提交 `e741a12`、`fa41428`，T-09～T-12 代码提交 `86a2c09`（后端/合同）、`5dc5bfa`（Web），Cloud `verify` 通过（2m19s）；Workspace 文档提交 `eede4db`、`3244079`，本次修订提交 `6ae4669`、`b4153d0`，`Workspace checks` 通过（13s）。
 
 ## 当前工作
 
@@ -62,8 +62,10 @@
 
 ```text
 Cloud go test ./...            ok=72 fail=0 no_test_files=11
+Cloud go build ./...           pass
 Vitest (web/)                  80 files / 736 tests passed
+Cloud web npm run build        pass（6.86s）
 verify_m0_config.py            Workspace config verification ok
-Cloud PR #11 CI                pass 2m47s（T-08 提交 e741a12、fa41428）
-Workspace PR #13 CI            pass 12s（8c67059；待本次文档/证据 push 后重跑）
+Cloud PR #11 CI                pass 2m19s（5dc5bfa；含 86a2c09）
+Workspace PR #13 CI            pass 13s（b4153d0；本次 checkpoint 更新后重跑）
 ```
