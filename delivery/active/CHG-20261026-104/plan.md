@@ -43,7 +43,8 @@ usage.operators         仅高级运营/管理员返回 [{id, name, output_count
 | T-05 | 共用页面：管理员团队筛选、游戏多选默认本人负责项、加入状态/我的使用/使用情况三列与服务端筛选、移除素材库下载入口、详情使用卡 | Vitest 全量；Cloud Web 与 Desktop 共用源码构建 | Cloud web |
 | T-06 | 真实 API/DB 验收：三角色、跨游戏/跨团队、加入/移出/恢复、失败/成功成片、筛选与统计、直连下载拒绝、Worker 准备回归 | 真实 MySQL/API 读数 + 数据前后对照 | 无代码；evidence |
 | T-07 | 真实页面读回：Cloud Web + Desktop 共用页面筛选项、三列状态、详情、从“我的素材”发起真实下载 | CDP/页面读回 + 传输任务/本地文件证据 | 无代码；evidence |
-| T-08 | 门禁、PR、归档：Cloud PR + Workspace 记录 PR，更新 LEDGER/里程碑/MASTER | `go test`、Vitest、Workspace 全量、PR CI | Workspace 交付记录 |
+| T-08 | 负责人筛选修订：任务/成片页只列团队成员（含本人）、未选即团队全部；高级运营列表/详情改为团队范围，普通运营与管理员不变；同步 PRD/产品主文档/里程碑 | Go service 用例 + Vitest + 真实页面走查 | Cloud 前后端 + Workspace 文档 |
+| T-09 | 门禁、PR、归档：Cloud PR + Workspace 记录 PR，更新 LEDGER/里程碑/MASTER | `go test`、Vitest、Workspace 全量、PR CI | Workspace 交付记录 |
 
 ## 5. 验收映射
 
@@ -52,6 +53,7 @@ usage.operators         仅高级运营/管理员返回 [{id, name, output_count
 - 第 3 条：T-02 + T-06 普通运营无姓名、高级运营/管理员有姓名、跨团队素材不合并。
 - 第 4 条：T-03 + T-05 + T-07 页面无入口、直连下载 403、我的素材下载成功、Worker 准备回归。
 - 第 5 条：T-05 + T-07 共用页面；发布相关不展示；回归 M4-A 与 M5 生产链路。
+- 2026-10-27 修订：T-08 覆盖负责人筛选与高级运营团队范围；原 T-01/T-02 的团队与游戏授权口径不变。
 
 ## 6. 风险
 

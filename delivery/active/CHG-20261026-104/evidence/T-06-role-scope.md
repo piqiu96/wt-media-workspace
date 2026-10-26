@@ -34,6 +34,10 @@
 | `execution_uncertain` 不可重试 | 同用例：`ErrComposeTaskNotRetryable`，任务行保持 failed/execution_uncertain | PASS |
 | HTTP 409／15217／`compose_task_not_retryable` | `TestComposeTaskErrorCarriesTheFrozenPairs` 增加该错误对；`contracts/cloud-error-codes/v1/content-production.yaml` 登记 `http_status: 409` | PASS |
 
+### 2026-10-27 修订（T-08）
+
+上面的高级运营读数覆盖素材库；任务／成片列表与详情原先仍按本人负责游戏收窄，与“管理本团队所有游戏”的产品定义不一致。T-08 已改为团队范围：高级运营可读本团队所有游戏的任务／成片，负责人下拉只列团队成员（含本人），未选择即团队全部。自动化读数见 `T-08-operator-filter.md`；真实页面走查待用户执行。
+
 ## 管理员
 
 | 断言 | 方式 | 结果 |
