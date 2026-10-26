@@ -1,10 +1,11 @@
 ---
 id: CHG-20261026-103
 parent: delivery/milestones/M4-content-production.md#m4-i-production-operator
-status: IMPLEMENTING
+status: DONE
 depends_on: ["CHG-20261026-102"]
 dependency_merge_commits: {"CHG-20261026-102": {"wt-media-workspace": "55ee841606131633bca353c829dd8d80aa7a686d", "wt-media-desktop": "4bf633c181d214a1c1aebe7a8f724c9107df0243"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
+merge_commits: {"wt-media-cloud": "2cd341d56ead14254243cf0932298ef8c5910c7c"}
 risk: H
 ---
 
@@ -21,6 +22,17 @@ risk: H
 - 普通运营仅从自己的“我的素材”为本人创建；高级运营／管理员可从自己的工作集为有权管理的运营代创建。任务保存创建人和负责人快照，策略负责人之后变化不改历史，成片继承任务负责人。
 - 普通运营伪造负责人或查询参数被拒绝；高级运营默认“我”且可筛本团队全部／指定运营，不能跨团队；管理员按目标团队查看。代创建后能直达任务与成片，普通运营不被他人任务干扰。
 - 同一素材经不同策略可产生归不同负责人的成片，既有 `(策略, 素材)` 防重、重试、下载与 M4/M5 Worker 链路回归；数据库、API、Cloud Web/Desktop 页面和真实成片逐层对账。
+
+## Verification
+
+- Cloud 以 PR [#10](https://github.com/piqiu96/wt-media-cloud/pull/10) 合入 `main`，CI `verify` pass（2m58s），merge commit `2cd341d`；合并后本地 `main` 与 `origin/main` 同为该提交，工作树干净。
+- 自动门禁：Cloud `go test ./... -count=1` 为 72 包 ok、0 FAIL、11 个无测试文件包；Cloud Web `npx vitest run` 79 文件 / 725 用例通过；Cloud `test-control.sh` 12/12；Workspace 175 用例与治理、AI 工作区、技能、产品对齐、M0 配置、文档、control 校验全部通过。
+- 真实链路：任务 325/326/327 由真实 Worker 产出成片 70/69/71，负责人分别继承 3/3/9，下载文件 SHA256 与 DB 一致；代创建、同素材跨策略、防重 15219、成功任务重试 15217、下载 transfer 幂等、调度 `operator_unavailable` 均现场读回。见 `evidence/T-08-real-chain.md`。
+- 页面：三种角色真实浏览器读回列表、筛选、表单与详情抽屉；历史负责人显示“未记录”且不被创建人冒充。Desktop 由 Cloud `54c0e87` 构建，前端戳 `source_dirty=false`，当前负责人页面资产在二进制中命中。见 `evidence/T-07-pages-and-desktop.md`。
+- 合同：Cloud OpenAPI `2026.10.26.1` 与 Workspace `contract-map.yaml` 同版；M0 配置校验通过。见 `evidence/T-06-contract.md`。
+- `python3 scripts/wt.py chg verify CHG-20261026-103`：Workspace 175 用例与 Cloud `internal/modules/...` 全部通过；最后固定调用 `verify_m1_integration.py`，因导入已退役的 `wt_media_agent.cloud_agent_client` 报 `ModuleNotFoundError` 退出 1。该脚本在 `scripts/README.md` 已标注“行为已知阻塞”，与 CHG-102 收尾现象相同，不属于本 CHG 运行时回归。
+- 未覆盖：Tauri 安装包 GUI 走查留给用户（本机不能程序化驱动 GUI，二进制只做到资产锚定）；清理后三个开发桶成片对象未删除；两个验收临时账号因审计外键保留为 `disabled`。见 T-08。
+- 原始读回摘录：`evidence/T-03-operator-directory.json`、`T-04-strategy-operator.json`、`T-05-task-scope-and-snapshot.json`、`T-07-pages.json`、`T-08-chain.json`。
 
 ## Constraints / Not In Scope
 

@@ -1,0 +1,221 @@
+{
+  "chain": {
+    "strategies": [
+      {
+        "id": 44,
+        "team_id": 1,
+        "game_id": "hy",
+        "operator_id": 3,
+        "operator_name": "pika",
+        "created_by": 9
+      },
+      {
+        "id": 45,
+        "team_id": 1,
+        "game_id": "hy",
+        "operator_id": 9,
+        "operator_name": "CHG103高级",
+        "created_by": 9
+      }
+    ],
+    "tasks": [
+      {
+        "id": 325,
+        "strategy": 44,
+        "material": 170,
+        "operator_id": 3,
+        "created_by": 3,
+        "status": "success",
+        "output": 70
+      },
+      {
+        "id": 326,
+        "strategy": 44,
+        "material": 175,
+        "operator_id": 3,
+        "created_by": 9,
+        "status": "success",
+        "output": 69
+      },
+      {
+        "id": 327,
+        "strategy": 45,
+        "material": 170,
+        "operator_id": 9,
+        "created_by": 9,
+        "status": "success",
+        "output": 71
+      }
+    ],
+    "outputs": [
+      {
+        "id": 69,
+        "task": 326,
+        "operator_id": 3,
+        "created_by": 9,
+        "object_key": "compose-outputs/326/3/output.mp4",
+        "bytes": 213187,
+        "sha256": "b15601ae26f756814b3a831684a02934c2184273125c6edce35e07bf3f7eee18"
+      },
+      {
+        "id": 70,
+        "task": 325,
+        "operator_id": 3,
+        "created_by": 3,
+        "object_key": "compose-outputs/325/3/output.mp4",
+        "bytes": 329883,
+        "sha256": "9dd230fd8924002942fa6e03728b0b7cbe486fb7bfc23a1a57b79e1e34b969a4"
+      },
+      {
+        "id": 71,
+        "task": 327,
+        "operator_id": 9,
+        "created_by": 9,
+        "object_key": "compose-outputs/327/1/output.mp4",
+        "bytes": 329883,
+        "sha256": "9dd230fd8924002942fa6e03728b0b7cbe486fb7bfc23a1a57b79e1e34b969a4"
+      }
+    ],
+    "downloaded_sha256": {
+      "69": "b15601ae26f756814b3a831684a02934c2184273125c6edce35e07bf3f7eee18",
+      "70": "9dd230fd8924002942fa6e03728b0b7cbe486fb7bfc23a1a57b79e1e34b969a4",
+      "71": "9dd230fd8924002942fa6e03728b0b7cbe486fb7bfc23a1a57b79e1e34b969a4"
+    },
+    "download_transfer": {
+      "id": "transfer_01bc1165411ed452465545cd",
+      "asset_id": 69,
+      "requested_by": 3,
+      "dedupe_second_request_same_id": true
+    },
+    "prepare_transfers": [
+      "transfer_43640101070cec2f4c9f3676",
+      "transfer_e7097ae184fe69898d9c8862"
+    ],
+    "scheduler_skip": {
+      "run_key": "d243637bd45fe6929bb963d9ac334be22d56b1e959ee527e5e7d846752e1082b",
+      "strategy": 42,
+      "trigger": "scheduled",
+      "candidate_count": 0,
+      "created_count": 0,
+      "skipped": [
+        {
+          "reason": "operator_unavailable",
+          "material_id": 0
+        }
+      ]
+    },
+    "rejections": {
+      "duplicate_material": {
+        "errcode": 15219,
+        "type": "compose_task_conflict"
+      },
+      "retry_success_task": {
+        "errcode": 15217,
+        "type": "compose_task_not_retryable"
+      },
+      "fake_operator_task": {
+        "errcode": 15214,
+        "type": "compose_task_invalid"
+      },
+      "ineligible_strategy_operator": {
+        "errcode": 15210,
+        "type": "compose_strategy_invalid"
+      }
+    }
+  },
+  "counts_before_cleanup": {
+    "strategies": {
+      "total": 9,
+      "assigned": 2,
+      "historical_assigned": 0
+    },
+    "tasks": {
+      "total": 22,
+      "assigned": 3,
+      "historical_assigned": 0
+    },
+    "outputs": {
+      "total": 19,
+      "assigned": 3,
+      "historical_assigned": 0
+    }
+  },
+  "cleanup": {
+    "deleted": {
+      "task_attempts": [
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255
+      ],
+      "outputs": [
+        69,
+        70,
+        71
+      ],
+      "tasks": [
+        325,
+        326,
+        327
+      ],
+      "strategies": [
+        44,
+        45
+      ],
+      "material_usages": [
+        90,
+        91
+      ],
+      "transfers": [
+        "transfer_01bc1165411ed452465545cd",
+        "transfer_43640101070cec2f4c9f3676",
+        "transfer_e7097ae184fe69898d9c8862"
+      ],
+      "scopes_users": [
+        9,
+        10
+      ],
+      "sessions_users": [
+        9,
+        10
+      ]
+    },
+    "counts_after": {
+      "strategies": {
+        "total": 7,
+        "assigned": 0
+      },
+      "tasks": {
+        "total": 19,
+        "assigned": 0
+      },
+      "outputs": {
+        "total": 16,
+        "assigned": 0
+      },
+      "material_usages_total": 43
+    },
+    "retained_users": [
+      {
+        "id": 9,
+        "username": "chg103senior",
+        "status": "disabled",
+        "reason": "audit_logs FK keeps actor history; deleting the users would require deleting audit rows"
+      },
+      {
+        "id": 10,
+        "username": "chg103admin",
+        "status": "disabled"
+      }
+    ],
+    "retained_audit_rows": 33,
+    "orphan_object_keys": [
+      "compose-outputs/325/3/output.mp4",
+      "compose-outputs/326/3/output.mp4",
+      "compose-outputs/327/1/output.mp4"
+    ]
+  }
+}

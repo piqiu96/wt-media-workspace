@@ -1,0 +1,136 @@
+{
+  "op01-strategies": {
+    "errcode": 0,
+    "ids": [
+      44
+    ],
+    "operators": [
+      [
+        44,
+        3
+      ]
+    ]
+  },
+  "op01-strategy45": {
+    "errcode": 15212,
+    "type": "compose_strategy_not_found",
+    "message": "合成策略不存在"
+  },
+  "senior-strategies": {
+    "errcode": 0,
+    "ids": [
+      45,
+      44,
+      43,
+      42,
+      39,
+      38,
+      37,
+      36,
+      34
+    ],
+    "operators": [
+      [
+        45,
+        9
+      ],
+      [
+        44,
+        3
+      ],
+      [
+        43,
+        null
+      ],
+      [
+        42,
+        null
+      ],
+      [
+        39,
+        null
+      ],
+      [
+        38,
+        null
+      ],
+      [
+        37,
+        null
+      ],
+      [
+        36,
+        null
+      ],
+      [
+        34,
+        null
+      ]
+    ]
+  },
+  "admin-strategies": {
+    "errcode": 0,
+    "ids": [
+      45,
+      44,
+      43,
+      42,
+      39,
+      38,
+      37,
+      36,
+      34
+    ],
+    "operators": [
+      [
+        45,
+        9
+      ],
+      [
+        44,
+        3
+      ],
+      [
+        43,
+        null
+      ],
+      [
+        42,
+        null
+      ],
+      [
+        39,
+        null
+      ],
+      [
+        38,
+        null
+      ],
+      [
+        37,
+        null
+      ],
+      [
+        36,
+        null
+      ],
+      [
+        34,
+        null
+      ]
+    ]
+  },
+  "op01-strategy44": {
+    "errcode": 0,
+    "strategy": {
+      "id": 44,
+      "operator_id": 3,
+      "operator_name": "pika"
+    }
+  },
+  "senior-invalid-create": {
+    "errcode": 15210,
+    "type": "compose_strategy_invalid",
+    "message": "compose strategy input is invalid: operator must be an enabled team operator responsible for the game"
+  }
+}

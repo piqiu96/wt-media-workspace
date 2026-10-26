@@ -1,0 +1,312 @@
+{
+  "op01-tasks-default": {
+    "total": 8,
+    "ids": [
+      326,
+      325,
+      324,
+      323,
+      322,
+      321,
+      320,
+      315
+    ],
+    "operators": [
+      3,
+      null
+    ]
+  },
+  "op01-tasks-team": {
+    "errcode": 15215,
+    "type": "compose_task_forbidden",
+    "message": "没有权限操作该合成任务"
+  },
+  "op01-tasks-op9": {
+    "errcode": 15215,
+    "type": "compose_task_forbidden",
+    "message": "没有权限操作该合成任务"
+  },
+  "senior-tasks-default": {
+    "total": 1,
+    "ids": [
+      327
+    ],
+    "operators": [
+      9
+    ]
+  },
+  "senior-tasks-team": {
+    "total": 22,
+    "ids": [
+      327,
+      326,
+      325,
+      324,
+      323,
+      322,
+      321,
+      320,
+      319,
+      318,
+      317,
+      316,
+      315,
+      314,
+      312,
+      306,
+      304,
+      303,
+      302,
+      301,
+      300,
+      299
+    ],
+    "operators": [
+      3,
+      9,
+      null
+    ]
+  },
+  "senior-tasks-op3": {
+    "total": 2,
+    "ids": [
+      326,
+      325
+    ],
+    "operators": [
+      3
+    ]
+  },
+  "senior-tasks-team2": {
+    "errcode": 15215,
+    "type": "compose_task_forbidden",
+    "message": "没有权限操作该合成任务"
+  },
+  "admin-tasks-default": {
+    "total": 22,
+    "ids": [
+      327,
+      326,
+      325,
+      324,
+      323,
+      322,
+      321,
+      320,
+      319,
+      318,
+      317,
+      316,
+      315,
+      314,
+      312,
+      306,
+      304,
+      303,
+      302,
+      301,
+      300,
+      299
+    ],
+    "operators": [
+      3,
+      9,
+      null
+    ]
+  },
+  "admin-tasks-team1": {
+    "total": 22,
+    "ids": [
+      327,
+      326,
+      325,
+      324,
+      323,
+      322,
+      321,
+      320,
+      319,
+      318,
+      317,
+      316,
+      315,
+      314,
+      312,
+      306,
+      304,
+      303,
+      302,
+      301,
+      300,
+      299
+    ],
+    "operators": [
+      3,
+      9,
+      null
+    ]
+  },
+  "admin-tasks-op3": {
+    "total": 2,
+    "ids": [
+      326,
+      325
+    ],
+    "operators": [
+      3
+    ]
+  },
+  "admin-tasks-team2": {
+    "total": 0,
+    "ids": [],
+    "operators": []
+  },
+  "op01-outputs-default": {
+    "total": 8,
+    "ids": [
+      70,
+      69,
+      68,
+      67,
+      66,
+      65,
+      64,
+      59
+    ],
+    "operators": [
+      3,
+      null
+    ]
+  },
+  "op01-outputs-op9": {
+    "errcode": 15215,
+    "type": "compose_output_forbidden",
+    "message": "没有权限操作该成片"
+  },
+  "senior-outputs-default": {
+    "total": 1,
+    "ids": [
+      71
+    ],
+    "operators": [
+      9
+    ]
+  },
+  "senior-outputs-team": {
+    "total": 19,
+    "ids": [
+      71,
+      70,
+      69,
+      68,
+      67,
+      66,
+      65,
+      64,
+      63,
+      62,
+      61,
+      60,
+      59,
+      58,
+      53,
+      52,
+      51,
+      50,
+      49
+    ],
+    "operators": [
+      3,
+      9,
+      null
+    ]
+  },
+  "senior-outputs-op3": {
+    "total": 2,
+    "ids": [
+      70,
+      69
+    ],
+    "operators": [
+      3
+    ]
+  },
+  "admin-outputs-default": {
+    "total": 19,
+    "ids": [
+      71,
+      70,
+      69,
+      68,
+      67,
+      66,
+      65,
+      64,
+      63,
+      62,
+      61,
+      60,
+      59,
+      58,
+      53,
+      52,
+      51,
+      50,
+      49
+    ],
+    "operators": [
+      3,
+      9,
+      null
+    ]
+  },
+  "admin-outputs-team2": {
+    "total": 0,
+    "ids": [],
+    "operators": []
+  },
+  "admin-outputs-op3": {
+    "total": 2,
+    "ids": [
+      70,
+      69
+    ],
+    "operators": [
+      3
+    ]
+  },
+  "fake-operator-task": {
+    "errcode": 15214,
+    "type": "compose_task_invalid",
+    "message": "compose task input is invalid: operator_id must match the strategy's operator"
+  },
+  "snapshot-before": {
+    "strategy45_operator": 9,
+    "task327": {
+      "id": 327,
+      "operator_id": 9,
+      "created_by": 9
+    }
+  },
+  "strategy45-update-to-pika": {
+    "errcode": 0,
+    "operator_id": 3
+  },
+  "snapshot-after": {
+    "task327": {
+      "id": 327,
+      "operator_id": 9,
+      "created_by": 9
+    },
+    "output71": {
+      "id": 71,
+      "operator_id": 9,
+      "created_by": 9
+    }
+  },
+  "strategy45-invalid-update": {
+    "errcode": 15210,
+    "type": "compose_strategy_invalid",
+    "message": "compose strategy input is invalid: operator must be an enabled team operator responsible for the game"
+  }
+}
