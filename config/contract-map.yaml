@@ -19,7 +19,10 @@ contracts:
     # 团队使用三个维度的筛选与投影，下载只允许从当前用户有效「我的素材」发起。
     # 2026.10.27.1：成片列表增加 game_id（只收窄，普通运营越界 403）；
     # 执行结果不明确的核对从「仅管理员」放宽为管理员或同团队高级运营。
-    contract_revision: "2026.10.27.1"
+    # 2026.10.27.2：自动选材改为策略团队素材池；新增
+    # GET /compose-strategies/{id}/runs/tasks 的 ComposeBatchView/ComposeBatchCounts，
+    # 无 run 返回 404；任务与成片 material_usage_id 允许 null。
+    contract_revision: "2026.10.27.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -48,7 +51,9 @@ contracts:
     # 2026.10.23.1：UserSession/BitAccountView（掩码）与 FileTransferTask.claimed_by。
     # 2026.10.26.1：Material 增加查看者关系（usage_status/added_at）、我的使用
     # （my_usage）与团队成功成片汇总（usage）；历史无负责人的成片只计总数。
-    schema_revision: "2026.10.26.1"
+    # 2026.10.27.1：ComposeSchedule.material_scope 增加 team_materials（当前
+    # 执行语义）；creator_usages 保留为历史持久值，旧 schedule_json 不重写。
+    schema_revision: "2026.10.27.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
