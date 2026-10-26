@@ -13,7 +13,6 @@
 | [CHG-20261026-103](CHG-20261026-103/change.md) | M4-I 策略、任务、成片负责人及人工代创建 | PLANNED；依赖 CHG-102（已完成） |
 | [CHG-20261026-104](CHG-20261026-104/change.md) | M4-J 团队素材库使用事实与个人下载 | PLANNED；依赖 CHG-103 |
 | [CHG-20261026-105](CHG-20261026-105/change.md) | M5-F 团队素材库自动选材 | PLANNED；依赖 CHG-103 |
-| [CHG-20261026-106](CHG-20261026-106/change.md) | 前端状态色语义表收口（`tokens.css` 死表处置） | PLANNED；无前置依赖 |
 
 M4 剩余 CHG 的执行边界见 [M4 §3.1](../milestones/M4-content-production.md#31-剩余-chg-执行边界)，不在此复制。M4-A 签收补记见 [2026-10-12 签收](../reports/2026-10-12-m4-a-signoff.md)。
 
