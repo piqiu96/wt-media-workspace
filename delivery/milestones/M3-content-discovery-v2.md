@@ -2,7 +2,7 @@
 
 > 实施状态：**DONE**（2026-09-23 用户签收，见第 2.2 节）；Active CHG：无。E3 验收矩阵第 1～7 项全部通过，无 FAIL、无 NOT VERIFIED。
 > 产品方向：CONFIRMED，依据用户明确提供的 M3 Milestone；A～E1 已实施并具备真实证据。C2/E2（博主搜索与作者策略）已于 2026-09-23 暂停，本期不交付。
-> 有效 Product：[PRD 第四章 内容挖掘](../../docs/product/prd/详细文档/第四章_内容挖掘.md)；决策：[ADR-0013](../../docs/decisions/0013-m3-content-mining-entry.md)、[ADR-0014](../../docs/decisions/0014-m3-team-content-scope.md)、[ADR-0015](../../docs/decisions/0015-m3-cloud-owned-discovery-execution.md)。
+> 有效 Product：[PRD 第四章 内容挖掘](../../docs/product/prd/详细文档/第四章_内容挖掘.md)；决策：[ADR-0013](../../docs/decisions/0013-m3-content-mining-entry.md)、[ADR-0014](../../docs/decisions/0014-m3-team-content-scope.md)、[ADR-0015](../../docs/decisions/0015-m3-cloud-owned-discovery-execution.md)、[ADR-0023](../../docs/decisions/0023-m3-m5-team-resources-and-production-operator.md)（验收后增量）。
 > 替代 M3-content-discovery.md 及旧 CHG-037～043 的实施资格，不将旧草案视为已完成工作。
 
 ## 1. Milestone 目标与边界
@@ -168,3 +168,12 @@ V2-Q02 的团队隔离与游戏维度已由用户确认并记录为 ADR-0014。Q
 Cloud 拥有业务、数据库和正式合同；Agent 拥有渠道执行；Desktop 复用 Web；Workspace 拥有需求、决策、交付治理。每仓独立提交，版本组合经联调再记录通过，不扫描代码就不估计实现完成率。
 
 当前：A～E1 已实施并有真实证据（关键词链路在配置真实凭据后取得 `status=success`、`errcode=0`；凭据以 `config/credentials/douyin.toml` 提供给 Cloud，Cloud 运行时只读 `config/` 下的 TOML，`WT_MEDIA_DOUYIN_*` 环境变量与 `.env.local` 对其无效）；C2、E2 已暂停；E3 由 [CHG-052](../completed/CHG-20260916-052/change.md) 承载，验收矩阵第 1～7 项全部通过并经用户 2026-09-23 签收，M3 为 `DONE`。结论与证据见 CHG-052 的 `checkpoint.md` 与 `evidence/m3-e3-acceptance-20260923/`，签收记录见第 2.2 节。M3 的关闭不处置 `CHG-20260923-054` 内的 D1～D10、D-scheduler-2 与 S-1。
+
+## M3-F public-content-scope
+
+2026-10-26 确认的**验收后增量**，不重开或改写 2026-09-23 的 M3 签收。对应 [CHG-20261026-102](../planned/CHG-20261026-102/change.md)。
+
+- 用户结果：普通运营在同一个内容池处理本团队所有游戏的公共来源；游戏可多选，初次默认本人负责的游戏。高级运营管理本团队所有游戏的挖掘策略与任务异常；管理员可选目标团队跨团队管理。
+- 数据边界：`source_content` 继续按团队独立，唯一键与历史处理状态不变；策略、任务与内容操作均在服务端按角色和团队授权，Cloud Web/Desktop 共用页面行为一致。本机 BitBrowser、Profile、Cookie、文件不因 Cloud 权限变化而开放。
+- 验收：同团队跨负责游戏可见且可处理内容；普通运营伪造策略修改、执行或异常处置请求被拒绝；高级运营无法跨团队；管理员选择目标团队后结果正确；游戏筛选不泄漏他团队数据。高级运营和管理员可登录 Desktop 的 M3–M5 共用 Cloud 页面，M2 本机执行入口仍按原角色和本人身份拦截。`/material-library` 的正式 `material` 页面边界在 M4-J 收敛。
+- P1 后续：跨团队同作品的业务记录仍独立；外部抓取、封面与源视频等昂贵资源可评估安全复用。先量化重复成本和现有缓存能力，再另立资源复用 CHG；不以共享业务状态或全局 `source_content` 唯一化实现，也不阻塞 M3-F。
