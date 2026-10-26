@@ -1,8 +1,8 @@
 # CHG-20261023-101 最终交付报告
 
 日期：2026-10-23
-状态：实现完成，101-4 用户已确认验收；待合并与其他 GUI 视觉验收；CHG 保持 `IMPLEMENTING`
-证据：`delivery/active/CHG-20261023-101/evidence/T-02..T-13`
+状态：实现及用户 GUI 验收完成，待四仓合并；CHG 保持 `IMPLEMENTING`
+证据：`delivery/active/CHG-20261023-101/evidence/T-02..T-14`
 
 ## 1. 变更摘要
 
@@ -168,7 +168,7 @@
 
 ### 未覆盖
 
-- 第二台物理 Desktop；GUI 逐屏视觉（本机不能程序化驱动/截取）；真实发布/互动任务（产品仍为 ComingSoon）；真实下载双机交接；常驻 `discovery-scheduler` 的 tick（开发环境不启动，扫描用同一 job 的一次性程序验证）；`outbox_test.py` 临时换发的 Token 未纳入日志字符串扫描（只用完即弃，未落盘）。
+- 第二台物理 Desktop；真实发布/互动任务（产品仍为 ComingSoon）；真实下载双机交接；常驻 `discovery-scheduler` 的 tick（开发环境不启动，扫描用同一 job 的一次性程序验证）；`outbox_test.py` 临时换发的 Token 未纳入日志字符串扫描（只用完即弃，未落盘）。GUI 逐屏视觉未由自动化执行，后续由用户确认验收。
 
 ## 6. 文档回写清单
 
@@ -201,7 +201,7 @@
 - **Agent 重启续跑**：只对声明可恢复的 executor 使用 checkpoint；无副作用任务从头重跑，有副作用任务报 `RESULT_UNKNOWN`。
 - **同机多 Cloud 用户**：一个 sidecar 同时只持有一个 Agent Token；切换 Cloud 用户时旧用户在途任务可能只能靠 Cloud 超时收敛。
 - **本地 API 既有边界**：CORS `*`、runtime token 为空时禁用认证是既有行为；2026-10-23 用户裁定不加固，继续只作为本机接口使用。
-- **GUI 验收**：打包 Desktop 已构建、登录 smoke 通过并启动；逐屏视觉与交互需用户确认（本机无法程序化驱动/截取 GUI）。
+- **GUI 验收**：打包 Desktop 已构建、登录 smoke 通过并启动；用户于 2026-10-26 确认 CHG-101 GUI 已验收，具体环境与步骤未在本次回复中提供（见 T-14）。
 - **开发环境差异**：`discovery-scheduler` 未启动，`task-recovery` 用一次性程序调用同一 job 验证；未测常驻调度器 tick。
 - **开发数据**：本轮写入的 `t10-real-%` 任务、admin 的 40 个扫描 Profile、扫描记录与真实 main 绑定已清理并读回为 0/NULL；admin 的 10 个测试 Web session 未失效（无法与用户自己的开发浏览器会话区分），按 30 天过期。清理细节见 T-10 证据。
 - **无关工作树差异**：Cloud 仓 `internal/modules/production/*` 存在与本 CHG 无关的纯 gofmt 差异（同一秒批量改写），未纳入提交、未还原，留给工作树所有者。
