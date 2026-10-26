@@ -62,6 +62,17 @@ python3 scripts/verify/verify_m0_config.py
 
 实际：`Workspace config verification ok`（Workspace 仓根）。
 
+### 真实 HTTP 读数（2026-10-27 02:29，operator01，团队 1，负责 `hy,sjz`）
+
+旧 API 进程仍是改动前的二进制，首次探测 `game_id=other` 返回 200 且条数不变；停止该进程后用当前代码重启（`bin/control.sh start`，pid 66952），复测：
+
+```text
+GET /api/v1/compose-outputs?game_id=hy     -> 200，1 条，game_id 全部为 hy
+GET /api/v1/compose-outputs?game_id=other  -> 403，errcode 15215（compose_output_forbidden）
+```
+
+`other` 已停用且不在 operator01 的负责游戏里；服务端拒绝而非静默放宽。这同时证明运行中的 API 已是本次构建，而不是旧二进制。
+
 ## 覆盖边界
 
 - 已验证：服务端参数校验、角色收窄、超长 400、越界 403；页面参数/列/选项源码。

@@ -41,6 +41,13 @@
 
 走查前停 compose worker/scheduler；高级运营提交核对后任务变为 `pending`，不会真正执行。
 
+### 夹具实测（2026-10-27 02:28）
+
+- compose worker（pid 60633）已停止，scheduler 未运行；停止前 `compose_tasks` 无 `running` 行。
+- 插入前 `id=331` 与 `request_key=chg104-senior-review-17` 均不存在。
+- 插入任务 331 与第 1 次失败 attempt（id 261）成功；守卫查询返回 `1`。
+- 旧 API 进程重启后，operator01 访问 `/compose-tasks/331/uncertain-review` 返回 404：331 属于 `other`，不在普通运营 `hy,sjz` 的可见游戏范围，属于“按不可见处理”，不是核对角色 403。普通运营在可见范围内的 403 由 `TestUncertainReviewRefusesOperatorsAndOtherTeams` 覆盖；高级运营的可见性与提交由走查 A6a/B5 覆盖。
+
 ## 自动验证
 
 ### Cloud Go

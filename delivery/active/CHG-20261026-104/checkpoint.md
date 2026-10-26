@@ -1,6 +1,6 @@
 # CHG-20261026-104 Checkpoint
 
-日期：2026-10-27 02:30（第二次验收修订 T-09～T-12 完成，待夹具 331 与用户复走查）
+日期：2026-10-27 02:31（第二次验收修订 T-09～T-12 完成、夹具 331 已建，待用户复走查）
 
 ## 已完成
 
@@ -34,7 +34,9 @@
 
 2026-10-27 01:42:26 管理员已核对任务 329 的 review 11；01:42:28–01:42:36 第 2 次执行成功，生成成片 74（团队 1 / `other` / 负责人 `operator01` / 素材 17 / 策略 47 / `pending_publish`）。329 现为 `success`，不能再用它走查高级运营核对；不回退、不改写 329、成片 74 或 review 11。
 
-走查前在本地开发库建同形态夹具 331（SQL，仅本地；字段见 `evidence/T-12-senior-uncertain-review.md`），插入 `status=failed`、`error_code=execution_uncertain`、`attempt_count=1` 的任务及第 1 次 failed attempt；走查后随夹具清理删除。
+走查前在本地开发库建同形态夹具 331（SQL，仅本地；字段见 `evidence/T-12-senior-uncertain-review.md`），插入 `status=failed`、`error_code=execution_uncertain`、`attempt_count=1` 的任务及第 1 次 failed attempt（attempt id 261）；走查后随夹具清理删除。
+
+夹具已建并实测：插入前无同 ID/同 `request_key`；守卫查询返回 `1`；compose worker 已停，scheduler 未运行；停止前无 `running` 任务。Cloud API 旧进程（pid 60606）不含本次构建，已停止并用 `bin/control.sh start` 重启（pid 66952）；真实 HTTP 复测 `game_id=hy` 200、`game_id=other` 403。
 
 ## 走查环境数据变更（2026-10-27 00:56～00:57）
 
