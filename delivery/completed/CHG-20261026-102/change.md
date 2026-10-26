@@ -1,10 +1,11 @@
 ---
 id: CHG-20261026-102
 parent: delivery/milestones/M3-content-discovery-v2.md#m3-f-public-content-scope
-status: IMPLEMENTING
+status: DONE
 depends_on: ["CHG-20261023-101"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-desktop"]
 risk: H
+merge_commits: {"wt-media-cloud": "cb26c66e69f7f476b3405db5a7018d9a0ddd6bef"}
 ---
 
 # CHG-20261026-102：M3 内容池公共范围与策略职责
@@ -20,6 +21,16 @@ risk: H
 - 内容池、挖掘策略、挖掘任务在 Cloud Web 与 Desktop 共用页面显示和 API 权限一致，拒绝越权时没有业务写入或外部抓取。
 - 管理员／高级运营能完成 Desktop 登录和 M3 页面操作，但不能借新入口访问普通运营的 BitBrowser、Profile、Cookie、本机文件或 M2 本机执行；Desktop 会话冲突和替换规则仍生效。
 - `source_content` 团队唯一性、各团队独立处理状态、原有调度／任务恢复和 M3 已签收路径回归通过；记录真实请求、数据库和页面读回。
+
+## Verification
+
+- Cloud 以 PR [#8](https://github.com/piqiu96/wt-media-cloud/pull/8) 合入 `main`，CI `verify` pass（2m39s），merge commit `cb26c66`；Desktop 无源码改动，构建产物只用于入口验证。
+- 收尾重跑：Cloud Go 72 包 ok / 0 FAIL / 11 无测试文件；Cloud Web Vitest 79 文件 / 720 用例；`test-control.sh` 12/12；Workspace 174 用例与治理、AI 工作区、技能、产品对齐、M0、文档、control 校验全部通过。
+- 真实读回：API 38/38 PASS（角色拒绝、团队边界、游戏筛选、游戏目录、Desktop 登录与 Agent Token）；Cloud／Desktop 页面 10/10 PASS；拒绝前后 `discovery_strategies` 4→4、`crawl_tasks` 73→73、`source_contents` 664→664；迁移重跑 `0 applied, 75 total`，手工重放 073 两次后 `other` 仍 1 行且不覆盖既有字段。
+- Desktop 前端戳 `source_commit=1f54e42`、`source_dirty=false`，二进制资产表命中当前前端文件名；Tauri GUI 走查留给用户。
+- 逐项证据见 `evidence/T-01-role-gates.md`、`T-02-game-filter.md`、`T-03-catalog-and-pages.md`、`T-04-desktop-boundary.md`、`T-05-acceptance.md`。
+- `wt chg verify` 的跨端集成步仍调用已退役的 `verify_m1_integration.py` 并报 `ModuleNotFoundError`；该脚本在 `scripts/README.md` 已标注“行为已知阻塞”，与本 CHG 无关。
+- 未覆盖：普通运营 Desktop 会话换 Agent Token 的现场正向链路（开发库仅一条属于用户本机的真实会话，由单测覆盖）；管理员跨团队编辑／启停／删除／执行的逐入口现场请求（现场实测创建与列表）；真实外部抓取未触发。
 
 ## Constraints / Not In Scope
 
