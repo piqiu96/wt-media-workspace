@@ -1,8 +1,9 @@
 ---
 id: CHG-20261026-103
 parent: delivery/milestones/M4-content-production.md#m4-i-production-operator
-status: PLANNED
+status: IMPLEMENTING
 depends_on: ["CHG-20261026-102"]
+dependency_merge_commits: {"CHG-20261026-102": {"wt-media-workspace": "55ee841606131633bca353c829dd8d80aa7a686d", "wt-media-desktop": "4bf633c181d214a1c1aebe7a8f724c9107df0243"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: H
 ---
