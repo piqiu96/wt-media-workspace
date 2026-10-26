@@ -9,7 +9,7 @@
 代码事实：
 
 - `ComposeTasksPage.vue` / `MyOutputsPage.vue` 给高级运营注入 `mine`、`team` 两个伪选项，并在挂载时把筛选默认成 `mine`；`/compose-operators` 返回的成员姓名排在伪选项之后。
-- 任务／成片列表给所有非管理员加 `filter.GameIDs = actor.GameIDs`；`canReadComposeTask` / `canReadComposeOutput` 也先按本人负责游戏判断。`senior01` 只负责 `other`，选中负责 `hy/sjz` 的成员也读不到其任务／成片。
+- 任务／成片列表给所有非管理员加 `filter.GameIDs = actor.GameIDs`；`canReadComposeTask` / `canReadComposeOutput` 也先按本人负责游戏判断。只要任务／成片属于高级运营本人未负责的游戏，即使下拉里能选到成员，也读不到其任务／成片。
 
 ## 修订
 
@@ -79,6 +79,8 @@ npm test -- --run
 - 未选择时列表含团队 1 全部游戏的任务／成片（任务 329 与 312/303/299；成片 72/73）。
 - 选中 `operator01` / `senior01` 后按成员收窄。
 - 任务 312 可读可重试，任务 329 仍不可重试。
+
+走查环境事实（2026-10-27 00:57 审计记录）：管理员把 `senior01` 的负责游戏改为 `hy,sjz`，并停用 `other` 游戏；团队 1 的历史任务 329/330 仍在。本次任务／成片列表按团队返回，不按游戏启停过滤；素材库游戏筛选项来自启用游戏，清空后仍列出 `other` 素材。
 
 走查结果由用户回报后补入本节。
 

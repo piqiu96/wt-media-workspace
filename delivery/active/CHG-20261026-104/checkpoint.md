@@ -1,6 +1,6 @@
 # CHG-20261026-104 Checkpoint
 
-日期：2026-10-27 00:59（T-08 修订完成，待用户走查）
+日期：2026-10-27 01:10（T-08 修订完成，待用户走查）
 
 ## 已完成
 
@@ -13,11 +13,11 @@
 - 自动门禁：Cloud `go test ./...` 72 包通过、0 FAIL；Vitest（`web/` 下）79 文件 / 729 用例通过；Workspace 175 用例与全部校验通过。
 - 真实读数（修订前）：团队 1 素材 59（hy/sjz/other = 14/19/26）、跨团队 403、加入/移出/恢复、真实任务 328→成片 72、真实下载 2 次、Worker 在关系移出后完成素材 17 源准备、真实任务 330→成片 73 与跨团队同外部作品分别计数。
 - 证据：`evidence/T-06-team-scope-and-filters.md`、`T-06-usage-facts.md`、`T-06-download-and-worker-prep.md`、`T-06-role-scope.md`、`T-07-page-readback.md`、`T-08-operator-filter.md`。
-- PR：Cloud #11、Workspace #13 已创建；T-08 提交后需重新推送并等 CI。
+- PR：Cloud #11、Workspace #13 已创建；T-08 代码提交 `e741a12`、`fa41428` 已推送，Cloud `verify` 通过（2m47s）；Workspace 文档提交 `eede4db`、`3244079` 已推送，`Workspace checks` 通过（10s）。
 
 ## 当前工作
 
-记录仍为 `VERIFYING`；T-08 代码、测试和文档已完成，等待推送 PR 与用户按修订后的清单走查。
+记录仍为 `VERIFYING`；T-08 代码、测试和文档已完成，等待推送证据修订后由用户按修订清单走查。
 
 ## 阻塞
 
@@ -25,11 +25,15 @@
 2. **用户走查**：负责人下拉含本人与 `operator01`、未选显示团队 1 全部游戏任务、选成员后按 `operator_id` 收窄、任务 312 可重试 / 329 不可重试、成片 72/73 可见。
 3. **合并批准**：走查通过后合并 Cloud #11 与 Workspace #13。
 
+## 走查环境数据变更（2026-10-27 00:56～00:57）
+
+审计日志 `audit_deaaafed81f202c3bd1e5b02`、`audit_e3f290abfd2f5e06fb60ff2b`、`audit_fb60ae6d9957c55b5b214340` 记录：管理员把 `senior01` 的负责游戏从 `hy,other,sjz` 改为 `hy,sjz`，随后停用 `other` 游戏。未回退该数据变更；验收清单已按当前事实调整（`other` 任务 329/330 仍在团队 1，任务/成片列表按团队返回，不按游戏启停过滤；素材库清空游戏筛选后仍列出 `other` 素材）。
+
 ## 下一步
 
-1. 提交 T-08 改动，推送 Cloud 分支与 Workspace 记录分支，等 PR CI。
-2. 重启 Vite 5173；保留 Cloud API/MySQL；停 compose worker 与无头 Chrome，避免走查期间自动跑任务。
-3. 向用户交付修订后的人工验收清单（A5、A8 已按新行为改写）。
+1. 提交并推送证据修订与 checkpoint，等 Workspace PR #13 CI。
+2. 保留 Cloud API（pid 53117，health ok）、Vite 5173、MySQL；compose worker 与无头 Chrome 已停，避免走查期间自动跑任务。
+3. 向用户交付修订后的人工验收清单（A5、A8 已按新行为改写；A1/A2/C1/C2 按当前 `hy,sjz` 默认调整）。
 4. 用户回报后，把结果写入 `evidence/T-08-operator-filter.md` 与 `T-06-role-scope.md`；不符项先修复并重走对应步骤。
 5. 走查通过后合并 Cloud #11；`change.md` 置 `DONE`，移入 `delivery/completed/`，LEDGER 删行；更新里程碑 §3 与 `MASTER_IMPLEMENTATION_PLAN.md` §3；运行 `wt chg verify CHG-20261026-104`；合并 Workspace #13。
 6. 清理验收夹具（见下），复核四仓 `main` 干净，再进入 CHG-105。
@@ -45,6 +49,6 @@
 ```text
 Cloud go test ./...            72 packages ok, 0 FAIL（11 个包无测试文件）
 Vitest (web/)                  79 files / 729 tests passed
-Cloud PR #11 CI                待 T-08 提交后重跑
-Workspace PR #13 CI            待记录提交后重跑
+Cloud PR #11 CI                pass 2m47s（e741a12、fa41428）
+Workspace PR #13 CI            pass 10s（eede4db、3244079）；证据修订后重跑
 ```
