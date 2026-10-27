@@ -101,6 +101,28 @@ created (`user_id` equals the caller), and admins cannot start local work at
 all. Ownership is enforced server-side; the page's disabled buttons are a
 courtesy, not the boundary.
 
+### Proxy team scope and window-side write-back (CHG-20261028-099)
+
+Cloud owns `2026.10.28.1` of `cloud-api`. Proxy resources now carry a required
+`team_id`; operators and senior operators read and write their own team, admins
+read every team and must name the target team when creating or importing.
+`proxies.openapi.yaml` declares the full lifecycle that Web already calls
+(list, detail, create, update, status, delete, quota, check, import preview and
+import) plus `POST /api/v1/proxies/profile-unbind`, batch assignment and
+release. Health checks run inside Cloud against the saved connection and return
+`ok` / `conn_failed` / `auth_failed` / `timeout` / `invalid_params`; a result
+arriving after the connection changed is discarded. Local-scan confirmation now
+takes `selected_profile_ids` for unknown addresses and reports
+`ownership_conflict` for windows registered to another operator, which the scan
+never modifies.
+
+`browser-profiles.openapi.yaml` records the role/team visibility of the window
+list, the `adopt_bit_profile_ids` confirmation body, the Cloud-remark and
+business-status update scope, the disabled-and-unreferenced delete rule, and the
+window fields the page reads (`team_id`, `cloud_remark`, `business_status`,
+`ownership_conflict`). BitBrowser writes remain Desktop/Agent-only; Cloud Web
+declares the create/open/close stubs as Desktop-only refusals.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`
