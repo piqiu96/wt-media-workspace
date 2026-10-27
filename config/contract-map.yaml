@@ -24,7 +24,9 @@ contracts:
     # 无 run 返回 404；任务与成片 material_usage_id 允许 null。
     # 2026.10.27.3：media-accounts 的 Platform 枚举把 baijiahao 改为 baidu
     # （CHG-20261015-098 第三轮平台标识统一，见 ADR-0024）。
-    contract_revision: "2026.10.27.3"
+    # 2026.10.27.4：content-production 的素材读取说明补上创建人
+    # （created_by / created_by_name）。
+    contract_revision: "2026.10.27.4"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -56,7 +58,9 @@ contracts:
     # 2026.10.27.1：ComposeSchedule.material_scope 增加 team_materials（当前
     # 执行语义）；creator_usages 保留为历史持久值，旧 schedule_json 不重写。
     # 2026.10.27.2：MediaAccount.platform 枚举改为 baidu。
-    schema_revision: "2026.10.27.2"
+    # 2026.10.27.3：Material 增加素材操作人 created_by（必填）与
+    # created_by_name（解析不到时不出现），三种角色都读。
+    schema_revision: "2026.10.27.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent

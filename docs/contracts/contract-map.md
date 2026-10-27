@@ -64,6 +64,15 @@ platform names. The enum change is breaking in both directions: Cloud and Agent
 must ship together, and rollback needs a reverse data migration first. See
 ADR-0024 and the `platform-identifier-rename-20261027` release entry.
 
+### Material creator revision (CHG-20261015-098 T-21)
+
+Cloud owns `2026.10.27.4` of `cloud-api` and `2026.10.27.3` of
+`business-schemas` (content-production): `Material` gains `created_by` (required,
+the library column that already exists) and `created_by_name` (resolved from the
+user directory at read time; absent when that user is gone). The creator is a
+fact about the material, so every role reads it, unlike the `usage.operators`
+names that stay with senior operators and administrators.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`
