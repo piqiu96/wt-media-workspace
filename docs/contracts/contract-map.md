@@ -51,6 +51,19 @@ Cloud owns revision `2026.10.23.1` across `cloud-api`, `cloud-agent-api`, `busin
 
 The Agent-owned `local-agent-api` and `local-error-codes` revisions are `2026.10.23.1`: the local Agent stores the Agent Token in memory only, accepts BitBrowser binding from Agent-read facts, and declares the profile CRUD, cookie-read, sensitive preflight/finish and agent-token routes it implements. Desktop `contracts.lock.json` pins `cloud_agent_api`, `task_schemas` and `local_agent_api` at this revision.
 
+### Platform identifier revision (CHG-20261015-098)
+
+Cloud owns `2026.10.27.3` of `cloud-api` (media-accounts), `2026.10.27.2` of
+`business-schemas` (media-account) and `2026.10.27.1` of `business-enums`
+(media-account): the `platform` enum becomes `douyin | bilibili | baidu`, retiring
+`baijiahao`. The Agent-owned `local-agent-api` revision `2026.10.27.1` changes
+`AccountCheckRequest.platform` the same way, and Desktop `contracts.lock.json`
+pins `local_agent_api v1@2026.10.27.1`. Display text is a client concern and
+lives in `web/src/shared/utils/platforms.js`, so no contract carries Chinese
+platform names. The enum change is breaking in both directions: Cloud and Agent
+must ship together, and rollback needs a reverse data migration first. See
+ADR-0024 and the `platform-identifier-rename-20261027` release entry.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`

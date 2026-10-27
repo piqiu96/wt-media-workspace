@@ -22,7 +22,9 @@ contracts:
     # 2026.10.27.2：自动选材改为策略团队素材池；新增
     # GET /compose-strategies/{id}/runs/tasks 的 ComposeBatchView/ComposeBatchCounts，
     # 无 run 返回 404；任务与成片 material_usage_id 允许 null。
-    contract_revision: "2026.10.27.2"
+    # 2026.10.27.3：media-accounts 的 Platform 枚举把 baijiahao 改为 baidu
+    # （CHG-20261015-098 第三轮平台标识统一，见 ADR-0024）。
+    contract_revision: "2026.10.27.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -53,7 +55,8 @@ contracts:
     # （my_usage）与团队成功成片汇总（usage）；历史无负责人的成片只计总数。
     # 2026.10.27.1：ComposeSchedule.material_scope 增加 team_materials（当前
     # 执行语义）；creator_usages 保留为历史持久值，旧 schedule_json 不重写。
-    schema_revision: "2026.10.27.1"
+    # 2026.10.27.2：MediaAccount.platform 枚举改为 baidu。
+    schema_revision: "2026.10.27.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -77,7 +80,8 @@ contracts:
     # 2026.07.14.3 → 2026.09.26.2：identity.yaml（2026.07.22.1）与
     # content-production.yaml（2026.09.26.2，CHG-20260930-069）已推进。
     # 2026.10.23.1：identity 增加 client_type 与 invalidated_reason。
-    enum_revision: "2026.10.23.1"
+    # 2026.10.27.1：media-account 的 platforms 枚举改为 baidu。
+    enum_revision: "2026.10.27.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -115,7 +119,8 @@ contracts:
     # which moves the definition to 2026.10.03.1, and synced that constant as well.
     # 2026.10.23.1：新增 Agent Token 交接、BitBrowser 绑定、敏感任务预检与许可
     # 交还、Profile CRUD 与 Cookie 读取；扫描带 observed_at。
-    contract_revision: "2026.10.23.1"
+    # 2026.10.27.1：AccountCheckRequest.platform 枚举改为 baidu。
+    contract_revision: "2026.10.27.1"
     consumers:
       - wt-media-desktop
   local_event_schemas:

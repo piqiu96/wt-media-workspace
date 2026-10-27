@@ -11,6 +11,7 @@
 - Affected repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-desktop`（验收目标，运行时代码修改以复现缺陷为前提）
 - Verification repositories: `wt-media-cloud`, `wt-media-agent`, `wt-media-desktop`
 - Runtime implementation: Cloud owns the M4/M5 compose-task acceptance corrections confirmed on 2026-10-16; Agent and Desktop remain verification targets
+- Round 3 (T-19～T-26, 2026-10-27): 用户确认八项页面修订并裁定平台标识与角色能力口径，运行时修改扩展到 Agent（平台标识重命名）与 Desktop（系统管理导航、sidecar 角色、共用前端）
 
 ## 目标
 
@@ -44,6 +45,14 @@
 | T-16 | 素材库列表移除文件状态列与筛选；详情仍可查看文件状态 | Vitest 反向断言 + 详情抽屉正向对照；真实页面读回 |
 | T-17 | 内容池「来源策略」「来源任务」合并为「来源」列，策略可点开只读关联弹窗，人工来源固定文案且不可点 | Vitest 列/组件/footer 渲染；真实页面用策略来源与人工来源各读回一次 |
 | T-18 | 六项修订复走查与签收：三账号机器走查、用户复走查、M4-H2 / M5-AC-13 签收与归档 | 探针 0 异常、复走查清单、用户签收、`wt chg verify` 与文档 PR |
+| T-19 | 平台展示统一：页面一律显示 抖音/B站/小红书/百度，代码统一为 `douyin/bilibili/xhs/baidu`，展示文案由前端公共常量持有 | `shared/utils/platforms.test.js`、受影响页面测试、Go mediaaccount 测试、migration 076 开发库应用与读回、Agent unittest、合同与 `verify_m0_config` |
+| T-20 | 挖掘策略/挖掘任务搜索标签改「综合搜索」；内容池「发现时间」改「入库时间」；内容池行操作「素材详情」改「详情」 | Vitest 标签/列/行操作断言与反向断言；真实页面读回 |
+| T-21 | 素材库列表与详情显示操作人（素材创建人，姓名由服务端解析） | Go production 用例、合同、Vitest 列序与详情断言；真实页面读回 |
+| T-22 | 管理员转素材后弹窗告知目标团队与素材；输出全量角色能力矩阵 | Vitest 单条/批量/失败分支；角色矩阵证据；真实页面读回 |
+| T-23 | 系统管理按角色可见：用户管理仅管理员，运营团队/游戏管理高级运营+管理员（高级运营只读），桌面环境运营+高级运营；团队人数服务端化 | Go identity 用例、identity 合同、Vitest 导航/页面角色断言、Desktop 路由与构建 |
+| T-24 | 社媒账号增加使用人列与筛选（默认本人）；高级运营仅对本人在本地可操作，他人与管理员只读；sidecar 改由 `canRunLocalAgent` 启停 | Go 三角色本人/他人用例、合同、Vitest 行级门禁、Desktop/Login/PersonalInfo 断言 |
+| T-25 | 11 个列表页去掉刷新按钮，改 10 秒自动刷新，抽屉/弹窗/表单打开时暂停 | 新 `useAutoRefresh` 测试与 11 页断言；真实页面等待读数 |
+| T-26 | 第三轮八项与第二轮六项统一复走查、签收与归档 | 探针 0 异常、复走查清单、用户签收、`wt chg verify` 与 PR |
 
 ## 验收
 
@@ -57,6 +66,7 @@
 
 - 不新增生产规则表、第二套批次或成片对象、Agent 视频合成服务。
 - 不将 C7 验证中发现的跨仓 Contract、Architecture 或 Ownership 变化直接混入修复；先回 Workspace 更新定义。
+- **第三轮显式豁免**：T-19 经用户 2026-10-27 裁定的平台标识重命名（`baijiahao` → `baidu`）是已定义的跨仓 Contract 变更，按 ADR-0024 与 release matrix 同批发布，不走「先回 Workspace 再修」的旧限制；定义与合同在 Workspace 侧同步更新。
 
 ## Pending Questions
 

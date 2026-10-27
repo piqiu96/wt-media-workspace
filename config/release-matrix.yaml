@@ -677,3 +677,37 @@ releases:
       - "build-info.json records agent source 1d6c883 while the Windows agent artifact was built after the component tag moved to 8e27531; the delta is .gitattributes-only and enters no artifact bytes."
       - "The presigned variables URL on the server (output/online.url) expires in at most 7 days; every deploy must regenerate it with ~/.wt-media/upload-config-variables.py and refresh the server copy, or deploy plan fails with HTTP 400."
       - "Release artifacts still do not automatically deploy Cloud or restart BaoTa processes."
+  - release: "platform-identifier-rename-20261027"
+    status: verifying
+    date: "2026-10-27"
+    scope: platform_identifier_baidu_and_display_label_ownership
+    environment: local_development
+    components:
+      cloud: "local chg/CHG-20261015-098-round2 tree (not released)"
+      cloud_agent: "local main tree (not released)"
+      desktop: "local main tree (not released)"
+    contracts:
+      cloud_api: "v1@2026.10.27.3"
+      business_schemas: "2026.10.27.2"
+      business_enums: "2026.10.27.1"
+      local_agent_api: "v1@2026.10.27.1"
+    contract_state: "CHG-20261015-098 round 3; display text moved to the client, codes stay English (ADR-0024)"
+    rollout_order:
+      - "Cloud first, together with migration 20261027_076: the CHECK swap rewrites every stored baijiahao to baidu, and the new Cloud rejects baijiahao."
+      - "Agent second: AccountCheckRequest accepts only douyin/bilibili/baidu after this release."
+      - "Desktop last: contracts.lock.json pins local_agent_api v1@2026.10.27.1."
+    rollback: >-
+      Mixing versions is not supported: a new Cloud rejects baijiahao while an old Agent
+      still sends it. Rolling back means restoring the old CHECK, running the reverse
+      UPDATE (baidu -> baijiahao), then deploying the old Cloud and Agent together.
+    verification:
+      local:
+        - "migration 20261027_076 applied to wt_media_cloud: 0 rows with baijiahao; CHECK accepts baidu and rejects baijiahao (error 3819); probe rows rolled back"
+        - "go test ./internal/modules/mediaaccount/... passed on the renamed model and service"
+    target_status:
+      windows_x64: "not_built_in_this_round"
+      macos_x86_64: "not_built_in_this_round"
+      macos_arm64: "packaged Desktop verification pending in CHG-20261015-098 T-26"
+    residual_risks:
+      - "The enum change is breaking in both directions; the three components must ship as one batch."
+      - "Historical xiaohongshu values are not rewritten by migration 076 because no code or data on this host carries them."
