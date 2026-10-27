@@ -95,11 +95,11 @@ Agent Token：Web 会话 `POST /api/v1/local-agent/agent-token` 返回 `11001 �
 ## 五、未覆盖（交用户或后续）
 
 - **打包 Desktop 窗口视觉与 sidecar 启停**：本机无法程序化驱动 Tauri 窗口。5174 的 Desktop 布局已验证菜单、路由守卫与账号行禁用态；真实安装包里 sidecar 是否随运营 / 高级运营启动、随管理员停止，仍需用户按打包产物确认（T-24 证据的源码与用例已覆盖 `canRunLocalAgent` 分支）。
-- **高级运营本人账号的本地执行正面链路**：`senior01` 名下暂无账号，本轮只实测了「他人账号禁用」。服务端「高级运营操作本人账号成功」由 Go 用例覆盖；实际执行还受待裁定 §三-5（高级运营拿不到归属自己的浏览器窗口）阻塞。
-- **开户页平台文案**：`/account-opening` 是本地执行面，Cloud Web 上点进去空转，本轮未打开；`ACCOUNT_OPENING_PLATFORM_OPTIONS`（抖音 / B站 / 百度）由 `platforms.test.js` 覆盖。
+- **高级运营本人账号的本地执行正面链路**：`senior01` 名下暂无账号，本轮只实测了「他人账号禁用」。服务端「高级运营操作本人账号成功」由 Go 用例覆盖；实际执行还受 §三-5（高级运营的窗口来源暂不动）阻塞。
+- **开户页平台文案**：`/account-opening` 只调用 Cloud `CreateAccount`，Cloud Web 可用（代理页同样全部走 `/proxies` API）；本轮未打开页面；`ACCOUNT_OPENING_PLATFORM_OPTIONS`（抖音 / B站 / 百度）由 `platforms.test.js` 覆盖。
 - **后台标签页节流**：`document.hidden` 跳过只有单测，未在真实后台标签计时。
 - **静默刷新失败**：quiet 失败保留旧数据、不提示，是 T-25 的拍定取舍。
-- **5 条待裁定**（Cloud Web 本地页面可见性、管理员读他人 Cookie、账号云端编辑边界、内容池团队公共池、高级运营窗口来源）仍在 `2026-10-27-round3-role-capability-matrix.md` §三，未静默改动。
+- **5 项待裁定已于 2026-10-28 裁定**：保持现状 / 保留管理员只读 / 云端写边界暂不动 / 维持团队公共池 / 窗口来源暂不动。结论见 `2026-10-27-round3-role-capability-matrix.md` §三；本轮无运行时代码改动。
 
 ## 六、用户复走查步骤
 
