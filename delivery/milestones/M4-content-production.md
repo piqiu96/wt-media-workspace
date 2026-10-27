@@ -1,6 +1,7 @@
 # M4 Cloud 内容生产闭环
 
-- Milestone status: `IN_PROGRESS`
+- Milestone status: `DONE`
+- Completed: 2026-10-28（用户签收 M4-H2；见 CHG-20261015-098）
 - Product baseline: `docs/product/prd/详细文档/第五章_素材生产.md`
 - Engineering baseline: `docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md`
 - Decision: `docs/decisions/0017-m4-m5-cloud-owned-content-production.md`、`docs/decisions/0021-compose-four-layer-model.md`、`docs/decisions/0023-m3-m5-team-resources-and-production-operator.md`（2026-10-26 增量）
@@ -26,7 +27,7 @@ compose_template（技术模板，按版本发布）
 
 M4 不包含定时自动创建合成任务；自动调度属于 M5。
 
-2026-10-14 用户调整交付顺序：M4-H2 的真实页面走查和人工签收暂缓，待 M5 各 CHG 完成后统一走查。M4 仍为 `IN_PROGRESS`，既有机器证据不冒充用户验收；此项暂缓不阻止 M5 的开发与逐 CHG 机器验收。
+2026-10-14 用户调整交付顺序：M4-H2 的真实页面走查和人工签收暂缓，待 M5 各 CHG 完成后统一走查。M4 当时仍为 `IN_PROGRESS`，既有机器证据不冒充用户验收；此项暂缓不阻止 M5 的开发与逐 CHG 机器验收。2026-10-28 用户签收 M4-H2，M4 进入 `DONE`。
 
 一次选择多个素材仍逐素材创建多个独立 `compose_task`。未来的任务归并只用于列表展示和筛选，可由任务名称或分组 code 标识；不合并执行、状态、重试或成片。本轮 M4-F 不预设分组字段。
 
@@ -48,12 +49,12 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 | M4-A | 素材库、“我的素材”和原素材懒加载准备/下载 | CHG-20260924-061 | `DONE`；2026-10-12 用户签收 |
 | M4-B | 模板/策略数据结构与合同；执行器就绪后再开放可用模板和策略 | CHG-20261012-079（基础）、CHG-20261012-081（策略交付） | `DONE`；2026-10-13 用户统一走查通过，CHG081 归档 |
 | M4-C | Cloud 执行器、`compose_task`、对象存储与真实 FFmpeg | M4-C4→策略交付→M4-C3→M4-C5→M4-C6 | `DONE`（M4-C4 执行器验证、策略交付、M4-C3 任务创建、M4-C5 成片执行与 M4-C6 我的成片均已归档；页面与执行走查并入 2026-10-14 统一验收） |
-| M4-D | 我的成片、下载中心与 Local Agent 本地文件落地 | M4-C6～M4-C7 | 机器链路及 CHG-20261013-087 缺口修复已验收；UI 待签收 |
-| M4-E | 真实视频、故障恢复、Cloud Web/Desktop WebView 综合验收 | M4-C8 | 机器验收已归档；UI 待签收 |
+| M4-D | 我的成片、下载中心与 Local Agent 本地文件落地 | M4-C6～M4-C7 | 机器链路及 CHG-20261013-087 缺口修复已验收；UI 于 2026-10-28 统一走查签收（M4-H2） |
+| M4-E | 真实视频、故障恢复、Cloud Web/Desktop WebView 综合验收 | M4-C8 | 机器验收已归档；UI 于 2026-10-28 统一走查签收（M4-H2） |
 | M4-F | 任务与成片可按时间查找，成片可按来源素材查找；预览失败仍可看详情 | CHG-20261013-088 | `DONE`（2026-10-13 归档，Cloud commit `b5cdffc`；机器验收见其 `evidence/`，页面真实数据走查并入 M4-H） |
 | M4-G | 任务执行详情与人工失败重试：先补可审计的服务端能力，再开放页面操作 | CHG-20261013-089 | `DONE`（2026-10-13 归档，Cloud commits `2e99dfd`/`7468ff9`/`50561d5`；尝试记录、人工重试与成片关联机器验收见其 `evidence/`，页面真实数据走查并入 M4-H） |
 | M4-H1 | 按 Admin UI 与参考图修正策略、任务、成片及创建任务的视觉与信息层级 | CHG-20261014-090 | `DONE`；2026-10-14 归档，Cloud commit `c92264b`；布局样本、定向测试和双端构建通过，不增加参考图中的未交付业务能力 |
-| M4-H2 | 按真实数据完成 Cloud Web/Desktop 页面走查与用户签收 | M4-H1 完成后，与 M5 最后统一走查 | `IN_PROGRESS`；2026-10-16 五轮合成任务整改已机器验收；2026-10-17 M5-C7 T-10 在新策略模型下复跑了人工任务创建、我的成片与 Local Agent 下载（任务 306/315、成片 53/59），Cloud Web 38 项走查通过；Desktop 视觉逐屏与用户签收待完成 |
+| M4-H2 | 按真实数据完成 Cloud Web/Desktop 页面走查与用户签收 | M4-H1 完成后，与 M5 最后统一走查 | `DONE`；2026-10-28 用户按第三轮统一复走查签收（CHG-20261015-098，Cloud PR #13/#14）；2026-10-16 五轮合成任务整改、2026-10-17 T-10 人工任务与 Local Agent 下载（任务 306/315、成片 53/59）及 Cloud Web 38 项走查均已机器验收；第三轮八项、第二轮回归与探针读数见 `delivery/completed/CHG-20261015-098/evidence/2026-10-27-m4-h2-m5-ac13-third-round-checklist.md` |
 | M4-I | 策略、任务和成片有可追溯的最终运营负责人；管理角色可代创建并按负责人查找 | CHG-20261026-103 | `DONE`；2026-10-26 归档，Cloud PR #10，merge commit `2cd341d`；原 M4-A～H 验收不充当此项证据 |
 | M4-J | 团队素材库使用口径、个人工作集与本机下载入口收敛 | CHG-20261026-104 | `DONE`；2026-10-27 归档，Cloud PR #11，merge commit `fc8504e`；依赖 M4-I 负责人事实，原 M4-A 签收不充当此项证据 |
 
@@ -264,6 +265,8 @@ M4 只有在 M4-AC-01～12 全部 PASS、自动测试与真实依赖验证完成
 十二项机器腿全部 PASS（真实读数或带日期引用，见 `delivery/completed/CHG-20261013-086/evidence/T-06.md`），无 UNVERIFIED；剩余唯一未决项为用户 UI 走查与签收（同文件签收清单七项）。
 
 M4-A 已签收；本表十二项机器部分与本轮下载缺口修复已对账，UI 部分仍待走查，不提前标记里程碑 `DONE`。
+
+2026-10-28 关闭：用户按 CHG-20261015-098 第三轮统一复走查签收 M4-H2，M4-AC-01～12 全部 PASS、M4-I/M4-J 证据齐备，M4 进入 `DONE`。未覆盖项（打包 Desktop 视觉与 sidecar 实际启停、高级运营本人账号的本地执行正面链路、开户页平台文案、后台标签节流）按 CHG-098 复走查清单 §五 登记保留。
 
 ## M4-I production-operator
 

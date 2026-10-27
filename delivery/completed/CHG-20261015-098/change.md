@@ -1,6 +1,6 @@
 # CHG-20261015-098：M5-C7 真实计划时间全链与 M4/M5 统一验收
 
-- Status: IMPLEMENTING
+- Status: DONE
 - Level: M
 - Milestone: `delivery/milestones/M5-automatic-production.md`
 - Closure anchor: §4 M5-A 策略调度纠偏、§6 M5-C 自动生产综合验收、§7 M5-AC-01/10～13、§8 DONE Gate
@@ -89,3 +89,6 @@ None.
 - 2026-10-27 T-25 完成（第三轮第 1 项）：内容挖掘、内容生产、系统设置三个分区共 11 个列表页移除「刷新」按钮，改由公共 `useAutoRefresh` 每 10 秒静默重读；抽屉/弹窗/表单打开、有选中行、批量/提交进行中、页面不可见时跳过。合成任务的列表从「有活任务才 5 秒轮询」并入同一实现，详情抽屉 5 秒轮询保留。Cloud 提交 `940716b`；读数：Web 88 文件/799 测试全绿、Cloud/Desktop 双端构建成功、11 页 `>刷新<` 扫描 0 命中且账号/窗口/代理三页阳性对照 3 命中。前端交互规范新增 §5.7，PRD 第四/五章同步。真实 10 秒等待读数并入 T-26，见 `evidence/T-25-list-auto-refresh.md`。
 - 2026-10-28 T-26 机器腿完成（第三轮八项 + 第二轮只读回归 + T-23/T-24 角色可见性）：Cloud Web 探针 75 项、Desktop 布局（127.0.0.1:5174）探针 28 项，FAILED 均 0，console error / 页面异常 / HTTP ≥500 全程 0。读数：11 页渲染按钮无「刷新」；内容池 / 素材库 / 用户管理在 11.2 秒窗口内各自动重读列表 1 次，内容池详情抽屉打开期间 0 次；内容池表头与详情为「入库时间」、行操作「详情」、平台显示「抖音」且平台筛选只有抖音；挖掘策略与挖掘任务搜索标签为「综合搜索」；素材库有「操作人」列；管理员转素材内容 972 → 素材 181（team 1「默认运营组」，created_by 1 admin），弹窗给出素材与目标团队；社媒账号使用人高级运营默认本人（本人暂无账号 → 0 行）、切「全部成员」后 4 行且不含 admin，管理员默认「全部成员」7 行；Cloud Web 与 Desktop 布局的系统管理菜单/路由、桌面环境、工作环境胶囊与账号行「检查」禁用提示均与 T-23/T-24 口径一致；Web 会话取 Agent Token 返回 11001「请先在 Desktop 登录」。2026-10-28 00:40 Web 全量 88 文件/799 测试全绿。未覆盖：打包 Desktop 视觉与 sidecar 实际启停、高级运营本人账号的本地执行正面链路（本人暂无账号，且受待裁定 §三-5 阻塞）、开户页平台文案、后台标签节流。清单见 `evidence/2026-10-27-m4-h2-m5-ac13-third-round-checklist.md`；用户复走查与 M4-H2/M5-AC-13 签收仍待办。
 - 2026-10-28 用户对角色矩阵五项待裁定给出结论：Cloud Web 开户 / 浏览器窗口 / 代理保持现状；管理员保留 Cookie 只读；账号云端字段与窗口绑定暂不动（用户将重构社媒账号）；普通运营维持内容池团队公共池；高级运营窗口来源随重构再定。复核更正：开户页与代理页走 Cloud API，Cloud Web 可用，只有浏览器窗口页依赖 Desktop 且已有提示——原「三页都是本机执行面」的说法不准确。本轮无运行时代码改动，只更新矩阵 §三、复走查清单 §五、PRD 第三章 §3.2.8；第 3/5 项留待 CHG-098 归档后的社媒账号重构 CHG。T-26 用户复走查与 M4-H2/M5-AC-13 签收仍待办。
+- 2026-10-28 用户确认验收完成：M4-H2 与 M5-AC-13 按 `evidence/2026-10-27-m4-h2-m5-ac13-third-round-checklist.md` 的统一复走查结果签收。清单 §五 的未覆盖项——打包 Desktop 视觉与 sidecar 实际启停、高级运营本人账号的本地执行正面链路、开户页平台文案、后台标签节流——按登记保持未覆盖，不因签收改写；第 3/5 项裁定留待后续社媒账号重构。
+- 2026-10-28 `python3 scripts/wt.py chg verify CHG-20261015-098`（risk M；fast + integration）：Cloud `go test ./internal/modules/...` 0 FAIL、Agent unittest 728 项 OK、Desktop cargo 540 passed / 6 ignored / 0 failed，release-versions 20 passed；integration（`scripts/verify/verify_m1_integration.py`）红于 `ModuleNotFoundError: No module named 'wt_media_agent.cloud_agent_client'`。该模块由 `e034910`（2026-10-23，已在 `origin/main`）删除，脚本本身早于该改造且不在 `AGENT-INDEX.md` §12 门禁表内，属既有失效，不是本 CHG 改动；`wt chg verify` 因此退出 1，表内各腿均绿。原始日志 `/private/tmp/chg098-wt-verify.log`，不提交。
+- 2026-10-28 合并：Cloud round 2 PR #13 `624e04e`、round 3 PR #14 `7dd49e8`；Agent PR #3 `1b6f196`；Desktop PR #5 `8dff82c`。四仓 CI 均通过后合入 `main`，本地 `main` 已同步。
