@@ -87,6 +87,20 @@ detail those counts open is admin-only. Operators get 403 for `management`.
 The game write endpoints are still implemented without contract declaration;
 that pre-existing gap is not widened here.
 
+### Account owner projection and local-operation gates (CHG-20261015-098 T-24)
+
+Cloud owns `2026.10.27.6` of `cloud-api`. `MediaAccount` gains `user_name`, the
+account owner's display name resolved by the read query (`users.nickname`,
+falling back to `users.username`; empty when the user row is missing). It is a
+read-only projection: no write path accepts it, and `user_id` remains the
+identity fact. The revision also declares the three local-operation entry points
+that were implemented but absent from the contract — `check`,
+`cookies/read` and `cookies/read-sync` — with one shared role rule: operators
+may act on the accounts they own, senior operators only the accounts they
+created (`user_id` equals the caller), and admins cannot start local work at
+all. Ownership is enforced server-side; the page's disabled buttons are a
+courtesy, not the boundary.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`

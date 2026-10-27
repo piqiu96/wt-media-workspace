@@ -1,7 +1,7 @@
 # T-22 管理员转素材去向与角色能力矩阵
 
 日期：2026-10-27（Asia/Shanghai）
-结论：转素材去向 PASS（机器腿）；角色能力矩阵登记完成。T-23 的行已在 `T-23-system-management-roles.md` 落地并回填；T-24 / T-25 的行在各自证据落地前仍是计划，不是既成事实
+结论：转素材去向 PASS（机器腿）；角色能力矩阵登记完成。T-23 的行已在 `T-23-system-management-roles.md` 落地并回填，T-24 的行已在 `T-24-account-owner-and-local-operations.md` 落地并回填；T-25 的行在证据落地前仍是计划，不是既成事实
 
 ## 提交
 
@@ -150,13 +150,13 @@
 | 查看 | 👁 仅本人账号 | 👁 本团队账号 | 👁 全部账号 | 保留 |
 | 新增账号 | ✅ 仅本人 | ✅ 仅本人 | ✅ 可为指定用户创建 | 保留 |
 | 编辑（业务状态 / 登录状态 / 备注 / 游戏 / 标签） | ✅ 本人账号 | ✅ 当前本团队账号 | ✅ 当前全部账号 | 与「他人 / 管理员只读」表面冲突，待裁定（见 §三-3） |
-| 使用人列与筛选 | ✗ 无此列，服务端固定本人 | ✗ 当前无列 | ✗ 当前无列 | 调整 T-24：列表加「使用人」；高级运营默认本人、可切全部成员；管理员默认全部成员 |
+| 使用人列与筛选 | 👁 列显示本人；不显示筛选（服务端固定本人） | 👁 列 + 筛选，默认本人、可切全部成员 | 👁 列 + 筛选，默认全部成员 | 已实现（T-24）。服务端 `user_name` 随账号读出，筛选在已加载团队范围内收窄 |
 | 绑定 / 解绑窗口 | ✅ 本人账号 | ✅ 当前本团队账号（只能绑到账号本人名下的窗口） | ✅ 当前全部账号 | 同上，待裁定（见 §三-3） |
-| 本地检查 / 读 Cookie | ✅ 本人账号 | ✗ 当前服务端 403 | ✗ | 调整 T-24：高级运营本人账号可执行；他人账号只读；管理员恒不可执行 |
+| 本地检查 / 读 Cookie | ✅ 本人账号 | ✅ 仅本人创建的账号；他人账号按钮禁用并提示 | ✗ 全部禁用并提示「管理员不执行本地操作」 | 已实现（T-24）。服务端角色门禁 `operator \| senior_operator` + `GetOwnedAccountRecord` 归属校验；批量检查跳过非本人账号 |
 | 查看已存 Cookie | 👁 本人账号 | 👁 仅本人账号（他人被拒） | 👁 任意账号 | 保留但登记待裁定（见 §三-2） |
 | 账号分组 | ✅ 本团队范围 | ✅ 本团队 | ✅ 全部 | 保留 |
 
-服务端：`ListAccounts` 对 operator 固定 `user_id`，再按 `CanAccessOwnedResource` 过滤（本人 / 本团队 / 全部）；`StartLocalAccountCheck`、`StartCookieRead` 当前硬性 `role == operator` 且随后 `GetOwnedAccountRecord` 要求本人；`GetAccountRecord`（含 Cookie）允许本人或管理员。
+服务端：`ListAccounts` 对 operator 固定 `user_id`，再按 `CanAccessOwnedResource` 过滤（本人 / 本团队 / 全部）；`StartLocalAccountCheck`、`StartCookieRead` 与异步 `cookies/read` 共用 `canStartLocalOperation`（operator + senior_operator），随后 `GetOwnedAccountRecord` 要求本人；管理员在角色门禁处被拒。`GetAccountRecord`（含 Cookie）仍允许本人或管理员（只读导出）。Agent Token 对运营与高级运营签发，管理员仍被拒。
 
 **开户（account-opening）/ 浏览器窗口（browser-window）/ 代理（proxy）**
 
@@ -200,6 +200,7 @@
 2. **管理员可读取任意账号已存 Cookie**：`GetAccountRecord` 允许本人或管理员，`AccountsPage` 的 Cookie 弹窗对列表内任意行可用。这与「管理员对账号只读」字面一致（读操作），但涉及敏感数据。是否保留管理员读他人 Cookie 的能力？
 3. **账号云端编辑与窗口绑定的「只读」边界**：`UpdateAccount`、`changeTags`、`BindProfile` / `UnbindProfile` 都走 `authorizedRecord`（本人 / 本团队 / 全部），所以高级运营能改本团队成员的备注、业务状态、登录状态、游戏、标签并绑定 / 解绑其窗口，管理员能改全部账号。用户拍定的是「其他成员的账号对高级运营只读，管理员对所有账号只读」，字面上与这些写操作冲突；但同一句里的「能操作」也可以只指本地操作。需要裁定：是收紧到「只有账号本人能改云端字段、管理员也只读」，还是保留管理角色的云端管理能力、只把本地执行限制为本人？
 4. **普通运营在内容池可处理本团队全部来源**（可跨负责游戏），而挖掘任务 / 合成任务只给自己负责游戏范围内的行。这是既有 PRD 口径（内容池是团队公共池），登记为保留，不再改。
+5. **高级运营无法自己拿到可绑定的浏览器窗口**（T-24 新发现）：高级运营的本地动作要求账号绑定的窗口归属本人（`profilebinding` 以 `profile.user_id == actor.ID` 判定），但 `/browser-windows` 页面在 Desktop 仍只对普通运营开放，`AssignProfileOwner` 也拒绝把窗口指派给非 operator 的目标。也就是说，高级运营自建的账号若还没有一个归属自己的窗口，本轮放开的本地检查 / 读 Cookie 在实际环境里无法执行，直到有管理员（或已有流程）为其准备窗口。需要裁定：是给高级运营开一个「领取/创建自己的窗口」的最小入口，还是继续由普通运营或管理员代配窗口。
 
 ## 四、未覆盖
 

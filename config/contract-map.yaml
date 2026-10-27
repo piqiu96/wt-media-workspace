@@ -28,7 +28,9 @@ contracts:
     # （created_by / created_by_name）。
     # 2026.10.27.5：identity 的 OperationTeam 增加 user_count，并补上
     # GET /api/v1/games（scope=all|management；高级运营只读、无关联摘要）。
-    contract_revision: "2026.10.27.5"
+    # 2026.10.27.6：MediaAccount 增加只读 user_name（使用人），并声明
+    # check / cookies/read / cookies/read-sync 三个本地操作入口的角色与归属门禁。
+    contract_revision: "2026.10.27.6"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
