@@ -26,7 +26,9 @@ contracts:
     # （CHG-20261015-098 第三轮平台标识统一，见 ADR-0024）。
     # 2026.10.27.4：content-production 的素材读取说明补上创建人
     # （created_by / created_by_name）。
-    contract_revision: "2026.10.27.4"
+    # 2026.10.27.5：identity 的 OperationTeam 增加 user_count，并补上
+    # GET /api/v1/games（scope=all|management；高级运营只读、无关联摘要）。
+    contract_revision: "2026.10.27.5"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -60,7 +62,8 @@ contracts:
     # 2026.10.27.2：MediaAccount.platform 枚举改为 baidu。
     # 2026.10.27.3：Material 增加素材操作人 created_by（必填）与
     # created_by_name（解析不到时不出现），三种角色都读。
-    schema_revision: "2026.10.27.3"
+    # 2026.10.27.4：OperationTeam 增加 user_count（随列表读取的成员数）。
+    schema_revision: "2026.10.27.4"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent

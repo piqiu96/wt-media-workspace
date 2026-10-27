@@ -73,6 +73,20 @@ user directory at read time; absent when that user is gone). The creator is a
 fact about the material, so every role reads it, unlike the `usage.operators`
 names that stay with senior operators and administrators.
 
+### System management revision (CHG-20261015-098 T-23)
+
+Cloud owns `2026.10.27.5` of `cloud-api` and `2026.10.27.4` of
+`business-schemas` (identity). `OperationTeam` gains `user_count`, read from the
+users table in the same statement as the row, so a team's headcount does not
+need the user list (that endpoint is admin-only and would 403 for the read-only
+senior view). `GET /api/v1/games` is now declared with a `scope` parameter:
+`all` is the widened dictionary (game as a filter, not an access boundary) and
+`management` is the game-management page, available to senior operators and
+admins with every game status but without `reference_summary` — the reference
+detail those counts open is admin-only. Operators get 403 for `management`.
+The game write endpoints are still implemented without contract declaration;
+that pre-existing gap is not widened here.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`

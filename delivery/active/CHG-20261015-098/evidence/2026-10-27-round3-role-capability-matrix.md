@@ -1,7 +1,7 @@
 # T-22 管理员转素材去向与角色能力矩阵
 
 日期：2026-10-27（Asia/Shanghai）
-结论：转素材去向 PASS（机器腿）；角色能力矩阵登记完成，其中「本轮目标」列里 T-23 / T-24 / T-25 的行在各自证据落地前仍是计划，不是既成事实
+结论：转素材去向 PASS（机器腿）；角色能力矩阵登记完成。T-23 的行已在 `T-23-system-management-roles.md` 落地并回填；T-24 / T-25 的行在各自证据落地前仍是计划，不是既成事实
 
 ## 提交
 
@@ -173,20 +173,20 @@
 | 页面 / 操作 | operator | senior_operator | admin | 结论 |
 | --- | --- | --- | --- | --- |
 | 用户管理 | ✗ | ✗ | ✅ | 保留（本轮拍定） |
-| 运营团队查看 + 人数 | ✗ | ✗ 当前入口被隐藏；`listUsers` 会 403 | ✅ | 调整 T-23：高级运营可见只读，团队人数改为服务端 `user_count` |
+| 运营团队查看 + 人数 | ✗ | 👁 已实现（T-23）：可见只读，人数取服务端 `user_count` | ✅ | 调整 T-23 已完成 |
 | 运营团队增改删 | ✗ | ✗ | ✅ | 保留 |
-| 游戏管理查看 | ✗ | ✗ 当前入口被隐藏；非管理员只能拿启用且已分配游戏 | ✅ 全部状态 + 关联摘要 | 调整 T-23：高级运营 `scope=management` 只读全部状态，不含关联摘要 |
+| 游戏管理查看 | ✗ | 👁 已实现（T-23）：`scope=management`，全部状态、无关联摘要 | ✅ 全部状态 + 关联摘要 | 调整 T-23 已完成 |
 | 游戏增改删 / 关联情况 | ✗ | ✗ | ✅ | 保留 |
-| Cloud Web 入口 | ✗ | ✗ 当前 `adminOnlyPaths` | ✅ | 调整 T-23：团队 / 游戏对高级运营开放 |
-| Desktop 入口 | ✗ | ✗ 当前 `desktopHiddenPaths` | ✗ 当前 `desktopHiddenPaths` | 调整 T-23：三页进入 Desktop，按上表分角色 |
+| Cloud Web 入口 | ✗ | ✅ 已实现（T-23）：团队 / 游戏对高级运营开放 | ✅ | 调整 T-23 已完成（`shared/utils/roles.js`） |
+| Desktop 入口 | ✗ | ✅ 已实现（T-23）：三页进入 Desktop，共用 Cloud 组件 | ✅ 已实现（T-23） | 调整 T-23 已完成 |
 
-服务端：`CreateUser`、`ForceLogout`、`SetUserStatus`、`ResetPassword`、`UpdateUser`、`DeleteUser`、`ListUsers`、团队的增改删、游戏的增改删与 `GameReferences` 都是 admin-only；`ListTeams` 任何登录用户可读；`ListGames` 非管理员只回启用游戏（默认还按负责游戏过滤）。
+服务端：`CreateUser`、`ForceLogout`、`SetUserStatus`、`ResetPassword`、`UpdateUser`、`DeleteUser`、`ListUsers`、团队的增改删、游戏的增改删与 `GameReferences` 都是 admin-only；`ListTeams` 任何登录用户可读，响应带 `user_count`。`ListGames` 默认非管理员只回启用且分给自己的游戏，`scope=all` 放开到全部启用游戏（作筛选用），`scope=management` 只给 senior + admin、返回全部状态且不含关联摘要（T-23 已实现）。
 
 ### 2.5 桌面环境与本地 Agent
 
 | 项 | operator | senior_operator | admin | 结论 |
 | --- | --- | --- | --- | --- |
-| 本地日志 / 本机设置 | ✅ 菜单可见 | ✗ 当前菜单不显示，但 `/logs`、`/settings` 路由无角色门禁，直接访问可达 | ✗ 菜单不显示，路由同样可达 | 调整 T-23：运营 + 高级运营可见，管理员不可见，菜单与路由同时设门禁 |
+| 本地日志 / 本机设置 | ✅ | ✅ 已实现（T-23）：菜单与路由都放行 | ✗ 已实现（T-23）：菜单隐藏且守卫退回内容池 | 调整 T-23 已完成 |
 | sidecar 启动 | ✅ | ✗ 当前 `canUseLocalAgent` 仅 operator | ✗ | 调整 T-24：新增 `canRunLocalAgent`（operator + senior），管理员仍停止 |
 | 工作环境胶囊（WorkEnvPill） | ✅ | ✗ | ✗ | 调整 T-24 同上 |
 
@@ -203,6 +203,6 @@
 
 ## 四、未覆盖
 
-- 本轮 T-23 / T-24 / T-25 的目标行只有代码位置与口径，没有走查读数；各自证据文件落地后以那份为准。
+- T-23 已落地（`T-23-system-management-roles.md`），但真实页面读数仍并入 T-26 三账号走查；T-24 / T-25 的目标行只有代码位置与口径，各自证据文件落地后以那份为准。
 - Desktop 菜单与禁用态的最终视觉无法程序化验证，交 T-26 用户按打包产物确认。
 - 管理员转素材的真实弹窗与团队名文案并入 T-26 三账号走查。
