@@ -67,8 +67,8 @@ def validate_master_text(text: str) -> list[str]:
         1: "DONE",
         2: "DONE",
         3: "DONE",
-        4: "IN_PROGRESS",
-        5: "IN_PROGRESS",
+        4: "DONE",
+        5: "DONE",
         **{number: "NOT_STARTED" for number in range(6, 11)},
     }
     statuses: dict[int, str | None] = {}

@@ -51,6 +51,56 @@ Cloud owns revision `2026.10.23.1` across `cloud-api`, `cloud-agent-api`, `busin
 
 The Agent-owned `local-agent-api` and `local-error-codes` revisions are `2026.10.23.1`: the local Agent stores the Agent Token in memory only, accepts BitBrowser binding from Agent-read facts, and declares the profile CRUD, cookie-read, sensitive preflight/finish and agent-token routes it implements. Desktop `contracts.lock.json` pins `cloud_agent_api`, `task_schemas` and `local_agent_api` at this revision.
 
+### Platform identifier revision (CHG-20261015-098)
+
+Cloud owns `2026.10.27.3` of `cloud-api` (media-accounts), `2026.10.27.2` of
+`business-schemas` (media-account) and `2026.10.27.1` of `business-enums`
+(media-account): the `platform` enum becomes `douyin | bilibili | baidu`, retiring
+`baijiahao`. The Agent-owned `local-agent-api` revision `2026.10.27.1` changes
+`AccountCheckRequest.platform` the same way, and Desktop `contracts.lock.json`
+pins `local_agent_api v1@2026.10.27.1`. Display text is a client concern and
+lives in `web/src/shared/utils/platforms.js`, so no contract carries Chinese
+platform names. The enum change is breaking in both directions: Cloud and Agent
+must ship together, and rollback needs a reverse data migration first. See
+ADR-0024 and the `platform-identifier-rename-20261027` release entry.
+
+### Material creator revision (CHG-20261015-098 T-21)
+
+Cloud owns `2026.10.27.4` of `cloud-api` and `2026.10.27.3` of
+`business-schemas` (content-production): `Material` gains `created_by` (required,
+the library column that already exists) and `created_by_name` (resolved from the
+user directory at read time; absent when that user is gone). The creator is a
+fact about the material, so every role reads it, unlike the `usage.operators`
+names that stay with senior operators and administrators.
+
+### System management revision (CHG-20261015-098 T-23)
+
+Cloud owns `2026.10.27.5` of `cloud-api` and `2026.10.27.4` of
+`business-schemas` (identity). `OperationTeam` gains `user_count`, read from the
+users table in the same statement as the row, so a team's headcount does not
+need the user list (that endpoint is admin-only and would 403 for the read-only
+senior view). `GET /api/v1/games` is now declared with a `scope` parameter:
+`all` is the widened dictionary (game as a filter, not an access boundary) and
+`management` is the game-management page, available to senior operators and
+admins with every game status but without `reference_summary` — the reference
+detail those counts open is admin-only. Operators get 403 for `management`.
+The game write endpoints are still implemented without contract declaration;
+that pre-existing gap is not widened here.
+
+### Account owner projection and local-operation gates (CHG-20261015-098 T-24)
+
+Cloud owns `2026.10.27.6` of `cloud-api`. `MediaAccount` gains `user_name`, the
+account owner's display name resolved by the read query (`users.nickname`,
+falling back to `users.username`; empty when the user row is missing). It is a
+read-only projection: no write path accepts it, and `user_id` remains the
+identity fact. The revision also declares the three local-operation entry points
+that were implemented but absent from the contract — `check`,
+`cookies/read` and `cookies/read-sync` — with one shared role rule: operators
+may act on the accounts they own, senior operators only the accounts they
+created (`user_id` equals the caller), and admins cannot start local work at
+all. Ownership is enforced server-side; the page's disabled buttons are a
+courtesy, not the boundary.
+
 ## Agent-Owned Contracts
 
 - `../wt-media-agent/contracts/local-agent-api`

@@ -109,21 +109,21 @@ wt-media-workspace/
 |---|---|---|---|
 | `DISCUSSION` | 草案，方向待裁定；不激活 | 2 | 0 |
 | `PLANNED` | 方向已定、已拆分，可激活 | 2 | 0 |
-| `IMPLEMENTING` | 实施中 | 1 | 2 |
+| `IMPLEMENTING` | 实施中 | 0 | 2 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 65 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 66 |
 | `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **1** 篇；归档记录＝`delivery/completed/*/change.md` **79** 篇。归档列 68（`DONE` 65＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 79。planned 4 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
+分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **80** 篇。归档列 69（`DONE` 66＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 80。planned 4 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 
 | 状态 | 含义 | 当前处于该态的里程碑 |
 |---|---|---|
 | `NOT_STARTED` | 未进入该里程碑 | M6～M10 |
-| `IN_PROGRESS` | 开发中 | M4、M5 |
+| `IN_PROGRESS` | 开发中 | 无 |
 | `VERIFYING` | 自动综合验收完成，等待人工整体验收 | 无 |
-| `DONE` | 人工整体验收通过 | M2、M3、M-launch-engineering |
+| `DONE` | 人工整体验收通过 | M2、M3、M4、M5、M-launch-engineering |
 
 里程碑文件内部的子项状态（如 M2-D 的 `DEFERRED`）不是里程碑状态词，不占上表，只在其所属里程碑文件内自述。
 
@@ -157,11 +157,11 @@ wt-media-workspace/
 | M1 | `DONE` | M1 任务链路闭环复验通过。创建→领取→执行→上报→查询完整链路跑通，MySQL 持久化确认。统一 API 响应规约已迁移。修复：router 连接、mysql_registry 时间格式。 | M1 冻结。不扩建通用任务系统。 |
 | M2 | `DONE` | 2026-09-14 用户完成本轮综合人工验收并确认完整通过。M2-A/B/C/E 的真实依赖、构建、Desktop 与人工走查证据均已归档；M2-D 保持 `DEFERRED`。 | M2 冻结为当前运行环境与账号管理基线；后续内容发现从 M3 开始，M2-D 或真实受限样本校准须以独立 CHG 恢复。 |
 | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
-| M4 | `IN_PROGRESS` | M4 的各实施 CHG 与 M4-H1 视觉整改已归档；机器闭环已有证据。 | M4-H2 用户真实页面走查按 2026-10-14 指令暂缓，与 M5 最后统一签收。 |
-| M5 | `IN_PROGRESS` | M4 的人工生产底座可复用；M4-H2 尚未签收。 | 用户已授权先完成 M5 各 CHG 并逐项机器验收，最后统一走查 M4/M5。 |
+| M4 | `DONE` | M4 各实施 CHG、M4-H1 视觉整改与 M4-H2 统一走查均已完成；机器闭环与真实页面签收均有证据。 | 2026-10-28 用户签收 M4-H2；M4 冻结为 Cloud 内容生产闭环基线。 |
+| M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
 | M6-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
 
-2026-10-26 M3–M5 易用性增量已确认：CHG-101 已合并；[M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)已完成并归档（Cloud PR #8，`cb26c66`），团队公共内容池与 Desktop 共用 Cloud 页面入口上线；CHG-106 前端状态色死表已删除并归档（Cloud PR #9，`d793d92`）；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)已完成并归档（Cloud PR #10，`2cd341d`），策略→任务→成片负责人事实与代创建链路已上线；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)已完成并归档（Cloud PR #11，`fc8504e`），以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)已完成并归档（Cloud PR #12，`c509ee8`），自动候选改为团队素材库且任务/成片归策略负责人；M5 总体仍为 `IN_PROGRESS`，待 CHG-098 统一走查 M5-AC-13 与 M4-H2。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
+2026-10-26 M3–M5 易用性增量已确认：CHG-101 已合并；[M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)已完成并归档（Cloud PR #8，`cb26c66`），团队公共内容池与 Desktop 共用 Cloud 页面入口上线；CHG-106 前端状态色死表已删除并归档（Cloud PR #9，`d793d92`）；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)已完成并归档（Cloud PR #10，`2cd341d`），策略→任务→成片负责人事实与代创建链路已上线；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)已完成并归档（Cloud PR #11，`fc8504e`），以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)已完成并归档（Cloud PR #12，`c509ee8`），自动候选改为团队素材库且任务/成片归策略负责人；M5 总体当时仍为 `IN_PROGRESS`，待 CHG-098 统一走查 M5-AC-13 与 M4-H2；2026-10-28 用户签收 M4-H2 与 M5-AC-13，M4 与 M5 进入 `DONE`。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
 
 每个里程碑的最终综合验收至少包含：
 
@@ -415,15 +415,15 @@ A、B、C1、D、E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂�
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS` |
+| 状态 | `DONE` |
 | 目标 | 打通素材库、我的素材、人工创建合成任务、Cloud Worker 生成成片和下载的完整闭环。 |
 | 依赖 | M3 `DONE` |
 | 闭环 | `delivery/milestones/M4-content-production.md` |
 | 产品/决策 | 第五章素材生产；ADR-0017、ADR-0021；M4-M5 Cloud 内容生产工程设计 |
-| Active CHG | 无进行中；M4 实施 CHG 与 CHG-20261014-090（M4-H1 视觉整改）均已归档；M4-H2 用户走查暂缓 |
-| Evidence | M4-A 原功能证据见 `delivery/completed/CHG-20260924-061/evidence/`，用户签收见 `delivery/reports/2026-10-12-m4-a-signoff.md`；M4-C4 真实 FFmpeg 与 Garage 验证见 `delivery/completed/CHG-20261012-080/evidence/T-06.md` |
-| 完成日期 | None |
-| Commit/Tag | None |
+| Active CHG | None（M4 全部 CHG 已归档，含 CHG-20261015-098） |
+| Evidence | M4-A 原功能证据见 `delivery/completed/CHG-20260924-061/evidence/`，用户签收见 `delivery/reports/2026-10-12-m4-a-signoff.md`；M4-C4 真实 FFmpeg 与 Garage 验证见 `delivery/completed/CHG-20261012-080/evidence/T-06.md`；M4-H2 统一走查与签收见 `delivery/completed/CHG-20261015-098/evidence/2026-10-27-m4-h2-m5-ac13-third-round-checklist.md` |
+| 完成日期 | 2026-10-28 |
+| Commit/Tag | `wt-media-cloud` `624e04e`、`7dd49e8`；`wt-media-agent` `1b6f196`；`wt-media-desktop` `8dff82c`（CHG-20261015-098 合并提交） |
 
 目标闭环：
 
@@ -487,15 +487,15 @@ M4-C8 真实视频、对象存储、故障恢复和 UI 综合验收
 
 | 字段 | 内容 |
 |---|---|
-| 状态 | `IN_PROGRESS` |
+| 状态 | `DONE` |
 | 目标 | 在 M4 已验证的 Cloud 合成底座上，由 `compose_strategy` 定时自动创建任务，并完成批量、并发、超时、重试和恢复。 |
 | 依赖 | M4 机器闭环已验证；M4-H2 人工走查暂缓，与 M5 最后统一签收（2026-10-14 用户确认） |
 | 闭环 | `delivery/milestones/M5-automatic-production.md` |
 | 产品/决策 | 第五章素材生产；ADR-0017；M4-M5 Cloud 内容生产工程设计 |
-| Active CHG | `CHG-20261015-098`（M5-C7 真实计划时间全链与 M4/M5 统一验收） |
-| Evidence | M5-C1～C6（含 C2a）机器证据见已归档 CHG091～097；C7 真实时间全链与最终用户签收实施中。 |
-| 完成日期 | None |
-| Commit/Tag | None |
+| Active CHG | None（CHG-20261015-098 已归档） |
+| Evidence | M5-C1～C6（含 C2a）机器证据见已归档 CHG091～097；M5-F 见 `delivery/completed/CHG-20261026-105/`；C7 真实时间全链与 M5-AC-13 签收见 `delivery/completed/CHG-20261015-098/`。 |
+| 完成日期 | 2026-10-28 |
+| Commit/Tag | `wt-media-cloud` `624e04e`、`7dd49e8`；`wt-media-agent` `1b6f196`；`wt-media-desktop` `8dff82c`（CHG-20261015-098 合并提交） |
 
 目标闭环：
 

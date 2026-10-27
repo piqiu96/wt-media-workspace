@@ -13,7 +13,7 @@ M4-M5 于 2026-09-24 按用户确认方向完成闭环重划。M4 于 2026-09-26
 - [M4 Cloud 内容生产闭环](M4-content-production.md)：素材库 → 我的素材 → 人工 `compose_task` → Cloud Worker + FFmpeg → 我的成片 → 下载；
 - [M5 策略自动生产与 Worker 资源控制](M5-automatic-production.md)：`compose_strategy.schedule` → Scheduler → Worker Pool → 自动成片。
 
-两者共同依据 ADR-0017；不再使用本地/Cloud Agent 合成、`production_rule`、`compose_pool_item`、成片池或成片领取对象。M4-A 的 `CHG-20260924-061` 已于 2026-09-27 关闭归档为 `DONE`（归档记录见 [`../completed/CHG-20260924-061/change.md`](../completed/CHG-20260924-061/change.md)）。M4 与 M5 均保持 `IN_PROGRESS`，最终一起人工走查签收；M5 各 CHG 仍需独立机器验收。
+两者共同依据 ADR-0017；不再使用本地/Cloud Agent 合成、`production_rule`、`compose_pool_item`、成片池或成片领取对象。M4-A 的 `CHG-20260924-061` 已于 2026-09-27 关闭归档为 `DONE`（归档记录见 [`../completed/CHG-20260924-061/change.md`](../completed/CHG-20260924-061/change.md)）。M4 与 M5 于 2026-10-28 经用户统一走查签收，均进入 `DONE`（签收记录见 [CHG-20261015-098](../completed/CHG-20261015-098/change.md)）；两者各 CHG 的机器验收已逐项完成。
 
 Milestone 不替代 Product、Engineering、MASTER PLAN、AI Spec、CHG 或 Evidence。它只回答：用户按什么顺序操作，以及哪些业务结果和真实外部效果必须同时成立，才能认为该 M 的一段闭环完成。
 

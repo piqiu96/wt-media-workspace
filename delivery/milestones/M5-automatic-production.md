@@ -1,6 +1,7 @@
 # M5 策略自动生产与 Worker 资源控制
 
-- Milestone status: `IN_PROGRESS`
+- Milestone status: `DONE`
+- Completed: 2026-10-28（用户签收 M5-AC-13 与 M4-H2；见 CHG-20261015-098）
 - Product baseline: `docs/product/prd/详细文档/第五章_素材生产.md`
 - Engineering baseline: `docs/engineering/specs/2026-09-24-m4-m5-cloud-content-production.md`
 - Decision: `docs/decisions/0017-m4-m5-cloud-owned-content-production.md`、`docs/decisions/0023-m3-m5-team-resources-and-production-operator.md`（2026-10-26 增量）
@@ -43,12 +44,12 @@ M5 不创建 `production_rule`、`compose_pool_item`、成片池、成片领取�
 
 | 阶段 | 独立结果 | 候选 CHG | 状态 |
 | --- | --- | --- | --- |
-| M5-A | 高级运营设定合成策略的运行时间、适用素材和数量上限，并能启停 | M5-C1、M5-C2 | `IN_PROGRESS`；C1/C2 机器验证通过，T-10 新模型已复验（M5-AC-01/01a PASS），用户页面走查待统一签收 |
-| M5-B | 云端定时程序（Scheduler）到点创建任务；同一策略、同一计划时间、同一素材只创建一次，程序重启后也不重复 | M5-C2 | `IN_PROGRESS`；双进程竞争与重启验证通过，T-10 在新模型下再次真库复验（M5-AC-02/03 PASS），最终全链待 C7 签收 |
-| M5-B1 | 运营填写可下载引导视频地址并配置插入或画中画策略；人工与自动任务都按固定模板执行并形成可播放成片 | M5-C2a | `MACHINE_ACCEPTED`；CHG093 真实任务与成片预览读回通过，用户页面走查待统一签收 |
-| M5-C | 云端多个合成程序（Worker）按配置的数量上限工作；程序失联或任务超时后安全处理，不让同一任务同时执行两次 | M5-C3 | `MACHINE_ACCEPTED`；CHG094 全局容量、领取代次与安全恢复机器验证通过，用户页面走查待统一签收 |
-| M5-D | 批量任务有成功也有失败时，运营能看到每条结果、重试可恢复的失败，并由同团队高级运营或管理员核对处置结果不明确的任务 | M5-C4～M5-C6 | `MACHINE_ACCEPTED`；CHG095 批次结果、CHG096 技术重试、CHG097 管理员核对机器验证通过；2026-10-27 核对角色放宽见下方 M5-C6 追加；用户页面走查待统一签收 |
-| M5-E | 在真实计划时间、真实视频和故障场景下完成全流程验收 | M5-C7 | `IN_PROGRESS`；CHG-20261015-098 T-01～T-10 机器腿、真实全链与页面走查已完成，M5-AC-01～12 全部 PASS；2026-10-21 本地新增页面与 Desktop CSP 改动后，需以当前源码重打包并走查，M5-AC-13 与 M4-H2 尚待用户签收 |
+| M5-A | 高级运营设定合成策略的运行时间、适用素材和数量上限，并能启停 | M5-C1、M5-C2 | `DONE`；C1/C2 机器验证通过，T-10 新模型已复验（M5-AC-01/01a PASS），2026-10-28 统一用户走查签收（M5-AC-13） |
+| M5-B | 云端定时程序（Scheduler）到点创建任务；同一策略、同一计划时间、同一素材只创建一次，程序重启后也不重复 | M5-C2 | `DONE`；双进程竞争与重启验证通过，T-10 在新模型下再次真库复验（M5-AC-02/03 PASS），最终全链于 2026-10-28 随 C7 签收 |
+| M5-B1 | 运营填写可下载引导视频地址并配置插入或画中画策略；人工与自动任务都按固定模板执行并形成可播放成片 | M5-C2a | `DONE`；CHG093 真实任务与成片预览读回通过，2026-10-28 统一用户走查签收（M5-AC-13） |
+| M5-C | 云端多个合成程序（Worker）按配置的数量上限工作；程序失联或任务超时后安全处理，不让同一任务同时执行两次 | M5-C3 | `DONE`；CHG094 全局容量、领取代次与安全恢复机器验证通过，2026-10-28 统一用户走查签收（M5-AC-13） |
+| M5-D | 批量任务有成功也有失败时，运营能看到每条结果、重试可恢复的失败，并由同团队高级运营或管理员核对处置结果不明确的任务 | M5-C4～M5-C6 | `DONE`；CHG095 批次结果、CHG096 技术重试、CHG097 管理员核对机器验证通过；2026-10-27 核对角色放宽见下方 M5-C6 追加；2026-10-28 统一用户走查签收（M5-AC-13） |
+| M5-E | 在真实计划时间、真实视频和故障场景下完成全流程验收 | M5-C7 | `DONE`；CHG-20261015-098 T-01～T-10 机器腿、真实全链与页面走查已完成，M5-AC-01～13 全部 PASS；2026-10-28 用户签收 M5-AC-13 与 M4-H2（第三轮复走查清单：`delivery/completed/CHG-20261015-098/evidence/2026-10-27-m4-h2-m5-ac13-third-round-checklist.md`） |
 | M5-F | 策略从团队素材库自动选材并将任务与成片归指定运营 | CHG-20261026-105 | `DONE`（2026-10-27 归档，Cloud PR #12 `c509ee8`）；依赖 M4-I 负责人事实，原 M5-AC PASS 不充当此项证据 |
 
 后续 CHG 按可独立验证的结果建立：M5-C1 只交付计划配置与页面读回，M5-C2 验证 Scheduler 到点、幂等及跳过原因，M5-C2a 接入可下载引导视频地址并交付插入/画中画模板，M5-C3 验证 Worker 并发与租约恢复，M5-C4～C6 分别验收批次结果归集、可恢复失败重试、结果不明确的人工处置，M5-C7 再做真实时间与真实视频全链走查。页面不得提前展示尚无服务端事实的统计或操作；M4-G 的人工任务重试合同如被 M5 复用，M5 只扩展批次关联，不另造一套重试状态。
@@ -228,36 +229,40 @@ M5-C6 人工处置口径（2026-10-15 用户确认）：仅管理员在任务详
 
 ### 对应 CHG
 
-- M5-C7（CHG-20261015-098）：T-01～T-10 机器腿、真实全链与页面走查已完成，M5-AC-01～12 全部 PASS；剩 M5-AC-13 与 M4-H2 用户签收。详见 `delivery/active/CHG-20261015-098/evidence/`。
+- M5-C7（CHG-20261015-098）：T-01～T-10 机器腿、真实全链与页面走查已完成，M5-AC-01～13 全部 PASS；2026-10-28 用户签收 M5-AC-13 与 M4-H2。详见 `delivery/completed/CHG-20261015-098/evidence/`。
 
 ## 7. M5 验收矩阵
 
 | AC | 验收要求 | 最低证据 | 状态 |
 | --- | --- | --- | --- |
-| M5-AC-01 | 策略状态 `enabled/disabled`、手动/定时执行方式、计划/时区和下一次执行时间正确；状态确认先于提交，启用不立即触发 | API/数据库/UI 对照 | `PASS`；CHG098 T-10 新模型三处对照：库/API/UI 一致，启用得 `next_run_at=now+2min` 不立即触发，确认先于提交、取消零请求；见 `delivery/active/CHG-20261015-098/evidence/T-10.md` |
-| M5-AC-01a | 多优先级规则、`match/filter`、`all/any`、整组过滤、单次/每日额度及人工/定时同路径创建任务准确；单项失败不回滚成功项 | Domain/API/真库边界测试及 UI 走查 | `PASS`；CHG098 T-10 真库边界（策略 37/38/39/42）与同引擎执行、单项失败隔离（任务 312/314，1062 只回滚自己）；见 `evidence/T-10.md` |
-| M5-AC-02 | 真实到期扫描创建任务 | 独立 Scheduler 进程证据 | `PASS`；CHG098 T-10 独立 Scheduler 进程由当前源码运行，02:32/02:41/02:45/02:56 的 scheduled run 真实落库；见 `evidence/T-10.md` |
-| M5-AC-03 | 同时间槽并发/重启扫描防重 | 并发测试 + 唯一键证据 | `PASS`；CHG098 T-10 `TestLiveComposeSchedulerProcessesDeduplicate`（双进程 + 重启各 1 run/1 task），唯一键与 `run_key` 推导复算一致；见 `evidence/T-10.md` |
-| M5-AC-04 | 单次和每日上限生效 | 边界值测试 | `PASS`；CHG098 T-10 单次（策略 38，1/10）与每日（策略 37，1/1）真触边，抽屉任务不计每日额度；见 `evidence/T-10.md` |
+| M5-AC-01 | 策略状态 `enabled/disabled`、手动/定时执行方式、计划/时区和下一次执行时间正确；状态确认先于提交，启用不立即触发 | API/数据库/UI 对照 | `PASS`；CHG098 T-10 新模型三处对照：库/API/UI 一致，启用得 `next_run_at=now+2min` 不立即触发，确认先于提交、取消零请求；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
+| M5-AC-01a | 多优先级规则、`match/filter`、`all/any`、整组过滤、单次/每日额度及人工/定时同路径创建任务准确；单项失败不回滚成功项 | Domain/API/真库边界测试及 UI 走查 | `PASS`；CHG098 T-10 真库边界（策略 37/38/39/42）与同引擎执行、单项失败隔离（任务 312/314，1062 只回滚自己）；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
+| M5-AC-02 | 真实到期扫描创建任务 | 独立 Scheduler 进程证据 | `PASS`；CHG098 T-10 独立 Scheduler 进程由当前源码运行，02:32/02:41/02:45/02:56 的 scheduled run 真实落库；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
+| M5-AC-03 | 同时间槽并发/重启扫描防重 | 并发测试 + 唯一键证据 | `PASS`；CHG098 T-10 `TestLiveComposeSchedulerProcessesDeduplicate`（双进程 + 重启各 1 run/1 task），唯一键与 `run_key` 推导复算一致；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
+| M5-AC-04 | 单次和每日上限生效 | 边界值测试 | `PASS`；CHG098 T-10 单次（策略 38，1/10）与每日（策略 37，1/1）真触边，抽屉任务不计每日额度；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
 | M5-AC-04a | 策略可填写可下载引导视频地址；插入与画中画模板按快照产生可播放成片；旧模板不回归 | 地址与下载边界、真实 FFmpeg/FFprobe、API/UI 对账 | `PASS`；CHG093 任务 36 → 成片 13，预览 206；双模板真实 FFmpeg 回归 |
 | M5-AC-05 | Worker 有界并发和资源保护 | 压测 + 指标 | `PASS`；CHG094 双进程容量竞争（恰好上限数领取）、容量不一致拒启、真实进程磁盘停领与恢复 |
 | M5-AC-06 | heartbeat、租约过期和 Worker 重启恢复 | 故障注入 | `PASS`；CHG094 续租失败终止、启动期过期租约隔离 `execution_uncertain` 不重排 |
 | M5-AC-07 | 超时/取消真实终止 FFmpeg | 进程与任务对照 | `PASS`；CHG094 真实进程 cutting 阶段中途取消任务 166，无输出无残留；超时路径与取消共用 attempt ctx 终止，单测覆盖 |
 | M5-AC-08 | 技术失败退避重试、业务失败不盲目重试 | 错误分类测试 | `PASS`；CHG096 真 Worker 重启跨进程退避与第 2 次成片读回、真库资格读回、分类和耗尽单测；连续真实存储故障耗尽未单独注入 |
-| M5-AC-09 | 批量部分失败统计准确；每条素材的任务和结果独立可追溯 | 数据库/API/UI 对账 | `PASS`；CHG098 T-10 混合批次（策略 36：成功 1 / 失败 1 / 跳过 3）与单项创建失败（策略 42）在库/API/UI 三处对账，任务页按触发方式筛选与逐素材下钻；见 `evidence/T-10.md` |
-| M5-AC-10 | 自动任务生成真实可播放成片 | FFprobe + 对象存储 | `PASS`；CHG098 T-10 成片 49/50/51/52/53/58 逐条对象 Stat + 预签名 SHA-256 + FFprobe 4.000000s（例：69,142 B `4d802de9…beacd`）；见 `evidence/T-10.md` |
-| M5-AC-11 | M4 人工生产和下载完整回归 | M4 验收矩阵复跑 | `PASS`；CHG098 T-10 抽屉任务 306 → worker 成片 53、幂等重放与中文冲突，operator01 经 Local Agent 真实落盘成片 59（SHA-256 三方一致）；见 `evidence/T-10.md` |
+| M5-AC-09 | 批量部分失败统计准确；每条素材的任务和结果独立可追溯 | 数据库/API/UI 对账 | `PASS`；CHG098 T-10 混合批次（策略 36：成功 1 / 失败 1 / 跳过 3）与单项创建失败（策略 42）在库/API/UI 三处对账，任务页按触发方式筛选与逐素材下钻；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
+| M5-AC-10 | 自动任务生成真实可播放成片 | FFprobe + 对象存储 | `PASS`；CHG098 T-10 成片 49/50/51/52/53/58 逐条对象 Stat + 预签名 SHA-256 + FFprobe 4.000000s（例：69,142 B `4d802de9…beacd`）；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
+| M5-AC-11 | M4 人工生产和下载完整回归 | M4 验收矩阵复跑 | `PASS`；CHG098 T-10 抽屉任务 306 → worker 成片 53、幂等重放与中文冲突，operator01 经 Local Agent 真实落盘成片 59（SHA-256 三方一致）；见 `delivery/completed/CHG-20261015-098/evidence/T-10.md` |
 | M5-AC-12 | 不存在旧对象或 Agent 合成路径 | Migration/代码/Contract 扫描 | `PASS`；CHG098 T-04 `production_rule`/`compose_pool_item` 三仓 0 命中（带阳性对照）；Agent 执行器仅下载、合同无 compose；Desktop 仅状态 DTO |
-| M5-AC-13 | 用户按真实计划流程签收；任务页按“任务→触发方式→关联素材/策略/成片→状态/阶段→操作”展示人工与自动任务，执行记录区分创建触发与 Worker 尝试，页面操作与反馈遵循 `docs/standards/` | 人工验收记录 | `TODO`；2026-10-16 页面走查结论整改中 |
+| M5-AC-13 | 用户按真实计划流程签收；任务页按“任务→触发方式→关联素材/策略/成片→状态/阶段→操作”展示人工与自动任务，执行记录区分创建触发与 Worker 尝试，页面操作与反馈遵循 `docs/standards/` | 人工验收记录 | `PASS`；2026-10-28 用户按真实计划流程签收（M4-H2 同日签收）；2026-10-16 页面走查结论整改、第二轮六项与第三轮八项统一复走查均完成，见 `delivery/completed/CHG-20261015-098/evidence/2026-10-27-m4-h2-m5-ac13-third-round-checklist.md` 与 `2026-10-27-m4-h2-m5-ac13-second-round-checklist.md` |
 
 ## 8. M5 DONE Gate
 
 M5 各 CHG 可先实施并逐项完成机器验收。M5 只有在 M5-AC-01～13 全部 PASS、M4 回归通过、真实 Scheduler/Worker/FFmpeg/Object Storage 证据齐全，并与 M4-H2 一起经用户最终走查签收后才能进入 `DONE`。2026-10-26 新增的 M5-F 还须另行取得真实团队素材库选材与负责人归属证据；旧版候选来源的 PASS 不替代它。保存策略、调用“立即执行”、创建任务记录或 Mock Worker 都不能替代真实定时自动生产验收。
+
+2026-10-28 关闭：M5-AC-01～13 全部 PASS（01～12 见 §7 与 CHG-098 evidence，13 于 2026-10-28 用户签收），M5-F 已于 2026-10-27 归档，M4 回归与 M4-H2 同日签收，M5 进入 `DONE`。
 
 ## M5-F team-material-candidates
 
 见 [CHG-20261026-105](../completed/CHG-20261026-105/change.md)。高级运营管理本团队所有游戏策略，管理员可跨团队；策略必须有团队、指定游戏与最终运营负责人。Scheduler 到期及管理员／高级运营“立即执行”沿用现有 `compose_strategy`、`compose_task`、运行记录、条件组、额度与防重，只把候选源收敛为团队 `material`，任务和成功成片归策略负责人。人工任务仍从创建者自己的“我的素材”取材，两条入口不能互相替代。
 
 2026-10-27 验收：`DONE`。真实 `compose-scheduler`、Cloud `worker` 与 `compose-worker` 从来源 906 的素材夹具 176 自动建成任务 350 并产出成片 77，任务与成片 `material_usage_id` 为 NULL、负责人 3、创建者 1，创建者与负责人均无新增 usage；真实 HTTP “立即执行”、双 scheduler（含重启）、双 worker 抢同一素材与额度/负责人失效/跨团队回归见 `../completed/CHG-20261026-105/evidence/T-06-scheduled-e2e.md` 与 `T-07-run-now-and-concurrency.md`。本项完成只关闭 M5-F；M5 总体保持 `IN_PROGRESS`，M5-AC-13 仍待 CHG-098 统一走查。
+
+2026-10-28 用户签收 M5-AC-13 与 M4-H2，M5 进入 `DONE`。
 
 验收以策略创建者和负责人都**未加入**候选素材的真实样本验证：候选仍可进入任务、Cloud Worker 准备源文件、生成可播放成片，负责人在任务与成片读回一致；跨团队／跨游戏素材不能混入；负责人失效或不再负责游戏时不创建新任务；重复调度、额度和部分失败保持既有语义。Cloud Web 与 Desktop 共用页面显示相同事实，本地资源不因代创建或自动执行向管理角色开放。
