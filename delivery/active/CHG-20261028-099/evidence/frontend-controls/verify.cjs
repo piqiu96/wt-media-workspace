@@ -26,7 +26,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  ok('Home键可回到首项',await page.locator('#list-mode').inputValue()==='');
 
  const color=await page.locator('[data-resource-row]').first().getByRole('button',{name:'编辑',exact:true}).evaluate(e=>getComputedStyle(e).color);
- ok('次要行操作中性色',color==='rgb(101, 113, 132)');
+ ok('次要行操作品牌蓝（本轮最新确认）',color==='rgb(0, 82, 217)');
  await page.goto(url+'#foundations');await page.locator('[data-menu-trigger]').click();
  ok('更多打开浮动菜单',await page.locator('[data-menu-popup]').evaluate(e=>e.matches(':popover-open')));
  await page.keyboard.press('ArrowDown');ok('菜单键盘可达危险操作',await page.getByRole('menuitem',{name:'停用',exact:true}).evaluate(e=>e===document.activeElement));

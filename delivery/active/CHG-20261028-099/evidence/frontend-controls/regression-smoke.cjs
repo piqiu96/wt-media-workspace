@@ -6,5 +6,5 @@ let fields=await page.locator('[data-picker-search]').evaluate(e=>[...e.children
 await page.locator('dialog').getByRole('button',{name:'详情',exact:true}).click();check('少量代理信息应在当前层展开',await page.locator('dialog[open]').count()===1);
 await page.goto(url+'#foundations');check('更多应为浮动菜单触发器',await page.locator('[data-menu-trigger]').count()>0);
 await page.goto(url+'#list');check('选择器应有统一可控选项面板',await page.locator('#list-mode-trigger').count()===1);
-const color=await page.locator('[data-resource-row]').first().getByRole('button',{name:'编辑',exact:true}).evaluate(e=>getComputedStyle(e).color);check('次要行操作不应全部品牌蓝',color!=='rgb(0, 82, 217)');
+const color=await page.locator('[data-resource-row]').first().getByRole('button',{name:'编辑',exact:true}).evaluate(e=>getComputedStyle(e).color);check('次要行操作采用确认的清晰品牌蓝',color==='rgb(0, 82, 217)');
 console.log(JSON.stringify({phase:'REGRESSION',failures},null,2));await browser.close();if(failures.length)process.exitCode=1;})().catch(e=>{console.error(e);process.exit(1)});
