@@ -2,6 +2,16 @@
 
 更新时间：2026-10-28 10:51（Asia/Shanghai）。CHG：VERIFYING。本轮弹窗与侧栏优化已验证，待人工评审。
 
+## 最新请求：frontend 公共视觉规范审核（2026-10-28）
+
+用户进一步明确：以 browser-proxy-design/screens 原视觉稿优点优化 docs/standards/frontend 公共规范，先交规范审核文档。当前只交草案，不改正式规范、不继续运行时代码。
+
+正式审核记录：evidence/frontend-visual-standard-review.md；14项修订建议，逐项包含原图依据、现状、推荐、拟写条款与影响。重点为视觉重构授权模式、统一Token/密度、详情横向键值、卡片选择、轻提示、居中批量结果和视觉验收。V07单独保留短表单Dialog/恢复原Drawer选择，不把认可原稿理解为自动推翻上轮决定。
+
+可审批阅读页：/Users/aqiuye/.codex/visualizations/2026/10/26/01a1799f-9a86-7302-9201-4df31f7e9c3d/frontend-standard-review/frontend视觉规范审核.html
+
+14项、原图9张内嵌，含完整文字稿及75张原图索引。文档与链接校验、HTML阅读/放大/审批批注导出通过；未审批项仍为待审。下一步等待用户明确批准项，再回写frontend现有4份规范与README，不另建并行规范。不以此前业务测试代表本稿已实施。
+
 ## 本轮完成
 
 接续 Cloud `dc07f59`，本轮本地提交 `601238b`。用户明确允许更大胆地优化公共规范与组件：短窗口新建 / 编辑、备注 / 配额、普通运营资料编辑改为居中 Dialog；长配置与关联详情保留 Drawer；普通帮助、关键影响、真正异常分层；空资源、筛选无结果、不可用分开。

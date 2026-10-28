@@ -92,3 +92,7 @@ risk: H
 ### Task 9：弹层与提示分层（2026-10-28 用户截图反馈）
 
 用户明确允许优化公共组件及规范：短表单使用自适应高度居中 Dialog，完整配置与关联详情保留 Drawer；普通帮助、操作影响、真正异常分层，空态与重复提示合并。按 `plan.md` 第二轮实施并出真实页面对比，验证与人工入口见 `evidence/overlay-component-review.md`；不改业务服务与执行语义，不全站自动迁移，提交人工评审。
+
+### Task 10：frontend公共视觉规范审核（用户追加，先审后改）
+
+以原screens视觉优点评审frontend现有规范。提案见 `evidence/frontend-visual-standard-review.md`；本轮只提交审核稿，正式规范回写和下一阶段实施待用户批准，不自动推广全站。
