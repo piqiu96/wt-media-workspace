@@ -1,16 +1,16 @@
 # CHG-20261028-099 最新续接状态
 
-更新时间：2026-10-28 13:17（Asia/Shanghai）。CHG：VERIFYING。公共HTML参考与起始页已验证，供人工评审；运行时新视觉迁移仍待继续。
+更新时间：2026-10-28 13:42（Asia/Shanghai）。CHG：VERIFYING。公共HTML四项评审修订已验证，供人工评审。
 
-## 最新请求：公共HTML视觉参考（2026-10-28）
+## 最新请求：公共示例四项截图反馈
 
-用户要求基于已审批规范建立公共HTML，并明确落位Workspace根目录 `example/common/`（公共视觉交互）、`example/proto/`（业务原型）。已按该决定完成，无frontend/examples副本。入口 `example/common/index.html`，说明 `example/README.md` 与 `example/common/README.md`；原型起始页 `example/proto/starter.html` 共用common资源。
+已完成Task 12：少量账号与代理属性原位展开，完整详情才进入下一层；次要行操作改中性色、详情导航保留蓝色，更多为浮动菜单（5项阈值不变）；统一可键盘操作的选择器浮层；修复筛选form被display:contents破坏布局的问题，横距24px/行距20px/标签8px，窄屏整组换行。
 
-已交7组模式与560/640/960px Dialog、800/960px Drawer，涵盖列表8行、多平台、单双列详情、相关字段组合、选择/确认/嵌套、空态与反馈、批量过程结果和基础状态。frontend四份规范与README建立相互引用，根README及AGENT-INDEX注册目录。HTML仅演示，不接服务、不进入运行时依赖。
+入口仍为 `example/common/index.html`；新增 `example/common/controls.js`，起始页与复用说明已同步；正式frontend四份规范回写对应条款。所有内容为纯本地HTML参考，不进入运行仓依赖。
 
-最新验证：100项浏览器核验、8组静态核验（37个Token与规范一致）、15索引文档校验及diff检查通过；浏览器无错误/外部网络请求。三类视口为1600×1000、1366×900、390×844；详情密度与宽度自适应、键盘Radio、表单输入/错误、嵌套选择保留、批量关闭保护及恢复互斥均覆盖。只保留5张必要截图。证据与复核脚本：`evidence/frontend-examples-review.md`、`evidence/frontend-examples/`。
+验证：5项修前失败复现后转绿；28项控件专项、101项全场景、8组静态核验（37个Token一致）、15索引文档校验、diff检查通过。DPR1下覆盖1600×1000、1366×900、390×844；无脚本错误/外部请求。证据：`evidence/frontend-controls-review.md`与`evidence/frontend-controls/`。原Task 11通用核验与截图已更新到当前版本，历史由Git保留。
 
-前一轮14项规范审批已写回正式frontend规范，V07短表单Dialog、V08密度/长度/容器自适应单/双列；审批原件与映射见 `evidence/frontend-visual-standard-apply.md`。本轮公共HTML已供审核；下一步为运行仓公共组件与窗口/代理页面的真实视觉适配，不因示例完成而宣称产品已达到新稿。真实比特、目标网络、整体集成仍待验，全CHG继续VERIFYING。两份无关社媒报告保留，不纳入提交。
+下一步按用户新评审反馈继续；运行仓公共组件/窗口代理新视觉迁移、真实比特/目标网络/整体集成仍未完成，不能宣称整个CHG完成。frontend规范14项审批与common/proto目录决策继续有效。两份无关社媒报告保留，不能纳入提交。
 
 ## 本轮完成
 

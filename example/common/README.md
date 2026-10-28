@@ -10,15 +10,17 @@
 |---|---|
 | `index.html` | 七组公共模式、示例条款索引及Dialog/Drawer内容模板 |
 | `example.css` | 同一份示例Token、密度、布局和状态样式；来源标注在文件顶部 |
+| `controls.js` | 原生select的数据桥、统一选项浮层与更多菜单；原型演示专用 |
 | `example.js` | 导航、筛选、选择、焦点/关闭、字段校验、手动结果切换等本地演示行为 |
 
-本目录无构建、CDN、图片或业务服务依赖，支持直接打开 `index.html`。浏览器支持原生 `dialog` 和容器查询；当前Cloud/Desktop实际组件的兼容性仍应在真实运行环境验证。
+本目录无构建、CDN、图片或业务服务依赖，支持直接打开 `index.html`。浏览器支持原生 `dialog`、Popover和容器查询；不支持Popover时选择器保留原生select降级；当前Cloud/Desktop实际组件的兼容性仍应在真实运行环境验证。
 
-未来原型先找到对应模式，点击“查看 / 复制结构”，或直接读取HTML中的 `data-scene` / `template`。将所需结构与关联模板复制到原型，引用公共样式和演示脚本；不把整套七组展示目录复制到每个业务原型。
+未来原型先找到对应模式，点击“查看 / 复制结构”，或直接读取HTML中的 `data-scene` / `template`。将所需结构与关联模板复制到原型，引用公共样式、控件脚本与演示脚本；不把整套七组展示目录复制到每个业务原型。
 
 ```html
 <!-- example/proto/<业务主题>/index.html -->
 <link rel="stylesheet" href="../../common/example.css">
+<script src="../../common/controls.js" defer></script>
 <script src="../../common/example.js" defer></script>
 ```
 
@@ -31,7 +33,7 @@
 | [资源列表](index.html#list) | 8行、独立ID、多平台关联账号、上置筛选、展开低频条件、勾选工具栏、5项文字操作、筛选无结果 | [AdminUI §2–§4](../../docs/standards/frontend/AdminUI页面规范.md)；[架构视觉 §3.7、§4.1](../../docs/standards/frontend/前端架构与视觉规范.md) |
 | [自适应详情](index.html#details) | 字段密集/稀疏切换；800/560/380px内容容器；横向键值、长内容跨行、配置对比与真实关系表 | [AdminUI §7.2](../../docs/standards/frontend/AdminUI页面规范.md)；[架构视觉 §4.4.2](../../docs/standards/frontend/前端架构与视觉规范.md) |
 | [新建与编辑](index.html#forms) | 短表单Dialog560/640px；长配置Drawer800px；相关短字段成对、地址备注满行；真实Radio选择卡片；校验与输入保留 | [AdminUI §6](../../docs/standards/frontend/AdminUI页面规范.md)；[交互 §8–§9](../../docs/standards/frontend/前端交互规范.md) |
-| [选择与确认](index.html#overlays) | 资源选择960px、空选择560px；筛选、可用/不可用项、嵌套摘要及返回；风险确认、无Footer摘要与960px复杂详情 | [AdminUI §6.1、§7.4](../../docs/standards/frontend/AdminUI页面规范.md)；[交互 §9](../../docs/standards/frontend/前端交互规范.md) |
+| [选择与确认](index.html#overlays) | 资源选择960px、空选择560px；筛选、可用/不可用项、补充属性原位展开、完整详情及返回；风险确认、无Footer摘要与960px复杂详情 | [AdminUI §6.1、§7.4](../../docs/standards/frontend/AdminUI页面规范.md)；[交互 §9](../../docs/standards/frontend/前端交互规范.md) |
 | [反馈与空态](index.html#feedback) | 帮助/影响/风险/错误分层；空资源、无匹配、不可用、加载失败、无权限、加载中 | [用户反馈规范](../../docs/standards/frontend/用户反馈规范.md) |
 | [批量过程与结果](index.html#batch) | 居中摘要、同区七类计数、进度与8项原因；处理中/成功/失败/部分/待确认/中断；关闭保护、仅失败重试和待确认核实 | [AdminUI §7.7](../../docs/standards/frontend/AdminUI页面规范.md)；[交互 §11](../../docs/standards/frontend/前端交互规范.md) |
 | [视觉基础](index.html#foundations) | 配色、字号、36px控件、按钮禁用/Loading、操作收纳、配置/事实/结果状态 | [架构视觉 §3.6–§3.9](../../docs/standards/frontend/前端架构与视觉规范.md) |
@@ -58,3 +60,9 @@
 5. `file://` 可运行，资源与规范链接有效，无控制台错误、联网依赖或假业务结果。
 
 浏览器截图是必要的核验附件，无需为每个原型场景批量导出图片；规范、HTML和源码是日常复用入口。HTML不代替真实Vue组件回归、人工视觉审核或真实业务验收。
+
+## 本轮评审修订
+
+少量账号名单和代理补充属性在当前区域展开，完整详情才打开新层。行内详情导航保留蓝色，编辑/打开/设置等次要动作使用中性色；超过5项才收纳，更多采用浮动菜单。筛选横距24px、行距20px、标签间8px，容器不足时整组换行。原型选择器展示统一选项面板与键盘状态，原始select继续承载值、重置和change事件。
+
+动态插入原型内容后调用 `WTControls.enhance(container)`；现有示例弹层已自动接入。制作新原型时先加载controls.js再加载example.js。完整详情进入下一层时保留原先筛选/选择，Esc优先关闭当前选项或菜单，不连带关闭父Dialog。

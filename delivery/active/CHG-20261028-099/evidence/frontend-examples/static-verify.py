@@ -37,7 +37,7 @@ css=(root/'example/common/example.css').read_text()
 tokens=lambda text: dict(re.findall(r'(--wt-[\w-]+):\s*([^;]+);',text))
 assert tokens(block)==tokens(css), '示例Token与正式规范不一致'
 checks.append(f'{len(tokens(block))} Token values: exact match PASS')
-js=(root/'example/common/example.js').read_text()
+js=(root/'example/common/example.js').read_text()+(root/'example/common/controls.js').read_text()
 assert not re.search(r'\b(fetch\s*\(|XMLHttpRequest|WebSocket\s*\(|setInterval\s*\(|setTimeout\s*\()',js), '禁止联网或自动成功计时器'
 assert '/Users/' not in js+css, '公共素材不可依赖本机路径'
 checks.append('Offline behavior / portable resources PASS')

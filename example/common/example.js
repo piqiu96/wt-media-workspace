@@ -10,6 +10,7 @@
     paired: ['编辑资源资料', 'paired', 'medium'],
     'detail-complex': ['配置与关联详情', 'detail', 'ex-drawer complex'],
     proxy: ['新增代理', 'proxy', 'ex-drawer'], 'proxy-edit': ['编辑代理', 'proxy', 'ex-drawer'],
+    'proxy-detail': ['代理详情', 'proxy-detail', 'ex-drawer'],
     detail: ['窗口详情', 'detail', 'ex-drawer'], summary: ['代理摘要', 'summary', ''],
     picker: ['选择托管代理', 'picker', 'wide'], 'picker-empty': ['选择托管代理', 'picker-empty', ''],
     confirm: ['停用窗口', 'confirm', ''], batch: ['批量检测代理', 'batch', 'wide'],
@@ -35,7 +36,7 @@
   }
   function closeDialog(dialog) {
     if (!dialog || dialog.dataset.busy === 'true') return;
-    dialog.close();
+    window.WTControls?.dismiss(); dialog.close();
   }
   function openExample(kind, record = 'B站主号 · 上海01', trigger = null) {
     const selectedRows = trigger?.closest('[data-selection]') ? $$('[data-row-check]:checked').map(e => e.closest('[data-resource-row]')) : [];
@@ -66,7 +67,7 @@
       openDialogs.splice(openDialogs.indexOf(dialog), 1); dialog.remove(); refreshLayers();
       if (trigger?.isConnected) trigger.focus();
     });
-    document.body.append(dialog); openDialogs.push(dialog); refreshLayers(); dialog.showModal();
+    document.body.append(dialog); openDialogs.push(dialog); refreshLayers(); dialog.showModal(); window.WTControls?.enhance(dialog);
     if (kind === 'batch') {
       dialog._batchNames = selectedRows.length ? selectedRows.map(e => e.dataset.name) : null;
       dialog._batchItems = dialog._batchNames ? dialog._batchNames.map((name,i)=>({name,status:i===0?'processing':'pending'})) : itemsFor('processing');
@@ -188,6 +189,21 @@
     const dialog = button.closest('dialog');
     if (button.dataset.open) { openExample(button.dataset.open,button.dataset.record,button); return; }
     if (button.hasAttribute('data-close')) { closeDialog(dialog); return; }
+    if (button.dataset.proxyPeek) {
+      const preview = $('[data-proxy-preview]',dialog), kind=button.dataset.proxyPeek;
+      const configs = {
+        available:['沪线 · 静态01',[['供应商','示例线路商'],['认证方式','用户名与密码'],['到期时间','2026-12-31'],['最近检测','2026-10-28 11:30']]],
+        quota:['沪线 · 静态02',[['不可用原因','配额已满'],['建议','补充配额或选择其他可用代理']]],
+        expired:['粤线 · 静态01',[['不可用原因','已到期'],['建议','续费后重新核实，或选择其他代理']]]
+      };
+      const [title,fields]=configs[kind];
+      const same=preview.dataset.peek===kind && !preview.hidden;
+      preview.hidden=same;preview.dataset.peek=kind;
+      if(!same)preview.innerHTML='<h3>'+title+'<button class="ex-text-button" data-close-peek>收起</button></h3><div class="ex-description-container"><dl class="ex-description-list" data-density="dense">'+fields.map(([k,v])=>'<div class="ex-desc-item"><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('')+'</dl></div>'+(kind==='available'?'<button class="ex-text-button" data-open="proxy-detail" style="margin-top:12px">查看完整代理详情</button>':'');
+      return;
+    }
+    if (button.hasAttribute('data-close-peek')) { $('[data-proxy-preview]',dialog).hidden=true;return; }
+
     if (button.dataset.localNote) { notify(button.dataset.localNote); return; }
     if (button.hasAttribute('data-toggle')) {
       const target = document.getElementById(button.dataset.toggle);

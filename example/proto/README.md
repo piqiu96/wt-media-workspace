@@ -2,7 +2,7 @@
 
 此目录保存具体业务流程的可操作HTML原型。公共视觉与交互统一参考 [common](../common/README.md)，规则引用 [frontend正式规范](../../docs/standards/frontend/README.md)。
 
-[打开起始页](starter.html)：一个精简资源信息区与新建Dialog，共用 `../common/example.css` 和 `../common/example.js`。复制到业务主题子目录时，先把公共资源路径调整为 `../../common/`，再替换标题、业务字段与场景。
+[打开起始页](starter.html)：一个精简资源信息区与新建Dialog，共用 `../common/example.css` 、`../common/controls.js`和 `../common/example.js`。复制到业务主题子目录时，先把公共资源路径调整为 `../../common/`，再替换标题、业务字段与场景。
 
 ## 组织方式
 

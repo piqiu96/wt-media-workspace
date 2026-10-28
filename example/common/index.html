@@ -7,6 +7,7 @@
       WT Media · 公共视觉参考
     </title>
     <link rel="stylesheet" href="example.css">
+    <script src="controls.js" defer></script>
     <script src="example.js" defer>
     </script>
   </head>
@@ -1133,7 +1134,7 @@
                       i
                     </span>
                     <div>
-                      选择弹窗内可查看代理详情；返回后保留筛选与已选项。
+                      少量代理属性就地展开；完整详情进入下一层，返回后保留筛选与已选项。
                     </div>
                   </div>
                 </div>
@@ -1195,15 +1196,7 @@
                     <span class="ex-notice-icon" aria-hidden="true">
                       i
                     </span>
-                    <div>
-                      本次调整涉及 2 个关联账号。
-                      <details>
-                        <summary>
-                          查看关联账号
-                        </summary>
-                        B站：华东内容主号；百度：华东百家号。
-                      </details>
-                    </div>
+                    <div class="ex-impact-body"><div class="ex-impact-heading"><span>本次调整涉及 2 个关联账号。</span><button class="ex-text-button ex-disclosure-trigger" data-toggle="impact-accounts" aria-expanded="false" aria-controls="impact-accounts">查看关联账号<span class="ex-chevron" aria-hidden="true"></span></button></div><div class="ex-impact-list" id="impact-accounts" hidden><div><span>B站</span><div>华东内容主号</div></div><div><span>百度</span><div>华东百家号</div></div></div></div>
                   </div>
                   <div class="ex-notice warning">
                     <span class="ex-notice-icon" aria-hidden="true">
@@ -1449,19 +1442,7 @@
                       <button class="ex-text-button" data-open="picker">
                         设置代理
                       </button>
-                      <details>
-                        <summary>
-                          更多
-                        </summary>
-                        <div class="ex-stack">
-                          <button class="ex-text-button" data-open="summary">
-                            核实配置
-                          </button>
-                          <button class="ex-text-button danger" data-open="confirm">
-                            停用
-                          </button>
-                        </div>
-                      </details>
+                      <div class="ex-action-menu" data-action-menu><button class="ex-text-button ex-menu-trigger" data-menu-trigger>更多<span class="ex-chevron" aria-hidden="true"></span></button><div class="ex-menu-popup" data-menu-popup popover="manual"><button data-open="summary">核实配置</button><div class="ex-menu-divider" role="separator"></div><button class="danger" data-open="confirm">停用</button></div></div>
                     </div>
                   </div>
                 </div>
@@ -2083,7 +2064,7 @@
                     </span>
                   </td>
                   <td>
-                    <button class="ex-text-button" data-open="summary">
+                    <button class="ex-text-button" data-proxy-peek="available">
                       详情
                     </button>
                   </td>
@@ -2113,7 +2094,7 @@
                     </span>
                   </td>
                   <td>
-                    <button class="ex-text-button" data-local-note="此资源配额已满；实际页面展示完整资源详情。">
+                    <button class="ex-text-button" data-proxy-peek="quota">
                       原因
                     </button>
                   </td>
@@ -2143,7 +2124,7 @@
                     </span>
                   </td>
                   <td>
-                    <button class="ex-text-button" data-local-note="此资源已到期；实际页面展示续费或替换入口。">
+                    <button class="ex-text-button" data-proxy-peek="expired">
                       原因
                     </button>
                   </td>
@@ -2166,19 +2147,12 @@
             清除筛选
           </button>
         </div>
+        <section class="ex-picker-preview" data-proxy-preview aria-live="polite" hidden></section>
         <div class="ex-notice" style="margin-top:20px">
           <span class="ex-notice-icon" aria-hidden="true">
             i
           </span>
-          <div>
-            更换代理将影响此窗口关联的 2 个平台账号。
-            <details>
-              <summary>
-                查看账号
-              </summary>
-              B站：华东内容主号；百度：华东百家号。
-            </details>
-          </div>
+          <div class="ex-impact-body"><div class="ex-impact-heading"><span>更换代理将影响此窗口关联的 2 个平台账号。</span><button class="ex-text-button ex-disclosure-trigger" data-toggle="picker-accounts" aria-expanded="false" aria-controls="picker-accounts">查看账号<span class="ex-chevron" aria-hidden="true"></span></button></div><div class="ex-impact-list" id="picker-accounts" hidden><div><span>B站</span><div>华东内容主号</div></div><div><span>百度</span><div>华东百家号</div></div></div></div>
         </div>
       </div>
       <footer class="ex-overlay-footer">
@@ -2235,7 +2209,7 @@
     <template id="tpl-code">
       <div class="ex-overlay-body">
         <p class="ex-help" style="margin-bottom:12px">
-          复制目标结构，并在原型中引用example.css和example.js。业务实现仍使用TDesign与shared/ui。
+          复制目标结构，并在原型中引用example.css、controls.js和example.js。业务实现仍使用TDesign与shared/ui。
         </p>
         <label for="example-code" class="ex-help">
           示例结构
@@ -2265,5 +2239,6 @@
       <footer class="ex-overlay-footer"><button class="ex-button" type="button" data-close>取消</button><button class="ex-button primary" type="submit">保存演示输入</button></footer>
     </form>
   </template>
+<template id="tpl-proxy-detail"><div class="ex-overlay-body"><div class="ex-description-container"><section class="ex-section"><h3 class="ex-section-title detail">代理信息</h3><dl class="ex-description-list" data-density="dense"><div class="ex-desc-item"><dt>ID</dt><dd>81</dd></div><div class="ex-desc-item"><dt>可用性</dt><dd><span class="ex-tag success">可使用</span></dd></div><div class="ex-desc-item"><dt>地区</dt><dd>上海</dd></div><div class="ex-desc-item"><dt>供应商</dt><dd>示例线路商</dd></div><div class="ex-desc-item"><dt>到期时间</dt><dd>2026-12-31</dd></div><div class="ex-desc-item"><dt>可用额度</dt><dd>3 / 5</dd></div><div class="ex-desc-item full"><dt>代理名称</dt><dd>沪线 · 静态01</dd></div><div class="ex-desc-item full"><dt>地址</dt><dd>SOCKS5 · 203.0.113.18:1080</dd></div></dl></section><section class="ex-section"><h3 class="ex-section-title detail">关联窗口</h3><div class="ex-table-scroll"><table class="ex-table"><thead><tr><th>ID</th><th>窗口名称</th><th>代理方式</th></tr></thead><tbody><tr><td>328</td><td>B站主号 · 上海01</td><td>系统托管</td></tr><tr><td>335</td><td>日常运营 · 上海04</td><td>系统托管</td></tr></tbody></table></div></section></div></div></template>
 </body>
 </html>

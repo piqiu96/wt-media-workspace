@@ -28,7 +28,7 @@ fs.mkdirSync(evidence,{recursive:true});
  await page.locator('[data-row-check]').first().check();
  ok('选择工具栏出现',await page.locator('[data-selection]').isVisible());
  await page.getByRole('button',{name:'高级筛选',exact:true}).click();
- await page.locator('#list-group').selectOption('备用账号组');
+ await page.locator('#list-group').selectOption('备用账号组',{force:true});
  await page.locator('[data-filter-form]').getByRole('button',{name:'查询',exact:true}).click();
  ok('高级分组筛选有效',await page.locator('[data-resource-row]:visible').count()===3);
  await page.locator('[data-filter-form]').getByRole('button',{name:'重置',exact:true}).click();
@@ -66,10 +66,10 @@ fs.mkdirSync(evidence,{recursive:true});
  await scene('details');
  const columns=()=>page.locator('#detail-preview .ex-description-list').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length);
  ok('800容器密集字段双列',await columns()===2);
- await page.locator('#detail-width').selectOption('560');ok('560容器自然单列',await columns()===1);
- await page.locator('#detail-width').selectOption('800');await page.locator('#detail-density').selectOption('sparse');
+ await page.locator('#detail-width').selectOption('560',{force:true});ok('560容器自然单列',await columns()===1);
+ await page.locator('#detail-width').selectOption('800',{force:true});await page.locator('#detail-density').selectOption('sparse',{force:true});
  ok('宽容器稀疏字段仍单列',await columns()===1);
- await page.locator('#detail-density').selectOption('dense');
+ await page.locator('#detail-density').selectOption('dense',{force:true});
  ok('长字段满行',await page.locator('#detail-preview .ex-desc-item.full').first().evaluate(e=>getComputedStyle(e).gridColumn)==='1 / -1');
  await page.screenshot({path:path.join(evidence,'detail-adaptive-1600.png'),fullPage:true});
  await page.getByRole('button',{name:'查看详情 Drawer'}).click();
@@ -83,7 +83,9 @@ fs.mkdirSync(evidence,{recursive:true});
  await dialog.locator('#picker-q').fill('沪线');
  await dialog.locator('input[name="proxy-choice"]').first().check();
  await dialog.getByRole('button',{name:'详情',exact:true}).click();
- ok('摘要嵌套两层',await page.locator('dialog[open]').count()===2);
+ ok('少量代理信息当前层展开',await page.locator('dialog[open]').count()===1 && await dialog.locator('[data-proxy-preview]').isVisible());
+ await dialog.getByRole('button',{name:'查看完整代理详情',exact:true}).click();
+ ok('完整详情嵌套两层',await page.locator('dialog[open]').count()===2);
  ok('下层不重复加深遮罩',await page.locator('dialog.ex-underlay').count()===1);
  await close();dialog=page.locator('dialog[open]').last();
  ok('嵌套返回保留搜索',await dialog.locator('#picker-q').inputValue()==='沪线');
@@ -111,7 +113,7 @@ fs.mkdirSync(evidence,{recursive:true});
  // 批量7指标对应6类互斥状态；操作不串类。
  await scene('batch');
  for(const c of ['processing','success','failed','partial','uncertain','interrupted']) {
-  await page.locator('#batch-case').selectOption(c);
+  await page.locator('#batch-case').selectOption(c,{force:true});
   const counts=await page.locator('[data-batch-preview] [data-metric] strong').allTextContents();
   ok(c+'计数互斥且总数8',Number(counts[0])===8 && counts.slice(1).reduce((sum,x)=>sum+Number(x),0)===8);
  }
@@ -130,7 +132,7 @@ fs.mkdirSync(evidence,{recursive:true});
  for(const viewport of [{width:1600,height:1000},{width:1366,height:900},{width:390,height:844}]) {
   await page.setViewportSize(viewport);
   for(const s of ['list','details','forms','overlays','feedback','batch','foundations']) { await scene(s);await fit(viewport.width+'-'+s); }
-  await scene('feedback');for(const c of ['empty','filtered','unavailable','error','denied','loading']) {await page.locator('#empty-case').selectOption(c);await fit(viewport.width+'-feedback-'+c);}
+  await scene('feedback');for(const c of ['empty','filtered','unavailable','error','denied','loading']) {await page.locator('#empty-case').selectOption(c,{force:true});await fit(viewport.width+'-feedback-'+c);}
   await scene('list');await page.getByRole('button',{name:'新增窗口',exact:true}).click();
   const b=await box();ok(viewport.width+'-弹窗受视口约束',b.x>=0 && b.y>=0 && b.x+b.width<=viewport.width+1 && b.y+b.height<=viewport.height+1);
   dialog=page.locator('dialog[open]').last();await dialog.locator('#window-name').fill('窄屏演示');await dialog.getByRole('button',{name:'保存演示输入'}).click();
