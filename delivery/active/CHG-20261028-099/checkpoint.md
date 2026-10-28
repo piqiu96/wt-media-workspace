@@ -1,14 +1,21 @@
 # CHG-20261028-099 最新续接状态
 
-更新时间：2026-10-28 14:15（Asia/Shanghai）。CHG：VERIFYING。公共原型按用户确认的新行操作层级完成修订。
+更新时间：2026-10-28 14:28（Asia/Shanghai）。CHG：VERIFYING。用户批准Task 14–16，受额度停止条件限制，当前为准备阶段。
 
-## 最新请求：按照推荐规范修改原型
+## 最新请求：完整视觉方案迁入proto并真实落地
 
-Task 13完成：窗口8行和基础示例2组的打开动作置前，浅蓝底/品牌蓝/图标/32px热区；详情/编辑/设置清晰蓝色与悬停浅底，停用深色/悬停红色，禁用独立浅灰。更多保留浮动菜单，5项门槛不变。用户本轮确认明确覆盖上轮灰色次操作方向；对应架构视觉§3.7.3/§3.7.7和common复用说明已同步。
+用户已同意行操作新规范，要求更新原 `browser-proxy-design/完整视觉方案.html`、放入 `example/proto/`，随后落实Cloud共用Vue；明确“打开”前不留图标，并要求低于5%停止、北京时间2026-10-28 17:40查额度恢复。
 
-入口仍 `example/common/index.html`。新增专项13项通过（修前5项失败），全场景101项、控件28项、静态8组/37Token、15索引文档校验及diff检查通过。证据 `evidence/row-action-priority-review.md` 与 `evidence/row-action-priority/`；既有结果与必要截图同步当前版本，历史由Git保存。
+本轮已完成：公共example中10组打开按钮去除前置播放标识，frontend架构视觉§3.7.3写入纯文字规则；Task 14–16范围与计划写入change/plan。已运行chg start，Cloud/Desktop均干净、原分支沿用，未修改运行仓。原型迁移尚未开始，不能宣称完整图稿已更新或业务页面落地。
 
-此前详情原位展开、完整详情分层、选择器、筛选间距与common/proto目录决策保持。全CHG仍待运行仓视觉适配与真实比特/网络/整体集成验收；本轮未修改业务代码，不合并发布。两份无关社媒报告保留，不纳入提交。
+续接位置：
+
+1. 原型源目录 `/Users/aqiuye/.codex/visualizations/2026/10/26/01a1799f-9a86-7302-9201-4df31f7e9c3d/browser-proxy-design/`。完整HTML为约4.4MB内联制品；可复用 index.html、design.css、design.js、experience-v2.js、experience-v3.js、assets/icons.js与logo.png；无需复制screens/zip/旧版本。目标 `example/proto/browser-proxy/`，引用../../common公共资源。V3保留75个场景与角色/异常交互。design.js里scaleStage以1600整页缩放，迁移时需按最新规范修正实际视口验证。
+2. 旧基础drawer/dialog/facts/field函数位于design.js约70–82行；V3末尾可包装v3Render统一适配。注意旧底层源码有已被V3覆盖的BitBrowser/系统管理/分配字样，不把旧函数误当最终业务规则；不得恢复明确排除的比特标签/分配。
+3. Cloud已读CLAUDE.md与AGENT-INDEX.md。真实位置web/src/shared/ui/resource/ResourceRowActions.vue（当前28px/12px/无padding），opColumnWidth.js文字模式按12px无padding计算；ProfilesPage.vue约2326行操作，ProxyPage.vue约852行操作。先按新32px热区、主要轻按钮、列宽、无图标落实；回调/loading/权限不能改。两个页面详情仍item-layout=vertical固定双列，Task16待改。全局design-token.css当前品牌#2563EB等旧值，主题迁移需单独做消费者回归，不散落硬编码。
+4. 本地公共原型/规范最新提交7990794；Cloud此前代码601238b。公共示例曾101项全场景、28控件、13行操作专项通过，本轮仅去装饰图标不以旧测试冒充新验收。Cloud入口web/package.json用npm test及build:cloud/build:desktop。相关测试resourceModule.test.js；本轮未运行运行仓测试或构建。
+
+额度：本轮开始剩15%，最近查询used95%（约剩5%），已到停止预留边界，优先保存。已成功创建今天17:40线程heartbeat一次续接（automationId=17-40），恢复接手后删除该自动化；先查额度，不重复扫描。两份社媒报告继续未跟踪且不可提交。完整CHG仍待视觉迁移与真实比特/目标网络验收，不合并发布。
 
 ## 本轮完成
 
@@ -29,3 +36,5 @@ Task 13完成：窗口8行和基础示例2组的打开动作置前，浅蓝底/�
 ## 额度条件
 
 此前剩余约 5% 曾停止，06:55 后已查恢复并续接，一次恢复自动化 `6-55-ui` 已删除。用户要求短周期剩余低于 5% 保存并停止仍适用后续工作。
+
+停止前文档校验15索引与git diff --check通过；公共原型打开按钮无ex-action-icon元素，正式frontend已明确无前置图标。未生成新的完整原型，未改运行仓，保持任务未完成。
