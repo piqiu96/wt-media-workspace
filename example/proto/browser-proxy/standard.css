@@ -6,3 +6,11 @@
 @media(max-width:1100px){#catalog{width:180px}#preview{padding:16px}.app .sidebar{display:none}}
 @media(max-width:700px){#catalog{width:100%;height:auto;position:static}#design-book{display:block}#stage{min-height:900px}.topbar{padding:12px}.main-content{padding:16px}.form-grid,.radio-cards{grid-template-columns:minmax(0,1fr)}.filters .field,.filters .field.wide{flex:1 1 100%}.dialog-body,.drawer-body{padding:20px}.top-right{gap:8px;flex-wrap:wrap}}
 .drawer.short-task .form-grid { grid-template-columns: 1fr; }
+
+/* 运营备注：上下标签同字号，信息与编辑区分组，不沿用旧12px表单字号。 */
+.note-editor .adaptive-facts { margin-bottom: 24px; }
+.note-editor .ex-desc-item dt, .note-editor .ex-desc-item dd { font-size: 14px; line-height: 22px; }
+.note-editor .field > label { font-size: 14px; line-height: 22px; font-weight: 400; margin-bottom: 8px; }
+.note-editor .field textarea.input { display: block; font-size: 14px; line-height: 22px; padding: 10px 12px; }
+/* 覆盖旧场景内联15px，辅助说明紧随对应控件。 */
+.note-editor .field + .tiny { margin-top: 8px !important; line-height: 20px; }

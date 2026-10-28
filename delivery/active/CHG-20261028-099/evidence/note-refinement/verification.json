@@ -1,0 +1,27 @@
+{
+  "measurements": {
+    "metadata": {
+      "font": "14px",
+      "line": "22px"
+    },
+    "label": {
+      "font": "14px",
+      "line": "22px"
+    },
+    "input": {
+      "font": "14px",
+      "line": "22px"
+    },
+    "infoGap": 24,
+    "labelGap": 8,
+    "helpGap": 8
+  },
+  "viewports": [
+    1600,
+    1366,
+    768
+  ],
+  "saveAndCancel": true,
+  "errors": [],
+  "pass": true
+}
