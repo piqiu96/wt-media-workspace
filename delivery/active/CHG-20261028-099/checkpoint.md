@@ -1,48 +1,26 @@
 # CHG-20261028-099 最新续接状态
 
-更新时间：2026-10-28 18:15（Asia/Shanghai）。CHG：VERIFYING。17:40已查短周期额度恢复并删除一次续接自动化17-40，Task14完成；Task15–16实施及验证进行中。
+更新时间：2026-10-28 18:24（Asia/Shanghai）。CHG：VERIFYING。用户批准的Task14–16已完成到可审核状态，等待视觉人工评审与完整真实验收；不合并发布。
 
-## 当前实施位置
+## 当前成果与提交
 
-- 已迁入 `example/proto/browser-proxy/`，保留V3有效75场景、原始引擎和必要资产，使用common Token/选择器及正式规范适配层。75场景无空白、无全页缩放、无页面错误；另7项入口/创建/选择/详情/视口交互通过。
-- 原外部 `browser-proxy-design/完整视觉方案.html` 已转向Workspace最新入口，保留query/hash；迁移前完整制品保存为同目录 `完整视觉方案-迁移前备份.html`。新入口可直接离线运行，不使用真实业务服务。
-- Cloud存在本轮未提交改动：行操作、列宽、两页展示；ResourceDescriptions/ChoiceCards、弹层/分节/提示/批量结果、正式Token兼容映射。已有810用例、初次双入口构建、21弹层和22交互检查通过；新专项还在核验，后续修改须重新构建。不能将中途结果当最终验收。
-- 额度条件继续有效：短周期剩余<5%立即保存停止。当前最近剩88%，无需再建恢复自动化。两份无关社媒报告保留，禁止提交。
-- 下一步：完成新专项、核对公共主题消费者和业务脚本差异，最终双构建/必要回归，更新frontend实现引用、人工评审与证据，再独立本地提交。完整CHG仍待真实比特与目标网络验收，不合并发布。
+- Workspace `10d2e6e`：原完整V3迁入 `example/proto/browser-proxy/`，75有效场景，引用common并按最新frontend规范更新；真实视口渲染、打开纯文字无图标。原外部完整HTML转向新入口，保留query/hash，同目录保留“完整视觉方案-迁移前备份.html”。
+- Cloud `358d8a6`：32px主要轻行操作置前，蓝色次动作、加载预留列宽，权限/回调不变。
+- Cloud `4f73ba9`：ResourceDescriptions/ChoiceCards、统一Overlay/Section/Notice/Progress、Token/TDesign兼容映射、两页新筛选与详情/表单、导入语义标签。Cloud共用Vue唯一源码，Desktop Runtime未改。
+- 正式frontend补实际公共实现引用、别名兼容和分批接入约定；其他模块不自动改布局。当前验收与提交信息见 `evidence/modern-ui/implementation-review.md` 与verification-summary.json。
 
-## 最新请求：完整视觉方案迁入proto并真实落地
+## 最新验证
 
-用户已同意行操作新规范，要求更新原 `browser-proxy-design/完整视觉方案.html`、放入 `example/proto/`，随后落实Cloud共用Vue；明确“打开”前不留图标，并要求低于5%停止、北京时间2026-10-28 17:40查额度恢复。
+811用例/89文件、Cloud/Desktop共用前端双构建通过；75原型全场景和7交互通过；实际Vue隔离验证21弹层+22回归+15新专项通过。导入标签对比度≥4.5:1；评审30场景图像/批注保持/JSON导出通过。独立只读检查无Critical/Important，两项Minor（full简写、导入标签）已修复并验证。构建仍有非阻断chunk体积提示。
 
-本轮已完成：公共example中10组打开按钮去除前置播放标识，frontend架构视觉§3.7.3写入纯文字规则；Task 14–16范围与计划写入change/plan。已运行chg start，Cloud/Desktop均干净、原分支沿用，未修改运行仓。原型迁移尚未开始，不能宣称完整图稿已更新或业务页面落地。
+两页业务script对601238b比较，仅新增展示import与列宽主要动作选项，业务函数完全相同。测试fixture不进入运行时，原型不作为真实业务验收。
 
-续接位置：
+## 人工入口与后续
 
-1. 原型源目录 `/Users/aqiuye/.codex/visualizations/2026/10/26/01a1799f-9a86-7302-9201-4df31f7e9c3d/browser-proxy-design/`。完整HTML为约4.4MB内联制品；可复用 index.html、design.css、design.js、experience-v2.js、experience-v3.js、assets/icons.js与logo.png；无需复制screens/zip/旧版本。目标 `example/proto/browser-proxy/`，引用../../common公共资源。V3保留75个场景与角色/异常交互。design.js里scaleStage以1600整页缩放，迁移时需按最新规范修正实际视口验证。
-2. 旧基础drawer/dialog/facts/field函数位于design.js约70–82行；V3末尾可包装v3Render统一适配。注意旧底层源码有已被V3覆盖的BitBrowser/系统管理/分配字样，不把旧函数误当最终业务规则；不得恢复明确排除的比特标签/分配。
-3. Cloud已读CLAUDE.md与AGENT-INDEX.md。真实位置web/src/shared/ui/resource/ResourceRowActions.vue（当前28px/12px/无padding），opColumnWidth.js文字模式按12px无padding计算；ProfilesPage.vue约2326行操作，ProxyPage.vue约852行操作。先按新32px热区、主要轻按钮、列宽、无图标落实；回调/loading/权限不能改。两个页面详情仍item-layout=vertical固定双列，Task16待改。全局design-token.css当前品牌#2563EB等旧值，主题迁移需单独做消费者回归，不散落硬编码。
-4. 本地公共原型/规范最新提交7990794；Cloud此前代码601238b。公共示例曾101项全场景、28控件、13行操作专项通过，本轮仅去装饰图标不以旧测试冒充新验收。Cloud入口web/package.json用npm test及build:cloud/build:desktop。相关测试resourceModule.test.js；本轮未运行运行仓测试或构建。
+最新评审：`delivery/active/CHG-20261028-099/evidence/modern-ui/review.html`，30代表场景可逐项批注并导出JSON；完整可操作原型 `example/proto/browser-proxy/index.html`，公共参考 `example/common/index.html`。用户已批准规范，不需重复询问；若有新审美意见按对应条目修订并补相关回归。
 
-额度：本轮开始剩15%，最近查询used95%（约剩5%），已到停止预留边界，优先保存。已成功创建今天17:40线程heartbeat一次续接（automationId=17-40），恢复接手后删除该自动化；先查额度，不重复扫描。两份社媒报告继续未跟踪且不可提交。完整CHG仍待视觉迁移与真实比特/目标网络验收，不合并发布。
+真实比特开关/编辑字段读回/应用代理、目标网络与Cloud/Agent/Desktop组合仍待现场验收，整体CHG不能标完成。先读此checkpoint与plan；不重新全仓扫描。两份无关社媒报告继续未跟踪，不可纳入本次提交。
 
-## 本轮完成
+## 额度与自动化
 
-接续 Cloud `dc07f59`，本轮本地提交 `601238b`。用户明确允许更大胆地优化公共规范与组件：短窗口新建 / 编辑、备注 / 配额、普通运营资料编辑改为居中 Dialog；长配置与关联详情保留 Drawer；普通帮助、关键影响、真正异常分层；空资源、筛选无结果、不可用分开。
-
-新增 ResourceOverlay / ResourceForm / ResourceNotice / ResourceEmptyState，仅两页显式接入；确认与结果也统一容器，危险动作和错误保留。更新四份前端规范，解决简单配置与轻编辑容器规则冲突；不全站强制迁移。两个业务脚本除展示 import 外与上一轮完全一致。未修改后端、数据库、Contract、Agent 或 Desktop Runtime，未做真实写入、未推送 / 合并 / 发布。
-
-最新验证：807 用例、双入口构建、21 项弹层专项 + 22 项交互回归通过。完整证据见 `evidence/overlay-component-review.md`；第一轮证据继续保留，不重复实施。
-
-## 人工评审
-
-`/Users/aqiuye/.codex/visualizations/2026/10/26/01a1799f-9a86-7302-9201-4df31f7e9c3d/overlay-ui-review/视觉整改评审.html`
-
-26 场景、40 张内嵌截图；四项公共候选可独立给决定，每页可批注并导出 JSON。原 resource-ui-review 的入口也更新为最新，第一轮单独存档。
-
-下一步：按用户具体意见修订，不自动推广其他模块。真实比特、目标网络检测和整体集成待验，不能宣称全 CHG 完成。若继续，先查工作区与最新证据，不需要重扫仓库。Workspace 两份无关未跟踪社媒报告保留，不能纳入本次提交。
-
-## 额度条件
-
-此前剩余约 5% 曾停止，06:55 后已查恢复并续接，一次恢复自动化 `6-55-ui` 已删除。用户要求短周期剩余低于 5% 保存并停止仍适用后续工作。
-
-停止前文档校验15索引与git diff --check通过；公共原型打开按钮无ex-action-icon元素，正式frontend已明确无前置图标。未生成新的完整原型，未改运行仓，保持任务未完成。
+2026-10-28 17:40额度恢复后继续，本次一次自动化17-40已删除，先前6-55-ui也已删除，不重复执行。18:26最新查询短周期仍余63%；后续若低于5%立即保存停止。保留工作区，不重置他人改动、不自行合并/发布。

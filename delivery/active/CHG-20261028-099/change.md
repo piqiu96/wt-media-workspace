@@ -112,3 +112,5 @@ risk: H
 ### Task 14–16：完整业务原型迁移及新规范落地
 
 用户已同意新规范，要求更新原完整视觉方案并放入proto，随后落地实际页面；追加明确打开按钮不保留前置图标。Task 14移植原完整场景到 `example/proto/browser-proxy/`，引用common公共资源，保留V3角色、业务状态和交互，不复制旧截图大包。Task 15先将行操作层级接入真实公共组件和窗口/代理页面；Task 16继续颜色密度、表单/详情自适应、浮层/选择/反馈/结果等新规范迁移及两入口验证。仅Cloud共用Vue变化，无Contract、Agent或Desktop Runtime变化。原外部HTML作为旧入口导向新proto，原文件留档。执行低于5%保存停止条件。
+
+本轮已交付：75场景原型、两页真实Vue与公共组件、frontend实现引用、811用例和双入口构建、58项隔离Vue检查，以及30场景可批注评审。最新证据见 `evidence/modern-ui/implementation-review.md`，整体VERIFYING与真实验收边界保持。

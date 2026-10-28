@@ -152,8 +152,8 @@ Cloud / Desktop 共用 `wt-media-cloud/web`；当前 Cloud 与 Desktop 工作区
 ### 计划修改
 
 - [x] Task 14：迁移HTML与必需本地资源；加正式规范适配层和common引用；验证全部场景渲染、短表单容器、无图标行操作和旧入口。
-- [ ] Task 15：真实ResourceRowActions、列宽函数与两页操作次序/主要动作，保留loading/权限/回调；必要测试与Cloud/Desktop构建。
-- [ ] Task 16：公共表单、详情自适应、浮层、语义色/密度与两页交互视觉回归，记录消费者/兼容与人工评审。
+- [x] Task 15：真实ResourceRowActions、列宽函数与两页操作次序/主要动作，保留loading/权限/回调；必要测试与Cloud/Desktop构建。
+- [x] Task 16：公共表单、详情自适应、浮层、语义色/密度与两页交互视觉回归，记录消费者/兼容与人工评审。
 
 ### 明确不修改
 
@@ -162,3 +162,5 @@ Cloud / Desktop 共用 `wt-media-cloud/web`；当前 Cloud 与 Desktop 工作区
 ### 冲突与未确认项
 
 无新业务阻断。尚未完成的迁移和真实比特/网络验收明确保留，不能用原型全场景渲染代表真实服务验收。
+
+第七轮结果：原型10d2e6e，Cloud358d8a6/4f73ba9；Task14–16实现与验证到可审核状态。最新人工入口与证据见 `evidence/modern-ui/implementation-review.md`；完整CHG仍待真实比特/目标网络验收，不合并发布。

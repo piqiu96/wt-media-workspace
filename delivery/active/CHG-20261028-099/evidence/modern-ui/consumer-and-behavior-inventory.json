@@ -1,0 +1,41 @@
+{
+  "baseline": "601238b",
+  "current": "4f73ba9",
+  "business_scripts_equal_except_presentation_imports_and_column_measure": {
+    "web/src/modules/profiles/pages/ProfilesPage.vue": true,
+    "web/src/modules/proxy/pages/ProxyPage.vue": true
+  },
+  "direct_legacy_token_consumers": [
+    "web/src/styles/design-token.css",
+    "web/src/modules/transfer/DownloadCentreDrawer.vue",
+    "web/src/shared/ui/feedback/OperationProgressDialog.vue",
+    "web/src/shared/ui/resource/ResourceRowActions.vue",
+    "web/src/shared/styles/resource-module.css",
+    "web/src/shared/ui/resource/ResourceSection.vue",
+    "web/src/shared/ui/resource/KeywordTags.vue",
+    "web/src/shared/ui/resource/ResourceSelectionToolbar.vue",
+    "web/src/shared/ui/resource/ResourceStatGrid.vue",
+    "web/src/shared/ui/resource/ResourceCard.vue",
+    "web/src/shared/ui/resource/ResourceStatusBadge.vue",
+    "web/src/shared/ui/resource/ResourceNotice.vue",
+    "web/src/shared/ui/resource/ResourceChoiceCards.vue",
+    "web/src/modules/materials/MaterialDetailDrawer.vue",
+    "web/src/modules/contentpool/pages/ContentPoolPage.vue",
+    "web/src/modules/compose/pages/ComposeTasksPage.vue",
+    "web/src/modules/compose/pages/ComposeStrategyPage.vue",
+    "web/src/modules/compose/pages/MyOutputsPage.vue",
+    "web/src/modules/materials/pages/MyMaterialsPage.vue",
+    "web/src/modules/materials/pages/MaterialLibraryPage.vue",
+    "web/src/modules/compose/components/ComposeOutputDetail.vue",
+    "web/src/modules/contentpool/pages/DiscoveryStrategiesPage.vue",
+    "web/src/modules/compose/components/ComposeTaskCreateDialog.vue",
+    "web/src/modules/compose/components/ComposeStrategySummary.vue",
+    "web/src/modules/contentpool/pages/CrawlTasksPage.vue"
+  ],
+  "global_theme": "TDesign消费者同步获得已审批颜色/圆角/遮罩；不自动改页面信息架构",
+  "representative_browser_routes": [
+    "/compose-strategy",
+    "/discovery-strategies",
+    "/users"
+  ]
+}

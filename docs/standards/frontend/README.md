@@ -31,6 +31,6 @@
 
 ## 可操作参考与原型
 
-[打开公共HTML参考](../../../example/common/index.html) · [公共参考复用说明](../../../example/common/README.md) · [业务原型起始页](../../../example/proto/starter.html)
+[打开公共HTML参考](../../../example/common/index.html) · [公共参考复用说明](../../../example/common/README.md) · [业务原型起始页](../../../example/proto/starter.html) · [窗口/代理完整原型](../../../example/proto/browser-proxy/index.html)
 
 Workspace根目录 `example/common/` 展示公共视觉与交互；`example/proto/` 保存业务原型并引用公共资源。正式规则仍由本目录四份规范维护，HTML与之相互引用并同步更新，不成为第二套规则或运行时依赖。未来原型优先复用HTML结构和资源，图片仅按评审/验收需要导出；完整目录约定见[example入口](../../../example/README.md)。
