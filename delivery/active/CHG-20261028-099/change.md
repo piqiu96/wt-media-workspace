@@ -96,3 +96,7 @@ risk: H
 ### Task 10：frontend公共视觉规范审核（用户追加，先审后改）
 
 以原screens视觉优点评审frontend现有规范。用户已提交14项审批：V07选择“短表单Dialog + 原稿视觉”，V08要求按字段密度自适应单 / 双列，其余同意推荐。已回写frontend现有四份规范及README，提案、原始审批和逐项映射分别见 `evidence/frontend-visual-standard-review.md`、`evidence/frontend-visual-standard-approval.json`、`evidence/frontend-visual-standard-apply.md`。本次只完成审批后的规范修改，不将其冒充运行时迁移完成；后续按已批准目标实施公共能力并在窗口 / 代理页验证，不自动推广全站，不合并发布。
+
+### Task 11：公共 HTML 规范示例（2026-10-28 用户追加）
+
+用户要求先推荐目录并直接执行。按用户追加目录决策，示例放在Workspace根目录 `example/common/`，业务原型与起始模板放在 `example/proto/`，与正式规范相互引用：离线 HTML 入口、共用样式与演示交互、精简原型起始页、使用说明。覆盖列表、内容自适应详情、短新建/编辑 Dialog、长配置 Drawer、资源选择/确认、多层与忙碌保护、反馈空态、批量过程/结果及基础状态。HTML 为规范参考与原型素材，不是运行时依赖或业务功能实现；数据明确为演示数据，不访问服务。不修改运行仓，不自动全站迁移。校验两类桌面视口及窄屏、键盘/关闭/状态切换、规范 Token 一致性、离线资源与文档链接；证据归本CHG。

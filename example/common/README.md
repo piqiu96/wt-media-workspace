@@ -1,0 +1,60 @@
+# 公共视觉与交互参考
+
+[打开参考 HTML](index.html) · [正式规范入口](../../docs/standards/frontend/README.md) · [原型起始页](../proto/starter.html)
+
+这是正式规范的可操作参考，使用原生HTML展示布局、样式与关键状态，便于人工和AI查看源码、复用结构。窗口与代理数据均为虚构示例，借具体信息展示公共模式；这里不定义该业务的正式字段、权限或执行能力。
+
+## 文件与引用
+
+| 文件 | 职责 |
+|---|---|
+| `index.html` | 七组公共模式、示例条款索引及Dialog/Drawer内容模板 |
+| `example.css` | 同一份示例Token、密度、布局和状态样式；来源标注在文件顶部 |
+| `example.js` | 导航、筛选、选择、焦点/关闭、字段校验、手动结果切换等本地演示行为 |
+
+本目录无构建、CDN、图片或业务服务依赖，支持直接打开 `index.html`。浏览器支持原生 `dialog` 和容器查询；当前Cloud/Desktop实际组件的兼容性仍应在真实运行环境验证。
+
+未来原型先找到对应模式，点击“查看 / 复制结构”，或直接读取HTML中的 `data-scene` / `template`。将所需结构与关联模板复制到原型，引用公共样式和演示脚本；不把整套七组展示目录复制到每个业务原型。
+
+```html
+<!-- example/proto/<业务主题>/index.html -->
+<link rel="stylesheet" href="../../common/example.css">
+<script src="../../common/example.js" defer></script>
+```
+
+从 [starter.html](../proto/starter.html) 开始时，其相对路径适用于 `proto/` 这一层；放入主题子目录后调整为上面的路径。需要新建表单时保留 `tpl-window`、`data-local-form`、`name="name"`、字段错误节点和 `data-form-receipt`，并替换业务字段与标题。它们只驱动本地原型，不对应业务API。
+
+## 模式与规范出处
+
+| 模式 / 直接入口 | 可查看的内容与状态 | 规则事实源 |
+|---|---|---|
+| [资源列表](index.html#list) | 8行、独立ID、多平台关联账号、上置筛选、展开低频条件、勾选工具栏、5项文字操作、筛选无结果 | [AdminUI §2–§4](../../docs/standards/frontend/AdminUI页面规范.md)；[架构视觉 §3.7、§4.1](../../docs/standards/frontend/前端架构与视觉规范.md) |
+| [自适应详情](index.html#details) | 字段密集/稀疏切换；800/560/380px内容容器；横向键值、长内容跨行、配置对比与真实关系表 | [AdminUI §7.2](../../docs/standards/frontend/AdminUI页面规范.md)；[架构视觉 §4.4.2](../../docs/standards/frontend/前端架构与视觉规范.md) |
+| [新建与编辑](index.html#forms) | 短表单Dialog560/640px；长配置Drawer800px；相关短字段成对、地址备注满行；真实Radio选择卡片；校验与输入保留 | [AdminUI §6](../../docs/standards/frontend/AdminUI页面规范.md)；[交互 §8–§9](../../docs/standards/frontend/前端交互规范.md) |
+| [选择与确认](index.html#overlays) | 资源选择960px、空选择560px；筛选、可用/不可用项、嵌套摘要及返回；风险确认、无Footer摘要与960px复杂详情 | [AdminUI §6.1、§7.4](../../docs/standards/frontend/AdminUI页面规范.md)；[交互 §9](../../docs/standards/frontend/前端交互规范.md) |
+| [反馈与空态](index.html#feedback) | 帮助/影响/风险/错误分层；空资源、无匹配、不可用、加载失败、无权限、加载中 | [用户反馈规范](../../docs/standards/frontend/用户反馈规范.md) |
+| [批量过程与结果](index.html#batch) | 居中摘要、同区七类计数、进度与8项原因；处理中/成功/失败/部分/待确认/中断；关闭保护、仅失败重试和待确认核实 | [AdminUI §7.7](../../docs/standards/frontend/AdminUI页面规范.md)；[交互 §11](../../docs/standards/frontend/前端交互规范.md) |
+| [视觉基础](index.html#foundations) | 配色、字号、36px控件、按钮禁用/Loading、操作收纳、配置/事实/结果状态 | [架构视觉 §3.6–§3.9](../../docs/standards/frontend/前端架构与视觉规范.md) |
+
+详情的容器查询以实际内容宽度生效，字段元信息区分短字段、长字段与稀疏内容。示例中的640px断点是当前字号和标签宽度下的实现选择，不升级为所有业务的固定断点；以正式规范的密度、长度、可读性要求判断。表格在窄屏内滚动，不缩小整页或隐藏关键列。
+
+## 交互边界
+
+- 所有按钮只作用于本地演示。没有请求、外部写入、业务持久化或定时自动成功；保存入口明确写“保存演示输入”。重试与核实只手动改变对应类别的演示项目。
+- 原生Dialog管理焦点和下层不可交互；仅顶层绘制遮罩，返回时恢复触发入口。表单不通过遮罩关闭；处理中阻止X、Esc和关闭按钮。批量弹窗内“演示控制”可手动推进到结果，不是业务动作。
+- `example.js` 是演示工具，不是公共业务组件库。真实实现继续使用TDesign Vue Next、TDesign Icons和所属运行仓的shared/ui，主题集中映射；不能将此CSS/脚本引入Cloud、Agent或Desktop Runtime。
+- 演示校验仅覆盖模式所需的名称、端口等原生约束，不代表完整业务校验。示例“应用代理”等动作不证明真实服务或外部执行已成功。
+
+## 维护与验收
+
+正式规范维护规则，HTML维护示例，两者相互引用。规则变化先改所属正式文档，再同步当前示例；发现冲突时按事实源与审批记录修正，不以原型单方面覆盖规则。公共Token只在 `example.css` 一处映射，业务原型优先引用，不复制取值。
+
+修改示例时检查：
+
+1. Token与架构视觉§3.6.1一致，尺寸/密度与已审批档位一致。
+2. 1600×1000、1366×900、窄屏/窄容器的内容和操作可达，列表含8行与长内容。
+3. 键盘选择与焦点、名称校验、输入保留、嵌套返回、处理中关闭保护。
+4. 批量总数等于六类互斥状态之和，失败重试与待确认核实互不串类。
+5. `file://` 可运行，资源与规范链接有效，无控制台错误、联网依赖或假业务结果。
+
+浏览器截图是必要的核验附件，无需为每个原型场景批量导出图片；规范、HTML和源码是日常复用入口。HTML不代替真实Vue组件回归、人工视觉审核或真实业务验收。

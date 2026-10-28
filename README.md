@@ -34,6 +34,7 @@ Runtime code is owned by `wt-media-cloud`, `wt-media-agent`, and `wt-media-deskt
 - `scripts/verify/verify_ai_workspace.py`: verify entry references, snapshot uniqueness, and repository configuration agreement.
 
 - `docs/README.md`: documentation tree index, classification, lifecycle, and validation rules.
+- [example/](example/README.md): offline visual/interaction examples in `common/`, business prototypes in `proto/`; references the frontend standards and is never a runtime dependency.
 - `docs/product`: current effective product baseline.
 - `docs/engineering`: current effective engineering baseline.
 - `docs/contracts`: human-readable Cloud, Agent, and Desktop contract governance.

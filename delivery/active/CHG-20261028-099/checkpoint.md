@@ -1,16 +1,16 @@
 # CHG-20261028-099 最新续接状态
 
-更新时间：2026-10-28 12:45（Asia/Shanghai）。CHG：VERIFYING。本轮用户审批后的frontend规范回写完成，运行时视觉重构尚待继续。
+更新时间：2026-10-28 13:17（Asia/Shanghai）。CHG：VERIFYING。公共HTML参考与起始页已验证，供人工评审；运行时新视觉迁移仍待继续。
 
-## 最新请求：按 frontend 视觉规范审批修改（2026-10-28）
+## 最新请求：公共HTML视觉参考（2026-10-28）
 
-用户提供 `/Users/aqiuye/Downloads/frontend视觉规范-审批意见.json` 并明确要求修改。14项均可落地：V07选择“短表单Dialog + 原稿视觉”，V08修改后同意，原批注要求按字段密度自适应单 / 双列；其余同意推荐。
+用户要求基于已审批规范建立公共HTML，并明确落位Workspace根目录 `example/common/`（公共视觉交互）、`example/proto/`（业务原型）。已按该决定完成，无frontend/examples副本。入口 `example/common/index.html`，说明 `example/README.md` 与 `example/common/README.md`；原型起始页 `example/proto/starter.html` 共用common资源。
 
-已回写 `docs/standards/frontend/` 的四份规范与README：统一Token / 密度、页面轻面板、字段关系布局、卡片选择、浮层档位、轻提示、居中批量结果、公共组件状态与视觉验收。V08按密度、长度和内容容器宽度选择单 / 双列，长字段满行，稳定阅读顺序；不固定全部单列或双列。
+已交7组模式与560/640/960px Dialog、800/960px Drawer，涵盖列表8行、多平台、单双列详情、相关字段组合、选择/确认/嵌套、空态与反馈、批量过程结果和基础状态。frontend四份规范与README建立相互引用，根README及AGENT-INDEX注册目录。HTML仅演示，不接服务、不进入运行时依赖。
 
-审批原件留档 `evidence/frontend-visual-standard-approval.json`；逐项位置、验证与迁移边界见 `evidence/frontend-visual-standard-apply.md`。原 `frontend-visual-standard-review.md` 保留审批前提案并加后续结论。文档校验与最终改动边界核验见落地记录；本轮不引用旧业务测试证明新规范已编码。
+最新验证：100项浏览器核验、8组静态核验（37个Token与规范一致）、15索引文档校验及diff检查通过；浏览器无错误/外部网络请求。三类视口为1600×1000、1366×900、390×844；详情密度与宽度自适应、键盘Radio、表单输入/错误、嵌套选择保留、批量关闭保护及恢复互斥均覆盖。只保留5张必要截图。证据与复核脚本：`evidence/frontend-examples-review.md`、`evidence/frontend-examples/`。
 
-下一步：按已批准目标继续公共组件和窗口 / 代理页面的视觉适配，再按同视口、同密度场景交人工评审；本轮只修改正式规范，不声称页面已达到新稿。后续不重扫全仓、不自动全站迁移。真实比特、目标网络与整体集成仍待验，不能宣称全CHG完成。
+前一轮14项规范审批已写回正式frontend规范，V07短表单Dialog、V08密度/长度/容器自适应单/双列；审批原件与映射见 `evidence/frontend-visual-standard-apply.md`。本轮公共HTML已供审核；下一步为运行仓公共组件与窗口/代理页面的真实视觉适配，不因示例完成而宣称产品已达到新稿。真实比特、目标网络、整体集成仍待验，全CHG继续VERIFYING。两份无关社媒报告保留，不纳入提交。
 
 ## 本轮完成
 
