@@ -1,6 +1,0 @@
-{
-  "phase": "before-fix",
-  "expectedFailures": ["宽容器筛选同排对齐", "少量详情当前层展开", "浮动更多菜单", "统一选择器选项面板", "次要动作中性色"],
-  "observedFailures": 5,
-  "rootCause": "选择器筛选form被.ex-overlay form {display:contents}覆盖，另有原生summary/select与行操作色未统一"
-}

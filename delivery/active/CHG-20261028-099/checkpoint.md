@@ -1,30 +1,33 @@
-# CHG-20261028-099 最新续接状态
+# CHG099 · 当前接续点
 
-更新时间：2026-10-28 18:40（Asia/Shanghai）。CHG：VERIFYING。用户批准的Task14–16已完成到可审核状态，等待视觉人工评审与完整真实验收；不合并发布。
+## 当前状态
 
-## 最新评审第10项：运营备注原型
+整体状态以[change.md](change.md)为准：IMPLEMENTING。当前门禁是**最新视觉原型与最终落地计划待用户review**，审核通过前不继续运行时改动或真实业务写入。
 
-已按用户截图修正w-note：信息标签、运营备注标签及输入正文统一14px/22px行高；信息到编辑区24px、标签到输入8px、输入到辅助说明8px。只在原型备注弹窗显式接入note-editor，不改容器宽度、公共默认样式、保存/取消或运行仓。1600/1366/768视口、保存/取消和页面错误检查通过，修前/修后截图与测量见 `evidence/note-refinement/`。无需重跑未改动的Cloud/ Desktop测试。
+## 已完成
 
-## 当前成果与提交
+- 最新75场景可操作原型位于[example/proto/browser-proxy](../../../example/proto/browser-proxy/index.html)，运营备注已按14px/22px、24px分组/8px间距修订。
+- 公共参考与frontend规范已建立；基础规范14项用户审批保留在evidence。
+- 已有Cloud候选`358d8a6`、`4f73ba9`和Desktop桥`a607773`保留，未合并发布；不将候选实现当最新稿最终验收。
+- example/evidence已按最终稿原则收口；旧截图、测试脚本/日志/调试JSON、多轮结论不再留在当前树。历史由Git追溯，必要脚本/图片是当前HTML依赖。
+- change/plan已按最新原型重写为当前范围、先审后实施顺序及验收矩阵，不再追加多轮流水账。
 
-- Workspace `10d2e6e`：原完整V3迁入 `example/proto/browser-proxy/`，75有效场景，引用common并按最新frontend规范更新；真实视口渲染、打开纯文字无图标。原外部完整HTML转向新入口，保留query/hash，同目录保留“完整视觉方案-迁移前备份.html”。
-- Cloud `358d8a6`：32px主要轻行操作置前，蓝色次动作、加载预留列宽，权限/回调不变。
-- Cloud `4f73ba9`：ResourceDescriptions/ChoiceCards、统一Overlay/Section/Notice/Progress、Token/TDesign兼容映射、两页新筛选与详情/表单、导入语义标签。Cloud共用Vue唯一源码，Desktop Runtime未改。
-- 正式frontend补实际公共实现引用、别名兼容和分批接入约定；其他模块不自动改布局。当前验收与提交信息见 `evidence/modern-ui/implementation-review.md` 与verification-summary.json。
+## 当前交付
 
-## 最新验证
+[最终视觉评审入口](evidence/modern-ui/review.html) · [执行计划](plan.md) · [范围与门禁](change.md) · [最终验收状态](evidence/acceptance.md)。本轮仅Workspace制品与文档整理，运行仓保持原样。
 
-811用例/89文件、Cloud/Desktop共用前端双构建通过；75原型全场景和7交互通过；实际Vue隔离验证21弹层+22回归+15新专项通过。导入标签对比度≥4.5:1；评审30场景图像/批注保持/JSON导出通过。独立只读检查无Critical/Important，两项Minor（full简写、导入标签）已修复并验证。构建仍有非阻断chunk体积提示。
+## 下一步
 
-两页业务script对601238b比较，仅新增展示import与列宽主要动作选项，业务函数完全相同。测试fixture不进入运行时，原型不作为真实业务验收。
+1. 等待用户审核视觉与plan/change；有批改直接更新当前稿，不能把旧审批当本轮确认。
+2. 确认后按plan步骤1–7从已有候选继续，先核对实际差异，再对齐公共组件和两页。
+3. 完成最终代码对应的测试/双构建/兼容/真实比特及目标网络验收，更新最终验收表；用户确认前不合并发布。
 
-## 人工入口与后续
+## 最近检查
 
-最新评审：`delivery/active/CHG-20261028-099/evidence/modern-ui/review.html`，30代表场景可逐项批注并导出JSON；完整可操作原型 `example/proto/browser-proxy/index.html`，公共参考 `example/common/index.html`。用户已批准规范，不需重复询问；若有新审美意见按对应条目修订并补相关回归。
+本轮只验证制品/文档整理：75场景内容与整理前一致、无页面/控制台错误；最新运营备注效果图逐字节相同；最终评审入口及内嵌原型/取消操作正常；本地资源与文档链接、15索引校验、CHG/台账对齐及diff检查通过。检查过程放临时目录，没有把脚本、日志或截图包重新放回example/evidence。运行仓测试和真实业务验收本轮未执行。
 
-真实比特开关/编辑字段读回/应用代理、目标网络与Cloud/Agent/Desktop组合仍待现场验收，整体CHG不能标完成。先读此checkpoint与plan；不重新全仓扫描。两份无关社媒报告继续未跟踪，不可纳入本次提交。
+## 风险与执行约束
 
-## 额度与自动化
+真实外部验收未完成，integration旧模块引用问题尚需当前环境核实；原型演示不等于真实成功。工程路径查config/repository-map.yaml，先恢复当前CHG，不重新全仓扫描、不重跑数据清理。保留无关未跟踪社媒报告，不纳入提交。
 
-2026-10-28 17:40额度恢复后继续，本次一次自动化17-40已删除，先前6-55-ui也已删除，不重复执行。18:26最新查询短周期仍余63%；后续若低于5%立即保存停止。保留工作区，不重置他人改动、不自行合并/发布。
+短周期额度低于5%保存停止的要求仍有效；此前一次续接自动化已删除，本轮没有新建自动化。
