@@ -1,7 +1,7 @@
 ---
 id: CHG-20261029-107
 parent: none
-status: IMPLEMENTING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
@@ -37,3 +37,7 @@ risk: M
 - [ADR-0028](../../../docs/decisions/0028-flat-business-categories.md)
 - [产品第三章](../../../docs/product/prd/详细文档/第三章_用户与账号管理.md)
 - [最终类目迁移计划](plan.md)
+
+## Acceptance
+
+2026-10-29：计划内数据库迁移、Cloud Go/前端、Cloud/Desktop 双入口构建、Workspace 文档与治理检查、API 实测及类目页读回均通过。完整命令、迁移计数和已知的无关 M1 verifier 环境限制见 [verification](evidence/verification.md)。
