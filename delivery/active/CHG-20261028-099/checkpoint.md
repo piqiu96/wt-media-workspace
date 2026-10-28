@@ -9,6 +9,7 @@
 - 最新75场景可操作原型位于[example/proto/browser-proxy](../../../example/proto/browser-proxy/index.html)，运营备注已按14px/22px、24px分组/8px间距修订。
 - 公共参考与frontend规范已建立；基础规范14项用户审批保留在evidence。
 - 已有Cloud候选`358d8a6`、`4f73ba9`和Desktop桥`a607773`保留，未合并发布；不将候选实现当最新稿最终验收。
+- 业务原型统一以index.html为唯一入口，已移除冗余跳转页。
 - example/evidence已按最终稿原则收口；旧截图、测试脚本/日志/调试JSON、多轮结论不再留在当前树。历史由Git追溯，必要脚本/图片是当前HTML依赖。
 - change/plan已按最新原型重写为当前范围、先审后实施顺序及验收矩阵，不再追加多轮流水账。
 
