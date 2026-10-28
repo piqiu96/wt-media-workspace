@@ -152,9 +152,10 @@ contracts:
     state: active
     formal_definition: active
     # The newest of the area's definitions, as `local_event_schemas` does: the
-    # files carry their own revisions. CHG-20261023-101 advanced both
-    # `v1/bitbrowser.yaml` (offline / Cloud-unreachable refusals, secret policy)
-    # and `v1/transfer.yaml` (save-directory and Agent Token refusals).
-    error_revision: "2026.10.23.1"
+    # files carry their own revisions. CHG-20261023-101 advanced BitBrowser
+    # refusals and transfer errors to 2026.10.23.1. CHG-20261028-099 added
+    # explicit proxy assignment outcomes, moving `v1/bitbrowser.yaml` to
+    # 2026.10.29.1.
+    error_revision: "2026.10.29.1"
     consumers:
       - wt-media-desktop
