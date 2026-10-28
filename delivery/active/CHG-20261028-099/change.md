@@ -13,7 +13,7 @@ risk: H
 
 让运营在「浏览器窗口 / 代理管理」两个页面上按角色与环境看到正确的动作和状态，把代理从全局资源池改为按团队共享，把检测从本机执行改为 Cloud 服务端执行，并补齐窗口停用、批量开关窗、配置不一致与代理生命周期（启停 / 到期 / 配额 / 删除）的阻断与恢复语义。
 
-依据：`/Users/aqiuye/.codex/visualizations/2026/10/26/01a1799f-9a86-7302-9201-4df31f7e9c3d/browser-proxy-design/需求优化执行稿-Codex-V3.md`（下称 V3）与《DeepSeek实施Prompt-V3》。视觉稿只用于理解信息关系与状态覆盖，样式与交互按 `docs/standards/frontend/` 本地规范实现。
+依据：`/Users/aqiuye/.codex/visualizations/2026/10/26/01a1799f-9a86-7302-9201-4df31f7e9c3d/browser-proxy-design/需求优化执行稿-Codex-V3.md`（下称 V3）与《DeepSeek实施Prompt-V3》。最初视觉稿用于理解信息关系与状态覆盖。2026-10-28 用户进一步批准 frontend 公共视觉规范优化14项：后续视觉重构以已批准原稿视觉目标与修订后的 `docs/standards/frontend/` 共同验收，范围与例外按 Task 10 记录；业务、权限和真实执行语义不变。
 
 用户已确认的四项裁决（2026-10-28）：
 
@@ -95,4 +95,4 @@ risk: H
 
 ### Task 10：frontend公共视觉规范审核（用户追加，先审后改）
 
-以原screens视觉优点评审frontend现有规范。提案见 `evidence/frontend-visual-standard-review.md`；本轮只提交审核稿，正式规范回写和下一阶段实施待用户批准，不自动推广全站。
+以原screens视觉优点评审frontend现有规范。用户已提交14项审批：V07选择“短表单Dialog + 原稿视觉”，V08要求按字段密度自适应单 / 双列，其余同意推荐。已回写frontend现有四份规范及README，提案、原始审批和逐项映射分别见 `evidence/frontend-visual-standard-review.md`、`evidence/frontend-visual-standard-approval.json`、`evidence/frontend-visual-standard-apply.md`。本次只完成审批后的规范修改，不将其冒充运行时迁移完成；后续按已批准目标实施公共能力并在窗口 / 代理页验证，不自动推广全站，不合并发布。

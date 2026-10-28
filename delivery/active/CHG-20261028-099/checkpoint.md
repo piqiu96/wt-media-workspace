@@ -1,16 +1,16 @@
 # CHG-20261028-099 最新续接状态
 
-更新时间：2026-10-28 10:51（Asia/Shanghai）。CHG：VERIFYING。本轮弹窗与侧栏优化已验证，待人工评审。
+更新时间：2026-10-28 12:45（Asia/Shanghai）。CHG：VERIFYING。本轮用户审批后的frontend规范回写完成，运行时视觉重构尚待继续。
 
-## 最新请求：frontend 公共视觉规范审核（2026-10-28）
+## 最新请求：按 frontend 视觉规范审批修改（2026-10-28）
 
-用户进一步明确：以 browser-proxy-design/screens 原视觉稿优点优化 docs/standards/frontend 公共规范，先交规范审核文档。当前只交草案，不改正式规范、不继续运行时代码。
+用户提供 `/Users/aqiuye/Downloads/frontend视觉规范-审批意见.json` 并明确要求修改。14项均可落地：V07选择“短表单Dialog + 原稿视觉”，V08修改后同意，原批注要求按字段密度自适应单 / 双列；其余同意推荐。
 
-正式审核记录：evidence/frontend-visual-standard-review.md；14项修订建议，逐项包含原图依据、现状、推荐、拟写条款与影响。重点为视觉重构授权模式、统一Token/密度、详情横向键值、卡片选择、轻提示、居中批量结果和视觉验收。V07单独保留短表单Dialog/恢复原Drawer选择，不把认可原稿理解为自动推翻上轮决定。
+已回写 `docs/standards/frontend/` 的四份规范与README：统一Token / 密度、页面轻面板、字段关系布局、卡片选择、浮层档位、轻提示、居中批量结果、公共组件状态与视觉验收。V08按密度、长度和内容容器宽度选择单 / 双列，长字段满行，稳定阅读顺序；不固定全部单列或双列。
 
-可审批阅读页：/Users/aqiuye/.codex/visualizations/2026/10/26/01a1799f-9a86-7302-9201-4df31f7e9c3d/frontend-standard-review/frontend视觉规范审核.html
+审批原件留档 `evidence/frontend-visual-standard-approval.json`；逐项位置、验证与迁移边界见 `evidence/frontend-visual-standard-apply.md`。原 `frontend-visual-standard-review.md` 保留审批前提案并加后续结论。文档校验与最终改动边界核验见落地记录；本轮不引用旧业务测试证明新规范已编码。
 
-14项、原图9张内嵌，含完整文字稿及75张原图索引。文档与链接校验、HTML阅读/放大/审批批注导出通过；未审批项仍为待审。下一步等待用户明确批准项，再回写frontend现有4份规范与README，不另建并行规范。不以此前业务测试代表本稿已实施。
+下一步：按已批准目标继续公共组件和窗口 / 代理页面的视觉适配，再按同视口、同密度场景交人工评审；本轮只修改正式规范，不声称页面已达到新稿。后续不重扫全仓、不自动全站迁移。真实比特、目标网络与整体集成仍待验，不能宣称全CHG完成。
 
 ## 本轮完成
 
