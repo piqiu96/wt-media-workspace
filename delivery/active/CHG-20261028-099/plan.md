@@ -1,83 +1,261 @@
-# CHG099 · 最新视觉基线与最终落地计划（执行中）
+# CHG099 · 运营资源重构报告与执行计划
 
 ## 任务理解
 
-用户已要求按[当前完整原型](../../../example/proto/browser-proxy/index.html)继续执行；在已有候选实现上完成最终对齐。[change.md](change.md)拥有范围与状态，本文只规定剩余执行顺序。
+本次重构覆盖三个核心功能块：社媒账号、浏览器窗口、代理。目标不是给现有实现继续叠状态，而是收敛数据边界、命名、页面信息架构和本机执行链路。
 
-`example`、`evidence`只留当前最终稿、必要资源和最终审批/验收结论，不再保存多轮对照包、测试脚本、日志和调试缓存；具体按[治理规范§2.1](../../../docs/standards/文档与知识事实治理规范.md#21-最终制品保留原则)。
+CHG099 依赖 [CHG-20261029-107](../../planned/CHG-20261029-107/change.md)（游戏目录改为扁平业务类目）。类目迁移先完成并合入，之后 CHG099 再修改社媒账号及运营资源页面。
 
-## 当前事实与约束
+本文件是当前现状、目标态、文档清理和任务顺序的唯一执行报告；ADR 只保留长期取舍，OpenAPI / business schema 只保留机器契约。
 
-- 当前原型包含75个有效场景；[运营备注](../../../example/proto/browser-proxy/index.html)是最新局部修订。公共参考位于example/common，正式规则位于docs/standards/frontend。
-- Cloud已有候选实现：`358d8a6`行操作、`4f73ba9`公共视觉与两页、`01797b7`运营备注对齐、`d722fba`代理明确选择与可用性校验、`a7d977b`代理响应、合同与未知状态处理。Agent 隔离工作树候选 `1508a67`；Desktop既有桥实现`a607773`保留。仓路径从config/repository-map.yaml读取，Agent隔离工作树见checkpoint，不猜测或全仓重扫。
-- 既有单测、构建和隔离UI读数只证明对应代码基线，不证明最新视觉已最终落地，更不能替代真实比特、目标网络与跨端验收。当前状态见[最终验收表](evidence/acceptance.md)。
-- 基础视觉规范14项已有用户审批；用户本轮明确要求继续落地，最新视觉稿与执行计划的实施门禁已解除。剩余工作是视觉/交互校准与验收，不重新扩展业务范围。
+## 当前事实
 
-## 计划修改
+以下来自 2026-10-29 本机 `wt_media_cloud` 实际结构：
 
-### A. 已确认的执行基线
+| 表 | 当前行数 | 当前主要问题 |
+| --- | ---: | --- |
+| `media_accounts` | 7 | `name/avatar_url/login_status` 未体现第三方数据；Cookie 大字段被普通列表查询读取；契约仍残留 `game_id/retired` |
+| `browser_profiles` | 40 | 比特镜像、实际代理、正式托管关系和页面状态混名；`remark` 实际是比特备注；进行中操作没有额度预留 |
+| `proxy_configs` | 0 | `business_status` 与窗口/账号启停语义不一致；`observed_exit_ip` 从未写入；最近检测原因刷新后丢失 |
+| `profile_sync_scans` | 70 | `diff_json` 重复表达；`reject` 不落状态；没有真实 `observed_at` |
+| `profile_sync_candidates` | 2711 | 临时快照拆成第二张表，54 次 ready 扫描长期堆积 |
 
-| 审核项 | 本计划采用的原则 | 参考入口 |
+当前关键链路问题：
+
+- Cloud `/proxies/{id}/assign` 由服务端直接访问 `127.0.0.1:8765` 的 Local Agent，生产环境不可依赖；
+- Desktop 没有代理 apply / verify / unbind 桥；
+- `local_agent_profile_restore` 会顺带写代理字段，可绕过配额和进行中占用；
+- 异常结果没有统一按失败收敛，也没有可重试的临时额度预留；
+- 配额只算正式关系，不计算进行中的目标；
+- 同步发现的代理关系确认没有重查配额；
+- 设备、代理、游戏命名形成多个中间态 ADR，当前文档重复且部分已失效。
+
+### 当前接口面
+
+社媒账号当前 11 个 Cloud 接口：
+
+```text
+GET    /media-accounts
+POST   /media-accounts
+GET    /media-accounts/{account_id}
+PATCH  /media-accounts/{account_id}
+POST   /media-accounts/{account_id}/identify
+POST   /media-accounts/{account_id}/check
+POST   /media-accounts/{account_id}/cookies/read
+POST   /media-accounts/{account_id}/cookies/read-sync
+POST   /media-accounts/tags/add
+POST   /media-accounts/tags/remove
+PATCH  /media-accounts/{account_id}/profile
+```
+
+窗口当前 12 个 Cloud 接口，代理当前 22 个 Cloud 接口。旧代理分配链路包含
+`assign/assign-batch/unbind/release/profile-unbind/local-scan/confirm` 六套入口，
+状态和额度判断分散；本轮收敛为两个代理操作接口。
+
+Local Agent 已有窗口扫描、创建、打开、关闭、更新、删除、代理提取、代理 mutation 和
+proxy assignment；Desktop 已有窗口桥，但没有代理写入桥。接口细节以当前 OpenAPI 为准，
+不在本报告复制全部 schema。
+
+## 目标数据模型
+
+### 命名规则
+
+- 启停统一 `enabled TINYINT(1)`，API 使用布尔值。
+- 比特只读镜像统一 `bit_`。
+- 平台账号只读数据统一 `platform_`。
+- 检测结果统一 `last_check_`。
+- Cloud 自有字段不加第三方前缀。
+- 生命周期使用 `*_state`，检测/登录使用 `*_status`，不继续混用 `business_status`。
+
+### Cloud 表
+
+```text
+media_accounts
+media_account_games -> media_account_categories       (CHG107)
+media_account_tags
+media_account_groups
+browser_profiles
+proxies                  (原 proxy_configs)
+browser_profile_syncs    (原 profile_sync_scans，单用户单快照)
+```
+
+`profile_sync_candidates` 删除。
+
+不新增：代理操作表、连接版本表、检测历史表、敏感任务表、审计事件表。
+
+### `media_accounts`
+
+```text
+id, user_id, team_id
+platform, platform_account_id, platform_name, platform_avatar_url
+browser_profile_id, remark
+identification_status, duplicate_of_account_id
+enabled, platform_login_status
+last_check_at, last_check_items
+cookie_status, cookie_updated_at, original_cookie, active_cookie
+created_at, updated_at
+```
+
+规则：
+
+- `team_id` 保留创建时历史归队；
+- 列表/摘要查询不得读取 Cookie 大字段；
+- 保留现有账号—类目多对多与标签表；
+- `media_account_tags` 收敛为 `(media_account_id, tag_name)`，删除冗余 `id/user_id`；
+- `account_groups` 改为 `media_account_groups`，只保存个人筛选预设，不复制业务状态。
+
+### `browser_profiles`
+
+```text
+id, user_id, team_id
+bit_profile_id, bit_main_user_id, bit_user_id
+bit_name, bit_seq, bit_group_id, bit_group_name
+bit_profile_status, bit_updated_at, bit_remark
+bit_proxy_type, bit_proxy_host, bit_proxy_port
+remark, enabled, local_state
+proxy_id
+reserved_proxy_id, reserved_since
+last_synced_at, created_at, updated_at
+```
+
+规则：
+
+- `proxy_id` 是 Cloud 正式托管关系；
+- `bit_proxy_*` 是比特实际观测；
+- `reserved_proxy_id` 只在进行中的 apply 操作期间占用目标额度，不作为用户可见待确认状态；
+- 同一窗口有进行中操作时拒绝再次发起写入；
+- 有临时预留引用时禁止修改/停用/删除目标代理；
+- 结果成功则更新 `proxy_id` 并清预留；拒绝、超时、断开或异常均清预留并按失败返回；
+- `proxy_id`、`reserved_proxy_id` 外键使用 `RESTRICT`，不再依赖 `SET NULL` 掩盖错误。
+
+### `proxies`
+
+```text
+id, team_id, name
+source, protocol, host, port, username, password, extract_url
+region, supplier, tags, expires_at
+enabled, max_profiles, remark
+last_check_at, last_check_result, last_check_message
+created_at, updated_at
+```
+
+规则：
+
+- 删除 `observed_exit_ip`；
+- 保留最近一次检测结果和原因，不建检测历史；
+- 正式绑定数和进行中预留数在查询时计算，不落冗余计数字段；
+- 正常分配、解绑和直连都走统一代理操作状态。
+
+### `browser_profile_syncs`
+
+```text
+id, user_id UNIQUE, bit_main_user_id
+snapshot JSON, observed_at, expires_at, created_at
+```
+
+规则：
+
+- 每个用户最多一份当前扫描；
+- 新扫描覆盖旧快照；
+- 确认、拒绝、过期后删除；
+- 不保存跨扫描历史、`diff_json` 或候选表；
+- 快照只包含非秘密的比特窗口与实际代理字段。
+
+### 依赖关系
+
+```text
+users
+├── media_accounts ── browser_profiles
+│   ├── media_account_categories ── categories
+│   └── media_account_tags
+├── browser_profiles ── proxies (proxy_id / reserved_proxy_id)
+├── browser_profile_syncs
+└── media_account_groups
+
+operation_teams
+├── users.current_team_id
+├── media_accounts.team_id        historical
+├── browser_profiles.team_id      historical
+└── proxies.team_id               current resource scope
+```
+
+## 目标接口与执行边界
+
+### Cloud
+
+- 资源启停统一通过 `PATCH` 写 `enabled`，删除单独 status/quota 端点。
+- 扫描使用 `/browser-profiles/sync` 单例：创建、读取、确认、删除。
+- 代理写入使用两个接口：
+  - `POST /browser-profiles/{id}/proxy-operation`
+  - `POST /browser-profiles/{id}/proxy-operation/result`
+- 删除 Cloud Web 的 create/open/close 兼容桩。
+- 删除 assign、assign-batch、unbind、release、profile-unbind、local-scan/confirm 旧组合。
+
+### Desktop / Agent
+
+- Cloud 只创建意图和收敛结果，不访问运营电脑；
+- Desktop 新增 proxy apply / verify / unbind 桥；
+- Agent 保留 `proxy-assignment` 明确 ack 与 `proxy-mutation` 解绑读回；
+- `proxy-check` 退出正常业务路径，Cloud 负责代理健康检测；
+- `local_agent_profile_restore` 不再写代理字段；
+- Cookie 读取只保留 `read-sync -> Desktop/Agent 读取 -> result` 链路；删除异步 `cookies/read`、Cloud Agent 通用任务接口和 Cloud `tasks` 表；
+- Agent SQLite 不新增表。
+
+## 页面与反馈
+
+- 社媒账号：账号/平台事实、检查结果、Cookie 入口分开；列表不因 Cookie 大字段变慢。
+- 窗口：BitBrowser 字段、Cloud 运营备注、正式代理和比特实际代理分开展示。
+- 代理：资源启停、到期、检测、额度分开表达；最近检测原因可刷新后保留。
+- 异常结果：窗口行和批量结果显示失败原因并允许直接重试；不提供读取后人工确认态。
+- 批量：逐项 prepare/result，不建 batch 任务中心；失败仅重试失败项。
+
+## 文档清理
+
+本 CHG 同步执行以下清理，不再保留中间态重复裁决：
+
+- 新增 ADR-0027，合并并取代 ADR-0025/0026；
+- 新增 ADR-0028，取代游戏稳定字符串和多游戏过渡裁决 ADR-0011/0012，并局部取代 ADR-0001；
+- 删除已被 ADR-0022 完全取代的 ADR-0018/0019；
+- ADR-0008 保留账号/Cookie 同步执行原则，并标注浏览器/代理部分由 ADR-0027 收敛；
+- M2 历史验收记录保留，但当前执行只引用 ADR-0022/0027，不再复制设备/节点中间模型；
+- CHG099 的 `change.md` 只保留范围/验收，`plan.md` 保存现状与执行方案，`checkpoint.md` 只保留交接状态；
+- 实现完成后，把最终稳定结论回写一份 Engineering Spec 和 OpenAPI/business schema，不把字段表复制进 PRD。
+
+## 顺序任务
+
+| 步骤 | 工作 | 完成判据 |
 | --- | --- | --- |
-| 最终稿保留 | 一个当前HTML入口，必要依赖按资源职责命名；没有历史版、修前对照或测试缓存包 | example/README、evidence/README |
-| 视觉基调 | 冷灰白、清晰品牌蓝、轻边框/遮罩、明确层级；不以旧实现或库默认值降低已批准视觉目标 | common视觉基础、frontend§3.6 |
-| 行操作 | 每行至多一个主要浅蓝轻按钮，32px热区；可用次动作蓝色；危险/禁用区分；打开无前置图标，≤5平铺 | 窗口/代理列表及common行操作 |
-| 表单与弹层 | 少字段新建/编辑用居中Dialog；长配置和关系详情用Drawer；宽度与留白依内容和正式档位，不机械等宽或整页缩放 | 新建/编辑、代理配置、选择与确认 |
-| 详情 | 横向键值；按字段密度、内容长度及实际容器宽度自适应列数，长字段满行；关联账号按平台完整展示 | 窗口/代理详情 |
-| 运营备注 | 信息、编辑标签与正文14px/22px；信息到编辑区24px，标签/输入/说明间8px；帮助仍轻量 | w-note |
-| 筛选与提示 | 标签上置，横距24/行距20/标签间8；少量关系当前展开；必要后果显式保留，不重复堆大提示 | 代理选择、空/异常态 |
-| 状态与结果 | 配置、事实、检测和执行结果分开；七项互斥计数、逐项原因、失败重试与待确认核实分开 | 批量过程/结果、导入 |
-| 公共推广 | 在两页显式接入新布局；公共Token影响其他消费者时列影响与回归，不自动全站重排 | 公共参考与frontend实现映射 |
+| 0 | 完成 CHG107 类目 Foundation | 类别迁移与契约合入，旧 `game_id` 清理 |
+| 1 | 固化 ADR-0027 与运营资源数据模型 | 无 blocked 产品/架构问题，文档清理完成 |
+| 2 | Cloud 迁移与模型收敛 | 7 张领域表落定，旧候选/无字段与 `tasks` 清理，迁移重放通过 |
+| 3 | Cloud API 与权限/额度/失败收敛 | 团队范围、临时预留、失败释放、直接重试与真实 MySQL 验证 |
+| 4 | Desktop/Agent 本机代理桥 | 明确成功、失败、超时/断开、解绑读回、旧 Agent 边界通过 |
+| 5 | 三块页面重构 | 列表/详情/表单/同步/批量/三角色/窄屏/失败恢复符合当前原型与正式前端规范 |
+| 6 | 文档与契约收口 | OpenAPI/schema/Engineering Spec 一致，删除过期裁决和重复实现描述 |
+| 7 | 真实验收 | 真实比特开关/编辑/代理应用、Cloud 检测、目标网络、Desktop 组合全部有读回 |
 
-上述作为本轮最终执行基线，不把原型中的示例姓名、数量、IP或模拟成功逻辑带进业务。
-
-### B. 执行顺序
-
-| 步骤 | 要做的事 | 完成判据 |
-| --- | --- | --- |
-| 1. 锁定基线 | 将用户本轮意见直接修订当前稿和正式Owner，列出实际差异；限定受影响组件/页面 | 无阻断差异；不另建版本目录 |
-| 2. 公共能力对齐 | 从Cloud现有shared/ui与主题继续，核对RowActions/列宽、Descriptions、ChoiceCards、Overlay/Form/Section/Notice/StatusBadge/Progress | 默认/焦点/选中/禁用/Loading/错误/长内容/窄容器均符合已审基线；旧消费者兼容 |
-| 3. 窗口完整链路 | 列表、详情对比、多平台关系、新建/编辑/备注、同步认领、代理管理与异常处理、批量 | 字段/角色/环境正确，必要后果可读；真实写入/读回/未确认恢复不变 |
-| 4. 代理完整链路 | 列表、详情/凭据复制、新建/编辑/来源、导入、候选选择、额度/启停/删除、检测与结果 | 团队权限、独立状态、不可用原因、勾选提交、失败与待确认均真实 |
-| 5. 兼容与视觉验收 | 相同视口/状态对照当前稿；检查内容生产、挖掘、用户管理等主题消费者 | 比例/密度/间距/层级一致；关键动作无遮挡，长内容不丢失 |
-| 6. 服务与跨端验收 | 必要Go/前端回归、双入口构建、真实比特和目标网络、Desktop桥及组合验证 | 状态/外部效果/读回/业务投影/页面结果全部成立，未验收不报通过 |
-| 7. 收口交付 | 当前稿与规范一致；最终验收表对应实际提交，必要最终效果稿及审批保留，过程产物清理 | 用户最终review通过后再申请后续集成；不自动合并发布 |
-
-### C. 验收覆盖矩阵
+## 验收矩阵
 
 | 维度 | 必须覆盖 |
 | --- | --- |
-| 页面族 | 窗口/代理列表、详情、新建、编辑、备注、选择、风险确认、导入、同步、进度/结果 |
-| 角色/环境 | 普通运营/高级运营/管理员；本人桌面/成员视图/网页版；服务端拒绝越权 |
-| 状态 | 正常、加载、无资源、无匹配、不可用、失败、部分完成、未知、缺失、不一致、到期、停用 |
-| 控件/恢复 | 键盘/焦点、下拉/更多、禁用/Loading、提交关闭保护、返回保留筛选/选择/输入、仅失败重试、待确认先核实 |
-| 视口 | 1600×1000、1366×900；按实际内容容器检查窄宽和低高度，不缩放整页掩盖问题 |
-| 真实效果 | 比特开关/字段修改/代理应用及读回，Cloud检测与目标网络，团队权限/并发配额/删除占用/导入结果 |
+| 账号 | 新增/编辑/启停、类目/标签/窗口关系、检查、Cookie 专用读取、三角色 |
+| 窗口 | 扫描认领、字段镜像、运营备注、启停、打开/关闭、单/批代理 |
+| 代理 | 导入、检测、额度、启用、到期、删除占用、动态提取、凭据边界 |
+| 异常结果 | 超时、断开、中断、异常响应均按失败释放临时占用，用户可直接重试 |
+| 并发 | 同窗口不同目标、两个窗口抢最后名额、同步确认额度复核 |
+| Cookie | 同步读取成功、Agent 拒绝、响应丢失、许可释放；无异步任务创建 |
+| 环境 | Cloud Web / Desktop / Local Agent 真实组合；不能以 fixture-only 结论代替 |
 
-执行测试与临时截图放临时目录，长期测试回所属工程；evidence只更新最终验收状态与必要最终效果稿，不保存流水、fixtures或对照包。
+## 明确不修改 / 不做
 
-## 明确不修改
+- 不新增通用任务中心、操作历史、审计事件表、检测历史表或敏感许可表；删除旧通用 `tasks` 表。
+- 不接入比特标签或窗口业务标签。
+- 不恢复窗口分配、远程代操作或父子重试任务。
+- 不执行新的存量代理清理迁移。
+- 不在 PRD/CHG 中重复完整字段表；字段以机器契约和一份 Engineering Spec 为准。
 
-本轮不执行数据清理迁移，不扩展change中排除的标签、分配、任务中心、动态提取归属或其他模块业务。公共Contract/Ownership确需变化时先回Workspace裁定；不以视觉稿替代合同。
+## 已收敛的判断
 
-## 冲突与未确认项
-
-- 用户已明确要求执行，视觉与计划审核门禁解除；不自动合并或发布。
-- 最新备注修订已在Cloud `01797b7`对齐并做隔离交互检查；其余场景仍需真实服务与人工验收。
-- 真实比特/目标网络及整体组合未验收；已有记录的integration脚本模块引用问题须在最终验收前核对当前事实，不能用隔离UI通过掩盖。
-- 用户已确认代理绑定成功口径，执行详情见下；其他已确认业务边界不变。
-
-### 代理绑定成功口径（已裁定）
-
-用户确认：托管代理绑定、重新应用时，比特更新接口明确成功即继续确认系统关系；正常路径不做写入后字段读取。不确定时先读取核对，不得自动重复写入；可观察字段不足以证明认证一致。代理连接检测独立，窗口普通编辑和解绑直连读回规则不变。见 [ADR-0026](../../../docs/decisions/0026-proxy-assignment-acknowledgement.md)。
-
-Agent 是本地接口提供方，新增兼容端点表示明确成功，不改变原端点读回语义；Cloud 消费新端点，遇到旧 Agent 不能猜测成功。先更新提供方合同并验证，再更新运行时及消费方；分别覆盖明确成功、明确拒绝、超时/断开、字段不一致、旧版兼容、并发额度、无秘密泄露和人工核对。真实比特和目标网络验收仍待完成。Agent 当前其他工作分支必须保留，CHG099 使用隔离工作树。
-
-当前仍有一项阻断闭环：待确认状态目前只在页面内存中，离开页面或刷新后无法可靠恢复；服务端代理锁在请求结束后释放，也没有为未确认应用预留额度。现有同步确认的 `changed` 分支仅按代理加锁直接写入关系，没有重新检查额度。后续须先设计并落地服务端持久化的待确认事实、额度占用和恢复，并修正同步确认的并发裁决；不得仅依赖页面提示、进程内内存或重复调用比特掩盖问题。再验证重启、并发占用、查实一致/不一致、认证不可观察及无需重写的恢复闭环。此项是已确认业务约束的实现缺口，当前代码仅为候选，不可视作完成或发布。
-
-后续实现约束：
-
-1. 写入比特前以数据库事务建立唯一的窗口级待确认记录，并在代理级锁下把目标资源的待确认占额计入可用额度；仍保留旧正式关系。同一窗口已存在未解决记录时阻断新的代理写入。记录不能包含密码、可逆凭据或通用扫描秘密，须保存可用于判定目标配置已变化的非秘密版本事实。
-2. 比特明确拒绝或确定未发送时释放预留；明确成功时以同一事务更新正式关系并清理预留。超时、断开、异常响应、Cloud写库失败或进程中断保留待确认记录；重启后仍可从窗口列表/详情进入处理。不得以时间到期自动释放占额。
-3. 读取核对只针对本人窗口与该待确认记录。协议/地址/端口不一致可在确认旧结果无效并释放预留后由用户显式重试；一致但认证无法观察时继续显示待确认，不得自动重写或宣称认证一致。认证可安全比较的能力和明确人工处理入口须按正式合同实现；配置在核对期间变更、权限变化和窗口消失均不能直接判成功。
-4. 同步接受与待确认处理共享代理级锁及事务性额度裁决；待确认预留与正式绑定不能双重计数。删除、停用、修改配额和配置等入口也要正确处理未解决预留。全链路测试至少覆盖同窗口不同目标并发、两个窗口抢最后名额、响应丢失、进程中断、重启、重复核对和旧 Agent。
+- 类目规则：社媒账号允许零个，表示尚未分类；内容来源、挖掘策略、合成策略/任务/成片新增时必须选择一个。只有筛选条件可不选；系统不假定或自动创建 `other`。
+- 代理异常结果只在“写入可能已发送，但未得到明确成功”时出现：超时、断线、Agent/Desktop 中断、响应损坏或 Cloud 未收到结果。所有异常统一按本次失败处理，保留旧正式关系，清除临时额度预留，用户直接重试；不做读取后人工确认。
+- Cookie 读取改同步：删除旧异步 `/cookies/read`、Cloud Agent 通用任务接口和 `tasks` 表；保留 Desktop 同步读取并向 Cloud 回报结果的链路。

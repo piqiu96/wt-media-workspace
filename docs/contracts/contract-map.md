@@ -39,12 +39,12 @@ compatible `POST /api/v1/proxies/{proxy_id}/assign`, `/unbind`, and
 `/local-scan/{preview,confirm}` projections. The original revision records or
 clears `browser_profiles.proxy_id` after an Agent response confirms the matching
 proxy or `noproxy` read-back, or after a trusted Desktop Profile scan is
-explicitly accepted. ADR-0026 updates the assignment rule as described below.
+explicitly accepted. ADR-0027 updates the assignment and execution rule as described below.
 Unknown scanned proxies become paused, unchecked records;
 ambiguous tuple matches are surfaced as conflicts and are never guessed.
 Cloud Web and Desktop consume the refreshed Web build output.
 
-CHG-20261028-099 / ADR-0026 adds the Agent-owned `POST /api/v1/proxy-assignment`
+CHG-20261028-099 / ADR-0027 adds the Agent-owned `POST /api/v1/proxy-assignment`
 capability (revision `2026.10.29.1`). Its explicit acknowledgement is not a
 read-back or connectivity result. Cloud may confirm an assignment only after
 the new capability acknowledges the requested Profile; an unavailable old
@@ -52,7 +52,7 @@ Agent cannot be assumed to support it. The prior `proxy-mutation` endpoint
 retains its existing read-back contract for mixed-version compatibility and
 the unbind flow. Unknown outcomes must not be retried automatically.
 
-Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extract` operation. Cloud owns the compatible proxy-address parse, dynamic extraction preview, dynamic refresh, and bound-window detail projections. The Agent fetches a manually requested provider URL and returns only the first supported plain-text proxy address to Cloud; it never writes BitBrowser. Cloud stores the source URL as a secret, exposes only a configured/masked indication, clears stale check facts when the extracted connection changes, and leaves applying an updated proxy to the browser-window flow. That flow's current acknowledgement rule is ADR-0026.
+Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extract` operation. Cloud owns the compatible proxy-address parse, dynamic extraction preview, dynamic refresh, and bound-window detail projections. The Agent fetches a manually requested provider URL and returns only the first supported plain-text proxy address to Cloud; it never writes BitBrowser. Cloud stores the source URL as a secret, exposes only a configured/masked indication, clears stale check facts when the extracted connection changes, and leaves applying an updated proxy to the browser-window flow. That flow's current acknowledgement and pending rule is ADR-0027.
 
 ### Session-only auth and Agent Token revision (CHG-20261023-101)
 

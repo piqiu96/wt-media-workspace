@@ -1,6 +1,6 @@
 # ADR-0003: Local Agent session binding and runtime attestation
 
-- Status: Accepted；设备证明、一次性票据与 node credential 部分由 [ADR-0022](0022-session-only-auth-and-agent-token.md) 取代
+- Status: Accepted；设备证明、一次性票据与 node credential 部分由 [ADR-0022](0022-session-only-auth-and-agent-token.md) 取代，旧设备/节点中间决策已从当前文档树清理
 - Date: 2026-07-14
 - Change: CHG-20260714-018
 
@@ -21,4 +21,4 @@ Reports are allow-listed: normalized OS/architecture and dependency statuses/ver
 - Desktop integration must transport a one-time ticket to the local Agent without exposing the HttpOnly session Cookie; that end-to-end bridge is verified in C6.
 - C4 attestation alone grants no sensitive task permission. C5 still performs task-time validation and locking.
 
-ADR-0018 adds a stable, explicitly bound Desktop installation identity. Session replacement still revokes the old node credential; the same bound device obtains a fresh credential automatically after login. The device binding is not the session or node ID.
+当前桌面执行只使用会话绑定的 Agent Token，不再保留稳定设备绑定、节点凭据或 runtime presence；历史实现由 Git 追溯。
