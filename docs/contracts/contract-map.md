@@ -43,7 +43,15 @@ explicitly accepted. Unknown scanned proxies become paused, unchecked records;
 ambiguous tuple matches are surfaced as conflicts and are never guessed.
 Cloud Web and Desktop consume the refreshed Web build output.
 
-Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extract` operation. Cloud owns the compatible proxy-address parse, dynamic extraction preview, dynamic refresh, and bound-window detail projections. The Agent fetches a manually requested provider URL and returns only the first supported plain-text proxy address to Cloud; it never writes BitBrowser. Cloud stores the source URL as a secret, exposes only a configured/masked indication, clears stale check facts when the extracted connection changes, and requires browser-window-side write/read-back before any bound Profile changes.
+CHG-20261028-099 / ADR-0026 adds the Agent-owned `POST /api/v1/proxy-assignment`
+capability (revision `2026.10.29.1`). Its explicit acknowledgement is not a
+read-back or connectivity result. Cloud may confirm an assignment only after
+the new capability acknowledges the requested Profile; an unavailable old
+Agent cannot be assumed to support it. The prior `proxy-mutation` endpoint
+retains its existing read-back contract for mixed-version compatibility and
+the unbind flow. Unknown outcomes must not be retried automatically.
+
+Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extract` operation. Cloud owns the compatible proxy-address parse, dynamic extraction preview, dynamic refresh, and bound-window detail projections. The Agent fetches a manually requested provider URL and returns only the first supported plain-text proxy address to Cloud; it never writes BitBrowser. Cloud stores the source URL as a secret, exposes only a configured/masked indication, clears stale check facts when the extracted connection changes, and leaves applying an updated proxy to the browser-window flow. That flow's current acknowledgement rule is ADR-0026.
 
 ### Session-only auth and Agent Token revision (CHG-20261023-101)
 
