@@ -1,20 +1,22 @@
-# CHG099 · 最终验收状态
+# CHG099 · 验收状态
 
-当前结论：**未最终验收，不具备合并/发布结论。** 范围与门禁由 [change.md](../change.md) 维护，现状与目标设计见 [plan.md](../plan.md)。
+当前结论：**自动化、真实 MySQL 和 API/Web 读回通过；真实 BitBrowser 写入与目标网络尚未执行，因此状态保持 VERIFYING，不宣称可发布。**
 
-| 验收项 | 当前结论 | 依据与后续 |
+| 验收项 | 结论 | 证据 |
 | --- | --- | --- |
-| 前置类目 CHG107 | 未开始 | `operation_games -> categories`、`game_id -> category_id` 完成并合入后才继续 |
-| 数据模型与命名 | 未实施 | 当前仍是 `browser_profiles/proxy_configs/profile_sync_scans` 旧结构；目标模型见 plan |
-| Cloud 候选实现 | 自动化通过但基于旧结构 | 既有窗口/代理代码只作为候选，不代表本轮数据、接口和失败重试验收 |
-| Agent 候选 | 自动化通过但链路未收口 | 已有明确 ack；Desktop 代理桥和执行归属仍未完成 |
-| Desktop 候选 | 已有窗口桥候选 | 尚无代理 apply/verify/unbind 桥；`profile_restore` 仍有代理写入旁路 |
-| 社媒账号 | 未重构 | 列表仍读取 Cookie 大字段；第三方字段命名和契约仍待收敛 |
-| 浏览器窗口 | 未重构 | 比特镜像与正式代理字段未分离，进行中额度预留未建立 |
-| 代理 | 未重构 | 团队、检测和额度候选存在；异常失败收敛、直接重试和真实执行链路未完成 |
-| 真实比特 / 目标网络 | 未验收 | 开关窗、字段修改、代理应用、检测和目标网络仍需现场证据 |
-| 视觉与人工 review | 未最终验收 | 需按三块页面、三角色、桌面/Web 和窄容器覆盖 |
-| 文档与契约 | 收敛中 | ADR/计划已整理；OpenAPI、business schema 和实现需随代码同步 |
-| 合并 / 发布 | 未执行 | 用户审核、真实验收和后续授权分别处理 |
-
-本文件只保留当前最终结论，不保存过程流水；测试与临时截图放 `/tmp`，长期测试回所属工程。
+| 前置类目 CHG107 | PASS | 已合入本地主线；4 条历史类目迁移、API/页面读回通过 |
+| Cloud 7 张领域表 | PASS | `20261029_079_operating_resources.sql` 在 scratch 与稳定本地库重放成功；旧扫描候选、旧代理、旧账号分组、通用 tasks、sensitive 表均无残留 |
+| 列表不读 Cookie 大字段 | PASS | 账号列表 SQL 使用独立 summary 列；真实 API 返回不含 Cookie |
+| 单用户单快照 | PASS | `browser_profile_syncs` 唯一用户键；提交、读取、确认、删除链路通过 |
+| 代理失败释放与并发 | PASS | 真实 MySQL live test 覆盖同窗口第二目标冲突、两窗口抢最后名额、失败清预留 |
+| 代理 Desktop 桥 | PASS（自动构建/单测） | Rust 命令调用 Agent `proxy-mutation`，验证 readback；Cloud 不再访问本机 Agent |
+| Cloud API 读回 | PASS | 临时空库运行 79 个迁移；登录、账号、同步确认、Cookie 同步、代理预留/成功/释放、PATCH 启停与额度均读回 |
+| Web 页面读回 | PASS（浏览器） | 社媒账号、浏览器窗口、代理管理三页在临时 Cloud 环境真实读回 |
+| Cloud Go | PASS | `go test ./...` |
+| Web | PASS | 90 files / 813 tests；Cloud 与 Desktop 双 build 通过；页面直接使用 `enabled/local_state/protocol/max_profiles/platform_*` |
+| Agent | PASS | 717 tests；Local Agent API 定义已发布为 `2026.10.29.2` |
+| Desktop | PASS | 540 passed / 6 ignored；发布脚本测试通过 |
+| 真实 BitBrowser 开关/编辑/代理应用 | NOT VERIFIED | 需要指定不影响现有运营数据的测试窗口和可达目标网络代理；本轮未擅自改动存量窗口 |
+| 真实目标网络 | NOT VERIFIED | 没有授权测试代理目标；Cloud 检测逻辑通过单测，不做 fixture 冒充真实验收 |
+| 代码提交 | READY FOR REVIEW | Cloud `eefc61d`；Agent `46775c7`；Desktop `815468d`；三个工作树 clean |
+| 发布 / 合并到远端 | NOT EXECUTED | 本地提交与审核留待用户早上 review；未推送或发布 |

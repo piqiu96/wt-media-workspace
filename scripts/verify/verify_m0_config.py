@@ -29,7 +29,6 @@ EXPECTED_CONTRACTS = {
     "cloud_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-api"),
     "cloud_agent_api": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-agent-api"),
     "business_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/business-schemas"),
-    "task_schemas": ("wt-media-cloud", "../wt-media-cloud/contracts/task-schemas"),
     "business_enums": ("wt-media-cloud", "../wt-media-cloud/contracts/business-enums"),
     "cloud_error_codes": ("wt-media-cloud", "../wt-media-cloud/contracts/cloud-error-codes"),
     "local_agent_api": ("wt-media-agent", "../wt-media-agent/contracts/local-agent-api"),
@@ -84,7 +83,6 @@ def validate_contract_map(allow_missing_repos: bool) -> list[str]:
 
     for required in (
         "schema_version: 1",
-        "contract_state: m2_sensitive_profile_guard",
         "formal_definitions_active: true",
     ):
         if required not in text:
@@ -178,7 +176,6 @@ def validate_release_matrix() -> list[str]:
         "contract_state: m2_media_accounts",
         "contract_state: m2_bitbrowser_profile_binding",
         "contract_state: m2_agent_runtime_binding",
-        "contract_state: m2_sensitive_profile_guard",
         "formal_contract_versions_active: false",
         "formal_contract_versions_active: true",
         'cloud_agent_api: "v1@2026.07.14.1"',

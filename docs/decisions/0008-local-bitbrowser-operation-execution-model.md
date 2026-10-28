@@ -1,6 +1,6 @@
 # ADR-0008: Local BitBrowser Operation Execution Model
 
-- Status: Accepted；浏览器窗口与代理的数据关系及 Cloud/Desktop 执行边界由 [ADR-0027](0027-operating-resource-data-and-local-execution.md) 收敛，账号/Cookie 的同步执行原则继续有效
+- Status: Superseded by [ADR-0027](0027-operating-resource-data-and-local-execution.md)
 - Date: 2026-07-22
 - Scope: M2 Browser Profile、代理、Cookie、账号检查和上号
 

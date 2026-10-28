@@ -8,7 +8,7 @@ Current state is mixed. The machine-readable map is authoritative for exact revi
 
 - Cloud API, Cloud-Agent API, business schemas, business enums and Cloud error codes are active formal definitions.
 - Local Agent API, local event schemas, local status enums and local error codes are active formal definitions.
-- `task_schemas` is active. Revision `2026.10.23.1` defines the universal task model, status state machine, task types, execution defaults and error codes.
+- `task_schemas` retired together with the generic Cloud task table and `/cloud-agent/tasks/*` endpoints. File transfer keeps its own contract.
 
 Historical M0/M1 release entries remain valid evidence for their recorded scaffold/noop scope. They do not imply that the revised M0/M1 end-to-end milestone gates are complete.
 
@@ -17,7 +17,6 @@ Historical M0/M1 release entries remain valid evidence for their recorded scaffo
 - `../wt-media-cloud/contracts/cloud-api`
 - `../wt-media-cloud/contracts/cloud-agent-api`
 - `../wt-media-cloud/contracts/business-schemas`
-- `../wt-media-cloud/contracts/task-schemas`
 - `../wt-media-cloud/contracts/business-enums`
 - `../wt-media-cloud/contracts/cloud-error-codes`
 
@@ -29,35 +28,19 @@ set; empty means intentionally unclassified. No single-category compatibility
 field remains. Cloud Web is the direct consumer; Agent has no media-account
 category relation contract and Desktop consumes the Cloud Web build output only.
 
-### Proxy ledger extraction and synchronous mutation revision (M2-C)
+### Operating-resource proxy execution revision (ADR-0027)
 
-The Agent-owned Local Agent API revision `2026.09.05.1` provides compatible
-`POST /api/v1/proxy-mutation` assign and `unbind` write/read-back operations;
-credentials are write-only and never returned. Cloud owns the corresponding
-compatible `POST /api/v1/proxies/{proxy_id}/assign`, `/unbind`, and
-`/local-scan/{preview,confirm}` projections. The original revision records or
-clears `browser_profiles.proxy_id` after an Agent response confirms the matching
-proxy or `noproxy` read-back, or after a trusted Desktop Profile scan is
-explicitly accepted. ADR-0027 updates the assignment and execution rule as described below.
-Unknown scanned proxies become paused, unchecked records;
-ambiguous tuple matches are surfaced as conflicts and are never guessed.
-Cloud Web and Desktop consume the refreshed Web build output.
-
-CHG-20261028-099 / ADR-0027 adds the Agent-owned `POST /api/v1/proxy-assignment`
-capability (revision `2026.10.29.1`). Its explicit acknowledgement is not a
-read-back or connectivity result. Cloud may confirm an assignment only after
-the new capability acknowledges the requested Profile; an unavailable old
-Agent cannot be assumed to support it. The prior `proxy-mutation` endpoint
-retains its existing read-back contract for mixed-version compatibility and
-the unbind flow. Unknown outcomes must not be retried automatically.
-
-Revision `2026.09.06.1` adds a compatible Agent-owned `POST /api/v1/proxy-extract` operation. Cloud owns the compatible proxy-address parse, dynamic extraction preview, dynamic refresh, and bound-window detail projections. The Agent fetches a manually requested provider URL and returns only the first supported plain-text proxy address to Cloud; it never writes BitBrowser. Cloud stores the source URL as a secret, exposes only a configured/masked indication, clears stale check facts when the extracted connection changes, and leaves applying an updated proxy to the browser-window flow. That flow's current acknowledgement and pending rule is ADR-0027.
+The Agent-owned Local Agent API revision `2026.10.29.2` exposes synchronous
+`POST /api/v1/proxy-extract` and `POST /api/v1/proxy-mutation`; mutation returns
+secret-free read-back for assign/unbind. `proxy-check` is retired because proxy
+health is checked by Cloud against the saved connection. Agent credentials remain
+write-only and never appear in responses.
 
 ### Session-only auth and Agent Token revision (CHG-20261023-101)
 
-Cloud owns revision `2026.10.23.1` across `cloud-api`, `cloud-agent-api`, `business-schemas`, `business-enums`, `task-schemas` and `cloud-error-codes`. `user_sessions` becomes the only authentication fact: Web allows multiple sessions, Desktop allows one valid session per user, and a second Desktop login returns `DESKTOP_LOGIN_CONFLICT` until the caller confirms with the current session id. Desktop exchanges a valid desktop session for a signed, stateless Agent Token at `POST /api/v1/local-agent/agent-token`; its `exp` equals the session `expires_at`, strict mode gates new work and report-safe mode closes already-claimed tasks. Device, node, presence and binding-ticket contracts are retired. Task claim/report requires the Agent Token plus `attempt_id`, and `task-recovery` settles silent `running` tasks as `EXECUTION_INTERRUPTED` or `RESULT_UNKNOWN` by external-side-effect flag.
+Cloud owns the current revisions across `cloud-api`, `cloud-agent-api`, `business-schemas`, `business-enums` and `cloud-error-codes`. `user_sessions` becomes the only authentication fact: Web allows multiple sessions, Desktop allows one valid session per user, and a second Desktop login returns `DESKTOP_LOGIN_CONFLICT` until the caller confirms with the current session id. Desktop exchanges a valid desktop session for a signed, stateless Agent Token at `POST /api/v1/local-agent/agent-token`; its `exp` equals the session `expires_at`, strict mode gates new work and report-safe mode closes already-claimed tasks. Device, node, presence and binding-ticket contracts are retired. Generic task claim/report and recovery are retired; the surviving Cloud-Agent surface is compatibility, Agent Token, and dedicated file-transfer routes.
 
-The Agent-owned `local-agent-api` and `local-error-codes` revisions are `2026.10.23.1`: the local Agent stores the Agent Token in memory only, accepts BitBrowser binding from Agent-read facts, and declares the profile CRUD, cookie-read, sensitive preflight/finish and agent-token routes it implements. Desktop `contracts.lock.json` pins `cloud_agent_api`, `task_schemas` and `local_agent_api` at this revision.
+The Agent-owned `local-agent-api` and `local-error-codes` are active formal definitions. The local Agent stores the Agent Token in memory only and accepts BitBrowser binding from Agent-read facts. Generic sensitive preflight/permit and task claim/report interfaces are retired. Desktop `contracts.lock.json` pins the surviving Cloud-Agent and Local Agent contracts.
 
 ### Platform identifier revision (CHG-20261015-098)
 
@@ -66,7 +49,7 @@ Cloud owns `2026.10.27.3` of `cloud-api` (media-accounts), `2026.10.27.2` of
 (media-account): the `platform` enum becomes `douyin | bilibili | baidu`, retiring
 `baijiahao`. The Agent-owned `local-agent-api` revision `2026.10.27.1` changes
 `AccountCheckRequest.platform` the same way, and Desktop `contracts.lock.json`
-pins `local_agent_api v1@2026.10.27.1`. Display text is a client concern and
+pins the current `local_agent_api` revision. Display text is a client concern and
 lives in `web/src/shared/utils/platforms.js`, so no contract carries Chinese
 platform names. The enum change is breaking in both directions: Cloud and Agent
 must ship together, and rollback needs a reverse data migration first. See
@@ -87,7 +70,7 @@ Cloud owns `2026.10.27.5` of `cloud-api` and `2026.10.27.4` of
 `business-schemas` (identity). `OperationTeam` gains `user_count`, read from the
 users table in the same statement as the row, so a team's headcount does not
 need the user list (that endpoint is admin-only and would 403 for the read-only
-senior view). The former categorys endpoint is replaced by `GET /api/v1/categories` with a `scope` parameter:
+senior view). The former games endpoint is replaced by `/api/v1/categories` with a `scope` parameter:
 `all` is the widened dictionary (category as a filter, not an access boundary) and
 `management` is the category-management page, available to senior operators and
 admins with every category status but without `reference_summary` — the reference
@@ -103,33 +86,23 @@ falling back to `users.username`; empty when the user row is missing). It is a
 read-only projection: no write path accepts it, and `user_id` remains the
 identity fact. The revision also declares the three local-operation entry points
 that were implemented but absent from the contract — `check`,
-`cookies/read` and `cookies/read-sync` — with one shared role rule: operators
+`cookies/read-sync` and its result callback — with one shared role rule: operators
 may act on the accounts they own, senior operators only the accounts they
 created (`user_id` equals the caller), and admins cannot start local work at
 all. Ownership is enforced server-side; the page's disabled buttons are a
 courtesy, not the boundary.
 
-### Proxy team scope and window-side write-back (CHG-20261028-099)
+### Operating-resource contract (CHG-20261028-099)
 
-Cloud owns `2026.10.28.1` of `cloud-api`. Proxy resources now carry a required
-`team_id`; operators and senior operators read and write their own team, admins
-read every team and must name the target team when creating or importing.
-`proxies.openapi.yaml` declares the full lifecycle that Web already calls
-(list, detail, create, update, status, delete, quota, check, import preview and
-import) plus `POST /api/v1/proxies/profile-unbind`, batch assignment and
-release. Health checks run inside Cloud against the saved connection and return
-`ok` / `conn_failed` / `auth_failed` / `timeout` / `invalid_params`; a result
-arriving after the connection changed is discarded. Local-scan confirmation now
-takes `selected_profile_ids` for unknown addresses and reports
-`ownership_conflict` for windows registered to another operator, which the scan
-never modifies.
-
-`browser-profiles.openapi.yaml` records the role/team visibility of the window
-list, the `adopt_bit_profile_ids` confirmation body, the Cloud-remark and
-business-status update scope, the disabled-and-unreferenced delete rule, and the
-window fields the page reads (`team_id`, `cloud_remark`, `business_status`,
-`ownership_conflict`). BitBrowser writes remain Desktop/Agent-only; Cloud Web
-declares the create/open/close stubs as Desktop-only refusals.
+Cloud owns revision `2026.10.29.2` of the affected API schemas. `proxies` is the
+team-scoped proxy ledger with boolean `enabled`, `max_profiles`, Cloud-side health
+checks, and current formal/reserved occupancy. `browser-profiles` records the
+single user snapshot, `bit_` mirror fields, boolean enablement, Cloud remark, and
+two proxy-operation endpoints: start reservation and settle the Desktop result.
+`apply` and `unbind` require the result call; `release` only clears the formal
+Cloud relation. Uncertain Desktop results are reported as failures and clear the
+reservation for direct retry. Legacy assign/batch/unbind/release/local-scan Cloud
+endpoints and Cloud Web create/open/close stubs are retired.
 
 ## Agent-Owned Contracts
 

@@ -1,7 +1,7 @@
 ---
 id: CHG-20261028-099
 parent: none
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: ["CHG-20261029-107"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H

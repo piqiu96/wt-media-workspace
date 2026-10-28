@@ -4,7 +4,7 @@
 - Date: 2026-10-29
 - Scope: 社媒账号、浏览器窗口、代理资源及其 Cloud / Desktop / Local Agent 执行边界
 - Related: ADR-0008、ADR-0022、ADR-0023
-- Supersedes: ADR-0025、ADR-0026
+- Supersedes: ADR-0004、ADR-0008、ADR-0025、ADR-0026
 
 ## Context
 
@@ -23,11 +23,11 @@
 7. **代理异常结果统一按失败处理。** 只有明确成功才建立正式关系。明确拒绝、超时、断开、Agent/Desktop 中断或响应损坏都视为本次失败，清除临时额度预留并允许用户直接重试，不要求读取配置后再人工确认。代理连接检测与比特写入结果是不同事实。
 8. **同步扫描只保留当前快照。** 每个用户最多一条 `browser_profile_syncs` 记录，保存本次窗口实际配置快照；确认、拒绝或过期后删除。不保存扫描历史，不建立候选表。
 9. **Cookie 读取走同步链路。** Cookie 读取由 Desktop 调用 Local Agent 后一次性回报 Cloud；删除旧异步 Cookie 任务入口和 Cloud 通用 `tasks` 表，不用通用任务表承载短操作。Agent 本地 `task_checkpoints/offline_results` 是否退役，以文件传输等既有执行链路是否仍依赖为准。
-10. **敏感许可与审计不是本域状态机。** 账号检查/Cookie 的 Profile 互斥许可保持原职责；浏览器窗口和代理不新增敏感任务表。现有 `audit_logs` 不为每次代理操作强制扩展。
+10. **敏感许可与审计不是本域状态机。** 账号检查/Cookie 使用短生命周期 operation id 和现有账号/窗口归属校验，不建立 sensitive task/permit 表；浏览器窗口和代理同样不新增敏感任务表。现有 `audit_logs` 不为每次代理操作强制扩展。
 
 ## Consequences
 
 - Cloud 领域表收敛为社媒账号四表、`browser_profiles`、`proxies`、`browser_profile_syncs`。
 - Desktop 必须增加代理 apply/unbind 桥；`local_agent_profile_restore` 不得再顺带写代理字段。
 - 写入异常按失败收口，用户可以立即重试；系统不提供“读取实际配置后人工确认”的业务状态。
-- 不保留专用检测历史、操作历史和通用审计，因此无法从这些表重建历史过程；需要追溯时以现有日志和 Git 记录为限。
+- 不保留专用检测历史、操作历史、通用审计或敏感许可表，因此无法从这些表重建历史过程；需要追溯时以现有日志和 Git 记录为限。

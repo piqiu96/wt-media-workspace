@@ -2,32 +2,29 @@
 
 ## 状态
 
-- CHG099 状态以 [change.md](change.md) 为准：`IMPLEMENTING`。
-- 范围已扩展为社媒账号、浏览器窗口、代理三个功能块。
-- 当前正式依赖：[CHG-20261029-107](../../planned/CHG-20261029-107/change.md)。CHG107 合入前，不继续修改社媒账号类目字段和依赖该字段的页面。
+- CHG099：`VERIFYING`。
+- CHG107 已完成并合入本地主线。
+- 代码、迁移、契约、Cloud/Agent/Desktop 自动化和 Web 页面读回已完成。
+- 真实 BitBrowser 写入与目标网络尚待用户在早上 review 后指定测试资源。
 
 ## 已完成
 
-- 已核对 Cloud 实际 MySQL 结构、行数和现有接口边界，报告写入 [plan.md](plan.md)。
-- 已确定 Cloud / Desktop / Local Agent 边界：Cloud 不直接执行运营电脑本机代理写入。
-- 已验证 Cloud 迁移与代码当前状态；既有实现只作为候选，不视为本轮完成。
+- Cloud 收敛为 7 张运营资源领域表：`media_accounts`、`media_account_categories`、`media_account_tags`、`media_account_groups`、`browser_profiles`、`proxies`、`browser_profile_syncs`。
+- 删除 `profile_sync_candidates`、`profile_sync_scans`、`proxy_configs`、`account_groups`、通用 `tasks` 与 sensitive 表。
+- 启停统一 `enabled`；比特字段统一 `bit_`；平台字段统一 `platform_`；检查字段统一 `last_check_`。
+- Cookie 只保留同步读取并回报链路；旧异步 `/cookies/read`、`/cloud-agent/tasks/*` 已退役。
+- 代理写链路改为 Cloud 预留 + Desktop/Agent 执行 + Cloud 结算；失败清预留，可直接重试。
+- 三块页面完成 Web 真实读回；Web 适配层已移除旧字段回译，统一使用 `enabled/local_state/protocol/max_profiles/platform_*`。
+- 最终自动化通过：Cloud `go test ./...`、Web 90 files / 813 tests、Agent 717 tests、Desktop 540 passed / 6 ignored，Cloud/Desktop 双 build 通过。
+- 最新提交：Cloud `eefc61d`、Agent `46775c7`、Desktop `815468d`；测试与构建结果见 [acceptance.md](evidence/acceptance.md)。
 
 ## 下一步
 
-1. 完成 CHG107：`operation_games -> categories`、`game_id -> category_id`；社媒账号允许零类目，内容/策略新增必选，不自动创建 `other`。
-2. 回到 CHG099，先做 Cloud 数据/接口收敛，再做 Desktop/Agent 桥和三块页面。
-3. 同步删除旧 Cookie 异步任务入口、Cloud Agent 通用任务接口和 `tasks` 表。
+1. 用户指定不影响现有运营数据的测试窗口与可达代理目标。
+2. 完成真实 BitBrowser 开/关、字段编辑、代理 apply/unbind/release 与目标网络读回。
+3. 将真实结果补入 acceptance；满足后再决定完成、推送和发布。
 
-## 阻塞与约束
+## 阻塞
 
-- 真实比特、目标网络、跨端组合和人工视觉验收仍未完成。
-- CHG099 的代理临时额度预留、统一 `enabled`、`bit_`/`platform_`/`last_check_` 命名是当前基线。异常结果按失败清除预留并允许直接重试。
-- 不执行新的存量代理清理迁移；不把 `profile_sync_candidates`、通用任务历史或敏感许可扩进本域。
-- Cookie 改为同步读取；不保留异步任务双路径。
-- 保留现有未跟踪社媒分析报告，不纳入提交。
-
-## 最近验证
-
-- 实际表行数：`media_accounts=7`、`browser_profiles=40`、`proxy_configs=0`、`profile_sync_scans=70`、`profile_sync_candidates=2711`。
-- 实际类目：`operation_games=4`，并已确认 7 个 `game_id` 依赖列及 `other` 历史引用。
-- 本轮为设计与文档收敛，不代表代码或真实业务验收通过。
+- 真实 BitBrowser 写入没有安全的测试窗口授权。
+- 代理目标网络没有可用测试代理。

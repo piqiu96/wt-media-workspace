@@ -4,11 +4,11 @@
 
 本次重构覆盖三个核心功能块：社媒账号、浏览器窗口、代理。目标不是给现有实现继续叠状态，而是收敛数据边界、命名、页面信息架构和本机执行链路。
 
-CHG099 依赖 [CHG-20261029-107](../../planned/CHG-20261029-107/change.md)（游戏目录改为扁平业务类目）。类目迁移先完成并合入，之后 CHG099 再修改社媒账号及运营资源页面。
+CHG099 依赖 [CHG-20261029-107](../../completed/CHG-20261029-107/change.md)（游戏目录改为扁平业务类目）。类目迁移先完成并合入，之后 CHG099 再修改社媒账号及运营资源页面。
 
 本文件是当前现状、目标态、文档清理和任务顺序的唯一执行报告；ADR 只保留长期取舍，OpenAPI / business schema 只保留机器契约。
 
-## 当前事实
+## 实施前事实
 
 以下来自 2026-10-29 本机 `wt_media_cloud` 实际结构：
 
@@ -30,7 +30,7 @@ CHG099 依赖 [CHG-20261029-107](../../planned/CHG-20261029-107/change.md)（游
 - 同步发现的代理关系确认没有重查配额；
 - 设备、代理、游戏命名形成多个中间态 ADR，当前文档重复且部分已失效。
 
-### 当前接口面
+### 实施前接口面
 
 社媒账号当前 11 个 Cloud 接口：
 
@@ -55,6 +55,10 @@ PATCH  /media-accounts/{account_id}/profile
 Local Agent 已有窗口扫描、创建、打开、关闭、更新、删除、代理提取、代理 mutation 和
 proxy assignment；Desktop 已有窗口桥，但没有代理写入桥。接口细节以当前 OpenAPI 为准，
 不在本报告复制全部 schema。
+
+## 实施结果
+
+截至 2026-10-29，目标 7 表模型、统一命名、单用户单快照、同步 Cookie、Cloud 代理预留/Desktop 执行/Cloud 结算均已落地。Web 适配层和三个页面已改为直接读取 `enabled/local_state/protocol/max_profiles/platform_*`，单窗口同步中遗留的代理变化死分支已删除。真实 MySQL live test 和临时空库全量迁移通过。真实 BitBrowser 写入与目标网络仍未执行，因此验收保持 VERIFYING；详情见 [acceptance.md](evidence/acceptance.md)。
 
 ## 目标数据模型
 
