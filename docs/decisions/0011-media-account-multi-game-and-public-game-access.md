@@ -2,7 +2,7 @@
 
 ## Status
 
-Superseded in part by Decision 0012
+Superseded by [ADR-0028](0028-flat-business-categories.md)
 
 ## Context
 
