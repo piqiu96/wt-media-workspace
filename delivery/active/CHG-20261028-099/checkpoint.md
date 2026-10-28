@@ -13,10 +13,11 @@
 - 删除 `profile_sync_candidates`、`profile_sync_scans`、`proxy_configs`、`account_groups`、通用 `tasks` 与 sensitive 表。
 - 启停统一 `enabled`；比特字段统一 `bit_`；平台字段统一 `platform_`；检查字段统一 `last_check_`。
 - Cookie 只保留同步读取并回报链路；旧异步 `/cookies/read`、`/cloud-agent/tasks/*` 已退役。
-- 代理写链路改为 Cloud 预留 + Desktop/Agent 执行 + Cloud 结算；失败清预留，可直接重试。
+- 代理写链路改为 Cloud 预留 + Desktop/Agent 执行 + Cloud 结算；失败清预留，可直接重试。动态提取归属保持在 CHG099 明确排除项内。
+- Agent 通用 task claim/report、preflight/permit、proxy-check 与浏览器 executors 已退役；只剩独立 file-transfer 租约循环。Desktop 账号检查/Cookie 改为 operation id 直达。
 - 三块页面完成 Web 真实读回；Web 适配层已移除旧字段回译，统一使用 `enabled/local_state/protocol/max_profiles/platform_*`。
-- 最终自动化通过：Cloud `go test ./...`、Web 90 files / 813 tests、Agent 717 tests、Desktop 540 passed / 6 ignored，Cloud/Desktop 双 build 通过。
-- 最新提交：Cloud `eefc61d`、Agent `46775c7`、Desktop `815468d`；测试与构建结果见 [acceptance.md](evidence/acceptance.md)。
+- 最终自动化通过：Cloud `go test ./...`、Web 90 files / 813 tests、Agent 652 tests、Desktop 539 passed / 6 ignored，Cloud/Desktop 双 build 通过。
+- 最新提交：Cloud `c5acb5b`、Agent `d679a3b`、Desktop `772b5bd`；测试与构建结果见 [acceptance.md](evidence/acceptance.md)。
 
 ## 下一步
 

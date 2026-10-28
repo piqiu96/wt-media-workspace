@@ -32,9 +32,11 @@ category relation contract and Desktop consumes the Cloud Web build output only.
 
 The Agent-owned Local Agent API revision `2026.10.29.2` exposes synchronous
 `POST /api/v1/proxy-extract` and `POST /api/v1/proxy-mutation`; mutation returns
-secret-free read-back for assign/unbind. `proxy-check` is retired because proxy
-health is checked by Cloud against the saved connection. Agent credentials remain
-write-only and never appear in responses.
+secret-free read-back for assign/unbind. Dynamic extraction ownership is unchanged
+in CHG099; its existing Cloud-to-Agent call remains the explicit exception. Proxy
+writes go through Desktop, and `proxy-check` is retired because proxy health is
+checked by Cloud against the saved connection. Agent credentials remain write-only
+and never appear in responses.
 
 ### Session-only auth and Agent Token revision (CHG-20261023-101)
 

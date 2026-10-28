@@ -58,7 +58,7 @@ proxy assignment；Desktop 已有窗口桥，但没有代理写入桥。接口�
 
 ## 实施结果
 
-截至 2026-10-29，目标 7 表模型、统一命名、单用户单快照、同步 Cookie、Cloud 代理预留/Desktop 执行/Cloud 结算均已落地。Web 适配层和三个页面已改为直接读取 `enabled/local_state/protocol/max_profiles/platform_*`，单窗口同步中遗留的代理变化死分支已删除。真实 MySQL live test 和临时空库全量迁移通过。真实 BitBrowser 写入与目标网络仍未执行，因此验收保持 VERIFYING；详情见 [acceptance.md](evidence/acceptance.md)。
+截至 2026-10-29，目标 7 表模型、统一命名、单用户单快照、同步 Cookie、Cloud 代理预留/Desktop 执行/Cloud 结算均已落地。Web 适配层和三个页面已改为直接读取 `enabled/local_state/protocol/max_profiles/platform_*`，单窗口同步中遗留的代理变化死分支已删除。Agent 通用任务执行器、preflight/permit、proxy-check 与浏览器 executors 已删除，只保留独立 file-transfer 租约循环；Desktop 账号检查/Cookie 改用 operation id 直达同步接口。动态提取归属按“明确排除”保持原样。真实 MySQL live test 和临时空库全量迁移通过。真实 BitBrowser 写入与目标网络仍未执行，因此验收保持 VERIFYING；详情见 [acceptance.md](evidence/acceptance.md)。
 
 ## 目标数据模型
 

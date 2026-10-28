@@ -14,9 +14,9 @@
 | Web 页面读回 | PASS（浏览器） | 社媒账号、浏览器窗口、代理管理三页在临时 Cloud 环境真实读回 |
 | Cloud Go | PASS | `go test ./...` |
 | Web | PASS | 90 files / 813 tests；Cloud 与 Desktop 双 build 通过；页面直接使用 `enabled/local_state/protocol/max_profiles/platform_*` |
-| Agent | PASS | 717 tests；Local Agent API 定义已发布为 `2026.10.29.2` |
-| Desktop | PASS | 540 passed / 6 ignored；发布脚本测试通过 |
+| Agent | PASS | 652 tests；通用任务执行器、preflight/permit 与 proxy-check 已删除，只保留 file-transfer 循环；Local Agent API 为 `2026.10.29.2` |
+| Desktop | PASS | 539 passed / 6 ignored；账号检查/Cookie 使用 `operation_id`，敏感 preflight 已删除 |
 | 真实 BitBrowser 开关/编辑/代理应用 | NOT VERIFIED | 需要指定不影响现有运营数据的测试窗口和可达目标网络代理；本轮未擅自改动存量窗口 |
 | 真实目标网络 | NOT VERIFIED | 没有授权测试代理目标；Cloud 检测逻辑通过单测，不做 fixture 冒充真实验收 |
-| 代码提交 | READY FOR REVIEW | Cloud `eefc61d`；Agent `46775c7`；Desktop `815468d`；三个工作树 clean |
+| 代码提交 | READY FOR REVIEW | Cloud `c5acb5b`；Agent `d679a3b`；Desktop `772b5bd`；三个工作树 clean |
 | 发布 / 合并到远端 | NOT EXECUTED | 本地提交与审核留待用户早上 review；未推送或发布 |
