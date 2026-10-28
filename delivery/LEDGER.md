@@ -6,5 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-
-当前无进行中的 CHG。

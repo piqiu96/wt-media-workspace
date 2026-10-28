@@ -21,14 +21,13 @@ Historical M0/M1 release entries remain valid evidence for their recorded scaffo
 - `../wt-media-cloud/contracts/business-enums`
 - `../wt-media-cloud/contracts/cloud-error-codes`
 
-### Media-account game-set revision (M2-B)
+### Media-account category-set revision (M2-B, superseded by ADR-0028)
 
-Cloud owns the additive media-account API revision. `game_ids` is the
-canonical request, response and query field for the full account game set;
-`game_id` remains a single-value compatibility input/projection only. A request
-containing both fields must use the same normalized singleton value or Cloud
-rejects it. Cloud Web is the direct consumer; Agent has no media-account game
-relation contract and Desktop consumes the Cloud Web build output only.
+Cloud owns the media-account category API revision. `category_ids` is the
+canonical request, response and query field for the complete account category
+set; empty means intentionally unclassified. No single-category compatibility
+field remains. Cloud Web is the direct consumer; Agent has no media-account
+category relation contract and Desktop consumes the Cloud Web build output only.
 
 ### Proxy ledger extraction and synchronous mutation revision (M2-C)
 
@@ -79,12 +78,12 @@ Cloud owns `2026.10.27.5` of `cloud-api` and `2026.10.27.4` of
 `business-schemas` (identity). `OperationTeam` gains `user_count`, read from the
 users table in the same statement as the row, so a team's headcount does not
 need the user list (that endpoint is admin-only and would 403 for the read-only
-senior view). `GET /api/v1/games` is now declared with a `scope` parameter:
-`all` is the widened dictionary (game as a filter, not an access boundary) and
-`management` is the game-management page, available to senior operators and
-admins with every game status but without `reference_summary` — the reference
+senior view). The former categorys endpoint is replaced by `GET /api/v1/categories` with a `scope` parameter:
+`all` is the widened dictionary (category as a filter, not an access boundary) and
+`management` is the category-management page, available to senior operators and
+admins with every category status but without `reference_summary` — the reference
 detail those counts open is admin-only. Operators get 403 for `management`.
-The game write endpoints are still implemented without contract declaration;
+The category write endpoints are still implemented without contract declaration;
 that pre-existing gap is not widened here.
 
 ### Account owner projection and local-operation gates (CHG-20261015-098 T-24)

@@ -26,11 +26,12 @@ contracts:
     # （CHG-20261015-098 第三轮平台标识统一，见 ADR-0024）。
     # 2026.10.27.4：content-production 的素材读取说明补上创建人
     # （created_by / created_by_name）。
-    # 2026.10.27.5：identity 的 OperationTeam 增加 user_count，并补上
-    # GET /api/v1/games（scope=all|management；高级运营只读、无关联摘要）。
+    # 2026.10.27.5：identity 的 OperationTeam 增加 user_count。
     # 2026.10.27.6：MediaAccount 增加只读 user_name（使用人），并声明
     # check / cookies/read / cookies/read-sync 三个本地操作入口的角色与归属门禁。
-    contract_revision: "2026.10.27.6"
+    # 2026.10.29.1：游戏目录收敛为扁平类目；category_id/category_ids 使用数字 ID，
+    # identity/media-accounts/content-production 使用 type + enabled。
+    contract_revision: "2026.10.29.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -65,7 +66,8 @@ contracts:
     # 2026.10.27.3：Material 增加素材操作人 created_by（必填）与
     # created_by_name（解析不到时不出现），三种角色都读。
     # 2026.10.27.4：OperationTeam 增加 user_count（随列表读取的成员数）。
-    schema_revision: "2026.10.27.4"
+    # 2026.10.29.1：Category 使用自增数字 ID、固定 type、enabled；MediaAccount 使用 category_ids。
+    schema_revision: "2026.10.29.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
