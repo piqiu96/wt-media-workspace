@@ -19,5 +19,5 @@
 | Desktop | PASS | 539 passed / 6 ignored；账号检查/Cookie 使用 `operation_id`，敏感 preflight 已删除 |
 | 真实 BitBrowser 开关/编辑/代理应用 | NOT VERIFIED | 需要指定不影响现有运营数据的测试窗口和可达目标网络代理；本轮未擅自改动存量窗口 |
 | 真实目标网络 | NOT VERIFIED | 没有授权测试代理目标；Cloud 检测逻辑通过单测，不做 fixture 冒充真实验收 |
-| 代码提交 | READY FOR REVIEW | Cloud `c5acb5b`；Agent `d679a3b`；Desktop `772b5bd`；三个工作树 clean |
+| 代码提交 | READY FOR REVIEW | Cloud `c5acb5b`；Agent `45d778c`；Desktop `772b5bd`；三个工作树 clean |
 | 发布 / 合并到远端 | NOT EXECUTED | 本地提交与审核留待用户早上 review；未推送或发布 |

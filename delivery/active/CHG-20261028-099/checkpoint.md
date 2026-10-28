@@ -17,7 +17,7 @@
 - Agent 通用 task claim/report、preflight/permit、proxy-check 与浏览器 executors 已退役；只剩独立 file-transfer 租约循环。Desktop 账号检查/Cookie 改为 operation id 直达。
 - 三块页面完成 Web 真实读回；Web 适配层已移除旧字段回译，统一使用 `enabled/local_state/protocol/max_profiles/platform_*`。
 - 最终自动化通过：Workspace 175 tests、Cloud `go test ./...`、Web 90 files / 813 tests、Agent 652 tests、Desktop 539 passed / 6 ignored，Cloud/Desktop 双 build 通过。
-- 最新提交：Cloud `c5acb5b`、Agent `d679a3b`、Desktop `772b5bd`；测试与构建结果见 [acceptance.md](evidence/acceptance.md)。
+- 最新提交：Cloud `c5acb5b`、Agent `45d778c`、Desktop `772b5bd`；测试与构建结果见 [acceptance.md](evidence/acceptance.md)。
 
 ## 下一步
 
