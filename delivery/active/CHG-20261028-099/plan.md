@@ -151,7 +151,7 @@ Cloud / Desktop 共用 `wt-media-cloud/web`；当前 Cloud 与 Desktop 工作区
 
 ### 计划修改
 
-- [ ] Task 14：迁移HTML与必需本地资源；加正式规范适配层和common引用；验证全部场景渲染、短表单容器、无图标行操作和旧入口。
+- [x] Task 14：迁移HTML与必需本地资源；加正式规范适配层和common引用；验证全部场景渲染、短表单容器、无图标行操作和旧入口。
 - [ ] Task 15：真实ResourceRowActions、列宽函数与两页操作次序/主要动作，保留loading/权限/回调；必要测试与Cloud/Desktop构建。
 - [ ] Task 16：公共表单、详情自适应、浮层、语义色/密度与两页交互视觉回归，记录消费者/兼容与人工评审。
 

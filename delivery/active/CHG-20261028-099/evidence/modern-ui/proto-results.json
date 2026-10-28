@@ -1,0 +1,380 @@
+{
+  "results": [
+    {
+      "id": "w-list",
+      "content": 1270,
+      "scaled": "none"
+    },
+    {
+      "id": "w-web",
+      "content": 1127,
+      "scaled": "none"
+    },
+    {
+      "id": "w-detail-self",
+      "content": 1560,
+      "scaled": "none"
+    },
+    {
+      "id": "w-detail-managed",
+      "content": 1572,
+      "scaled": "none"
+    },
+    {
+      "id": "w-detail-mismatch",
+      "content": 1644,
+      "scaled": "none"
+    },
+    {
+      "id": "w-create",
+      "content": 1337,
+      "scaled": "none"
+    },
+    {
+      "id": "w-create-error",
+      "content": 296,
+      "scaled": "none"
+    },
+    {
+      "id": "w-create-success",
+      "content": 1327,
+      "scaled": "none"
+    },
+    {
+      "id": "w-edit",
+      "content": 1326,
+      "scaled": "none"
+    },
+    {
+      "id": "w-note",
+      "content": 1332,
+      "scaled": "none"
+    },
+    {
+      "id": "w-edit-failed",
+      "content": 1505,
+      "scaled": "none"
+    },
+    {
+      "id": "w-edit-partial",
+      "content": 1437,
+      "scaled": "none"
+    },
+    {
+      "id": "w-mode",
+      "content": 1451,
+      "scaled": "none"
+    },
+    {
+      "id": "w-bind",
+      "content": 1697,
+      "scaled": "none"
+    },
+    {
+      "id": "w-replace",
+      "content": 1696,
+      "scaled": "none"
+    },
+    {
+      "id": "w-replace-confirm",
+      "content": 1410,
+      "scaled": "none"
+    },
+    {
+      "id": "w-mismatch",
+      "content": 1525,
+      "scaled": "none"
+    },
+    {
+      "id": "w-resync",
+      "content": 1394,
+      "scaled": "none"
+    },
+    {
+      "id": "w-self",
+      "content": 1406,
+      "scaled": "none"
+    },
+    {
+      "id": "w-self-success",
+      "content": 1364,
+      "scaled": "none"
+    },
+    {
+      "id": "w-unbind",
+      "content": 1400,
+      "scaled": "none"
+    },
+    {
+      "id": "w-bind-empty",
+      "content": 1729,
+      "scaled": "none"
+    },
+    {
+      "id": "w-sync",
+      "content": 1422,
+      "scaled": "none"
+    },
+    {
+      "id": "w-sync-issues",
+      "content": 1444,
+      "scaled": "none"
+    },
+    {
+      "id": "w-identity",
+      "content": 1461,
+      "scaled": "none"
+    },
+    {
+      "id": "w-missing",
+      "content": 1510,
+      "scaled": "none"
+    },
+    {
+      "id": "w-uncertain",
+      "content": 1507,
+      "scaled": "none"
+    },
+    {
+      "id": "w-offline",
+      "content": 1310,
+      "scaled": "none"
+    },
+    {
+      "id": "w-batch",
+      "content": 1302,
+      "scaled": "none"
+    },
+    {
+      "id": "w-batch-bind",
+      "content": 1481,
+      "scaled": "none"
+    },
+    {
+      "id": "w-batch-result",
+      "content": 1448,
+      "scaled": "none"
+    },
+    {
+      "id": "w-disable",
+      "content": 1341,
+      "scaled": "none"
+    },
+    {
+      "id": "p-list",
+      "content": 870,
+      "scaled": "none"
+    },
+    {
+      "id": "p-web",
+      "content": 891,
+      "scaled": "none"
+    },
+    {
+      "id": "p-detail",
+      "content": 1198,
+      "scaled": "none"
+    },
+    {
+      "id": "p-detail-api",
+      "content": 1210,
+      "scaled": "none"
+    },
+    {
+      "id": "p-create",
+      "content": 1039,
+      "scaled": "none"
+    },
+    {
+      "id": "p-create-api",
+      "content": 1001,
+      "scaled": "none"
+    },
+    {
+      "id": "p-extract",
+      "content": 1083,
+      "scaled": "none"
+    },
+    {
+      "id": "p-edit",
+      "content": 932,
+      "scaled": "none"
+    },
+    {
+      "id": "p-edit-bound",
+      "content": 1097,
+      "scaled": "none"
+    },
+    {
+      "id": "p-quota",
+      "content": 940,
+      "scaled": "none"
+    },
+    {
+      "id": "p-quota-error",
+      "content": 957,
+      "scaled": "none"
+    },
+    {
+      "id": "p-import",
+      "content": 965,
+      "scaled": "none"
+    },
+    {
+      "id": "p-import-preview",
+      "content": 1127,
+      "scaled": "none"
+    },
+    {
+      "id": "p-import-result",
+      "content": 1162,
+      "scaled": "none"
+    },
+    {
+      "id": "p-checking",
+      "content": 1033,
+      "scaled": "none"
+    },
+    {
+      "id": "p-check-result",
+      "content": 984,
+      "scaled": "none"
+    },
+    {
+      "id": "p-batch-check",
+      "content": 1108,
+      "scaled": "none"
+    },
+    {
+      "id": "p-delete",
+      "content": 971,
+      "scaled": "none"
+    },
+    {
+      "id": "p-delete-blocked",
+      "content": 1057,
+      "scaled": "none"
+    },
+    {
+      "id": "p-paused",
+      "content": 975,
+      "scaled": "none"
+    },
+    {
+      "id": "p-expired",
+      "content": 1315,
+      "scaled": "none"
+    },
+    {
+      "id": "s-loading",
+      "content": 320,
+      "scaled": "none"
+    },
+    {
+      "id": "s-error",
+      "content": 221,
+      "scaled": "none"
+    },
+    {
+      "id": "s-permission",
+      "content": 159,
+      "scaled": "none"
+    },
+    {
+      "id": "s-buttons",
+      "content": 487,
+      "scaled": "none"
+    },
+    {
+      "id": "s-status",
+      "content": 477,
+      "scaled": "none"
+    },
+    {
+      "id": "w-senior",
+      "content": 1298,
+      "scaled": "none"
+    },
+    {
+      "id": "w-admin",
+      "content": 1178,
+      "scaled": "none"
+    },
+    {
+      "id": "w-detail-senior",
+      "content": 1600,
+      "scaled": "none"
+    },
+    {
+      "id": "w-detail-admin",
+      "content": 1471,
+      "scaled": "none"
+    },
+    {
+      "id": "w-accounts",
+      "content": 1377,
+      "scaled": "none"
+    },
+    {
+      "id": "p-senior",
+      "content": 891,
+      "scaled": "none"
+    },
+    {
+      "id": "p-admin",
+      "content": 989,
+      "scaled": "none"
+    },
+    {
+      "id": "p-detail-senior",
+      "content": 1219,
+      "scaled": "none"
+    },
+    {
+      "id": "s-roles",
+      "content": 300,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-progress",
+      "content": 1455,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-partial",
+      "content": 1421,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-interrupted",
+      "content": 1464,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-uncertain",
+      "content": 1423,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-retry",
+      "content": 1373,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-import-progress",
+      "content": 1205,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-failed",
+      "content": 1423,
+      "scaled": "none"
+    },
+    {
+      "id": "flow-retry-result",
+      "content": 1391,
+      "scaled": "none"
+    }
+  ],
+  "errors": []
+}
