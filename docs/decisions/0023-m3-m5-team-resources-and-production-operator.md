@@ -1,6 +1,6 @@
 # ADR-0023：M3–M5 团队公共资源与成片负责人边界
 
-- Status: Accepted
+- Status: Accepted；游戏术语、字段和标识由 [ADR-0028](0028-flat-business-categories.md) 收敛为扁平类目，团队范围与负责人边界不变
 - Date: 2026-10-26
 - Scope: M3 内容池／挖掘策略／挖掘任务，M4–M5 素材与内容生产
 - Supersedes: [ADR-0014](0014-m3-team-content-scope.md) 中“同团队运营均可修改、执行挖掘策略”的角色结论；其团队业务隔离、游戏归属与筛选、来源唯一键继续有效。
