@@ -172,7 +172,7 @@ Agent 只执行本机和平台能力；Cloud browser_profile_id 是数据库 ID�
 | 阶段 | 运营可见结果 | 数据与接口重点 | 同阶段清理 |
 | --- | --- | --- | --- |
 | [CHG-108](../../../delivery/completed/CHG-20261030-108/change.md) 日常维护与检查 | 按 V7 新增/编辑、列表与详情；人工登录后检查并同步；同 UID 更新、异 UID 对照 | 账号表补当前检查结果及编号；资料接口收窄，绑定/检查链路明确，无 Cookie 和分类前置 | 旧手填身份、账号组、标签外部接口、独立开户入口及专用实现 |
-| [CHG-109](../../../delivery/active/CHG-20261030-109/change.md) 单账号 Cookie | 查看原始/当前 CK；新接入或更新并检查；失败和待确认可处理 | 账号 before_cookie/cookie_update、窗口当前操作占用；Cloud 起始/保留/结算，Agent prepare/apply/inspect | 旧 read-sync/读取客户端及只服务旧链路的实现；保留原始/当前 Cookie 字段 |
+| [CHG-109](../../../delivery/completed/CHG-20261030-109/change.md) 单账号 Cookie | 查看原始/当前 CK；新接入或更新并检查；失败和待确认可处理 | 账号 before_cookie/cookie_update、窗口当前操作占用；Cloud 起始/保留/结算，Agent prepare/apply/inspect | 旧 read-sync/读取客户端及只服务旧链路的实现；保留原始/当前 Cookie 字段 |
 | [CHG-110](../../../delivery/planned/CHG-20261030-110/change.md) 批量接入 | 输入预览、逐项接入、七计数、人工处理与关闭重进 | 仅新增批次表；content_json 顶层批次信息+items 数组；固定行号、请求去重、revision 和尝试次数 | 旧批量残余、模拟成功和无消费者代码；补齐最终原型入口 |
 
 108/109 交付期间后续能力如尚不可用，应明确其状态，不以演示成功或旧开户页面代替。全部完成后呈现 V7 的完整操作闭环；不引入旧模块兼容、接码、审计中心或通用任务范围。

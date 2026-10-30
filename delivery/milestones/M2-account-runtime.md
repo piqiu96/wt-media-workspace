@@ -353,7 +353,7 @@ Desktop登录后扫描Profile
 
 ## M2-D 社媒账号重构
 
-状态 `IN_PROGRESS`，D1维护与检查已完成并合入四仓main；数据库、接口与[整体落地方案](../../docs/engineering/specs/social-accounts.md#7-整体落地方案)已确认，当前CHG-20261030-109实施D2，D3按依赖推进。用户 2026-10-30 批准按最终原型重构需求、设计、数据库、接口及废弃代码。不继承旧 D1～D6 和三种上号范围，不承担未上线模块兼容与业务历史迁移。正式规则见 PRD 第三章 §3.3，工程取舍见 ADR-0030，交互入口为 example/proto/social-accounts/index.html。原 M2 已完成验收结论保持不变，本扩展独立验收。
+状态 `IN_PROGRESS`，D1维护与检查、D2单账号Cookie已完成并合入四仓main；数据库、接口与[整体落地方案](../../docs/engineering/specs/social-accounts.md#7-整体落地方案)已确认，D3按依赖推进。用户 2026-10-30 批准按最终原型重构需求、设计、数据库、接口及废弃代码。不继承旧 D1～D6 和三种上号范围，不承担未上线模块兼容与业务历史迁移。正式规则见 PRD 第三章 §3.3，工程取舍见 ADR-0030，交互入口为 example/proto/social-accounts/index.html。原 M2 已完成验收结论保持不变，本扩展独立验收。
 
 ### M2-D1 maintenance
 
