@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-108
 parent: delivery/milestones/M2-account-runtime.md#m2-d1-maintenance
-status: IMPLEMENTING
+status: PLANNED
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
@@ -13,17 +13,19 @@ risk: H
 
 交付 M2-D1：最终账号维护页面及人工登录后真实平台识别，检查不写浏览器 Cookie。同步回写 PRD、ADR、工程设计并固定已批准原型。旧账号模块未使用，不建设兼容层；保留外部真实窗口与会话。
 
-当前差距：现有账号页不符合最终原型，未分类会阻止检查；检查没有持久化本次结果/编号校验，同 UID 名称不刷新，异 UID 存在被正常结果覆盖风险；旧 identify、账号组与开户入口仍在。运行仓起始均干净；Workspace 的 example/README.md、example/proto/README.md、publishing-interaction 及两份 10-27 报告已有未提交工作，不覆盖、不纳入本次提交。
+本轮仅核实数据库表、接口与文档，运行时实施未启动；进入实施阶段时再激活。
+
+当前差距：账号表尚无本次检查结果与编号字段；现有资料接口仍可写平台身份/登录状态，identify、账号组与旧 Cookie 接口需要收敛，部分路由缺少 OpenAPI 描述。数据库与接口核对及目标清理目录见工程设计。
 
 ### Ordered tasks
 
 1. 回写稳定业务及工程结论、M2-D1～D3、固定唯一原型入口，创建 109/110 依赖计划；文档链接与交付校验。
-2. 提供方先更新 Cloud 检查/资料契约；新增迁移 082 的当前检查字段和编号条件更新，完善 Handler/Service/Repository 的失败保留、身份对照、同 UID 更新、归属与迟到结果验证。删除手填 identify、账号组与批量标签外部接口，资料 PATCH 原子替换 tags。
+2. 提供方先更新 Cloud 检查/资料契约；追加当前检查字段迁移和编号条件更新，完善 Handler/Service/Repository 的失败保留、身份对照、同 UID 更新、归属与迟到结果验证。删除手填 identify、账号组与批量标签外部接口，资料 PATCH 原子替换 tags。
 3. Agent 只读检查区分实时会话与失败，不静默把保存值当实时检查；核对 B站/百度 Client。Desktop DTO/桥消费契约，不复制业务规则。定向失败、平台身份与桥接测试。
 4. Vue 依原型拆列表、两级类目、详情、编辑、绑定/窗口详情、检查结果与批量检查；复用公共反馈和 Token。移除旧开户页/路由/菜单及仅服务旧入口的客户端代码和断言；保留列表上下文。
 5. 定向契约/迁移/前后端/Agent/Desktop 验证，1440/1920 页面走查；使用已授权测试环境执行人工登录后真实识别。保存与最终代码基线对应的验收结论，完成前独立 review。
 
-数据库、接口与清理映射见工程设计 §1、§2、§5；首个闭环的具体文件、签名、测试与提交边界见 plan.md。
+数据库、接口与清理映射见工程设计 §1、§2、§5；执行时按当前契约与直接消费者确定最小实现，不在核实阶段展开全量代码细节。
 
 ## Done When
 
