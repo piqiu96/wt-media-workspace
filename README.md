@@ -113,3 +113,5 @@ python3 scripts/wt.py test fast|repo|integration|e2e|real [--repo wt-media-cloud
 | `real` | Print real-environment preparation | Print the external-effect and manual-evidence checklist |
 
 `--plan` prints the commands without starting services or running tests. `integration`, `e2e` and `real` are cross-repository scenarios; omit `--repo` for them. Real acceptance remains recorded in the CHG evidence. The optional `.ai/WORK_STATE.md` is local and ignored; `checkpoint.md` is optional and is the handoff record when a CHG needs one.
+
+`control.sh start` verifies the headless combination before handing the Agent port to the packaged Desktop. After handover, `control.sh verify` cannot authenticate to that Sidecar; verify its authenticated readiness through the Desktop work-environment panel and the real business action, and record both results in CHG evidence.
