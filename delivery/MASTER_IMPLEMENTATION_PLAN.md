@@ -111,10 +111,10 @@ wt-media-workspace/
 | `PLANNED` | 方向已定、已拆分，可激活 | 2 | 0 |
 | `IMPLEMENTING` | 实施中 | 0 | 2 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 66 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 68 |
 | `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 0 |
 
-分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **80** 篇。归档列 69（`DONE` 66＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 80。planned 4 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
+分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **82** 篇。归档列 71（`DONE` 68＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 82。planned 4 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 

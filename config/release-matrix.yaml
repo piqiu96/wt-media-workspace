@@ -712,21 +712,21 @@ releases:
       - "The enum change is breaking in both directions; the three components must ship as one batch."
       - "Historical xiaohongshu values are not rewritten by migration 076 because no code or data on this host carries them."
   - release: "chg099-numeric-proxy-id-20261030"
-    status: verifying
+    status: verified
     date: "2026-10-30"
     scope: operating_resource_proxy_integer_primary_key
     environment: local_development
     components:
-      cloud: "local CHG-20261028-099 tree (not released)"
-      cloud_agent: "local CHG-20261028-099 tree (not released)"
-      local_agent: "local wt-media-agent-chg099 worktree (not released)"
-      desktop: "local Desktop tree with Cloud shared Web source (not released)"
+      cloud: "main merge 12555562af07d9e63b939bb75f7d49d3b6695e04 (not released)"
+      cloud_agent: "Cloud merge 12555562af07d9e63b939bb75f7d49d3b6695e04 (not released)"
+      local_agent: "main merge 104f88c85e9e1050e3e32b588c6f8a1e2c449f63 (not released)"
+      desktop: "main merge 2c528f2e64fd8bf0adac5fcedd659db79d09a1d5 (not released)"
     contracts:
       cloud_api: "v1@2026.10.30.1"
       business_schemas: "2026.10.30.1"
       cloud_error_codes: "2026.10.30.1"
       local_agent_api: "v1@2026.10.29.3"
-    contract_state: "CHG099 breaking proxy ID revision, ADR-0029; candidate for human review"
+    contract_state: "CHG099 breaking proxy ID revision, ADR-0029; local acceptance signed off, no release"
     rollout_order:
       - "Back up Cloud database, stop older proxy-writing clients, then apply migration 20261030_081 with the revised Cloud."
       - "Deploy matching Cloud Web/Desktop consumers before proxy writes resume; keep the CHG099 Agent revision paired with Desktop."
@@ -741,7 +741,7 @@ releases:
     target_status:
       windows_x64: "not_built_for_this_revision"
       macos_x86_64: "not_built_for_this_revision"
-      macos_arm64: "local_rebuild_pending"
+      macos_arm64: "local DMG rebuild and user walkthrough passed; not released"
     residual_risks:
       - "Cloud API proxy IDs are breaking for older clients; no mixed-version writes are supported."
       - "Dynamic supplier extraction live network acceptance is deferred by user decision."

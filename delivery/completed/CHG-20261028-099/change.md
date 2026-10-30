@@ -1,9 +1,11 @@
 ---
 id: CHG-20261028-099
 parent: none
-status: VERIFYING
+status: DONE
 depends_on: ["CHG-20261029-107"]
+dependency_merge_commits: {"CHG-20261029-107": {"wt-media-cloud": "37f40ae", "wt-media-workspace": "0963547"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
+merge_commits: {"wt-media-agent": "104f88c85e9e1050e3e32b588c6f8a1e2c449f63", "wt-media-desktop": "2c528f2e64fd8bf0adac5fcedd659db79d09a1d5", "wt-media-cloud": "12555562af07d9e63b939bb75f7d49d3b6695e04", "wt-media-workspace": "d7c5aca259f57ca5694cd521b6d295e66a1d5bb3"}
 risk: H
 ---
 
