@@ -533,10 +533,6 @@ M2只有在全部追踪项和真实Evidence通过，并由用户完成人工整�
 
 上文 M2-A 的“高级运营、管理员不能登录 Desktop”是原验收口径。M3–M5 后续产品裁定允许这两种角色登录 Desktop 并使用**共用 Cloud 业务页面**，见 [ADR-0023](../../docs/decisions/0023-m3-m5-team-resources-and-production-operator.md) 与 [M3-F](M3-content-discovery-v2.md#m3-f-public-content-scope)。本机浏览器操作的角色准入和当前用户身份边界不随 Cloud 页面开放；实现与复验由 CHG-20261026-102 承载，不改写原 M2 验收证据。
 
-### M2-F 后续入口例外（2026-10-26）
-
-上文 M2-A 的“高级运营、管理员不能登录 Desktop”是原验收口径。M3–M5 后续产品裁定允许这两种角色登录 Desktop 并使用**共用 Cloud 业务页面**，见 [ADR-0023](../../docs/decisions/0023-m3-m5-team-resources-and-production-operator.md) 与 [M3-F](M3-content-discovery-v2.md#m3-f-public-content-scope)。本机浏览器操作的角色准入和当前用户身份边界不随 Cloud 页面开放；实现与复验由 CHG-20261026-102 承载，不改写原 M2 验收证据。
-
 ### M2-G 起飞品牌、登录页与桌面图标
 
 - Cloud Web、Desktop 共享登录页按用户提供的“起飞 / 内容运营平台”参考图优化：蓝色纸飞机 Logo、品牌名称、左右分栏的价值说明与登录卡片；保持现有账号、密码和替换会话流程。
