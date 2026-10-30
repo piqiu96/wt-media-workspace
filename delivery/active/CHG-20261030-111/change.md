@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-111
 parent: delivery/milestones/M2-account-runtime.md#m2-d-社媒账号重构
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
