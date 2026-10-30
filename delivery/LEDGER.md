@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261030-110 | 矩阵账号批量 Cookie 接入与结果处理 | IMPLEMENTING | wt-media-workspace |
+| CHG-20261030-110 | 矩阵账号批量 Cookie 接入与结果处理 | VERIFYING | wt-media-workspace |

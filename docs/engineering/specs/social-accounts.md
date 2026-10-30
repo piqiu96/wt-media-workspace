@@ -19,7 +19,7 @@
 
 主键/关联 ID 沿用 BIGINT UNSIGNED 和现有 API ID 表达。request_key/操作编号使用 VARCHAR(64)，platform/状态使用 VARCHAR(32)，说明 VARCHAR(500)，时间 DATETIME(6)。content_json、cookie_update、检查观测为 JSON；revision 为非空 BIGINT UNSIGNED，初始 0。Cookie 字段使用 LONGTEXT，原始输入保留原格式，实时读回和写前值存完整 Cookie 对象的 JSON 文本。
 
-108 新增 last_check_status，默认 never，枚举 never/running/completed/failed；其余检查新增字段可空。last_check_identity 为观测 UID/name/avatar，供身份对照。last_check_at 表示最近取得结论的时间，失败不覆盖历史平台资料与登录结论。结果须匹配当前检查编号、窗口和归属；重复结果返回原结算，迟到结果拒绝，绑定变化使旧检查失效。
+last_check_status，默认 never，枚举 never/running/completed/failed；其余检查新增字段可空。last_check_identity 为观测 UID/name/avatar，供身份对照。last_check_at 表示最近取得结论的时间，失败不覆盖历史平台资料与登录结论。结果须匹配当前检查编号、窗口和归属；重复结果返回原结算，迟到结果拒绝，绑定变化使旧检查失效。
 
 资料、标签和类目更新在一个事务完成；检查使用专用带条件更新，不用整行旧记录回写覆盖其他字段。迁移只新增必要字段/表和删除废弃账号组，不预占迁移序号，不改旧建库链。
 
@@ -77,19 +77,11 @@ content_json 顶层存批次补充信息，items 为数组。分类、标签、�
 
 ## 2. Cloud API
 
-### 2.1 现有接口收敛
+### 2.1 接口边界
 
-| 现有接口 | 处理 |
-| --- | --- |
-| 列表/新增/详情/资料 PATCH；绑定 PATCH、解绑 DELETE | 保留路径，按当前 PRD 改字段；解绑已注册但账号 OpenAPI 缺失，实施时补齐 |
-| check、check/result | 保留路径，补当前执行结果和编号语义；无已存 Cookie、未分类亦可检查 |
-| identify；tags/add、tags/remove | 删除；身份由检查写入，标签并入账号 PATCH |
-| cookies/read-sync、cookies/read-sync/result；GET /:id/cookies | 删除旧链路，改为 credentials 与专用 cookie-updates；旧 GET 已注册但账号 OpenAPI 缺失 |
-| /account-groups 的 POST/GET、/:group_id 的 PATCH/DELETE、/:group_id/accounts GET | 删除，不补为继续维护的产品 |
+身份仅由实时检查结算，标签随资料 PATCH 原子更新。独立账号组、手填 identify、tags/add/remove、旧 cookies/read-sync 和 GET /:id/cookies 均已退场，不提供转发兼容层。凭证与更新入口统一为 credentials 和 cookie-updates，批量入口统一在账号模块。
 
-契约由提供方维护，修改 OpenAPI/Schema/错误码后同步直接消费者和契约锁。
-
-### 2.2 目标接口目录
+### 2.2 接口目录
 
 所有路径以 /api/v1 为前缀，响应沿用 errcode/message/data/logid。
 
@@ -107,7 +99,7 @@ content_json 顶层存批次补充信息，items 为数组。分类、标签、�
 | PUT /media-accounts/:id/cookie-updates/:operation_id/snapshot | 目标平台写前值及实际占用；保存 before_cookie 和必要指纹后返回 can_apply=true 与本次编号 |
 | PUT /media-accounts/:id/cookie-updates/:operation_id/result | 写入/读回/身份与明确或未知结果；确认成功事务更新账号凭证，失败保留旧值，未知继续保留本次处理 |
 | GET /media-accounts/:id/cookie-updates/:operation_id | 返回当前匹配操作的状态/回执；旧操作冲突，不建设更新历史查询 |
-| POST /media-account-imports/preview | 平台、分类、标签、逐行输入；只校验并返回原行号和错误，不建正式资源 |
+| POST /media-account-imports/preview | 平台、分类、标签、逐行输入；只校验并返回原行号和错误，不建正式资源；每批最多100原始行、输入合计2MiB、单项1MiB |
 | POST /media-account-imports | request_key、平台、批次属性与确认有效行；一条批次记录保存 content_json，重复提交返回同批次 |
 | GET /media-account-imports；GET /media-account-imports/:id | 本人批次摘要和详情；详情为批次属性、items 数组、revision 与七计数；普通投影不回传内部 Cookie |
 | POST /media-account-imports/:id/items/:row_number/start | expected_revision；原子领取当前可执行项，返回 attempt/operation_id/step/窗口计划和必要执行输入；重复领取不能再次下发执行 |
@@ -123,10 +115,10 @@ Cookie 和批次执行仅本人 Desktop 可用；管理员无凭证/本机入口
 - 创建批次前，前端为一次确认意图生成一次 UUID request_key；连续点击和网络重试复用，打开已有批次使用 batch_id。唯一 user_id+request_key 防重复创建。content_json 内保存服务端生成的规范化请求摘要 request_digest，用于拒绝同 key 不同内容；摘要不是业务身份，不进入普通响应。该 UUID 不扩散为逐项 UUID。
 - 单账号 cookie_update 保存当前 request_key 与输入摘要，同 key 同内容返回当前处理。新请求须匹配 expected_operation_id 且无未完成/未知操作；过期起始请求不能覆盖新处理。仅保存当前回执，不提供永久幂等历史。
 - 单项状态仅 pending/running/succeeded/failed/skipped/uncertain；step 记录目前执行到哪一步。开始领取时在短事务内校验状态并递增 attempt；相同领取的重复请求返回已处理状态，不重新授予执行。已成功项不重放，未知项不递增 attempt，明确失败后的新尝试才递增。
-- 服务端按 row_number 查找数组项，校验本次编号、步骤和状态，再以 WHERE id=? AND user_id=? AND revision=? 更新单项 JSON 路径并递增 revision。影响 0 行则重读：已结算返回原结果，否则返回冲突；不能直接重放浏览器操作。数组路径只由服务端生成，不接受客户端路径。正式账号与单项的结算在同一数据库事务内完成。
-- revision 防止旧 JSON 覆盖，但不同 key、不同批次仍可能操作同一窗口。109 在共享 browser_profiles 增加可空 cookie_operation_id，短事务内通过条件更新取得目标窗口的 Cookie 操作占用；失败领取不得执行。明确结算才释放，未知保留编号先核实；只读核实取得明确失败结论后可释放占用，不仅凭超时判断失败；窗口关联变更和冲突操作也校验该占用。不建额外锁表或通用任务表，数据库事务不跨浏览器调用持有。
+- 服务端按 row_number 查找数组项，校验本次编号、步骤和状态，再以 WHERE id=? AND user_id=? AND revision=? 写回服务端更新单项后的 content_json 并递增 revision。影响 0 行则重读：已结算返回原结果，否则返回冲突；不能直接重放浏览器操作。单项由服务端定位，不接受客户端数组路径或整份 JSON 覆盖。正式账号与单项的结算在同一数据库事务内完成。
+- revision 防止旧 JSON 覆盖，但不同 key、不同批次仍可能操作同一窗口。共享 browser_profiles 使用可空 cookie_operation_id，短事务内通过条件更新取得目标窗口的 Cookie 操作占用；失败领取不得执行。明确结算才释放，未知保留编号先核实；只读核实取得明确失败结论后可释放占用，不仅凭超时判断失败；窗口关联变更和冲突操作也校验该占用。不建额外锁表或通用任务表，数据库事务不跨浏览器调用持有。
 - 每批逐项执行，同批已存在未结算执行时其他页面只查看/核实，不能并行领取下一项。关闭浮层停止发起下一项，已发出项先结算或待确认。JSON 存储不保证外部操作恰好一次；超时后读取真实状态，不能靠重发编号推断安全。
-- 此方案用于按批次查看、有限大小且逐项执行的接入。不承诺 JSON 内不同单项独立行锁或所有写入均原地局部更新。实施时根据真实 Cookie 体积验证批次容量及响应大小，不为假设的大规模并行预建明细表、索引或后台队列。
+- 此方案用于按批次查看、有限大小且逐项执行的接入。不承诺 JSON 内不同单项独立行锁或所有写入均原地局部更新。批次上限为100原始行、输入合计2MiB、单项1MiB；真实样本体积及近上限 JSON 持久化已纳入验证，不为假设的大规模并行预建明细表、索引或后台队列。
 
 ## 4. Agent / Desktop 与批次结果
 
@@ -134,14 +126,14 @@ Agent 只执行本机和平台能力；Cloud browser_profile_id 是数据库 ID�
 
 | Agent 接口 | 输入与结果 |
 | --- | --- |
-| POST /api/v1/account-check（保留） | profile_id/platform/expected_platform_account_id；返回实时 UID/name/avatar/login_status/check_items，调用失败与有效平台结论分开，不写 Cookie |
-| POST /api/v1/cookie-read（修改） | 增加 platform，按平台域读实时 cookies，source=live；失败不用存量值冒充成功 |
-| POST /api/v1/account-cookie/prepare（新增） | 本次编号/窗口/平台/预期身份；返回实际占用、完整 before_cookie 及指纹，情况不明不当空闲 |
-| POST /api/v1/account-cookie/apply（新增） | 本次编号/目标/input_cookie、Cloud 已允许的写前指纹；再次比较当前会话，匹配才写目标平台；返回 applied/failed/uncertain 与读回/身份 |
-| POST /api/v1/account-cookie/inspect（新增） | 本次编号/目标/预期身份与输入摘要；只读核实，不重新写入 |
-| POST /api/v1/bit-browser/profile-create（复用扩展） | 带本次创建标识，沿用返回 id，通过扫描核实超时结果；可靠写入/检索标识须 BitBrowser 实测，不能确认时不重复创建或转复用 |
+| POST /api/v1/account-check | profile_id/platform/expected_platform_account_id；返回实时 UID/name/avatar/login_status/check_items，调用失败与有效平台结论分开，不写 Cookie |
+| POST /api/v1/cookie-read | platform 指定平台域，读取实时 cookies，source=live；失败不用存量值冒充成功 |
+| POST /api/v1/account-cookie/prepare | 本次编号/窗口/平台/预期身份；返回实际占用、完整 before_cookie 及指纹，情况不明不当空闲 |
+| POST /api/v1/account-cookie/apply | 本次编号/目标/input_cookie、Cloud 已允许的写前指纹；再次比较当前会话，匹配才写目标平台；返回 applied/failed/uncertain 与读回/身份 |
+| POST /api/v1/account-cookie/inspect | 本次编号/目标/预期身份与输入摘要；只读核实，不重新写入 |
+| POST /api/v1/bit-browser/profile-create | 带本次创建标识，沿用返回 id，通过扫描核实超时结果；本次创建标识为 WT_IMPORT:批次ID:原行号:attempt，超时以 inspect_only 读取标识；标识写入/检索以 BitBrowser 实测为准，不能确认时不重复创建或转复用 |
 
-实际 Cookie 读取使用 CDP；平台识别仍以实时平台响应为准，保存值回退不能冒充实时成功。B站/百度适配保留 Client/Service 分层，不在 Vue 或 Desktop 复制平台逻辑。prepare/apply/inspect 不增加 Agent 业务库或执行历史。
+实际 Cookie 读取使用 CDP；实时目标平台 Cookie 确认为空时表示无登录信息，非空则读取实时平台响应。B站通过同源平台页读取身份，避免比特默认页跨域限制；不覆盖运营原有页面。保存值回退不能冒充实时成功。B站/百度适配保留 Client/Service 分层，不在 Vue 或 Desktop 复制平台逻辑。prepare/apply/inspect 不增加 Agent 业务库或执行历史。
 
 批次成功必须有真实 UID、明确登录结论和正确正式窗口关系；人工登录、待同步、容量不足、身份冲突以 step/message 表达。需要人工登录时继续原项，不重新导入整批。跳过保留原项和必要原状态，恢复后从原步骤处理；未知先核实。检查成功表示取得结论，与接入成功语义不同。
 
@@ -160,22 +152,20 @@ Agent 只执行本机和平台能力；Cloud browser_profile_id 是数据库 ID�
 
 按 108/109/110 定向验证提供方契约、数据库、Vue 和桥接消费者，不做全仓无差别扫描。覆盖检查失败保留旧结论、异 UID 对照、旧编号拒绝；单次写前保护、完整属性与平台隔离；重复创建、同 key 不同内容、并发 JSON 更新、固定行号/排序、重复领取和回报、失败重试、未知核实与跨批次窗口占用。验证 JSON 批次容量、投影不带内部凭证，以及成功项凭证转存和计数一致。
 
-真实验收先用授权测试账号分别验证人工登录识别、读取、写入及隔离；模拟 HTTP 或原型演示不能代替真实数据库/BitBrowser/平台效果。当前文档更新不代表运行时已完成。
+真实验收先用授权测试账号分别验证人工登录识别、读取、写入及隔离；模拟 HTTP 或原型演示不能代替真实数据库/BitBrowser/平台效果。验收状态以对应 CHG 与 Milestone 为准。
 
 
 ## 7. 整体落地方案
 
-### 7.1 三阶段交付
+### 7.1 三个运营闭环
 
-已有 CHG 按下列顺序交付，不再重复创建同范围 CHG。每阶段完成一个可独立验收的运营闭环；前置完成并合入各仓 main 后再启动下一阶段。CHG 是交付范围和验收源，具体代码拆分、内部函数、测试命名、迁移编号与实现命令由实施时的 Codex 根据目标仓现状决定。
+| 能力 | 运营可见结果 | 数据与接口重点 |
+| --- | --- | --- |
+| 日常维护与检查 | 按 V7 新增/编辑、列表与详情；人工登录后检查并同步；同 UID 更新、异 UID 对照 | 当前检查结果及编号；资料接口收窄，无 Cookie 和分类前置 |
+| 单账号 Cookie | 查看原始/当前 CK；更新并检查；失败和待确认可处理 | before_cookie/cookie_update、窗口当前操作占用；prepare/apply/inspect |
+| 批量接入 | 输入预览、逐项接入、七计数、人工处理与关闭重进 | 单批次表、固定行号、请求去重、revision 和尝试次数 |
 
-| 阶段 | 运营可见结果 | 数据与接口重点 | 同阶段清理 |
-| --- | --- | --- | --- |
-| [CHG-108](../../../delivery/completed/CHG-20261030-108/change.md) 日常维护与检查 | 按 V7 新增/编辑、列表与详情；人工登录后检查并同步；同 UID 更新、异 UID 对照 | 账号表补当前检查结果及编号；资料接口收窄，绑定/检查链路明确，无 Cookie 和分类前置 | 旧手填身份、账号组、标签外部接口、独立开户入口及专用实现 |
-| [CHG-109](../../../delivery/completed/CHG-20261030-109/change.md) 单账号 Cookie | 查看原始/当前 CK；新接入或更新并检查；失败和待确认可处理 | 账号 before_cookie/cookie_update、窗口当前操作占用；Cloud 起始/保留/结算，Agent prepare/apply/inspect | 旧 read-sync/读取客户端及只服务旧链路的实现；保留原始/当前 Cookie 字段 |
-| [CHG-110](../../../delivery/active/CHG-20261030-110/change.md) 批量接入 | 输入预览、逐项接入、七计数、人工处理与关闭重进 | 仅新增批次表；content_json 顶层批次信息+items 数组；固定行号、请求去重、revision 和尝试次数 | 旧批量残余、模拟成功和无消费者代码；补齐最终原型入口 |
-
-108/109 交付期间后续能力如尚不可用，应明确其状态，不以演示成功或旧开户页面代替。全部完成后呈现 V7 的完整操作闭环；不引入旧模块兼容、接码、审计中心或通用任务范围。
+以最终 V7 为唯一操作闭环，不引入旧模块兼容、接码、审计中心或通用任务范围。交付状态统一见 M2-D 与其 CHG，不在本文保留分期临时入口或中间方案。
 
 ### 7.2 跨仓职责与接口交付
 
