@@ -38,6 +38,13 @@
 3. 整理四仓 CHG099 改动，排除其他任务文件和构建缓存；Cloud 根 `node_modules/`、Desktop `__pycache__/` 已加入各自 `.gitignore`，最终提交前复核暂存清单。执行最终适用验证，按仓提交并交由人工审核；不自行合并或发布。
 4. 真实动态供应商提取的现场网络验证按 Q-02 延期；A37 同页会话“查看上次导入结果”作为用户整体走查后保留的行为，不擅自改成历史中心。
 
+## 人工审核入口 · 2026-10-30
+
+- 前置 CHG107 已在本地 Workspace/Cloud `main` 合入，远端 `main` 尚未合入：Cloud [#15](https://github.com/piqiu96/wt-media-cloud/pull/15)、Workspace [#16](https://github.com/piqiu96/wt-media-workspace/pull/16) 为独立草稿 PR，首次 CI 均 PASS。先审核这两份依赖。
+- CHG099 四仓分别提交并推送，均为草稿 PR：Cloud [#16](https://github.com/piqiu96/wt-media-cloud/pull/16)（`e73050a`）、Agent [#4](https://github.com/piqiu96/wt-media-agent/pull/4)（`ae14d18`）、Desktop [#6](https://github.com/piqiu96/wt-media-desktop/pull/6)（`bcb6105`）、Workspace [#17](https://github.com/piqiu96/wt-media-workspace/pull/17)（`fa80e1e`）。Cloud/Workspace 的 PR 基线为 CHG107 分支；依赖合入远端 `main` 后再切回 `main` 触发常规 CI。Agent/Desktop 基于 `main`。
+- 最终本机回归：Agent `bash scripts/test.sh` 656 项 PASS；Desktop `bash scripts/test.sh`（Rust 541 项及脚本闸口）PASS；Workspace `python3 scripts/docs/check.py` 15 个索引 PASS、Delivery 治理检查 PASS；Cloud Go 全量与隔离 MySQL 回执投影验证见验收记录。Cloud 根 `node_modules/` 和 Desktop `__pycache__/` 已忽略，未进入提交；Workspace 的发布互动原型及早期社媒分析稿属于其他工作，未纳入 CHG099 PR。
+- 保持 `VERIFYING`，不自行合并或发布。人工审核完成并按顺序合入四仓后，才能同步发布矩阵与归档为 `DONE`。
+
 ## 接续边界
 
 保护他人改动；不重新全仓扫描，不操作其他运营窗口/代理，不自行合并发布。进一步记录验收时只写最终可复核事实到 `evidence/acceptance.md`。
