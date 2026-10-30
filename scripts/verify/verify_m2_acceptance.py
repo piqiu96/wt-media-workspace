@@ -75,7 +75,7 @@ def validate_static_matrix() -> list[str]:
     require_contains(
         errors,
         WORKSPACE / "config" / "contract-map.yaml",
-        ("contract_state: m2_sensitive_profile_guard",),
+        ("contract_state: operating_resources_refactor",),
     )
     require_contains(
         errors,
@@ -99,16 +99,14 @@ def validate_static_matrix() -> list[str]:
         matches = list((CLOUD / "migrations").glob(f"20260714_00{migration}_*.sql"))
         if len(matches) != 1:
             errors.append(f"expected one M2 migration 00{migration}, got {matches}")
-    require_contains(
-        errors,
+    for retired in (
         CLOUD / "contracts" / "cloud-agent-api" / "v1" / "sensitive-profile-guard.openapi.yaml",
-        ("review_required", "permit_id"),
-    )
-    require_contains(
-        errors,
-        AGENT / "contracts" / "local-event-schemas" / "v1" / "profile-guard.yaml",
-        ("result_uncertain",),
-    )
+        CLOUD / "contracts" / "cloud-agent-api" / "v1" / "task-lease.openapi.yaml",
+        CLOUD / "contracts" / "cloud-agent-api" / "v1" / "task-report.openapi.yaml",
+        CLOUD / "contracts" / "task-schemas",
+    ):
+        if retired.exists():
+            errors.append(f"retired contract still exists: {retired}")
 
     # Desktop contract lock 不对硬编码基线：基线会随每次合约前进过期。期望值
     # 从定义文件派生：
@@ -127,7 +125,6 @@ def validate_static_matrix() -> list[str]:
     else:
         for name, contracts_dir in (
             ("cloud_agent_api", CLOUD / "contracts" / "cloud-agent-api"),
-            ("task_schemas", CLOUD / "contracts" / "task-schemas"),
             ("local_agent_api", AGENT / "contracts" / "local-agent-api"),
         ):
             def_max, def_file = definition_revision_max(contracts_dir)

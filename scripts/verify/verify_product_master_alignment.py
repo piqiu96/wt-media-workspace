@@ -240,16 +240,10 @@ def validate_contract_texts(human: str, machine: str) -> list[str]:
     errors.extend(
         require_all(
             human,
-            ("Current state is mixed.", "`task_schemas` is active"),
+            ("Current state is mixed.", "`task_schemas` retired"),
             "mixed contract state",
         )
     )
-    task_match = re.search(
-        r"^  task_schemas:\s*(.*?)(?=^  [a-z_]+:|\Z)",
-        machine,
-        flags=re.MULTILINE | re.DOTALL,
-    )
-    task_block = task_match.group(1) if task_match else ""
     errors.extend(
         require_all(
             machine,
@@ -257,13 +251,8 @@ def validate_contract_texts(human: str, machine: str) -> list[str]:
             "machine contract state",
         )
     )
-    errors.extend(
-        require_all(
-            task_block,
-            ("state: active", "formal_definition: active"),
-            "task_schemas machine state",
-        )
-    )
+    if "  task_schemas:" in machine:
+        errors.append("task_schemas machine state must be retired")
     return errors
 
 

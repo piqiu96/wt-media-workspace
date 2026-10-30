@@ -46,7 +46,7 @@ wt-media-workspace/
 │   │   └── CHG-YYYYMMDD-NNN/
 │   │       ├── change.md           # 当前变更唯一执行依据
 │   │       ├── checkpoint.md       # 可选：跨执行器接力的进度记录
-│   │       └── evidence/           # 测试、Spike、Diff、人工验证事实
+│   │       └── evidence/           # 最终交付、审批与验收结论（保留边界见文档治理规范）
 │   ├── milestones/                 # 人工确认的业务闭环基线
 │   ├── planned/                    # 待规划与待决记录
 │   ├── completed/                  # 已收口记录，默认不加载

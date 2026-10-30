@@ -1,6 +1,6 @@
 # ADR-0008: Local BitBrowser Operation Execution Model
 
-- Status: Accepted
+- Status: Superseded by [ADR-0027](0027-operating-resource-data-and-local-execution.md)
 - Date: 2026-07-22
 - Scope: M2 Browser Profile、代理、Cookie、账号检查和上号
 

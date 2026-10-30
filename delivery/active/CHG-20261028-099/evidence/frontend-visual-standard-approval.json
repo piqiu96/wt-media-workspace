@@ -1,0 +1,91 @@
+{
+  "document": "frontend公共视觉规范优化审核稿V1",
+  "createdAt": "2026-10-28T04:36:05.089Z",
+  "decisions": [
+    {
+      "id": "V01",
+      "title": "让已审批视觉目标成为实施依据",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V02",
+      "title": "统一冷灰层次与语义配色",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V03",
+      "title": "重建清楚而紧凑的字号与控件节奏",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V04",
+      "title": "保留原稿的页面骨架与轻面板",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V05",
+      "title": "表单按字段关系组织，避免全单列或全双列",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V06",
+      "title": "将语义选择恢复成带说明的卡片",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V07",
+      "title": "保留原稿浮层气质，同时延续短表单居中",
+      "decision": "同意推荐",
+      "comment": "",
+      "variant": "短表单Dialog + 原稿视觉（推荐）"
+    },
+    {
+      "id": "V08",
+      "title": "详情以横向键值对为默认，双列按内容选择",
+      "decision": "修改后同意",
+      "comment": "需要根据字段密度，自适应分布双列还是单列。 "
+    },
+    {
+      "id": "V09",
+      "title": "分区标题减少重线条和重复层级",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V10",
+      "title": "采用原稿的轻提示层级，减少说明而非删除引导",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V11",
+      "title": "列表、按钮和状态保留原稿的轻重关系",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V12",
+      "title": "批量结果恢复原稿的视觉中心",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V13",
+      "title": "公共能力优先做完整，再推广",
+      "decision": "同意推荐",
+      "comment": ""
+    },
+    {
+      "id": "V14",
+      "title": "把视觉还原纳入验收，而不是只看测试通过",
+      "decision": "同意推荐",
+      "comment": ""
+    }
+  ]
+}

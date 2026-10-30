@@ -3,12 +3,12 @@
 - Status: Accepted
 - Date: 2026-10-23
 - Scope: Cloud identity/cloudagent/runtimebinding/filetransfer/profilebinding/profileguard、Desktop 登录与本地执行、Agent 认证与恢复、Contract
-- Supersedes: ADR-0018、ADR-0019
+- Supersedes: 早期固定设备、节点和 presence 模型；具体中间决策已从当前文档树清理，历史由 Git 追溯
 - Partially supersedes: ADR-0003 的设备证明与 node credential 部分；票据作为一次性注册闸门的思路不再保留
 
 ## Context
 
-ADR-0018 引入稳定设备绑定，ADR-0019 又把执行在场从登录会话中拆出，形成 `users.device_*`、Ed25519 安装身份、`local_agent_nodes`、node credential、runtime presence 和按设备去重的下载模型。该模型把「用户身份」「登录会话」「安装实例」「BitBrowser 主账号」「任务执行」混在多个长期状态对象中：换电脑需要手工解绑，登录替换与执行资格相互牵连，节点/在线/presence 又需要额外观测与清理。普通 task claim/report 甚至没有认证。
+早期实现曾引入稳定设备绑定、节点凭据、runtime presence 和按设备去重的执行模型，把用户身份、登录会话、安装实例、BitBrowser 主账号和任务执行混在多个长期状态对象中。该模型已被当前会话认证和 Agent Token 模型取代。
 
 本轮用户裁定：`users` 只保存业务身份，`user_sessions` 是唯一认证事实源；Web 多会话、Desktop 单有效会话；Agent 不是设备或节点，而是由当前 desktop session 换取短期、限权、无服务端状态的签名凭证。同时 BitBrowser Profile 必须以 `user_id + main_user_id` 双作用域隔离，任务按 attempt 与活动时间收敛，而不是按设备迁移。
 

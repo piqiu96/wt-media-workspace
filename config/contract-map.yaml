@@ -1,5 +1,5 @@
 schema_version: 1
-contract_state: m2_sensitive_profile_guard
+contract_state: operating_resources_refactor
 formal_definitions_active: true
 
 contracts:
@@ -31,7 +31,12 @@ contracts:
     # check / cookies/read / cookies/read-sync 三个本地操作入口的角色与归属门禁。
     # 2026.10.29.1：游戏目录收敛为扁平类目；category_id/category_ids 使用数字 ID，
     # identity/media-accounts/content-production 使用 type + enabled。
-    contract_revision: "2026.10.29.1"
+    # 2026.10.29.2：代理归属团队、检测改由 Cloud 执行、窗口写回后读回；
+    # proxies 补齐生命周期与 profile-unbind / 批量分配，browser-profiles
+    # 补齐角色团队范围、确认体与窗口字段（CHG-20261028-099）。
+    # 2026.10.30.1：CHG099 代理 ID 改为自增整数，窗口代理关系及操作回执同步迁移；
+    # 代理列表新增管理员团队文本搜索（ADR-0029）。
+    contract_revision: "2026.10.30.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
@@ -43,8 +48,8 @@ contracts:
     api_major_version: v1
     # 2026.10.13.1：v1/file-transfer.openapi.yaml 已推进（map 停在 2026.10.01.1，
     # 由活源对比抓出）。
-    # 2026.10.23.1：Agent Token、统一 Preflight、attempt 上报与 permit 互斥取代
-    # 节点凭证与无认证 claim/report；minimum 同步抬高，旧 Agent 失败关闭。
+    # 2026.10.23.1：Agent Token 鉴权保留；通用 task lease/report、preflight 和
+    # sensitive permit 契约已退役，文件传输使用独立契约。
     contract_revision: "2026.10.23.1"
     minimum_agent_contract_revision: "2026.10.23.1"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
@@ -67,20 +72,12 @@ contracts:
     # created_by_name（解析不到时不出现），三种角色都读。
     # 2026.10.27.4：OperationTeam 增加 user_count（随列表读取的成员数）。
     # 2026.10.29.1：Category 使用自增数字 ID、固定 type、enabled；MediaAccount 使用 category_ids。
-    schema_revision: "2026.10.29.1"
+    # 2026.10.29.2：三块运营资源统一 enabled、bit_/platform_/last_check_ 前缀；
+    # 删除扫描候选、账号标签冗余列和旧代理字段。
+    # 2026.10.30.1：browser-profile 的代理引用改为整数（ADR-0029）。
+    schema_revision: "2026.10.30.1"
     consumers:
       - wt-media-cloud/web
-      - wt-media-agent
-      - wt-media-desktop
-  task_schemas:
-    owner: wt-media-cloud
-    path: ../wt-media-cloud/contracts/task-schemas
-    state: active
-    formal_definition: active
-    # 2026.10.23.1：Task 增加 user/attempt/last_report_at/settled_by 等运行字段，
-    # 去掉设备/节点，并按任务类型给出静默超时与外部副作用默认值。
-    schema_revision: "2026.10.23.1"
-    consumers:
       - wt-media-agent
       - wt-media-desktop
   business_enums:
@@ -92,7 +89,8 @@ contracts:
     # content-production.yaml（2026.09.26.2，CHG-20260930-069）已推进。
     # 2026.10.23.1：identity 增加 client_type 与 invalidated_reason。
     # 2026.10.27.1：media-account 的 platforms 枚举改为 baidu。
-    enum_revision: "2026.10.27.1"
+    # 2026.10.29.2：媒体账号平台登录状态、窗口 local_state 和代理操作枚举收敛。
+    enum_revision: "2026.10.29.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -106,9 +104,9 @@ contracts:
     # 三个错误码文件已推进，map 停在旧值，由活源对比抓出。
     # 2026.10.23.1：会话/Agent Token/BitBrowser 绑定/统一 Preflight 的错误码重写，
     # 新增 v1/execution.yaml；节点凭证与 permit credential 的错误码删除。
-    # 2026.10.26.1：content-production 补登记 compose_task_not_retryable（409）；
-    # 该错误码自 CHG-20261026-103 起已由服务返回，此前只存在于 OpenAPI 描述。
-    error_revision: "2026.10.26.1"
+    # 2026.10.26.1：content-production 补登记 compose_task_not_retryable（409）。
+    # 2026.10.29.2：删除通用任务/preflight/permit 错误码，代理改为预约与重试错误。
+    error_revision: "2026.10.30.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
@@ -131,7 +129,8 @@ contracts:
     # 2026.10.23.1：新增 Agent Token 交接、BitBrowser 绑定、敏感任务预检与许可
     # 交还、Profile CRUD 与 Cookie 读取；扫描带 observed_at。
     # 2026.10.27.1：AccountCheckRequest.platform 枚举改为 baidu。
-    contract_revision: "2026.10.27.1"
+    # 2026.10.29.2：Cloud 检测接管代理健康；Agent 停止暴露 proxy-check，窗口/账号/代理同步接口保留。
+    contract_revision: "2026.10.29.3"
     consumers:
       - wt-media-desktop
   local_event_schemas:
@@ -156,9 +155,10 @@ contracts:
     state: active
     formal_definition: active
     # The newest of the area's definitions, as `local_event_schemas` does: the
-    # files carry their own revisions. CHG-20261023-101 advanced both
-    # `v1/bitbrowser.yaml` (offline / Cloud-unreachable refusals, secret policy)
-    # and `v1/transfer.yaml` (save-directory and Agent Token refusals).
-    error_revision: "2026.10.23.1"
+    # files carry their own revisions. CHG-20261023-101 advanced BitBrowser
+    # refusals and transfer errors to 2026.10.23.1. CHG-20261028-099 added
+    # explicit proxy assignment outcomes, moving `v1/bitbrowser.yaml` to
+    # 2026.10.29.1.
+    error_revision: "2026.10.29.3"
     consumers:
       - wt-media-desktop

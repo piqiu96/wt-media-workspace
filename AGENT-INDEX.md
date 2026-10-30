@@ -52,6 +52,7 @@
 | `docs/engineering/architecture/` | 系统架构、模块边界、分层和通信设计 |
 | `docs/engineering/specs/` | 长期有效的专题工程设计 |
 | `docs/standards/` | 跨领域的研发、设计、产品与文档实践规范；代码演进细则在此维护 |
+| `example/` | 规范配套的离线HTML制品：`common/`公共视觉交互、`proto/`业务原型；引用正式规范，不承载运行时能力 |
 | `docs/contracts/` | 跨仓 API、协议、Event Schema 和数据契约 |
 | `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
 | `docs/devops/` | 端口与部署总账：各组件监听端口、连接链路和本地/线上接法的索引 |
