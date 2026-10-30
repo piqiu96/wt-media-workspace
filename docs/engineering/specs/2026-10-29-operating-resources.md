@@ -1,6 +1,6 @@
 # 运营资源：Cloud 事实与本机执行
 
-本规格描述社媒账号、浏览器窗口、代理在 CHG099 收口后的稳定边界。业务字段与接口以 [契约映射](../../contracts/contract-map.md) 指向的 Cloud 提供方 OpenAPI 与业务 Schema 为准；取舍见 [ADR-0027](../../decisions/0027-operating-resource-data-and-local-execution.md)。本文件不记录实施进度。
+本规格描述浏览器窗口、代理及其与账号的公共边界。社媒账号的完整数据与执行设计统一见[社媒账号设计](social-accounts.md)。业务字段与接口以 [契约映射](../../contracts/contract-map.md) 指向的 Cloud 提供方 OpenAPI 与业务 Schema 为准；取舍见 [ADR-0027](../../decisions/0027-operating-resource-data-and-local-execution.md)。本文件不记录实施进度。
 
 ## 数据归属
 

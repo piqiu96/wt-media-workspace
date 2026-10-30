@@ -6,6 +6,8 @@
 - Related: ADR-0008、ADR-0022、ADR-0023
 - Supersedes: ADR-0004、ADR-0008、ADR-0025、ADR-0026
 
+社媒账号数据模型及 Cookie/批次能力由 [ADR-0030](0030-social-account-rebuild.md) 更新；本文的窗口、代理与公共执行边界继续有效。
+
 ## Context
 
 运营资源当前把第三方镜像、Cloud 正式关系、检测结果和本机操作结果混在少量宽表中，同时由 Cloud 服务端直接访问运营电脑的 Local Agent。该实现既无法稳定表达“结果待确认”，也把当前页面不需要的审计、检测历史和通用操作状态引入了设计。
@@ -27,7 +29,7 @@
 
 ## Consequences
 
-- Cloud 领域表收敛为社媒账号四表、`browser_profiles`、`proxies`、`browser_profile_syncs`。
+- Cloud 领域表包含社媒账号（表结构见 ADR-0030）、`browser_profiles`、`proxies`、`browser_profile_syncs`。
 - Desktop 增加代理 apply/unbind 与动态提取桥；`local_agent_profile_restore` 不得再顺带写代理字段。
 - Agent 通用 task claim/report、preflight/permit、proxy-check 与浏览器 executors 退役；Cloud 不再调用代理写入或健康检测的 Agent 方法。
 - 明确拒绝可重试；未知结果必须先核实，恢复事实不能因关闭页面或超时而释放，旧结果不得结算新操作。
