@@ -1,7 +1,7 @@
 ---
 id: CHG-20261031-114
 parent: delivery/milestones/M2-account-runtime.md#m2-d1-maintenance
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
@@ -26,3 +26,5 @@ risk: M
 References: docs/product/prd/详细文档/第三章_用户与账号管理.md §3.3；docs/engineering/specs/social-accounts.md；docs/decisions/0030-social-account-rebuild.md；example/proto/social-accounts/index.html。
 
 验证事实与人工复核：见 [evidence/verification.md](evidence/verification.md)、[evidence/manual-checklist.md](evidence/manual-checklist.md)。
+
+实施、真实验收和 PR/CI 均已完成并合入各仓 main；人工最终产品走查使用所附清单，M2-D 总体验收状态不在本次提前关闭。

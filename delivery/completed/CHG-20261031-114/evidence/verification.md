@@ -28,3 +28,9 @@ Cloud 核心提交 `9b3b4bf`，末次页面说明提交 `2ab4b4a`；Agent `6fb30
 人工复核入口：[manual-checklist.md](manual-checklist.md)。本次自行验证不代替运营最终产品走查，M2-D 总体仍按人工验收状态维护。
 
 末次复核：`bin/control.sh start` 再次全流程通过，最终包前端版本 `0.1.0+2ab4b4a`。原生界面确认接入说明已更新；按窗口名综合搜索 ID 12，列表仍无专门跳转，详情顶部提示与正常状态一致。补充截图 `04-最终包列表无专门跳转.png`、`05-最终包详情顶部提示.png`。授权临时 Cookie 输入文件已删除；evidence 不包含明文凭证。
+
+Review / CI：Cloud [PR #26](https://github.com/piqiu96/wt-media-cloud/pull/26) verify 通过（3m19s），merge commit `250b78d`；Workspace [PR #26](https://github.com/piqiu96/wt-media-workspace/pull/26) checks 通过（11s），merge commit `245c511`。两仓本地 main 已快进到相应合并提交；Cloud 合并树与已验收的 `2ab4b4a` 完全一致。Agent/Desktop 无代码变更，启动时创建的空工作分支已清理。已审查范围、迁移异常恢复、真实异 UID 保留、详情读取、批次重报与旧状态恢复；无阻塞项。
+
+主分支最终交付：重新执行 `bin/control.sh start` 全流程通过（迁移重入 0 applied / 88 total），包内前端版本为 `0.1.0+250b78d`。桌面接管本机端口后，从其工作环境面板确认“本机服务已连接 / 比特浏览器已登录指定账号 / 执行凭证已配置”；并在该最终包再次真实检查 ID 12，提示“检查完成：登录正常”，详情顶部说明与可选入口正确。独立 verify 脚本不能越过桌面端令牌查询其 Agent，故接管后的状态与真实动作从桌面端核实，不冒充脚本全通过。
+
+复用了原验收工作台，生成本次 7 项人工复核网页：`/Users/aqiuye/Downloads/社媒账号样式走查-20261031/CHG114-同账号多窗口/人工复核工作台.html`。支持逐项结论、意见、本机草稿及 Markdown/JSON 导出；使用独立清单标识，不覆盖原 27 项草稿。仅替换清单内容与版本，保留原有交互代码，JS 语法检查通过。
