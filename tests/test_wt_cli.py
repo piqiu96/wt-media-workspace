@@ -196,7 +196,7 @@ class WTCLITests(unittest.TestCase):
         with contextlib.redirect_stdout(output):
             cmd_verify(change, plan=True, root=self.root)
         text = output.getvalue()
-        self.assertIn("scripts/verify/verify_m1_integration.py", text)
+        self.assertIn("bin/control.sh verify", text)
         self.assertIn("scripts/verify/verify_m0_config.py", text)
         self.assertIn("H risk:", text)
 
@@ -223,7 +223,7 @@ class WTCLITests(unittest.TestCase):
         with contextlib.redirect_stdout(output):
             cmd_test("integration", None, True, self.root)
             cmd_test("e2e", None, True, self.root)
-        self.assertIn("scripts/verify/verify_m1_integration.py", output.getvalue())
+        self.assertIn("bin/control.sh verify", output.getvalue())
         self.assertIn("bin/control.sh verify", output.getvalue())
 
     def test_resume_reads_checkpoint_and_optional_state(self) -> None:

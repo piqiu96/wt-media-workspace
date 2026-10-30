@@ -108,7 +108,7 @@ python3 scripts/wt.py test fast|repo|integration|e2e|real [--repo wt-media-cloud
 | --- | --- | --- |
 | `fast` | No environment start | Each repository's existing fast tests; the four repositories do not currently define an identical fast set |
 | `repo` | Selected repository `bin/control.sh start` | Selected repository test entry; Workspace also runs governance gates, `scripts/docs/check.py`, and `verify-control.sh` |
-| `integration` | Start Cloud and Agent using their controls | Existing M1 cross-end entry; its behavior is a known blocker (port override, contract revision, Desktop test entry) and is not claimed to pass |
+| `integration` | Build and start the current combination through the Workspace control | Verify the running Cloud, Agent and packaged Desktop with the current readiness gates; CHG evidence records business effects |
 | `e2e` | Workspace `bin/control.sh start` | Workspace `bin/control.sh verify` |
 | `real` | Print real-environment preparation | Print the external-effect and manual-evidence checklist |
 
