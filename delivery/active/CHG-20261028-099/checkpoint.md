@@ -6,7 +6,7 @@
 - Agent 仅使用 `/Users/aqiuye/Develop/workspace/wt-media/wt-media-agent-chg099`，不使用旧 098 Agent 分支。运营库固定为 `wt_media_cloud`；隔离测试库每次用后删除。
 - 用户授权的“测试账号”窗口和静态测试代理早前现场验收已完成；最新只读检查发现当前 Cloud 又有“测试代理”ID 1 并正式关联“测试账号”窗口 ID 10，不能沿用早前的“已清理”结论。此次未改变关联；原恢复信息不在当前仓库，保留现状交运营决定。用户明确暂不测试真实动态供应商提取。
 - 用户要求 `example/` 和 `evidence/` 仅留最终稿；不保存截图缓存、临时测试数据或凭据。短周期额度低于 5% 时保存并停止。
-- 用户于 2026-10-30 明确确认“CHG099 已走查完毕”；人工整体走查已签收。当前阶段转为四仓候选改动整理、独立提交与 PR 审核，仍不自行合并或发布。CHG107 已在本地 Workspace/Cloud `main` 合入，远端 `main` 尚未合入；已建立两仓 CHG107 草稿 PR 作为先行审核入口。
+- 用户于 2026-10-30 明确确认“CHG099 已走查完毕”；人工整体走查已签收。用户随后指定先将前置 CHG107 合入远端 `main`，再合入 CHG099；本轮不发布。CHG107 的 Cloud 与 Workspace PR 已通过 CI，并用保留历史的 merge commit 合入远端 `main`。
 
 ## 已完成与最新验证
 
@@ -34,16 +34,16 @@
 ## 后续交付工作
 
 1. 用户于 2026-10-30 确认 CHG099 整体人工走查完成；此前逐项未留实屏证据的场景不冒称为各自独立现场 PASS，统一签收见 [evidence/acceptance.md](evidence/acceptance.md)。批量设置后的列表与同步差异已单独确认验收；最新成功回执投影通过独立 MySQL 结算验证，未为了验收重复写入运营窗口。
-2. CHG107 在本地 Workspace/Cloud `main` 已合入；远端 `main` 尚未合入。Cloud [#15](https://github.com/piqiu96/wt-media-cloud/pull/15) 与 Workspace [#16](https://github.com/piqiu96/wt-media-workspace/pull/16) 已作为独立草稿 PR 提交人工审核。CHG099 的两仓审核基线应指向 CHG107 分支，避免混入依赖差异；Agent/Desktop 可直接基于远端 `main`。
+2. CHG107 Cloud [#15](https://github.com/piqiu96/wt-media-cloud/pull/15) 与 Workspace [#16](https://github.com/piqiu96/wt-media-workspace/pull/16) 已先行合入远端 `main`。CHG099 的 Cloud/Workspace PR 已切回 `main` 基线；差异清单不含 CHG107 迁移及过期计划副本。Agent/Desktop 原本即基于 `main`。
 3. 整理四仓 CHG099 改动，排除其他任务文件和构建缓存；Cloud 根 `node_modules/`、Desktop `__pycache__/` 已加入各自 `.gitignore`，最终提交前复核暂存清单。执行最终适用验证，按仓提交并交由人工审核；不自行合并或发布。
 4. 真实动态供应商提取的现场网络验证按 Q-02 延期；A37 同页会话“查看上次导入结果”作为用户整体走查后保留的行为，不擅自改成历史中心。
 
 ## 人工审核入口 · 2026-10-30
 
-- 前置 CHG107 已在本地 Workspace/Cloud `main` 合入，远端 `main` 尚未合入：Cloud [#15](https://github.com/piqiu96/wt-media-cloud/pull/15)、Workspace [#16](https://github.com/piqiu96/wt-media-workspace/pull/16) 为独立草稿 PR，首次 CI 均 PASS。先审核这两份依赖。
-- CHG099 四仓分别提交并推送，均为草稿 PR：Cloud [#16](https://github.com/piqiu96/wt-media-cloud/pull/16)（`e73050a`）、Agent [#4](https://github.com/piqiu96/wt-media-agent/pull/4)（`ae14d18`）、Desktop [#6](https://github.com/piqiu96/wt-media-desktop/pull/6)（`bcb6105`）、Workspace [#17](https://github.com/piqiu96/wt-media-workspace/pull/17)（`fa80e1e`）。Cloud/Workspace 的 PR 基线为 CHG107 分支；依赖合入远端 `main` 后再切回 `main` 触发常规 CI。Agent/Desktop 基于 `main`。
+- 前置 CHG107 Cloud [#15](https://github.com/piqiu96/wt-media-cloud/pull/15) 与 Workspace [#16](https://github.com/piqiu96/wt-media-workspace/pull/16) 首次 CI 均 PASS，已依用户指定顺序用 merge commit 合入远端 `main`；远端 `main` 分别包含其原分支提交。CHG099 PR 已切回 `main` 基线。
+- CHG099 四仓分别提交并推送：Cloud [#16](https://github.com/piqiu96/wt-media-cloud/pull/16)（`e73050a`）、Agent [#4](https://github.com/piqiu96/wt-media-agent/pull/4)（`ae14d18`）、Desktop [#6](https://github.com/piqiu96/wt-media-desktop/pull/6)（`bcb6105`）、Workspace [#17](https://github.com/piqiu96/wt-media-workspace/pull/17)（`fa80e1e` 起，后续有文档修正）。Agent/Desktop GitHub 校验 PASS；Cloud/Workspace 切回 `main` 后需触发并核对常规 CI。
 - 最终本机回归：Agent `bash scripts/test.sh` 656 项 PASS；Desktop `bash scripts/test.sh`（Rust 541 项及脚本闸口）PASS；Workspace `python3 scripts/docs/check.py` 15 个索引 PASS、Delivery 治理检查 PASS；Cloud Go 全量与隔离 MySQL 回执投影验证见验收记录。Cloud 根 `node_modules/` 和 Desktop `__pycache__/` 已忽略，未进入提交；Workspace 的发布互动原型及早期社媒分析稿属于其他工作，未纳入 CHG099 PR。
-- 保持 `VERIFYING`，不自行合并或发布。人工审核完成并按顺序合入四仓后，才能同步发布矩阵与归档为 `DONE`。
+- CHG099 在四仓 CI 与差异复核完成前保持 `VERIFYING`；按用户指定顺序合入后再同步发布矩阵与归档为 `DONE`。本轮不发布。
 
 ## 接续边界
 

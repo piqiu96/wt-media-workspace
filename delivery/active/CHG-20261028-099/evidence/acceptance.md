@@ -173,4 +173,4 @@
 
 用户随后于 2026-10-30 明确确认“CHG099 已走查完毕”。据此，整个人工走查已签收；先前清单中未逐项留存的实屏结果不补写为虚构证据。真实动态供应商链接的现场网络验证仍按 Q-02 延期。
 
-四仓候选改动已各自提交并推送为草稿 PR，入口和依赖顺序见 [checkpoint.md](../checkpoint.md#人工审核入口--2026-10-30)。最终本机补验：Agent `bash scripts/test.sh` 656 项 PASS；Desktop `bash scripts/test.sh` 的 Rust 541 项与脚本闸口 PASS；Workspace 文档索引 15 项及 Delivery 治理检查 PASS。Cloud 根 `node_modules/` 和 Desktop Python 缓存均被 `.gitignore` 排除，提交清单未包含缓存。CHG107 的 Cloud/Workspace 两份前置 PR 首次 CI 均通过；CHG099 Cloud/Workspace 为依赖分支上的草稿 PR，需待前置合入后切回 `main` 再看常规 CI。当前未合并、未发布，CHG 保持 `VERIFYING`。
+四仓候选改动已各自提交并推送，入口和依赖顺序见 [checkpoint.md](../checkpoint.md#人工审核入口--2026-10-30)。最终本机补验：Agent `bash scripts/test.sh` 656 项 PASS；Desktop `bash scripts/test.sh` 的 Rust 541 项与脚本闸口 PASS；Workspace 文档索引 15 项及 Delivery 治理检查 PASS。Cloud 根 `node_modules/` 和 Desktop Python 缓存均被 `.gitignore` 排除，提交清单未包含缓存。用户指定的 CHG107 Cloud/Workspace 前置 PR 均通过 CI，并先行合入远端 `main`；CHG099 Cloud/Workspace PR 已切回 `main`，差异清单不含 CHG107 迁移和过期计划副本。Agent/Desktop GitHub 校验通过。CHG099 四仓在常规 CI 与差异复核完成前保持 `VERIFYING`；本轮不发布。
