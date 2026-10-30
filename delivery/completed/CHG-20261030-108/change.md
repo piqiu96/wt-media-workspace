@@ -1,10 +1,11 @@
 ---
 id: CHG-20261030-108
 parent: delivery/milestones/M2-account-runtime.md#m2-d1-maintenance
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
+merge_commits: {"wt-media-workspace": "887ddfbeb8ec466bfc75e74a6c973dc0f49f4f40", "wt-media-cloud": "2f9b5962f131bf034b8bc87279239dfb9e2ab502", "wt-media-agent": "ed92ff0d3506e50948c5290a193c83887f4e1545", "wt-media-desktop": "fc963afdd4603cab75be3045dbeb49a3af140149"}
 ---
 
 # CHG-20261030-108：矩阵账号维护与人工登录后检查同步
@@ -13,7 +14,7 @@ risk: H
 
 交付 M2-D1：最终账号维护页面及人工登录后真实平台识别，检查不写浏览器 Cookie。同步回写 PRD、ADR、工程设计并固定已批准原型。旧账号模块未使用，不建设兼容层；保留外部真实窗口与会话。
 
-运行时改动已提交，进入真实平台、桌面页面和契约组合验收。实现与验证记录见同目录 evidence 和 checkpoint；Cookie 替换链路按 109 继续交付。
+四仓PR已通过CI并以merge commit合入各仓main；真实B站/百度与打包Desktop、Vue交互和数据库验收通过，证据见evidence/verification.md。Cookie更新按109交付，最终产品人工走查由用户进行。
 
 ### 落地顺序
 

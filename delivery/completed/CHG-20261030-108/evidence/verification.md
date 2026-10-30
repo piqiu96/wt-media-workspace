@@ -5,7 +5,7 @@
 - Cloud: b586848（含检查结算、窗口分离、单行选择、即时回车标签与V7详情修正）
 - Agent: 0156c50（实时识别ec766de，契约索引同步）
 - Desktop: 56f0600
-- Workspace: 当前 CHG 与正式文档提交
+- Workspace: PR #19 / merge887ddfb；各仓合并号见change.md
 
 ## 自动验证
 
