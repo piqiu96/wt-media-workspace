@@ -22,7 +22,6 @@
 | `scripts/verify/verify_ai_workspace.py` | 验收 | AI 入口文件、执行快照与配置一致性 | `python3 scripts/verify/verify_ai_workspace.py` |
 | `scripts/verify/verify_delivery_governance.py` | 验收 | Delivery、CHG 引用与只读归档边界 | `python3 scripts/verify/verify_delivery_governance.py` |
 | `scripts/verify/verify_m0_config.py` | 验收 | Contract map、release matrix 与契约版本 | `python3 scripts/verify/verify_m0_config.py` |
-| `scripts/verify/verify_m1_integration.py` | 验收 | M1 Cloud-Agent-Desktop 跨端集成（行为已知阻塞，见根 README） | `python3 scripts/verify/verify_m1_integration.py` |
 | `scripts/verify/verify_m2_acceptance.py` | 验收 | M2 静态跨仓验收矩阵 | `python3 scripts/verify/verify_m2_acceptance.py` |
 | `scripts/verify/verify_m3_acceptance.py` | 验收 | M3 真实环境全量验收 | `python3 scripts/verify/verify_m3_acceptance.py --phase all` |
 | `scripts/verify/verify_product_master_alignment.py` | 验收 | 状态词、LEDGER 行与 Milestone 对齐 | `python3 scripts/verify/verify_product_master_alignment.py` |

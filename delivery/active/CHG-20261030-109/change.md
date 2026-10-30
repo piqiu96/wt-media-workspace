@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-109
 parent: delivery/milestones/M2-account-runtime.md#m2-d2-cookie-single
-status: PLANNED
+status: VERIFYING
 depends_on: ["CHG-20261030-108"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
@@ -11,7 +11,7 @@ risk: H
 
 ## Change
 
-先变更提供方 Cookie 契约，保留账号 original_cookie/active_cookie，增加 before_cookie 与当前 cookie_update JSON，打通单账号接入/更新；复用窗口/代理能力，在现有窗口记录保存当前 Cookie 操作占用，落实写前保留、平台隔离、身份核实和未知先核实。替换旧 read-sync 链路，不新增 Cookie 版本表或版本引用。
+先变更提供方 Cookie 契约，保留账号 original_cookie/active_cookie，增加 before_cookie 与当前 cookie_update JSON，打通单账号接入/更新；复用窗口/代理能力，在现有窗口记录保存当前 Cookie 操作占用，落实写前保留、平台隔离、身份核实和未知先核实。替换旧 read-sync 链路；移除仍调用已退役 noop 链路的 M1 验证脚本，统一复用现有环境组合验收入口。不新增 Cookie 版本表或版本引用。
 
 整体落地见[工程设计 §7](../../../docs/engineering/specs/social-accounts.md#7-整体落地方案)，表与接口见同文 §1～4。前置 CHG 完成并合入各仓 main 后再激活；按提供方契约 → 数据/业务 → 本机消费者及页面 → 真实验收推进，同阶段删除替代链路的废弃实现。具体代码拆分、迁移编号和测试由实施 Codex 决定，不预写文件级任务。
 

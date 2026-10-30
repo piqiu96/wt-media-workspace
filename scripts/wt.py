@@ -81,7 +81,7 @@ def cmd_test(scenario: str, repo_name: str | None, plan: bool, root: Path = ROOT
     elif scenario == "integration":
         if repo_name:
             raise WTError("integration is a cross-repository scenario; omit --repo")
-        run_command(root, ["python3", "scripts/verify/verify_m1_integration.py"], plan)
+        run_command(root, ["bash", "bin/control.sh", "verify"], plan)
     elif scenario == "e2e":
         if repo_name:
             raise WTError("e2e is a cross-repository scenario; omit --repo")
@@ -103,9 +103,7 @@ def cmd_dev(scenario: str, repo_name: str | None, plan: bool, root: Path = ROOT)
             raise WTError("dev repo needs --repo wt-media-cloud|wt-media-agent|wt-media-desktop")
         run_command(paths[repo_name], ["bash", "bin/control.sh", "start"], plan)
     elif scenario == "integration":
-        for name in ("wt-media-cloud", "wt-media-agent"):
-            run_command(paths[name], ["bash", "bin/control.sh", "start"], plan)
-        print("M1 integration: run wt test integration for the existing cross-end check")
+        run_command(root, ["bash", "bin/control.sh", "start"], plan)
     elif scenario == "e2e":
         run_command(root, ["bash", "bin/control.sh", "start"], plan)
     elif scenario == "real":
