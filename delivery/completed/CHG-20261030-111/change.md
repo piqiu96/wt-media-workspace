@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-111
 parent: delivery/milestones/M2-account-runtime.md#m2-d-社媒账号重构
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
@@ -32,3 +32,10 @@ References:
 - 账号筛选、行操作、详情、新增/编辑、分类及标签输入和批量接入容器对齐原型及公共规范；抽屉、滚动正文与固定底部不裁切。
 - 公共分类/团队/成员选择在实际消费者中复用，搜索、清空、联动及单/多选保持业务语义，失效选择不会悄悄带入提交。
 - 定向测试和 Web/Desktop 前端构建通过，重新构建安装包完成真实视觉与交互走查，保存截图及验证摘要；人工最终走查仍待用户。
+
+
+## Acceptance
+
+2026-10-30 完成实现、定向回归、公共字段代表页面与最新 macOS 安装包实测，结果见[验证证据](evidence/verification.md)。Cloud [PR #20](https://github.com/piqiu96/wt-media-cloud/pull/20) merge commit `4580251bf8b9d618f16a1ffb3c67db01a284fb67`、Workspace [PR #22](https://github.com/piqiu96/wt-media-workspace/pull/22) merge commit `fcc37708bf1ee918e4a1c360dbf87c3b1dca1821` 均已合入本地 main；两仓 PR 检查通过，短期分支退场。
+
+本 CHG 无剩余实施项。M2-D 整体继续 VERIFYING，由用户进行最终人工走查；不将本轮自检等同于人工签收。

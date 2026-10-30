@@ -6,4 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261030-111 | 社媒账号视觉纠偏与公共字段交互统一 | VERIFYING | wt-media-cloud |
