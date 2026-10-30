@@ -132,3 +132,10 @@ Contract existence and milestone completion are separate facts. A consumer may u
 ## M3 V2 planned contract scope (not a published revision)
 
 ADR-0013 confirms content-pool-first ingestion, `discovery_strategy`, a controlled channel abstraction and five business `crawl_task` statuses (`pending`, `running`, `success`, `partial_success`, `failed`). Cloud owns the future business API/enums, source/material relationship and task input/result/error contracts; Agent consumes execution contracts and implements channel adapters. Desktop reuses Cloud Web. Partial-failure mapping is confirmed as of 2026-09-23 (`partial_success` is a real business state, not a pending decision); content authorization still requires confirmed decisions before publication. This planning entry neither changes machine-readable revisions nor claims runtime compatibility, migrations or generated consumers have been updated.
+
+
+## Social-account rebuild planned scope (ADR-0030)
+
+CHG-20261030-108 → 109 → 110 defines the planned social-account maintenance/check, single Cookie update, and batch onboarding sequence. The Cloud provider owns account projections, check settlement, credentials and the dedicated import API; the Agent provider owns live platform checking and Cookie prepare/apply/inspect. Desktop and the shared Cloud Vue consume those definitions. Storage uses one import-batch table with a content_json object and an items array; row_number is the stable item identity within a batch, not a UUID or an array offset.
+
+The [engineering design](../engineering/specs/social-accounts.md#7-整体落地方案) defines the agreed rollout and cleanup. This is planned scope only: provider versions, generated consumers and Desktop contract locks change during implementation and validation of the relevant CHG. It does not declare the new API published or runtime compatibility verified.

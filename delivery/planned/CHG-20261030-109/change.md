@@ -13,7 +13,7 @@ risk: H
 
 先变更提供方 Cookie 契约，保留账号 original_cookie/active_cookie，增加 before_cookie 与当前 cookie_update JSON，打通单账号接入/更新；复用窗口/代理能力，在现有窗口记录保存当前 Cookie 操作占用，落实写前保留、平台隔离、身份核实和未知先核实。替换旧 read-sync 链路，不新增 Cookie 版本表或版本引用。
 
-按工程设计中的完整表/接口/清理目录交付本闭环；前置 CHG 合并后才能激活。执行顺序：提供方契约与迁移 → Cloud 业务 → Agent 执行 → Desktop 桥与 Vue → 真实验证及旧实现删除。每一任务先反例验证，再实现和定向回归；新迁移不修改旧建库链。
+整体落地见[工程设计 §7](../../../docs/engineering/specs/social-accounts.md#7-整体落地方案)，表与接口见同文 §1～4。前置 CHG 完成并合入各仓 main 后再激活；按提供方契约 → 数据/业务 → 本机消费者及页面 → 真实验收推进，同阶段删除替代链路的废弃实现。具体代码拆分、迁移编号和测试由实施 Codex 决定，不预写文件级任务。
 
 ## Done When
 
