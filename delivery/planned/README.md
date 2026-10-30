@@ -10,7 +10,6 @@
 | [CHG-20260915-047](CHG-20260915-047/change.md) | M3-C2 博主主动搜索入池 | 暂停（本期不做，ADR-0013） |
 | [CHG-20260915-050](CHG-20260915-050/change.md) | M3-E2 博主任务与持续入池 | 暂停（本期不做，ADR-0013） |
 | [CHG-20260923-054](CHG-20260923-054/change.md) | M3 综合验收缺陷与安全问题处置（D1、D2、D3、D6～D10、D-scheduler-2、S-1） | PLANNED；D3 已裁定不阻塞 M3 |
-| [CHG-20261029-107](CHG-20261029-107/change.md) | 游戏目录改为扁平业务类目 | PLANNED；CHG099 的前置 Foundation |
 
 M4 剩余 CHG 的执行边界见 [M4 §3.1](../milestones/M4-content-production.md#31-剩余-chg-执行边界)，不在此复制。M4-A 签收补记见 [2026-10-12 签收](../reports/2026-10-12-m4-a-signoff.md)。
 
