@@ -18,10 +18,21 @@
 
 只使用用户明确指定的两个窗口。没有向其他窗口写 Cookie，没有清空窗口或全域 Cookie。
 
-- B站「测试账号」，序号 51，Cloud 窗口 10、账号 1：PASS。使用实时读出的自身 Cookie 值进行实际更新，Cloud 肯定允许前核实数据库完整写前值；真实平台 UID/昵称和读回一致。其他域 50 条 Cookie 的完整指纹不变；输入约 9,016 字节。
-- 百度「路-华为」，序号 46，Cloud 窗口 37、账号 9：PASS。同样验证真实写入、身份和读回；其他域 60 条 Cookie 指纹不变；输入约 21,643 字节。该窗口存在浏览器合法的空名称 Cookie，修正 JSON 输入兼容并回归后通过；第一次校验拒绝时未授予写入。
+- B站「测试账号」，序号 51，Cloud 窗口 10、账号 1：PASS。使用实时读出的自身 Cookie 值进行实际更新，Cloud 肯定允许前核实数据库完整写前值；真实平台 UID/昵称和读回一致。其他域 50 条 Cookie 的完整指纹不变；最终源复验输入约 9,030 字节。
+- 百度「路-华为」，序号 46，Cloud 窗口 37、账号 9：PASS。同样验证真实写入、身份和读回；其他域 60 条 Cookie 指纹不变；最终源复验输入约 21,337 字节。该窗口存在浏览器合法的空名称 Cookie，修正 JSON 输入兼容并回归后通过；第一次校验拒绝时未授予写入。
 - 两个平台均验证原始值不被后续更新覆盖、普通详情无凭证、重复起始/重复写前回报不再次授予执行、处理中解绑冲突、迟到编号冲突。模拟一次回报丢失后只读核实并结算，未重放写入。
 - 验证通过生产 LocalApiServer/BitBrowser Client/CDP 实现与真实 Cloud API/MySQL 完成；不等同于已完成安装包点击路径。凭证值仅在进程内及业务数据库保存，不进入证据文件。
+
+## 四仓评审
+
+四仓 Draft PR 的 CI 均为 SUCCESS：
+
+- [Cloud #18](https://github.com/piqiu96/wt-media-cloud/pull/18)：完整 Go/Vue、重复迁移与发布构建通过。
+- [Agent #6](https://github.com/piqiu96/wt-media-agent/pull/6)：测试、SQLite 迁移与构建通过。
+- [Desktop #8](https://github.com/piqiu96/wt-media-desktop/pull/8)：原生及发布脚本测试通过。
+- [Workspace #20](https://github.com/piqiu96/wt-media-workspace/pull/20)：治理验证通过。
+
+最终提交的 B站/百度真实链路及 MySQL 两组集成均再次通过。最新源 DMG 已重建、挂载并启动；最终 Sidecar 和界面门槛仍待人工解锁后完成。
 
 ## 清理与组合门槛
 
@@ -29,4 +40,4 @@
 
 原 `wt chg verify` 集成步骤仍调用已退役 M1 noop 注册/租约链路，实测 import 已不存在；其脚本与现行产品无消费者，已移除，场景统一复用现有 `bin/control.sh verify`。没有以跳过失败冒充通过。
 
-安装包已构建和挂载；移交 8765 端口后需运营桌面会话启动 Sidecar。当前 Mac 锁屏，CUA 明确要求人工解锁，已请求用户解锁。因此最终最新源组合重建、安装包登录/凭证/更新界面与红色失败反馈仍 PENDING，当前运行环境就绪检查也尚不能记 PASS。CHG-109 保持 VERIFYING，未合并/归档；CHG-110 尚未启动。
+安装包已构建和挂载；移交 8765 端口后需运营桌面会话启动 Sidecar。当前 Mac 锁屏，CUA 明确要求人工解锁，已请求用户解锁。最新源组合构建已通过；安装包登录/凭证/更新界面与红色失败反馈仍 PENDING，当前运行环境就绪检查也尚不能记 PASS。CHG-109 保持 VERIFYING，未合并/归档；CHG-110 尚未启动。
