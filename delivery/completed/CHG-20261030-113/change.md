@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-113
 parent: delivery/milestones/M2-account-runtime.md#m2-d-社媒账号重构
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
@@ -29,3 +29,9 @@ References:
 - 批量结果复用公共视觉模式：状态图标/标题、七项计数、进度与逐项表、固定操作；成功/全失败/部分/暂停/待确认呈现准确。
 - 长名称、UID、Cookie、原因及窄屏不撑破浮层；表格仅在内部滚动，关闭/提交/恢复动作可达。
 - 相关回归、Web/Desktop 构建和实际页面检查通过；证据区分真实操作与隔离展示，人工清单可逐项签收。M2-D 仍待人工整体验收。
+
+## Verification
+
+已完成全入口视觉核对、28 类生产模板展示状态与 11 类窄屏检查、真实运行页面只读复核；Web 109 文件 / 931 项测试、Cloud 构建、最新 DMG 与完整环境门禁通过。详见 [逐项记录](evidence/走查与验证记录.md) 与 [人工验收清单](evidence/人工验收清单.md)。本轮未写入真实 Cookie；安装包原生登录页保留用户未完成输入，M2-D 整体人工验收仍为 VERIFYING。
+
+Cloud PR #23 已以 merge commit `e9424fa` 合入本地 main；Workspace PR #24 已以 merge commit `0f3dee7` 合入本地 main。最终源码为 Cloud `5f99e95`，与重建前端版本 `0.1.0+5f99e95` 对应。两仓 CI 均通过；分支已退场。
