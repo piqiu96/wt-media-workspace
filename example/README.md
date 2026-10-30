@@ -14,3 +14,5 @@
 ## 当前稿保留
 
 本目录只保存最终可操作稿及必要资源；中间截图、测试脚本、日志、缓存和多版本副本不进入example或CHG evidence。具体边界统一遵循[最终制品保留原则](../docs/standards/文档与知识事实治理规范.md#21-最终制品保留原则)。当前业务原型见[浏览器窗口与代理](proto/browser-proxy/index.html)。
+
+当前社媒账号业务稿见[社媒账号](proto/social-accounts/index.html)。

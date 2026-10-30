@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-108
 parent: delivery/milestones/M2-account-runtime.md#m2-d1-maintenance
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
@@ -13,9 +13,7 @@ risk: H
 
 交付 M2-D1：最终账号维护页面及人工登录后真实平台识别，检查不写浏览器 Cookie。同步回写 PRD、ADR、工程设计并固定已批准原型。旧账号模块未使用，不建设兼容层；保留外部真实窗口与会话。
 
-数据库、接口和整体落地方案已确认；当前进入运行时实施。
-
-当前差距：账号表尚无本次检查结果与编号字段；现有资料接口仍可写平台身份/登录状态，identify、账号组与旧 Cookie 接口需要收敛，部分路由缺少 OpenAPI 描述。数据库与接口核对及目标清理目录见工程设计。
+运行时改动已提交，进入真实平台、桌面页面和契约组合验收。实现与验证记录见同目录 evidence 和 checkpoint；Cookie 替换链路按 109 继续交付。
 
 ### 落地顺序
 

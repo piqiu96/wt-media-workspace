@@ -4,18 +4,9 @@
 
 ## 1. 数据归属与四张领域表
 
-### 1.1 已核实现状与变更方向
+### 1.1 最终表集合
 
-2026-10-30 已只读核实 Cloud 迁移链、账号 OpenAPI / 路由注册及 Agent OpenAPI，并查询本机开发库 information_schema；本轮不实施运行时代码或数据库迁移。开发库有 7 条账号记录，执行迁移前按目标环境确认测试数据处理，不以模块未上线直接清空数据或外部会话。
-
-| 已核实的现状 | 最终处理 | 交付 |
-| --- | --- | --- |
-| media_accounts 已有身份、归属、窗口、enabled、登录结论、last_check_at/items 和 original_cookie/active_cookie | 保留；补当前检查结果、编号及必要写前值/当前更新信息 | 108 检查；109 凭证 |
-| media_account_categories、media_account_tags 已存在 | 保留；复用 categories 的 game/ai/anime | 108 |
-| media_account_groups 已存在 | 删除独立账号组 API 和表 | 108 |
-| 接入批次表不存在 | 仅新增 media_account_import_batches，content_json 内保存 items 数组 | 110 |
-
-最终账号领域共四张表：media_accounts、media_account_categories、media_account_tags、media_account_import_batches。不建立独立 Cookie 版本表和接入明细表。Cloud 保存业务事实；Agent 不落账号/Cookie/批次业务库；Desktop 只桥接。users、categories、browser_profiles、proxies 继续复用。
+账号领域使用 media_accounts、media_account_categories、media_account_tags、media_account_import_batches 四张表。Cloud 保存业务事实；Agent 不落账号/Cookie/批次业务库；Desktop 只桥接。users、categories、browser_profiles、proxies 继续复用。不保留独立账号组，不新增 Cookie 版本表或接入明细表。
 
 ### 1.2 表结构与字段
 
@@ -96,7 +87,7 @@ content_json 顶层存批次补充信息，items 为数组。分类、标签、�
 | cookies/read-sync、cookies/read-sync/result；GET /:id/cookies | 删除旧链路，改为 credentials 与专用 cookie-updates；旧 GET 已注册但账号 OpenAPI 缺失 |
 | /account-groups 的 POST/GET、/:group_id 的 PATCH/DELETE、/:group_id/accounts GET | 删除，不补为继续维护的产品 |
 
-本轮不修改运行仓正式契约版本或生成 DTO；108→109→110 分别先修改提供方 OpenAPI/Schema/错误码，再更新消费者和契约锁。
+契约由提供方维护，修改 OpenAPI/Schema/错误码后同步直接消费者和契约锁。
 
 ### 2.2 目标接口目录
 

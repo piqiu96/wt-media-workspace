@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-10-30
 - Scope: 社媒账号、Cookie 接入与检查，Cloud / Desktop / Agent
-- Supersedes: ADR-0010 的页面冻结及旧状态字段约束；ADR-0027 对原社媒账号表集合的限定。ADR-0027 的其他资源与职责边界继续有效。
+- Supersedes: 未上线账号旧方案（原 ADR-0010，历史保留在 Git）；ADR-0027 对原社媒账号表集合的限定。ADR-0027 的其他资源与职责边界继续有效。
 
 ## Context
 
