@@ -12,12 +12,14 @@
 
 | 表 | 字段与责任 | 约束/索引 |
 | --- | --- | --- |
-| media_accounts | 保留现有账号、归属、身份、窗口、启停、备注与登录字段；新增 last_check_status/message/identity、check_operation_id/started_at/profile_id；保留 original_cookie、active_cookie、cookie_status、cookie_updated_at；新增 before_cookie、cookie_update | 保留唯一 user_id+platform+platform_account_id（待识别 UID 为 NULL）、browser_profile_id+platform（未绑定为 NULL），以及归属/窗口外键、原有查询索引 |
+| media_accounts | 保留现有账号、归属、身份、窗口、启停、备注与登录字段；移除重复异常状态与 duplicate_of_account_id 外键/列；新增 last_check_status/message/identity、check_operation_id/started_at/profile_id；保留 original_cookie、active_cookie、cookie_status、cookie_updated_at；新增 before_cookie、cookie_update | user_id+platform+platform_account_id 为非唯一查询索引；保留唯一 browser_profile_id+platform（未绑定为 NULL），以及归属/窗口外键、原有查询索引 |
 | media_account_categories | media_account_id、category_id | 复合主键；同账号多选属于同一 type，关联归属用户可用的已启用类目 |
 | media_account_tags | media_account_id、tag_name、created_at | 复合主键；不建全局标签字典 |
 | media_account_import_batches | id、user_id、request_key、platform、content_json、revision、created_at、updated_at | id 自增主键；唯一 user_id+request_key；user_id+created_at 索引 |
 
 主键/关联 ID 沿用 BIGINT UNSIGNED 和现有 API ID 表达。request_key/操作编号使用 VARCHAR(64)，platform/状态使用 VARCHAR(32)，说明 VARCHAR(500)，时间 DATETIME(6)。content_json、cookie_update、检查观测为 JSON；revision 为非空 BIGINT UNSIGNED，初始 0。Cookie 字段使用 LONGTEXT，原始输入保留原格式，实时读回和写前值存完整 Cookie 对象的 JSON 文本。
+
+同 UID 不同窗口各自保存真实平台身份；identification_status 仅 pending_identification/identified。读取投影 same_identity_account_id 按当前用户+平台+UID 查询另一个窗口的记录，供详情顶部可选查看，不持久化依赖或参与登录/执行判定。UID 查询索引非唯一，同窗口同平台唯一约束继续生效。历史重复误判回到待检查，保留观测和凭证，真实只读检查再确认，不把历史结论冒充当前正常。历史批次重复失败转为待核实，复用原窗口/操作只读结算，不再次写入。
 
 last_check_status，默认 never，枚举 never/running/completed/failed；其余检查新增字段可空。last_check_identity 为观测 UID/name/avatar，供身份对照。last_check_at 表示最近取得结论的时间，失败不覆盖历史平台资料与登录结论。结果须匹配当前检查编号、窗口和归属；重复结果返回原结算，迟到结果拒绝，绑定变化使旧检查失效。
 
@@ -93,7 +95,7 @@ content_json 顶层存批次补充信息，items 为数组。分类、标签、�
 | PATCH /media-accounts/:id | category_ids/tags/remark，或独立 enabled 请求；未传不改、空数组清空；不接受手填身份/登录结论 |
 | PATCH / DELETE /media-accounts/:id/profile | 绑定/解绑本人窗口，校验同平台占用；只改关联，不写或清 Cookie |
 | POST /media-accounts/:id/check | 返回 operation_id/browser_profile_id/bit_profile_id/platform/expected_platform_account_id |
-| POST /media-accounts/:id/check/result | operation_id、execution_status(completed/failed)、平台观测与 check_items/message；同 UID 刷新，异 UID 保存对照，失败保留旧结论 |
+| POST /media-accounts/:id/check/result | operation_id、execution_status(completed/failed)、平台观测与 check_items/message；同 UID 刷新（其他窗口同 UID 仅提示），异 UID 保存对照，失败保留旧结论 |
 | GET /media-accounts/:id/credentials | 最初输入、当前确认值与更新时间；无值为空，不触发本机读写 |
 | POST /media-accounts/:id/cookie-updates | request_key、当前更新编号 expected_operation_id（初次可空）、input_cookie；原子校验目标并保存 cookie_update，返回本次编号与目标 |
 | PUT /media-accounts/:id/cookie-updates/:operation_id/snapshot | 目标平台写前值及实际占用；保存 before_cookie 和必要指纹后返回 can_apply=true 与本次编号 |
@@ -106,7 +108,7 @@ content_json 顶层存批次补充信息，items 为数组。分类、标签、�
 | PUT /media-account-imports/:id/items/:row_number/result | expected_revision、attempt、step、结果；按当前步骤结算，重复回报返回已有结果，不接受整份 content_json 覆盖 |
 | POST /media-account-imports/:id/items/:row_number/actions | expected_revision、action=skip/restore/retry/reconcile/reuse；复用带 candidate_profile_id 与明确确认；未知只先核实 |
 
-列表标签模式 tag_match=any/all/exclude。normal 检查结论必须有 UID；failed 不要求伪造身份。异 UID 不接管原账号；重复 UID 返回 existing_account_id，不覆盖已有账号的窗口或 Cookie。分类编辑校验同 type，归属名称关联查询，不冗余保存账号表。
+列表标签模式 tag_match=any/all/exclude。normal 检查结论必须有 UID；failed 不要求伪造身份。异 UID 不接管原账号；同 UID 不同窗口均正常保存，详情投影 same_identity_account_id 仅提供其他窗口记录的可选查看，不覆盖已有账号的窗口或 Cookie。分类编辑校验同 type，归属名称关联查询，不冗余保存账号表。
 
 Cookie 和批次执行仅本人 Desktop 可用；管理员无凭证/本机入口。写前流程为 Agent prepare → Cloud 持久化并肯定允许 → Agent apply；批次通过单项 result 的 step=prepared 保存同样信息。成功阶段响应不等于整项接入成功。明确失败红色反馈，未知显示待确认；旧编号、目标变化与版本冲突用结构化错误，不解析字符串驱动状态。
 
@@ -135,7 +137,7 @@ Agent 只执行本机和平台能力；Cloud browser_profile_id 是数据库 ID�
 
 实际 Cookie 读取使用 CDP；实时目标平台 Cookie 确认为空时表示无登录信息，非空则读取实时平台响应。B站通过同源平台页读取身份，避免比特默认页跨域限制；不覆盖运营原有页面。保存值回退不能冒充实时成功。B站/百度适配保留 Client/Service 分层，不在 Vue 或 Desktop 复制平台逻辑。prepare/apply/inspect 不增加 Agent 业务库或执行历史。
 
-批次成功必须有真实 UID、明确登录结论和正确正式窗口关系；人工登录、待同步、容量不足、身份冲突以 step/message 表达。需要人工登录时继续原项，不重新导入整批。跳过保留原项和必要原状态，恢复后从原步骤处理；未知先核实。检查成功表示取得结论，与接入成功语义不同。
+批次成功必须有真实 UID、明确登录结论和正确正式窗口关系；同 UID 其他窗口已有记录时仍保存本窗口已确认身份和凭证，单项 succeeded、提示已存在，不要求跳过；人工登录、待同步、容量不足、身份冲突以 step/message 表达。需要人工登录时继续原项，不重新导入整批。跳过保留原项和必要原状态，恢复后从原步骤处理；未知先核实。检查成功表示取得结论，与接入成功语义不同。
 
 七计数为 total 加 succeeded/failed/skipped/running/pending/uncertain 六个互斥计数，读取 items 聚合，不重复存储。批量检查复用逐项检查 API 和计数投影，不另建长期检查历史。总继续按钮只计可自动继续项。
 

@@ -3,7 +3,7 @@ id: CHG-20261031-114
 parent: delivery/milestones/M2-account-runtime.md#m2-d1-maintenance
 status: IMPLEMENTING
 depends_on: []
-affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
+affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
 ---
 
@@ -13,7 +13,7 @@ risk: M
 
 按已确认规则修正“同 UID 即冲突”：同一用户的同平台 UID 可在不同窗口保留独立运营记录，身份、登录结论与 Cookie 按当前窗口维护；同窗口同平台仍唯一。其他窗口已有同 UID 仅作为详情顶部提示，列表恢复常规检查/详情操作，详情可选查看已有账号。批量已验证的同 UID 新窗口正常结算，不阻断后续项、不要求跳过、不写已有窗口。
 
-先统一 PRD、M2-D、工程设计、ADR-0030、原型和 Cloud 提供方契约，再修改 Cloud 的唯一约束、检查/Cookie/批次结算与共用 Vue；Agent/Desktop 仅同步消费契约和验证安装包，不复制业务判定。不新增账号主表/窗口关系表、合并向导或新的流程。清理旧重复状态/反向依赖及专门跳转主操作；旧错误重复结果不得直接冒充当前登录正常，须只读核实。
+先统一 PRD、M2-D、工程设计、ADR-0030、原型和 Cloud 提供方契约，再修改 Cloud 的唯一约束、检查/Cookie/批次结算与共用 Vue；Agent/Desktop 无受影响的 DTO/消费锁，复用原有本机协议并验证安装包，不复制业务判定。不新增账号主表/窗口关系表、合并向导或新的流程。清理旧重复状态/反向依赖及专门跳转主操作；旧错误重复结果不得直接冒充当前登录正常，须只读核实。
 
 ## Done When
 
