@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-112
 parent: delivery/milestones/M2-account-runtime.md#m2-d-社媒账号重构
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
@@ -31,3 +31,5 @@ References:
 - 关联自动测试、Cloud/Desktop 构建与最新安装包/Web 走查通过；提供含操作、预期、人工结果栏的清单。M2-D 人工最终签收仍由用户完成。
 
 实施与自检已完成：见 [逐页验证记录](evidence/verification.md)、[人工验收清单](evidence/人工验收清单.md)。Cloud PR #21，最终前端版本 `0.1.0+59f8f8d`。M2-D 人工签收仍未完成。
+
+两仓已通过 CI 并以 merge commit 合入本地与远端 `main`：Cloud [PR #21](https://github.com/piqiu96/wt-media-cloud/pull/21)（`143e11f36845e66d65e981295eaae7c530540371`）；Workspace [PR #23](https://github.com/piqiu96/wt-media-workspace/pull/23)（`e1fd3a8410c71e104640678d568785307c03132d`）。本次逐页整改与自检完成；M2-D 保持 VERIFYING，等待人工整体签收。

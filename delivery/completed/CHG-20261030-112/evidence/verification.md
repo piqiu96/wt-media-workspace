@@ -66,3 +66,9 @@
 运行差异仅为 Cloud 共用 Vue 页面及对应测试；无数据库、接口、协议或 Agent/Desktop Runtime 变更。Workspace 只更新 Delivery、验证记录及人工清单，其他会话原型改动未纳入。最终差异经过逐页行为、失败路径和边界核对；治理与 Product/Master 对齐检查通过。
 
 人工签收入口：[人工验收清单](人工验收清单.md)。本 CHG 的代码整改/自检可交付，M2-D 仍为 VERIFYING，等待人工整体走查。
+
+## 合并与归档
+
+- Cloud [PR #21](https://github.com/piqiu96/wt-media-cloud/pull/21)：CI verify PASS，merge commit `143e11f36845e66d65e981295eaae7c530540371`。
+- Workspace [PR #23](https://github.com/piqiu96/wt-media-workspace/pull/23)：CI Workspace checks PASS，merge commit `e1fd3a8410c71e104640678d568785307c03132d`。
+- 两仓本地 main 已快进至上述合并提交。CHG-112 代码整改、自检与人工清单交付完成，归档为 DONE；人工结果仍留空，M2-D 仍为 VERIFYING。
