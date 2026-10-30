@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-110
 parent: delivery/milestones/M2-account-runtime.md#m2-d3-cookie-batch
-status: PLANNED
+status: VERIFYING
 depends_on: ["CHG-20261030-109"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
