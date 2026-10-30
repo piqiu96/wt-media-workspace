@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20261030-113 | 社媒账号浮层与操作结果视觉收口 | VERIFYING | wt-media-cloud |

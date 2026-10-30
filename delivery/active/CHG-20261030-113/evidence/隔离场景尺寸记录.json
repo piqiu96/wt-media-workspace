@@ -1,0 +1,531 @@
+[
+  {
+    "scene": "saved",
+    "geometry": [
+      {
+        "height": 270,
+        "scrollHeight": 270,
+        "scrollWidth": 558,
+        "width": 558
+      }
+    ]
+  },
+  {
+    "scene": "bound",
+    "geometry": [
+      {
+        "height": 230,
+        "scrollHeight": 230,
+        "scrollWidth": 558,
+        "width": 558
+      }
+    ]
+  },
+  {
+    "scene": "binding",
+    "geometry": [
+      {
+        "height": 318,
+        "scrollHeight": 318,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "binding-empty",
+    "geometry": [
+      {
+        "height": 293,
+        "scrollHeight": 293,
+        "scrollWidth": 558,
+        "width": 558
+      }
+    ]
+  },
+  {
+    "scene": "create",
+    "geometry": [
+      {
+        "height": 508,
+        "scrollHeight": 508,
+        "scrollWidth": 638,
+        "width": 638
+      }
+    ]
+  },
+  {
+    "scene": "edit",
+    "geometry": [
+      {
+        "height": 502,
+        "scrollHeight": 502,
+        "scrollWidth": 638,
+        "width": 638
+      }
+    ]
+  },
+  {
+    "scene": "detail",
+    "geometry": [
+      {
+        "height": 763,
+        "scrollHeight": 763,
+        "scrollWidth": 800,
+        "width": 800
+      }
+    ]
+  },
+  {
+    "scene": "check-failed",
+    "geometry": [
+      {
+        "height": 763,
+        "scrollHeight": 763,
+        "scrollWidth": 800,
+        "width": 800
+      }
+    ]
+  },
+  {
+    "scene": "cookie-update",
+    "geometry": [
+      {
+        "height": 407,
+        "scrollHeight": 407,
+        "scrollWidth": 638,
+        "width": 638
+      }
+    ]
+  },
+  {
+    "scene": "credentials",
+    "geometry": [
+      {
+        "height": 404,
+        "scrollHeight": 404,
+        "scrollWidth": 638,
+        "width": 638
+      }
+    ]
+  },
+  {
+    "scene": "detail",
+    "geometry": [
+      {
+        "height": 763,
+        "scrollHeight": 763,
+        "scrollWidth": 800,
+        "width": 800
+      }
+    ]
+  },
+  {
+    "scene": "import-partial",
+    "geometry": [
+      {
+        "height": 555,
+        "scrollHeight": 555,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-failed",
+    "geometry": [
+      {
+        "height": 559,
+        "scrollHeight": 559,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-input",
+    "geometry": [
+      {
+        "height": 698,
+        "scrollHeight": 868,
+        "scrollWidth": 952,
+        "width": 952
+      }
+    ]
+  },
+  {
+    "scene": "import-preview",
+    "geometry": [
+      {
+        "height": 279,
+        "scrollHeight": 279,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-history",
+    "geometry": [
+      {
+        "height": 168,
+        "scrollHeight": 168,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "reuse",
+    "geometry": [
+      {
+        "height": 555,
+        "scrollHeight": 555,
+        "scrollWidth": 958,
+        "width": 958
+      },
+      {
+        "height": 164,
+        "scrollHeight": 164,
+        "scrollWidth": 558,
+        "width": 558
+      }
+    ]
+  },
+  {
+    "scene": "tags",
+    "geometry": [
+      {
+        "height": 131,
+        "scrollHeight": 131,
+        "scrollWidth": 558,
+        "width": 558
+      }
+    ]
+  },
+  {
+    "scene": "mismatch",
+    "geometry": [
+      {
+        "height": 763,
+        "scrollHeight": 845,
+        "scrollWidth": 792,
+        "width": 792
+      }
+    ]
+  },
+  {
+    "scene": "cookie-error",
+    "geometry": [
+      {
+        "height": 463,
+        "scrollHeight": 463,
+        "scrollWidth": 638,
+        "width": 638
+      }
+    ]
+  },
+  {
+    "scene": "cookie-uncertain",
+    "geometry": [
+      {
+        "height": 209,
+        "scrollHeight": 209,
+        "scrollWidth": 638,
+        "width": 638
+      }
+    ]
+  },
+  {
+    "scene": "check-running",
+    "geometry": [
+      {
+        "height": 497,
+        "scrollHeight": 497,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "check-result",
+    "geometry": [
+      {
+        "height": 415,
+        "scrollHeight": 415,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "history-empty",
+    "geometry": [
+      {
+        "height": 196,
+        "scrollHeight": 196,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-success",
+    "geometry": [
+      {
+        "height": 551,
+        "scrollHeight": 551,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-paused",
+    "geometry": [
+      {
+        "height": 551,
+        "scrollHeight": 551,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-uncertain",
+    "geometry": [
+      {
+        "height": 627,
+        "scrollHeight": 627,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-skipped",
+    "geometry": [
+      {
+        "height": 551,
+        "scrollHeight": 551,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-running",
+    "geometry": [
+      {
+        "height": 573,
+        "scrollHeight": 573,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "binding-empty",
+    "geometry": [
+      {
+        "height": 309,
+        "scrollHeight": 309,
+        "scrollWidth": 558,
+        "width": 558
+      }
+    ]
+  },
+  {
+    "scene": "history-empty",
+    "geometry": [
+      {
+        "height": 222,
+        "scrollHeight": 222,
+        "scrollWidth": 958,
+        "width": 958
+      }
+    ]
+  },
+  {
+    "scene": "import-input",
+    "geometry": [
+      {
+        "height": 698,
+        "scrollHeight": 868,
+        "scrollWidth": 952,
+        "width": 952
+      }
+    ]
+  },
+  {
+    "scene": "create",
+    "geometry": [
+      {
+        "height": 481,
+        "scrollHeight": 586,
+        "scrollWidth": 440,
+        "width": 440
+      }
+    ]
+  },
+  {
+    "scene": "edit",
+    "geometry": [
+      {
+        "height": 481,
+        "scrollHeight": 597,
+        "scrollWidth": 440,
+        "width": 440
+      }
+    ]
+  },
+  {
+    "scene": "tags",
+    "geometry": [
+      {
+        "height": 143,
+        "scrollHeight": 143,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "mismatch",
+    "geometry": [
+      {
+        "height": 576,
+        "scrollHeight": 1053,
+        "scrollWidth": 440,
+        "width": 440
+      }
+    ]
+  },
+  {
+    "scene": "credentials",
+    "geometry": [
+      {
+        "height": 396,
+        "scrollHeight": 396,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "cookie-error",
+    "geometry": [
+      {
+        "height": 477,
+        "scrollHeight": 477,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "import-input",
+    "geometry": [
+      {
+        "height": 519,
+        "scrollHeight": 1058,
+        "scrollWidth": 440,
+        "width": 440
+      }
+    ]
+  },
+  {
+    "scene": "import-preview",
+    "geometry": [
+      {
+        "height": 301,
+        "scrollHeight": 301,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "import-partial",
+    "geometry": [
+      {
+        "height": 485,
+        "scrollHeight": 619,
+        "scrollWidth": 440,
+        "width": 440
+      }
+    ]
+  },
+  {
+    "scene": "check-result",
+    "geometry": [
+      {
+        "height": 479,
+        "scrollHeight": 479,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "reuse",
+    "geometry": [
+      {
+        "height": 485,
+        "scrollHeight": 619,
+        "scrollWidth": 440,
+        "width": 440
+      },
+      {
+        "height": 180,
+        "scrollHeight": 180,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "tags",
+    "geometry": [
+      {
+        "height": 201,
+        "scrollHeight": 201,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "credentials",
+    "geometry": [
+      {
+        "height": 396,
+        "scrollHeight": 396,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "cookie-error",
+    "geometry": [
+      {
+        "height": 477,
+        "scrollHeight": 477,
+        "scrollWidth": 446,
+        "width": 446
+      }
+    ]
+  },
+  {
+    "scene": "check-failed",
+    "geometry": [
+      {
+        "height": 763,
+        "scrollHeight": 763,
+        "scrollWidth": 800,
+        "width": 800
+      }
+    ]
+  }
+]
