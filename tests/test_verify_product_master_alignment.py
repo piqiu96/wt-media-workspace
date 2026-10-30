@@ -132,18 +132,12 @@ class ProductMasterAlignmentTests(unittest.TestCase):
             ],
         )
 
-    def test_rejects_missing_m2_product_capability(self) -> None:
-        changed = self.mutate("### M2-C：代理与 Profile 闭环", "### 代理网络配置")
-
-        # `M2-C：` occurs exactly once in the Master Plan, so stripping it
-        # removes both the section label and the capability needle.
-        self.assert_errors(
-            changed,
-            [
-                "M2 candidate missing 'M2-C：'",
-                "M2 capability missing 'M2-C：代理与 Profile 闭环'",
-            ],
+    def test_rejects_missing_m2_closure_reference(self) -> None:
+        changed = self.mutate(
+            'milestones/M2-account-runtime.md#m2-d-社媒账号重构',
+            'milestones/missing-account-closure.md',
         )
+        self.assert_errors(changed, ['M2 closure reference missing'])
 
     def _active_root(self, status: str, ledger_status: str | None = None) -> Path:
         """A minimal, otherwise-valid active CHG whose status line is `status`.

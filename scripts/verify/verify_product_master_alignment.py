@@ -131,36 +131,10 @@ def validate_master_text(text: str) -> list[str]:
         )
     )
 
-    # A DONE milestone has no candidate block, so its record is asserted against
-    # the section itself. Do not fall back to `candidate_block(...) or section`:
-    # a missing block would silently redirect the assertions and report stale
-    # needles instead of a structural error.
-    m2_record = sections[2]
-    errors.extend(
-        require_all(
-            m2_record,
-            ("M2-A：", "M2-B：", "M2-C：", "M2-D：", "M2-E："),
-            "M2 candidate",
-        )
-    )
-    errors.extend(
-        require_all(
-            m2_record,
-            (
-                "四条业务闭环顺序补齐",
-                "M2-A：用户与权限闭环",
-                "M2-B：媒体账号与 Profile 闭环",
-                "M2-C：代理与 Profile 闭环",
-                "M2-D：Cookie 与开户闭环",
-                "M2-E：Desktop 与安全闭环",
-                "真实 MySQL",
-                "BitBrowser",
-                "Cookie",
-                "Desktop",
-            ),
-            "M2 capability",
-        )
-    )
+    # Current M2 extension owns its closure in the milestone, not a duplicate
+    # frozen list of pre-refactor capabilities in this summary.
+    if 'milestones/M2-account-runtime.md#m2-d-社媒账号重构' not in sections[2]:
+        errors.append('M2 closure reference missing')
 
     # M3 has no candidate block: a DONE milestone is covered by its status word
     # plus the common milestone acceptance needles (D-04).
