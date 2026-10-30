@@ -25,10 +25,24 @@
 
 ## 新安装包与页面
 
-进行中。统一入口 `bin/control.sh start` 将从当前三仓提交重建、验证全部环境门并挂载macOS Apple Silicon DMG；随后验证Native页面，不用dev页面代替安装包。Windows和macOS Intel未进行本轮实机验收。
+PASS。`bin/control.sh start` 最终完整运行成功：Cloud/migration、Agent/BitBrowser、worker、两端dev入口、构建资产/版本、DMG新鲜度、CORS和login smoke全部通过，再将8765交给新安装包的受保护Sidecar。最终组合为Cloud `de4849f`、Agent `950122a`、Desktop `6e7ade0`；DMG来自最新源码，frontend build为 `0.1.0+de4849f`。
+
+Native实际操作（非dev页）：
+
+- 登录验收用户12，工作环境显示“这台电脑可以工作 / 本机服务已连接 / 比特浏览器已登录指定账号 / 执行凭证已配置”；从社媒账号打开批量输入抽屉，平台切换百度、默认真实分组「测试」，一级/二级分类联动、回车标签可用，未出现“暂不分类”。
+- 输入真实来源Cookie一行+无效一行：预览显示原行1可接入、原行2不接入且红色原因；确认只创建1项，未在预览产生新窗口/账号。
+- 确认后通过Vue → Rust → 打包Sidecar → BitBrowser完成新建、同步、写前读取/保存、写入和实时百度身份读取，批次18最终1项重复UID，显示实际昵称与UID，查看已有账号打开账号11，既有绑定/凭证未覆盖。无假成功。
+- 关闭后从接入记录重进，仍为原行1、未完成1、执行中/待确认0；继续数量为0。实际点击跳过→恢复，计数在未完成1/跳过1之间对应变化，仍定位原项。
+- 弹窗底部操作始终在可视区域；结果标题区分完成与暂停；失败红色、成功绿色。截图见 [Native预览](native-preview.png) 与 [Native结果](native-result.png)。
+
+Windows和macOS Intel未进行本轮实机验收。真人手机号/验证码登录未代操作；人工完成会话后的只读继续路径按上表真实状态测试。
 
 ## 交付与清理
 
-当前实现：Cloud `896924b`、Agent `950122a`、Desktop `6e7ade0`。关联PR：Cloud #19、Agent #7、Desktop #9。合并提交和最终页面证据在完成验收后补齐。
+实现提交：Cloud `896924b` + `de4849f`、Agent `950122a`、Desktop `6e7ade0`。关联PR：Cloud #19、Agent #7、Desktop #9、Workspace #21。四仓CI通过；Cloud最后修正重新通过service测试与完整CI。运行仓已合入并同步main：Cloud PR #19 `4fbd945d3e71d9b0e98ff49acd4aeccb6d09c795`、Agent PR #7 `6fb30d9b17d4452d90b20d09a66cd14829a2a694`、Desktop PR #9 `bd10f0d6ea6b8f28d12b13c54ace976a3de53814`。CI同时覆盖Cloud全部modules、前端、迁移与发布脚本，以及Agent测试目录隔离、Desktop Rust及打包shell套件。
+
+按Done When再次复核实现、状态错误路径、真实数据库/平台/页面和契约组合，未发现范围外增量或缺失的必要结算链路。此处为执行器自检，不代表用户已完成人工整体签收。M2-D进入VERIFYING交由人工走查。
 
 旧开户页/路由、账号组、手填身份、独立标签API和旧read-sync已由108/109清理，本轮核对目标模块无并行旧入口。工程设计去除按阶段隐藏能力的中间描述，明确最终接口与一张JSON批次表；保留顺序迁移建库链及有价值交付证据。与本任务无关的example改动保持原状。
+
+仅清理本次未执行的准备批次2、11；正式验收批次7、14、17、18和新建窗口保留供人工走查。原窗口、原账号和其他工作区改动保持原状。
