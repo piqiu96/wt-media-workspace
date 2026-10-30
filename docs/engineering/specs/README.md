@@ -10,7 +10,7 @@ This file is the index. Every other `*.md` in this directory must be listed belo
 
 ## Current capability designs
 
-- [社媒账号：数据、接口与本机执行](social-accounts.md)：矩阵维护、人工登录识别、Cookie 版本与接入批次；ADR-0030。
+- [社媒账号：数据、接口与本机执行](social-accounts.md)：矩阵维护、人工登录识别、CK 明细、写前保护与单表 JSON 接入批次；ADR-0030。
 
 - [运营资源：Cloud 事实与本机执行](2026-10-29-operating-resources.md)：社媒账号、浏览器窗口、代理的事实归属、同步、代理操作恢复、角色与批量处理边界（ADR-0027）。
 - [M4-M5 Cloud 内容生产工程设计](2026-09-24-m4-m5-cloud-content-production.md)：Cloud Scheduler / Worker / FFmpeg、对象存储、文件传输和恢复边界（ADR-0017）。
