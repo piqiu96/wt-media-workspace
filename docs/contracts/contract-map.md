@@ -96,7 +96,7 @@ courtesy, not the boundary.
 
 ### Operating-resource contract (CHG-20261028-099)
 
-Cloud owns revision `2026.10.29.2` of the affected API schemas. `proxies` is the
+Cloud owns revision `2026.10.30.1` of the affected API schemas. `proxies` is the
 team-scoped proxy ledger with boolean `enabled`, `max_profiles`, Cloud-side health
 checks, and current formal/reserved occupancy. `browser-profiles` records the
 single user snapshot, `bit_` mirror fields, boolean enablement, Cloud remark, and
@@ -105,6 +105,12 @@ two proxy-operation endpoints: start reservation and settle the Desktop result.
 Cloud relation. Uncertain Desktop results are reported as failures and clear the
 reservation for direct retry. Legacy assign/batch/unbind/release/local-scan Cloud
 endpoints and Cloud Web create/open/close stubs are retired.
+
+ADR-0029 changes `proxies.id` and all current browser-profile proxy references to
+positive integer IDs. The Cloud migration preserves existing formal and reserved
+relationships plus operation receipts. Cloud Web and packaged Desktop must use the
+same API generation; older clients cannot write proxies to the revised Cloud.
+Admins can search proxy teams by name or ID; operators stay within their own team.
 
 ## Agent-Owned Contracts
 

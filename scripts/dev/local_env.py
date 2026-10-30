@@ -27,7 +27,8 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 WORKSPACE_DIR = Path(__file__).resolve().parents[2]
 ROOT_DIR = Path(__file__).resolve().parents[3]
 CLOUD_DIR = ROOT_DIR / "wt-media-cloud"
-AGENT_DIR = ROOT_DIR / "wt-media-agent"
+# CHG worktrees can supply their Agent source without changing the sibling repo map.
+AGENT_DIR = Path(os.environ.get("WT_MEDIA_AGENT_SOURCE_DIR") or ROOT_DIR / "wt-media-agent")
 DESKTOP_DIR = ROOT_DIR / "wt-media-desktop"
 RUNTIME_DIR = Path(os.environ.get("WT_MEDIA_M2B_RUNTIME_DIR", ROOT_DIR / ".local" / "m2b"))
 LOG_DIR = RUNTIME_DIR / "logs"
@@ -827,6 +828,44 @@ def wait_port_free(port: str, timeout_seconds: float = 10.0) -> None:
         time.sleep(0.3)
 
 
+def stop_orphan_compose_worker() -> None:
+    """Stop a same-Cloud worker whose PID file lives in another review runtime.
+
+    The worker has no port, but holds the Cloud repository's single-instance
+    lock. Only the current user's exact Cloud build is eligible for cleanup.
+    An unrelated lock holder is reported instead of being killed.
+    """
+    lock_file = CLOUD_DIR / ".compose" / "compose-worker.lock"
+    if not lock_file.exists():
+        return
+    result = subprocess.run(["lsof", "-t", str(lock_file)], capture_output=True, text=True)
+    pids = [int(line) for line in result.stdout.splitlines() if line.isdigit()]
+    if not pids:
+        return
+    if len(pids) != 1:
+        raise RuntimeError(f"Compose worker lock has multiple holders: {pids}")
+    pid = pids[0]
+    detail = subprocess.run(
+        ["ps", "-p", str(pid), "-o", "uid=", "-o", "command="],
+        capture_output=True,
+        text=True,
+    ).stdout.strip().split(maxsplit=1)
+    if (
+        len(detail) != 2
+        or not detail[0].isdigit()
+        or int(detail[0]) != os.getuid()
+        or Path(detail[1].split()[0]).resolve() != COMPOSE_WORKER_BIN.resolve()
+    ):
+        raise RuntimeError(f"Compose worker lock held by unrecognized process {pid}; inspect it before restart")
+    os.kill(pid, signal.SIGTERM)
+    deadline = time.time() + 10.0
+    while time.time() < deadline and process_alive(pid):
+        time.sleep(0.2)
+    if process_alive(pid):
+        raise RuntimeError(f"Compose worker {pid} did not exit after SIGTERM")
+    print(f"compose-worker: stopped orphan pid {pid} holding {lock_file}")
+
+
 def stop_started() -> None:
     log("Stopping stale Cloud/Agent/Worker processes")
     # First, so the port sweep below is final rather than a race with a supervisor
@@ -862,6 +901,7 @@ def stop_started() -> None:
             time.sleep(0.2)
         if process_alive(pid):
             print(f"{name}: pid {pid} ignored SIGTERM and is still running", file=sys.stderr)
+    stop_orphan_compose_worker()
 
 
 def source_commit_epoch(repo_dir: Path, paths: tuple[str, ...] = ()) -> float:

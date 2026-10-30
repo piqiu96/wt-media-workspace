@@ -1,6 +1,9 @@
 """The local acceptance environment must not strand compose tasks."""
 
 import io
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from contextlib import ExitStack, redirect_stdout
@@ -15,6 +18,72 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class ComposeWorkerLifecycleTests(unittest.TestCase):
+    def test_restart_stops_same_cloud_compose_worker_left_by_other_runtime_dir(self):
+        with tempfile.TemporaryDirectory() as temp, ExitStack() as stack:
+            cloud = Path(temp) / "wt-media-cloud"
+            lock = cloud / ".compose" / "compose-worker.lock"
+            binary = cloud / ".cache" / "wt-media-compose-worker"
+            lock.parent.mkdir(parents=True)
+            binary.parent.mkdir(parents=True)
+            lock.touch()
+            binary.touch()
+            stack.enter_context(mock.patch.object(harness, "CLOUD_DIR", cloud))
+            stack.enter_context(mock.patch.object(harness, "COMPOSE_WORKER_BIN", binary))
+            run = stack.enter_context(mock.patch.object(harness.subprocess, "run", side_effect=[
+                SimpleNamespace(stdout="4512\n"),
+                SimpleNamespace(stdout=f"{os.getuid()} {binary}\n"),
+            ]))
+            kill = stack.enter_context(mock.patch.object(harness.os, "kill"))
+            stack.enter_context(mock.patch.object(harness, "process_alive", return_value=False))
+
+            harness.stop_orphan_compose_worker()
+
+            self.assertEqual(run.call_count, 2)
+            kill.assert_called_once_with(4512, harness.signal.SIGTERM)
+
+    def test_restart_refuses_to_stop_unrelated_lock_holder(self):
+        with tempfile.TemporaryDirectory() as temp, ExitStack() as stack:
+            cloud = Path(temp) / "wt-media-cloud"
+            lock = cloud / ".compose" / "compose-worker.lock"
+            lock.parent.mkdir(parents=True)
+            lock.touch()
+            stack.enter_context(mock.patch.object(harness, "CLOUD_DIR", cloud))
+            stack.enter_context(mock.patch.object(harness.subprocess, "run", side_effect=[
+                SimpleNamespace(stdout="4512\n"),
+                SimpleNamespace(stdout=f"{os.getuid()} /tmp/some-other-worker\n"),
+            ]))
+            kill = stack.enter_context(mock.patch.object(harness.os, "kill"))
+
+            with self.assertRaisesRegex(RuntimeError, "unrecognized process"):
+                harness.stop_orphan_compose_worker()
+
+            kill.assert_not_called()
+
+    def test_agent_source_override_keeps_chg_worktree_in_restart(self):
+        with tempfile.TemporaryDirectory() as temp:
+            result = subprocess.run(
+                [sys.executable, "-c", "from scripts.dev.local_env import AGENT_DIR; print(AGENT_DIR)"],
+                cwd=REPO_ROOT,
+                env={**os.environ, "WT_MEDIA_AGENT_SOURCE_DIR": temp},
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        self.assertEqual(result.stdout.strip(), temp)
+
+    def test_force_restart_checks_for_orphan_after_stopping_pid_workers(self):
+        with tempfile.TemporaryDirectory() as temp, ExitStack() as stack:
+            stack.enter_context(mock.patch.object(harness, "PID_DIR", Path(temp)))
+            stack.enter_context(mock.patch.object(harness, "close_desktop_app"))
+            stack.enter_context(mock.patch.object(harness, "stop_listener"))
+            stack.enter_context(mock.patch.object(harness, "wait_port_free"))
+            stack.enter_context(mock.patch.object(harness, "pid_alive", return_value=False))
+            cleanup = stack.enter_context(mock.patch.object(harness, "stop_orphan_compose_worker"))
+
+            harness.stop_started()
+
+            cleanup.assert_called_once_with()
+
     def test_path_constants_match_the_new_location(self):
         self.assertEqual(harness.SCRIPTS_DIR, REPO_ROOT / "scripts")
         self.assertEqual(harness.WORKSPACE_DIR, REPO_ROOT)

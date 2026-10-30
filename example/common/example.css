@@ -95,8 +95,8 @@ h2,h3 { font-size: 14px; font-weight: 600; }
 .ex-text-button { border: 0; background: transparent; padding: 4px 0; color: var(--wt-color-primary); line-height: 22px; white-space: nowrap; }
 .ex-text-button:hover:not(:disabled) { color: var(--wt-color-primary-hover); }
 .ex-text-button:disabled { color: var(--wt-color-text-disabled); }
-.ex-text-button.danger { color: var(--wt-color-text-secondary); }
-.ex-text-button.danger:hover { color: var(--wt-color-danger-text); }
+.ex-text-button.danger { min-height: 32px; padding-inline: 8px; border-radius: 4px; color: var(--wt-color-text-primary); }
+.ex-text-button.danger:hover:not(:disabled) { color: var(--wt-color-danger-text); background: var(--wt-color-danger-bg); }
 .ex-row-actions { display: inline-flex; gap: 8px; align-items: center; }
 .ex-row-actions button { font-size: 13px; }
 .ex-panel { background: var(--wt-color-bg-container); border: 1px solid var(--wt-color-border); border-radius: 8px; min-width: 0; }
