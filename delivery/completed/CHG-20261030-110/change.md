@@ -1,7 +1,7 @@
 ---
 id: CHG-20261030-110
 parent: delivery/milestones/M2-account-runtime.md#m2-d3-cookie-batch
-status: VERIFYING
+status: DONE
 depends_on: ["CHG-20261030-109"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
@@ -29,3 +29,7 @@ risk: H
 - Engineering: `docs/engineering/specs/social-accounts.md`
 - Decision: `docs/decisions/0030-social-account-rebuild.md`
 - UI: `example/proto/social-accounts/index.html`；`docs/standards/frontend/AdminUI页面规范.md`、`前端交互规范.md`、`用户反馈规范.md`。
+
+## Acceptance
+
+2026-10-30 实现、自检及真实平台/安装包走查通过，详见 [验证证据](evidence/verification.md)。Cloud #19、Agent #7、Desktop #9、Workspace #21 均已merge commit合并并进入各仓本地main；M2-D保留VERIFYING，等待用户最终人工整体签收。没有未收敛的执行项或阻塞问题。
