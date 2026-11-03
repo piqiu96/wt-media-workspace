@@ -25,6 +25,7 @@ Read `references/workflow.md` for the end-to-end process. Load only relevant spe
 - Interaction: `references/interaction-design.md`
 - Visual consistency/reuse: `references/visual-consistency.md`
 - Decisions/consolidation: `references/decision-governance.md`
+- Reconciling PRD, reviews and evolving prototypes: `references/source-reconciliation.md`
 - ChatGPT/Codex handoff and QA: `references/handoff-and-qa.md`
 
 ## Project onboarding
