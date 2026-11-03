@@ -170,5 +170,48 @@ class SyncSkillsTests(unittest.TestCase):
         )
 
 
+    def test_skill_sources_include_nested_supporting_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            group = root / "common"
+            skill = group / "sample-skill"
+            (skill / "references").mkdir(parents=True)
+            (skill / "SKILL.md").write_text("---\\nname: sample-skill\\ndescription: Use when testing.\\n---\\n", encoding="utf-8")
+            (skill / "references" / "guide.md").write_text("# Guide\\n", encoding="utf-8")
+            (skill / "templates").mkdir()
+            (skill / "templates" / "handoff.md").write_text("# Handoff\\n", encoding="utf-8")
+            original = self.module.SKILLS_ROOT
+            try:
+                self.module.SKILLS_ROOT = root
+                sources = self.module.skill_sources(("common",))
+            finally:
+                self.module.SKILLS_ROOT = original
+
+        self.assertEqual(
+            sorted(sources),
+            ["sample-skill/SKILL.md", "sample-skill/references/guide.md", "sample-skill/templates/handoff.md"],
+        )
+
+    def test_sync_copies_supporting_files_and_check_detects_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source" / "sample-skill"
+            (source / "references").mkdir(parents=True)
+            (source / "SKILL.md").write_text("skill\\n", encoding="utf-8")
+            (source / "references" / "guide.md").write_text("guide\\n", encoding="utf-8")
+            target = self.module.Target("test", root / "target", ("common",))
+            original_root = self.module.SKILLS_ROOT
+            try:
+                self.module.SKILLS_ROOT = root / "source"
+                self.module.sync_target(target, "codex")
+                target_file = target.path / ".codex" / "skills" / "sample-skill" / "references" / "guide.md"
+                self.assertEqual(target_file.read_text(encoding="utf-8"), "guide\\n")
+                self.assertEqual(self.module.check_target(target, "codex"), [])
+                target_file.write_text("drift\\n", encoding="utf-8")
+                self.assertTrue(any("out of date" in error for error in self.module.check_target(target, "codex")))
+            finally:
+                self.module.SKILLS_ROOT = original_root
+
+
 if __name__ == "__main__":
     unittest.main()
