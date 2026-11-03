@@ -140,6 +140,10 @@ def target_tool_dir(target: Target, tool: str) -> Path:
 
 def generated_text(source: Path) -> str:
     text = source.read_text(encoding="utf-8")
+    try:
+        source_label = source.relative_to(ROOT)
+    except ValueError:
+        source_label = source
     lines = text.splitlines()
     if lines and lines[0] == "---":
         try:
@@ -149,7 +153,7 @@ def generated_text(source: Path) -> str:
         if end > 0:
             header = [
                 "<!-- GENERATED FILE - DO NOT EDIT DIRECTLY -->",
-                f"<!-- Source: {source.relative_to(ROOT)} -->",
+                f"<!-- Source: {source_label} -->",
                 "",
             ]
             lines = lines[: end + 1] + header + lines[end + 1 :]
