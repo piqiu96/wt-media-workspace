@@ -195,7 +195,7 @@ class SyncSkillsTests(unittest.TestCase):
     def test_sync_copies_supporting_files_and_check_detects_drift(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            source = root / "source" / "sample-skill"
+            source = root / "source" / "common" / "sample-skill"
             (source / "references").mkdir(parents=True)
             (source / "SKILL.md").write_text("skill\\n", encoding="utf-8")
             (source / "references" / "guide.md").write_text("guide\\n", encoding="utf-8")
