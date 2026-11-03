@@ -2,7 +2,7 @@
 
 ## 0. Discover
 
-Identify product type, users, jobs, success criteria, repository ownership, formal requirements, accepted decisions, design standards, actual shared components, prototype entry points and available tools. Follow indexes; do not scan the entire repository by default. A README does not prove a capability exists.
+Identify product type, users, jobs, success criteria, repository ownership, formal requirements, accepted decisions, design standards, actual shared components, prototype entry points and available tools. Follow indexes; do not scan the entire repository by default. A README does not prove a capability exists. When PRD, review documents and prototype coexist, apply references/source-reconciliation.md before treating any difference as a requirement.
 
 ## 1. Product logic first
 
