@@ -160,7 +160,7 @@ def generated_text(source: Path) -> str:
             return "\n".join(lines) + "\n"
     return (
         "<!-- GENERATED FILE - DO NOT EDIT DIRECTLY -->\n"
-        f"<!-- Source: {source.relative_to(ROOT)} -->\n\n{text}"
+        f"<!-- Source: {source_label} -->\n\n{text}"
     )
 
 
