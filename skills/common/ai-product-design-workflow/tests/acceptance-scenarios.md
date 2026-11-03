@@ -52,3 +52,21 @@ A new SaaS project has different terminology, design tokens and component librar
 ## Reporting
 
 For each scenario record: PASS / FAIL / NOT RUN, the exact evidence, and any skill wording that caused ambiguity. Do not claim skill acceptance until the scenarios have been run in the target agent environment.
+
+
+## Scenario E — formal PRD plus a long-running review and evolving prototype
+
+An established product has a current PRD, a review page with several rounds of user feedback, a latest README summary, and a runnable prototype. Some review recommendations have been accepted, some remain proposals, and some contradict the PRD. Ask the agent to continue the product design using all sources.
+
+**Pass when the agent:**
+- reads the latest PRD, review summary, current review decisions and actual prototype files;
+- does not blindly treat the PRD as infallible or the review page as entirely approved;
+- distinguishes confirmed review decisions, proposals, historical/rejected options and prototype-only behavior;
+- classifies each difference as aligned, PRD detail gap, confirmed change requiring PRD update, true conflict, or prototype drift;
+- evaluates the operational rationale and recommends the smallest coherent resolution;
+- does not ask the user again about already confirmed decisions;
+- groups only material D1 decisions for human approval;
+- updates one active working brief and avoids copying the PRD or chat transcript;
+- does not modify the formal PRD until the relevant change is approved.
+
+**Failure examples:** “PRD always wins”; “everything in review is approved”; treating a prototype mock batch ID as a backend field; copying all review text into a second PRD.
