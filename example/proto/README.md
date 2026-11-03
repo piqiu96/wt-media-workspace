@@ -23,4 +23,8 @@ example/
 
 [浏览器窗口与代理完整原型](browser-proxy/index.html)包含75个有效场景，按当前公共规范适配。只保留最终稿与必要资源，遵循[example约定](../README.md#当前稿保留)。
 
+[内容运营完整原型](content-operations/index.html)已统一内容生产、发布管理、作品管理、互动管理的视觉、导航和演示数据。场景与操作方式见[原型说明](content-operations/README.md)；[逐页评审](content-operations/review.html#page-review)支持逐页结论、补充意见、本机保存与导出／导入交接。目前第 06 页新增合成任务及素材选择器已接入工作台，按“本页方案确认 → 实施 → 体验确认 → 下一页”的节奏细化。
+
 [社媒账号完整原型](social-accounts/index.html)为已确认 V7，重构与走查统一引用此入口。
+
+内容生产与发布互动的旧兼容目录已移除；当前原型、资源与评审入口统一维护在 `content-operations/`。

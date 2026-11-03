@@ -13,6 +13,8 @@
 
 ## 当前稿保留
 
-本目录只保存最终可操作稿及必要资源；中间截图、测试脚本、日志、缓存和多版本副本不进入example或CHG evidence。具体边界统一遵循[最终制品保留原则](../docs/standards/文档与知识事实治理规范.md#21-最终制品保留原则)。当前业务原型见[浏览器窗口与代理](proto/browser-proxy/index.html)。
+本目录只保存最终可操作稿及必要资源；中间截图、测试脚本、日志、缓存和多版本副本不进入example或CHG evidence。具体边界统一遵循[最终制品保留原则](../docs/standards/文档与知识事实治理规范.md#21-最终制品保留原则)。当前业务原型见[浏览器窗口与代理](proto/browser-proxy/index.html)、[内容运营完整工作台](proto/content-operations/index.html)。
 
 当前社媒账号业务稿见[社媒账号](proto/social-accounts/index.html)。
+
+内容生产、发布管理、作品管理和互动管理已合并到 [content-operations](proto/content-operations/README.md)。[逐页评审稿](proto/content-operations/review.html#page-review)按页面与 Tab 列出功能问题及建议，支持人工补充、逐页结论和导出交接；综合依据与历史意见保留在同一入口。
