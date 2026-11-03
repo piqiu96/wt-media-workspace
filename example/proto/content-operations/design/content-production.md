@@ -8,11 +8,11 @@
 
 ### 正式业务事实
 
-- [产品文档索引](../../../../../docs/product/README.md)
-- [第五章：素材生产](../../../../../docs/product/prd/详细文档/第五章_素材生产.md)
+- [产品文档索引](../../../../docs/product/README.md)
+- [第五章：素材生产](../../../../docs/product/prd/详细文档/第五章_素材生产.md)
 - 关键章节：§5.2 对象关系、§5.3 素材库、§5.4 我的素材、§5.5 合成策略、§5.6 合成任务、§5.7 自动生产、§5.8 失败与恢复。
-- [前端规范索引](../../../../../docs/standards/frontend/README.md)
-- [公共视觉参考](../../../../common/README.md)
+- [前端规范索引](../../../../docs/standards/frontend/README.md)
+- [公共视觉参考](../../../common/README.md)
 
 ### 当前原型
 
