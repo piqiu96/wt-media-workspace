@@ -1,0 +1,8 @@
+{
+  "controlled_test": "Only the QA-created local copy of output117 was moved aside; bytes retained privately",
+  "file_present_at_original_location": false,
+  "previous_transfer": "transfer_ab7a2422b01162c8b6e82e1d",
+  "returned_transfer": "transfer_ab7a2422b01162c8b6e82e1d",
+  "returned_status": "success",
+  "new_download_started": false
+}

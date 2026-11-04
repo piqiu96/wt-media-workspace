@@ -1,0 +1,39 @@
+{
+  "dmg": "起飞_0.1.0_aarch64.dmg",
+  "bytes": 23004406,
+  "sha256": "d22bc3698848366f288071adb308121a58ad0fe9da052a36ca29c541f3ca98ac",
+  "versions": {
+    "schema_version": 1,
+    "desktop_version": "0.1.0",
+    "agent_version": "0.3.0",
+    "frontend_build_version": "0.1.0+7bf8e2a",
+    "contract_versions": {
+      "business_enums": "2026.11.05.4",
+      "business_schemas": "2026.11.05.4",
+      "cloud_agent_api": "2026.11.05.1",
+      "cloud_api": "2026.11.05.4",
+      "cloud_error_codes": "2026.11.05.4",
+      "local_agent_api": "2026.10.30.3",
+      "local_error_codes": "2026.10.30.2",
+      "local_event_schemas": "2026.07.14.9",
+      "local_status_enums": "2026.07.14.8"
+    },
+    "components_resources_version": "sha256:cf35b7c0caaf6ac5549ef1fe83deb049a8c10bcee124c705b7115a3cf38baac3",
+    "components_resources_files": 5,
+    "components_resources_manifest": {
+      "config/README.md": "868d3449ee97dea7b72067c48a166bf8294fb98d35074455220ca0f2c1155fbd",
+      "config/agent.toml": "e2781cbb8ca63a1c7ecf139a5c2060f5057b177d477edf82fe792f5080746003",
+      "icon.icns": "e71fb2f065acd7a390cbf86c7a799b4084a6a25cb849143bf4e35d6bde75f248",
+      "resources/desktop.production.toml": "bfe8365c7b8ef43777e9c2ffaf315da136e29f2b44de3a1b2d9d201a5a3a4044",
+      "sidecar-manifest.json": "33becb72846026f619fd8c62fcceaa004b69e61cd26f4965bfb97a34fc8fb1b9"
+    }
+  },
+  "sidecar": {
+    "component": "wt-media-agent",
+    "version": "0.3.0",
+    "target": "aarch64-apple-darwin",
+    "filename": "wt-media-agent",
+    "sha256": "c299f78fc5362e569046c0d315184ff35e6fe8f6a4be8a516d4d777c97c0f488"
+  },
+  "sidecar_hash_verified": true
+}

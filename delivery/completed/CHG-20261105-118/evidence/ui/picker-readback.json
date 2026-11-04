@@ -1,0 +1,77 @@
+{
+  "strategy": {
+    "id": 140,
+    "name": "CHG-098 人工验收",
+    "team_id": 1,
+    "category_id": 4,
+    "operator_id": 3
+  },
+  "serverTotal": 6,
+  "selectedLabel": "CHG-098 人工验收",
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/compose-strategies",
+      "query": {
+        "page": "1",
+        "page_size": "20"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/compose-strategies",
+      "query": {
+        "search": "140",
+        "page": "1",
+        "page_size": "20"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/compose-strategies/140",
+      "query": {}
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/compose-strategies",
+      "query": {
+        "category_id": "4",
+        "status": "enabled",
+        "team_id": "1",
+        "operator_id": "3",
+        "page": "1",
+        "page_size": "20"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/compose-strategies",
+      "query": {
+        "search": "140",
+        "category_id": "4",
+        "status": "enabled",
+        "team_id": "1",
+        "operator_id": "3",
+        "page": "1",
+        "page_size": "20"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/compose-strategies/140",
+      "query": {}
+    }
+  ],
+  "errors": [],
+  "writes": [],
+  "drawerSizes": [
+    {
+      "clientWidth": 880,
+      "scrollWidth": 880
+    },
+    {
+      "clientWidth": 1238,
+      "scrollWidth": 1238
+    }
+  ]
+}

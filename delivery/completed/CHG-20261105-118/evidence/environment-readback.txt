@@ -1,0 +1,34 @@
+
+== Verifying local M2-B environment ==
+Cloud: PASS http://127.0.0.1:8188/api/v1/health
+
+== Verifying Local Agent ==
+Agent: PASS http://127.0.0.1:8765/healthz
+
+== Verifying Cloud worker ==
+Cloud worker: PASS pid=18017
+
+== Verifying Compose worker ==
+Compose worker: PASS pid=18032
+
+== Verifying Compose scheduler ==
+Compose scheduler: fresh
+Compose scheduler: PASS pid=18050
+
+== Verifying BitBrowser through Agent ==
+BitBrowser via Agent: PASS
+
+== Verifying Desktop assets ==
+Desktop assets: fresh
+Desktop assets: PASS (origin http://127.0.0.1:8188 from the packaged config)
+
+== Verifying front-end dev servers ==
+Web dev server: PASS http://127.0.0.1:5173/
+Desktop dev server: PASS http://127.0.0.1:5174/
+
+== Verifying DMG ==
+DMG: fresh
+DMG: PASS /Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/起飞_0.1.0_aarch64.dmg
+
+== Verifying login smoke ==
+Login smoke: PASS user=admin

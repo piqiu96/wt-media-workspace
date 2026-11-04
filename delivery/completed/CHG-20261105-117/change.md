@@ -1,10 +1,11 @@
 ---
 id: CHG-20261105-117
 parent: delivery/milestones/M4-content-production.md#m4-m-output-assets
-status: VERIFYING
+status: DONE
 depends_on: ["CHG-20261105-116"]
 affected_repos: ["wt-media-cloud"]
 risk: H
+merge_commits: {"wt-media-cloud": "bc204b8e1ad1d7b9d8a65efc018b4346bd2d0e7d"}
 ---
 
 # CHG-20261105-117：成片资产视图与文件信息
