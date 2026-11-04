@@ -1,47 +1,58 @@
 ---
 name: ai-product-design-workflow
-description: Use when designing or improving a product, website, SaaS, admin workspace, user flows, interaction patterns, visual consistency, prototypes, or coordinating product design with code agents across an existing or new project.
+description: 当需要设计或优化产品、网站、SaaS、管理后台、用户流程、交互模式、视觉一致性、可执行原型，或需要协调产品设计与代码代理跨项目协作时使用。
 ---
 
-# AI Product Design Workflow
+# AI 产品设计协同工作流
 
-A reusable, lean workflow for turning an evolving product idea into a coherent, testable product and prototype. The skill defines the method; the active project defines business facts, design standards, components, and constraints.
+这是一套可跨项目复用、轻量且完整的工作方法，用于把持续演进中的产品想法转化为一致、可验证的产品方案与原型。
 
-## Core rules
+**Skill 负责定义工作方法；当前项目负责提供业务事实、设计规范、组件和约束。**
 
-1. **Understand before changing.** Inspect project instructions, relevant product facts, standards, reusable patterns, prototype, and accepted decisions. Load only what the task needs.
-2. **One fact, one owner.** Never create a parallel PRD, design system, component library, decision log, or tracker when the project already has one.
-3. **Separate fact from maturity.** Formal requirements, user-confirmed decisions, AI proposals, current implementation, and accepted experience are different things. Existing UI proves implementation, not correctness.
-4. **Reuse before inventing.** Inspect actual components and common patterns first. Extend shared patterns only for real repeated needs; keep one-off business behavior in its module.
-5. **Design for the actual product.** Solve the stated user need with the smallest sufficient design. Do not add hypothetical dashboards, workflows, states, filters, settings, or abstractions.
-6. **Protect human attention.** Decide routine field ordering, layout, copy, and interaction details autonomously when evidence is sufficient. Ask only when business meaning, data semantics, permissions, irreversible actions, cross-module ownership, or an accepted baseline changes.
-7. **Keep one current answer.** Consolidate decisions at milestones. Remove duplicates and dead options from active briefs; preserve history only as project governance requires.
-8. **Verify before claiming.** Design review, implementation, browser verification, and product acceptance are separate. Never claim a test or review that was not run.
+## 核心原则
 
-## Workflow
+1. **先理解，再修改。** 先检查项目指引、相关产品事实、规范、可复用模式、原型和已确认决策。只加载当前任务需要的资料。
+2. **一条事实，一个归属位置。** 项目已有 PRD、设计系统、组件库、决策记录或任务管理机制时，不另建一套平行体系。
+3. **区分事实与成熟度。** 正式需求、用户确认的决策、AI 建议、当前实现和已验收体验是不同概念。现有界面只能证明“已经这样实现”，不能证明“产品设计正确”。
+4. **先复用，再创造。** 设计或实现前先检查真实组件和公共模式。只有确实存在跨场景复用需求时才扩展公共能力；一次性的业务行为留在所属模块。
+5. **服务真实产品，不做过度设计。** 用最小充分方案解决当前用户问题。不要为了假想的未来需求增加仪表盘、流程、状态、筛选项、设置或抽象层。
+6. **节省人工注意力。** 证据充分时，字段顺序、布局、文案和普通交互细节由 AI 自主判断。只有业务含义、数据口径、权限、不可逆操作、跨模块归属或已确认基线发生变化时，才提交人工决策。
+7. **始终保留一个当前有效答案。** 在里程碑节点合并决策；从当前工作稿中清理重复内容和已淘汰方案。历史只按项目既有治理要求保留。
+8. **验证后再宣称完成。** 设计评审、原型实施、浏览器验证和产品验收是不同环节。没有实际执行的测试或评审，不得宣称已经完成。
 
-Read `references/workflow.md` for the end-to-end process. Load only relevant specialist references:
-- Product logic: `references/product-analysis.md`
-- Interaction: `references/interaction-design.md`
-- Visual consistency/reuse: `references/visual-consistency.md`
-- Decisions/consolidation: `references/decision-governance.md`
-- Reconciling PRD, reviews and evolving prototypes: `references/source-reconciliation.md`
-- ChatGPT/Codex handoff and QA: `references/handoff-and-qa.md`
+## 工作流
 
-## Project onboarding
+端到端流程见 references/workflow.md。只按任务需要加载专项参考：
 
-Use `templates/project-profile.md` to point to existing sources; never copy their rules into the profile. In an established repository, inspect its governance before adding files or changing document policy.
+- 产品逻辑分析：references/product-analysis.md
+- 交互设计：references/interaction-design.md
+- 视觉一致性与复用：references/visual-consistency.md
+- 决策治理与合并：references/decision-governance.md
+- PRD、评审稿与演进中原型的对照：references/source-reconciliation.md
+- ChatGPT / Codex 交接与验收：references/handoff-and-qa.md
 
-## Decision permissions
+## 项目接入
 
-D0-D3 are autonomy levels, not lifecycle statuses:
-- **D0:** binding formal facts and user-confirmed decisions; follow.
-- **D1:** business meaning, metrics, permissions, core workflow, irreversible or cross-module changes; human approval required.
-- **D2:** evidence-based product/interaction judgment; AI may decide and record rationale.
-- **D3:** presentation detail within the system; AI may decide and implement.
+使用 templates/project-profile.md 指向项目已有资料，不要把原有规则复制进配置文件。接入成熟仓库时，先检查其文档治理约定，再决定是否新增文件或调整规则。
 
-Track maturity separately: PROPOSED → CONFIRMED → IMPLEMENTED → ACCEPTED; replace obsolete active decisions with SUPERSEDED. IMPLEMENTED is not ACCEPTED.
+## 决策权限
 
-## Stop and ask
+D0–D3 表示 AI 的自主处理权限，不表示决策生命周期状态：
 
-Ask one concise, decision-focused question when formal sources conflict, a business rule is missing, a core workflow or permission changes, or a shared/global baseline must be broken. Otherwise make a proportionate recommendation, label assumptions, and proceed within scope.
+- **D0：必须遵循。** 已有正式规则和用户明确确认的决策。
+- **D1：必须人工确认。** 涉及业务含义、指标口径、权限、核心流程、不可逆行为或跨模块重大变化。
+- **D2：有依据时自主判断。** 产品组织和交互设计层面的合理判断，AI 可以决定并记录必要理由。
+- **D3：自主实施。** 现有设计系统范围内的视觉和表现细节。
+
+成熟度另行记录：PROPOSED → CONFIRMED → IMPLEMENTED → ACCEPTED；被替代的旧决策标记为 SUPERSEDED。IMPLEMENTED 不等于 ACCEPTED。
+
+## 何时暂停并询问用户
+
+仅在以下情况提出一个简洁、聚焦决策的问题：
+
+- 正式事实源之间存在无法自行判断归属的冲突；
+- 缺少关键业务规则；
+- 需要改变核心流程或权限；
+- 必须突破全局视觉规范、公共组件契约或已确认基线。
+
+其他情况应基于证据给出适度方案，标明必要假设，并在已授权范围内继续推进。
