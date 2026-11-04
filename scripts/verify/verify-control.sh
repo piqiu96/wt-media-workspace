@@ -8,8 +8,8 @@
 #      那样写的检查与「执行位」这个缺陷正好错开一格（CHG-20260926-068 的起因）。
 #   3. usage 逐字断言——动词清单改了而 usage 没跟着改，这里红。
 #   4. 未知名词退出码 2 且 usage 落到 stderr——分派被短路成「总是打印 usage」时，这里红。
-#   5. `status` 端到端跑通并给出六行读数
-#      （cloud/agent/worker/compose-worker/web-dev/desktop-dev）——
+#   5. `status` 端到端跑通并给出七行读数
+#      （cloud/agent/worker/compose-worker/compose-scheduler/web-dev/desktop-dev）——
 #      LOCAL_ENV 路径写错时，这里红（命令找不到）；任一行缺少时也红。
 #   6. 本文件不含端口字面量——把端口搬进 control.sh 时，这里红。
 #
@@ -85,6 +85,8 @@ grep -Eq '^worker: pid=[^ ]* alive=(yes|no) health=pid-only url=-$' <<<"$STATUS_
   || die "no worker status line"
 grep -Eq '^compose-worker: pid=[^ ]* alive=(yes|no) health=pid-only url=-$' <<<"$STATUS_OUT" \
   || die "no compose-worker status line"
+grep -Eq '^compose-scheduler: pid=[^ ]* alive=(yes|no) health=pid-only url=-$' <<<"$STATUS_OUT" \
+  || die "no compose-scheduler status line"
 grep -Eq '^web-dev: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
   || die "no web-dev status line"
 grep -Eq '^desktop-dev: pid=[^ ]* alive=(yes|no) health=(ok|down) url=' <<<"$STATUS_OUT" \
@@ -95,4 +97,4 @@ if grep -nE ':[0-9]{4,5}([^0-9]|$)' "$CONTROL"; then
   die "bin/control.sh carries a port literal; it belongs to the harness config"
 fi
 
-echo "PASS: bin/control.sh entry (tracked, index 100755, executable, directly invocable), usage, dispatch, status wiring (cloud/agent/worker/compose-worker/web-dev/desktop-dev), and no-port-literal"
+echo "PASS: bin/control.sh entry (tracked, index 100755, executable, directly invocable), usage, dispatch, status wiring (cloud/agent/worker/compose-worker/compose-scheduler/web-dev/desktop-dev), and no-port-literal"

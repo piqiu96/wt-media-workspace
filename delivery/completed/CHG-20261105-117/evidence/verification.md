@@ -12,3 +12,5 @@
 - `git diff --check` 通过。共享页面回归、Cloud／Desktop 构建及截图见 `ui-verification.md`。
 
 本轮真实页面和对象已验证；本机完整下载及原生 Desktop 交接、三角色与全量容量／失败恢复走查在后续 CHG118 收口，不把浏览器演示或排队受理记为已下载。
+
+Cloud PR29 的完整 CI 通过（3 分 11 秒），已合并 main：`bc204b8e1ad1d7b9d8a65efc018b4346bd2d0e7d`；Workspace PR32 已合并 main：`25bab45`。后续 CHG118 处理全链检查发现的下载角色／取消边界，不将其记为本轮已完成。

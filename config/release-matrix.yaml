@@ -745,3 +745,37 @@ releases:
     residual_risks:
       - "Cloud API proxy IDs are breaking for older clients; no mixed-version writes are supported."
       - "Dynamic supplier extraction live network acceptance is deferred by user decision."
+
+  - release: "chg118-content-production-20261105"
+    status: verifying
+    date: "2026-11-05"
+    scope: content_production_multiset_batches_outputs_and_real_acceptance_preparation
+    environment: local_development
+    components:
+      cloud: "main merge 7bf8e2a4a47012ad5b443b9ec3d88b2c35c542d7 (not released)"
+      cloud_agent: "Cloud merge 7bf8e2a4a47012ad5b443b9ec3d88b2c35c542d7 (not released)"
+      local_agent: "main merge b8c2b259ec06e68eaac304bad753acf131fce598 (not released)"
+      desktop: "main merge e3ee88afcda134d097a9f9770a3282c3d2db4046 (not released)"
+    contracts:
+      cloud_api: "v1@2026.11.05.4"
+      business_schemas: "2026.11.05.4"
+      business_enums: "2026.11.05.4"
+      cloud_error_codes: "2026.11.05.4"
+      cloud_agent_api: "v1@2026.11.05.1"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Provider revisions, consumer lock and actual lease category_name verified; current local candidate, no release tag."
+    rollout_order:
+      - "Apply Cloud migrations through 094; then deploy matching API, compose Worker and Scheduler."
+      - "Use the paired Agent category_name reader and Desktop contract lock; managed local startup enables the actual download runner."
+    verification:
+      local:
+        - "Real manual/immediate/scheduled batches each produced three successful outputs; FFprobe and object/database/API read-back agree."
+        - "Real Local Agent download and missing-file re-download match output SHA256; terminal history retained and pending/running dedupe verified under eight concurrent requests."
+        - "Shared Web/Desktop visual checks at 1440/1280 passed; native Desktop visual acceptance remains pending."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "local DMG built; user native walkthrough pending, not released"
+    residual_risks:
+      - "Native UI automation connection unavailable; do not treat shared Desktop browser screenshots as native acceptance."
+      - "Publishing execution remains outside this content-production delivery; no fake publishing records."

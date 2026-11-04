@@ -1,0 +1,43 @@
+{
+  "checks": [
+    {
+      "view": "admin-material-row",
+      "downloadDisabled": true
+    },
+    {
+      "view": "admin-material-detail",
+      "downloadDisabled": true
+    },
+    {
+      "view": "admin-output-detail",
+      "downloadDisabled": true
+    },
+    {
+      "view": "material-library-advanced",
+      "clientWidth": 1280,
+      "scrollWidth": 1280
+    },
+    {
+      "view": "strategies-advanced",
+      "clientWidth": 1280,
+      "scrollWidth": 1280
+    },
+    {
+      "view": "tasks-advanced",
+      "clientWidth": 1280,
+      "scrollWidth": 1280
+    },
+    {
+      "view": "outputs-advanced",
+      "clientWidth": 1280,
+      "scrollWidth": 1280
+    },
+    {
+      "view": "senior-task-filters",
+      "clientWidth": 1280,
+      "scrollWidth": 1280
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

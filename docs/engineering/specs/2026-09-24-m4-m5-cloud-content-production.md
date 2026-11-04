@@ -1,7 +1,7 @@
 # M4-M5 Cloud 内容生产工程设计
 
 > 产品基线：[PRD 第五章](../../product/prd/详细文档/第五章_素材生产.md)，2026-11-05 按已确认原型回写。
-> 状态：现有 Cloud 执行架构继续有效；本次批次、多组展开、接口与表结构收敛为**待实施目标设计**，不代表已经上线或完成验收。
+> 状态：当前 Cloud 内容生产实现，覆盖人工、立即、定时创建、多组展开、任务恢复及成片管理。代码实施不代表生产环境已上线；次日人工与原生 Desktop 签收以 Delivery 记录为准。
 > 决策依据：[ADR-0017](../../decisions/0017-m4-m5-cloud-owned-content-production.md)、[ADR-0023](../../decisions/0023-m3-m5-team-resources-and-production-operator.md)、[ADR-0031](../../decisions/0031-content-production-batches-and-manual-reproduction.md)。
 > 本文维护模型、接口职责和工程约束；原型入口见[内容生产设计导航](../../../example/proto/content-operations/design/content-production.md)。实际迁移、提供方 OpenAPI 和代码位于 Cloud，实施步骤与验收证据进入对应 CHG，不在原型目录另存技术方案。
 
@@ -80,15 +80,15 @@ video_status = not_downloaded | downloading | ready | failed
 
 `compose_task` 是 Worker 最小执行单位：一条素材、一组成片设置的一份产出。任务保存创建人、负责人、团队／类目、执行来源、素材、可空个人关系、策略及最终不可变快照，状态仍为 `pending | running | success | failed | cancelled`，保留租约、领取代次、阶段、错误与输出关联。
 
-新增 `compose_task_batches`，仅组织同次创建任务，不替代任务执行和恢复。最小事实：ID、名称、团队／类目／负责人、策略、触发来源、创建人、整次请求幂等键及请求摘要、必要创建配置快照、创建时间。批次有实际任务才存在；受理／拒绝结果与后续任务执行结果分开。
+`compose_task_batches` 仅组织同次创建任务，不替代任务执行和恢复。最小事实：ID、名称、团队／类目／负责人、策略、触发来源、创建人、整次请求幂等键及请求摘要、必要创建配置快照、创建时间。批次有实际任务才存在；受理／拒绝结果与后续任务执行结果分开。
 
 任务扩展 `batch_id`、成片设置稳定 key／名称／平台快照、份序号，实际执行读最终参数，不读当前策略。唯一性为 `(batch_id, material_id, setting_key, copy_index)`；整次重放同键同内容返回既有结果，同键异内容拒绝。人工再次制作创建新批次及新任务；重试保留原任务、批次和配置，历史尝试不删。
 
-触发来源区分人工创建、立即执行、定时执行，与策略执行方式、attempt 的自动／人工恢复来源分开。现有 `manual | scheduled` 编码不足以表达三种业务入口，提供方契约需扩展且同步消费者，不能仅改中文标签。
+触发来源区分人工创建、立即执行、定时执行，与策略执行方式、attempt 的自动／人工恢复来源分开。提供方契约与共享页面统一使用 `manual | immediate | scheduled`，分别表示人工创建、立即执行和定时执行；与策略 `manual | scheduled` 两种执行方式分开。
 
-`compose_schedule_runs` 保留一次策略选材／创建结果，加可空 `batch_id`；零任务记录不建批次，人工创建不伪造成策略运行。统一分页查询，按 ID 关联批次，不按 `schedule_slot` 猜身份。
+`compose_schedule_runs` 保存一次策略选材／创建结果及可空 `batch_id`；零任务记录不建批次，人工创建不伪造成策略运行。统一分页查询，按 ID 关联批次，不按 `schedule_slot` 猜身份。
 
-`compose_task_attempts` 保留逐次步骤与错误；将每次 attempt 至多一次的人工核实人、依据、时间并入此记录，迁移后删除独立核实表。核实是受保护的处置事件，不建审批产品；记录随执行历史返回，普通运营不取得核实依据，写入权限、两项确认、审计与恢复事务不因合表放宽。
+`compose_task_attempts` 保留逐次步骤与错误；每次 attempt 至多一次的人工核实人、依据、时间已并入此记录，独立核实表已迁移删除。核实是受保护的处置事件，不建审批产品；记录随执行历史返回，普通运营不取得核实依据，写入权限、两项确认、审计与恢复事务不因合表放宽。
 
 批次进度从授权范围内全部任务聚合，结束率与成功率分开；局部任务筛选不改全批统计。阶段常量百分比不是逐帧合成进度，不能假装 0／1 已完成。
 
@@ -96,7 +96,7 @@ video_status = not_downloaded | downloading | ready | failed
 
 仅保存校验通过的成功产出，继承任务负责人；关联素材、可空个人关系、任务与策略创建时快照。补齐可供显示的视频文件名、时长、宽高、大小、Hash 与对象键；未知信息不推算，名称、参数和平台不能从当前策略反推。
 
-`composite_outputs.name` 与 `file_name` 为资产字段，在成功提交事务内写入；名称来自当时素材标题与任务组名，视频文件名经过路径／控制字符清理并保留实际扩展名。旧记录未知时保持空值，不推造历史。`media_json` 只存真实输出探测的时长、宽高等媒体参数，大小与 Hash 沿用上传校验事实。任务、批次、组、平台及模板参数通过已冻结任务关联读取，不重复建立资产配置表。
+`composite_outputs.name` 与 `file_name` 为资产字段，在成功提交事务内写入；名称在首次成功提交时由素材标题与已冻结任务组名生成，此后不随素材改名变化，视频文件名经过路径／控制字符清理并保留实际扩展名。旧记录未知时保持空值，不推造历史。`media_json` 只存真实输出探测的时长、宽高等媒体参数，大小与 Hash 沿用上传校验事实。任务、批次、组、平台及模板参数通过已冻结任务关联读取，不重复建立资产配置表。
 
 再次制作复用 `POST /compose-tasks`，可选 `source_output_id` 与普通 `material_ids/items/config_override` 互斥。服务器从受权源成片与原任务读取原素材、原组稳定 key／名称／平台、原模板版本及最终参数，固定只生成该组一份；客户端不能提交替代的固定参数。仅原版本 Schema 的开放参数可覆盖。原策略须仍启用、原负责人仍有效并匹配策略与原团队／类目，且原模板版本已部署可用；任一缺失明确拒绝，不切换到当前默认组或新负责人。历史无完整快照或无负责人时引导普通新建，不猜补。源成片文件丢失不妨碍利用可获取原素材再制作。
 
@@ -117,7 +117,7 @@ video_status = not_downloaded | downloading | ready | failed
 | `execution_scope` | `cloud`、`local_agent` |
 | `status` | `pending`、`running`、`success`、`failed`、`cancelled` |
 
-进度字段包括总字节、完成字节、瞬时/平滑速度、预计剩余秒数、尝试次数和错误。正式业务表不保存本机绝对路径；本地路径由 Local Agent / Desktop 在本机可信存储中管理，Cloud 只保存请求用户、领取审计、文件名和完成事实。
+进度字段包括总字节、完成字节、瞬时/平滑速度、预计剩余秒数、尝试次数和错误。正式业务表不保存本机绝对路径；Local Agent 按租约 `category_name` 命名文件，字段缺失时兼容旧 `game_name`；本地路径由 Local Agent / Desktop 在本机可信存储中管理，Cloud 只保存请求用户、领取审计、文件名和完成事实。
 
 ## 4. 进程模型
 
@@ -174,6 +174,8 @@ Cloud 侧处理 `execution_scope=cloud` 的输入准备；Local Agent 处理 `ex
 
 用户下载在对象确认丢失且素材有 `source_url` 时，创建 `purpose=user_download` 的本地传输任务，并以 `dependency_task_id` 指向一次 Cloud 准备；下载任务保持 `pending` 直到准备成功。Cloud 不中转文件字节，只在准备完成后签发对象下载信息。
 
+下载按用户、资产与传输代次去重，仅复用仍为 `pending/running` 的请求。终态后的显式下载创建下一代，旧成功事实不改写，也不能证明当前设备仍有文件；不增加设备归属、强制下载接口或本机路径列。创建下载的事务使用 READ COMMITTED，唯一去重键仲裁同代并发，冲突请求可读到已提交的同一任务；其他业务事务隔离级别不变。
+
 ## 5. 领取、并发与恢复
 
 ### 5.1 原子领取
@@ -200,9 +202,9 @@ pending
 - 最大重试次数；
 - 临时目录容量阈值。
 
-总并发是跨进程的系统上限。短期继续用 `compose_worker_capacity` 的单行锁，在同一事务内校验容量、统计运行数、领取任务及建立 attempt。当前初始容量为 2，正式值以部署资源与配置校验为准；配置缺失、非法或与数据库不一致时拒绝启动，不以无限并发降级。磁盘低于阈值暂停领取。
+总并发是跨进程的系统上限。当前使用 `compose_worker_capacity` 的单行锁，在同一事务内校验容量、统计占用、领取任务及建立 attempt。占用包括 `running`，以及当前尝试尚未核实的 `execution_uncertain`；尝试记录缺失时保守占用，旧尝试的核实不能释放新尝试。当前初始容量为 2，正式值以部署资源与配置校验为准；配置缺失、非法或与数据库不一致时拒绝启动，不以无限并发降级。磁盘低于阈值暂停领取。
 
-预留内部并发准入边界，覆盖领取及其生命周期，不只包装 `max_running` 的读取；不新增 HTTP 配置接口、通用锁平台或 Redis 空实现。未来 Redis 适配须原子申请唯一名额令牌、续期、按持有者释放；数据库领取失败补偿释放，任务代次守卫与提交仍在 MySQL。TTL 过期不证明旧 FFmpeg 已停止，Redis 不可用时停止新领取，不自动切回另一套同时生效的控制。
+现有 Repository 生命周期接口覆盖领取、续租、结束与恢复，是未来并发实现的内部替换边界，不另建只包装 `max_running` 读取的接口；不新增 HTTP 配置接口、通用锁平台或 Redis 空实现。未来 Redis 适配须原子申请唯一名额令牌、续期、按持有者释放；数据库领取失败补偿释放，任务代次守卫与提交仍在 MySQL。TTL 过期不证明旧 FFmpeg 已停止，Redis 不可用时停止新领取，不自动切回另一套同时生效的控制。
 
 Redis 服务部署后仍需实现适配、验证崩溃／过期／数据丢失和切换全部 Worker，不能只配地址即替换。短期停 Worker 切换，避免双实现并行；完成替换后再删除容量表。
 
@@ -267,7 +269,8 @@ Worker 在运行期间周期续租。恢复扫描只处理 `running` 且租约�
 FFmpeg / FFprobe 固定在 Cloud Worker 镜像或受控部署产物：
 
 - 使用绝对路径；
-- 启动时校验 SHA256、CPU 架构、编码器和 Filter；
+- 启动时检查可执行文件、配置版本及必需编码器；配置 SHA256 pin 时同时核对 Hash，开发配置可不设 pin；
+- 当前启动器不单独探测 CPU 架构或 Filter，部署制品须为对应架构并通过实际模板执行验证；
 - 版本不兼容时 Worker 健康检查失败，不领取任务；
 - 版本、编译信息与许可证进入发布清单。
 
@@ -285,11 +288,11 @@ FFmpeg / FFprobe 固定在 Cloud Worker 镜像或受控部署产物：
 
 ## 7. API 与 Contract
 
-Cloud 为正式提供方，完整前缀 **`/api/v1` 保留**；本文定义目标职责，最终 Schema、路径参数和错误在 Cloud OpenAPI 及对应 CHG 落实，不在 Workspace 生成第二份提供方合同。列表统一服务端分页、总数、稳定排序、范围／日期／权限过滤，取消最多 200 条取全后前端拼接的方案。
+Cloud 为正式提供方，完整前缀 **`/api/v1` 保留**。最终 Schema、路径参数和错误由 Cloud 的 `contracts/` 定义，Workspace 只维护映射与职责。业务列表使用服务端分页、总数、稳定排序及受权过滤；模板／负责人候选按自身目录合同返回，不冒充全量业务列表。策略分页默认20、最大100；策略页、任务筛选和新建选择器共享远程分页搜索，已选 ID 单独读取完整详情。
 
-### 7.1 目标接口清单
+### 7.1 当前接口清单
 
-以下为本轮收敛建议：保留／扩展现有 30 个、新增 6 个，共 **36 个 production 接口**，尚未实施。关联的 7 个文件传输接口另计，发布领域不计入。
+当前有 **36 个 production 接口**；关联的 7 个文件传输接口另计，发布领域不计入。
 
 | 方法与完整路径 | 用途 |
 | --- | --- |
@@ -310,21 +313,21 @@ Cloud 为正式提供方，完整前缀 **`/api/v1` 保留**；本文定义目�
 | `POST /api/v1/compose-strategies/:strategy_id/copy` | 复制为新策略 |
 | `PATCH /api/v1/compose-strategies/:strategy_id/status` | 启停策略 |
 | `POST /api/v1/compose-strategies/next-run-preview` | 计算下一计划时间，不能充当选材预览 |
-| `POST /api/v1/compose-strategies/:strategy_id/execution-preview` | 新增：只读选材、未完成任务检查、预计产量及依据 |
+| `POST /api/v1/compose-strategies/:strategy_id/execution-preview` | 只读选材、未完成任务检查、预计产量及依据 |
 | `POST /api/v1/compose-strategies/:strategy_id/run-now` | 确认后真实创建，重新校验预览与并发 |
 | `GET /api/v1/compose-strategies/:strategy_id/runs` | 统一分页／时间／触发筛选的执行记录，返回可空真实批次 ID |
-| `GET /api/v1/compose-task-batches` | 新增：人工及策略任务的统一批次分页 |
-| `GET /api/v1/compose-task-batches/:batch_id` | 新增：批次主体与全批统计 |
+| `GET /api/v1/compose-task-batches` | 人工及策略任务的统一批次分页 |
+| `GET /api/v1/compose-task-batches/:batch_id` | 批次主体与全批统计 |
 | `GET /api/v1/compose-tasks` | 任务分页，支持精确 batch_id |
 | `POST /api/v1/compose-tasks` | 人工创建／再次制作；返回批次及逐项受理结果，重放幂等 |
 | `GET /api/v1/compose-tasks/:task_id` | 任务主体、快照与允许动作 |
 | `GET /api/v1/compose-tasks/:task_id/attempts` | 分次执行记录；核实事件对受权角色附带依据 |
 | `POST /api/v1/compose-tasks/:task_id/retry` | 重试原任务 |
 | `POST /api/v1/compose-tasks/:task_id/cancel` | 取消排队任务或请求停止执行 |
-| `POST /api/v1/compose-tasks/:task_id/uncertain-review` | 保留：受保护的核实并恢复，不混入普通重试 |
-| `POST /api/v1/compose-tasks/batch-retry` | 新增：受权整批或明确所选任务重试 |
-| `POST /api/v1/compose-tasks/batch-cancel` | 新增：受权整批或明确所选任务取消 |
-| `GET /api/v1/compose-output-materials` | 新增：先授权、按素材 ID 聚合成片并分页 |
+| `POST /api/v1/compose-tasks/:task_id/uncertain-review` | 受保护的核实并恢复，不混入普通重试 |
+| `POST /api/v1/compose-tasks/batch-retry` | 受权整批或明确所选任务重试 |
+| `POST /api/v1/compose-tasks/batch-cancel` | 受权整批或明确所选任务取消 |
+| `GET /api/v1/compose-output-materials` | 先授权、按素材 ID 聚合成片并分页 |
 | `GET /api/v1/compose-outputs` | 成片分页及素材／批次精确过滤 |
 | `GET /api/v1/compose-outputs/:output_id` | 成片与创建时来源、视频及真实发布关联 |
 | `GET /api/v1/compose-outputs/:output_id/video-url` | 先核验对象，再签发访问地址 |
@@ -332,19 +335,11 @@ Cloud 为正式提供方，完整前缀 **`/api/v1` 保留**；本文定义目�
 
 模板读取应精确匹配绑定版本，不因目录只列启用版本而无法查看历史。我的素材、公共素材可复用查询实现，但保留不同业务语义。访问视频与创建本机下载分别承担打开／传输，不能机械合并。按钮能力和原因随现有读取返回，不为每个按钮新增状态查询接口。
 
-### 7.2 收敛的旧接口
+### 7.2 读取与受保护处置
 
-当前源码核对为 35 个 production 接口；建议移除以下 5 个独立入口，并同步调用方及合同。不能先删路由再等消费者适配。
+策略执行记录统一由分页 `runs` 返回，带可空真实批次 ID；任务步骤与核实事件统一由 `attempts` 返回。没有独立的 runs/history、runs/tasks、material-states 或 uncertain-review GET，也没有成片归档命令。素材的策略历史通过素材查询上下文读取，与“我的使用／团队使用”分别表达。
 
-| 当前完整路径 | 目标承接 |
-| --- | --- |
-| `GET /api/v1/compose-strategies/:strategy_id/runs/history` | 合并进分页 runs；最近记录用较小 page_size |
-| `GET /api/v1/compose-strategies/:strategy_id/runs/tasks` | runs 返回 batch_id，复用批次详情与任务查询 |
-| `GET /api/v1/compose-strategies/:strategy_id/material-states` | 素材查询的可选策略上下文；不可冒充我的使用／团队使用 |
-| `GET /api/v1/compose-tasks/:task_id/uncertain-review` | 并入 attempts 的受权处置事件，无需独立核实查询页 |
-| `POST /api/v1/compose-outputs/:output_id/archive` | 已确认产品无归档入口，本轮不保留 |
-
-保留独立的核实**写**入口是必要的安全职责：管理员或同团队高级运营，且仍为结果不明确的旧尝试、无已提交成片、两项确认成立、依据有效时才能恢复；合表和合并读取不放宽任一条件。读取依据继续按原有权限裁剪。
+核实**写**入口独立保留：管理员或同团队高级运营，且仍为结果不明确的旧尝试、无已提交成片、两项确认成立、依据有效时才能恢复。合并读取及合表不放宽条件，普通运营不取得核实依据。
 
 ### 7.3 批量与跨端合同
 
@@ -362,17 +357,19 @@ Cloud Web 与 Desktop 共用业务源码、同一能力投影；Local Agent 只�
 
 ## 8. 安全与可观测性
 
-- 对象存储凭据只在 Cloud 受控配置中；Local Agent 使用短时、最小范围下载授权；
+- 对象存储凭据只在 Cloud 受控配置中；Local Agent 使用受会话有效期约束的最小范围下载授权；
 - 日志包含 `trace_id`、`request_id`、`module`、任务 ID 和 Worker ID，不记录凭据或完整签名 URL；
 - 生产指标至少包括队列长度、领取延迟、执行时长、成功率、重试率、超时数、FFmpeg 退出码分布、临时磁盘与对象存储失败；
 - 审计记录策略启停、人工创建/取消/重试和下载任务创建；
 - M3–M5 正式授权按 ADR-0023：团队公共 `material` 不按个人或负责类目硬限制；普通运营任务、成片固定本人，高级运营仅本团队全部类目，管理员跨团队；个人工作集按 §3.2 区分独立页面与受权代选材，本机下载仍按当前用户。审计保留策略、任务和下载操作。
 
-## 9. 配置
+## 9. 配置与本地运行
 
-运行时仍只读 `./config`，发布时由 `config_online` 替换产物中的 `config`。沿用 Cloud 当前 Loader 的 scheduler、存储和媒体配置，不在此虚定新 YAML 文件名；实际配置格式与键名在实施 CHG 核对。不把配置放进 `internal`，不创建第二份 Worker 容量来源，不用环境变量绕过只读 Config。
+Cloud 从 runtime home 下的 `config/` 加载配置；发布配置由既有打包流程提供。`config/scheduler/compose.toml` 管理 Compose Worker 节点、并发、磁盘阈值、租约、心跳、超时与轮询；`config/scheduler/scheduler.toml` 管理调度周期。媒体二进制和对象存储使用现有媒体／存储配置，不创建第二套容量来源。
 
-来源平台当前仅抖音，成片／发布目标为 B站、百度、小红书，分开枚举。当前账号提供方枚举与目标不完全一致，须在账号／发布领域核对真实支持后扩展合同；不能把原型候选视为已经具备发布能力。
+Workspace `bin/control.sh` / `scripts/dev/local_env.py` 是统一环境入口：管理 Cloud、文件准备 Worker、Compose Worker、Compose Scheduler、Web、Desktop 开发页面及 Agent，使用固定开发数据库；Scheduler 纳入 PID、停止与新鲜度检查，发现挖掘的 Discovery Scheduler 仍不自动启动。Agent 使用正式 `wt_media_agent.local_main`，并通过受支持配置启用文件传输循环；仅启动 Local API 健康服务不能代替执行器。正式 Desktop 使用其自身 Sidecar 与凭证交接。
+
+来源平台仅抖音；成片目标为 B站、百度、小红书。目标枚举不等于已具备发布执行能力，发布任务、账号与结果继续由发布领域承接。
 
 ## 10. 验证矩阵
 
@@ -417,51 +414,41 @@ Cloud Web 与 Desktop 共用业务源码、同一能力投影；Local Agent 只�
 - 重新命名 `material_usage` 或复制“我的素材”关系；
 - 在 M4 自动创建定时生产任务；自动调度属于 M5。
 
-## 12. 数据库现状与目标收敛
+## 12. 当前数据库模型
 
 ### 12.1 表清单
 
-2026-11-05 源码核对有 **12 张关联业务表**，不含 users／团队／类目／账号／审计等共享表。本次新增统一任务批次、将核实字段合入执行记录后删除独立核实表，MySQL 阶段目标仍为 **12 张**；没有执行迁移或删表。
+内容生产关联 **12 张业务表**，不含用户、团队、类目、账号及审计等共享表。
 
-| 当前表 | 作用 | 本轮目标 |
+| 表 | 作用 |
+| --- | --- |
+| `source_contents` | 上游来源内容与原始指标 |
+| `materials` | 团队正式素材、准备状态和输入对象事实 |
+| `material_usages` | 个人素材工作集；移出保留制作历史 |
+| `compose_templates` | 按 code/version 发布的固定能力和参数 Schema |
+| `compose_strategies` | 负责人、模板、成片设置 JSON、规则、计划和额度 |
+| `compose_task_batches` | 一次真实创建命令的身份、幂等摘要和必要快照 |
+| `compose_tasks` | 单素材、单组、单份的任务与最终参数、领取租约 |
+| `composite_outputs` | 校验通过的成片、名称、媒体与对象事实 |
+| `compose_schedule_runs` | 一次策略选材及创建结果，零任务也保留原因 |
+| `compose_task_attempts` | 逐次执行步骤、错误、核实和暂存清理记录 |
+| `compose_worker_capacity` | MySQL 跨进程并发准入的单行锁 |
+| `file_transfer_tasks` | 统一 Cloud 输入准备与 Local Agent 本机下载 |
+
+成片设置、按素材聚合的成片批次、使用统计、预览和批次进度均不建表。`compose_uncertain_reviews` 已合并删除；不新建 Redis 占位表或发布领域数据表。
+
+### 12.2 辅助事实字段与必要性
+
+| 表 | 实际字段 | 保留原因 |
 | --- | --- | --- |
-| `source_contents` | 挖掘来源内容 | 沿用，上游事实 |
-| `materials` | 团队正式素材与输入准备 | 补足指标缺失／有效性语义，不能缺失补零 |
-| `material_usages` | 个人素材关系 | 沿用，代办明确关系所属人 |
-| `compose_templates` | 固定模板版本、Schema 与执行器 | 扩展任务内可调整声明 |
-| `compose_strategies` | 业务策略、计划、条件及参数 | 成片设置 JSON 数组、正确选材及额度语义 |
-| `compose_tasks` | 单份产出的任务与租约 | 增加批次、组及份序号、最终快照 |
-| `composite_outputs` | 成功成片与存储事实 | 补视频元数据、稳定名称与追溯投影 |
-| `compose_schedule_runs` | 每次策略选材与创建结果 | 保留，新增可空 batch_id |
-| `compose_task_attempts` | 每次真实尝试、步骤与错误 | 保留，接纳核实字段 |
-| `compose_uncertain_reviews` | 结果不确定时的人工核实 | 并入原 attempt 后删除 |
-| `compose_worker_capacity` | MySQL 全局并发准入 | 当前保留，未来适配替换后再删 |
-| `file_transfer_tasks` | Cloud 输入准备及本机下载 | 复用，不建另一套文件任务 |
-| `compose_task_batches`（新增） | 人工、立即、定时创建的统一集合 | 真实批次身份与提交幂等，不保存冗余实时状态 |
+| `compose_schedule_runs` | `run_key`（主键）、`compose_strategy_id`、`trigger_type`、`schedule_slot`、`candidate_count`、`created_count`、`skipped_json`、`created_at`、可空 `batch_id`、`request_hash` | 解释策略为什么创建或没有创建任务；不是任务最终结果，也不覆盖人工批次 |
+| `compose_task_attempts` | `id`、`task_id`、`attempt`、`source`、`started_at`、`finished_at`、`outcome`、`stage`、`error_code`、`error_message`、`steps_json`、`staging_cleaned_at`、`created_at`、`updated_at`；可空 `uncertain_review_actor_id`、`uncertain_review_evidence`、`uncertain_reviewed_at` | 重试不覆盖旧事实；核实归原尝试，没有额外审批生命周期 |
+| `compose_worker_capacity` | `id`（固定1）、`max_running`、`updated_at` | 多 Worker 原子领取必须有实际协调；未来 Redis 完整适配后可删除，当前不能用进程内计数代替 |
 
-成片设置、按素材聚合的成片批次、使用统计、预览和批次进度均不建表。发布表归发布领域，不借本轮内容生产界面扩出一整套发布数据库。
+核实的两项确认是写入门禁，不存冗余布尔列；依据20–2000字且禁止 URL，读取和写入保持原有管理权限。Redis 替换涉及全生命周期与失效处理，见 §5.2，部署 Redis 服务本身不会切换实现。
 
-### 12.2 四张辅助表的当前字段与必要性
+### 12.3 迁移与交付核对
 
-以下是当前模型字段，不是新增 migration DDL；主外键、类型、索引、删除顺序须在实施时按 Cloud migration 定向核实。
+Cloud migrations 是唯一 DDL 来源，部署前通过标准迁移器顺序执行，重复执行不重复变更。087建立批次及组／份唯一键；088–090完善可调整字段、人工制作与请求摘要；091保留核实证据后合并删除旧表；092增加真实资产名／视频文件名；093将文件传输类目列统一为 `category_name`；094仅撤销可精确证明由087生成的人造历史批次，原任务、尝试和成片保留，无法证明的关联不改。
 
-| 表 | 当前字段 | 事实与取舍 |
-| --- | --- | --- |
-| `compose_schedule_runs` | `run_key`、`strategy_id`、`trigger_type`、`schedule_slot`、`candidate_count`、`created_count`、`skipped_json`、`created_at` | run_key 标识执行，周期／触发说明来源，候选／创建／跳过解释为何有或无任务；不是最终任务执行结果，不能替代统一任务批次 |
-| `compose_task_attempts` | `id`、`task_id`、`attempt`、`source`、`started_at`、`finished_at`、`outcome`、`stage`、`error_code`、`error_message`、`steps_json`、`staging_cleaned_at`、`created_at`、`updated_at` | 保存执行次数、时间、过程、结果与暂存清理，任务重试不能覆盖旧事实；保留 |
-| `compose_uncertain_reviews` | `id`、`task_id`、`attempt`、`actor_user_id`、`evidence`、`created_at` | 每个任务尝试最多一条核实；没有独立生命周期，合到原 attempt 更简单；保留人、依据、时间及审计，不保留独立表 |
-| `compose_worker_capacity` | `id`（固定 1）、`max_running`、`updated_at` | 容量行锁协调多个 Worker；现阶段有实际原子领取作用，不能直接删掉后只靠进程内计数 |
-
-核实写入仍校验“旧执行已停止”“无已提交成片”两项确认，依据 20–2000 字且禁止 URL；两项确认当前是服务端提交门禁，不是两列已存布尔值。合表后清理任务必须读取原尝试核实事实，不能丢掉安全前提。
-
-### 12.3 实施前必须闭合的差距
-
-- 补齐统一批次、按组展开及批次／组／份唯一键，去除人工新制作的永久对锁；同次重放与再次制作分别验证。
-- 修正规则先排除再选入、缺失指标、手动隐藏每日额度及按素材计额；预览与提交共用判定并处理确认期间变化。
-- 所有列表服务端分页／统计，按授权先过滤再聚合；修复最多 200 条截断和成片无分页，不能以浏览器全量拼接落地。
-- 受权代选材须在创建与关系写入中一致；任务读取、成片追溯从最终快照取值，不读取当前策略配置冒充历史。
-- 统一实际策略枚举与提供方 Schema 的 `enabled/disabled` 等差异，增加三种触发来源；平台来源／去向与账号合同分别校验。
-- 文件访问先核验实际对象，补实际文件名与宽高；设备下载状态由本机核验，不以历史成功补造。
-- 核实合表与删除旧 GET 同步仓储、恢复事务、清理器、审计及调用方；保留原 POST 权限和不可重复处置守卫。
-
-落地时由 CHG 明确迁移／重建、契约生成、消费者更新、验证证据及交付状态。现有架构与既有验收不证明上述新能力已实现，原型内的演示步骤与样例数据也不属于真实运行证据。
+历史未知数据保持未知，不按当前策略、相近时间或显示名称补造。JSON默认、最终参数、来源平台与目标平台分别验证；旧记录无完整快照时拒绝直接再次制作并引导普通新建。升级与回归证据归对应 CHG，正式文档不保存中间方案流水。

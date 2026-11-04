@@ -1,0 +1,15 @@
+{
+  "event": "download-terminal",
+  "id": "transfer_1e20cbdac00e025c50a78134",
+  "status": "success",
+  "total_bytes": 37396,
+  "completed_bytes": 37396,
+  "error_code": null,
+  "file": {
+    "file": "20261105/三角洲-117-【杨齐家】四叶＞杨哥 团战咬死俩 五头六甲大运8杀踢烂大坝 #三角洲行动 #杨齐家 #杨齐家三角洲行动 #杨齐家拯救大兵计划 #杨齐家直播二创计划 @杨齐家(三角洲行动).mp4",
+    "bytes": 37396,
+    "sha256": "e77bb2d12f6b8c98cd28246b92447101af884804792ce8661fe84532dae94a96"
+  },
+  "integrity": true,
+  "category_in_filename": true
+}

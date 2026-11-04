@@ -79,6 +79,7 @@ DMG_MOUNT = RUNTIME_DIR / "dmg-mount"
 # output lives under the tree's `.cache`, next to the server binary.
 WORKER_BIN = CLOUD_DIR / ".cache" / "wt-media-discovery-worker"
 COMPOSE_WORKER_BIN = CLOUD_DIR / ".cache" / "wt-media-compose-worker"
+COMPOSE_SCHEDULER_BIN = CLOUD_DIR / ".cache" / "wt-media-compose-scheduler"
 
 # Where `cargo tauri build` writes the app bundle and where this script assembles
 # the DMG from it. The app bundle's own name is the product name from
@@ -262,19 +263,11 @@ def close_desktop_app() -> None:
 def hand_over_agent_port() -> None:
     """Stop this script's Agent so the app's own Agent can hold `AGENT_PORT`.
 
-    Only one process can listen there, and which one it is decides whether the
-    environment has a local executor at all. The python Agent started here is an
-    API-only stand-in: it answers `/healthz` and `/status` but runs no task loop
-    (`wt_media_agent/bootstrap/cloud.py` claims nothing without a credential
-    delivered by Desktop). The app ships the real one -- its bundled config sets
-    `python_fallback = false`, so inside a bundle the packaged sidecar is the only
-    Agent there is.
-
-    Left in place, the stand-in costs the walkthrough its executor: measured
-    2026-10-02, the freshly packaged sidecar started, failed to bind with
-    `OSError: [Errno 48] Address already in use`, and was stopped by the app's own
-    supervisor -- so the queued `local_agent` download had no claimant while
-    every health check in this script read green.
+    Both the managed Python Agent and the packaged sidecar run the formal local
+    bootstrap and file-transfer loop. Only one may own the port: the packaged
+    app must bind its own sidecar and hand over its per-launch credential.
+    Leaving the managed Agent listening would make that sidecar fail to bind,
+    even though a health probe against the older listener still succeeds.
     """
     log("Handing the Agent port to the Desktop app")
     pid_file = PID_DIR / "agent.pid"
@@ -389,6 +382,39 @@ def start_compose_worker() -> None:
     )
 
 
+def start_compose_scheduler() -> None:
+    """Run composition schedules alongside their managed compose worker.
+
+    Discovery scheduling remains excluded; this process only creates the
+    enabled composition strategies' due batches.
+    """
+    log("Building and starting Compose scheduler")
+    run(
+        [str(GO_BIN), "build", "-o", str(COMPOSE_SCHEDULER_BIN), "./cmd/compose-scheduler"],
+        cwd=CLOUD_DIR,
+        env=env_with(GOROOT=GOROOT, GOPATH=GOPATH, GOCACHE=str(CLOUD_DIR / ".cache" / "go-build")),
+    )
+    pid_file = PID_DIR / "compose-scheduler.pid"
+    if pid_alive(pid_file) and pid_file.stat().st_mtime_ns < COMPOSE_SCHEDULER_BIN.stat().st_mtime_ns:
+        # Direct `up` may reuse processes. A successful rebuild must not leave
+        # the old scheduler running against a newer binary on disk.
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        deadline = time.time() + 10.0
+        while time.time() < deadline and process_alive(pid):
+            time.sleep(0.2)
+        if process_alive(pid):
+            raise RuntimeError(f"Compose scheduler: pid {pid} is still running; PID retained")
+        pid_file.unlink(missing_ok=True)
+    start_background(
+        "compose-scheduler", [str(COMPOSE_SCHEDULER_BIN)], CLOUD_DIR,
+        cloud_runtime_env(WT_MEDIA_MYSQL_DSN=MYSQL_DSN),
+    )
+
+
 def start_agent() -> None:
     """Start this script's Agent, taking the Agent port if the app is holding it.
 
@@ -408,17 +434,17 @@ def start_agent() -> None:
         [
             str(AGENT_PYTHON),
             "-m",
-            "wt_media_agent.local_api.server",
-            "--host",
-            AGENT_HOST,
-            "--port",
-            AGENT_PORT,
+            "wt_media_agent.local_main",
         ],
         AGENT_DIR,
         env_with(
             PYTHONPATH="src",
             WT_MEDIA_AGENT_LOG_LEVEL="INFO",
             WT_MEDIA_BITBROWSER_API_URL=BIT_API_URL,
+            WT_MEDIA_AGENT_RUN_RUNNER="true",
+            WT_MEDIA_LOCAL_API_HOST=AGENT_HOST,
+            WT_MEDIA_LOCAL_API_PORT=AGENT_PORT,
+            WT_MEDIA_CLOUD_BASE_URL=CLOUD_BASE_URL,
         ),
     )
     wait_http(f"{AGENT_BASE_URL}/healthz", "Agent")
@@ -692,6 +718,22 @@ def verify_compose_worker() -> None:
     print(f"Compose worker: PASS pid={pid_file.read_text(encoding='utf-8').strip()}")
 
 
+def verify_compose_scheduler() -> None:
+    """Require a live scheduler launched from the current build."""
+    log("Verifying Compose scheduler")
+    pid_file = PID_DIR / "compose-scheduler.pid"
+    if not pid_alive(pid_file):
+        raise RuntimeError(f"Compose scheduler: not running (pid file {pid_file})")
+    check_fresh(
+        COMPOSE_SCHEDULER_BIN,
+        [(CLOUD_DIR, ("cmd/compose-scheduler", "internal", "go.mod", "go.sum"))],
+        "Compose scheduler",
+    )
+    if pid_file.stat().st_mtime_ns < COMPOSE_SCHEDULER_BIN.stat().st_mtime_ns:
+        raise RuntimeError("Compose scheduler: stale process; restart after rebuilding")
+    print(f"Compose scheduler: PASS pid={pid_file.read_text(encoding='utf-8').strip()}")
+
+
 def verify_agent() -> None:
     """The Agent endpoint, accepting either of the two providers that can hold it.
 
@@ -717,6 +759,7 @@ def verify_all() -> None:
     verify_agent()
     verify_worker()
     verify_compose_worker()
+    verify_compose_scheduler()
     verify_bitbrowser()
     verify_assets()
     verify_dev_servers()
@@ -755,6 +798,7 @@ def cmd_status() -> int:
         ("agent", PID_DIR / "agent.pid", f"{AGENT_BASE_URL}/healthz", None),
         ("worker", PID_DIR / "worker.pid", None, None),
         ("compose-worker", PID_DIR / "compose-worker.pid", None, None),
+        ("compose-scheduler", PID_DIR / "compose-scheduler.pid", None, None),
         ("web-dev", PID_DIR / "web-dev.pid", f"{WEB_DEV_URL}/", WEB_DEV_ENTRY),
         (
             "desktop-dev",
@@ -872,7 +916,7 @@ def stop_started() -> None:
     # that would start the Agent again.
     close_desktop_app()
     signalled: list[tuple[str, int]] = []
-    for name in ["cloud", "agent", "worker", "compose-worker", "web-dev", "desktop-dev"]:
+    for name in ["cloud", "agent", "worker", "compose-worker", "compose-scheduler", "web-dev", "desktop-dev"]:
         pid_file = PID_DIR / f"{name}.pid"
         if pid_alive(pid_file):
             pid = int(pid_file.read_text(encoding="utf-8").strip())
@@ -894,12 +938,17 @@ def stop_started() -> None:
     # between "asked to stop" and "did stop" -- and a surviving worker would go
     # on draining queues with nothing left to find it by.
     for name, pid in signalled:
-        if name not in ("worker", "compose-worker"):
+        if name not in ("worker", "compose-worker", "compose-scheduler"):
             continue
         deadline = time.time() + 10.0
         while time.time() < deadline and process_alive(pid):
             time.sleep(0.2)
         if process_alive(pid):
+            if name == "compose-scheduler":
+                # A scheduler has no port to sweep. Keep its identity and fail
+                # the restart rather than leaving an untracked timer behind.
+                (PID_DIR / f"{name}.pid").write_text(f"{pid}\n", encoding="utf-8")
+                raise RuntimeError(f"Compose scheduler: pid {pid} is still running; PID retained")
             print(f"{name}: pid {pid} ignored SIGTERM and is still running", file=sys.stderr)
     stop_orphan_compose_worker()
 
@@ -978,6 +1027,7 @@ def main() -> int:
             start_cloud()
             start_worker()
             start_compose_worker()
+            start_compose_scheduler()
             start_agent()
             start_web_dev()
             start_desktop_dev()
@@ -997,6 +1047,7 @@ def main() -> int:
             start_cloud()
             start_worker()
             start_compose_worker()
+            start_compose_scheduler()
             start_agent()
             start_web_dev()
             start_desktop_dev()

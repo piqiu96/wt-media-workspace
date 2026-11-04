@@ -1,0 +1,215 @@
+[
+  {
+    "role": "operator",
+    "path": "/compose-strategies/160",
+    "status": 200,
+    "errcode": 0
+  },
+  {
+    "role": "operator",
+    "path": "/compose-outputs/104",
+    "status": 404,
+    "errcode": 15216
+  },
+  {
+    "role": "operator",
+    "path": "/compose-tasks/671",
+    "status": 404,
+    "errcode": 15216
+  },
+  {
+    "role": "senior",
+    "path": "/compose-strategies/160",
+    "status": 200,
+    "errcode": 0
+  },
+  {
+    "role": "senior",
+    "path": "/compose-outputs/104",
+    "status": 200,
+    "errcode": 0
+  },
+  {
+    "role": "senior",
+    "path": "/compose-tasks/671",
+    "status": 200,
+    "errcode": 0
+  },
+  {
+    "role": "other",
+    "path": "/compose-strategies/160",
+    "status": 404,
+    "errcode": 15212
+  },
+  {
+    "role": "other",
+    "path": "/compose-outputs/104",
+    "status": 404,
+    "errcode": 15216
+  },
+  {
+    "role": "other",
+    "path": "/compose-tasks/671",
+    "status": 404,
+    "errcode": 15216
+  },
+  {
+    "operation": "manual-create-replay",
+    "batch": 44,
+    "created": 3,
+    "replay_batch": 44
+  },
+  {
+    "operation": "preview",
+    "keys": [
+      "strategy",
+      "selected_count",
+      "estimated_output_count",
+      "single_limit",
+      "daily_remaining",
+      "settings",
+      "materials",
+      "active_batch",
+      "preview_token"
+    ],
+    "selected": 1,
+    "materials": [
+      {
+        "id": 177,
+        "selected": true,
+        "reason": "matched"
+      },
+      {
+        "id": 178,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 179,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 180,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 181,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 161,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 29,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 27,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 28,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 160,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 159,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 157,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 32,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 155,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 154,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 151,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 152,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 156,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 31,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 33,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 34,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 30,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 153,
+        "selected": false,
+        "reason": "per_run_limit"
+      },
+      {
+        "id": 158,
+        "selected": false,
+        "reason": "per_run_limit"
+      }
+    ]
+  },
+  {
+    "operation": "immediate-run",
+    "keys": [
+      "batch_id",
+      "run_key",
+      "compose_strategy_id",
+      "trigger_type",
+      "schedule_slot",
+      "candidate_count",
+      "created_count",
+      "skipped",
+      "created_at"
+    ],
+    "batch": 45,
+    "created": 3
+  }
+]

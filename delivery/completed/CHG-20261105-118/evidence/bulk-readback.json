@@ -1,0 +1,332 @@
+[
+  {
+    "operation": "operator-bulk-retry",
+    "http": 200,
+    "error": 0,
+    "data": {
+      "items": [
+        {
+          "task_id": 688,
+          "status": "skipped",
+          "reason": "无操作权限"
+        },
+        {
+          "task_id": 689,
+          "status": "skipped",
+          "reason": "无操作权限"
+        },
+        {
+          "task_id": 690,
+          "status": "skipped",
+          "reason": "无操作权限"
+        }
+      ],
+      "accepted": 0,
+      "skipped": 3,
+      "failed": 0
+    }
+  },
+  {
+    "operation": "batch-retry",
+    "http": 200,
+    "data": {
+      "items": [
+        {
+          "task_id": 688,
+          "status": "accepted",
+          "task": {
+            "id": 688,
+            "batch_id": 45,
+            "setting_key": "short",
+            "setting_name": "短版",
+            "platforms": [
+              "bilibili",
+              "baidu"
+            ],
+            "copy_index": 1,
+            "display_name": "稳健游戏 #三角洲行动 #成成大王二创活动 #成成大王 #成成大王AI二创#成成大王提前到9：50开播了 · 短版",
+            "team_id": 1,
+            "category_id": 4,
+            "operator_id": 13,
+            "operator_name": "",
+            "trigger_type": "immediate",
+            "material_id": 177,
+            "material_usage_id": null,
+            "compose_strategy_id": 161,
+            "template_code": "basic_cut",
+            "template_version": 1,
+            "config_snapshot": {
+              "end_seconds": 2,
+              "start_seconds": 0
+            },
+            "status": "pending",
+            "cancel_requested": false,
+            "created_by": 1,
+            "attempt_count": 1,
+            "started_at": null,
+            "finished_at": null,
+            "stage": "",
+            "progress": 0,
+            "error_code": "",
+            "error_message": "",
+            "composite_output_id": null,
+            "created_at": "2026-11-05T04:49:24.078839+08:00",
+            "updated_at": "2026-11-05T05:20:13.300037+08:00"
+          }
+        },
+        {
+          "task_id": 689,
+          "status": "accepted",
+          "task": {
+            "id": 689,
+            "batch_id": 45,
+            "setting_key": "short",
+            "setting_name": "短版",
+            "platforms": [
+              "bilibili",
+              "baidu"
+            ],
+            "copy_index": 2,
+            "display_name": "稳健游戏 #三角洲行动 #成成大王二创活动 #成成大王 #成成大王AI二创#成成大王提前到9：50开播了 · 短版",
+            "team_id": 1,
+            "category_id": 4,
+            "operator_id": 13,
+            "operator_name": "",
+            "trigger_type": "immediate",
+            "material_id": 177,
+            "material_usage_id": null,
+            "compose_strategy_id": 161,
+            "template_code": "basic_cut",
+            "template_version": 1,
+            "config_snapshot": {
+              "end_seconds": 2,
+              "start_seconds": 0
+            },
+            "status": "pending",
+            "cancel_requested": false,
+            "created_by": 1,
+            "attempt_count": 1,
+            "started_at": null,
+            "finished_at": null,
+            "stage": "",
+            "progress": 0,
+            "error_code": "",
+            "error_message": "",
+            "composite_output_id": null,
+            "created_at": "2026-11-05T04:49:24.078839+08:00",
+            "updated_at": "2026-11-05T05:20:13.308127+08:00"
+          }
+        },
+        {
+          "task_id": 690,
+          "status": "accepted",
+          "task": {
+            "id": 690,
+            "batch_id": 45,
+            "setting_key": "long",
+            "setting_name": "长版",
+            "platforms": [
+              "xiaohongshu"
+            ],
+            "copy_index": 1,
+            "display_name": "稳健游戏 #三角洲行动 #成成大王二创活动 #成成大王 #成成大王AI二创#成成大王提前到9：50开播了 · 长版",
+            "team_id": 1,
+            "category_id": 4,
+            "operator_id": 13,
+            "operator_name": "",
+            "trigger_type": "immediate",
+            "material_id": 177,
+            "material_usage_id": null,
+            "compose_strategy_id": 161,
+            "template_code": "basic_cut",
+            "template_version": 1,
+            "config_snapshot": {
+              "end_seconds": 4,
+              "start_seconds": 1
+            },
+            "status": "pending",
+            "cancel_requested": false,
+            "created_by": 1,
+            "attempt_count": 1,
+            "started_at": null,
+            "finished_at": null,
+            "stage": "",
+            "progress": 0,
+            "error_code": "",
+            "error_message": "",
+            "composite_output_id": null,
+            "created_at": "2026-11-05T04:49:24.078839+08:00",
+            "updated_at": "2026-11-05T05:20:13.31363+08:00"
+          }
+        }
+      ],
+      "accepted": 3,
+      "skipped": 0,
+      "failed": 0
+    }
+  },
+  {
+    "operation": "batch-cancel",
+    "http": 200,
+    "data": {
+      "items": [
+        {
+          "task_id": 688,
+          "status": "accepted",
+          "task": {
+            "id": 688,
+            "batch_id": 45,
+            "setting_key": "short",
+            "setting_name": "短版",
+            "platforms": [
+              "bilibili",
+              "baidu"
+            ],
+            "copy_index": 1,
+            "display_name": "稳健游戏 #三角洲行动 #成成大王二创活动 #成成大王 #成成大王AI二创#成成大王提前到9：50开播了 · 短版",
+            "team_id": 1,
+            "category_id": 4,
+            "operator_id": 13,
+            "operator_name": "",
+            "trigger_type": "immediate",
+            "material_id": 177,
+            "material_usage_id": null,
+            "compose_strategy_id": 161,
+            "template_code": "basic_cut",
+            "template_version": 1,
+            "config_snapshot": {
+              "end_seconds": 2,
+              "start_seconds": 0
+            },
+            "status": "cancelled",
+            "cancel_requested": false,
+            "created_by": 1,
+            "attempt_count": 1,
+            "started_at": null,
+            "finished_at": "2026-11-05T05:20:13.32643+08:00",
+            "stage": "",
+            "progress": 0,
+            "error_code": "",
+            "error_message": "",
+            "composite_output_id": null,
+            "created_at": "2026-11-05T04:49:24.078839+08:00",
+            "updated_at": "2026-11-05T05:20:13.32643+08:00"
+          }
+        },
+        {
+          "task_id": 689,
+          "status": "accepted",
+          "task": {
+            "id": 689,
+            "batch_id": 45,
+            "setting_key": "short",
+            "setting_name": "短版",
+            "platforms": [
+              "bilibili",
+              "baidu"
+            ],
+            "copy_index": 2,
+            "display_name": "稳健游戏 #三角洲行动 #成成大王二创活动 #成成大王 #成成大王AI二创#成成大王提前到9：50开播了 · 短版",
+            "team_id": 1,
+            "category_id": 4,
+            "operator_id": 13,
+            "operator_name": "",
+            "trigger_type": "immediate",
+            "material_id": 177,
+            "material_usage_id": null,
+            "compose_strategy_id": 161,
+            "template_code": "basic_cut",
+            "template_version": 1,
+            "config_snapshot": {
+              "end_seconds": 2,
+              "start_seconds": 0
+            },
+            "status": "cancelled",
+            "cancel_requested": false,
+            "created_by": 1,
+            "attempt_count": 1,
+            "started_at": null,
+            "finished_at": "2026-11-05T05:20:13.329253+08:00",
+            "stage": "",
+            "progress": 0,
+            "error_code": "",
+            "error_message": "",
+            "composite_output_id": null,
+            "created_at": "2026-11-05T04:49:24.078839+08:00",
+            "updated_at": "2026-11-05T05:20:13.329253+08:00"
+          }
+        },
+        {
+          "task_id": 690,
+          "status": "accepted",
+          "task": {
+            "id": 690,
+            "batch_id": 45,
+            "setting_key": "long",
+            "setting_name": "长版",
+            "platforms": [
+              "xiaohongshu"
+            ],
+            "copy_index": 1,
+            "display_name": "稳健游戏 #三角洲行动 #成成大王二创活动 #成成大王 #成成大王AI二创#成成大王提前到9：50开播了 · 长版",
+            "team_id": 1,
+            "category_id": 4,
+            "operator_id": 13,
+            "operator_name": "",
+            "trigger_type": "immediate",
+            "material_id": 177,
+            "material_usage_id": null,
+            "compose_strategy_id": 161,
+            "template_code": "basic_cut",
+            "template_version": 1,
+            "config_snapshot": {
+              "end_seconds": 4,
+              "start_seconds": 1
+            },
+            "status": "cancelled",
+            "cancel_requested": false,
+            "created_by": 1,
+            "attempt_count": 1,
+            "started_at": null,
+            "finished_at": "2026-11-05T05:20:13.33219+08:00",
+            "stage": "",
+            "progress": 0,
+            "error_code": "",
+            "error_message": "",
+            "composite_output_id": null,
+            "created_at": "2026-11-05T04:49:24.078839+08:00",
+            "updated_at": "2026-11-05T05:20:13.33219+08:00"
+          }
+        }
+      ],
+      "accepted": 3,
+      "skipped": 0,
+      "failed": 0
+    }
+  },
+  {
+    "tasks": [
+      {
+        "id": 690,
+        "batch": 45,
+        "status": "cancelled",
+        "attempt_count": 1,
+        "output": null
+      },
+      {
+        "id": 689,
+        "batch": 45,
+        "status": "cancelled",
+        "attempt_count": 1,
+        "output": null
+      },
+      {
+        "id": 688,
+        "batch": 45,
+        "status": "cancelled",
+        "attempt_count": 1,
+        "output": null
+      }
+    ]
+  }
+]

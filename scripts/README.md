@@ -13,7 +13,7 @@
 | `scripts/chg/resume.py` | CHG 动词 | `wt chg resume`：重生成上下文、报告 main 漂移与 checkpoint | 由 `scripts/wt.py` 调用 |
 | `scripts/chg/verify.py` | CHG 动词 | `wt chg verify` 的风险→场景策略 | 由 `scripts/wt.py` 调用 |
 | `scripts/docs/check.py` | 校验入口 | 文档分类、索引、标记与相对链接检查 | `python3 scripts/docs/check.py` |
-| `scripts/dev/local_env.py` | 实现 | `bin/control.sh` 下游：本地环境启停、状态、验收与 DMG | `python3 scripts/dev/local_env.py <verb>` |
+| `scripts/dev/local_env.py` | 实现 | `bin/control.sh` 下游：本地环境启停、状态、验收与 DMG；包含合成 Worker／调度器及 Local Agent 下载循环，不启动发现调度器 | `python3 scripts/dev/local_env.py <verb>` |
 | `scripts/lib/change_metadata.py` | 库 | 新/旧格式 CHG 元数据解析 | 不直接执行 |
 | `scripts/lib/workspace_config.py` | 库 | 仓库映射与 Skill 分发配置读取 | 不直接执行 |
 | `scripts/prepare_ai_workspace.py` | 维护入口 | 生成 `.ai/CURRENT_CONTEXT.md` 执行快照 | `python3 scripts/prepare_ai_workspace.py --change <CHG>` |

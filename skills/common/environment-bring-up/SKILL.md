@@ -32,7 +32,8 @@ Before relying on any process, enforce freshness:
 2. **Rebuild from latest source.** In order:
    - Cloud migrations (`wt-media-cloud/scripts/migrate.sh`);
    - Cloud server (`go run ./cmd/server`);
-   - Local Agent (`wt-media-agent/.venv/bin/python -m wt_media_agent.local_api.server`);
+   - Compose Worker 与 Compose Scheduler（由统一入口管理 PID、构建和停止；仅健康 API 无法执行任务）；
+   - Local Agent（正式 `wt_media_agent.local_main`，统一入口设置 `WT_MEDIA_AGENT_RUN_RUNNER=true`；`local_api.server` 仅健康服务不能代替传输循环）；
    - Front-end dev servers: Cloud Web (`npm run dev`, port 5173) and Desktop (`npm run dev:desktop`, port 5174);
    - Desktop frontend via `wt-media-workspace/scripts/build-desktop-frontend.sh` and DMG via `cargo tauri build --bundles dmg --no-sign`;
    - Regenerate Cloud desktop artifacts (`npm run build:desktop`).
