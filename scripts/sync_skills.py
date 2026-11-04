@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import sys
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -118,15 +119,18 @@ TARGETS, TOOLS = load_targets(CONFIG_PATH, WORKSPACE_ROOT)
 
 
 def skill_sources(groups: tuple[str, ...]) -> dict[str, Path]:
+    """Return every file in each skill directory, keyed by skill-relative path."""
     sources: dict[str, Path] = {}
     for group in groups:
         group_dir = SKILLS_ROOT / group
         if not group_dir.exists():
             continue
         for skill_dir in sorted(group_dir.iterdir()):
-            skill_file = skill_dir / "SKILL.md"
-            if skill_file.exists():
-                sources[skill_dir.name] = skill_file
+            if not skill_dir.is_dir() or not (skill_dir / "SKILL.md").is_file():
+                continue
+            for source in sorted(path for path in skill_dir.rglob("*") if path.is_file()):
+                relative = source.relative_to(skill_dir).as_posix()
+                sources[f"{skill_dir.name}/{relative}"] = source
     return sources
 
 
@@ -136,6 +140,10 @@ def target_tool_dir(target: Target, tool: str) -> Path:
 
 def generated_text(source: Path) -> str:
     text = source.read_text(encoding="utf-8")
+    try:
+        source_label = source.relative_to(ROOT)
+    except ValueError:
+        source_label = source
     lines = text.splitlines()
     if lines and lines[0] == "---":
         try:
@@ -145,43 +153,60 @@ def generated_text(source: Path) -> str:
         if end > 0:
             header = [
                 "<!-- GENERATED FILE - DO NOT EDIT DIRECTLY -->",
-                f"<!-- Source: {source.relative_to(ROOT)} -->",
+                f"<!-- Source: {source_label} -->",
                 "",
             ]
             lines = lines[: end + 1] + header + lines[end + 1 :]
             return "\n".join(lines) + "\n"
     return (
         "<!-- GENERATED FILE - DO NOT EDIT DIRECTLY -->\n"
-        f"<!-- Source: {source.relative_to(ROOT)} -->\n\n{text}"
+        f"<!-- Source: {source_label} -->\n\n{text}"
     )
+
+
+def expected_skill_dirs(sources: dict[str, Path]) -> set[str]:
+    return {relative.split("/", 1)[0] for relative in sources}
 
 
 def unknown_entries(target_dir: Path, expected: set[str]) -> list[Path]:
     if not target_dir.exists():
         return []
-    unknown: list[Path] = []
-    for entry in sorted(target_dir.iterdir()):
-        if entry.name == ".gitkeep":
-            continue
-        if entry.name not in expected:
-            unknown.append(entry)
-    return unknown
+    return [
+        entry for entry in sorted(target_dir.iterdir())
+        if entry.name != ".gitkeep" and entry.name not in expected
+    ]
+
+
+def unknown_skill_files(target_dir: Path, expected: set[str]) -> list[Path]:
+    if not target_dir.exists():
+        return []
+    return [
+        path for path in sorted(target_dir.rglob("*"))
+        if path.is_file()
+        and path.name != ".gitkeep"
+        and path.relative_to(target_dir).as_posix() not in expected
+    ]
 
 
 def check_target(target: Target, tool: str) -> list[str]:
     errors: list[str] = []
     sources = skill_sources(target.groups)
     target_dir = target_tool_dir(target, tool)
-    for entry in unknown_entries(target_dir, set(sources)):
+    for entry in unknown_entries(target_dir, expected_skill_dirs(sources)):
         errors.append(f"{target.name}/{tool}: unknown generated entry {entry}")
-    for name, source in sources.items():
-        dest = target_dir / name / "SKILL.md"
+    for path in unknown_skill_files(target_dir, set(sources)):
+        errors.append(f"{target.name}/{tool}: unknown generated file {path}")
+    for relative, source in sources.items():
+        dest = target_dir / relative
         if not dest.exists():
             errors.append(f"{target.name}/{tool}: missing {dest}")
             continue
-        expected = generated_text(source)
-        actual = dest.read_text(encoding="utf-8")
-        if actual != expected:
+        expected = (
+            generated_text(source).encode("utf-8")
+            if source.name == "SKILL.md"
+            else source.read_bytes()
+        )
+        if dest.read_bytes() != expected:
             errors.append(f"{target.name}/{tool}: out of date {dest}")
     return errors
 
@@ -189,16 +214,20 @@ def check_target(target: Target, tool: str) -> list[str]:
 def sync_target(target: Target, tool: str) -> None:
     sources = skill_sources(target.groups)
     target_dir = target_tool_dir(target, tool)
-    unknown = unknown_entries(target_dir, set(sources))
-    if unknown:
-        details = ", ".join(str(path) for path in unknown)
+    expected_dirs = expected_skill_dirs(sources)
+    unknown = unknown_entries(target_dir, expected_dirs)
+    unknown_files = unknown_skill_files(target_dir, set(sources))
+    if unknown or unknown_files:
+        details = ", ".join(str(path) for path in [*unknown, *unknown_files])
         raise RuntimeError(f"{target.name}/{tool}: unknown generated entries: {details}")
 
-    target_dir.mkdir(parents=True, exist_ok=True)
-    for name, source in sources.items():
-        skill_dir = target_dir / name
-        skill_dir.mkdir(parents=True, exist_ok=True)
-        (skill_dir / "SKILL.md").write_text(generated_text(source), encoding="utf-8")
+    for relative, source in sources.items():
+        dest = target_dir / relative
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if source.name == "SKILL.md":
+            dest.write_text(generated_text(source), encoding="utf-8")
+        else:
+            shutil.copy2(source, dest)
 
 
 def selected_targets(name: str | None) -> list[Target]:
