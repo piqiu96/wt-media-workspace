@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261105-116 | 人工选材与任务批次工作台 | IMPLEMENTING | wt-media-cloud |
+| CHG-20261105-117 | 成片资产视图与文件信息 | VERIFYING | wt-media-cloud |
