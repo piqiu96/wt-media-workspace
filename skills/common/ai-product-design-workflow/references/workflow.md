@@ -1,47 +1,81 @@
-# End-to-end workflow
+# 端到端工作流
 
-## 0. Discover
+## 0. 项目理解与资料发现
 
-Identify product type, users, jobs, success criteria, repository ownership, formal requirements, accepted decisions, design standards, actual shared components, prototype entry points and available tools. Follow indexes; do not scan the entire repository by default. A README does not prove a capability exists. When PRD, review documents and prototype coexist, apply references/source-reconciliation.md before treating any difference as a requirement.
+识别产品类型、用户、核心任务、成功标准、仓库归属、正式需求、已确认决策、设计规范、真实公共组件、原型入口和可用工具。
 
-## 1. Product logic first
+- 优先沿项目索引和引用查找，不默认扫描整个仓库。
+- README 中写有某项能力，不代表该能力在当前环境中一定可用；必要时检查真实代码和工具。
+- 当 PRD、评审文档和原型同时存在时，先阅读 references/source-reconciliation.md，完成事实对照后再把差异当作设计要求。
 
-Map the relevant business area:
-- objects and responsibilities;
-- actors, roles and access boundaries;
-- lifecycle and source-of-truth data;
-- user scenarios and entry/exit points;
-- field definitions, derivation, freshness and missing-data behavior;
-- status meanings and transitions;
-- cross-page dependencies;
-- duplicate, failure, retry, cancellation, partial-success and unknown-result cases.
+## 1. 先梳理产品逻辑
 
-Separate formal facts, user-confirmed decisions, AI proposals and unresolved questions. Use the smallest useful model; do not invent entities or statuses.
+针对当前业务范围梳理：
+- 业务对象及各自职责；
+- 使用角色、权限和数据边界；
+- 对象生命周期与事实来源；
+- 端到端用户场景及入口/出口；
+- 字段定义、计算方式、数据新鲜度和缺失值行为；
+- 状态含义及状态变化；
+- 页面和模块之间的依赖；
+- 重复提交、失败、重试、取消、部分成功和结果未知等异常情况。
 
-**Gate:** primary objects, rules and cross-module boundaries are sufficiently clear. Only unresolved D1 decisions block progress.
+明确区分正式事实、用户确认、AI 建议和待确认事项。只建立解决当前问题所需的最小模型，不臆造对象或状态。
 
-## 2. Interaction design
+**阶段门槛：** 核心对象、关键规则和跨模块边界足够清楚。只有尚未解决的 D1 决策会阻塞后续工作。
 
-For each relevant page/flow specify the user goal, page responsibilities, information hierarchy, search/filter/sort/pagination, single/bulk actions, overlays/navigation, defaults, dependencies, validation, context retention and relevant loading/empty/error/retry/partial-result states.
+## 2. 再设计交互
 
-Use state tables only where they resolve ambiguity. Do not create matrices for every static field.
+针对相关页面和流程明确：
+- 用户目标、页面职责和信息优先级；
+- 搜索、筛选、排序和分页；
+- 单条操作与批量操作；
+- 抽屉、弹窗和页面导航；
+- 默认值、联动关系、校验和上下文保留；
+- 与当前流程相关的加载、空数据、无匹配结果、错误、重试和部分成功状态。
 
-**Gate:** important user scenarios are completable and consequential actions are unambiguous.
+只有在状态表能够消除歧义时才建立状态矩阵，不要给每个静态字段都制作一张表。
 
-## 3. Visual design
+**阶段门槛：** 重要用户场景可以完整执行，关键操作的后果和反馈明确。
 
-Start from the active design system, actual shared components and common examples. Compose existing patterns first. Tune hierarchy, density, alignment, responsiveness and clarity to the real page. A new shared pattern needs repeated use or a genuine system-wide gap; a one-off stays local. A static common gallery is not automatically a runtime component library.
+## 3. 再处理视觉设计
 
-**Gate:** the page belongs to the same product while fitting its own task.
+从项目当前使用的设计系统、真实公共组件和 common 参考模式开始。优先组合现有能力，再根据页面任务调整信息层级、密度、对齐、响应式和可读性。
 
-## 4. Prototype implementation
+- 只有存在多处复用需求或真正的全局能力缺口，才新增公共模式。
+- 只服务一个业务场景的特殊设计留在业务模块。
+- 静态 common 展示页不自动等同于运行时组件库。
 
-Prepare a concise handoff pointing to the active brief, formal facts, common patterns and exact scope. Implement confirmed requirements and authorized D2/D3 choices. Preserve unrelated behavior. Keep unresolved D1 behavior pending; do not fabricate rules to make a demo look complete.
+**阶段门槛：** 页面看起来属于同一产品，同时适合自身业务任务。
 
-## 5. Verification and acceptance
+## 4. 实施可执行原型
 
-Verify the actual running prototype: normal and long content, primary interactions, roles, empty/no-result and representative failures, narrow viewports/containers, overflow and shared-consumer regressions. Use real browser screenshots/tests when available. State what remains unverified. A successful build is not product acceptance.
+准备简洁的实施交接，引用当前设计工作稿、正式事实源、公共模式和明确修改范围。
 
-## 6. Milestone close
+只实施已确认的要求，以及有依据且已授权的 D2/D3 选择。保护无关页面和现有交互。未解决的 D1 事项保持待定，不得为了让演示看起来完整而编造业务规则。
 
-Merge duplicate decisions; keep one current statement per question; remove superseded options from active context; retain only necessary rationale and open D1 items; update the active brief. After acceptance, promote stable business facts to the existing PRD and shared rules to the existing standards. Retire temporary material under repository policy. Never create a parallel tracker or archive of chat transcripts.
+## 5. 验证与验收
+
+验证真实运行的原型，至少覆盖：
+- 正常数据和长内容；
+- 核心交互与页面跳转；
+- 重要角色差异；
+- 空数据、无匹配结果和典型失败；
+- 窄视口/容器及溢出问题；
+- 公共组件其他使用页面的回归。
+
+有真实浏览器和测试工具时，使用实际截图和测试结果。工具不可用时，明确说明哪些内容尚未验证。构建成功不等于产品体验验收通过。
+
+## 6. 里程碑收敛
+
+在有意义的讨论轮次、页面设计完成、模块/阶段完成或验收时：
+1. 合并重复决策；
+2. 统一不同表述；
+3. 每个问题只保留一个当前有效答案；
+4. 被替代的方案标记为 SUPERSEDED，并从当前执行摘要中移除；
+5. 从当前工作稿中清理无效选项和临时推理；
+6. 只保留理解非显而易见决策所需的理由；
+7. 保留尚未解决的 D1 问题；
+8. 决策正式归档后，更新其正式事实源引用。
+
+正式验收后，将稳定业务事实合并到现有 PRD，将公共规则合并到现有规范，并按仓库治理要求归档或清理临时工作稿。不要另建平行任务看板或聊天记录档案。
