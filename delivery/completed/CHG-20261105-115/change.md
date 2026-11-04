@@ -1,10 +1,11 @@
 ---
 id: CHG-20261105-115
 parent: delivery/milestones/M4-content-production.md#m4-k-multiset-strategies
-status: IMPLEMENTING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud"]
 risk: H
+merge_commits: {"wt-media-cloud": "73e8d067ffe8fea8f7784b58c6e860ec818281be"}
 ---
 
 # CHG-20261105-115：多组成片策略与真实执行批次

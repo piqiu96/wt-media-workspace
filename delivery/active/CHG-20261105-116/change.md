@@ -1,7 +1,7 @@
 ---
 id: CHG-20261105-116
 parent: delivery/milestones/M4-content-production.md#m4-l-manual-batches
-status: PLANNED
+status: IMPLEMENTING
 depends_on: ["CHG-20261105-115"]
 affected_repos: ["wt-media-cloud"]
 risk: H
