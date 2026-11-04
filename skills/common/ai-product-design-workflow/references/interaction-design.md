@@ -1,32 +1,52 @@
-# Interaction design
+# 交互设计
 
-Design around the user's task, not the inventory of controls.
+围绕用户要完成的任务设计交互，而不是围绕现有控件清单堆叠功能。
 
-## Page contract
+## 页面职责约定
 
-Define page purpose/non-goals, entry and return points, primary decision information, list/detail/form responsibilities, role actions and upstream/downstream relationships.
+明确页面目标与非目标、进入和返回路径、关键决策信息、列表/详情/表单的职责、各角色可执行的操作，以及与上下游页面的关系。
 
-## Lists and filters
+## 列表与筛选
 
-- Put frequent, high-value filters first; move genuinely low-frequency filters to advanced filters.
-- Choose single/multi-select from the real query task.
-- Define defaults, apply/reset, pagination reset, sorting and cross-page context retention.
-- Search identifiers users actually use, not just internal database IDs.
-- Keep independently useful fields searchable/sortable even when visually grouped.
-- Do not make horizontal scrolling the only way to discover essential information.
+- 高频、高价值筛选项放在前面；真正低频的条件才放入高级筛选。
+- 单选还是多选，应由真实查询任务决定。
+- 明确默认值、应用/重置行为、筛选后分页重置、排序方式和跨页面上下文保留规则。
+- 搜索应覆盖用户实际使用的标识，不应只支持数据库内部 ID。
+- 即使多个字段在视觉上组合展示，只要各自有独立运营价值，就应保留相应搜索或排序能力。
+- 不要让横向滚动成为发现关键信息的唯一方式；应优先合理安排列宽和信息分组。
 
-## Actions
+## 操作设计
 
-For each consequential action define eligibility, side effects, idempotency, duplicates, confirmation need, result feedback and recovery. Bulk actions define selection scope, cross-page selection, partial success and failed-only retry.
+每个重要操作都要明确：可操作条件、副作用、幂等性、重复操作处理、是否需要确认、结果反馈和恢复方式。
 
-Do not confirm every action. Confirm destructive, irreversible, broad-scope or risk-bearing actions. Preserve context after completion.
+批量操作还要明确：
+- 选择范围是当前页还是全部筛选结果；
+- 跨页选择是否保留；
+- 部分成功如何反馈；
+- 是否支持只重试失败项。
 
-## Overlays and navigation
+不要给每个操作都增加确认弹窗。仅对破坏性、不可逆、大范围或有明显风险的操作要求确认。操作完成后尽量保留用户当前上下文。
 
-Use established project Dialog/Drawer patterns. Choose a temporary detail, focused confirmation or full page based on the task. Avoid duplicate actions in list and detail unless context gives the detail action a distinct purpose.
+## 抽屉、弹窗与导航
 
-Define close/focus behavior, nested overlays, loading locks and parent-state preservation.
+使用项目既有 Dialog/Drawer 模式。根据任务判断使用临时详情、聚焦确认还是独立页面。
 
-## State coverage
+避免在列表和详情中重复放置同一个操作，除非详情场景确实有独立价值。
 
-Cover only states relevant to the flow: initial/loading, normal, empty source vs no matches, unavailable, submitting/in progress, success, failure, partial success, unknown/pending confirmation, retry and cancel where supported. State what users see and what they can do next. Never invent backend transitions.
+明确关闭与焦点返回、嵌套弹层、加载期间的操作锁定，以及父页面状态保留规则。
+
+## 状态覆盖
+
+只覆盖当前流程确实涉及的状态：
+- 初始/加载中；
+- 正常；
+- 数据为空与筛选无结果；
+- 不可用/无权限；
+- 提交中/处理中；
+- 成功；
+- 失败；
+- 部分成功；
+- 结果未知/等待确认；
+- 在业务支持时的重试与取消。
+
+对每种相关状态说明用户看到什么、下一步能做什么。不得臆造后端状态变化，也不得承诺产品当前无法执行的操作。
