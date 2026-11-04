@@ -1,5 +1,5 @@
 schema_version: 1
-skills_revision: "2026.07.14.bootstrap"
+skills_revision: "2026.11.03.ai-product-design-workflow"
 
 # This file is the single declaration of where skill copies are distributed.
 # `scripts/sync_skills.py` reads it and nothing else; it must not hardcode

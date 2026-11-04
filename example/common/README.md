@@ -1,4 +1,4 @@
-# 公共视觉与交互参考
+# 公共视觉与交互参考\n\n通用设计协同方法见 [AI Product Design Workflow Skill](../../skills/common/ai-product-design-workflow/SKILL.md)。本目录仍是公共视觉/交互参考，不是该 Skill 的替代品，也不是运行时组件库。
 
 [打开参考 HTML](index.html) · [正式规范入口](../../docs/standards/frontend/README.md) · [原型起始页](../proto/starter.html)
 
