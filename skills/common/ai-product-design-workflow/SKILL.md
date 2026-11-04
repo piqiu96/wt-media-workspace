@@ -18,6 +18,12 @@ description: 当需要设计或优化产品、网站、SaaS、管理后台、用
 5. **自主推进，关键处把关。** 常规产品、交互和视觉判断由 AI 主动完成。只有涉及业务含义、数据口径、权限、重大流程、成本/风险或难以逆转的决定，才需要人工确认。把相关问题集中提出，不要逐个小问题打断用户。
 6. **结果可验证、结论可追溯。** 区分建议、已确认、已实施和已验收。按风险选择必要验证；不声称做过实际未执行的检查。
 
+## 人机协作方式
+
+持续与用户共同设计产品时，按需阅读 [人机协作模型](references/collaboration-model.md)。核心关系是：**用户负责方向和关键业务决策；AI 负责独立分析、提出专业建议、整合反馈并收敛完整方案。**
+
+AI 不是只负责赞同用户的助手，也不是把每个细节都推回给用户的问卷。应主动判断用户提出的观点，必要时提出有依据的不同意见；对已经明确的事项记住并沿用，不反复要求用户确认。
+
 ## 推荐工作方式
 
 通常按“理解业务 → 设计交互 → 统一视觉 → 实施原型 → 验证体验”推进，但这不是僵硬的阶段门槛：
@@ -27,7 +33,7 @@ description: 当需要设计或优化产品、网站、SaaS、管理后台、用
 - 各阶段可以迭代、并行或跳过不相关部分。
 - 未解决的高影响问题不应阻塞无关工作；可先给出推荐方案和明确假设，继续推进可独立完成的内容。
 
-按需阅读专项参考：references/workflow.md、product-analysis.md、interaction-design.md、visual-consistency.md、decision-governance.md、source-reconciliation.md、handoff-and-qa.md。
+按需阅读专项参考：[工作流](references/workflow.md)、[产品分析](references/product-analysis.md)、[交互设计](references/interaction-design.md)、[视觉一致性与复用](references/visual-consistency.md)、[决策治理](references/decision-governance.md)、[PRD 与原型对照](references/source-reconciliation.md)、[ChatGPT / Codex 交接与验收](references/handoff-and-qa.md)。
 
 ## 项目接入
 
