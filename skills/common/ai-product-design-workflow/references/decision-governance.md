@@ -1,40 +1,52 @@
-# Decision governance and consolidation
+# 决策治理与里程碑合并
 
-## Two independent axes
+## 两条相互独立的维度
 
-**Autonomy**
-- D0: binding formal facts and user-confirmed decisions; follow.
-- D1: business meaning, metrics, permissions, core workflow, irreversible or cross-module changes; human approval required.
-- D2: evidence-based product/interaction judgment; AI may decide and record rationale.
-- D3: presentation detail within the system; AI may decide and implement.
+**自主权限**
 
-**Maturity**
-- PROPOSED: recommendation, not binding.
-- CONFIRMED: human-confirmed decision.
-- IMPLEMENTED: reflected in prototype/code.
-- ACCEPTED: verified and accepted by product owner.
-- SUPERSEDED: replaced by a newer decision.
+- D0：必须遵循的正式事实和用户已确认决策。
+- D1：业务含义、指标、权限、核心流程、不可逆操作或跨模块变化，必须人工确认。
+- D2：有证据支持的产品/交互判断，AI 可以自主决定并记录必要理由。
+- D3：设计系统范围内的表现细节，AI 可以自主决定并实施。
 
-D0-D3 is not a status. IMPLEMENTED is not ACCEPTED.
+**成熟度**
 
-## Record shape
+- PROPOSED：建议，尚不具约束力。
+- CONFIRMED：已由用户确认。
+- IMPLEMENTED：已反映到原型或代码。
+- ACCEPTED：已验证并由产品负责人验收。
+- SUPERSEDED：已被更新决策替代。
 
-Keep only decisions that affect future work: concise decision, autonomy/maturity, owner/source, non-obvious rationale, affected pages/modules, next action/formal destination. Do not record every thought or ordinary styling choice.
+D0–D3 不是状态。IMPLEMENTED 不等于 ACCEPTED。
 
-## Milestone consolidation
+## 决策记录内容
 
-After a meaningful discussion round, page design, module/phase completion or acceptance:
-1. merge duplicates;
-2. resolve wording differences;
-3. keep one active answer per question;
-4. mark replaced decisions SUPERSEDED and remove them from active summaries;
-5. remove dead options/transient reasoning from the active brief;
-6. retain only rationale needed to understand non-obvious choices;
-7. keep unresolved D1 decisions visible;
-8. point to the formal source when promoted.
+只记录会影响后续工作的决策，包含：
 
-History belongs to Git/PR or the existing review mechanism. Do not build a permanent decision database or duplicate tracker.
+- 简洁明确的决策内容；
+- 自主权限级别和成熟度；
+- 来源/负责人；
+- 非显而易见时的决策理由；
+- 影响的页面/模块；
+- 后续动作或正式归档位置。
 
-## Avoid false authority
+不要记录每一个想法、所有备选方案或普通视觉细节。
 
-A proposal is not confirmed because it appears in a draft. Implementation is not acceptance. A user statement is binding only for the scope it confirms. Never silently upgrade maturity.
+## 里程碑合并
+
+在有意义的讨论轮次、页面设计完成、模块/阶段结束或验收后执行：
+
+1. 合并重复决策；
+2. 统一不同表述；
+3. 每个问题只保留一个当前有效答案；
+4. 被替代的决策标记为 SUPERSEDED，并从当前摘要中移除；
+5. 从当前工作稿中清理已无价值的方案和临时推理；
+6. 只保留理解非显而易见选择所必需的理由；
+7. 将尚未解决的 D1 事项保留为明确阻塞项；
+8. 决策进入正式文档后，更新对应引用。
+
+历史通过 Git/PR 或项目现有评审机制追溯。不要建立永久决策数据库，也不要复制一套项目看板。
+
+## 防止错误提升决策权威性
+
+草稿中出现一项建议，不代表它已经确认。代码已经实现，不代表体验已经验收。用户的一句话只对其明确涉及的范围生效。不得擅自提升决策成熟度。
