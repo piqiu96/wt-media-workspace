@@ -1,22 +1,27 @@
-# Decision: <short title>
+# 决策记录：<简短标题>
 
-- ID:
-- Autonomy: D0 / D1 / D2 / D3
-- Maturity: PROPOSED / CONFIRMED / IMPLEMENTED / ACCEPTED / SUPERSEDED
-- Source/owner:
-- Affected scope:
+- 决策编号：
+- 自主权限：D0 / D1 / D2 / D3
+- 成熟度：PROPOSED / CONFIRMED / IMPLEMENTED / ACCEPTED / SUPERSEDED
+- 来源/负责人：
+- 影响范围：
 
-## Decision
-<one current answer>
+## 决策结论
 
-## Rationale
-<only if needed to understand a non-obvious tradeoff>
+<只写一个当前有效答案>
 
-## Formal source
-<existing PRD/standard/ADR link, or "not yet promoted">
+## 决策理由
 
-## Supersedes / superseded by
-<reference if applicable>
+<仅在理解非显而易见的取舍时填写>
 
-## Next action
-<only if action remains>
+## 正式事实源
+
+<现有 PRD / 规范 / ADR 链接；尚未归档时填写“尚未回写”>
+
+## 替代关系
+
+<被哪项决策替代，或替代了哪项旧决策>
+
+## 后续动作
+
+<仅在仍有后续工作时填写>
