@@ -1,34 +1,37 @@
-# ChatGPT / Codex handoff and QA
+# ChatGPT / Codex 交接与质量验收
 
-## Manual handoff
+## 手动交接约定
 
-ChatGPT and Codex are separate environments unless the product explicitly provides a connected handoff. Never claim to switch modes, start a local process or edit a local working tree when unavailable.
+除非产品明确提供了连接能力，否则 ChatGPT 与 Codex 是两个独立执行环境。不得声称能够自动切换模式、启动用户本地进程或修改用户本地工作区。
 
-The design handoff points to repository files and includes only:
-- task and exact scope;
-- active design brief and confirmed decisions;
-- formal PRD/standard references;
-- common patterns to reuse;
-- files/entry points to inspect;
-- prohibited scope changes;
-- browser scenarios/evidence required;
-- unresolved D1 items that must not be guessed.
+设计侧交接应指向仓库中的文件，只包含：
 
-Do not paste the whole PRD or repeat common rules in every prompt.
+- 本次任务和明确范围；
+- 当前设计工作稿及已确认决策；
+- 正式 PRD/规范引用；
+- 必须复用的公共模式；
+- 需要检查的文件和入口；
+- 禁止擅自修改的范围；
+- 浏览器验证场景和证据要求；
+- 不得猜测的未解决 D1 事项。
 
-## Implementation agent
+不要粘贴整份 PRD，也不要在每个 Prompt 中重复公共规范。
 
-1. Read repository instructions.
-2. Read referenced design brief and formal sources.
-3. Inspect actual common components and existing page code.
-4. Implement confirmed scope and authorized D2/D3 choices only.
-5. Ask only for unresolved D1 decisions.
-6. Reuse before adding shared components.
-7. Preserve unrelated behavior.
-8. Run relevant tests and browser checks; distinguish pass/fail/not-run.
-9. Return changed files, screenshots, commands/results, regressions and unresolved issues.
-10. Update implementation maturity; never mark ACCEPTED for the human.
+## 实施代理的工作要求
 
-## Acceptance
+1. 先阅读仓库级指引。
+2. 阅读交接中引用的设计工作稿和正式事实源。
+3. 检查真实公共组件和当前页面代码。
+4. 只实施已确认要求和已授权的 D2/D3 决策。
+5. 只针对尚未解决的 D1 问题请求人工决策。
+6. 新增共享组件前先确认能否复用。
+7. 保护不在本次范围内的页面和行为。
+8. 执行相关测试和浏览器检查，并区分通过/失败/未运行。
+9. 返回修改文件、截图、命令与实际结果、回归情况和未解决事项。
+10. 更新实施成熟度；不得代替用户标记为 ACCEPTED。
 
-Compare implementation against confirmed design decisions and actual scenarios. A screenshot alone cannot prove interaction. A passing test suite cannot prove product usability. Record acceptance explicitly and then promote stable facts to their existing owners.
+## 验收原则
+
+对照已确认的设计决策和真实操作场景验收。单张截图不能证明交互正确；测试全部通过也不能单独证明产品好用。
+
+验收结论必须明确记录。通过验收后，再将稳定事实归入其原有正式维护位置。
