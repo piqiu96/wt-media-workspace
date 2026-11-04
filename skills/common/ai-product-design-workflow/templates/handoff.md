@@ -1,44 +1,51 @@
-# Prototype implementation handoff
+# 原型实施交接单
 
-- Project:
-- Milestone/page:
-- Current maturity:
-- Exact scope:
-- Out of scope:
+- 项目：
+- 里程碑/页面：
+- 当前成熟度：
+- 本次实施范围：
+- 明确不在范围内的内容：
 
-## Read first
-- Active design brief:
-- Formal product facts:
-- Frontend standards:
-- Common pattern references:
-- Prototype entry point / relevant files:
+## 实施前先阅读
 
-## Confirmed decisions
-- Link to current decision section; do not copy the PRD.
+- 当前设计工作稿：
+- 正式产品事实源：
+- 前端规范：
+- Common 公共模式参考：
+- 原型入口/相关文件：
 
-## Authorized implementation choices
-- D2:
-- D3:
+## 已确认决策
 
-## Must not guess / human approval required
-- D1 unresolved items:
+- 引用当前决策章节即可，不要复制 PRD 全文。
 
-## Reuse requirements
-- Existing common patterns/components to inspect and reuse:
-- New shared capability allowed? Why / approval:
+## 已授权实施的选择
 
-## Verification
-- Browser scenarios:
-- Roles and data states:
-- Viewports/containers:
-- Regression consumers:
-- Required evidence:
+- D2：
+- D3：
 
-## Completion report
-- Changed files:
-- Tests/commands and actual results:
-- Browser screenshots/actual results:
-- Not run / not verified:
-- Regressions:
-- Remaining D1 decisions:
-- Updated maturity (never mark ACCEPTED for the human):
+## 不得猜测 / 必须人工确认
+
+- 尚未解决的 D1 事项：
+
+## 复用要求
+
+- 必须检查和复用的现有公共模式/组件：
+- 是否允许新增公共能力？原因和批准依据：
+
+## 验证要求
+
+- 浏览器操作场景：
+- 角色与数据状态：
+- 视口/容器：
+- 需要回归的其他页面：
+- 必须提供的验证证据：
+
+## 完成报告
+
+- 修改文件：
+- 测试/命令及实际结果：
+- 浏览器截图/实际验证结果：
+- 未运行/未验证的内容：
+- 回归问题：
+- 尚未解决的 D1 决策：
+- 当前成熟度（不得代替用户标记为 ACCEPTED）：
