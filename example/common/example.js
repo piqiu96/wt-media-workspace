@@ -103,6 +103,8 @@
   function filterList() {
     const form = $('[data-filter-form]'); if (!form) return;
     const q = form.elements.q.value.trim().toLowerCase();
+    const countLabel = $('[data-advanced-count]', form);
+    if(countLabel){const applied=Number(Boolean(form.elements.group.value));countLabel.textContent=applied?'（已生效 '+applied+' 项）':'';countLabel.hidden=!applied;}
     let count = 0;
     $$('[data-resource-row]').forEach(row => {
       const ok = row.textContent.toLowerCase().includes(q) && (!form.elements.mode.value || row.dataset.mode === form.elements.mode.value) &&
@@ -118,7 +120,8 @@
   const filterForm = $('[data-filter-form]');
   filterForm?.addEventListener('submit', e => { e.preventDefault(); filterList(); });
   filterForm?.addEventListener('reset', () => {
-    queueMicrotask(() => { $$('[data-row-check]').forEach(e => { e.checked = false; }); filterList(); });
+    // Native reset restores values after its event dispatch; refresh in the next task.
+    setTimeout(() => { const advanced=$('#list-advanced');if(advanced)advanced.open=false; $$('[data-row-check]').forEach(e => { e.checked = false; }); filterList(); },0);
   });
   function applyDetail() {
     const panel = $('#detail-preview'); if (!panel) return;

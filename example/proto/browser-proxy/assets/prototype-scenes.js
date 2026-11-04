@@ -15,7 +15,7 @@ function v3Local(){return v3Client==='desktop'&&v3Own()&&v3Role()!=='admin'}
 function v3Manager(){return v3Role()!=='operator'}
 function v3Base(mod){return mod==='proxy'?(v3Role()==='admin'?'p-admin':v3Role()==='senior'?'p-senior':'p-list'):(v3Role()==='admin'?'w-admin':v3Role()==='senior'?'w-senior':'w-list')}
 function v3Owner(i=0){return v3Role()==='operator'?'林予安':v3Role()==='senior'?(v3Member==='self'?'陈以宁':'林予安'):['林予安','陈以宁','许知夏','林予安','宋嘉言','林予安','沈知行','陈以宁'][i]}
-function v3Accounts(i=v3Focus){return i===0?[['208','B站','星河玩游戏','登录正常'],['216','百家号','星河游戏资讯','登录正常']]:[[''+(220+i*2),'B站','星河观察'+(i+1),'登录正常'],[''+(221+i*2),'百家号','游戏资讯'+(i+1),'登录正常']]}
+function v3Accounts(i=v3Focus){return i===0?[['208','B站','星河玩游戏','登录正常'],['216','百度','星河游戏资讯','登录正常']]:[[''+(220+i*2),'B站','星河观察'+(i+1),'登录正常'],[''+(221+i*2),'百度','游戏资讯'+(i+1),'登录正常']]}
 function v3AccountTable(i=v3Focus){return `<table class="dense"><thead><tr><th>ID</th><th>平台</th><th>账号名称</th><th>登录状态</th></tr></thead><tbody>${v3Accounts(i).map(a=>`<tr><td>${a[0]}</td><td>${a[1]}</td><td>${a[2]}</td><td>${badge(a[3],'green')}</td></tr>`).join('')}</tbody></table>`}
 function v3Btn(t,id,c='',disabled=false){return btn(t,id,c,disabled)}
 function v3Drawer(t,b,f='',wide=true){return drawer(t,b,f,wide)}

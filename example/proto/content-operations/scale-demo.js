@@ -7,7 +7,7 @@
  };
  const load=()=>{
   const groups=O.platforms.map(()=>[]);
-  O.platforms.forEach((platform,k)=>{for(let i=0;i<80;i++){const a={id:P.id(),name:platform+' · 演示账号'+String(i+1).padStart(3,'0'),platform,quality:i%4===0?'优质':'普通',window:'演示窗口 '+(k*80+i+1),channel:'browser',channels:platform==='百家号'?['browser','api']:['browser'],enabled:i%19!==0,reason:i%19===0?'待登录':'',tags:['运营'+(Math.floor(i/20)+1)+'组',i%2?'教程':'知识','规模演示'],scaleDemo:true};P.db.accounts.push(a);if(a.enabled)groups[k].push(a);}});
+  O.platforms.forEach((platform,k)=>{for(let i=0;i<80;i++){const a={id:P.id(),name:platform+' · 演示账号'+String(i+1).padStart(3,'0'),platform,quality:i%4===0?'优质':'普通',window:'演示窗口 '+(k*80+i+1),channel:'browser',channels:platform==='百度'?['browser','api']:['browser'],enabled:i%19!==0,reason:i%19===0?'待登录':'',tags:['运营'+(Math.floor(i/20)+1)+'组',i%2?'教程':'知识','规模演示'],scaleDemo:true};P.db.accounts.push(a);if(a.enabled)groups[k].push(a);}});
   for(let i=0;i<240;i++){
    const material=C.db.materials[i%C.db.materials.length],strategy=C.db.strategies.find(s=>s.category===material.category)||C.db.strategies[0],taskId=C.id(),outputId=C.id(),name='片段'+(i+1)+' · '+(i%2?'引导版':'精简版'),version={...O.version(),name,start:i%2?'00:10':'00:00',end:i%2?'01:40':'01:00',platforms:[...O.platforms]};
    C.db.tasks.push({id:taskId,materialId:material.id,strategyId:strategy.id,name,batch:'规模演示 · 第'+(Math.floor(i/20)+1)+'批',batchId:'scale-'+Math.floor(i/20),status:'success',owner:O.actor,version,snapshot:{strategyName:strategy.name,template:strategy.template,...version},created:'11-03 08:00',finished:'11-03 08:30',trigger:'人工创建',attempt:1,scaleDemo:true});

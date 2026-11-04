@@ -142,7 +142,8 @@
   document.addEventListener('scroll',event=>{if(active && !active.popup.contains(event.target))dismiss();},true);
   window.addEventListener('resize',()=>dismiss());
   window.addEventListener('hashchange',()=>dismiss());
-  document.addEventListener('reset',event=>queueMicrotask(()=>all('select',event.target).forEach(e=>e.dispatchEvent(new Event('change',{bubbles:true})))));
+  // Observe native reset's restored values, not the values during reset dispatch.
+  document.addEventListener('reset',event=>setTimeout(()=>{if(!event.defaultPrevented)all('select',event.target).forEach(e=>e.dispatchEvent(new Event('change',{bubbles:true})));},0));
   document.addEventListener('close',()=>{if(active && !active.trigger.isConnected)dismiss();},true);
   function enhance(root=document){if(!supported)return;all('select',root).forEach(enhanceSelect);all('[data-action-menu]',root).forEach(enhanceMenu);}
   window.WTControls={enhance,dismiss}; enhance();

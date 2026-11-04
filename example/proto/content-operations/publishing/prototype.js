@@ -3,7 +3,8 @@
   'use strict';
   const P = window.PI = {};
   const KEY = 'wt-operations-execution-v3';
-  try { P.db = JSON.parse(localStorage.getItem(KEY)); } catch { /* file://可能禁用存储。 */ }
+  // 读取时兼容旧平台名称，保留已有演示数据及平台分配关系。
+  try { P.db = JSON.parse(localStorage.getItem(KEY)?.replaceAll('\u767e\u5bb6\u53f7','百度') || 'null'); } catch { /* file://可能禁用存储。 */ }
   if (P.db?.version !== 2) P.db = PISeed();
   P.ui = {route:'publish/tasks',selected:new Set(),filters:{},page:1,size:8,review:false,replyId:9101,replyFilter:'pending',replyQuery:'',replyDraft:{}};
   P.callbacks = new Map(); P.serial = 0; P.dialogs = [];

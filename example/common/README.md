@@ -72,3 +72,32 @@
 当前操作层级：主要任务用浅底表达层级，其余可执行动作保持明确点击识别。复用时给该行的主要动作增加 `ex-row-primary`，不要通过按钮文案自动猜测业务优先级；每行至多一个主要轻按钮。
 
 “打开”按钮使用纯文字，不保留前置图标；浅底与32px热区保留。完整业务原型见[窗口与代理](../proto/browser-proxy/index.html)。本目录只保留当前稿，存储边界见[example约定](../README.md#当前稿保留)。
+
+
+## 下方展开式筛选（2026-11-04）
+
+公共资源列表统一采用“基础条件＋查询／重置 → 下方左对齐高级筛选 → 展开条件”。入口不挤入查询按钮组，不因基础字段换行漂移；不增加第二套操作按钮。只改变可见性，不清空输入，不自动查询。入口按已应用条件显示“已生效 N 项”（日期范围为一项，未查询草稿不计入）；重置后同步恢复默认条件与计数。页面的校验错误不能被折叠隐藏。
+
+引用 `example.css`，面板加 `ex-list-pattern`，筛选表单加 `ex-filters-stacked`：
+
+```html
+<section class="ex-panel ex-list-pattern">
+  <form class="ex-filters ex-filters-stacked">
+    <!-- ex-field / ex-filter-search：基础字段，标签在上 -->
+    <div class="ex-actions"><button class="ex-button primary" type="submit">查询</button><button class="ex-button" type="reset">重置</button></div>
+    <details class="ex-filter-advanced">
+      <summary>高级筛选<span class="ex-filter-applied">（已生效 1 项）</span></summary>
+      <div class="ex-filter-extra"><!-- 日期范围用 ex-field ex-filter-range；其他字段复用 ex-field --></div>
+    </details>
+    <!-- 校验反馈放在 details 外部 -->
+  </form>
+  <!-- ex-table / ex-selection -->
+  <footer class="ex-pagination ex-pagination-compact"><!-- 总数、条数选择器、ex-page-number、当前页 --></footer>
+</section>
+```
+
+`details/summary` 原生提供键盘与展开语义，页面只维护展开状态和已应用计数，不监听展开来发起查询。字号：标签13px/500、输入值及查询按钮14px、展开入口14px、列表正文与排序动作13px、辅助文字12px；控件36px，横距24px、行距20px、标签间8px、展开内容距入口16px。使用CSS逻辑像素，不能按高分辨率截图尺寸放大。
+
+排序复用 `ex-sort-button` 和16px的 `ex-sort-icon`，活动字段用 `is-active`、升序用 `is-ascending`；表头维护 `aria-sort`，按钮说明当前状态和下一步操作。分页复用同一个紧凑模式，选择器显示完整“20 条 / 页”，无跳页框。多选、日期控件继续遵循各自原生／官方组件行为，不由本样式接管业务数据。
+
+当前显式接入：本目录资源列表、内容运营素材库、我的素材。公共样式通过新类生效，其他原型不会自动迁移布局；运行时Vue页面须按所属工程规范另行实施，不引用离线脚本。

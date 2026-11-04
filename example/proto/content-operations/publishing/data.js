@@ -10,8 +10,8 @@ window.PISeed = function () {
     {id:104,name:'长风游戏日记',platform:'B站',quality:'普通',window:'B站 · 杭州04',channel:'browser',enabled:true},
     {id:105,name:'清晨游玩指南',platform:'B站',quality:'普通',window:'B站 · 上海05',channel:'browser',enabled:true},
     {id:106,name:'战术地图册',platform:'B站',quality:'普通',window:'B站 · 上海06',channel:'browser',enabled:true},
-    {id:107,name:'游戏攻略档案',platform:'百家号',quality:'优质',window:'百家号 · 上海07',channel:'api',enabled:true},
-    {id:108,name:'小熊的日常攻略',platform:'百家号',quality:'普通',window:'百家号 · 杭州08',channel:'api',enabled:true},
+    {id:107,name:'游戏攻略档案',platform:'百度',quality:'优质',window:'百度 · 上海07',channel:'api',enabled:true},
+    {id:108,name:'小熊的日常攻略',platform:'百度',quality:'普通',window:'百度 · 杭州08',channel:'api',enabled:true},
     {id:109,name:'山海游玩记录',platform:'B站',quality:'普通',window:'B站 · 上海09',channel:'browser',enabled:false,reason:'需重新登录'}
   ];
   accounts.forEach(a=>a.channels=a.channel==='api'?['browser','api']:['browser']);
@@ -22,7 +22,7 @@ window.PISeed = function () {
   const planSpecs = [
     ['三角洲 · 优质内容四日计划','三角洲行动','auto','browser','running',24,8],
     ['版本更新 · 人工连续发布','火影忍者','assisted','browser','running',12,3],
-    ['每日攻略 · 百家号发布','洛克王国','auto','api','paused',16,6],
+    ['每日攻略 · 百度发布','洛克王国','auto','api','paused',16,6],
     ['周末活动内容储备','三角洲行动','auto','browser','draft',8,0],
     ['新手入门 · 双账号分发','火影忍者','assisted','browser','ready',10,0],
     ['十月活动攻略收尾','洛克王国','auto','browser','completed',18,18],
@@ -31,8 +31,8 @@ window.PISeed = function () {
   ];
   const plans=planSpecs.map((spec,i)=>{
     const assetIds=assets.filter(a=>!a.sourceAssetId).slice(0,i===0?12:spec[5]).map(a=>a.id);
-    const platform=spec[3]==='api'?'百家号':'B站',groups=[model.group(resources,platform,assetIds,{mode:spec[2],channel:spec[3]})];
-    if(i===0){groups[0].mode='assisted';const other=model.group(resources,'百家号',assetIds,{mode:'auto',channel:'api'});other.useCommon=false;other.assetIds=[...assetIds.slice(0,4),...assetIds.slice(-4)];groups.push(other);}
+    const platform=spec[3]==='api'?'百度':'B站',groups=[model.group(resources,platform,assetIds,{mode:spec[2],channel:spec[3]})];
+    if(i===0){groups[0].mode='assisted';const other=model.group(resources,'百度',assetIds,{mode:'auto',channel:'api'});other.useCommon=false;other.assetIds=[...assetIds.slice(0,4),...assetIds.slice(-4)];groups.push(other);}
     return {id:2101+i,name:i===0?'本周攻略 · 多平台发布计划':spec[0],category:spec[1],assetIds,groups,status:spec[4],seedDone:i===0?1:spec[6],defaultMode:spec[2],defaultChannel:'browser',start:'2026-10-30',date:'10-29 17:'+String(10+i).padStart(2,'0')};
   });
   let taskId=6101;
@@ -45,7 +45,7 @@ window.PISeed = function () {
   });
   ['ready','preparing','waiting','failed','submitted','published','ready','ready'].forEach((status,i)=>{const asset=assets[i],account=accounts[i%8],id=taskId++;tasks.push({id,assetId:asset.id,title:asset.title,accountId:account.id,planId:null,channel:account.channel,mode:i%2?'auto':'assisted',status,phase:status==='waiting'?3:status==='preparing'?1:0,scheduled:'2026-10-30T14:'+String(i*5).padStart(2,'0'),created:'10-30 09:'+String(10+i),published:status==='published'?'10-30 10:08':null,url:status==='published'?'https://demo.invalid/works/'+id:'',description:'本期整理了实用思路与操作细节，欢迎交流。',tags:'游戏攻略,新手入门',partition:'单机游戏',post:model.post(resources,account.platform),platform:account.platform,sourceAssetId:asset.id,guideStatus:'pending',initStatus:'pending',reason:status==='failed'?'账号登录已失效，请完成登录后继续。':''});});
   const interactions = Array.from({length:8},(_,i)=>{
-    const publication=tasks.filter(t=>t.status==='published'&&t.platform==='B站')[Math.floor(i/2)],internal=i%2===0,platform=internal?accounts.find(a=>a.id===publication.accountId).platform:i===3?'百家号':'B站';
+    const publication=tasks.filter(t=>t.status==='published'&&t.platform==='B站')[Math.floor(i/2)],internal=i%2===0,platform=internal?accounts.find(a=>a.id===publication.accountId).platform:i===3?'百度':'B站';
     const ids=internal?publication.post.accountIds.filter(id=>id!==publication.accountId).slice(0,publication.post.perWork):i===3?[107,108]:[101,102,103,104,105,106];
     const status=['completed','partial','running','ready','attention','completed','paused','ready'][i];
     if(internal)publication.initStatus=status==='completed'?'done':status==='attention'||status==='partial'?'attention':'pending';

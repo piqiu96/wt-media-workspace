@@ -42,12 +42,12 @@
   let resultModel = { added: 1, updated: 2, missing: 1, skipped: 2 };
   const added = [
     { key: 'bit-new-1', name: 'B站新号 · 上海05', bit: 'b71a…0e32', group: '主力账号组' },
-    { key: 'bit-new-2', name: '百家号 · 杭州03', bit: 'c82b…1f43', group: '备用账号组' },
+    { key: 'bit-new-2', name: '百度 · 杭州03', bit: 'c82b…1f43', group: '备用账号组' },
     { key: 'bit-new-3', name: 'B站备用 · 北京01', bit: 'd93c…2a54', group: '华北运营组', conflict: true },
   ];
   const changes = [
     ['328', 'B站主号 · 上海01', '窗口名称', 'B站主号', 'B站主号 · 上海01'],
-    ['329', '百家号 · 上海02', '比特分组、备注', '备用账号组 · 备用窗口', '主力账号组 · 日常发布'],
+    ['329', '百度 · 上海02', '比特分组、备注', '备用账号组 · 备用窗口', '主力账号组 · 日常发布'],
   ];
   const pending = [
     ['332', 'B站备用 · 华东03', '代理配置不一致', 'w-mismatch'],
@@ -106,7 +106,7 @@
     } else {
       const rows = changes.map(r => [r[0], r[1], r[2] + '已更新', badge('已同步', 'green')]);
       if (model.added) rows.unshift(['346', 'B站新号 · 上海05', '已建立关联', badge('已同步', 'green')]);
-      if (model.added > 1) rows.splice(1, 0, ['347', '百家号 · 杭州03', '已建立关联', badge('已同步', 'green')]);
+      if (model.added > 1) rows.splice(1, 0, ['347', '百度 · 杭州03', '已建立关联', badge('已同步', 'green')]);
       body += table(['ID', '窗口', '更新内容', '结果'], rows);
     }
     return shell('同步结果', body, button('完成', 'close', 'primary'));

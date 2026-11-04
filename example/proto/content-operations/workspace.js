@@ -1,11 +1,11 @@
 /* 统一工作台；所有操作均为浏览器内的体验演示。 */
 (() => {
   const C=CP,P=PI,E=C.e,O=window.OPS={actor:'陈小雨',route:'overview'};
-  O.platforms=['B站','百家号','抖音','小红书'];
-  O.version=()=>({name:'通用版',qty:1,platforms:['B站','百家号'],intro:'不使用',guide:'不使用',outro:'不使用',start:'00:00',end:'01:30'});
+  O.platforms=['B站','百度','抖音','小红书'];
+  O.version=()=>({name:'通用版',qty:1,platforms:['B站','百度'],intro:'不使用',guide:'不使用',outro:'不使用',start:'00:00',end:'01:30'});
   if(!C.db.suiteVersion){
     C.db.strategies.forEach(s=>{s.versions=[O.version()];s.autoOwner=s.operator;s.auto=false;});
-    C.db.tasks.forEach(t=>{t.owner='陈小雨';t.version={...O.version(),name:t.name||'通用版',platforms:t.platform?[t.platform]:['B站','百家号']};t.batchId=t.batch||'历史单条-'+t.id;});
+    C.db.tasks.forEach(t=>{t.owner='陈小雨';t.version={...O.version(),name:t.name||'通用版',platforms:t.platform?[t.platform]:['B站','百度']};t.batchId=t.batch||'历史单条-'+t.id;});
     C.db.outputs.forEach(o=>{o.owner='陈小雨';o.platforms=C.get('tasks',o.taskId)?.version.platforms||['B站'];o.assignees=Object.fromEntries(o.platforms.map(p=>[p,'陈小雨']));});
     C.db.mine=[101,102,103];C.db.suiteVersion=1;C.save();
   }

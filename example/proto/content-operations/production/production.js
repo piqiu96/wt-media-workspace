@@ -3,7 +3,8 @@
   'use strict';
   const C = window.CP = {};
   const KEY = 'wt-operations-production-v3';
-  try { C.db = JSON.parse(localStorage.getItem(KEY)); } catch {}
+  // 读取时兼容旧平台名称，保留已有演示数据及平台分配关系。
+  try { C.db = JSON.parse(localStorage.getItem(KEY)?.replaceAll('\u767e\u5bb6\u53f7','百度') || 'null'); } catch {}
   if (C.db?.version !== 1) C.db = CPSeed();
   C.ui = {page:1,size:8,selected:new Set(),filters:{},group:false,collapsed:new Set()};
   C.handlers = new Map(); C.serial = 0; C.dialogs = [];

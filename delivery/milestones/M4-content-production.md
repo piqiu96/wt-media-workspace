@@ -31,7 +31,7 @@ M4 不包含定时自动创建合成任务；自动调度属于 M5。
 
 一次选择多个素材仍逐素材创建多个独立 `compose_task`。未来的任务归并只用于列表展示和筛选，可由任务名称或分组 code 标识；不合并执行、状态、重试或成片。本轮 M4-F 不预设分组字段。
 
-页面走查以 [AdminUI 页面规范](../../docs/standards/frontend/AdminUI页面规范.md) 和[用户反馈规范](../../docs/standards/frontend/用户反馈规范.md)为准。[合成策略](../../assets/images/ui/content-production/compose-strategies-reference.png)、[合成任务](../../assets/images/ui/content-production/compose-tasks-reference.png)、[我的成片](../../assets/images/ui/content-production/my-outputs-reference.png)三张图只供布局参考，不能据图扩大业务状态和数据模型。
+页面走查以 [AdminUI 页面规范](../../docs/standards/frontend/AdminUI页面规范.md) 和[用户反馈规范](../../docs/standards/frontend/用户反馈规范.md)为准。页面布局不得扩大已确认的业务状态和数据模型。
 
 下文 M4-A～H 的“我的成片”、原有游戏授权和发布入口是对应历史验收时的称呼与范围，证据不改写。2026-10-26 新增 M4-I/J 后，当前产品入口统一叫“成片管理”；M3–M5 Cloud 范围按 ADR-0023，发布入口仍待 M6。新口径须另行验收，不借旧 PASS 宣称已交付。
 

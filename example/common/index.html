@@ -6,9 +6,9 @@
     <title>
       WT Media · 公共视觉参考
     </title>
-    <link rel="stylesheet" href="example.css">
-    <script src="controls.js" defer></script>
-    <script src="example.js" defer>
+    <link rel="stylesheet" href="example.css?v=20261104-filters-r3">
+    <script src="controls.js?v=20261104-filters" defer></script>
+    <script src="example.js?v=20261104-filters-r2" defer>
     </script>
   </head>
   <body>
@@ -116,8 +116,8 @@
                 </button>
               </div>
             </header>
-            <div class="ex-panel" data-list>
-              <form class="ex-filters" data-filter-form>
+            <div class="ex-panel ex-list-pattern" data-list>
+              <form class="ex-filters ex-filters-stacked" data-filter-form>
                 <div class="ex-field ex-filter-search">
                   <label for="list-search">
                     搜索
@@ -172,11 +172,10 @@
                   <button class="ex-button" type="reset">
                     重置
                   </button>
-                  <button class="ex-text-button" type="button" data-toggle="list-advanced" aria-expanded="false">
-                    高级筛选
-                  </button>
                 </div>
-                <div class="ex-filter-extra" id="list-advanced" hidden>
+                <details class="ex-filter-advanced" id="list-advanced">
+                  <summary>高级筛选<span class="ex-filter-applied" data-advanced-count hidden></span></summary>
+                  <div class="ex-filter-extra">
                   <div class="ex-field ex-filter-select">
                     <label for="list-group">
                       比特分组
@@ -193,7 +192,8 @@
                       </option>
                     </select>
                   </div>
-                </div>
+                  </div>
+                </details>
               </form>
               <div class="ex-selection" data-selection hidden>
                 <span>
@@ -300,16 +300,16 @@
                         </div>
                       </td>
                     </tr>
-                    <tr class="ex-resource-row" data-resource-row data-name="百家号 · 上海02" data-mode="比特自管" data-status="正常">
+                    <tr class="ex-resource-row" data-resource-row data-name="百度 · 上海02" data-mode="比特自管" data-status="正常">
                       <td>
-                        <input class="ex-check" type="checkbox" aria-label="选择百家号 · 上海02" data-row-check value="329">
+                        <input class="ex-check" type="checkbox" aria-label="选择百度 · 上海02" data-row-check value="329">
                       </td>
                       <td>
                         329
                       </td>
                       <td>
-                        <span class="ex-name" title="百家号 · 上海02">
-                          百家号 · 上海02
+                        <span class="ex-name" title="百度 · 上海02">
+                          百度 · 上海02
                         </span>
                         <small>
                           主力账号组
@@ -340,17 +340,17 @@
                       <td>
                         <div class="ex-row-actions">
 <button class="ex-text-button ex-row-primary" data-local-note="打开窗口是本机业务能力；本页仅示范按钮状态。" ><span>打开</span></button>
-                          <button class="ex-text-button" data-open="detail" data-record="百家号 · 上海02">
+                          <button class="ex-text-button" data-open="detail" data-record="百度 · 上海02">
                             详情
                           </button>
-                          <button class="ex-text-button" data-open="edit" data-record="百家号 · 上海02">
+                          <button class="ex-text-button" data-open="edit" data-record="百度 · 上海02">
                             编辑
                           </button>
 
-                          <button class="ex-text-button" data-open="picker" data-record="百家号 · 上海02">
+                          <button class="ex-text-button" data-open="picker" data-record="百度 · 上海02">
                             选择代理
                           </button>
-                          <button class="ex-text-button danger" data-open="confirm" data-record="百家号 · 上海02">
+                          <button class="ex-text-button danger" data-open="confirm" data-record="百度 · 上海02">
                             停用
                           </button>
                         </div>
@@ -468,16 +468,16 @@
                         </div>
                       </td>
                     </tr>
-                    <tr class="ex-resource-row" data-resource-row data-name="百家号 · 杭州01" data-mode="比特自管" data-status="待确认">
+                    <tr class="ex-resource-row" data-resource-row data-name="百度 · 杭州01" data-mode="比特自管" data-status="待确认">
                       <td>
-                        <input class="ex-check" type="checkbox" aria-label="选择百家号 · 杭州01" data-row-check value="332">
+                        <input class="ex-check" type="checkbox" aria-label="选择百度 · 杭州01" data-row-check value="332">
                       </td>
                       <td>
                         332
                       </td>
                       <td>
-                        <span class="ex-name" title="百家号 · 杭州01">
-                          百家号 · 杭州01
+                        <span class="ex-name" title="百度 · 杭州01">
+                          百度 · 杭州01
                         </span>
                         <small>
                           主力账号组
@@ -508,17 +508,17 @@
                       <td>
                         <div class="ex-row-actions">
 <button class="ex-text-button ex-row-primary" data-local-note="打开窗口是本机业务能力；本页仅示范按钮状态。" ><span>打开</span></button>
-                          <button class="ex-text-button" data-open="detail" data-record="百家号 · 杭州01">
+                          <button class="ex-text-button" data-open="detail" data-record="百度 · 杭州01">
                             详情
                           </button>
-                          <button class="ex-text-button" data-open="edit" data-record="百家号 · 杭州01">
+                          <button class="ex-text-button" data-open="edit" data-record="百度 · 杭州01">
                             编辑
                           </button>
 
-                          <button class="ex-text-button" data-open="picker" data-record="百家号 · 杭州01">
+                          <button class="ex-text-button" data-open="picker" data-record="百度 · 杭州01">
                             选择代理
                           </button>
-                          <button class="ex-text-button danger" data-open="confirm" data-record="百家号 · 杭州01">
+                          <button class="ex-text-button danger" data-open="confirm" data-record="百度 · 杭州01">
                             停用
                           </button>
                         </div>
@@ -580,16 +580,16 @@
                         </div>
                       </td>
                     </tr>
-                    <tr class="ex-resource-row" data-resource-row data-name="百家号 · 成都01" data-mode="系统托管" data-status="正常">
+                    <tr class="ex-resource-row" data-resource-row data-name="百度 · 成都01" data-mode="系统托管" data-status="正常">
                       <td>
-                        <input class="ex-check" type="checkbox" aria-label="选择百家号 · 成都01" data-row-check value="334">
+                        <input class="ex-check" type="checkbox" aria-label="选择百度 · 成都01" data-row-check value="334">
                       </td>
                       <td>
                         334
                       </td>
                       <td>
-                        <span class="ex-name" title="百家号 · 成都01">
-                          百家号 · 成都01
+                        <span class="ex-name" title="百度 · 成都01">
+                          百度 · 成都01
                         </span>
                         <small>
                           备用账号组
@@ -620,17 +620,17 @@
                       <td>
                         <div class="ex-row-actions">
 <button class="ex-text-button ex-row-primary" data-local-note="打开窗口是本机业务能力；本页仅示范按钮状态。" ><span>打开</span></button>
-                          <button class="ex-text-button" data-open="detail" data-record="百家号 · 成都01">
+                          <button class="ex-text-button" data-open="detail" data-record="百度 · 成都01">
                             详情
                           </button>
-                          <button class="ex-text-button" data-open="edit" data-record="百家号 · 成都01">
+                          <button class="ex-text-button" data-open="edit" data-record="百度 · 成都01">
                             编辑
                           </button>
 
-                          <button class="ex-text-button" data-open="picker" data-record="百家号 · 成都01">
+                          <button class="ex-text-button" data-open="picker" data-record="百度 · 成都01">
                             选择代理
                           </button>
-                          <button class="ex-text-button danger" data-open="confirm" data-record="百家号 · 成都01">
+                          <button class="ex-text-button danger" data-open="confirm" data-record="百度 · 成都01">
                             停用
                           </button>
                         </div>
@@ -709,14 +709,12 @@
                   清除筛选
                 </button>
               </div>
-              <footer class="ex-pagination">
+              <footer class="ex-pagination ex-pagination-compact">
                 <span data-list-count aria-live="polite">
                   共 8 条
                 </span>
                 <div class="ex-actions">
-                  <span>
-                    20 条 / 页
-                  </span>
+                  <select aria-label="每页条数"><option value="8">8 条 / 页</option><option value="20" selected>20 条 / 页</option><option value="50">50 条 / 页</option></select>
                   <button class="ex-button ex-page-number" aria-label="上一页" disabled>
                     ‹
                   </button>
@@ -946,7 +944,7 @@
                             百度
                           </td>
                           <td>
-                            华东百家号
+                            华东百度
                           </td>
                           <td>
                             <span class="ex-tag success">
@@ -1189,7 +1187,7 @@
                     <span class="ex-notice-icon" aria-hidden="true">
                       i
                     </span>
-                    <div class="ex-impact-body"><div class="ex-impact-heading"><span>本次调整涉及 2 个关联账号。</span><button class="ex-text-button ex-disclosure-trigger" data-toggle="impact-accounts" aria-expanded="false" aria-controls="impact-accounts">查看关联账号<span class="ex-chevron" aria-hidden="true"></span></button></div><div class="ex-impact-list" id="impact-accounts" hidden><div><span>B站</span><div>华东内容主号</div></div><div><span>百度</span><div>华东百家号</div></div></div></div>
+                    <div class="ex-impact-body"><div class="ex-impact-heading"><span>本次调整涉及 2 个关联账号。</span><button class="ex-text-button ex-disclosure-trigger" data-toggle="impact-accounts" aria-expanded="false" aria-controls="impact-accounts">查看关联账号<span class="ex-chevron" aria-hidden="true"></span></button></div><div class="ex-impact-list" id="impact-accounts" hidden><div><span>B站</span><div>华东内容主号</div></div><div><span>百度</span><div>华东百度</div></div></div></div>
                   </div>
                   <div class="ex-notice warning">
                     <span class="ex-notice-icon" aria-hidden="true">
@@ -1880,7 +1878,7 @@
                       百度
                     </td>
                     <td>
-                      华东百家号
+                      华东百度
                     </td>
                     <td>
                       <span class="ex-tag success">
@@ -2150,7 +2148,7 @@
           <span class="ex-notice-icon" aria-hidden="true">
             i
           </span>
-          <div class="ex-impact-body"><div class="ex-impact-heading"><span>更换代理将影响此窗口关联的 2 个平台账号。</span><button class="ex-text-button ex-disclosure-trigger" data-toggle="picker-accounts" aria-expanded="false" aria-controls="picker-accounts">查看账号<span class="ex-chevron" aria-hidden="true"></span></button></div><div class="ex-impact-list" id="picker-accounts" hidden><div><span>B站</span><div>华东内容主号</div></div><div><span>百度</span><div>华东百家号</div></div></div></div>
+          <div class="ex-impact-body"><div class="ex-impact-heading"><span>更换代理将影响此窗口关联的 2 个平台账号。</span><button class="ex-text-button ex-disclosure-trigger" data-toggle="picker-accounts" aria-expanded="false" aria-controls="picker-accounts">查看账号<span class="ex-chevron" aria-hidden="true"></span></button></div><div class="ex-impact-list" id="picker-accounts" hidden><div><span>B站</span><div>华东内容主号</div></div><div><span>百度</span><div>华东百度</div></div></div></div>
         </div>
       </div>
       <footer class="ex-overlay-footer">

@@ -1,7 +1,7 @@
 /* 原型的纯业务计算：平台分组、账号匹配和排期；不连接业务服务。 */
 window.PIPublishModel = (() => {
   const clone = value => JSON.parse(JSON.stringify(value));
-  const platforms = ['B站','百家号'];
+  const platforms = ['B站','百度'];
   const now = '2026-10-30T14:00';
   const eligible = (db, platform, channel='browser') => db.accounts.filter(a=>a.platform===platform&&a.enabled&&(channel!=='api'||a.channels?.includes('api')));
   const post = (db, platform) => ({guide:true,guideText:'这期你最想深入了解哪一部分？欢迎在评论区交流。',init:true,accountIds:eligible(db,platform).filter(a=>platform!=='B站'||a.quality==='普通').map(a=>a.id),perWork:platform==='B站'?3:1,actions:['like','comment'],comments:['这次的思路讲得很清楚。','想看更多新手入门的细节。','这部分很实用，期待下一期。']});

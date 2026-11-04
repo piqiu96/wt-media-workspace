@@ -32,7 +32,7 @@
   O.sorted=(rows,value=(x,key)=>x[key])=>{const sort=C.ui.sorts?.[C.route];if(!sort)return rows;return [...rows].sort((a,b)=>{const x=value(a,sort.key),y=value(b,sort.key);return (typeof x==='number'&&typeof y==='number'?x-y:String(x??'').localeCompare(String(y??''),'zh-CN'))*(sort.desc?-1:1);});};
   O.reference=(text,url)=>url&&/^https?:\/\//.test(url)?`<a href="${E(url)}" target="_blank" rel="noopener noreferrer">${E(text)} ↗</a>`:`<span class="ops-muted">${E(text)}未取得</span>`;
   O.preview=(title,description='当前为演示素材，未加载真实视频。')=>`<div class="ops-media-preview"><div class="ops-poster" aria-label="${E(title)}的演示封面">${C.icon('Video')}</div><div><strong>${E(title)}</strong><p>${E(description)}</p></div></div>`;
-  O.capability=(platform,action='publish')=>action==='publish'&&platform==='百家号'?['browser','api']:['browser'];
+  O.capability=(platform,action='publish')=>action==='publish'&&platform==='百度'?['browser','api']:['browser'];
   O.launchPlan=(opts={})=>{O.closeAll();const draft=P.newPlanDraft();draft.replicationId=opts.replicationId||null;if(opts.assetIds?.length){draft.assetIds=[...opts.assetIds];draft.groups.forEach(g=>{g.assetIds=[...opts.assetIds];g.enabled=(!opts.platform||g.platform===opts.platform)&&opts.assetIds.some(id=>O.availability(id,g.platform).ok);});}P.ui.planPlatform=draft.groups.find(g=>g.enabled)?.platform||'B站';P.nav('publish/plan/new');};
   // Exact account/time collisions are shown to the operator; no silent rescheduling.
   O.scheduleConflicts=(rows,opts={})=>{

@@ -16,8 +16,8 @@
     {id:102,title:'手机拍摄也能做出电影感',author:'镜头练习生',category:'拍摄技巧',mine:true,owner:'陈小雨',date:'11-02 10:00',views:26221,likes:2937,saves:807,state:'ready',use:'未制作'},
     {id:106,title:'一盏灯拍出干净的人像',author:'镜头练习生',category:'拍摄技巧',mine:false,date:'11-01 10:00',views:40863,likes:3211,saves:1061,state:'remote',use:'未使用'}
   ];
-  const strategies=[{id:'201',name:'教程通用引导',category:'剪辑教程',owner:'陈小雨',template:'引导视频插入',effect:'片头插入 5 秒引导视频，再播放源素材。',versions:[{name:'通用版',qty:1,platform:'B站 / 百家号'},{name:'竖屏引导版',qty:1,platform:'抖音 / 小红书'}]},
-    {id:'202',name:'教程精简剪辑',category:'剪辑教程',owner:'陈小雨',template:'视频截取',effect:'截取源素材 00:05–01:00。',versions:[{name:'精简版',qty:1,platform:'B站 / 百家号'}]},
+  const strategies=[{id:'201',name:'教程通用引导',category:'剪辑教程',owner:'陈小雨',template:'引导视频插入',effect:'片头插入 5 秒引导视频，再播放源素材。',versions:[{name:'通用版',qty:1,platform:'B站 / 百度'},{name:'竖屏引导版',qty:1,platform:'抖音 / 小红书'}]},
+    {id:'202',name:'教程精简剪辑',category:'剪辑教程',owner:'陈小雨',template:'视频截取',effect:'截取源素材 00:05–01:00。',versions:[{name:'精简版',qty:1,platform:'B站 / 百度'}]},
     {id:'206',name:'拍摄技巧精简版',category:'拍摄技巧',owner:'陈小雨',template:'视频截取',effect:'截取源素材 00:00–01:00。',versions:[{name:'精简版',qty:1,platform:'B站 / 抖音'}]}];
   const parameterSchemas={
     '引导视频插入':[['guideUrl','引导视频地址','url'],['insertSeconds','插入时间（主体第几秒）','number'],['guideDuration','引导时长（秒，0 为完整视频）','number'],['maxDuration','成片时长上限（秒，0 为不限）','number']],
