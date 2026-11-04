@@ -1,0 +1,12 @@
+{
+  "created_http_status": 202,
+  "asset_id": 104,
+  "total_bytes": 53707,
+  "completed_bytes": 0,
+  "initial_status": "pending",
+  "cancel_http_status": 404,
+  "cancel_errcode": 15101,
+  "final_status": "pending",
+  "task_id": "transfer_0ac9d9ec92c7e924d52267eb",
+  "native_completion_verified": false
+}

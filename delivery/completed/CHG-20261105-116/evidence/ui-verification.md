@@ -6,6 +6,8 @@
 
 在 Cloud `web` 执行 `npm test -- --run src/modules/compose src/shared/api src/modules/materials`：**PASS，37 个文件、313 项测试**。覆盖合成、共享 API 和素材相关测试。`git diff --check`：PASS。本次按分工未重复构建，构建由主执行者汇总。
 
+CI 回归修复后另执行全量 `npm test`：**PASS，115 个文件、942 项测试**（2026-11-05 04:10，耗时 8.01 秒）。仅调整 `autoRefreshPages.test.js`：保留定时读取／暂停条件／无刷新按钮覆盖，将三页旧的重置页码源码字符串断言改为真实 loader 执行断言，验证传入当前服务端页码和筛选、静默成功更新数据、静默失败保留原页与原数据。未为测试修改运行行为。
+
 ## 最终页面复查
 
 | 操作／预期 | 实际结果 | 结果／截图 |

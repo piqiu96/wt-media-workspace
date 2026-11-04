@@ -1,10 +1,11 @@
 ---
 id: CHG-20261105-116
 parent: delivery/milestones/M4-content-production.md#m4-l-manual-batches
-status: IMPLEMENTING
+status: DONE
 depends_on: ["CHG-20261105-115"]
 affected_repos: ["wt-media-cloud"]
 risk: H
+merge_commits: {"wt-media-cloud": "f5302811dad607341f09693cc95c7ad18db205d8"}
 ---
 
 # CHG-20261105-116：人工选材与任务批次工作台

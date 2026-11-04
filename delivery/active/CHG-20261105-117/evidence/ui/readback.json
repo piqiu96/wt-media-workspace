@@ -1,0 +1,152 @@
+{
+  "task": {
+    "id": 671,
+    "status": "success",
+    "batch_id": 41,
+    "material_id": 161,
+    "setting_key": "default",
+    "copy_index": 1,
+    "config_snapshot": {
+      "end_seconds": 4,
+      "start_seconds": 1
+    },
+    "composite_output_id": 104
+  },
+  "output": {
+    "id": 104,
+    "name": "【杨齐家】四叶＞杨哥 团战咬死俩 五头六甲大运8杀踢烂大坝 #三角洲行动 #杨齐家 #杨齐家三角洲行动 #杨齐家拯救大兵计划 #杨齐家直播二创计划 @杨齐家(三角洲行动) · 默认成片",
+    "file_name": "【杨齐家】四叶＞杨哥 团战咬死俩 五头六甲大运8杀踢烂大坝 #三角洲行动 #杨齐家 #杨齐家三角洲行动 #杨齐家拯救大兵计划 #杨齐家直播二创计划 @杨齐家(三角洲行动) · 默认成片-104.mp4",
+    "file_size_bytes": 53707,
+    "media": {
+      "width": 640,
+      "height": 360,
+      "duration_ms": 3000
+    },
+    "platforms": [
+      "bilibili",
+      "baidu"
+    ],
+    "video": {
+      "status": "ready",
+      "reason": "",
+      "checked_at": "2026-11-04T20:37:46.788013Z"
+    },
+    "actions": {
+      "download": true,
+      "remake": true,
+      "download_reason": "",
+      "remake_reason": ""
+    }
+  },
+  "originalOutputPreserved": true,
+  "trace": {
+    "compose_task": {
+      "batch_id": 41,
+      "setting_key": "default",
+      "setting_name": "默认成片",
+      "platforms": [
+        "bilibili",
+        "baidu"
+      ],
+      "template_code": "basic_cut",
+      "template_version": 1,
+      "id": 671,
+      "status": "success",
+      "config_snapshot": {
+        "end_seconds": 4,
+        "start_seconds": 1
+      },
+      "created_at": "2026-11-05T04:30:35.116392+08:00"
+    },
+    "publishing": {
+      "available": false,
+      "reason": "发布能力尚未提供",
+      "platforms": [
+        {
+          "platform": "bilibili",
+          "status": null
+        },
+        {
+          "platform": "baidu",
+          "status": null
+        }
+      ]
+    },
+    "exact_template_schema_present": true
+  },
+  "current_strategy_groups": [
+    {
+      "key": "default",
+      "name": "默认成片",
+      "platforms": [
+        "bilibili",
+        "baidu"
+      ],
+      "copies": 1,
+      "params": {
+        "end_seconds": 5,
+        "start_seconds": 1
+      }
+    }
+  ],
+  "aggregation": {
+    "total": 2,
+    "items": [
+      {
+        "material_id": 161,
+        "material_title": "【杨齐家】四叶＞杨哥 团战咬死俩 五头六甲大运8杀踢烂大坝 #三角洲行动 #杨齐家 #杨齐家三角洲行动 #杨齐家拯救大兵计划 #杨齐家直播二创计划 @杨齐家(三角洲行动)",
+        "author_name": "杨齐家（三角洲行动切片）",
+        "category_id": 4,
+        "output_count": 2,
+        "strategies": [
+          {
+            "id": 140,
+            "name": "CHG-098 人工验收"
+          }
+        ],
+        "latest_created_at": "2026-11-05T04:30:36.425035+08:00"
+      },
+      {
+        "material_id": 153,
+        "material_title": "G.T.I.年度表彰，最佳干员就是？ 新年快乐，欢聚一刻，不止现在！\n你，就是最佳干员！ \n《三角洲行动》祝所有干员新年快乐！\n#三角洲行动#三角洲新春版本上线#三角洲新年正当红",
+        "author_name": "三角洲行动",
+        "category_id": 4,
+        "output_count": 2,
+        "strategies": [
+          {
+            "id": 139,
+            "name": "CHG-098 定时验收"
+          },
+          {
+            "id": 140,
+            "name": "CHG-098 人工验收"
+          }
+        ],
+        "latest_created_at": "2026-10-27T04:31:21.990879+08:00"
+      }
+    ]
+  },
+  "flat": {
+    "total": 4,
+    "ids": [
+      104,
+      82,
+      81,
+      80
+    ]
+  },
+  "material_detail": {
+    "total": 2,
+    "ids": [
+      104,
+      82
+    ]
+  },
+  "object_read": {
+    "http_status": 200,
+    "bytes": 53707,
+    "content_type": "video/mp4",
+    "sha256_matches": true
+  },
+  "captured_at": "2026-11-04T20:37:47.345Z"
+}
