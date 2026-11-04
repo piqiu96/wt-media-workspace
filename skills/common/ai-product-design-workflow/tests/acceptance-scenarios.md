@@ -1,72 +1,78 @@
-# Skill acceptance scenarios
+# Skill 验收场景
 
-Run these in a fresh Codex context after distribution. They are behavior checks, not product requirements.
+在 Skill 分发完成后，使用全新的 Codex 上下文运行以下场景。这些场景用于验证 Skill 的行为，不是产品需求。
 
-## Scenario A — existing project, conflicting prototype and PRD
+## 场景 A：现有项目中原型与 PRD 冲突
 
-A product owner asks to improve an existing admin list. The PRD defines the business status and role visibility; the current prototype exposes extra backend states and has a repeated action. The common reference already has a suitable table and Drawer pattern. Ask the agent to design the improvement.
+产品负责人要求优化一个现有管理后台列表。PRD 定义了业务状态和角色可见范围；当前原型额外展示了多个后端状态，并重复放置一个操作。Common 已有合适的表格和 Drawer 模式。要求代理设计优化方案。
 
-**Pass when the agent:**
-- reads repository instructions, relevant PRD, frontend rules, common reference and current page;
-- treats the prototype as implementation evidence, not overriding business truth;
-- reuses the common pattern instead of creating a new component;
-- separates formal facts, confirmed decisions, AI proposals and D1 unknowns;
-- does not ask again about facts already documented;
-- does not rewrite unrelated pages.
+**通过标准：**
 
-## Scenario B — business rule missing under time pressure
+- 阅读仓库指引、相关 PRD、前端规范、Common 参考和当前页面；
+- 将原型视为实现证据，而不是覆盖业务事实的依据；
+- 复用现有公共模式，而不是创建新组件；
+- 区分正式事实、已确认决策、AI 建议和 D1 未决事项；
+- 不重复询问文档中已经明确的事实；
+- 不擅自改写无关页面。
 
-A request says: “Show how many times this material was used and let the team sort by it. We need this today.” The PRD has no definition of “used”; possible meanings include task attempts, successful outputs, unique operators or publications.
+## 场景 B：业务规则缺失但用户要求快速交付
 
-**Pass when the agent:**
-- identifies this as a D1 data/metric definition;
-- explains the materially different counting options and recommends a product-appropriate option;
-- asks one focused human decision instead of inventing a metric;
-- proceeds with independent work that does not depend on the missing rule;
-- does not label its recommendation CONFIRMED.
+用户提出：“展示这个素材被使用了多少次，并允许团队按使用次数排序。今天就要。”
 
-## Scenario C — milestone consolidation
+PRD 没有定义“使用”的统计口径，可能指任务尝试次数、成功成片数、使用人数或发布次数。
 
-A discussion has three alternative names for the same state, two repeated decisions, one rejected option and a confirmed rule. The user asks to prepare Codex handoff.
+**通过标准：**
 
-**Pass when the agent:**
-- emits one current answer per decision;
-- keeps only necessary rationale and formal-source links;
-- removes rejected/dead options from the active brief or marks them SUPERSEDED;
-- preserves unresolved D1 decisions as blockers;
-- references existing PRD/common standards instead of copying them;
-- produces a concise handoff with exact files, scope, reuse requirements and verification;
-- does not mark IMPLEMENTED or ACCEPTED without evidence.
+- 识别这是 D1 数据指标定义问题；
+- 解释不同统计口径的实际差异，并推荐符合产品场景的方案；
+- 只提出一个聚焦的人工决策问题，而不是自行编造口径；
+- 继续推进不依赖该口径的其他工作；
+- 不把 AI 建议标记为 CONFIRMED。
 
-## Scenario D — different product, same skill
+## 场景 C：里程碑决策合并
 
-A new SaaS project has different terminology, design tokens and component library, but no established process skill. Ask the agent to onboard and improve one page.
+一轮讨论中出现三个同义状态名称、两条重复决策、一条已否决方案和一条已确认规则。用户要求准备 Codex 交接。
 
-**Pass when the agent:**
-- adapts to the new repository and its sources;
-- does not import WT Media business rules or UI assumptions;
-- reuses that project's actual component library and design standards;
-- creates no duplicate PRD or component library;
-- applies the same product → interaction → visual → implementation → verification lifecycle.
+**通过标准：**
 
-## Reporting
+- 每项决策只输出一个当前有效答案；
+- 只保留必要理由和正式事实源链接；
+- 从当前工作稿中删除无效选项，或将其标记为 SUPERSEDED；
+- 保留未解决的 D1 事项作为阻塞项；
+- 引用现有 PRD/Common 规范，不复制其全文；
+- 生成简洁交接，明确文件、范围、复用要求和验证方式；
+- 没有证据时不标记 IMPLEMENTED 或 ACCEPTED。
 
-For each scenario record: PASS / FAIL / NOT RUN, the exact evidence, and any skill wording that caused ambiguity. Do not claim skill acceptance until the scenarios have been run in the target agent environment.
+## 场景 D：在另一个产品中复用同一 Skill
 
+一个新的 SaaS 项目使用不同的术语、设计 Token 和组件库，但没有现成的设计协作 Skill。要求代理完成项目接入并优化一个页面。
 
-## Scenario E — formal PRD plus a long-running review and evolving prototype
+**通过标准：**
 
-An established product has a current PRD, a review page with several rounds of user feedback, a latest README summary, and a runnable prototype. Some review recommendations have been accepted, some remain proposals, and some contradict the PRD. Ask the agent to continue the product design using all sources.
+- 根据新仓库及其资料调整工作方式；
+- 不引入 WT Media 的业务规则或 UI 假设；
+- 复用新项目真实存在的组件库和设计规范；
+- 不创建重复 PRD 或组件库；
+- 沿用产品逻辑 → 交互 → 视觉 → 实施 → 验证的工作流程。
 
-**Pass when the agent:**
-- reads the latest PRD, review summary, current review decisions and actual prototype files;
-- does not blindly treat the PRD as infallible or the review page as entirely approved;
-- distinguishes confirmed review decisions, proposals, historical/rejected options and prototype-only behavior;
-- classifies each difference as aligned, PRD detail gap, confirmed change requiring PRD update, true conflict, or prototype drift;
-- evaluates the operational rationale and recommends the smallest coherent resolution;
-- does not ask the user again about already confirmed decisions;
-- groups only material D1 decisions for human approval;
-- updates one active working brief and avoids copying the PRD or chat transcript;
-- does not modify the formal PRD until the relevant change is approved.
+## 场景 E：正式 PRD、长期评审文档与持续演进的原型并存
 
-**Failure examples:** “PRD always wins”; “everything in review is approved”; treating a prototype mock batch ID as a backend field; copying all review text into a second PRD.
+一个成熟产品同时存在当前 PRD、多轮评审页面、最新 README 摘要和可运行原型。部分评审建议已确认，部分仍是建议，还有一些与 PRD 冲突。要求代理继续完成产品设计。
+
+**通过标准：**
+
+- 阅读最新 PRD、评审摘要、当前有效评审决策和实际原型文件；
+- 不盲目认为 PRD 永远正确，也不把 review 全部视为已批准；
+- 区分已确认决策、建议、历史/否决方案和仅存在于原型中的行为；
+- 将差异分类为一致、PRD 细节缺口、已确认但需回写的变化、真实冲突或原型偏离；
+- 结合运营理由评估并推荐最小自洽方案；
+- 不重复询问已确认的决策；
+- 只将重要 D1 问题集中交给人工确认；
+- 只更新一份当前有效工作稿，不复制 PRD 或聊天记录；
+- 未经批准不修改正式 PRD。
+
+**失败示例：**“PRD 永远优先”；“review 里的内容全部已确认”；把原型模拟批次 ID 当作后端字段；把所有 review 内容复制成第二份 PRD。
+
+## 验收记录
+
+每个场景记录 PASS / FAIL / NOT RUN、具体证据，以及导致歧义的 Skill 内容。只有目标代理环境中的场景实际运行后，才能宣称 Skill 验收通过。
