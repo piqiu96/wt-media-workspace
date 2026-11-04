@@ -1,28 +1,44 @@
-# Product logic analysis
+# 产品逻辑分析
 
-Use before detailed interaction or visual design when the business model is not clear.
+当业务模型尚不清楚时，先使用本参考完成产品分析，再进入交互和视觉设计。
 
-## Analysis frame
+## 分析框架
 
-1. **Users/jobs:** who uses this, in what situation, to achieve what outcome?
-2. **Objects:** what is managed? Define each object's responsibility; avoid duplicate entities.
-3. **Lifecycle:** how is it created, changed, completed, removed, restored or retired?
-4. **Relationships:** which user, team, account, source or parent owns each record?
-5. **Facts/metrics:** source, counting unit, attribution, time window, freshness, null-vs-zero and role visibility.
-6. **Permissions:** distinguish visibility, action authority and data returned by the server.
-7. **Workflow:** entry points, handoffs, downstream effects and independent actions.
-8. **Exceptions:** duplicate submission, stale source, missing file, failed task, partial success, unknown result, retry and cancellation.
+1. **用户与任务：** 谁在什么场景下使用该能力，要完成什么结果？
+2. **业务对象：** 实际管理的是什么？明确每个对象的职责，避免重复建模。
+3. **生命周期：** 对象如何创建、修改、完成、移除、恢复或归档？
+4. **关系：** 每条记录归属于哪个用户、团队、账号、来源或父对象？
+5. **事实与指标：** 数据来源、计数单位、归因方式、时间窗口、数据新鲜度、空值与零值的区别，以及角色可见范围。
+6. **权限：** 区分查看权限、操作权限和服务端实际返回的数据范围。
+7. **业务流程：** 入口、交接、下游影响和彼此独立的操作分别是什么？
+8. **异常场景：** 重复提交、来源失效、文件缺失、任务失败、部分成功、结果未知、重试和取消。
 
-## Field decision
+## 字段判断
 
-For each proposed field determine what question it answers; whether it is a fact, derived metric, status, action or link; source and update timing; list/detail/filter/sort need; duplication; permissions; and missing-data behavior.
+对每个候选字段，明确：
+- 它回答运营人员的什么问题；
+- 它属于事实、衍生指标、状态、操作还是链接；
+- 数据来源和更新时间；
+- 是否需要出现在列表、详情、筛选、排序或导出中；
+- 是否与其他字段重复；
+- 角色可见范围和缺失值展示方式。
 
-Do not expose every backend state as a separate badge. Translate independent backend facts into the few operational concepts users need without conflating their underlying meaning.
+不要把所有后端状态都暴露为独立标签。应将不同的底层事实转换为运营人员真正需要理解的少量信息，但不能混淆底层语义。
 
-## Status decision
+## 状态判断
 
-A status has one subject, one meaning, entry/exit conditions, source of truth, permitted next actions and recovery behavior. Do not combine unrelated state dimensions into one ambiguous backend status.
+一个状态必须具备：
+- 明确的状态主体；
+- 唯一且清晰的含义；
+- 进入和退出条件；
+- 事实来源；
+- 允许的后续操作；
+- 失败后的恢复方式。
 
-## Output
+不要把无关状态维度合并成一个含义模糊的后端状态。
 
-Prefer a concise object map, scenario flow and field/status tables. Add detailed state diagrams only for non-trivial lifecycles. Label statements as formal fact, user-confirmed decision, AI recommendation or unresolved question.
+## 输出形式
+
+优先使用简洁的业务对象关系、场景流程、字段表和状态表。只有复杂生命周期才补充状态图。
+
+所有结论标记为：正式事实、用户已确认、AI 建议或待确认事项。
