@@ -1,0 +1,108 @@
+{
+  "task": {
+    "id": 616,
+    "batch_id": 30,
+    "status": "success",
+    "material_id": 161
+  },
+  "attempts": [
+    {
+      "id": 275,
+      "compose_task_id": 616,
+      "attempt": 1,
+      "source": "auto",
+      "started_at": "2026-11-05T03:52:34.713221+08:00",
+      "finished_at": "2026-11-05T03:52:35.686014+08:00",
+      "outcome": "success",
+      "stage": "committing",
+      "error_code": "",
+      "error_message": "",
+      "steps": [
+        {
+          "step": "prepare_input",
+          "label": "准备源素材",
+          "outcome": "success",
+          "started_at": "2026-11-05T03:52:34.752774+08:00",
+          "finished_at": "2026-11-05T03:52:35.21415+08:00",
+          "duration_ms": 461,
+          "error_code": "",
+          "error_label": "",
+          "metrics": {
+            "size_bytes": 473820
+          }
+        },
+        {
+          "step": "cut",
+          "label": "视频合成",
+          "outcome": "success",
+          "started_at": "2026-11-05T03:52:35.218776+08:00",
+          "finished_at": "2026-11-05T03:52:35.448769+08:00",
+          "duration_ms": 229,
+          "error_code": "",
+          "error_label": "",
+          "metrics": {
+            "output_duration_ms": 4000
+          }
+        },
+        {
+          "step": "upload",
+          "label": "上传并校验成片",
+          "outcome": "success",
+          "started_at": "2026-11-05T03:52:35.452781+08:00",
+          "finished_at": "2026-11-05T03:52:35.634908+08:00",
+          "duration_ms": 182,
+          "error_code": "",
+          "error_label": "",
+          "metrics": {
+            "size_bytes": 69142,
+            "sha256": "4d802de94d9c42de302eb5706cd92c2037c03790c050826349474111f58beacd"
+          }
+        },
+        {
+          "step": "commit",
+          "label": "保存成片记录",
+          "outcome": "success",
+          "started_at": "2026-11-05T03:52:35.637889+08:00",
+          "finished_at": "2026-11-05T03:52:35.686013+08:00",
+          "duration_ms": 48,
+          "error_code": "",
+          "error_label": "",
+          "metrics": {
+            "output_id": 82
+          }
+        }
+      ],
+      "created_at": "2026-11-05T03:52:34.713221+08:00",
+      "updated_at": "2026-11-05T03:52:35.686014+08:00"
+    }
+  ],
+  "output": {
+    "id": 82,
+    "compose_task_id": 616,
+    "material_id": 161,
+    "file_size_bytes": 69142,
+    "media": {
+      "duration_ms": 4000
+    },
+    "keys": [
+      "id",
+      "team_id",
+      "category_id",
+      "operator_id",
+      "operator_name",
+      "material_id",
+      "material_usage_id",
+      "compose_task_id",
+      "compose_strategy_id",
+      "template_code",
+      "template_version",
+      "file_size_bytes",
+      "sha256",
+      "media",
+      "publish_status",
+      "created_by",
+      "created_at",
+      "updated_at"
+    ]
+  }
+}

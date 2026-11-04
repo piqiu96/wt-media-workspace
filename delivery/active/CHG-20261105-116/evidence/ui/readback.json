@@ -1,0 +1,55 @@
+{
+  "task": {
+    "id": 616,
+    "batch_id": 30,
+    "status": "success",
+    "output": 82
+  },
+  "attempts": [
+    {
+      "id": 275,
+      "attempt": 1,
+      "outcome": "success",
+      "steps": [
+        {
+          "step": "prepare_input",
+          "duration_ms": 461,
+          "metrics": {
+            "size_bytes": 473820
+          }
+        },
+        {
+          "step": "cut",
+          "duration_ms": 229,
+          "metrics": {
+            "output_duration_ms": 4000
+          }
+        },
+        {
+          "step": "upload",
+          "duration_ms": 182,
+          "metrics": {
+            "size_bytes": 69142,
+            "sha256": "4d802de94d9c42de302eb5706cd92c2037c03790c050826349474111f58beacd"
+          }
+        },
+        {
+          "step": "commit",
+          "duration_ms": 48,
+          "metrics": {
+            "output_id": 82
+          }
+        }
+      ]
+    }
+  ],
+  "output": {
+    "id": 82,
+    "compose_task_id": 616,
+    "file_size_bytes": 69142,
+    "media": {
+      "duration_ms": 4000
+    }
+  },
+  "urlAvailable": true
+}
