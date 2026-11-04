@@ -1,22 +1,23 @@
-# Project design profile
+# 项目设计配置
 
-> Keep this file short. It is a navigation map, not a second set of project rules.
+> 保持简短。此文件是资料导航，不是另一套项目规则。
 
-- Project name/type:
-- Primary users and jobs:
-- Repository instructions:
-- Product fact sources:
-- Design/frontend standards:
-- Common visual references:
-- Actual runtime shared components:
-- Prototype entry points:
-- Review/decision mechanism:
-- Available browser/test tooling:
-- Current milestone and scope:
-- Explicit non-goals:
-- Known conflicts or unavailable capabilities:
+- 项目名称/类型：
+- 主要用户与核心任务：
+- 仓库级指引：
+- 产品事实源：
+- 设计/前端规范：
+- Common 视觉参考：
+- 实际运行时公共组件：
+- 原型入口：
+- 评审/决策机制：
+- 可用浏览器/测试工具：
+- 当前里程碑与范围：
+- 明确的非目标：
+- 已知冲突或当前不可用的能力：
 
-Rules:
-- Link to the source; do not copy its contents.
-- Distinguish formal facts, confirmed decisions, proposals and implementation.
-- Update only when project structure or ownership changes.
+## 维护规则
+
+- 只链接到原有资料，不复制其内容。
+- 区分正式事实、已确认决策、建议和当前实现。
+- 只有项目结构或资料归属发生变化时才更新此配置。
