@@ -5,6 +5,7 @@ status: IMPLEMENTING
 depends_on: ["CHG-20261105-118"]
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
+dependency_merge_commits: {"CHG-20261105-118": {"wt-media-workspace": "b21564b2e1ead95d0b48e57088d143d28573573e"}}
 ---
 
 # CHG-20261105-119: 内容生产实际产品与批准原型视觉交互对齐
