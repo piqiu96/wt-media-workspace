@@ -48,3 +48,5 @@ risk: M
 实施和独立审查整改已完成，当前 `VERIFYING` 等待 PR 审阅及用户人工视觉签收。验收范围与截图见 [evidence/acceptance.md](evidence/acceptance.md)。原生窗口自动控制不可用，同源 Vue 界面已完成浏览器三角色检查；执行中预览采用明确标记的界面 fixture，仅验证动作及进度展示。未合并、不归档为 DONE。
 
 Cloud PR：https://github.com/piqiu96/wt-media-cloud/pull/32。公共组件、策略、关联详情分别提交，验收记录对应最终 `b4e1bd0`。
+
+用户补充的素材表现差距已修正于 `44c407e`：两页及详情只展示点赞／收藏／评论、指标更新时间行；两页删除指标筛选，实际指标更新时间接口缺失的边界见验收记录。
