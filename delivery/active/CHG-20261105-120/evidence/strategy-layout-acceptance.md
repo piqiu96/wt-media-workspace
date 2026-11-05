@@ -32,3 +32,9 @@ Cloud 提交 `c36a9b4`。仅修改实际 Vue 策略页及共用策略详情，�
 - [窄屏表单](120-strategy-editor-narrow.png)／[窄屏规则](120-strategy-rules-narrow.png)
 
 本次为机器走查，当前 CHG 仍为 VERIFYING，等待既有 PR 审阅及用户人工视觉签收。
+
+## 字段顺序补充（用户确认）
+
+基本信息改为“策略名称整行 → 类目／模板 → 团队／负责人”。新增、编辑和详情同步；本次只调整现有节点顺序。策略页定向 9 项测试、文档索引及 diff 检查 PASS；实际浏览器检查新增／编辑两行坐标与详情字段顺序，无 pageerror，未保存业务数据。上文完整构建和三角色结果仍对应 `c36a9b4`，不作为这次增量的重新构建声明。
+
+最新截图：[新建](120-strategy-fields-create.png)／[编辑](120-strategy-fields-edit.png)／[详情](120-strategy-fields-detail.png)。此前截图保留为前次验收证据，以本段顺序为准。
