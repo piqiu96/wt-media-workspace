@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261106-122 | 独立运营文件管理 | IMPLEMENTING | wt-media-workspace |
+| CHG-20261106-122 | 独立运营文件管理 | VERIFYING | wt-media-workspace |

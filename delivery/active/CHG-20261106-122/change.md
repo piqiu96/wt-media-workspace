@@ -1,7 +1,7 @@
 ---
 id: CHG-20261106-122
 parent: delivery/milestones/M4-content-production.md#m4-o-resource-composition-cutover
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: ["CHG-20261106-121"]
 dependency_merge_commits: {"CHG-20261106-121": {"wt-media-workspace": "c2713530432d3bbb068236b596e4800be6b59e07", "wt-media-cloud": "58d409e0843b05b1cec71ca6652065bcd8eabe50"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
@@ -13,7 +13,7 @@ risk: H
 ## Change
 
 1. Cloud自有运营文件API/Contract与model/repository/service：必填文件名、安全扩展名、大小/类型边界、本地暂存并计算摘要，ID分配后上传正式键，完整校验后才可见；三角色读取/修改/删除范围测试。
-2. 稳定随机令牌资源路径；请求时验证文件仍存在并签发短期对象GET，下载附带附件文件名；删除先撤销访问，再清理对象，失败可重试，不增加停用功能。显示名称修改不移动对象。
+2. 稳定随机令牌资源路径；请求时验证文件仍存在并签发短期对象GET，下载附带附件文件名；删除先清理对象，再移除记录，失败保留记录可重试，不增加停用功能。显示名称修改不移动对象。
 3. 共用Vue页面及双端菜单：运营工具/文件管理，图片/视频筛选、必填命名上传、外部预览、下载、复制完整资源URL、改名和删除；复用common布局/反馈，不另建下载中心。
 4. 真实上传/读回/三角色/改名/删除撤销验证，相关Go与前端测试及双前端构建，独立Review、按Contract/后端/前端提交合并。
 
@@ -23,7 +23,7 @@ Cloud新增`internal/modules/files/{model,repository,service}`及协议Handler�
 
 ## Current facts
 
-CHG121 Cloud PR33与Workspace PR36均已合并至原仓main；两个仓干净。新bucket写读与并发冲突实际PASS；历史来源待补，CHG125负责迁移。`bin/control.sh verify`开发Agent恢复后全PASS；Desktop业务流程尚待最终验收。
+文件管理后端与双端页面已提交，真实上传、下载读回、三角色、改名和删除验证PASS，独立Review缺口已修复。最新用户明确旧文件直接删除，CHG125改为清理旧存储引用与关联无效记录，保留wt-media中新对象。打包Desktop完整业务流程留至CHG125。
 
 ## Risks
 
