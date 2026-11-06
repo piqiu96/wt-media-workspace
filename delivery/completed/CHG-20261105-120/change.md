@@ -1,7 +1,7 @@
 ---
 id: CHG-20261105-120
 parent: delivery/milestones/M4-content-production.md#m4-n-production-acceptance
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
@@ -22,7 +22,7 @@ risk: M
 
 ### Constraints
 
-- 不修改已有 example/ 工作区变更，不修改 Agent/Desktop Runtime、权限、真实重试取消/合成机制；不扩展发布模块。用户本轮确认的素材接口与采集时间字段补齐属于范围内，其他 API/DB 不变。
+- 原有 example/ 变更原先不纳入实施；2026-11-06 用户明确要求先清理提交合并，按下方补充收口。不修改 Agent/Desktop Runtime、权限、真实重试取消/合成机制；不扩展发布模块。用户本轮确认的素材接口与采集时间字段补齐属于范围内，其他 API/DB 不变。
 - 素材来源抖音；目标平台 B站/百度/小红书。任务创建固定组只允许 schema 开放参数；无本地下载前提；估算不乘平台数。
 - 先判断操作归属，再确定 Footer 位置；任务批次保留列表仅详情的已确认例外。
 - 复用真实数据、真实执行记录与文件；不构造虚假状态、封面或发布成功。
@@ -102,3 +102,12 @@ Cloud PR：https://github.com/piqiu96/wt-media-cloud/pull/32。公共组件、�
 4. 相关前端与 Go 回归测试、双前端构建、当前源码环境与角色页面走查；记录真实失败和修复证据，正式产品仅回写稳定结论。按数据修复／界面／验收文档独立提交，不将机器验收等同人工签收。
 
 本轮实现已提交 Cloud `6c4764d`／`a5e694d`／`165f367`。43 项相关前端测试、身份模块 Go 回归、双前端构建及三角色浏览器走查通过，正式产品第三章已回写。新增中文团队名称边界回归并简化关联错误文案；检查范围及截图见 [系统管理验收](evidence/system-management-acceptance.md)。保持 VERIFYING，等待 PR 审阅及用户人工签收。
+
+
+### 既有工作区收口（2026-11-06，用户明确要求提交合并）
+
+用户要求优先整理原仓库已有未提交内容，验证后提交、合并，再自动继续后续功能；不创建或使用 worktree。本次把已存在的 common、内容挖掘及内容运营原型纳入版本控制，保留设计稿、评审存储和离线边界，不将原型视为正式发布能力。
+
+Cloud 最后两笔提交 `40f817c`、`3b86001`：任务详情只呈现实际结果和异常；系统管理自动刷新测试改为真实 loader 行为验证。Cloud PR32 已以 merge commit `a4f2916` 合入 main。
+
+Workspace 原型提交 `6d2424d`、`077f300`。独立审查发现并修复三平台规模演示崩溃和旧演示日期范围丢失；18 项原型测试通过。最终证据见 [既有改动收口](evidence/pending-work-closure.md)。本记录随 Workspace PR35 合并归档；M4-N 用户人工视觉验收仍在里程碑跟踪，不用代码合并冒充签收。
