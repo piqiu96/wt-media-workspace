@@ -20,6 +20,8 @@ M4-B 首版实现把「版本」建在策略层：策略每次修改追加不可
 5. 片头/片尾/BGM 等资产参数键**随模板新版本放开**：首个模板版本的 schema 只定义当前可执行参数；资产接入后在模板新版本中扩展，正好使用模板自身的版本机制；
 6. 禁止动态工作流编排、用户自定义脚本、任意 FFmpeg 命令与泛化 `template` 表（保持 `compose_template` 领域命名）。
 
+本次旧模板执行保留规则由 [ADR-0032](0032-compose-resources-and-template-cutover.md) 的明确切换范围更新；其余四层模型保持。
+
 ## Decision
 
 1. `compose_template` 为 Cloud 维护的入库实体：`code`、`name`、`version`（整数自增）、`schema_json`、`executor`、`status`，唯一约束 `(code, version)`；旧版本永久保留，策略按 `(模板, 版本)` 绑定。

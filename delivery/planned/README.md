@@ -14,3 +14,8 @@
 M4 剩余 CHG 的执行边界见 [M4 §3.1](../milestones/M4-content-production.md#31-剩余-chg-执行边界)，不在此复制。M4-A 签收补记见 [2026-10-12 签收](../reports/2026-10-12-m4-a-signoff.md)。
 
 已交付、已归档或已废弃的草案由 Git 保存；本目录只列仍未关闭的记录。
+
+- [CHG-20261106-122](CHG-20261106-122/change.md)：独立运营文件管理，PLANNED，依赖前一项。
+- [CHG-20261106-123](CHG-20261106-123/change.md)：build-slice-video 自动切片库，PLANNED，依赖前一项。
+- [CHG-20261106-124](CHG-20261106-124/change.md)：五段模板和策略公共执行入口，PLANNED，依赖前一项。
+- [CHG-20261106-125](CHG-20261106-125/change.md)：资源合成全链验收及旧模板清理，PLANNED，依赖前一项。
