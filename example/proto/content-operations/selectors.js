@@ -2,7 +2,7 @@
 (() => {
  const P=PI,O=OPS,E=P.e;
  P.pick=(type,ids,apply,opts={})=>{
-  const assets=type==='assets',source=assets?P.db.assets:P.db.accounts,allowed=source.filter(a=>(!opts.allowedIds||opts.allowedIds.includes(a.id))&&(!opts.rootOnly||!a.sourceAssetId)&&(assets||!opts.platform||a.platform===opts.platform)&&(!opts.channel||opts.channel!=='api'||a.channels?.includes('api'))),chosen=new Set(ids.filter(id=>allowed.some(a=>a.id===id))),f={q:'',category:'',tag:'',quality:'',history:'',availability:'available',selected:''};let page=1,d;const size=20;
+  const assets=type==='assets',source=assets?P.db.assets:P.db.accounts,allowed=source.filter(a=>(assets||O.platforms.includes(a.platform))&&(!opts.allowedIds||opts.allowedIds.includes(a.id))&&(!opts.rootOnly||!a.sourceAssetId)&&(assets||!opts.platform||a.platform===opts.platform)&&(!opts.channel||opts.channel!=='api'||a.channels?.includes('api'))),chosen=new Set(ids.filter(id=>allowed.some(a=>a.id===id))),f={q:'',category:'',tag:'',quality:'',history:'',availability:'available',selected:''};let page=1,d;const size=20;
   const platforms=opts.publishPlatform?[opts.publishPlatform]:opts.publishPlatforms||O.platforms;
   const available=a=>a.enabled!==false&&(!assets||platforms.every(p=>O.availability(a.id,p,opts.excludeTask,opts.excludePlan).ok));
   const availabilityText=a=>assets?platforms.filter(p=>!O.availability(a.id,p,opts.excludeTask,opts.excludePlan).ok).map(p=>p+' '+O.availability(a.id,p,opts.excludeTask,opts.excludePlan).text).join(' / '):a.reason||'不可用';

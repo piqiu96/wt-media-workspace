@@ -17,7 +17,8 @@ console.log('PASS: 10 video state / device / relationship checks');
 const callbacks=[],listeners={},doc={addEventListener:(e,f)=>(listeners[e]||=[]).push(f),querySelectorAll:()=>[],querySelector:()=>null};
 let currentDialog;
 const C={db:{materials:[{id:1,title:'A',platform:'百度',category:'剪辑教程',cloudState:'notSaved',published:'2026-10-01',created:'2026-11-01'},{id:2,title:'B',platform:'B站',category:'剪辑教程',cloudState:'notSaved',published:'2026-10-02',created:'2026-11-01'}],outputs:[{id:10,materialId:1,owner:'陈小雨'},{id:11,materialId:1,owner:'林予安'}],usages:{陈小雨:[{materialId:1,status:'active',added:'11-01 09:00'},{materialId:2,status:'active',added:'11-02 09:00'}],林予安:[{materialId:1,status:'active',added:'11-01 09:00'}]}},ui:{filters:{}},prod:{table:(heads,body)=>'<table><thead>'+heads.map(x=>'<th>'+x+'</th>').join('')+'</thead><tbody>'+body+'</tbody></table>'},e:v=>String(v??''),save:()=>{},render:()=>{},dialogs:[],toast:()=>{},head:(t,d)=>t+d,field:()=>'',select:()=>'',tag:(s)=>s,btn:(label,fn,cls='',disabled=false,attrs='')=>{callbacks.push({label,fn});return `<button class="${cls}" ${disabled?'disabled':''} ${attrs}>${label}</button>`;},row:(label,fn)=>C.btn(label,fn),link:(label,fn)=>C.btn(label,fn),materialPage:()=>'<old-page>',materialDetail:()=>'<old-detail>',facts:rows=>rows.map(x=>x.join(':')).join(' '),section:(t,b)=>t+b,open:opts=>{const d={opts,paint:()=>{d.html=opts.body();},querySelector:()=>({}),minePending:null};d.paint();currentDialog=d;C.dialogs.push(d);return d;},close:d=>{C.dialogs=C.dialogs.filter(x=>x!==d);}};
-const O={actor:'陈小雨',categories:['剪辑教程'],platforms:['百度','B站'],people:[{name:'陈小雨',role:'高级运营'},{name:'林予安',role:'运营'}],render:()=>{},role:()=>O.actor==='陈小雨'?'高级运营':'运营',peopleOptions:()=>[],reference:(s)=>s};
+const O={actor:'陈小雨',categories:['剪辑教程'],platforms:['百度','B站'],sourcePlatforms:['抖音'],people:[{name:'陈小雨',role:'高级运营'},{name:'林予安',role:'运营'}],render:()=>{},role:()=>O.actor==='陈小雨'?'高级运营':'运营',peopleOptions:()=>[],reference:(s)=>s};
+C.coverPlaceholder=()=>'<span class="cp-cover cp-cover-default" role="img" aria-label="默认视频封面"></span>';
 C.get=(key,id)=>C.db[key].find(x=>x.id===+id);C.usages=(owner=O.actor)=>C.db.usages[owner]||=[];C.usage=(id,owner=O.actor)=>C.usages(owner).find(x=>x.materialId===id);C.canManage=()=>O.role()!=='运营';
 const ctx={window:{},CP:C,OPS:O,document:doc,CPSeed:()=>({materials:[]}),URL,Date,navigator:{},addEventListener:()=>{},setTimeout};vm.createContext(ctx);
 for(const file of ['mine-model.js','library.js','mine.js']){if(file==='mine.js')ctx.MineVideo=ctx.window.MineVideo;vm.runInContext(fs.readFileSync('example/proto/content-operations/production/'+file,'utf8'),ctx);}
@@ -26,7 +27,7 @@ assert.equal(O.mine.state().usage,'unused');assert.equal(O.mine.state().sort,'pu
 assert.deepEqual(Array.from(O.mine.rows(),m=>m.id),[2]);
 O.mine.state().usage='';assert.deepEqual(Array.from(O.mine.rows(),m=>m.id),[2,1]);
 C.usage(2).status='removed';O.mine.state().relation='all';assert.deepEqual(Array.from(O.mine.rows(),m=>m.id),[1]);C.usage(2).status='active';delete O.mine.state().relation;
-const html=C.materialPage(true);assert.equal((html.match(/<th>/g)||[]).length,15);assert.match(html,/平台作品 ID/);assert.match(html,/团队使用情况/);
+const html=C.materialPage(true);assert.equal((html.match(/<th>/g)||[]).length,15);assert.match(html,/平台作品 ID/);assert.match(html,/团队使用/);
 let batch=O.mine.download([1,2]);assert.equal(batch.entries.filter(x=>x.result==='running').length,2);
 O.mine.advance(batch,'progress');assert.equal(O.mine.video(C.db.materials[0]).canCompose,true);
 O.mine.advance(batch,'partial');assert.equal(batch.entries[0].result,'failed');assert.equal(batch.entries[1].result,'success');assert.equal(O.mine.video(C.db.materials[0]).canCompose,true);

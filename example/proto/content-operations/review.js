@@ -7,6 +7,8 @@
   const titles = Object.fromEntries(sections.map(s => [s.id, s.querySelector('h1,h2')?.textContent || s.id]));
   const pages = window.OPSReviewPages;
   const pageMap = Object.fromEntries(pages.map(p => [p.id, p]));
+  const productionReview = window.OPSProductionReview;
+  const progressPages = productionReview ? pages.filter(p=>productionReview.ids.includes(p.id)) : pages;
   const escape = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const statusLabels = {open:'待讨论', accepted:'已采纳', resolved:'已处理'};
   const decisionLabels = {pending:'未评审', adjust:'需要调整', approved:'粗评通过'};
@@ -35,13 +37,15 @@
   const count = () => {
     document.getElementById('review-count').textContent = `已记录 ${db.comments.length} 条意见 · 待讨论 ${db.comments.filter(c=>c.status==='open').length} 条`;
     const counts = {pending:0, adjust:0, approved:0};
-    pages.forEach(p => {
+    progressPages.forEach(p => {
       const status = db.pageDecisions[p.id]?.status || 'pending';
       counts[status]++;
       const badge = document.querySelector(`[data-page-status="${p.id}"]`);
-      badge.textContent = decisionLabels[status]; badge.className = 'page-status ' + status;
+      if(badge){badge.textContent = decisionLabels[status]; badge.className = 'page-status ' + status;}
     });
-    document.getElementById('page-progress').textContent = `人工粗评：${counts.approved} / ${pages.length} 通过 · ${counts.adjust} 需调整 · ${counts.pending} 未评审${counts.approved===pages.length?'；仍需整体确认，细评未开始。':''}`;
+    document.getElementById('page-progress').textContent = productionReview
+      ? `历史粗评记录：${counts.approved} / ${progressPages.length} 通过 · ${counts.adjust} 需调整 · ${counts.pending} 未评审。本轮内容生产方案仍待人工评审，历史结论不自动沿用为本轮通过。`
+      : `人工粗评：${counts.approved} / ${pages.length} 通过 · ${counts.adjust} 需调整 · ${counts.pending} 未评审${counts.approved===pages.length?'；仍需整体确认，细评未开始。':''}`;
   };
   const renderDecision = p => {
     const box = document.querySelector(`[data-page-decision="${p.id}"]`);
@@ -75,11 +79,21 @@
     const key = s.id, page = pageMap[key], draft = db.drafts[key] || {role:'运营', priority:'P1', text:''};
     let box = s.querySelector('.review-feedback');
     if (!box) { box = document.createElement('div'); box.className = 'review-feedback'; s.append(box); }
+    if(page?.productionReport) s.querySelector('[id="feedback-'+key+'"]')?.append(box);
     const focusOptions = page ? ['整页／跨区域', ...page.units.map(u=>u.area)] : [];
+    if(page&&draft.focus&&!focusOptions.includes(draft.focus))focusOptions.push(draft.focus);
     box.innerHTML = `<h3>${key==='global-review'?'补充整体粗评意见':page?'补充本页粗评':'补充本节历史评审'}</h3><form data-comment-section="${key}">${page?`<div class="review-focus"><label for="focus-${key}">针对哪个 Tab／区域</label><select name="focus" id="focus-${key}">${options(focusOptions.map(v=>[v,v]),draft.focus||focusOptions[0])}</select></div>`:''}<div class="review-comment-fields"><div><label for="role-${key}">评审视角</label><select name="role" id="role-${key}">${options(roles.map(v=>[v,v]),draft.role)}</select></div><div><label for="priority-${key}">建议优先级</label><select name="priority" id="priority-${key}">${options(priorities,draft.priority)}</select></div><div><label for="author-${key}">评审人</label><input id="author-${key}" class="review-author-local" name="author" maxlength="80" value="${escape(db.author)}" placeholder="姓名或称呼"></div></div><label class="sr-only" for="text-${key}">对${escape(titles[key])}的补充意见</label><textarea name="text" id="text-${key}" placeholder="${page?'写明问题编号或 Tab、功能问题和调整建议；细节留到下一阶段。':'发生在哪个场景？哪里不顺？建议如何调整？'}" maxlength="20000">${escape(draft.text)}</textarea><div class="feedback-footer"><small data-save-status>${draft.text?'草稿已恢复':'填写时自动保存草稿'}</small><div>${draft.editId?'<button type="button" class="ex-button" data-cancel-edit>取消修改</button>':''}<button class="ex-button primary" type="submit">${draft.editId?'保存修改':'添加评审意见'}</button></div></div></form><div class="review-comments">${db.comments.filter(c=>c.section===key).sort((a,b)=>a.created.localeCompare(b.created)).map(c=>`<article class="review-comment ${c.status==='resolved'?'done':''}" data-comment="${escape(c.id)}"><header><strong>${escape(c.author)} · ${escape(c.role)} · ${escape(c.priority)}</strong><time>${format(c.updated)}</time></header>${c.focus?`<div class="review-comment-focus">${escape(c.focus)}</div>`:''}<p>${escape(c.text)}</p><footer><label for="status-${escape(c.id)}">意见状态</label><select id="status-${escape(c.id)}" data-status>${options(Object.entries(statusLabels),c.status)}</select><button type="button" class="ex-text-button" data-edit>修改意见</button></footer></article>`).join('')}</div>`;
     if (page?.detailProposal) {
       box.querySelector('h3').textContent = '补充本轮细评意见';
       box.querySelector('textarea').placeholder = '请注明 D1—D3 或具体区域，描述预期操作和需要调整的地方。';
+    }
+    if(page?.productionReport){
+      box.querySelector('h3').textContent='补充本页评审意见';
+      box.querySelector('textarea').placeholder='可写本页场景、实际业务补充与希望的行为；已确认的规则无需重复选择。';
+    }
+    if(productionReview&&key==='global-review'){
+      box.querySelector('h3').textContent='集中补充本轮内容生产意见';
+      box.querySelector('textarea').placeholder='按页码／场景 → 业务补充 → 期望行为，一次写下需要修订的内容。';
     }
     const form = box.querySelector('form');
     const saveDraft = () => {
@@ -115,10 +129,10 @@
     a.href=url;a.download='内容运营逐页粗评-'+new Date().toISOString().slice(0,10)+'.'+ext;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   };
   document.getElementById('export-json').onclick=()=>{
-    download(JSON.stringify({...db,phase:'page-coarse-review',exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8','json');notify('已生成 JSON 备份，包含意见、逐页结论和未提交草稿');
+    download(JSON.stringify({...db,phase:productionReview?'production-product-interaction-review':'page-coarse-review',...(productionReview?{proposalRevision:productionReview.revision}:{}),exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8','json');notify('已生成 JSON 备份，包含意见、逐页结论和未提交草稿');
   };
   document.getElementById('export-md').onclick=()=>{
-    const lines=['# 内容运营逐页评审 · 人工补充',`评审稿版本：${REVISION}`,'当前阶段：第 06 页新增合成任务及素材选择器细评提案；已有页面结论仍为历史粗评结论，不代表当前提案确认。',`导出时间：${new Date().toLocaleString('zh-CN')}`,''];
+    const lines=['# 内容运营逐页评审 · 人工补充',`评审稿版本：${productionReview?.revision||REVISION}`,productionReview?'当前阶段：内容生产七个单元的产品与交互评审；历史粗评记录保留，不代表本轮方案或原型已通过。':'当前阶段：第 06 页新增合成任务及素材选择器细评提案；已有页面结论仍为历史粗评结论，不代表当前提案确认。',`导出时间：${new Date().toLocaleString('zh-CN')}`,''];
     feedbackSections.forEach(s=>{
       const comments=db.comments.filter(c=>c.section===s.id),draft=db.drafts[s.id],decision=db.pageDecisions[s.id],decisionDraft=db.decisionDrafts[s.id];
       if(!comments.length&&!draft?.text&&!decision&&!decisionDraft)return;
