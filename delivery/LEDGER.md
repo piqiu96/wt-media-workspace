@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20261106-124 | 五段模板和策略公共执行入口 | IMPLEMENTING | wt-media-workspace |
