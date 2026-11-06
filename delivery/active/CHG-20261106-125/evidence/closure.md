@@ -1,0 +1,13 @@
+# CHG125 acceptance evidence
+
+2026-11-07, original checkouts, no worktree.
+
+- Full Go suite PASS `/tmp/chg125-go-final.txt`; targeted common Plan and recovery repository checks PASS. Registry rejects basic_cut/guide_insert/guide_pip. Runtime dependencies contain no test stand-ins.
+- Local DB cutover rollback test PASS `/tmp/chg125-cutover-live-test.txt`: backup failure does not delete, new bucket collateral blocks, pending old task blocks, scoped dependency deletion counts match, repeat is empty.
+- Independent Cloud code and destructive-scope reviews: no open P1/P2 after durable backup fix (file sync/close and directory sync).
+- Actual cleanup PASS `/tmp/chg125-cutover-apply.txt`: 34 materials,16 outputs,20 tasks,7 strategies,3 templates,120 transfers,43 usages,23 attempts,16 allocations,8 batches,15 schedule runs deleted;34 source-content pointers cleared, source rows retained. `/tmp/chg125-cutover-after.txt` verifies the entire retired reference set empty. Complete private backup `/tmp/wt-media-old-data-before-delete-20261107.json`,0600; remote inaccessible objects were not removed.
+- New material185, platform files3/4 and two real anime dance slices preserved. Task709 used file URLs, frozen source/intro/ad/ending facts, seed8494285200928634683 and4transitions; real output128 succeeded on attempt2,49.166seconds,ad11.3193977seconds. First worker process crash exposed missing configuration initialization, media inspection dependency and shared claims assembly; fixed and verified formal uncertain-review recovery after process termination and no committed output.
+- Full packaged Desktop and Agent download acceptance is in progress; no PASS claim yet.
+- Fresh full environment rebuild PASS `/tmp/chg125-environment.txt`, including current Cloud main, migrations, workers, frontend, packaged DMG, source freshness, API/CORS and login smoke. Native automation could not resolve the hidden mount path. SHA256 inventories of the mounted and same-build `target/release/bundle/macos` application bundles matched for all10files; after terminating only the mounted process22557, the latter bundle showed the native login page through CUA. No Desktop source change was needed.
+- Native login input was then blocked by the Mac locking again; user unlock requested. The subsequent sequential `wt.py chg verify` `/tmp/chg125-wt-verify-final.txt` passed Workspace190 and Cloud modules, then failed its environment gate because Agent8765 was absent before operator login. This is an incomplete acceptance result, not PASS; rerun after actual Desktop login/download.
+- Independent Workspace review confirmed the Plan naming, two shared request-schema retirements and scoped historical-retention wording; no open blocking documentation issue.
