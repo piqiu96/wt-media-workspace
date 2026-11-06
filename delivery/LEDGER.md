@@ -6,4 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261106-123 | build-slice-video 自动切片库 | IMPLEMENTING | wt-media-workspace |
