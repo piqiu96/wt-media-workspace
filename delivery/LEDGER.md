@@ -6,4 +6,3 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261106-121 | 存储位置与历史读取迁移 | IMPLEMENTING | wt-media-cloud |
