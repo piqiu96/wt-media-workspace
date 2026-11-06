@@ -36,7 +36,7 @@ contracts:
     # 补齐角色团队范围、确认体与窗口字段（CHG-20261028-099）。
     # 2026.10.30.1：CHG099 代理 ID 改为自增整数，窗口代理关系及操作回执同步迁移；
     # 代理列表新增管理员团队文本搜索（ADR-0029）。
-    contract_revision: "2026.11.07.1"
+    contract_revision: "2026.11.07.2"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
