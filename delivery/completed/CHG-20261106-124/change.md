@@ -1,7 +1,7 @@
 ---
 id: CHG-20261106-124
 parent: delivery/milestones/M4-content-production.md#m4-o-resource-composition-cutover
-status: IMPLEMENTING
+status: DONE
 depends_on: ["CHG-20261106-123"]
 dependency_merge_commits: {"CHG-20261106-123": {"wt-media-workspace": "fdd6652cfc11dc41fe96a3fb18b8cb917036516a", "wt-media-cloud": "9ddfacab5d62802dadd8dfd27d4d55ea271a8593"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
@@ -16,8 +16,8 @@ risk: H
 
 ## Done When
 
-- [ ] 对应M4-O交付项真实结果可读回，失败行为经过验证，不借其他CHG的PASS替代。
-- [ ] 修改按所有权提交，相关测试/构建通过，独立Review和PR合并后回写事实。
+- [x] 对应M4-O交付项真实结果可读回，失败行为经过验证，不借其他CHG的PASS替代。
+- [x] 修改按所有权提交，相关测试/构建通过，独立Review和PR合并后回写事实。
 
 ## References
 
@@ -38,7 +38,7 @@ risk: H
 
 ## Current facts and boundaries
 
-CHG123两仓已合并，wt-media/file-ku/随机视频切片/有两条已读回验证的6秒原声动漫舞蹈切片，index.json可读。文件管理ID3为已上传的开头引导。当前注册basic_cut/guide_insert/guide_pip，公共执行中含GuidePlan分支，策略已支持多组完整参数但任务覆盖仍有旧字段特判；本CHG需替换为通用模板契约与服务端范围校验。Cloud拥有业务及FFmpeg，Agent下载契约不变。最终旧数据/模板实现清理与打包Desktop下载闭环归CHG125；本CHG不提前删除历史素材。
+Cloud PR36已合并main（464361a51332fea02e1e3401aeeb6061a5bde3cc），公共任务与Runner使用ResourcePlan，执行器负责时间线和FFmpeg；任务覆盖由Schema及策略上限校验，三种创建路径固定技术配置与种子，资源准备按有效租约首次保存manifest。新模板已发布id10；旧模板仅保留临时公共入口适配，最终目录及执行实现清理归CHG125。真实DB、池路径、176.233秒/27.5秒渲染均已验证；平台实际任务709正在使用新桶material185及文件3/4，最终成片/Agent下载归CHG125继续核验。Mac锁定已请求用户解锁；本CHG不宣称native业务闭环完成。
 
 ## File mapping and commits
 
