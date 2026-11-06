@@ -1,4 +1,4 @@
-// Local adapter: the official range picker is mounted only in the material library.
+// Official date-range adapter shared by resource filters and production dialogs.
 import { createApp, h, reactive } from 'vue';
 import DateRangePicker from 'tdesign-vue-next/es/date-picker/DateRangePicker.mjs';
 import 'tdesign-vue-next/es/date-picker/style/css.mjs';
@@ -16,10 +16,10 @@ window.LibraryDateRange = {
         value: inputs.every(input => input.value) ? inputs.map(input => input.value) : [],
         valueType: 'YYYY-MM-DD', format: 'YYYY-MM-DD', clearable: true,
         allowInput: false, needConfirm: false, separator: '至', placeholder: ['开始日期', '结束日期'],
-        popupProps: { overlayClassName: 'lib-date-popup' },
+        popupProps: { overlayClassName: 'lib-date-popup', attach: () => field.closest('dialog') || document.body },
         onChange(value) {
           props.value = value || [];
-          inputs.forEach((input, index) => { input.value = value?.[index] || ''; });
+          inputs.forEach((input, index) => { input.value = value?.[index] || ''; input.dispatchEvent(new Event('change', { bubbles: true })); });
         }
       });
       const app = createApp({ render: () => h(DateRangePicker, props) });

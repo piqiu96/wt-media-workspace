@@ -18,7 +18,7 @@
       else a.removeAttribute('aria-current');
     });
     document.querySelectorAll('.review-toc a').forEach(a => {
-      if (a.hash === '#' + active.id) a.setAttribute('aria-current', 'page');
+      if (a.pathname === location.pathname && a.search === location.search && a.hash === '#' + active.id) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
     document.title = `${active.querySelector('h1,h2')?.textContent || '逐页粗评'} · 内容运营评审`;
