@@ -779,3 +779,28 @@ releases:
     residual_risks:
       - "Native UI automation connection unavailable; do not treat shared Desktop browser screenshots as native acceptance."
       - "Publishing execution remains outside this content-production delivery; no fake publishing records."
+
+  - release: "chg126-files-public-url-20261107"
+    status: verified
+    date: "2026-11-07"
+    scope: permanent_bucket_file_links_and_shared_upload_row_actions
+    environment: local_development
+    components:
+      cloud: "095cbf35c6326da39fafb5d7f5f20d64d3c0580f (not released)"
+      local_agent: "b8c2b259ec06e68eaac304bad753acf131fce598 (unchanged)"
+      desktop: "e3ee88afcda134d097a9f9770a3282c3d2db4046 with shared Vue 095cbf3 (not released)"
+    contracts:
+      cloud_api: "v1@2026.11.07.2"
+    verification:
+      local:
+        - "CHG126 complete verification passed: all Go tests, 1000 frontend tests, 190 Workspace tests and governance/integration checks."
+        - "Image/video upload, anonymous public bytes/hash, display rename stability, legacy attachment and origin deletion verified; all disposable files removed."
+        - "Browser and native system chooser exercised upload failure retention, busy guards, image/video previews, actual copy/rename and row hover colors."
+        - "Cloud/Desktop shared frontend and latest macOS DMG rebuilt; all managed environment gates passed."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "DMG rebuilt from final shared Vue; browser/system chooser verified; not released"
+    residual_risks:
+      - "The public domain can return nginx cached bytes after origin deletion; cached copies expire under its cache policy. No bucket ACL changes."
+      - "Agent walkthroughs do not replace user visual sign-off."
