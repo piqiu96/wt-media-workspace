@@ -12,7 +12,7 @@ verify_scenarios: ["repo", "integration"]
 
 ## Change
 
-用户已确认执行：文件管理复制URL使用已配置bucket公共HTTPS域名及持久化完整对象位置，改名不改变URL；保留旧平台资源入口兼容。使用公共上传、表单、列表组件优化上传及行操作颜色，修正文件管理和相关合成列表。仅修改Workspace事实与Cloud后端/共享Vue，无数据库迁移，不改Agent/Desktop运行代码、不创建worktree、不调整bucket权限。
+用户已确认执行：文件管理复制URL使用已配置bucket公共HTTPS域名及持久化完整对象位置，改名不改变URL；保留旧平台资源入口兼容。使用公共上传、表单、列表组件优化上传及行操作颜色，修正文件管理、素材及相关合成列表。仅修改Workspace事实与Cloud后端/共享Vue，无数据库迁移，不改Agent/Desktop运行代码、不创建worktree、不调整bucket权限。
 
 当前基线：Workspace main 794d82ff、Cloud main 0d161df7均干净且已发布；CHG121～125已归档。原文件管理仅复制平台capability URL，上传暴露原生文件控件，操作列写死宽度并混用Link/文字按钮，相关合成列表残留描边按钮类。实际存储公共域名已匿名读到现有运营文件。
 

@@ -786,9 +786,9 @@ releases:
     scope: permanent_bucket_file_links_and_shared_upload_row_actions
     environment: local_development
     components:
-      cloud: "095cbf35c6326da39fafb5d7f5f20d64d3c0580f (not released)"
+      cloud: "c4e02c5bb7e5a5c9a0d8a55a9a9559f8a51fb520 (not released)"
       local_agent: "b8c2b259ec06e68eaac304bad753acf131fce598 (unchanged)"
-      desktop: "e3ee88afcda134d097a9f9770a3282c3d2db4046 with shared Vue 095cbf3 (not released)"
+      desktop: "e3ee88afcda134d097a9f9770a3282c3d2db4046 with shared Vue c4e02c5 (not released)"
     contracts:
       cloud_api: "v1@2026.11.07.2"
     verification:
