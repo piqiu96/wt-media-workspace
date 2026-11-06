@@ -828,3 +828,5 @@ Codex 每次必须按 `AGENT-INDEX.md` §4 的**读取顺序**执行——该节
 ```
 
 若工程骨架或最小跨端任务闭环未真实完成并通过验收，不得跳到用户与账号模块。
+
+2026-11-06 用户确认的资源与合成闭环增量按 [M4-O](milestones/M4-content-production.md#m4-o-resource-composition-cutover) 及CHG121～125顺序独立交付；已授权清理现有改动后自动继续，在原仓库执行。
