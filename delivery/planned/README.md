@@ -15,4 +15,3 @@ M4 剩余 CHG 的执行边界见 [M4 §3.1](../milestones/M4-content-production.
 
 已交付、已归档或已废弃的草案由 Git 保存；本目录只列仍未关闭的记录。
 
-- [CHG-20261106-125](CHG-20261106-125/change.md)：资源合成全链验收及旧模板清理，PLANNED，依赖前一项。
