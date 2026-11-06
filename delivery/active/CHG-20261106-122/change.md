@@ -3,6 +3,7 @@ id: CHG-20261106-122
 parent: delivery/milestones/M4-content-production.md#m4-o-resource-composition-cutover
 status: IMPLEMENTING
 depends_on: ["CHG-20261106-121"]
+dependency_merge_commits: {"CHG-20261106-121": {"wt-media-workspace": "c2713530432d3bbb068236b596e4800be6b59e07", "wt-media-cloud": "58d409e0843b05b1cec71ca6652065bcd8eabe50"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: H
 ---
