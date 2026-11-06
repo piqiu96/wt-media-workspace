@@ -1,7 +1,7 @@
 ---
 id: CHG-20261106-122
 parent: delivery/milestones/M4-content-production.md#m4-o-resource-composition-cutover
-status: VERIFYING
+status: DONE
 depends_on: ["CHG-20261106-121"]
 dependency_merge_commits: {"CHG-20261106-121": {"wt-media-workspace": "c2713530432d3bbb068236b596e4800be6b59e07", "wt-media-cloud": "58d409e0843b05b1cec71ca6652065bcd8eabe50"}}
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
@@ -31,8 +31,8 @@ Cloud新增`internal/modules/files/{model,repository,service}`及协议Handler�
 
 ## Done When
 
-- [ ] 对应M4-O交付项真实结果可读回，失败行为经过验证，不借其他CHG的PASS替代。
-- [ ] 修改按所有权提交，相关测试/构建通过，独立Review和PR合并后回写事实。
+- [x] 对应M4-O交付项真实结果可读回，失败行为经过验证，不借其他CHG的PASS替代。
+- [x] 修改按所有权提交，相关测试/构建通过，独立Review和PR合并后回写事实。
 
 ## References
 
@@ -43,3 +43,7 @@ Cloud新增`internal/modules/files/{model,repository,service}`及协议Handler�
 ## Constraints
 
 按用户要求在原仓库分支执行，不创建worktree；不打印/提交AK/SK。角色与业务事实仍在Cloud，Workspace不承载运行代码。按依赖完成后自行启动后续已授权任务。
+
+## Acceptance
+
+文件管理真实对象上传/下载/摘要、三角色、改名和删除撤销PASS，测试及双端构建PASS；独立Review修复容器匹配与里程碑旧迁移表述遗漏。Cloud PR34（CI PASS）已合并至本地main，merge `2043fe1933061938dd857d210ec44f24f60af9be`。Workspace最终证据见evidence/files-verification.md；Desktop完整打包验收归CHG125。

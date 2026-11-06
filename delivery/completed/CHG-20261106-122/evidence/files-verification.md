@@ -11,3 +11,5 @@
 
 - `wt.py chg verify CHG-20261106-122`：190项Workspace测试及Cloud模块测试PASS；环境门禁首次调度器构建早于最终提交，已重建，复核Cloud/Agent/Worker/Compose Worker/Scheduler/BitBrowser全PASS。该通用门禁继续报打包Desktop assets早于新增前端提交；本CHG两套前端源码构建已PASS，打包DMG重建与原生完整验收统一在CHG125执行，未以旧包宣称通过。
 - docs、Delivery、Product/Master、config、AI workspace校验PASS；状态改为VERIFYING后同步Ledger，消除首次状态不一致。
+
+- Cloud PR34 CI verify PASS（2m58s），已merge并fast-forward本地main：2043fe1933061938dd857d210ec44f24f60af9be。Workspace独立Review指出里程碑残留旧迁移目标，已同步改为最新删除决定。
