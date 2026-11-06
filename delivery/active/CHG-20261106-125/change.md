@@ -16,7 +16,7 @@ risk: H
 
 ## Done When
 
-- [ ] 对应M4-O交付项真实结果可读回，失败行为经过验证，不借其他CHG的PASS替代。
+- [x] 对应M4-O交付项真实结果可读回，失败行为经过验证，不借其他CHG的PASS替代。
 - [ ] 修改按所有权提交，相关测试/构建通过，独立Review和PR合并后回写事实。
 
 ## References
@@ -47,4 +47,6 @@ risk: H
 
 实际任务709在同一快照下第2次尝试成功，成片128写入新目录，时间线49.166秒、广告11.3194秒开始。首次恢复验证发现成功任务仍携带旧错误投影，已修复正式恢复/成功提交时清空错误，尝试历史仍保留；数据修正migration101仅清理success任务旧错误。
 
-Cloud PR37已合入本地main：`0d161df7580315eb00829ef40398813c01814fa9`，CI PASS（2m38s）；全量Go PASS含模板响应contract投影，Workspace190项测试PASS。最新main全环境重建PASS，DMG挂载及启动成功。桌面工具不能识别隐藏挂载目录，逐文件核对同次构建的两个应用包10个文件完全一致后，使用构建目录中的包正常显示native登录页；登录动作时Mac再次锁定，等待用户解锁。后续独立wt verify的代码测试PASS，环境检查因尚未登录运营账号、Agent未启动而FAIL，不能据此宣称下载已验收。
+Cloud PR37已合入本地main：`0d161df7580315eb00829ef40398813c01814fa9`，CI PASS（2m38s）；全量Go PASS含模板响应contract投影，Workspace190项测试PASS。最新main全环境重建PASS，DMG挂载及启动成功。桌面工具不能识别隐藏挂载目录，逐文件核对同次构建的两个应用包10个文件完全一致后，使用构建目录中的包正常显示native登录页。用户解锁后，operator01在真实桌面登录，分别下载成片128和素材185，下载中心均显示已完成；本地大小、SHA256、音画时长及严格解码PASS，Cloud两条local_agent传输均成功，integrity与对象事实完全一致。
+
+最终顺序执行headless环境重启和wt verify，Workspace190、Cloud模块、环境全部gate及配置治理PASS。此前未登录时Agent缺失、以及桌面Agent接管后CLI无权读取BitBrowser的两次检查失败均保留在evidence；最终PASS在正式headless检查阶段取得，不把401当作BitBrowser正常，也不影响已经完成的真实桌面下载证据。独立Cloud、清理范围和Workspace文档Review均无未解决阻塞项。
