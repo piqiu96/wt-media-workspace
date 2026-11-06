@@ -6,3 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
+| CHG-20261106-125 | 资源合成全链验收及旧模板清理 | VERIFYING | wt-media-workspace |
