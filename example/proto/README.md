@@ -30,3 +30,5 @@ example/
 [社媒账号完整原型](social-accounts/index.html)为已确认 V7，重构与走查统一引用此入口。
 
 内容生产与发布互动的旧兼容目录已移除；当前原型、资源与评审入口统一维护在 `content-operations/`。
+
+[内容挖掘评审原型](content-mining/index.html)覆盖内容池、挖掘策略与挖掘任务；[现状与设计分析](content-mining/design/analysis.md)记录当前源码、PRD 差异和设计建议，尚待用户评审。
