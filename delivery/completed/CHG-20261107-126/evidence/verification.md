@@ -21,16 +21,23 @@
 - 真实hover计算样式：普通操作品牌蓝rgb(0,82,217)，悬停rgb(38,111,232)+rgb(234,241,252)浅底；删除默认正文rgb(38,52,73)，悬停rgb(213,73,65)+rgb(255,240,237)浅底。热区32px。策略页实际「立即执行」在首位、浅品牌底；详情/编辑/复制透明蓝字；任务及成片列表当前可见详情同样32px品牌蓝。
 - 证明截图：本地/tmp/wt-media-chg126-upload.jpg、/tmp/wt-media-chg126-row-actions.jpg、/tmp/wt-media-chg126-strategy-actions.jpg；截图为验收时刻，测试文件随后清理。拖拽接线经TDesign实际源码及独立Review核对，未冒充操作系统真实文件拖拽实测。
 - 文件9删除成功后的旧入口回读遇到环境重启，服务恢复后重新读取确认5～9所有本轮测试记录均不存在，文件9回源404；原有文件3/4仍保留。
-- 补查素材列表前的源095cbf3：完整前端134文件1000项PASS（/tmp/wt-media-chg126-web-final.log）；最终完整bin/control.sh start所有gate PASS（/tmp/wt-media-chg126-final-bring-up.log），两端构建与DMG从最终源重建。整体CHG检查正在收口，不以前置测试代替最终结果。
+- 补查素材列表前的源095cbf3：完整前端134文件1000项PASS（/tmp/wt-media-chg126-web-final.log）；最终完整bin/control.sh start所有gate PASS（/tmp/wt-media-chg126-final-bring-up.log），两端构建与DMG从最终源重建。最终完整CHG检查已通过，不以前置测试代替最终结果。
 
 ## 最终检查
 
 - `python3 scripts/wt.py chg verify CHG-20261107-126` 最终退出0，包含Cloud全Go、1000项前端、Cloud control检查、完整受管环境/BitBrowser验证、Workspace 190项、Delivery/AI/Skills/Product/Contract配置/文档/脚本检查全部PASS。最终日志/tmp/wt-media-chg126-verification.log。
-- Cloud PR38，最终实现095cbf35c6326da39fafb5d7f5f20d64d3c0580f；独立Review未发现P1/P2。Workspace独立Review确认需求、契约及缓存边界一致；指出的旧顺序断言已修正并由最终全量检查通过。
-- 本次验收是代码交付、自动检查和代理真实界面走查，不替代用户人工视觉签收；无未验证的执行承诺。等待各仓PR检查及合并后归档。
+- Cloud PR38，最终实现c4e02c5bb7e5a5c9a0d8a55a9a9559f8a51fb520；独立Review未发现P1/P2。Workspace独立Review确认需求、契约及缓存边界一致；指出的旧顺序断言已修正并由最终全量检查通过。
+- 本次验收是代码交付、自动检查和代理真实界面走查，不替代用户人工视觉签收；无未验证的执行承诺。两仓PR及合并结果见下节。
 
 - 最终同类页面补查：素材库/我的素材仍有旧Secondary文字按钮类，我的素材「放弃」未显式标记危险行操作；仅移除两处旧类、将放弃改为公共is-danger，保留权限/回调/业务行为。复用已经实测的同一ResourceRowActions颜色和热区，不新增页面色值。该三处类名调整后重新运行共享前端测试及双端构建，不重复无关后端实测。最终源提交及本地组合随后同步。
 
 - 素材列表颜色补充提交c4e02c5bb7e5a5c9a0d8a55a9a9559f8a51fb520；完整前端再次134文件/1000项PASS（/tmp/wt-media-chg126-final-web.log），新增类全部复用已验收公共组件，不新增业务路径。最终本地组合固定该提交。
 
-- 补充3处素材类名独立Review PASS，无P1/P2；权限/条件/禁用/回调均未改变。最终c4e02c5 Cloud CI全部通过（PR38，run42284994544：测试、MySQL迁移、发布二进制及Cloud/Desktop双端构建、打包脚本）。本地Cloud build:cloud PASS，最终DMG及其共享前端从c4e02c5重建成功；最终完整CHG检查再次运行。
+- 补充3处素材类名独立Review PASS，无P1/P2；权限/条件/禁用/回调均未改变。最终c4e02c5 Cloud CI全部通过（PR38，run42284994544：测试、MySQL迁移、发布二进制及Cloud/Desktop双端构建、打包脚本）。本地Cloud build:cloud PASS，最终DMG及其共享前端从c4e02c5重建成功；最终完整CHG检查再次通过，退出0（/tmp/wt-media-chg126-verification-final.log）。
+
+## 合并与归档
+
+- Cloud [PR38](https://github.com/piqiu96/wt-media-cloud/pull/38) 已合并为660e4e6d0855dd94ece257dbbd0573b17c118b86；Workspace [PR41](https://github.com/piqiu96/wt-media-workspace/pull/41) 已合并为cd1dcb459ebc57e5aeea9cca7330b818d76c72d0。两仓本地main已快进，代码树与受测提交一致；CI全部PASS。
+- 最终完整CHG验证退出0；1000项共享前端、190项Workspace、全Go、环境/契约/文档/脚本检查均PASS。两端构建和本地DMG从最终共享源重建。
+- Done When逐项PASS：永久直链/编码/错误配置/改名稳定及兼容；真实图片与视频字节读回和删除源；上传实际交互及错误保留；相关列表公共组件和颜色；独立Review及两仓合并。无未处理P1/P2、未清理验收资产或阻塞问题。
+- 未调整bucket权限，未修改Agent/Desktop运行源码，无数据库迁移，无新增worktree。CHG126退出Active并归档；本次代码与代理验收完成，不宣称用户人工视觉签收。

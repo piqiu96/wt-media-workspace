@@ -1,10 +1,13 @@
 ---
 id: CHG-20261107-126
 parent: delivery/milestones/M4-content-production.md#m4-p-file-links-and-upload
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
+merge_commits:
+  wt-media-cloud: "660e4e6d0855dd94ece257dbbd0573b17c118b86"
+  wt-media-workspace: "cd1dcb459ebc57e5aeea9cca7330b818d76c72d0"
 verify_scenarios: ["repo", "integration"]
 ---
 
