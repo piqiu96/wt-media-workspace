@@ -9,7 +9,7 @@
 
 ## Implementation references
 
-- Cloud implementation: `31d5fcf0af0937f9bfbb23bc429b1eeaa5a17494` — [Cloud PR #39](https://github.com/piqiu96/wt-media-cloud/pull/39).
+- Cloud implementation: `31d5fcf0af0937f9bfbb23bc429b1eeaa5a17494`; CI integration: `6fe2eba` — [Cloud PR #39](https://github.com/piqiu96/wt-media-cloud/pull/39).
 - Workspace migration: `6b68d6a091e574c996f6d619989da357e48e2cf9`; confirmed baseline: `c65629b6` — [Workspace PR #43](https://github.com/piqiu96/wt-media-workspace/pull/43).
 - GitHub Git Data API publication verified matching tree and commit SHA before updating either feature branch; no main ref was changed.
 
@@ -29,6 +29,8 @@
 | Local documentation | Open design index and follow publishing link | Local documents render with relative navigation; reader tests verify changed saved contents are read without commit or push |
 | Review continuity | Enter review text, reload, switch scene/back, export JSON | Text survives and export contains the edit; original review scripts/storage keys are byte-identical; default origin remains `http://127.0.0.1:8768` |
 | Independent preview entry | Request `/`, `/index.html`, `/login` on dev and built preview | First two redirect to `/example/`; production login is 404; `/api` is blocked |
+
+The existing Cloud PR workflow now runs the prototype regression tests and isolated preview build in a separate step, in addition to formal frontend/runtime validation. Current online check results remain attached to the paired PRs.
 
 ## Limits and delivery state
 
