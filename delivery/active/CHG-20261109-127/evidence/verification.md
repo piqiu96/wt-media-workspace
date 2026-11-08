@@ -7,6 +7,12 @@
 - 105 prototype/resource files retain their relative layout under Cloud `web/example/`. Six Markdown working documents move to Workspace `docs/design/`: content-operations `design/README.md` → `content-operations.md`; the four business documents retain their names; content-mining `design/analysis.md` → `content-mining.md`.
 - Local/known-repository references in the migrated files were resolved against their new destinations: zero missing targets. Historical delivery evidence was not rewritten.
 
+## Implementation references
+
+- Cloud implementation: `31d5fcf0af0937f9bfbb23bc429b1eeaa5a17494` — [Cloud PR #39](https://github.com/piqiu96/wt-media-cloud/pull/39).
+- Workspace migration: `6b68d6a091e574c996f6d619989da357e48e2cf9`; confirmed baseline: `c65629b6` — [Workspace PR #43](https://github.com/piqiu96/wt-media-workspace/pull/43).
+- GitHub Git Data API publication verified matching tree and commit SHA before updating either feature branch; no main ref was changed.
+
 ## Acceptance results — PASS
 
 | Check | Action | Actual result |
