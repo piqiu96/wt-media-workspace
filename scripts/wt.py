@@ -96,7 +96,10 @@ def cmd_test(scenario: str, repo_name: str | None, plan: bool, root: Path = ROOT
 
 def cmd_dev(scenario: str, repo_name: str | None, plan: bool, root: Path = ROOT) -> None:
     paths = repositories(root)
-    if scenario == "fast":
+    if scenario == "example":
+        cloud = paths["wt-media-cloud"]
+        run_command(cloud / "web", ["env", f"WT_MEDIA_WORKSPACE_ROOT={root}", "npm", "run", "dev:example"], plan)
+    elif scenario == "fast":
         print("fast: no environment startup; use wt test fast")
     elif scenario == "repo":
         if not repo_name or repo_name == "wt-media-workspace" or repo_name not in paths:
@@ -142,7 +145,7 @@ def main(argv: list[str] | None = None) -> int:
             part.add_argument("--plan", action="store_true")
     for name in ("dev", "test"):
         part = commands.add_parser(name)
-        part.add_argument("scenario", choices=("fast", "repo", "integration", "e2e", "real"))
+        part.add_argument("scenario", choices=("fast", "repo", "integration", "e2e", "real") + (("example",) if name == "dev" else ()))
         part.add_argument("--repo", choices=("wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"))
         part.add_argument("--plan", action="store_true")
     args = parser.parse_args(argv)

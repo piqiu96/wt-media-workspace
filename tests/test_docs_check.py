@@ -46,6 +46,7 @@ class DocsCheckTests(unittest.TestCase):
 # Documents
 
 - [Product](product/README.md)
+- [Design](design/README.md)
 - [Engineering](engineering/README.md)
 - [Standards](standards/README.md)
 - [Contracts](contracts/README.md)
@@ -54,7 +55,7 @@ class DocsCheckTests(unittest.TestCase):
 - [Reference](reference/README.md)
 """)
         for directory in (
-            "docs/product", "docs/engineering", "docs/standards",
+            "docs/design", "docs/product", "docs/engineering", "docs/standards",
             "docs/contracts", "docs/decisions", "docs/devops", "docs/reference",
         ):
             self.write(f"{directory}/README.md", STABLE + "\n# Index\n")
@@ -94,6 +95,10 @@ class DocsCheckTests(unittest.TestCase):
 
     def test_compliant_tree_has_no_errors(self) -> None:
         self.assertEqual(self.check(), [])
+
+    def test_design_working_document_links_are_checked(self) -> None:
+        self.write("docs/design/ongoing.md", "# Design\n\n[Missing](missing.md)\n")
+        self.assertIn("broken relative link: docs/design/ongoing.md -> missing.md", self.check())
 
     def test_missing_index_is_reported(self) -> None:
         (self.root / "docs/contracts/README.md").unlink()

@@ -35,6 +35,7 @@ wt-media-workspace/
 ├── .ai/
 │   └── CURRENT_CONTEXT.md          # 唯一执行状态快照，脚本生成，禁止手工编辑
 ├── docs/
+│   ├── design/                     # 当前设计工作稿，正式承接后退出
 │   ├── product/                    # 当前有效产品事实
 │   ├── engineering/                # 当前有效工程架构
 │   ├── contracts/                  # 人类可读的跨仓库协议治理
@@ -71,6 +72,7 @@ wt-media-workspace/
 
 | 位置 | 保存内容 | 不保存内容 |
 |---|---|---|
+| `docs/design` | 当前设计探索、评审及待回写结论，完成承接后移除 | 第二套正式 PRD、开发状态、永久草稿 |
 | `docs/product` | 当前系统应该做什么 | 每日开发进度 |
 | `docs/engineering` | 当前系统应该如何设计 | 临时实施清单 |
 | `docs/contracts` | 协议所有权、兼容性、变更流程和跨项目协作规范 | 完整 OpenAPI、Schema、DTO、事件定义 |

@@ -3,7 +3,7 @@
 > 产品基线：[PRD 第五章](../../product/prd/详细文档/第五章_素材生产.md)，2026-11-05 按已确认原型回写。
 > 状态：当前 Cloud 内容生产实现，覆盖人工、立即、定时创建、多组展开、任务恢复及成片管理。代码实施不代表生产环境已上线；次日人工与原生 Desktop 签收以 Delivery 记录为准。
 > 决策依据：[ADR-0017](../../decisions/0017-m4-m5-cloud-owned-content-production.md)、[ADR-0023](../../decisions/0023-m3-m5-team-resources-and-production-operator.md)、[ADR-0031](../../decisions/0031-content-production-batches-and-manual-reproduction.md)。
-> 本文维护模型、接口职责和工程约束；原型入口见[内容生产设计导航](../../../example/proto/content-operations/design/content-production.md)。实际迁移、提供方 OpenAPI 和代码位于 Cloud，实施步骤与验收证据进入对应 CHG，不在原型目录另存技术方案。
+> 本文维护模型、接口职责和工程约束；原型入口见[内容生产设计导航](../../design/content-production.md)。实际迁移、提供方 OpenAPI 和代码位于 Cloud，实施步骤与验收证据进入对应 CHG，不在原型目录另存技术方案。
 
 ## 1. 设计目标
 

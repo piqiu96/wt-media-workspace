@@ -1,7 +1,7 @@
 ---
 id: CHG-20261109-127
 parent: none
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
@@ -34,4 +34,4 @@ Tasks: record the source checksums; relocate files and repair references; add th
 
 ## Verification
 
-Pending implementation. Source manifest captured outside the repositories before relocation (111 files).
+Implementation and local acceptance are complete. See `evidence/verification.md` for measured results and limitations. Independent PR review and merge remain pending; this CHG is not DONE.

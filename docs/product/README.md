@@ -20,7 +20,7 @@ M3 范围内对旧规则的改动（自动转素材、`partial_success`）已回
 
 [第五章：素材生产](prd/详细文档/第五章_素材生产.md) 是内容生产与自动生产的正式产品事实源，已按用户确认的内容生产原型合并：多组成片设置、模板参数权限、三种创建来源、统一任务批次、人工再次制作、受权代选材与按素材聚合的成片管理。
 
-Cloud 合成、Agent 下载和共用页面的边界继续有效；数据／接口收敛见[内容生产工程设计](../engineering/specs/2026-09-24-m4-m5-cloud-content-production.md)，与旧规则的替代关系见 [ADR-0031](../decisions/0031-content-production-batches-and-manual-reproduction.md)。[原型入口](../../example/proto/content-operations/design/content-production.md)仅作体验与导航，不维护第二份 PRD。产品定稿不代表新增运行能力已实施，交付状态以 Delivery 为准。
+Cloud 合成、Agent 下载和共用页面的边界继续有效；数据／接口收敛见[内容生产工程设计](../engineering/specs/2026-09-24-m4-m5-cloud-content-production.md)，与旧规则的替代关系见 [ADR-0031](../decisions/0031-content-production-batches-and-manual-reproduction.md)。[原型入口](../design/content-production.md)仅作体验与导航，不维护第二份 PRD。产品定稿不代表新增运行能力已实施，交付状态以 Delivery 为准。
 
 ## Public site
 

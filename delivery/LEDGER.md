@@ -6,4 +6,4 @@ Completed delivery records are removed after their final product, engineering, c
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261109-127 | Prototype and design-document relocation | IMPLEMENTING | wt-media-workspace, wt-media-cloud |
+| CHG-20261109-127 | Unify prototypes in Cloud and current design drafts in Workspace | VERIFYING | wt-media-workspace |

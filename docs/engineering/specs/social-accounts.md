@@ -1,6 +1,6 @@
 # 社媒账号：数据、接口与本机执行
 
-产品规则唯一正文为[第三章 §3.3](../../product/prd/详细文档/第三章_用户与账号管理.md#33-社媒账号管理)，交互为[当前原型](../../../example/proto/social-accounts/index.html)，取舍见[ADR-0030](../../decisions/0030-social-account-rebuild.md)。本文定义目标工程设计；实施及验收状态归 Delivery，不以文档存在声明已上线。正式 OpenAPI、Schema 和 DTO 由提供方仓库维护。
+产品规则唯一正文为[第三章 §3.3](../../product/prd/详细文档/第三章_用户与账号管理.md#33-社媒账号管理)，交互为[当前原型](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/social-accounts/index.html)，取舍见[ADR-0030](../../decisions/0030-social-account-rebuild.md)。本文定义目标工程设计；实施及验收状态归 Delivery，不以文档存在声明已上线。正式 OpenAPI、Schema 和 DTO 由提供方仓库维护。
 
 ## 1. 数据归属与四张领域表
 
