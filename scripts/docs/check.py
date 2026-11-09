@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 REQUIRED_INDEXES = (
     "docs/README.md",
+    "docs/design/README.md",
     "docs/product/README.md",
     "docs/engineering/README.md",
     "docs/engineering/specs/README.md",
@@ -47,6 +48,7 @@ HEADING_RE = re.compile(r"^## \d+\.", re.MULTILINE)
 SUPERSEDED_RE = re.compile(r"^\s*(?:>\s*)?(?:\*\*)?SUPERSEDED(?:\*\*)?\b", re.MULTILINE)
 
 CURRENT_DOC_ROOTS = (
+    "docs/design",
     "docs/product",
     "docs/engineering",
     "docs/standards",

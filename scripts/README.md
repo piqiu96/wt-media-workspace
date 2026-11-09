@@ -7,7 +7,7 @@
 | 路径 | 类型 | 用途 | 调用方式 |
 | --- | --- | --- | --- |
 | `bin/control.sh` | 入口 | 本地开发环境启停、状态与 readiness 验收的稳定入口 | `bin/control.sh <start\|stop\|restart\|status\|verify\|help>` |
-| `scripts/wt.py` | 入口 | 唯一 CLI：`status`、`chg`、`dev`、`test` 的薄分派 | `python3 scripts/wt.py ...` |
+| `scripts/wt.py` | 入口 | 唯一 CLI：`status`、`chg`、`dev`、`test` 的薄分派；`dev example` 按仓库映射启动 Cloud 原型并挂载本地文档 | `python3 scripts/wt.py ...` |
 | `scripts/chg/__init__.py` | 库 | CHG 共享必要条件：仓库映射、Git、依赖提交、References、handoff | 不直接执行；由 `wt chg` 调用 |
 | `scripts/chg/start.py` | CHG 动词 | `wt chg start`：依赖、main、脏树与分支预检 | 由 `scripts/wt.py` 调用 |
 | `scripts/chg/resume.py` | CHG 动词 | `wt chg resume`：重生成上下文、报告 main 漂移与 checkpoint | 由 `scripts/wt.py` 调用 |

@@ -6,6 +6,7 @@ This file is the entry index for the documentation tree. It defines directory ro
 
 ## Directories
 
+- [Design](design/README.md): current design working documents; an explicit working-document category, written back to formal owners and removed when absorbed.
 - [Product](product/README.md): current product facts and product acceptance.
 - [Engineering](engineering/README.md): current architecture, module boundaries, and long-lived specs.
 - [Standards](standards/README.md): current engineering, design, product, and documentation practice standards.
@@ -30,13 +31,13 @@ Conflict resolution follows fact ownership, not a global product/engineering/imp
 
 ## One fact, one place
 
-- Keep a stable fact in exactly one directory. Delivery records cite it; they do not copy its body.
+- Keep a stable fact in exactly one directory. Delivery records and design working documents cite it; they do not copy its body. `docs/design/` holds current exploration and confirmed decisions awaiting write-back; its location does not make a proposal an approved fact.
 - Analysis, discussion, and proposals become formal only after they enter Product, Engineering, Contract, Decision, or Delivery.
 - Code proves current behavior, but current behavior does not by itself change a formal requirement.
 
 ## Lifecycle and history
 
-- `docs/` holds current facts only. Git keeps old versions; do not keep a second current copy for history.
+- `docs/` holds current formal facts and the explicit `design/` working-document category. Design drafts exit after formal write-back and Delivery handoff, with unique confirmation evidence preserved. Git keeps old versions; do not keep a second current copy for history.
 - `delivery/active/` holds the current CHG; `delivery/planned/` holds confirmed work not yet started; `delivery/milestones/` holds current business closure.
 - `delivery/completed/` and `delivery/reports/` hold only material with independent traceability value. Both exit the default context.
 - The temporary marker `SUPERSEDED` is only for an old document that cannot be deleted yet because external references remain. It must name a resolvable replacement and is removed after references migrate.

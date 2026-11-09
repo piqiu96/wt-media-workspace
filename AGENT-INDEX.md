@@ -47,12 +47,13 @@
 | 位置 | 负责内容 |
 | --- | --- |
 | `docs/README.md` | 文档树入口：目录索引、标记和校验规则；分类与冲突细则指向 `docs/standards/文档与知识事实治理规范.md` |
-| `docs/` | 当前有效的产品、工程、规范、契约、决策事实；不保存旧版本和过程历史 |
+| `docs/` | 当前有效的正式事实，以及明确标识、完成承接后退出的设计工作稿；不保存旧版本和过程历史 |
+| `docs/design/` | 当前设计工作稿：探索、评审和待回写结论；正式内容由原 Owner 承接后移除，不是第二套 PRD 或 Delivery |
 | `docs/product/` | 产品需求、用户场景、功能目标和产品验收 |
 | `docs/engineering/architecture/` | 系统架构、模块边界、分层和通信设计 |
 | `docs/engineering/specs/` | 长期有效的专题工程设计 |
 | `docs/standards/` | 跨领域的研发、设计、产品与文档实践规范；代码演进细则在此维护 |
-| `example/` | 规范配套的离线HTML制品：`common/`公共视觉交互、`proto/`业务原型；引用正式规范，不承载运行时能力 |
+| Cloud `web/example/` | 原型代码与公共参考的唯一维护位置：`common/`公共示例、`proto/`业务原型；Workspace 不保留第二份代码，正式应用不依赖预览 |
 | `docs/contracts/` | 跨仓 API、协议、Event Schema 和数据契约 |
 | `docs/decisions/` | 已确认的架构选择、技术取舍和 ADR |
 | `docs/devops/` | 端口与部署总账：各组件监听端口、连接链路和本地/线上接法的索引 |
