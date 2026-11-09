@@ -11,7 +11,7 @@
 
 - Cloud implementation: `31d5fcf0af0937f9bfbb23bc429b1eeaa5a17494`; CI integration: `6fe2eba` — [Cloud PR #39](https://github.com/piqiu96/wt-media-cloud/pull/39).
 - Workspace migration: `6b68d6a091e574c996f6d619989da357e48e2cf9`; confirmed baseline: `c65629b6` — [Workspace PR #43](https://github.com/piqiu96/wt-media-workspace/pull/43).
-- GitHub Git Data API publication verified matching tree and commit SHA before updating either feature branch; no main ref was changed.
+- Initial GitHub Git Data API publication verified matching tree and commit SHA before updating either feature branch. PR merge commits were later imported byte-for-byte, including their GitHub signatures, and verified against their original SHA before fast-forwarding local main.
 
 ## Acceptance results — PASS
 
@@ -37,4 +37,8 @@ The existing Cloud PR workflow now runs the prototype regression tests and isola
 - Browser acceptance used an isolated browser context. Existing user-profile review notes were neither read nor copied nor removed; preservation is established by unchanged origin/storage keys and a fresh-context round trip, not by claiming to have inspected private existing notes.
 - Standard Vite large-chunk notices remain; builds succeed. No business prototype was redesigned to optimize bundles.
 - The usual Git transport timed out; GitHub API access is available. Publication must preserve and verify exact local Git objects before changing feature-branch refs.
-- Independent review and PR merge are still required by repository policy. Keep the CHG in VERIFYING until review and merge into both local `main` branches are confirmed; then archive through the existing delivery workflow.
+- On 2026-11-09 the user explicitly instructed merging both PRs and removing unused branches. No independent GitHub approval review was recorded; this authorization is not represented as an independent review.
+- [Cloud PR #39](https://github.com/piqiu96/wt-media-cloud/pull/39) merged as `eb64700e7d1808c0afd8f45ada79603f2e19ed05`; [Workspace PR #43](https://github.com/piqiu96/wt-media-workspace/pull/43) merged as `a7a3ee1ad63db35b930f0bb3709f82a9012b3652`. Both have two parents, retain their original feature heads, and are present in each corresponding local main. The merge trees exactly match the tested PR heads.
+- Final PR checks passed: [Cloud verify](https://github.com/piqiu96/wt-media-cloud/actions/runs/42514853989), [Workspace checks](https://github.com/piqiu96/wt-media-workspace/actions/runs/42514871569).
+- Cleanup removed 11 local branches and four remote branches only after checking containment in main; remote candidates had no open PR and were not protected. Workspace’s CHG127 remote branch had already been automatically deleted after merge. Existing detached worktrees were retained.
+- The completed record exits delivery/active and the active ledger, and is archived once these closure facts are written. Formal design working documents remain unchanged by this merge/cleanup task.

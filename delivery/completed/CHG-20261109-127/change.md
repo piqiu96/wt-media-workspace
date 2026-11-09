@@ -1,10 +1,11 @@
 ---
 id: CHG-20261109-127
 parent: none
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
+merge_commits: {"wt-media-cloud": "eb64700e7d1808c0afd8f45ada79603f2e19ed05", "wt-media-workspace": "a7a3ee1ad63db35b930f0bb3709f82a9012b3652"}
 ---
 
 # CHG-20261109-127: Unify prototypes in Cloud and current design drafts in Workspace
@@ -34,4 +35,4 @@ Tasks: record the source checksums; relocate files and repair references; add th
 
 ## Verification
 
-Implementation and local acceptance are complete. See `evidence/verification.md` for measured results and limitations. Independent PR review and merge remain pending; this CHG is not DONE.
+Implementation and acceptance are complete. Both PRs were merged with merge commits on 2026-11-09 following the user’s explicit instruction, and both local main branches contain the corresponding merge commits. See `evidence/verification.md` for measured results, CI links and closure facts. No independent GitHub approval review was recorded; the merge was explicitly authorized by the user.
