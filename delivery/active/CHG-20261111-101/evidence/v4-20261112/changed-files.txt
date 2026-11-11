@@ -1,0 +1,13 @@
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/App.vue
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/QuickPublish.vue
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/TaskDetail.vue
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/model.js
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/publishing.css
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/taskExperience.js
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/tests/taskExperience.test.js
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/AccountPicker.vue
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/TaskActionDialog.vue
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/accountAvailability.js
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/taskActions.js
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/tests/taskActions.test.js
+/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/tests/taskDetailComponent.test.js

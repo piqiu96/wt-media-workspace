@@ -1,0 +1,152 @@
+
+> wt-media-cloud-web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web
+
+stdout | src/localAgentService.test.js > local agent desktop service > starts the Agent through Tauri only when Desktop is available
+本机执行凭证将在登录或下一次执行前获取 请先登录运营平台，才能获取本机执行凭证
+
+ ✓ src/shared/utils/appVersion.test.js (3 tests) 59ms
+ ✓ src/shared/ui/resource/resourceModule.test.js (8 tests) 73ms
+ ✓ src/localAgentService.test.js (12 tests) 45ms
+ ✓ src/modules/compose/pages/ComposeStrategyPage.test.js (9 tests) 83ms
+ ✓ src/modules/compose/components/ComposeTaskCreateDialog.test.js (8 tests) 81ms
+ ✓ src/modules/materials/components/MaterialPerformance.test.js (3 tests) 23ms
+ ✓ src/modules/materials/labels.test.js (25 tests) 27ms
+ ✓ src/modules/materials/materialFilters.test.js (3 tests) 24ms
+ ✓ src/modules/contentpool/pages/ListPageConventions.test.js (6 tests) 22ms
+ ✓ src/modules/transfer/transferRows.test.js (14 tests) 18ms
+ ✓ src/shared/utils/autoRefreshPages.test.js (31 tests) 10ms
+ ✓ src/shared/api/files.test.js (3 tests) 8ms
+ ✓ src/shared/utils/datetime.test.js (3 tests) 16ms
+ ✓ src/modules/accounts/pages/accountFormRendering.test.js (1 test) 17ms
+ ✓ src/shared/utils/useAutoRefresh.test.js (7 tests) 18ms
+ ✓ src/modules/compose/materialStates.test.js (21 tests) 13ms
+ ✓ src/modules/contentpool/crawlTaskDetail.test.js (6 tests) 17ms
+ ✓ src/migrationCandidates.test.js (8 tests) 13ms
+ ✓ src/modules/compose/pages/ComposeTasksPage.test.js (34 tests) 9ms
+ ✓ src/mediaAccounts.test.js (10 tests) 5ms
+ ✓ src/modules/compose/strategyDirectory.test.js (5 tests) 7ms
+ ✓ src/shared/ui/fields/fields.test.js (4 tests) 18ms
+ ✓ src/modules/materials/pages/MaterialLibraryPage.test.js (21 tests) 5ms
+ ✓ src/apps/routerParity.test.js (14 tests) 5ms
+ ✓ src/modules/contentpool/pages/ContentPoolPage.test.js (23 tests) 8ms
+ ✓ src/localSettingsService.test.js (30 tests) 8ms
+ ✓ src/modules/transfer/DownloadCentreDrawer.test.js (28 tests) 9ms
+ ✓ src/modules/profiles/pages/profileSyncWorkflow.test.js (13 tests) 11ms
+ ✓ src/modules/materials/joinMaterials.test.js (2 tests) 11ms
+ ✓ src/localSettingsView.test.js (43 tests) 18ms
+ ✓ src/localSettingsWiring.test.js (9 tests) 2136ms
+   ✓ desktop page imports > imports only names the target module actually exports  2133ms
+ ✓ src/modules/materials/pages/MyMaterialsPage.test.js (24 tests) 6ms
+ ✓ src/modules/compose/useTaskPolling.test.js (7 tests) 9ms
+ ✓ src/modules/accounts/pages/AccountsPage.test.js (14 tests) 6ms
+ ✓ src/modules/accounts/pages/accountForms.test.js (11 tests) 7ms
+ ✓ src/modules/compose/components/ComposeOutputDetail.test.js (4 tests) 39ms
+ ✓ src/modules/contentpool/components/ContentPoolSourceDrawer.test.js (7 tests) 13ms
+ ✓ src/modules/compose/outputRemake.test.js (5 tests) 5ms
+ ✓ src/workEnvStatus.test.js (23 tests) 6ms
+ ✓ src/shared/api/compose.test.js (13 tests) 6ms
+ ✓ src/modules/compose/pages/ListPageConventions.test.js (4 tests) 7ms
+ ✓ src/modules/compose/materialSelection.test.js (2 tests) 8ms
+ ✓ src/modules/profiles/pages/profileProxyWorkflow.test.js (11 tests) 6ms
+ ✓ src/modules/transfer/desktopBridge.test.js (13 tests) 5ms
+ ✓ src/modules/accounts/pages/importForm.test.js (4 tests) 5ms
+ ✓ src/modules/contentpool/miningRules.test.js (7 tests) 4ms
+ ✓ src/modules/contentpool/pages/DiscoveryPages.test.js (9 tests) 6ms
+ ✓ src/shared/api/materials.test.js (5 tests) 6ms
+ ✓ src/modules/profiles/pages/ProfilesPage.test.js (19 tests) 8ms
+ ✓ src/modules/compose/dynamicSettings.test.js (3 tests) 7ms
+(node:90651) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/http.test.js (8 tests) 8ms
+ ✓ src/shared/ui/resource/KeywordTags.test.js (1 test) 14ms
+ ✓ src/modules/compose/taskOverrides.test.js (15 tests) 3ms
+ ✓ src/modules/accounts/pages/importItemPresentation.test.js (5 tests) 8ms
+ ✓ src/modules/profiles/pages/profileRunningReader.test.js (5 tests) 4ms
+ ✓ src/modules/materials/pages/ListPageConventions.test.js (3 tests) 3ms
+ ✓ src/modules/materials/MaterialDetailDrawer.test.js (19 tests) 11ms
+ ✓ src/modules/contentpool/pages/teamFilterReset.test.js (2 tests) 2ms
+ ✓ src/shared/api/fileTransfer.test.js (4 tests) 6ms
+ ✓ src/apps/cloud/pages/users/managementInteractions.test.js (4 tests) 4ms
+ ✓ src/modules/transfer/downloadFacts.test.js (35 tests) 5ms
+ ✓ src/profileBindings.test.js (3 tests) 3ms
+ ✓ src/modules/compose/strategySettings.test.js (4 tests) 3ms
+ ✓ src/shared/utils/units.test.js (5 tests) 2ms
+ ✓ src/modules/materials/cloudVideo.test.js (6 tests) 3ms
+ ✓ src/modules/transfer/downloadErrors.test.js (4 tests) 2ms
+ ✓ src/session.test.js (2 tests) 5ms
+ ✓ src/localSettingsSearchWiring.test.js (5 tests) 3ms
+ ✓ src/shared/utils/roles.test.js (4 tests) 2ms
+ ✓ src/modules/compose/strategyRules.test.js (3 tests) 4ms
+ ✓ src/modules/proxy/pages/importFile.test.js (4 tests) 3ms
+ ✓ src/modules/public/scrollSpy.test.js (8 tests) 2ms
+ ✓ src/modules/compose/pages/operatorLoading.test.js (5 tests) 3ms
+ ✓ src/shared/ui/feedback/index.test.js (5 tests) 4ms
+ ✓ src/modules/compose/effectiveTaskParams.test.js (1 test) 4ms
+ ✓ src/shared/api/proxy.test.js (2 tests) 5ms
+ ✓ src/modules/profiles/pages/profileSyncPresentation.test.js (9 tests) 2ms
+ ✓ src/localLogsView.test.js (17 tests) 3ms
+ ✓ src/modules/accounts/pages/cookieUpdates.test.js (4 tests) 3ms
+ ✓ src/modules/contentpool/pages/strategyStatus.test.js (3 tests) 30ms
+ ✓ src/apps/cloud/pages/users/UsersPage.test.js (5 tests) 11ms
+ ✓ src/shared/ui/resource/overlayStack.test.js (1 test) 4ms
+ ✓ src/modules/compose/retryPolicy.test.js (8 tests) 3ms
+ ✓ src/modules/accounts/pages/accountImports.test.js (5 tests) 3ms
+ ✓ src/apps/cloud/pages/users/usersApi.test.js (3 tests) 4ms
+ ✓ src/modules/accounts/pages/checkAvailability.test.js (2 tests) 1ms
+ ✓ src/modules/profiles/pages/batchProgress.test.js (3 tests) 4ms
+ ✓ src/modules/accounts/pages/importResultSummary.test.js (11 tests) 3ms
+ ✓ src/apps/desktop/desktopRoleGuard.test.js (10 tests) 4ms
+ ✓ src/modules/auth/pages/LoginPage.feedbackReachability.test.js (2 tests) 2ms
+ ✓ src/modules/compose/outputScope.test.js (1 test) 1ms
+ ✓ src/apps/cloud/pages/users/TeamsAndCategoriesPage.test.js (7 tests) 2ms
+ ✓ src/modules/compose/reorder.test.js (3 tests) 2ms
+ ✓ src/modules/compose/schemaFields.test.js (6 tests) 2ms
+ ✓ src/modules/transfer/localDownloadEligibility.test.js (5 tests) 2ms
+ ✓ src/modules/compose/createdRange.test.js (2 tests) 7ms
+ ✓ src/shared/ui/resource/opColumnWidth.test.js (5 tests) 2ms
+ ✓ src/proxy.test.js (2 tests) 3ms
+ ✓ src/localSettingsMigrationWiring.test.js (7 tests) 2ms
+ ✓ src/modules/materials/pages/myMaterialsBatch.test.js (2 tests) 3ms
+ ✓ src/modules/compose/attemptSteps.test.js (6 tests) 5ms
+ ✓ src/modules/compose/taskCreationContext.test.js (3 tests) 2ms
+ ✓ src/modules/compose/outputManagement.test.js (5 tests) 5ms
+ ✓ src/modules/proxy/pages/ProxyPage.test.js (8 tests) 2ms
+ ✓ src/filterPanelConvention.test.js (4 tests) 2ms
+ ✓ src/modules/compose/taskGroupOverrides.test.js (2 tests) 2ms
+ ✓ src/localAgentBoundary.test.js (4 tests) 2ms
+ ✓ src/drawerFooterConvention.test.js (4 tests) 2ms
+ ✓ src/proxyOperationBoundary.test.js (4 tests) 3ms
+ ✓ src/modules/public/downloadManifest.test.js (2 tests) 4ms
+ ✓ src/modules/profiles/pages/profileRunningFeedback.test.js (6 tests) 1ms
+ ✓ src/layout/AppLayout.test.js (6 tests) 2ms
+ ✓ src/shared/utils/categories.test.js (3 tests) 2ms
+ ✓ src/shared/ui/resource/descriptionLayout.test.js (4 tests) 2ms
+ ✓ src/modules/compose/labels.test.js (2 tests) 2ms
+ ✓ src/shared/utils/platforms.test.js (5 tests) 2ms
+ ✓ src/modules/compose/operatorFilter.test.js (4 tests) 2ms
+ ✓ src/modules/contentpool/labels.test.js (2 tests) 1ms
+ ✓ src/shared/api/discovery.test.js (1 test) 2ms
+ ✓ src/modules/proxy/pages/importResult.test.js (3 tests) 2ms
+ ✓ src/modules/compose/batchActions.test.js (3 tests) 4ms
+ ✓ src/shared/utils/objectReadUrl.test.js (4 tests) 2ms
+ ✓ src/localAgentStatus.test.js (3 tests) 2ms
+ ✓ src/workEnvPillScanReuse.test.js (4 tests) 2ms
+ ✓ src/modules/compose/uncertainReview.test.js (2 tests) 2ms
+ ✓ src/modules/profiles/pages/proxyAssignmentOutcome.test.js (1 test) 1ms
+ ✓ src/shared/ui/resource/overlayFocus.test.js (1 test) 1ms
+ ✓ src/modules/materials/components/MaterialCover.test.js (3 tests) 1ms
+ ✓ src/shared/utils/executionErrors.test.js (2 tests) 1ms
+ ✓ src/modules/compose/strategyConfig.test.js (2 tests) 2ms
+ ✓ src/apps/cloud/publicRoutes.test.js (1 test) 1ms
+ ✓ src/modules/compose/pages/MyOutputsPage.test.js (6 tests) 2ms
+ ✓ src/modules/compose/components/ComposeRelatedDetail.test.js (2 tests) 2ms
+ ✓ src/resourceSearchLayout.test.js (11 tests) 4ms
+
+ Test Files  134 passed (134)
+      Tests  1000 passed (1000)
+   Start at  04:37:46
+   Duration  8.10s (transform 4.27s, setup 0ms, collect 20.08s, tests 3.27s, environment 14ms, prepare 6.42s)

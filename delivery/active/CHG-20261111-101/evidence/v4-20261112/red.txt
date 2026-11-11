@@ -1,0 +1,31 @@
+
+> wt-media-cloud-web@0.1.0 test:publishing-prototype
+> vitest run --config vite.config.example.js example/proto/publishing-design/tests/*.test.js --reporter=dot
+
+
+ RUN  v3.2.7 /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web
+
+················································································
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  example/proto/publishing-design/tests/taskActions.test.js [ example/proto/publishing-design/tests/taskActions.test.js ]
+Error: Cannot find module '../taskActions.js' imported from '/Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/tests/taskActions.test.js'
+ ❯ example/proto/publishing-design/tests/taskActions.test.js:3:1
+      1| import { describe,it,expect } from 'vitest';
+      2| import { allowedActions, displayStatus, canEditTask } from '../taskExp…
+      3| import { verifyResult, cancelPublication, processHuman, publicWork } f…
+       | ^
+      4| const task=(status='结果待确认')=>({id:1,status,platform:'B站',accountId:1,a…
+      5| describe('V4 10×8 action matrix',()=>{
+
+Caused by: Error: Failed to load url ../taskActions.js (resolved id: ../taskActions.js) in /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web/example/proto/publishing-design/tests/taskActions.test.js. Does the file exist?
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/config.js:22739:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  80 passed (80)
+   Start at  04:25:27
+   Duration  412ms (transform 181ms, setup 0ms, collect 427ms, tests 159ms, environment 1ms, prepare 476ms)

@@ -1,7 +1,7 @@
 ---
 id: CHG-20261111-101
 parent: delivery/milestones/M-publishing-prototype.md#单任务创建与状态化处理
-status: VERIFYING
+status: IMPLEMENTING
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
@@ -11,7 +11,7 @@ risk: M
 
 ## Change
 
-在现有 Cloud `web/example/proto/publishing-design/` 中完成快速发布、任务列表、任务详情一个可操作闭环。以用户本轮整改及本地 `docs/design/publishing.md` §8–9 为依据。仅修复批次/计划的必要联动，不变更业务模型、运行 API、Agent/Desktop 或生产发布能力。
+在现有 Cloud `web/example/proto/publishing-design/` 中完成快速发布、任务列表、任务详情一个可操作闭环。以用户本轮整改及本地 `docs/design/publishing.md` §8–9 为依据。本轮由用户 V4.0 执行包继续整改：仅发布任务 10 状态、8 动作、4 弹窗、新建编辑共享、账号筛选、封面三模式及作品关联。允许对实际存在的 DTO/API/持久化映射修正；不重构计划、批次、账号全局架构，不新增 Agent/Desktop 能力。当前仓库未提供正式发布任务 API/schema，先在现有原型边界内实施并明确真实后端缺口。
 
 执行顺序：审计与截图 → 快速发布单页与恢复 → 统一状态权限及详情 → 列表主动作与返回 → 定向测试、构建、真实浏览器操作 → 修复与证据。
 
@@ -33,3 +33,5 @@ risk: M
 2026-11-11 补充发布任务专项产品与视觉复核，范围为任务列表、快速发布、任务详情及相关弹窗，不含批次和计划。保存 28 张本轮原图与 3 张整改前存档对照，详见 [专项走查报告](evidence/visual-review-20261111/00-走查结论.md) 和 [离线截图索引](evidence/visual-review-20261111/01-截图索引.html)。新增 3 项 P1、8 项 P2 尚待整改：P1 为失败预检提示易误解、缺作品链接时主操作不准确、执行中进度信息靠后。本次未提交任务状态变更，不能将专项体验复核记为全部通过，也不覆盖此前功能操作记录。
 
 保留 VERIFYING：本地原型已可 Review，尚未创建或合并 PR，不代表运行时发布能力交付。`chg start --plan` 初始因 Workspace 既有设计文档未提交及当前分支不符而未通过；为保护用户修改，继续在现有两个 `codex/` 分支实施，通过 `chg resume` 选定上下文，未重置、切换或夹带用户文件。
+
+2026-11-12 V4.0 已开始实施，最新记录见 [V4 实施与验收](evidence/v4-20261112/implementation.md) 及 [逐用例状态](evidence/v4-20261112/case-status.csv)。本地原型 188 项、Cloud Web 1000 项及示例 22 项通过，构建通过。真实 API、作品管理服务和浏览器验收尚未完成，状态为 IMPLEMENTING，不以旧轮次验收替代 V4。
