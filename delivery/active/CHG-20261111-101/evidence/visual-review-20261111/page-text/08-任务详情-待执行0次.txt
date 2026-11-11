@@ -1,0 +1,151 @@
+Browser tab: 85911726, Title: "WT Media · 原型与公共组件", URL: "http://127.0.0.1:8768/example/?view=publishing#tasks".
+0 AXWebArea WT Media · 原型与公共组件, URL: 127.0.0.1:8768/example/?view=publishing#tasks
+	1 container app
+		2 container
+			3 link Description: WT MEDIA, Value: 127.0.0.1:8768/example/
+			4 text 内容运营
+			5 button 发布任务
+			6 button 发布批次
+			7 button 发布计划
+			8 button 图片库
+			9 button 封面模板库
+			10 link Description: 内容生产工作台 ↗, Value: 127.0.0.1:8768/example/proto/content-operations/
+			11 link Description: 发布设计说明 ↗, Value: 127.0.0.1:8768/__docs/workspace/docs/design/publishing.md
+			12 text 交互原型 · 仅本地演示
+			13 text 不会上传或发布到真实平台
+		14 container
+			15 text 内容运营 / 发布任务
+			16 text 原型预览
+			17 heading 发布任务, Value: 1
+				225 text 发布任务
+			226 text 检查发布内容，跟进执行与平台结果。
+			227 button 快速发布
+			21 container
+				22 text 有未完成的快速发布配置。 
+				23 button 继续配置
+			24 button (collapsed) 可复现演示场景（新增虚构数据，保留已有记录）, Secondary Actions: Expand
+				25 text 可复现演示场景（新增虚构数据，保留已有记录）
+			26 container
+				27 text 名称
+				28 text field (settable) 名称, Value: 人工标题保留验收
+			29 container
+				30 text 平台
+				31 container
+					32 text field 平台, Value: 全部平台
+					33 image
+			228 container
+				229 text 执行状态
+				230 container
+					231 text field 执行状态, Value: 全部状态
+					232 image
+			34 button 查询
+			35 button 重置
+			36 button (collapsed) 高级筛选, Secondary Actions: Expand
+				37 image
+				38 text 高级筛选
+			39 container
+				40 table
+					41 row
+						234 cell
+							235 checkbox (settable, integer) 0
+						42 cell
+							43 text ID
+						44 cell
+							45 text 发布内容
+						46 cell
+							47 text 平台 / 类目
+						236 cell
+							237 text 发布账号
+						238 cell
+							239 text 批次 / 计划
+						240 cell
+							241 text 执行状态 / 结果
+						56 cell
+							57 text 操作
+					244 row
+						245 cell
+							246 checkbox (settable, integer) 0
+						247 cell
+							248 text 1820
+						249 cell
+							250 button 查看大图
+								251 image 查看大图
+							252 button 人工标题保留验收
+							253 text 成片 1124 · 01:20
+						254 cell
+							255 text B站
+							256 text 三角洲行动
+						257 cell
+							258 text 游戏魔王嘟嘟
+							259 text 窗口 51
+						260 cell
+							261 text 独立任务
+							262 text 未关联计划
+						263 cell
+							264 text 待执行
+							265 text 未提交
+						266 cell
+							267 container 行操作
+								268 button 启动任务
+								269 button 更多
+				215 text 共 1 条数据
+				216 container
+					217 text field 8 条/页
+					218 image
+				219 image
+				220 content list
+					270 text 1
+				224 image
+		271 container
+			272 container 任务详情 任务 #1820 · 待执行 · 关闭后返回原列表位置 关闭
+				273 text 任务详情
+				274 container
+					275 container 任务关联
+						276 text 发布任务 / 独立任务
+					277 text 任务 #1820 · B站 · 三角洲行动
+					278 heading 人工标题保留验收, Value: 2
+						279 text 人工标题保留验收
+					280 text 游戏魔王嘟嘟 · 窗口 51 · 成片 #1124 · 0 次尝试
+					281 text 待执行
+					282 text 当前进展与下一步
+					283 heading 准备启动任务, Value: 3
+						284 text 准备启动任务
+					285 text 资源与内容检查通过，启动后进入执行队列。
+					286 button 启动任务
+					287 button 更多
+					288 heading 发布前检查, Value: 3
+						289 text 发布前检查
+					290 text 检查通过
+					291 text 账号、成片占用、必填内容与封面版本已通过检查。启动前会再次校验。
+					292 heading 发布内容与封面, Value: 3
+						293 text 发布内容与封面
+					294 text 内容版本 6
+					295 button 发布封面预览 查看封面与各比例效果
+						296 image 发布封面预览
+						297 text 查看封面与各比例效果
+					298 heading 发布标题, Value: 4
+						299 text 发布标题
+					300 text 人工标题保留验收
+					301 heading 简介, Value: 4
+						302 text 简介
+					303 text 结合本条成片整理操作与路线思路。
+					304 definition list
+						305 container 分区 / 标签
+							306 text 分区 / 标签
+						307 text 游戏 · 三角洲行动,游戏攻略
+						308 container 话题
+							309 text 话题
+						310 text #三角洲行动 #游戏攻略
+						311 container 创作声明
+							312 text 创作声明
+						313 text 含AI生成内容
+						314 container 可见范围
+							315 text 可见范围
+						316 text 公开
+						317 container 发布时间
+							318 text 发布时间
+						319 text 启动后尽快提交
+				320 text 任务 #1820 · 待执行 · 关闭后返回原列表位置
+				321 button 关闭
+
+The focused UI element is 272 container 任务详情 任务 #1820 · 待执行 · 关闭后返回原列表位置 关闭

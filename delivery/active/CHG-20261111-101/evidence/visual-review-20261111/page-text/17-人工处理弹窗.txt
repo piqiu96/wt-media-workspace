@@ -1,0 +1,342 @@
+Browser tab: 85911726, Title: "WT Media · 原型与公共组件", URL: "http://127.0.0.1:8768/example/?view=publishing#tasks".
+0 AXWebArea WT Media · 原型与公共组件, URL: 127.0.0.1:8768/example/?view=publishing#tasks
+	1 container app
+		2 container
+			3 link Description: WT MEDIA, Value: 127.0.0.1:8768/example/
+			4 text 内容运营
+			5 button 发布任务
+			6 button 发布批次
+			7 button 发布计划
+			8 button 图片库
+			9 button 封面模板库
+			10 link Description: 内容生产工作台 ↗, Value: 127.0.0.1:8768/example/proto/content-operations/
+			11 link Description: 发布设计说明 ↗, Value: 127.0.0.1:8768/__docs/workspace/docs/design/publishing.md
+			12 text 交互原型 · 仅本地演示
+			13 text 不会上传或发布到真实平台
+		14 container
+			15 text 内容运营 / 发布任务
+			16 text 原型预览
+			17 heading 发布任务, Value: 1
+				225 text 发布任务
+			226 text 检查发布内容，跟进执行与平台结果。
+			227 button 快速发布
+			21 container
+				22 text 有未完成的快速发布配置。 
+				23 button 继续配置
+			24 button (collapsed) 可复现演示场景（新增虚构数据，保留已有记录）, Secondary Actions: Expand
+				25 text 可复现演示场景（新增虚构数据，保留已有记录）
+			26 container
+				27 text 名称
+				28 text field (settable) 名称
+			29 container
+				30 text 平台
+				31 container
+					32 text field 平台, Value: 全部平台
+					33 image
+			228 container
+				229 text 执行状态
+				230 container
+					231 text field 执行状态, Value: 全部状态
+					232 image
+			34 button 查询
+			35 button 重置
+			36 button (collapsed) 高级筛选, Secondary Actions: Expand
+				37 image
+				38 text 高级筛选
+			39 container
+				40 table
+					41 row
+						234 cell
+							235 checkbox (settable, integer) 0
+						42 cell
+							43 text ID
+						44 cell
+							45 text 发布内容
+						46 cell
+							47 text 平台 / 类目
+						236 cell
+							237 text 发布账号
+						238 cell
+							239 text 批次 / 计划
+						240 cell
+							241 text 执行状态 / 结果
+						56 cell
+							57 text 操作
+					242 row
+						243 cell
+							244 checkbox (settable, integer) 0
+						245 cell
+							246 text 1001
+						247 cell
+							248 button 查看大图
+								249 image 查看大图
+							250 button 三角洲实战精彩片段
+							251 text 成片 128 · 00:49
+						252 cell
+							253 text 小红书
+							254 text 三角洲行动
+						255 cell
+							256 text 战术笔记
+							257 text 窗口 41
+						258 cell
+							259 button 小红书 · 首轮内容
+							260 text 游戏内容日常运营
+						261 cell
+							262 text 待执行
+							263 text 未提交
+						264 cell
+							265 container 行操作
+								266 button (disabled) 启动任务
+								267 button 更多
+					268 row
+						269 cell
+							270 checkbox (settable, integer) 0
+						271 cell
+							272 text 1002
+						273 cell
+							274 button 查看大图
+								275 image 查看大图
+							276 button 三角洲新手进阶指南
+							277 text 成片 130 · 00:49
+						278 cell
+							279 text 小红书
+							280 text 三角洲行动
+						281 cell
+							282 text 战术笔记
+							283 text 窗口 41
+						284 cell
+							285 button 小红书 · 首轮内容
+							286 text 游戏内容日常运营
+						287 cell
+							288 text 排队中
+							289 text 未提交
+						290 cell
+							291 container 行操作
+								292 button 查看排队状态
+								293 button 更多
+					294 row
+						295 cell
+							296 checkbox (settable, integer) 0
+						297 cell
+							298 text 1003
+						299 cell
+							300 button 查看大图
+								301 image 查看大图
+							302 button 三角洲实战精彩片段 5
+							303 text 成片 132 · 00:49
+						304 cell
+							305 text 小红书
+							306 text 三角洲行动
+						307 cell
+							308 text 战术笔记
+							309 text 窗口 41
+						310 cell
+							311 button 小红书 · 首轮内容
+							312 text 游戏内容日常运营
+						313 cell
+							314 text 已发布
+							315 text 已公开
+						316 cell
+							317 container 行操作
+								318 button 查看作品
+								319 button 更多
+					320 row
+						321 cell
+							322 checkbox (settable, integer) 0
+						323 cell
+							324 text 1004
+						325 cell
+							326 button 查看大图
+								327 image 查看大图
+							328 button 三角洲新手进阶指南 7
+							329 text 成片 134 · 00:49
+						330 cell
+							331 text 小红书
+							332 text 三角洲行动
+						333 cell
+							334 text 战术笔记
+							335 text 窗口 41
+						336 cell
+							337 button 小红书 · 首轮内容
+							338 text 游戏内容日常运营
+						339 cell
+							340 text 等待人工
+							341 text 未提交
+						342 cell
+							343 container 行操作
+								344 button 去处理
+								345 button 更多
+					346 row
+						347 cell
+							348 checkbox (settable, integer) 0
+						349 cell
+							350 text 1005
+						351 cell
+							352 button 查看大图
+								353 image 查看大图
+							354 button 三角洲实战精彩片段 9
+							355 text 成片 136 · 00:49
+						356 cell
+							357 text B站
+							358 text 三角洲行动
+						359 cell
+							360 text 游戏魔王嘟嘟
+							361 text 窗口 51
+						362 cell
+							363 button B站 · 游戏精选
+							364 text 游戏内容日常运营
+						365 cell
+							366 text 结果待确认
+							367 text 未知
+						368 cell
+							369 container 行操作
+								370 button 核实结果
+								371 button 更多
+					372 row
+						373 cell
+							374 checkbox (settable, integer) 0
+						375 cell
+							376 text 1006
+						377 cell
+							378 button 查看大图
+								379 image 查看大图
+							380 button 三角洲新手进阶指南 11
+							381 text 成片 138 · 00:49
+						382 cell
+							383 text B站
+							384 text 三角洲行动
+						385 cell
+							386 text 游戏魔王嘟嘟
+							387 text 窗口 51
+						388 cell
+							389 button B站 · 游戏精选
+							390 text 游戏内容日常运营
+						391 cell
+							392 text 平台审核中
+							393 text 平台已接收
+						394 cell
+							395 container 行操作
+								396 button 查看审核状态
+								397 button 更多
+					398 row
+						399 cell
+							400 checkbox (settable, integer) 0
+						401 cell
+							402 text 1007
+						403 cell
+							404 button 查看大图
+								405 image 查看大图
+							406 button 三角洲实战精彩片段
+							407 text 成片 128 · 00:49
+						408 cell
+							409 text B站
+							410 text 三角洲行动
+						411 cell
+							412 text 游戏魔王嘟嘟
+							413 text 窗口 51
+						414 cell
+							415 button B站 · 游戏精选
+							416 text 游戏内容日常运营
+						417 cell
+							418 text 已发布
+							419 text 已公开
+						420 cell
+							421 container 行操作
+								422 button 查看作品
+								423 button 更多
+					424 row
+						425 cell
+							426 checkbox (settable, integer) 0
+						427 cell
+							428 text 1008
+						429 cell
+							430 button 查看大图
+								431 image 查看大图
+							432 button 三角洲新手进阶指南
+							433 text 成片 130 · 00:49
+						434 cell
+							435 text B站
+							436 text 三角洲行动
+						437 cell
+							438 text 游戏魔王嘟嘟
+							439 text 窗口 51
+						440 cell
+							441 button B站 · 游戏精选
+							442 text 游戏内容日常运营
+						443 cell
+							444 text 确认失败
+							445 text 确认未发布
+						446 cell
+							447 container 行操作
+								448 button 查看失败原因
+								449 button 更多
+				215 text 共 97 条数据
+				216 container
+					217 text field 8 条/页
+					218 image
+				219 image
+				220 content list
+					450 text 1
+					222 text 2
+					223 text 3
+					451 text 4
+					452 text 5
+					453 text 13
+				224 image
+		455 container
+			456 text 任务详情
+			457 image
+			458 container
+				459 container 任务关联
+					460 text 发布任务 /
+					461 button 小红书 · 首轮内容
+					462 text 所属计划：游戏内容日常运营 · 经批次关联
+				463 text 任务 #1004 · 小红书 · 三角洲行动
+				464 heading 三角洲新手进阶指南 7, Value: 2
+					465 text 三角洲新手进阶指南 7
+				466 text 战术笔记 · 窗口 41 · 成片 #134 · 1 次尝试
+				467 text 等待人工
+				468 text 当前进展与下一步
+				469 heading 需要你处理, Value: 3
+					470 text 需要你处理
+				471 text 账号登录或平台验证需要人工完成，请回到原账号窗口继续。
+				472 button 去处理
+				473 heading 本次执行使用的内容, Value: 3
+					474 text 本次执行使用的内容
+				475 text 内容版本 1
+				476 button 发布封面预览 查看封面与各比例效果
+					477 image 发布封面预览
+					478 text 查看封面与各比例效果
+				479 heading 发布标题, Value: 4
+					480 text 发布标题
+				481 text 三角洲新手进阶指南 7
+				482 definition list
+					483 container 创作声明
+						484 text 创作声明
+					485 text 内容无需标注
+					486 container 可见范围
+						487 text 可见范围
+					488 text 公开
+					489 container 发布时间
+						490 text 发布时间
+					491 text 启动后尽快提交
+				492 heading 执行进展, Value: 3
+					493 text 执行进展
+				494 text 历史样例记录 1 次尝试，未保留步骤明细。
+				495 button (collapsed) 本地演示 · 推进执行场景, Secondary Actions: Expand
+					496 text 本地演示 · 推进执行场景
+			497 container
+				498 container
+					499 text 处理人工验证
+					500 image
+					501 heading 战术笔记 · 窗口 41, Value: 3
+						502 text 战术笔记 · 窗口 41
+					503 text 请在原账号会话完成登录或验证，保留上传与提交现场。
+					504 text 完成后从安全节点继续；若已发生提交，先核实稿件结果。
+					505 text 本地原型仅演示处理后的状态，不会打开真实账号窗口。
+					506 button 稍后处理
+					507 button 已完成处理，继续任务
+			508 text 任务 #1004 · 等待人工 · 关闭后返回原列表位置
+			509 button 关闭
+
+The focused UI element is 0 AXWebArea WT Media · 原型与公共组件, URL: 127.0.0.1:8768/example/?view=publishing#tasks
