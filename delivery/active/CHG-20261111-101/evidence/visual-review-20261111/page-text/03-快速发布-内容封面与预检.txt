@@ -21,7 +21,7 @@ Browser tab: 85911726, Title: "WT Media · 原型与公共组件", URL: "http://
 			19 text 检查发布内容，跟进执行与平台结果。
 			20 button 快速发布
 			21 container
-				22 text 有未完成的快速发布配置。 
+				22 text 有未完成的快速发布配置。
 				23 button 继续配置
 			24 button (collapsed) 可复现演示场景（新增虚构数据，保留已有记录）, Secondary Actions: Expand
 				25 text 可复现演示场景（新增虚构数据，保留已有记录）
@@ -331,7 +331,7 @@ Browser tab: 85911726, Title: "WT Media · 原型与公共组件", URL: "http://
 							329 text field 创作声明 *, Value: 无需声明
 							330 image
 					331 button (collapsed) 更多设置 公开 · 启动后尽快提交, Secondary Actions: Expand
-						332 text 更多设置 
+						332 text 更多设置
 						333 text 公开 · 启动后尽快提交
 					334 container
 						335 heading 发布封面, Value: 4
