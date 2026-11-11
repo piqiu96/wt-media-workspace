@@ -1,0 +1,110 @@
+CHG CHG-20261111-101 risk=M; affected=wt-media-workspace, wt-media-cloud
+wt-media-workspace: /opt/homebrew/opt/python@3.14/bin/python3.14 -m unittest discover -s tests
+....................................................................................................
+== Building and starting Compose scheduler ==
+
+== Building and starting Compose scheduler ==
+
+== Stopping stale Cloud/Agent/Worker processes ==
+
+== Starting Agent on 127.0.0.1:8765 ==
+compose-worker: stopped orphan pid 4512 holding /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpxquk6hhs/wt-media-cloud/.compose/compose-worker.lock
+
+== Building and starting Compose scheduler ==
+
+== Building and starting Compose scheduler ==
+
+== Stopping stale Cloud/Agent/Worker processes ==
+compose-scheduler: stopped pid 4321 from pid file
+
+== Stopping stale Cloud/Agent/Worker processes ==
+compose-scheduler: stopped pid 4321 from pid file
+
+== Building and starting Compose worker ==
+
+== Building and starting Compose scheduler ==
+
+== Building and starting Compose worker ==
+
+== Building and starting Compose scheduler ==
+
+== Verifying Compose scheduler ==
+
+== Verifying Compose scheduler ==
+Compose scheduler: PASS pid=123
+waiting for release.yml run 123
+downloading and checking 6 release assets
+.waiting for release.yml run 123
+downloading and checking 6 release assets
+..........................................................................................
+----------------------------------------------------------------------
+Ran 191 tests in 18.103s
+
+OK
+wt-media-cloud: go test ./internal/modules/...
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/cloudagent	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool	(cached)
+?   	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/dto	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/contentpool/service	(cached)
+?   	github.com/wt-media/wt-media-cloud/internal/modules/files	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/modules/files/model	[no test files]
+?   	github.com/wt-media/wt-media-cloud/internal/modules/files/repository	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/files/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/dto	(cached)
+?   	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/model	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/filetransfer/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/identity/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/localagent	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/mediaaccount/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production/compose	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production/executor	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/production/service	1.367s
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/profilebinding/service	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/dto	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/model	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/proxy/service	(cached)
+?   	github.com/wt-media/wt-media-cloud/internal/modules/slicelibrary/model	[no test files]
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/slicelibrary/repository	(cached)
+ok  	github.com/wt-media/wt-media-cloud/internal/modules/slicelibrary/service	(cached)
+wt-media-workspace: bash bin/control.sh verify
+ERROR: BitBrowser via Agent: cannot check -- 127.0.0.1:8765 is not this script's Agent (the Desktop app's is serving it); start the headless environment with `bin/control.sh start`, or read it from the app
+
+== Verifying local M2-B environment ==
+Cloud: PASS http://127.0.0.1:8188/api/v1/health
+
+== Verifying Local Agent ==
+Agent: PASS http://127.0.0.1:8765/healthz (served by the Desktop app)
+
+== Verifying Cloud worker ==
+Cloud worker: PASS pid=56362
+
+== Verifying Compose worker ==
+Compose worker: PASS pid=56377
+
+== Verifying Compose scheduler ==
+Compose scheduler: fresh
+Compose scheduler: PASS pid=56395
+
+== Verifying BitBrowser through Agent ==
+ERROR wt-media-workspace: command failed with exit 1: bash bin/control.sh verify

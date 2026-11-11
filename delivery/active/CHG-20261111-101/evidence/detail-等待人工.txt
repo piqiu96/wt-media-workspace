@@ -1,0 +1,54 @@
+Browser tab: 85911726, Title: "WT Media · 原型与公共组件", URL: "http://127.0.0.1:8768/example/?view=publishing#tasks".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
++								491 text 体验验收 · 等待人工
++		492 container
++			493 text 任务详情
++			494 container
++				495 container 任务关联
++					496 text 发布任务 / 独立任务
++				497 text 任务 #1929 · B站 · 三角洲行动
++				498 heading 体验验收 · 等待人工, Value: 2
++					499 text 体验验收 · 等待人工
++				500 text 体验验收账号 3 · 窗口 演示 3 · 成片 #1927 · 1 次尝试
++				501 text 等待人工
++				502 text 当前进展与下一步
++				503 heading 需要你处理, Value: 3
++					504 text 需要你处理
++				505 text 本地演示：登录验证需要人工完成，上传现场已保留
++				506 button 去处理
++				507 heading 本次执行使用的内容, Value: 3
++					508 text 本次执行使用的内容
++				509 text 内容版本 1
++				510 button 发布封面预览 查看封面与各比例效果
++					511 image 发布封面预览
++					512 text 查看封面与各比例效果
++				513 heading 发布标题, Value: 4
++					514 text 发布标题
++				515 text 体验验收 · 等待人工
++				516 definition list
++					517 container 分区 / 标签
++						518 text 分区 / 标签
++					519 text 游戏 · 三角洲行动
++					520 container 创作声明
++						521 text 创作声明
++					522 text 内容无需标注
++					523 container 可见范围
++						524 text 可见范围
++					525 text 公开
++					526 container 发布时间
++						527 text 发布时间
++					528 text 启动后尽快提交
++				529 heading 执行进展, Value: 3
++					530 text 执行进展
++				531 content list
++					532 container
++						533 text 01:09:41 本地演示：账号与资源检查完成
++					534 container
++						535 text 01:09:41 进入等待人工
++				536 button (collapsed) 全部执行尝试 · 1 次, Secondary Actions: Expand
++					537 text 全部执行尝试 · 1 次
++				538 button (collapsed) 本地演示 · 推进执行场景, Secondary Actions: Expand
++					539 text 本地演示 · 推进执行场景
++			540 text 任务 #1929 · 等待人工 · 关闭后返回原列表位置
++			541 button 关闭
+The focused UI element is 342 button 体验验收 · 等待人工

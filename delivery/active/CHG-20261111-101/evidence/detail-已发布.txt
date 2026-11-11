@@ -1,0 +1,69 @@
+Browser tab: 85911726, Title: "WT Media · 原型与公共组件", URL: "http://127.0.0.1:8768/example/?view=publishing#tasks".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 494-559
++								491 text 体验验收 · 已发布
+~		492 container
+~			493 text 任务详情
++			494 container
++				495 container 任务关联
++					496 text 发布任务 / 独立任务
++				497 text 任务 #1941 · B站 · 三角洲行动
++				498 heading 体验验收 · 已发布, Value: 2
++					499 text 体验验收 · 已发布
++				500 text 体验验收账号 7 · 窗口 演示 7 · 成片 #1939 · 1 次尝试
++				501 text 已发布
++				502 text 当前进展与下一步
++				503 heading 已公开发布, Value: 3
++					504 text 已公开发布
++				505 text 查看最终作品、发布时间与本次提交使用的内容。
++				506 button 查看作品
++				507 heading 平台结果与证据, Value: 3
++					508 text 平台结果与证据
++				509 definition list
++					510 container 当前结果
++						511 text 当前结果
++					512 text 已公开
++					513 container 成片占用
++						514 text 成片占用
++					515 text 保留当前平台占用
++					516 container 公开发布时间
++						517 text 公开发布时间
++					518 text 2026/11/11 01:09:41
++					519 container 提交时间
++						520 text 提交时间
++					521 text 2026/11/11 01:09:41
++				522 text 本地演示：公开发布结果样例，未关联真实作品链接
++				523 heading 最终发布内容, Value: 3
++					524 text 最终发布内容
++				525 text 内容版本 1
++				526 button 发布封面预览 查看封面与各比例效果
++					527 image 发布封面预览
++					528 text 查看封面与各比例效果
++				529 heading 发布标题, Value: 4
++					530 text 发布标题
++				531 text 体验验收 · 已发布
++				532 definition list
++					533 container 分区 / 标签
++						534 text 分区 / 标签
++					535 text 游戏 · 三角洲行动
++					536 container 创作声明
++						537 text 创作声明
++					538 text 内容无需标注
++					539 container 可见范围
++						540 text 可见范围
++					541 text 公开
++					542 container 发布时间
++						543 text 发布时间
++					544 text 启动后尽快提交
++				545 heading 执行进展, Value: 3
++					546 text 执行进展
++				547 content list
++					548 container
++						549 text 01:09:41 本地演示：账号与资源检查完成
++					550 container
++						551 text 01:09:41 进入已发布
++				552 button (collapsed) 全部执行尝试 · 1 次, Secondary Actions: Expand
++					553 text 全部执行尝试 · 1 次
++			554 text 任务 #1941 · 已发布 · 关闭后返回原列表位置
++			555 button 关闭
+The focused UI element is 446 button 体验验收 · 已发布
