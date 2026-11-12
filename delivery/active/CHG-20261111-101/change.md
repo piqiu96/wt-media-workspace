@@ -35,3 +35,5 @@ risk: M
 保留 VERIFYING：本地原型已可 Review，尚未创建或合并 PR，不代表运行时发布能力交付。`chg start --plan` 初始因 Workspace 既有设计文档未提交及当前分支不符而未通过；为保护用户修改，继续在现有两个 `codex/` 分支实施，通过 `chg resume` 选定上下文，未重置、切换或夹带用户文件。
 
 2026-11-12 V4.0 已开始实施，最新记录见 [V4 实施与验收](evidence/v4-20261112/implementation.md) 及 [逐用例状态](evidence/v4-20261112/case-status.csv)。本地原型 188 项、Cloud Web 1000 项及示例 22 项通过，构建通过。真实 API、作品管理服务和浏览器验收尚未完成，状态为 IMPLEMENTING，不以旧轮次验收替代 V4。
+
+2026-11-12 追加 common / 内容生产视觉对齐及正式运营界面清理，落实列表 ≤5 个操作平铺的用户最新规则，补图片库底图来源守卫。191 项发布任务测试、22 项示例回归及示例构建通过；真实浏览器覆盖八状态和四弹窗证据分支，过程与最终截图分组保存。详见 [本轮视觉与交互报告](evidence/visual-alignment-20261112/00-走查报告.md) 和 [截图索引](evidence/visual-alignment-20261112/01-截图索引.html)。不覆盖用户既有 review.md 与设计文档修改；未将真实 API / 执行器 / 平台查询缺口记为完成，保持 IMPLEMENTING。

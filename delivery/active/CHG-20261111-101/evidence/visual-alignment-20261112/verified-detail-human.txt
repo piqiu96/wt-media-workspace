@@ -1,0 +1,52 @@
+- generic: 任务详情
+- article:
+  - navigation:
+    - text: 发布任务 /
+    - generic: 独立任务
+  - heading "体验验收 · 等待人工" [level=2]
+  - paragraph: "任务 #1668"
+  - generic "等待人工"
+  - strong: 等待人工
+  - paragraph: 本地演示：登录验证需要人工完成，上传现场已保留
+  - heading "任务摘要" [level=3]
+  - term: 发布平台 / 类目
+  - definition: B站 · 三角洲行动
+  - term: 发布账号
+  - definition: 体验验收账号 3
+  - term: 来源成片
+  - definition: "#1666"
+  - term: 创建时间
+  - definition: 2026/11/12 14:47:45
+  - term: 最近更新
+  - definition: 2026/11/12 14:47:45
+  - heading "发布内容" [level=3]
+  - generic: 内容版本 1
+  - button "发布封面":
+    - img "发布封面"
+  - term: 标题
+  - definition: 体验验收 · 等待人工
+  - term: 正文 / 简介
+  - definition: 未填写（选填）
+  - term: 封面方式
+  - definition: 现成封面
+  - term: 标签
+  - definition: 三角洲行动
+  - term: 创作声明
+  - definition: 内容无需标注
+  - term: 分区
+  - definition: 游戏
+  - term: 可见范围
+  - definition: 公开
+  - heading "执行历史" [level=3]
+  - generic "第 1 次 · 内容版本 1 · 等待人工"
+  - paragraph:
+    - time: 2026/11/12 14:47:45
+    - text: 本地演示：账号与资源检查完成
+  - paragraph:
+    - time: 2026/11/12 14:47:45
+    - text: 进入等待人工
+- generic: "任务 #1668 · 等待人工 · 关闭后返回原列表位置"
+- button "去处理":
+  - generic: 去处理
+- button "关闭":
+  - generic: 关闭

@@ -1,0 +1,44 @@
+- generic: 任务详情
+- article:
+  - navigation:
+    - text: 发布任务 /
+    - button "小红书 · 首轮内容" [active]:
+      - generic: 小红书 · 首轮内容
+  - heading "三角洲实战精彩片段 5" [level=2]
+  - paragraph: "任务 #1003"
+  - generic "执行中"
+  - strong: 执行中
+  - paragraph: 执行器正在处理，请关注实际阶段反馈。
+  - generic: 当前阶段：等待执行器反馈
+  - heading "任务摘要" [level=3]
+  - term: 发布平台 / 类目
+  - definition: 小红书 · 三角洲行动
+  - term: 发布账号
+  - definition: 战术笔记
+  - term: 来源成片
+  - definition: "#132"
+  - term: 创建时间
+  - definition: 2026/11/10 10:30:00
+  - term: 最近更新
+  - definition: 尚无记录
+  - heading "发布内容" [level=3]
+  - generic: 内容版本 1
+  - button "发布封面":
+    - img "发布封面"
+  - term: 标题
+  - definition: 三角洲实战精彩片段 5
+  - term: 正文 / 简介
+  - definition: 三角洲实战精彩片段 5
+  - term: 封面方式
+  - definition: 现成封面
+  - term: 话题
+  - definition: 未填写（选填）
+  - term: 创作声明
+  - definition: 不添加特殊声明（原型设置）
+  - term: 可见范围
+  - definition: 公开
+  - heading "执行历史" [level=3]
+  - paragraph: 任务尚未执行
+- generic: "任务 #1003 · 执行中 · 关闭后返回原列表位置"
+- button "关闭":
+  - generic: 关闭
