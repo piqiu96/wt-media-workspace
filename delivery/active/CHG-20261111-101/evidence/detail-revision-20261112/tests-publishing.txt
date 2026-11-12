@@ -1,0 +1,21 @@
+
+> wt-media-cloud-web@0.1.0 test:publishing-prototype
+> vitest run --config vite.config.example.js example/proto/publishing-design/tests/*.test.js
+
+
+ RUN  v3.2.7 /Users/aqiuye/Develop/workspace/wt-media/wt-media-cloud/web
+
+ ✓ example/proto/publishing-design/tests/content.test.js (7 tests) 19ms
+ ✓ example/proto/publishing-design/tests/model.test.js (14 tests) 21ms
+ ✓ example/proto/publishing-design/tests/covers.test.js (7 tests) 58ms
+ ✓ example/proto/publishing-design/tests/libraries.test.js (6 tests) 24ms
+ ✓ example/proto/publishing-design/tests/taskActions.test.js (98 tests) 24ms
+ ✓ example/proto/publishing-design/tests/relationships.test.js (37 tests) 42ms
+ ✓ example/proto/publishing-design/tests/taskDetailComponent.test.js (14 tests) 32ms
+ ✓ example/proto/publishing-design/tests/taskExperience.test.js (12 tests) 5ms
+
+ Test Files  8 passed (8)
+      Tests  195 passed (195)
+   Start at  16:47:27
+   Duration  588ms (transform 182ms, setup 0ms, collect 688ms, tests 226ms, environment 1ms, prepare 565ms)
+
