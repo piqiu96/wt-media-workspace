@@ -6,9 +6,9 @@
 
 ## 页面实施基线
 
-业务路由：`/example/operations/tools/images`、`/example/operations/tools/templates`。下列本机预览地址仅供阅读，可按开发环境更换主机和端口；源码及路由是校验依据。
+业务路由：`/example/operations/tools/images`、`/example/operations/tools/templates`。先启动 Cloud 原型服务，使用启动输出中的实际访问地址打开上述路由；主机和端口以本次启动结果为准。源码及业务路由是校验依据。
 
-已验收原型：[图片库](http://127.0.0.1:8768/example/operations/tools/images)、[封面模板及编辑器](http://127.0.0.1:8768/example/operations/tools/templates)，发布使用端沿用任务与批次原型。源码：[Cloud publishing-design](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design) 的 `ImageLibraryDetail.vue`、`CoverTemplateManager.vue`、`CoverTemplateWorkspace.vue`；编辑器另参照[专项交互](../../docs/design/cover-templates.md)。
+已验收原型：图片库、封面模板及编辑器，发布使用端沿用任务与批次原型。源码：[Cloud publishing-design](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design) 的 `ImageLibraryDetail.vue`、`CoverTemplateManager.vue`、`CoverTemplateWorkspace.vue`；编辑器另参照[专项交互](../../docs/design/cover-templates.md)。
 
 公共前端规范：[AdminUI](../../docs/standards/frontend/AdminUI页面规范.md)、[交互](../../docs/standards/frontend/前端交互规范.md)、[视觉与组件](../../docs/standards/frontend/前端架构与视觉规范.md)。
 

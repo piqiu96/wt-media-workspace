@@ -15,7 +15,7 @@
 | 正式实施与验收 | [发布 Milestone 路线](../../delivery/milestones/README.md#发布管理实施路线)、[Delivery](../../delivery/LEDGER.md) |
 | 已验收原型的证据 | [任务与批次](../../delivery/completed/CHG-20261111-101/change.md)、[计划](../../delivery/completed/CHG-20261113-101/change.md)、[统一详情](../../delivery/completed/CHG-20261114-101/change.md)、[封面模板](../../delivery/completed/CHG-20261114-102/change.md)；仅证明原型交付 |
 
-统一原型：[内容运营工作台](http://127.0.0.1:8768/example/operations/production/materials)。计划、批次、任务分别位于 `/example/operations/publishing/plans`、`/batches`、`/tasks`；图片和模板位于 `/example/operations/tools/images`、`/templates`。旧 `?view=publishing` 仅保留兼容跳转。
+统一原型：内容运营工作台，业务路由为 `/example/operations/production/materials`。预览先启动 Cloud 原型服务，使用启动输出中的实际访问地址，主机和端口以本次启动结果为准。计划、批次、任务分别位于 `/example/operations/publishing/plans`、`/batches`、`/tasks`；图片和模板位于 `/example/operations/tools/images`、`/templates`。旧 `?view=publishing` 仅保留兼容跳转。
 
 源码唯一维护在 [Cloud web/example/proto/publishing-design](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design)。Workspace 不复制运行时代码。菜单包含内容生产、发布管理、运营工具；作品和互动暂缓迁入。成片单选带入快速发布，多选带入批次配置，保留生产数据和原人工评审意见。
 

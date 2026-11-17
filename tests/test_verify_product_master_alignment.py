@@ -363,10 +363,13 @@ class ProductMasterAlignmentTests(unittest.TestCase):
                 for filename in self.module.PUBLISHING_CARDS.values():
                     path = root / "delivery" / "milestones" / filename
                     text = path.read_text(encoding="utf-8")
+                    self.assertNotRegex(text, r"https?://(?:127\.0\.0\.1|localhost)(?::\d+)?/")
                     if preview:
-                        text = text.replace("http://127.0.0.1:8768", preview)
-                    else:
-                        text = re.sub(r"\[([^]]+)\]\(http://127\.0\.0\.1:8768/[^)]+\)", r"\1", text)
+                        route = re.search(r"`(/example/operations/[^`]+)`", text)
+                        self.assertIsNotNone(route)
+                        text += f"\n[本次启动的预览地址]({preview}{route.group(1)})\n"
+                        self.assertIn(preview, text)
+                    self.assertIn("/tree/main/web/", text)
                     text = text.replace("/tree/main/web/", "/tree/" + "a" * 40 + "/web/")
                     path.write_text(text, encoding="utf-8")
                 self.assertEqual(self.module.validate_alignment(root), [])
