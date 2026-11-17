@@ -9,13 +9,17 @@
 | 主题 | 工作稿 |
 | --- | --- |
 | 内容运营整体导航 | [内容运营](content-operations.md) |
-| 发布管理：任务 / 单平台批次 / 仅批次计划及 AI 内容配置 | [发布管理](publishing.md) — 计划只规划并管理批次进展与推进，不直接执行发布、不关联独立任务；批次负责资源、内容与执行；包含图片库、封面模板、AI 批量内容生产与任务结果闭环 |
+| 发布管理：产品与原型入口 | [PRD 第六章](../product/prd/详细文档/第六章_发布管理.md)维护最终产品规则；[发布管理导航](publishing.md)保留专项交互、待对齐项与平台调研 |
+| 运营工具 → 图片库 | [PRD 6.6](../product/prd/详细文档/第六章_发布管理.md#66-图片库)维护上传、查找、启停与引用规则；[原型入口](publishing.md) |
+| 运营工具 → 封面模板 | [PRD 6.7](../product/prd/详细文档/第六章_发布管理.md#67-封面模板)维护模板业务；[编辑器专项交互](cover-templates.md)保留画布、图层与属性交互 |
 | 作品观察与爆款复刻 | [作品管理](works.md) |
 | 主动互动与评论处理 | [互动管理](interaction.md) |
 | 内容挖掘与逐页评审 | [内容挖掘](content-mining.md) |
 | 已确认内容生产的阅读入口 | [内容生产导航](content-production.md)（仅导航，不重新打开已确认设计） |
 
-原型源码统一由 [Cloud web/example](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example) 维护。旧原型原样迁移，新原型与正在修改的页面逐步引用正式公共组件。文档与正式产品来源使用本仓相对链接。
+原型源码统一由 [Cloud web/example](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example) 维护。保留已确认的交互结果，新原型与正在修改的页面逐步引用正式公共组件。文档与正式产品来源使用本仓相对链接。
+
+内容运营现统一在[发布管理原型](http://127.0.0.1:8768/example/operations/production/materials)：内容生产、发布管理、运营工具共用导航与标准路径；运营概览和旧发布管理已退出，作品与互动暂缓迁移。纯原型工作在既有主题中维护，不新建 CHG。
 
 ## 完成与退出
 

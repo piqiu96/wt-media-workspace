@@ -6,6 +6,11 @@
 __pycache__/
 .DS_Store
 .local/secrets/*.env
+# 发布原型过程产物仅在临时目录使用，最终结论保存在 change.md。
+delivery/active/CHG-20261111-101/evidence/
+delivery/active/CHG-20261113-101/evidence/
+delivery/active/CHG-20261114-101/evidence/
+delivery/active/CHG-20261114-102/evidence/
 # Generated skill copies distributed by `scripts/sync_skills.py`;
 # rebuild with that script instead of committing them.
 .claude
