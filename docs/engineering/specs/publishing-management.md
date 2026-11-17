@@ -410,7 +410,7 @@ UNIQUE (platform, executing_account_uid)
 
 ### 3.7 本地存储
 
-Agent 在现有 SQLite 中维护 `publication_draft`，唯一键为环境、当前用户和 `plan/batch/task` 类型，保存 `payload_json/schema_version/saved_at`。覆盖同一份续编输入，不保留草稿历史或状态机。环境和用户来自 Desktop／Agent 已建立的上下文，不接受前端任意指定他人身份。
+Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也使用自增主键 `id INTEGER PRIMARY KEY AUTOINCREMENT`**；另加 `UNIQUE(environment,user_id,draft_type)`，保证同一环境、用户、类型只保留一份。`environment/user_id/draft_type/payload_json/saved_at` 为必填 TEXT，`schema_version INTEGER NOT NULL DEFAULT 1`。`draft_type` 只允许 plan、batch、task；保存时按组合唯一键更新原行，不建草稿历史或状态机。环境与用户取自当前已认证上下文，前端不能指定别人的身份。
 
 发布执行复用 checkpoint/outbox 的存储方式，与续编分开。记录键区分业务域，避免下载与发布的任务 ID 相互覆盖；适配层保存 Cloud task/attempt 映射。补报循环仅发送原结果，检查点用于识别已发生阶段，不能据其存在自动恢复提交。原现场丢失时进入核实，不伪造可继续执行的现场。
 
@@ -542,6 +542,26 @@ Agent 先持久化领取与提交边界，最终结果和 outbox 同事务写入
 | 图片库 | `/image-assets` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`select-background` | 上传和资源访问仍复用 files；按 file_id 登记防重，选底图仅返回固定选择、不预占、不立即建立任务引用 |
 | 模板 | `/cover-templates` 新建／查询；草稿保存、`validate`、`publish`、`usage`、`copy` 及合法删除 | 校验不发布，发布不启用；内容与启停分开；复制有明确的新规格适配职责 |
 | 统计与记录 | 计划统计、各主体操作记录及任务尝试分页 | 聚合同一事实，不重复建设统计写入；复制取已有详情在新建表单填充，不另建复制任务 API |
+
+#### 关键接口在编码前需要明确哪些字段
+
+**现在尚无正式发布 Contract，不能只靠未来代码猜测接口。** 下表固定会影响多端协作的最少字段；其他筛选和表单字段按 PRD 与平台配置整理。实施对应 CHG 时，由 Cloud／Agent 的提供方发布正式 OpenAPI／Schema，再由消费者生成或锁定版本；不要在 Workspace 维护第二套可写契约。
+
+| 操作 | 必要输入 | 主要返回 | 必须拒绝的情况 |
+| --- | --- | --- | --- |
+| 创建计划 `POST /publication-plans` | `request_key,name,date_start/date_end,goals,batches` | `id,revision,batch_ids,status` | 同键异输入、目标矩阵不守恒、无权操作 |
+| 确认批次 `POST /publication-batches/{id}/confirm` | `expected_revision,included_row_keys,excluded_row_keys,allow_shortfall,expected_shortfalls` | `batch_id,revision,task_ids,target_count,created_count,creation_shortfall` | 资源／文件已变化、占用冲突、实际缺口与确认值不同 |
+| 快速创建任务 `POST /publications` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
+| 修改待执行任务 `PUT /publications/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
+| 首次启动／人工继续 `start、confirm-next` | `expected_revision`；继续还需 `expected_current_batch_id,next_batch_id` | `status,current_batch_id,revision` | 任务未决、未准备好、阈值需确认、位置已变化 |
+| Agent 领取 `claim` | `request_key`；执行用户从认证令牌获取 | `task_id,attempt_id,input_snapshot,platform_uid,profile_id,file_ids/digests,download_urls,not_before` | 无有效授权、账号或 Profile 忙、资源身份不符 |
+| Agent 完成 `complete` | `attempt_id,report_seq,result_hash,result,evidence` | `task_status,attempt_status` | 非当前 attempt、序号过期、同键结果冲突 |
+| 核实／补录 `POST /publications/{id}/resolve` | `attempt_id,expected_revision,conclusion,evidence`；确认公开还需 `platform_work_id/work_url,published_at` | `task_status,work_id/work_url,revision` | 不能证明公开、冲突作品身份、历史尝试不匹配 |
+
+创建类使用 `request_key`，同键同内容必须返回原结果；修改类使用 `expected_revision`，冲突时返回当前修订以便重新加载。ID 一律是十进制字符串；时间使用 RFC3339。失败响应沿用既有 `errcode/message/data/logid`，`data` 应包含可定位的冲突行、字段或原因，不允许返回假成功。具体枚举和错误码由提供方 Contract 最终定义。
+
+例如确认部分创建不是“能成功几条就悄悄创建几条”，必须明确列出本次包含与排除的候选及预期缺口。旧请求重放时，服务端返回上次已创建的结果，而不是重新占用成片。
+
 
 ### 5.3 执行端与本机接口
 
