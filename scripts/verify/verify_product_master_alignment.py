@@ -59,9 +59,9 @@ def forbid_all(errors: list[str], block: str, label: str, needles: tuple[str, ..
 def validate_master_text(text: str) -> list[str]:
     errors: list[str] = []
     sections = milestone_sections(text)
-    if set(sections) != set(range(11)):
+    if set(sections) != {*range(8), 10}:
         errors.append(
-            "Master milestone set mismatch: expected M0-M10, "
+            "Master milestone set mismatch: expected M0-M7 and M10 (M8/M9 retired), "
             f"got {', '.join(f'M{number}' for number in sorted(sections)) or 'none'}"
         )
         return errors
@@ -76,7 +76,7 @@ def validate_master_text(text: str) -> list[str]:
         3: "DONE",
         4: "DONE",
         5: "DONE",
-        **{number: "NOT_STARTED" for number in range(6, 11)},
+        **{number: "NOT_STARTED" for number in (6, 7, 10)},
     }
     statuses: dict[int, str | None] = {}
     for number, expected in expected_statuses.items():
@@ -96,7 +96,7 @@ def validate_master_text(text: str) -> list[str]:
     # silent PASS that certifies a milestone the check never read). Reporting
     # the missing block is what turns that second silence into an error.
     for number in sorted(sections):
-        if statuses[number] == "DONE" or number in (8, 9):
+        if statuses[number] == "DONE":
             continue
         if not candidate_block(sections[number]).strip():
             errors.append(
@@ -177,12 +177,6 @@ def validate_master_text(text: str) -> list[str]:
                 if re.search(rf"\b{excluded}\s+`DONE`", dependency_row.group(1)):
                     errors.append(f"{name} depends on excluded {excluded}")
 
-    for number in (8, 9):
-        section = sections[number]
-        errors.extend(require_all(section, ("退出当前未来实施路线",), f"M{number} route exclusion"))
-        if candidate_block(section).strip():
-            errors.append(f"M{number} is outside the current route but carries candidate CHGs")
-
     errors.extend(require_all(candidate_block(sections[6]), ("浏览器自动提交",), "M6 candidate"))
     errors.extend(require_all(sections[6], ("审核中不算公开成功", "断网后必须核实且不重复投稿"), "M6 gate"))
     for name in ("M6", "M7", "M-publishing-plan", "M-publishing-operations", "M10"):
@@ -253,6 +247,20 @@ def validate_publishing_cards(root: Path) -> list[str]:
             "系统与平台动作", "同时成立才算完成", "必须排除的假成功",
             "工作内容及仓库", "直接依赖", "可独立验证的完成条件", *candidates,
         ), filename))
+        ui_routes = {
+            "M6-single-publishing.md": ("publishing/tasks", "production/outputs"),
+            "M7-batch-publishing.md": ("publishing/batches",),
+            "M-publishing-plan.md": ("publishing/plans",),
+            "M-publishing-operations.md": ("tools/images", "tools/templates"),
+        }
+        errors.extend(require_all(card, (
+            "https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design",
+            "../../docs/standards/frontend/AdminUI页面规范.md",
+            "../../docs/standards/frontend/前端交互规范.md",
+            "../../docs/standards/frontend/前端架构与视觉规范.md",
+            "README.md#页面实施与验收基线", "实际页面与原型的一致性检查", "产品负责人裁定",
+            *(f"http://127.0.0.1:8768/example/operations/{route}" for route in ui_routes[filename]),
+        ), f"{filename} UI baseline"))
         if dependency:
             errors.extend(require_all(card, (f"]({dependency})",), f"{filename} dependency"))
         for target in re.findall(r"\]\(([^)]+)\)", card):
@@ -261,6 +269,21 @@ def validate_publishing_cards(root: Path) -> list[str]:
             relative = target.partition("#")[0]
             if relative and not (path.parent / relative).is_file():
                 errors.append(f"{filename} links missing file: {relative}")
+    return errors
+
+
+def validate_publishing_retirement(root: Path) -> list[str]:
+    """Reject retired planning files and current references; leave archives immutable."""
+    errors: list[str] = []
+    retired = "M-publishing-prototype.md"
+    if (root / "delivery" / "milestones" / retired).exists():
+        errors.append("Retired prototype milestone must not exist")
+    current = {root / "delivery" / "MASTER_IMPLEMENTATION_PLAN.md", root / "AGENT-INDEX.md", root / "README.md"}
+    for directory in ("docs", "delivery/milestones", "delivery/active", "delivery/planned"):
+        current.update((root / directory).rglob("*.md"))
+    for path in sorted(current):
+        if path.is_file() and path.name != retired and retired in path.read_text(encoding="utf-8"):
+            errors.append(f"Current document references retired prototype: {path.relative_to(root).as_posix()}")
     return errors
 
 
@@ -393,6 +416,12 @@ def validate_alignment(root: Path = ROOT) -> list[str]:
     )
     errors.extend(validate_master_text(master))
     errors.extend(validate_publishing_cards(root))
+    errors.extend(validate_publishing_retirement(root))
+    milestone_index = (root / "delivery" / "milestones" / "README.md").read_text(encoding="utf-8")
+    errors.extend(require_all(milestone_index, (
+        "## 页面实施与验收基线", "CHG 必须在 References 引用", "实际页面与同一原型基线逐项对照",
+        "原型提交", "产品负责人裁定后再修改原型", "不得绕开原型重新设计",
+    ), "Publishing UI implementation policy"))
     errors.extend(validate_active_change(root))
     errors.extend(validate_product_identity(root))
 

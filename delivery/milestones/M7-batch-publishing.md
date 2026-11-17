@@ -4,6 +4,14 @@
 - 依据：[PRD 第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.3、6.5、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md) §2.1—2.5、§4—6。
 - 依赖：[M6](M6-single-publishing.md) `DONE`；同批跨用户范围见[待裁定事项](README.md#待裁定事项)，先用同一所属用户的多个账号验证，不禁止未来混合归属。
 
+## 页面实施基线
+
+已验收原型：[批次列表、资源/内容配置、结果总览及详情](http://127.0.0.1:8768/example/operations/publishing/batches)。源码：[Cloud publishing-design](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design) 的 `BatchManager.vue`、`BatchWorkbench.vue`、`BatchContentWorkspace.vue`、`BatchDetailContent.vue`。
+
+公共前端规范：[AdminUI](../../docs/standards/frontend/AdminUI页面规范.md)、[交互](../../docs/standards/frontend/前端交互规范.md)、[视觉与组件](../../docs/standards/frontend/前端架构与视觉规范.md)。
+
+页面布局、交互和视觉继承上述原型。涉及正式页面的 CHG 按[页面实施与验收要求](README.md#页面实施与验收基线)引用具体原型入口，验收包含实际页面与原型的一致性检查；差异先由产品负责人裁定，不另行设计一套界面。
+
 ## 从一组资源到批次结果
 
 | 要回答的问题 | 本阶段交付 |

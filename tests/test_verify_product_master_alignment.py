@@ -96,13 +96,12 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         )
 
     def test_rejects_reactivated_interaction_or_analytics_candidates(self) -> None:
-        sections = self.module.milestone_sections(self.master)
         for number in (8, 9):
             with self.subTest(milestone=number):
-                old = sections[number]
                 self.assert_errors(
-                    self.mutate(old, old + f"\n候选 CHG：\n\n```text\nM{number}-C1 恢复旧实施\n```\n"),
-                    [f"M{number} is outside the current route but carries candidate CHGs"],
+                    self.mutate("### M10：", f"### M{number}：旧计划\n\n候选 CHG：\n\n```text\nM{number}-C1 旧实施\n```\n\n### M10："),
+                    ["Master milestone set mismatch: expected M0-M7 and M10 (M8/M9 retired), "
+                     f"got {', '.join(f'M{i}' for i in sorted([*range(8), number, 10]))}"],
                 )
 
     def test_rejects_unfinished_milestone_without_candidate_block(self) -> None:
@@ -171,6 +170,42 @@ class ProductMasterAlignmentTests(unittest.TestCase):
             "M7-batch-publishing.md dependency missing '](M6-single-publishing.md)'",
             "M7-batch-publishing.md links missing file: missing.md",
         ]))
+
+    def test_rejects_missing_ui_baseline(self) -> None:
+        import shutil
+        root = Path(self.tmp.name)
+        shutil.copytree(ROOT / "delivery" / "milestones", root / "delivery" / "milestones")
+        (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
+        (root / "delivery" / "completed").symlink_to(ROOT / "delivery" / "completed", target_is_directory=True)
+        card = root / "delivery" / "milestones" / "M6-single-publishing.md"
+        old = "http://127.0.0.1:8768/example/operations/publishing/tasks"
+        text = card.read_text(encoding="utf-8")
+        self.assertIn(old, text)
+        card.write_text(text.replace(old, "http://127.0.0.1:8768/example/operations/other"), encoding="utf-8")
+        self.assertEqual(self.module.validate_publishing_cards(root), [
+            f"M6-single-publishing.md UI baseline missing {old!r}",
+        ])
+
+    def test_retired_prototype_is_absent_and_not_referenced_by_current_docs(self) -> None:
+        root = Path(self.tmp.name)
+        milestones = root / "delivery" / "milestones"
+        milestones.mkdir(parents=True)
+        retired = milestones / "M-publishing-prototype.md"
+        retired.write_text("old prototype", encoding="utf-8")
+        self.assertEqual(self.module.validate_publishing_retirement(root), [
+            "Retired prototype milestone must not exist",
+        ])
+        retired.unlink()
+        current = milestones / "README.md"
+        current.write_text("[old](M-publishing-prototype.md)", encoding="utf-8")
+        self.assertEqual(self.module.validate_publishing_retirement(root), [
+            "Current document references retired prototype: delivery/milestones/README.md",
+        ])
+        current.unlink()
+        archive = root / "delivery" / "completed" / "old"
+        archive.mkdir(parents=True)
+        (archive / "change.md").write_text("[historical](../../milestones/M-publishing-prototype.md)", encoding="utf-8")
+        self.assertEqual(self.module.validate_publishing_retirement(root), [])
 
     def _active_root(self, status: str, ledger_status: str | None = None) -> Path:
         """A minimal, otherwise-valid active CHG whose status line is `status`.
