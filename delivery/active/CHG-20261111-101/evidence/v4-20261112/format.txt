@@ -1,4 +1,0 @@
-example/proto/publishing-design/QuickPublish.vue 149ms
-example/proto/publishing-design/App.vue 184ms (unchanged)
-example/proto/publishing-design/taskExperience.js 6ms
-example/proto/publishing-design/tests/taskActions.test.js 6ms

@@ -9,17 +9,19 @@
 | 用户流程、字段、权限、状态与动作、产品验收 | [PRD 第五章：素材生产](../product/prd/详细文档/第五章_素材生产.md) |
 | 表结构、接口、Cloud 执行、幂等、并发与恢复 | [内容生产工程设计](../engineering/specs/2026-09-24-m4-m5-cloud-content-production.md) |
 | 与旧规则的取舍及替代关系 | [ADR-0031](../decisions/0031-content-production-batches-and-manual-reproduction.md) |
-| 操作与体验 | [完整原型](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/index.html#materials) · [内容生产逐页评审](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/review.html?scope=production#page-review) |
+| 操作与体验 | [完整原型](http://127.0.0.1:8768/example/operations/production/materials) · [内容生产逐页评审](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/review.html?scope=production#page-review) |
 | 公共页面、视觉与交互规范 | [正式规范](../standards/frontend/README.md) · [common 示例](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/common/index.html) |
 
 ## 原型导航
 
+内容生产现并入发布管理统一原型，源码维护在 Cloud `web/example/proto/publishing-design/production/`；原评审工具与人工意见保留。
+
 | 页面 | 重点核对 |
 | --- | --- |
-| [素材库](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/index.html#materials)／[我的素材](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/index.html#mine) | 加入与准备分离、我的使用／团队使用、视频与本机状态 |
-| [合成策略](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/index.html#strategies) | 多组成片设置、模板参数、选材依据、立即执行预览与防重复 |
-| [合成任务](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/index.html#tasks) | 任务批次详情、整体进度、新建选材与参数调整、执行记录及恢复 |
-| [成片管理](https://github.com/piqiu96/wt-media-cloud/blob/main/web/example/proto/content-operations/index.html#outputs) | 按素材 ID 聚合、成片列表、视频信息、再次制作及去发布 |
+| [素材库](http://127.0.0.1:8768/example/operations/production/materials)／[我的素材](http://127.0.0.1:8768/example/operations/production/mine) | 加入与准备分离、我的使用／团队使用、视频与本机状态 |
+| [合成策略](http://127.0.0.1:8768/example/operations/production/strategies) | 多组成片设置、模板参数、选材依据、立即执行预览与防重复 |
+| [合成任务](http://127.0.0.1:8768/example/operations/production/tasks) | 任务批次详情、整体进度、新建选材与参数调整、执行记录及恢复 |
+| [成片管理](http://127.0.0.1:8768/example/operations/production/outputs) | 按素材 ID 聚合、成片列表、视频信息、再次制作及去发布 |
 
 成片“去发布”和发布任务“新建发布任务”共用表单，区别是是否带入成片；其入口约定见 PRD §5.9.12。发布计划、后续执行与作品／互动的完整设计继续由各模块维护，不因内容生产完成而一并标记验收。
 

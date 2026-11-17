@@ -792,7 +792,7 @@ Codex 每次必须按 `AGENT-INDEX.md` §4 的**读取顺序**执行——该节
 - 必要产品、工程、协议和决策基线已回写；
 - PRD 功能完整性：本 CHG 涉及的全部 PRD 功能点已逐条对照，且已实现或已记录暂缓（含原因和影响分析）；
 - 受影响仓库独立 Commit；
-- `delivery/active/<CHG>/evidence/` 目录存在非空证据文件；
+- 验证结论及对应基线可从 `change.md`、PR／CI 或按风险保留的 `evidence/` 核对；不要求保存原始截图、日志或过程副本；
 - `delivery/active` 和 `delivery/LEDGER.md` 不保留已完成 CHG 作为长期归档。
 
 ### 里程碑门禁 — DONE
