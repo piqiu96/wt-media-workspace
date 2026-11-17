@@ -6,6 +6,8 @@
 
 ## 页面实施基线
 
+业务路由：`/example/operations/publishing/plans`。下列本机预览地址仅供阅读，可按开发环境更换主机和端口；源码及路由是校验依据。
+
 已验收原型：[计划列表、新建、详情及计划内批次查看](http://127.0.0.1:8768/example/operations/publishing/plans)。源码：[Cloud publishing-design](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design) 的 `PlanPage.vue` 与 `plan/`；配置和任务处理复用原型中的批次、任务入口。
 
 公共前端规范：[AdminUI](../../docs/standards/frontend/AdminUI页面规范.md)、[交互](../../docs/standards/frontend/前端交互规范.md)、[视觉与组件](../../docs/standards/frontend/前端架构与视觉规范.md)。

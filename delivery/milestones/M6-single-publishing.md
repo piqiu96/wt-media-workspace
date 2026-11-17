@@ -7,6 +7,8 @@
 
 ## 页面实施基线
 
+业务路由：`/example/operations/publishing/tasks`、`/example/operations/production/outputs`。下列本机预览地址仅供阅读，可按开发环境更换主机和端口；源码及路由是校验依据。
+
 已验收原型：[任务列表、快速发布与任务详情](http://127.0.0.1:8768/example/operations/publishing/tasks)，以及[成片带入入口](http://127.0.0.1:8768/example/operations/production/outputs)。源码：[Cloud publishing-design](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design) 的 `PublishingTaskPage.vue`、`QuickPublish.vue`、`TaskDetail.vue`。
 
 公共前端规范：[AdminUI](../../docs/standards/frontend/AdminUI页面规范.md)、[交互](../../docs/standards/frontend/前端交互规范.md)、[视觉与组件](../../docs/standards/frontend/前端架构与视觉规范.md)。
