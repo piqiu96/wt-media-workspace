@@ -10,6 +10,8 @@ This file is the index. Every other `*.md` in this directory must be listed belo
 
 ## Current capability designs
 
+- [发布管理与运营工具工程设计](publishing-management.md)：六表与三端职责、正式创建、浏览器发布、计划推进、生成与文件引用保护；三项产品范围选择集中标记待裁定，不代表能力已经实现。
+
 - [社媒账号：数据、接口与本机执行](social-accounts.md)：矩阵维护、人工登录识别、CK 明细、写前保护与单表 JSON 接入批次；ADR-0030。
 
 - [运营资源：Cloud 事实与本机执行](2026-10-29-operating-resources.md)：社媒账号、浏览器窗口、代理的事实归属、同步、代理操作恢复、角色与批量处理边界（ADR-0027）。
