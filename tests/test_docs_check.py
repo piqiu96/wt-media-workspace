@@ -66,7 +66,6 @@ class DocsCheckTests(unittest.TestCase):
 """)
         self.write("docs/engineering/specs/alpha.md", "# Alpha\n")
         self.write("docs/standards/frontend/README.md", INDEX + "\n# Frontend\n")
-        self.write("docs/reference/state-models/README.md", STABLE + "\n# State models\n")
         for directory in ("delivery/milestones", "delivery/planned"):
             self.write(f"{directory}/README.md", INDEX + "\n# Index\n")
         self.write("delivery/reports/README.md", HISTORICAL + "\n# Reports\n")
@@ -220,7 +219,7 @@ class DocsCheckTests(unittest.TestCase):
         )
 
     def test_index_may_be_excluded_from_default_load(self) -> None:
-        self.write("docs/reference/state-models/README.md", NEVER_INDEX + "\n# State models\n")
+        self.write("docs/reference/README.md", NEVER_INDEX + "\n# Reference\n")
         self.assertEqual(self.check(), [])
 
     def test_broken_link_in_non_index_current_document_is_reported(self) -> None:

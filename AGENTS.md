@@ -42,7 +42,6 @@ WT Media Workspace 是多工程系统的研发控制中心（Engineering Control
 | 研发、设计与产品实践规范 | `docs/standards/` |
 | 跨仓协议 | `docs/contracts/` |
 | 技术决策 | `docs/decisions/` |
-| 可引用的状态说明 | `docs/reference/state-models/` |
 | 文档树分类、索引与校验 | `docs/README.md` |
 | 脚本用途与落位规则 | `scripts/README.md` |
 | Milestone / CHG / 交付状态 | `delivery/` |

@@ -28,7 +28,6 @@ REQUIRED_INDEXES = (
     "docs/decisions/README.md",
     "docs/devops/README.md",
     "docs/reference/README.md",
-    "docs/reference/state-models/README.md",
     "delivery/milestones/README.md",
     "delivery/planned/README.md",
     "delivery/reports/README.md",

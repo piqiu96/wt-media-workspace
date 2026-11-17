@@ -13,7 +13,7 @@ This file is the entry index for the documentation tree. It defines directory ro
 - [Contracts](contracts/README.md): human-readable contract governance; provider repositories own the definitions.
 - [Decisions](decisions/README.md): accepted architecture choices and ADRs, with their reasons.
 - [DevOps](devops/README.md): port and deployment ledger; the configuration/provider file owns each value.
-- [Reference](reference/README.md): reference material such as business state models; it does not independently decide product or interface facts.
+- [Reference](reference/README.md): supporting reference material; it does not independently decide product or interface facts.
 
 Temporary execution state belongs in `.ai/WORK_STATE.md` (optional, gitignored, not a fact source). A CHG's formal record is `../delivery/active/<change-id>/change.md`; `evidence/` is added only when needed. Do not put plans, progress, handoffs, or temporary analysis under `docs`.
 

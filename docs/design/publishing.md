@@ -11,6 +11,7 @@
 | 通用图片库 | [PRD 6.6](../product/prd/详细文档/第六章_发布管理.md#66-图片库) |
 | 封面模板的制作、发布、启停与历史成品 | [PRD 6.7](../product/prd/详细文档/第六章_发布管理.md#67-封面模板)；[编辑器专项交互](cover-templates.md) |
 | 页面、交互和视觉公共规则 | [前端规范索引](../standards/frontend/README.md) |
+| 待评审的数据库、接口和执行实现方案 | [后端设计](publishing-backend.md)，仅设计，不代表接口契约或已实施能力 |
 | 实施与验收 | [Delivery](../../delivery/LEDGER.md)、[原型 Milestone](../../delivery/milestones/M-publishing-prototype.md) |
 
 统一原型：[内容运营工作台](http://127.0.0.1:8768/example/operations/production/materials)。计划、批次、任务分别位于 `/example/operations/publishing/plans`、`/batches`、`/tasks`；图片和模板位于 `/example/operations/tools/images`、`/templates`。旧 `?view=publishing` 仅保留兼容跳转。
