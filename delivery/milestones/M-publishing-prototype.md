@@ -1,6 +1,7 @@
 # 发布管理原型体验闭环
 
 - 状态：本地原型已验收并合入两仓 main；仅验收本地交互原型，不代表生产发布适配通过。
+- 生产交付另按 [M6 单任务](M6-single-publishing.md) → [M7 批次](M7-batch-publishing.md) → [计划](M-publishing-plan.md) → [工具与三平台](M-publishing-operations.md) 验收；下文原型验收结论不升级为生产能力。
 
 ## 统一入口与内容生产迁移
 

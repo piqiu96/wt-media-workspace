@@ -82,54 +82,55 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         # candidate block, so the missing-block check has nothing to add here.
         self.assert_errors(changed, ["M0 status expected 'DONE', got 'VERIFYING'"])
 
-    def test_rejects_forbidden_operational_object_in_candidate_chg(self) -> None:
-        """Both forbidden-object arms, exercised on blocks that actually exist.
+    def test_rejects_manual_final_submission_baseline(self) -> None:
+        self.assert_errors(
+            self.mutate("首次浏览器自动提交与真实回执", "首次 pending_manual_submit 与真实回执"),
+            ["M6 candidate missing '浏览器自动提交'",
+             "M6 contains obsolete publishing baseline 'pending_manual_submit'"],
+        )
 
-        M8 and M9 are NOT_STARTED and carry candidate blocks, so the block is
-        non-empty and this really reaches the check. The old version of this
-        test mutated a string that is not in the Master Plan at all, on a
-        milestone whose block had been retired -- a no-op against an empty
-        block, i.e. it could not have failed had the check been deleted.
-        """
-        self.assert_errors(
-            self.mutate(
-                "M8-C1 外部 tracked_object 录入",
-                "M8-C1 interaction_batch 外部 tracked_object 录入",
-            ),
-            ["M8 candidate contains forbidden operational object 'interaction_batch'"],
-        )
-        self.assert_errors(
-            self.mutate(
-                "M9-C8 数据统计综合验收",
-                "M9-C8 数据统计综合验收 production_signal",
-            ),
-            ["M9 candidate contains forbidden operational object 'production_signal'"],
-        )
+    def test_rejects_reactivated_interaction_or_analytics_candidates(self) -> None:
+        sections = self.module.milestone_sections(self.master)
+        for number in (8, 9):
+            with self.subTest(milestone=number):
+                old = sections[number]
+                self.assert_errors(
+                    self.mutate(old, old + f"\n候选 CHG：\n\n```text\nM{number}-C1 恢复旧实施\n```\n"),
+                    [f"M{number} is outside the current route but carries candidate CHGs"],
+                )
 
     def test_rejects_unfinished_milestone_without_candidate_block(self) -> None:
-        """An empty block on an unfinished milestone is now loud, not silent.
-
-        Emptied block, three families of assertion, three different behaviours:
-        `require_all` reports every needle missing (noise that would otherwise
-        be mistaken for a finding), the forbidden loop contributes NOTHING
-        because `needle in ""` is never true (a silent pass), and the
-        structural check is the only one that names the real problem. Both
-        halves are asserted so the asymmetry is pinned down.
-        """
-        m9_block = self.module.candidate_block(
-            self.module.milestone_sections(self.master)[9]
-        )
-        self.assertNotEqual(m9_block, "")
-
+        block = self.module.candidate_block(self.module.milestone_sections(self.master)[7])
+        self.assertNotEqual(block, "")
         self.assert_errors(
-            self.mutate(m9_block, ""),
-            [
-                "M9 is 'NOT_STARTED' but carries no candidate CHG block; "
-                "candidate assertions against an empty block would be vacuous",
-                "M9 candidate missing 'M9-C1 platform_metric_snapshot'",
-                "M9 candidate missing '环境统计与新鲜度'",
-                "M9 candidate missing 'Excel 导出'",
-            ],
+            self.mutate(block, ""),
+            ["M7 is 'NOT_STARTED' but carries no candidate CHG block; "
+             "candidate assertions against an empty block would be vacuous"],
+        )
+
+    def test_rejects_missing_named_stage_or_changed_dependency(self) -> None:
+        self.assertTrue(self.module.validate_master_text(self.mutate(
+            "### M-publishing-plan：", "### missing-plan：")))
+        self.assert_errors(
+            self.mutate("| 依赖 | M7 `DONE` |", "| 依赖 | M6 `DONE` |"),
+            ["M-publishing-plan dependency missing '| 依赖 | M7 `DONE` |'"],
+        )
+
+    def test_rejects_m10_dependency_on_excluded_module(self) -> None:
+        self.assert_errors(
+            self.mutate("| 依赖 | M-publishing-operations `DONE`，继承", "| 依赖 | M9 `DONE`，继承"),
+            ["M10 dependency missing '| 依赖 | M-publishing-operations `DONE`'",
+             "M10 depends on excluded M9"],
+        )
+
+    def test_rejects_missing_publishing_reference_and_safety_gate(self) -> None:
+        self.assert_errors(
+            self.mutate("milestones/M6-single-publishing.md", "milestones/missing.md"),
+            ["M6 closure reference missing 'milestones/M6-single-publishing.md'"],
+        )
+        self.assert_errors(
+            self.mutate("断网后必须核实且不重复投稿", "断网后直接重新执行"),
+            ["M6 gate missing '断网后必须核实且不重复投稿'"],
         )
 
     def test_rejects_missing_m2_closure_reference(self) -> None:
@@ -138,6 +139,32 @@ class ProductMasterAlignmentTests(unittest.TestCase):
             'milestones/missing-account-closure.md',
         )
         self.assert_errors(changed, ['M2 closure reference missing'])
+
+    def test_rejects_old_route_and_missing_closure_card(self) -> None:
+        self.assert_errors(
+            self.mutate("→ M-publishing-plan 发布计划推进与结束", "→ M8 互动管理闭环"),
+            ["Current milestone route must follow M0-M7, publishing plan, operations, M10"],
+        )
+        root = Path(self.tmp.name)
+        errors = self.module.validate_publishing_cards(root)
+        self.assertEqual(len(errors), 4)
+        self.assertTrue(all("Publishing closure card missing:" in error for error in errors))
+
+    def test_rejects_missing_card_dependency_or_dangling_link(self) -> None:
+        import shutil
+        root = Path(self.tmp.name)
+        shutil.copytree(ROOT / "delivery" / "milestones", root / "delivery" / "milestones")
+        # Preserve formal references in this isolated fixture.
+        (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
+        (root / "delivery" / "completed").symlink_to(ROOT / "delivery" / "completed", target_is_directory=True)
+        card = root / "delivery" / "milestones" / "M7-batch-publishing.md"
+        text = card.read_text(encoding="utf-8")
+        self.assertIn("](M6-single-publishing.md)", text)
+        card.write_text(text.replace("](M6-single-publishing.md)", "](missing.md)"), encoding="utf-8")
+        self.assertEqual(sorted(self.module.validate_publishing_cards(root)), sorted([
+            "M7-batch-publishing.md dependency missing '](M6-single-publishing.md)'",
+            "M7-batch-publishing.md links missing file: missing.md",
+        ]))
 
     def _active_root(self, status: str, ledger_status: str | None = None) -> Path:
         """A minimal, otherwise-valid active CHG whose status line is `status`.

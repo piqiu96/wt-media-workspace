@@ -29,28 +29,45 @@ Milestone 不替代 Product、Engineering、MASTER PLAN、AI Spec、CHG 或 Evid
 
 CHG 必须引用一张闭环卡，只描述本次差距、修改范围、任务和验证方法，不重复维护完整业务流程。
 
-## Milestone-first 更新规则
+## 事实与交付分别维护
 
-Milestone 执行过程中发现的小变更、验收细节、页面口径、操作边界和异常处理，优先回写当前 `delivery/milestones/Mx-xxx.md`。
+稳定产品决策直接回写 PRD；工程技术选择进入 Engineering Spec，重大架构取舍按现有规则记录 Decision。Milestone 保存本阶段的业务交付与验收边界，CHG 保存具体实施范围与实际验证结果，不等整个 Milestone 结束才回写已确认的长期规则。
 
-不要在每个小变更时立即修改 PRD。PRD 是长期产品事实，不承载执行过程中的频繁修订。
+| 变化 | 写入位置 |
+| --- | --- |
+| 已确认且长期有效的产品规则、页面动作或异常处理 | 对应 PRD；Milestone 引用并调整交付边界 |
+| 工程实现、安全或三端职责选择 | 对应 Engineering Spec，必要时 Decision；同步受影响交付边界 |
+| 本阶段用户能完成什么、前置能力和验收条件 | 对应 Milestone；变化后重新核对候选 CHG |
+| 本次具体修改、进展与验证结果 | 当前 CHG；必要时保留 evidence，不复制整套产品规则 |
+| 不改变既定规则的实现缺陷 | 当前 CHG，不重复修改 PRD 或 Milestone |
 
-执行中产生的事实写入：
+未决建议显式标注，不能写成已批准需求。简短交接、正式回写及渐进加载遵循 `AGENT-INDEX.md` §4、§7；本目录不另建任务状态。
 
-- `delivery/active/<CHG>/change.md`
-- `delivery/active/<CHG>/evidence/`
+## 发布管理实施路线
 
-按以下规则判断写入位置：
+依据 [PRD 第六章](../../docs/product/prd/详细文档/第六章_发布管理.md)与[已合并工程设计](../../docs/engineering/specs/publishing-management.md)。本轮拆分为 DRAFT，待本 PR Review 确认；候选不是已创建/激活的 CHG，产品未决选项仍待裁定。主路线见 [MASTER PLAN](../MASTER_IMPLEMENTATION_PLAN.md)。
 
-| 变化类型 | 写入位置 |
-|---|---|
-| 当前 M 执行中发现的业务细节、验收口径、页面文案、按钮语义、异常处理 | 当前 Milestone + 当前 CHG checkpoint/evidence |
-| 当前 M 的业务闭环变化、操作顺序变化、成功条件变化、假成功规则变化 | 当前 Milestone；必要时重新拆 CHG |
-| 产品目标、用户角色、长期产品能力、全局业务范围变化 | PRD；再同步 Milestone 和 CHG |
-| Cloud / Desktop / Agent 职责边界、通信方式、安全原则变化 | Engineering / Decision；再同步 Milestone 和 CHG |
-| 代码实现缺陷且不改变业务闭环 | 当前 CHG，不改 Milestone，不改 PRD |
+| 顺序 | Milestone | 完成后用户可做什么 | 前置 |
+| --- | --- | --- | --- |
+| 1 | [M6 单任务](M6-single-publishing.md) | 用真实账号自动提交一条成片，核实公开作品并处理断网、失败与安全终止 | 真实账号/环境、成片和文件服务 |
+| 2 | [M7 批次](M7-batch-publishing.md) | 配置并执行多个真实任务，处理资源缺口、人工卡点和未知结果，停止后安全收尾 | M6 |
+| 3 | [M-publishing-plan 计划](M-publishing-plan.md) | 按周期目标逐批推进，按 10% 规则确认，暂停/恢复，核实后补量或结束 | M7 |
+| 4 | [M-publishing-operations 工具与三平台](M-publishing-operations.md) | 管理真实图片和模板，在 B站、小红书、百度完成任务/批次/计划 | 整体依赖计划阶段；子候选可按直接依赖提前实施 |
+| 5 | [M10 交付验收](../MASTER_IMPLEMENTATION_PLAN.md#m10打包升级诊断与稳定性验收) | 使用通过安装、升级、恢复和诊断验证的发布版本组合 | 工具与三平台阶段；不依赖 M8/M9 |
 
-一个 Milestone 完整验收后，再把已经稳定的产品规则按需回写 PRD。未稳定的执行细节不进入 PRD。
+发布四阶段均为 `NOT_STARTED`，Active CHG 为 None；原 M6/M7 未实施计划由新定义替换，M0—M5 历史验收不变。M8 互动、M9 效果采集保留编号但退出当前未来路线，不创建候选。新增阶段用名称标识，不把历史编号分配给其他业务。
+
+[发布原型](M-publishing-prototype.md)继续只证明交互原型；[首次上线](M-first-production-release.md)仅提供原范围的打包/部署证据，两者都不能证明真实发布能力完成。
+
+### 待裁定事项
+
+本表只给实施假设和影响，不把推荐当作批准；工程设计 §1.3 仍是三项未决选择的正式入口。裁定后将稳定规则写回 PRD/Engineering，再调整相应交付边界。
+
+| 事项 | 用于依赖分析的假设 | 裁定影响与时间 |
+| --- | --- | --- |
+| 同批账号能否属于不同用户 | 先用单一所属用户的多账号验通；不新增负责人指派。不能据此禁止混合归属 | M7-A 的混合范围在实施前裁定；若允许，增加按所属用户领取、协同待办和离线等待验收，任何 Agent 都不能代执行他人账号 |
+| 三平台阶段及开放顺序 | 推荐 B站首条，百度随后，小红书专项验收后开放；成本分析据此排候选 | 首个平台适配实施前裁定顺序和阶段开放；若要求同时开放，将平台候选前移，不降低三平台各自真实验收标准 |
+| 账号与成片质量等级维护 | 暂不新增正式评级字段和维护页，不用模拟值推荐 | 质量优先分配实施前确认权威来源及维护范围；批准后先由账号/成片模块提供输入，再接入配对；未裁定不阻塞资格/占用筛选与手工配对 |
 
 ## Milestone 关闭检查
 

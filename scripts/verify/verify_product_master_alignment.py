@@ -14,14 +14,21 @@ if str(ROOT) not in sys.path:
 from scripts.lib.change_metadata import read_change
 
 
-def milestone_sections(text: str) -> dict[int, str]:
-    headings = list(re.finditer(r"^### M(\d+)：.*$", text, flags=re.MULTILINE))
-    sections: dict[int, str] = {}
+def route_sections(text: str) -> dict[str, str]:
+    headings = list(re.finditer(
+        r"^### (M\d+|M-publishing-plan|M-publishing-operations)：.*$",
+        text, flags=re.MULTILINE,
+    ))
+    sections: dict[str, str] = {}
     for index, heading in enumerate(headings):
-        number = int(heading.group(1))
         end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
-        sections[number] = text[heading.start() : end]
+        sections[heading.group(1)] = text[heading.start():end]
     return sections
+
+
+def milestone_sections(text: str) -> dict[int, str]:
+    return {int(name[1:]): section for name, section in route_sections(text).items()
+            if re.fullmatch(r"M\d+", name)}
 
 
 def candidate_block(section: str) -> str:
@@ -89,7 +96,7 @@ def validate_master_text(text: str) -> list[str]:
     # silent PASS that certifies a milestone the check never read). Reporting
     # the missing block is what turns that second silence into an error.
     for number in sorted(sections):
-        if statuses[number] == "DONE":
+        if statuses[number] == "DONE" or number in (8, 9):
             continue
         if not candidate_block(sections[number]).strip():
             errors.append(
@@ -139,40 +146,58 @@ def validate_master_text(text: str) -> list[str]:
     # M3 has no candidate block: a DONE milestone is covered by its status word
     # plus the common milestone acceptance needles (D-04).
 
-    m8_candidates = candidate_block(sections[8])
-    forbid_all(errors, m8_candidates, "M8 candidate", ("interaction_batch", "interaction_item"))
-    errors.extend(
-        require_all(
-            m8_candidates,
-            ("外部 tracked_object", "interaction_task", "账号级 task", "验证码接管"),
-            "M8 candidate",
-        )
-    )
+    route = route_sections(text)
+    for name, dependency, reference in (
+        ("M6", None, "milestones/M6-single-publishing.md"),
+        ("M7", "M6", "milestones/M7-batch-publishing.md"),
+        ("M-publishing-plan", "M7", "milestones/M-publishing-plan.md"),
+        ("M-publishing-operations", "M-publishing-plan", "milestones/M-publishing-operations.md"),
+        ("M10", "M-publishing-operations", "milestones/M-first-production-release.md"),
+    ):
+        section = route.get(name, "")
+        if not section:
+            errors.append(f"Missing publishing route stage {name}")
+            continue
+        errors.extend(require_all(section, (reference,), f"{name} closure reference"))
+        if name.startswith("M-publishing-"):
+            errors.extend(require_all(section, ("| 状态 | `NOT_STARTED` |",), f"{name} status"))
+            if not candidate_block(section).strip():
+                errors.append(f"{name} carries no candidate CHG block")
+        if dependency:
+            needle = f"| 依赖 | {dependency} `DONE`"
+            # Tools may be implemented earlier, but acceptance still depends on plans.
+            if name == "M-publishing-operations":
+                needle = f"整体验收依赖 {dependency} `DONE`"
+            elif name != "M10":
+                needle += " |"
+            errors.extend(require_all(section, (needle,), f"{name} dependency"))
+        dependency_row = re.search(r"^\| 依赖 \| (.+)$", section, re.MULTILINE)
+        if dependency_row:
+            for excluded in ("M8", "M9"):
+                if re.search(rf"\b{excluded}\s+`DONE`", dependency_row.group(1)):
+                    errors.append(f"{name} depends on excluded {excluded}")
 
-    m9_candidates = candidate_block(sections[9])
-    forbid_all(errors, m9_candidates, "M9 candidate", ("production_signal",))
-    errors.extend(
-        require_all(
-            m9_candidates,
-            ("M9-C1 platform_metric_snapshot", "环境统计与新鲜度", "Excel 导出"),
-            "M9 candidate",
-        )
-    )
+    for number in (8, 9):
+        section = sections[number]
+        errors.extend(require_all(section, ("退出当前未来实施路线",), f"M{number} route exclusion"))
+        if candidate_block(section).strip():
+            errors.append(f"M{number} is outside the current route but carries candidate CHGs")
 
-    errors.extend(
-        require_all(
-            sections[6],
-            ("pending_manual_submit", "cancelled", "published", "tracked_object"),
-            "M6 tracked-object provider",
-        )
-    )
-    errors.extend(
-        require_all(
-            sections[9],
-            ("`tracked_object` 已由 M6/M8 创建", "不可变快照"),
-            "M9 dependency",
-        )
-    )
+    errors.extend(require_all(candidate_block(sections[6]), ("浏览器自动提交",), "M6 candidate"))
+    errors.extend(require_all(sections[6], ("审核中不算公开成功", "断网后必须核实且不重复投稿"), "M6 gate"))
+    for name in ("M6", "M7", "M-publishing-plan", "M-publishing-operations", "M10"):
+        section = route.get(name, "")
+        for obsolete in ("pending_manual_submit", "Agent 不点击最终发布按钮", "运营人工提交", "辅助发布"):
+            if obsolete in section:
+                errors.append(f"{name} contains obsolete publishing baseline {obsolete!r}")
+
+    # Check the actual ordered route, not incidental mentions in explanatory prose.
+    flow = re.search(r"采用纵向闭环路线：\s*```text\s*(.*?)```", text, re.DOTALL)
+    expected_route = [*(f"M{i}" for i in range(8)),
+                      "M-publishing-plan", "M-publishing-operations", "M10"]
+    actual_route = re.findall(r"^(?:→ )?(M[\w-]+) ", flow.group(1), re.MULTILINE) if flow else []
+    if actual_route != expected_route:
+        errors.append("Current milestone route must follow M0-M7, publishing plan, operations, M10")
 
     m10_candidates = candidate_block(sections[10])
     errors.extend(
@@ -206,6 +231,36 @@ def validate_master_text(text: str) -> list[str]:
             "common milestone acceptance",
         )
     )
+    return errors
+
+
+def validate_publishing_cards(root: Path) -> list[str]:
+    """Keep publishing closure cards present and linked to their real prerequisites."""
+    errors: list[str] = []
+    for filename, dependency, candidates in (
+        ("M6-single-publishing.md", None, ("M6-A", "M6-B", "M6-C")),
+        ("M7-batch-publishing.md", "M6-single-publishing.md", ("M7-A", "M7-B", "M7-C")),
+        ("M-publishing-plan.md", "M7-batch-publishing.md", ("PLAN-A", "PLAN-B", "PLAN-C")),
+        ("M-publishing-operations.md", "M-publishing-plan.md", ("OPS-A", "OPS-B", "PLATFORM-百度", "PLATFORM-小红书", "OPS-C")),
+    ):
+        path = root / "delivery" / "milestones" / filename
+        if not path.is_file():
+            errors.append(f"Publishing closure card missing: {filename}")
+            continue
+        card = path.read_text(encoding="utf-8")
+        errors.extend(require_all(card, (
+            "状态：`NOT_STARTED`", "Active CHG：None", "用户目标", "前置能力", "用户操作",
+            "系统与平台动作", "同时成立才算完成", "必须排除的假成功",
+            "工作内容及仓库", "直接依赖", "可独立验证的完成条件", *candidates,
+        ), filename))
+        if dependency:
+            errors.extend(require_all(card, (f"]({dependency})",), f"{filename} dependency"))
+        for target in re.findall(r"\]\(([^)]+)\)", card):
+            if re.match(r"[a-z]+://", target):
+                continue
+            relative = target.partition("#")[0]
+            if relative and not (path.parent / relative).is_file():
+                errors.append(f"{filename} links missing file: {relative}")
     return errors
 
 
@@ -337,6 +392,7 @@ def validate_alignment(root: Path = ROOT) -> list[str]:
         encoding="utf-8"
     )
     errors.extend(validate_master_text(master))
+    errors.extend(validate_publishing_cards(root))
     errors.extend(validate_active_change(root))
     errors.extend(validate_product_identity(root))
 
