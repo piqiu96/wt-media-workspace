@@ -208,7 +208,9 @@ Desktop 经 Tauri 调用 Agent 保存一份本地输入；Web 仅使用当前应
 
 ## 3. 核心模型
 
-### 3.1 六表与数据边界
+### 3.1 表结构总览
+
+**六张新 Cloud 表都用自增 ID 作主键。** 计划、批次、任务和执行尝试分别保存各自的事实；图片库和封面模板复用已有文件服务，不再复制文件数据。
 
 ```mermaid
 erDiagram
@@ -219,88 +221,111 @@ erDiagram
     operations_files o|--o{ cover_template : thumbnail
 ```
 
-| 云端表 | 保存的唯一主要事实 |
+| 新表 | 保存什么 |
 | --- | --- |
-| `publication_plan` | 计划目标、周期、推进位置、控制及结束原因 |
-| `publication_batch` | 单平台分目标、所属计划、配置、启动与停止控制 |
-| `publication_task` | 固定任务身份、当前内容、执行授权、当前平台结果与占用 |
-| `publication_attempt` | 每次领取的不可变输入、过程、结果及核实依据 |
-| `image_asset` | 已有文件的图片用途、类目、启停和归属 |
-| `cover_template` | 固定基础信息、一份编辑草稿、一份当前发布配置及启停 |
+| `publication_plan` | 目标、周期、推进位置和结束原因 |
+| `publication_batch` | 单平台批次的目标、资源配置和执行控制 |
+| `publication_task` | 一条正式发布任务的资源、内容、授权和真实结果 |
+| `publication_attempt` | 每次 Agent 领取后的固定输入、执行过程及证据 |
+| `image_asset` | 已上传图片的用途、类目、启停和引用 |
+| `cover_template` | 封面画布、一份草稿、一份当前发布配置 |
 
-`operations_files` 复用扩展；账号、成片、类目和审计继续由原模块拥有。图片与模板不设发布父对象外键，配置引用它们；不新增发布结果表、生成任务表、版本表或引用计数表。
+**建表共同约定：**
+- 六张表均含 `id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY`，不使用业务组合键作主键；通过 API 传递 ID 时使用十进制字符串。
+- 除 `publication_attempt` 外，其余五表均含 `created_by BIGINT UNSIGNED NOT NULL`、`created_at/updated_at DATETIME(6) NOT NULL` 和 `revision BIGINT UNSIGNED NOT NULL DEFAULT 1`。attempt 用 `started_at` 记录创建时刻、按报告序号维护执行进度。
+- MySQL 使用 InnoDB、utf8mb4；时间在数据库存 UTC、接口按 RFC3339 返回，按业务时区 `Asia/Shanghai` 计算运营日期。
+- 下表是**拟实施字段设计**：名称、类型、可空和关键索引需要在 Cloud migration 中实现。引用现有文件、账号、成片、用户表时，外键类型必须先核对已有列类型，不强行统一成无符号。
+- `JSON` 保存小型配置与执行快照，不保存文件二进制、Cookie 或长期签名地址；数据库字段与读写校验均由所属服务维护。
 
-六张新表使用单数实体名、自增整数主键、InnoDB 与 utf8mb4；新增 ID 对外输出十进制字符串。外键类型按现有被引用列核对，不能把新主键的 unsigned 约定直接套到已有文件、账号和成片 ID。云端时刻为 UTC `DATETIME(6)`，接口 RFC3339；运营日期按 `Asia/Shanghai`，日期周期不自动启动或终止计划。
+### 3.2 发布计划：`publication_plan`
 
-普通列保存身份、状态、排序、修订和索引条件；有界 JSON 保存目标、配置及快照。通用审计列为创建人、创建时间和更新时间，业务修改增加 `revision`。以下只列领域字段与约束，具体类型、完整索引及约束名归 Cloud migration。
+| 字段 | 建议类型 / 是否可空 | 含义 |
+| --- | --- | --- |
+| `id` | BIGINT UNSIGNED，自增主键 | 计划编号 |
+| `team_id`、`owner_id` | BIGINT UNSIGNED，必填 | 团队及负责人 |
+| `name` | VARCHAR(128)，必填 | 名称 |
+| `description` | VARCHAR(1000)，默认空串 | 备注 |
+| `date_start/date_end` | DATE，可空 | 计划周期，起止关系需校验 |
+| `goals_json` | JSON，必填 | 平台 × 类目目标，例如 `[{platform,category_id,target_count}]`；组合不得重复 |
+| `status` | VARCHAR(16)，必填，默认 ready | 计划执行控制 |
+| `pause_reason` | VARCHAR(32)，可空 | 只有人工暂停或需要人工确认时填写 |
+| `current_batch_id` | BIGINT UNSIGNED，可空 | 当前推进位置 |
+| `first_started_at/cancel_requested_at/ended_at` | DATETIME(6)，可空 | 首次启动、终止请求及结束时间 |
+| `end_reason/end_note` | VARCHAR(16)/VARCHAR(1000)，可空 | 结束原因与说明 |
+| `request_key/request_hash` | VARCHAR(64)/CHAR(64)，必填 | 创建防重键与输入摘要 |
+| `revision`、审计公共列 | 见 3.1 | 保存冲突检查与审计 |
 
-业务变更与必要审计同事务保存。审计记录操作者、对象、动作、前后状态、原因及关联标识；自动动作明确标为系统。日志和审计不记录 Cookie、Agent Token 或文件签名 URL。
+**索引：** `UNIQUE(created_by,request_key)`；团队＋创建时间用于列表；`status`＋ID 用于待推进计划扫描。目标数由 `goals_json` 求和，不另存一个可写总目标；10% 失败阈值固定遵守 PRD，不增加每计划配置列。
 
-### 3.2 计划
+内部 `ready/running/paused/stopping/ended` 分别表示待启动、运行推进、需人工解除的暂停、停止收尾、已结束。列表把 running 和 paused 都展示为「进行中」，暂停原因显示在当前进展。
 
-| 字段组 | 内容 |
-| --- | --- |
-| 身份与目标 | `team_id`、`owner_id`、名称、备注、周期、`goals_json`；目标为去重的平台 × 类目正整数集合 |
-| 控制 | `status`、`pause_reason`、`current_batch_id`、`first_started_at`、`cancel_requested_at` |
-| 结束事实 | `ended_at`、`end_reason`、`end_note`；真实结果迟到更新统计，不覆盖原结束原因 |
-| 创建防重 | `request_key`、规范化输入的 `request_hash`；按创建人及请求键唯一 |
+**等待配置不等于人工暂停。** 下一批没配置好时计划仍是 running，只显示「等待配置」；配置就绪后重新检查，若仍有人工暂停、失败率超限或无明确结果，不能自动继续。`first_started_at` 只记录计划首次合法启动，不能因确认某批资源而提前写入。
 
-内部控制 `ready/running/paused/stopping/ended` 分别表达未启动、自动推进、暂停推进、安全收尾和最终结束。界面将 `running/paused` 映射为「进行中」，暂停及等待原因只作为当前进展；不扩充 PRD 主状态。本轮派发完成由游标和批次事实计算，等待最终核实或补量决定时仍未最终 ended，不能提前关闭处理入口。
+### 3.3 发布批次：`publication_batch`
 
-`pause_reason` 只保存需要人工解除的原因：人工暂停、失败率超阈值和零明确结果。「等待配置」由下一批是否就绪实时计算，计划保持 `running`，不写入 `pause_reason`；若同时存在人工阻断，优先保持 `paused`。`first_started_at` 记录计划整体结构锁定；资源确认只锁当前批次映射。目标总数由 JSON 计算，10% 阈值不另存可修改配置。
+| 字段 | 建议类型 / 是否可空 | 含义 |
+| --- | --- | --- |
+| `id` | BIGINT UNSIGNED，自增主键 | 批次编号 |
+| `team_id/owner_id` | BIGINT UNSIGNED，必填 | 团队及负责人 |
+| `plan_id` | BIGINT UNSIGNED，可空 | 为空表示独立批次 |
+| `kind` | VARCHAR(16)，默认 original | 原始批次或补量批次 makeup |
+| `platform` | VARCHAR(32)，必填 | 一个批次只属于一个平台 |
+| `name/description` | VARCHAR(128)/VARCHAR(1000)，必填/默认空串 | 批次名称与备注 |
+| `targets_json` | JSON，必填 | 各类目数量，例如 `[{category_id,target_count}]` |
+| `group_order/batch_order` | INT UNSIGNED，默认 0 | 组与组内批次的执行顺序 |
+| `config_stage` | VARCHAR(16)，默认 resource | 资源配置、内容配置或已定版 |
+| `config_json` | JSON，可空 | 未定版映射、默认内容及确认依据；正式任务创建后删除可写候选 |
+| `execution_state` | VARCHAR(16)，默认 ready | 待执行、运行、停止收尾、结束或取消 |
+| `confirmed_at/first_started_at` | DATETIME(6)，可空 | 定版与首次执行时间 |
+| `cancel_requested_at/handoff_at` | DATETIME(6)，可空 | 停止请求与计划已推进标记 |
+| `request_key/request_hash` | VARCHAR(64)/CHAR(64)，可空 | 独立批次创建防重；计划骨架确认用 revision |
+| `revision`、审计公共列 | 见 3.1 | 保存冲突检查与审计 |
 
-### 3.3 批次
+**索引：** `UNIQUE(created_by,request_key)`（NULL 不占用）；`(plan_id,kind,group_order,batch_order,id)` 按计划取有序批次；团队＋时间用于列表。
 
-| 字段组 | 内容 |
-| --- | --- |
-| 归属与顺序 | `team_id`、`owner_id`、可空 `plan_id`、`kind`、平台、名称、备注、`group_order/batch_order` |
-| 目标与配置 | `targets_json`、`config_stage`、`config_json`；配置包含候选映射、默认内容、覆盖值、输入修订、确认指纹与执行设置 |
-| 控制事实 | `execution_state`、`confirmed_at`、`first_started_at`、`cancel_requested_at`、`handoff_at` |
-| 创建防重 | 独立创建的请求键与输入摘要；已有骨架确认依对象修订及定版事实防重 |
+确认资源后，`config_stage=content`，已选平台、类目、账号和成片不再改动，但**不占用成片，也不锁整个计划**。正式创建任务后进入 confirmed，当前内容只由 task 保存，不维护另一份可修改内容。
 
-`kind=original/makeup` 分开原始分配与补量；前者逐格等于计划目标，后者不改原目标。`handoff_at` 记录已推进位置，迟到结果不能再次推进该位置。已锁定行位置固定，其余仅在连续可编辑区间排序。
+批次的「有无待执行任务」「还有什么待处理」由任务实时计算，不另存一套容易过期的统计状态。`execution_state` 仅表示当前能否继续派发：`ready/running/stopping/finished/cancelled`；没有批次暂停。停止后绝不重新授权；已开始执行但暂时没有任务在运行，不等于自动结束整个批次。
 
-`config_stage=resource/content/confirmed` 是持久化进度：资源确认后进入 content 并锁映射，正式任务创建成功进入 confirmed。定版时移除可写候选，正式当前内容只在任务表维护；批次公共配置与执行间隔保留，不随清理候选丢失。结果总览无需单独状态列。
+### 3.4 发布任务：`publication_task`
 
-**派发收口是实时任务投影，不是可恢复的批次控制状态。**
+| 字段 | 建议类型 / 是否可空 | 含义 |
+| --- | --- | --- |
+| `id` | BIGINT UNSIGNED，自增主键 | 正式任务编号 |
+| `team_id/operator_id` | BIGINT UNSIGNED，必填 | 归属团队、实际执行用户 |
+| `batch_id` | BIGINT UNSIGNED，可空 | 为空表示快速发布的独立任务；不另存 plan_id |
+| `platform` | VARCHAR(32)，必填 | 发布平台 |
+| `category_id/media_account_id/composite_output_id` | BIGINT UNSIGNED，必填 | 类目、Cloud 账号、成片身份；外键类型最终核对提供方 |
+| `platform_account_uid` | VARCHAR(255)，必填，精确比较 | 平台真实 UID，不等于 Cloud 账号 ID |
+| `resource_snapshot_json/content_json` | JSON，必填 | 选定资源和已确认内容；只存必要快照及文件 ID／摘要 |
+| `task_order` | INT UNSIGNED，默认 0 | 批次内顺序 |
+| `status` | VARCHAR(24)，默认 pending | 当前业务状态 |
+| `current_attempt_id` | BIGINT UNSIGNED，可空 | 最近一次执行 |
+| `attempt_count` | INT UNSIGNED，默认 0 | 已领取的次数 |
+| `not_before/authorized_at/cancel_requested_at` | DATETIME(6)，可空 | 执行时间、授权和停止请求 |
+| `accepted_at/published_at` | DATETIME(6)，可空 | 平台接收与确认公开时间 |
+| `platform_work_id/work_url` | VARCHAR(255)/VARCHAR(2048)，可空 | 平台稿件身份与可信作品链接 |
+| `failure_code/failure_message` | VARCHAR(64)/VARCHAR(1000)，可空 | 明确失败的原因 |
+| `request_key/request_hash` | VARCHAR(64)/CHAR(64)，可空 | 独立任务创建防重 |
+| `occupied_output_id` | BIGINT UNSIGNED，生成列，可空 | 非 abandoned 时固定为成片 ID |
+| `executing_account_uid` | VARCHAR(255)，生成列，可空 | 执行中、等待人工或结果未知时固定为平台 UID |
+| `revision`、审计公共列 | 见 3.1 | 并发编辑与审计 |
 
-| 维度 | 实现含义 |
-| --- | --- |
-| 执行控制 | `ready/running/stopping/finished/cancelled`；running 表示已启动且控制未结束，不保证当前有浏览器正在操作。停止标记永久禁止新派发，finished 不回迁为 running |
-| 派发是否收口 | 当前不存在 pending、queued、running、awaiting_human、uncertain；每次查询／推进重算，不以历史时间戳代替当前事实 |
-| 是否仍有待办 | 从任务失败、审核、人工及未知结果和相应处理权限计算；派发收口仍可有审核或失败待办 |
-| 列表主状态 | 按 PRD 从配置、控制及任务聚合得到待执行／执行中／待处理／已结束／已取消；骨架不进正式批次列表，收尾原因不增加列表状态 |
+**索引：** `UNIQUE(platform,occupied_output_id)` 防止同一成片同平台重复占用；`UNIQUE(platform,executing_account_uid)` 保证真实 UID 串行；`UNIQUE(created_by,request_key)` 为独立快速创建防重；按 batch/status、operator/status/not_before、team/published_at 建查询索引。生成列在 `status=abandoned` 或不执行时返回 NULL；详细表达见下方 SQL 规则。
 
-正常批次的任务全部已发布、已取消或已放弃后才关闭控制；移交下一批只记录 handoff，不以此把仍有失败待办的批次置为 finished。停止批次在没有在途、人工或未知执行后关闭控制，审核等真实结果仍可后续核实。尚未结束、未停止批次的安全失败任务可单独重试；不以“派发收口”误禁合法重试，也不借晚到结果重开已结束控制。
+任务只使用十个状态；这里列出内部代码供迁移和 Contract 对齐，**允许动作以 [PRD 6.4.1](../../product/prd/详细文档/第六章_发布管理.md#641-任务列表) 为准**。
 
-### 3.4 任务与结果
+| 内部状态 | 页面显示 | 内部状态 | 页面显示 |
+| --- | --- | --- | --- |
+| pending | 待执行 | queued | 排队中 |
+| running | 执行中 | awaiting_human | 等待人工 |
+| uncertain | 结果待确认 | reviewing | 平台审核中 |
+| failed | 发布失败 | published | 已发布 |
+| cancelled | 已取消 | abandoned | 已放弃 |
 
-| 字段组 | 内容 |
-| --- | --- |
-| 固定身份 | `team_id`、`operator_id`、可空 `batch_id`、平台、类目、账号 ID、真实平台 UID、成片 ID；任务不重复存 `plan_id` |
-| 输入 | `resource_snapshot_json`、`content_json`；保存最终值、平台默认配置版本、实际封面文件和来源，不保存长期访问 URL |
-| 执行 | `status`、`task_order`、`not_before`、`authorized_at`、`current_attempt_id`、`attempt_count`、`cancel_requested_at` |
-| 平台结果 | `accepted_at`、`published_at`、`platform_work_id`、`work_url`、失败代码与摘要；安全结论以当前尝试证据为准 |
-| 并发与防重 | 修订、创建请求键、同平台成片唯一占用、真实 UID 串行和浏览器 Profile 互斥 |
+缺少链接时仍按审核中或结果待确认处理，不新建主状态。提交阶段在 attempt 保存，不在 task 另建同义状态。
 
-任务只使用以下十个主状态；动作权限直接复用 [PRD 6.4.1](../../product/prd/详细文档/第六章_发布管理.md#641-任务列表)，不在本规格维护第二张业务操作表。
-
-| 任务状态代码 | 界面状态 |
-| --- | --- |
-| `pending` | 待执行 |
-| `queued` | 排队中 |
-| `running` | 执行中 |
-| `awaiting_human` | 等待人工 |
-| `uncertain` | 结果待确认 |
-| `reviewing` | 平台审核中 |
-| `failed` | 发布失败 |
-| `published` | 已发布 |
-| `cancelled` | 已取消 |
-| `abandoned` | 已放弃 |
-
-缺少链接不单列主状态：已有明确接收证据保持 reviewing，结果不能确定则 uncertain；保留缺失资料的待办原因及核实／补录入口。阶段上传、填写、提交写在 attempt，不扩充任务主状态。
-
-占用通过现有任务表生成列和唯一索引保证，概念约束如下；实际列类型与迁移由 Cloud 定义：
+生成列需要在 MySQL migration 中实现：
 
 ```sql
 occupied_output_id = CASE WHEN status <> 'abandoned'
@@ -312,37 +337,76 @@ executing_account_uid = CASE WHEN status IN ('running', 'awaiting_human', 'uncer
 UNIQUE (platform, executing_account_uid)
 ```
 
-`platform_account_uid` 是平台真实 UID，不是 Cloud 的账号记录 ID。同 UID 多窗口不能同时执行；不同平台共用一个浏览器 Profile 时，也必须串行。领取时先锁现有 Profile 行，再查询该 Profile 尚未安全结束的 attempt，同事务确认无冲突后才领取；冻结 Cloud Profile ID 以便查询。失联不能自动释放 Profile 的执行占位，核实旧执行已经停止后才能释放；任务结果未知及成片占用另行处理。Profile 绑定调整也应检查旧执行是否仍占用现场，不增加锁表或设备节点。取消仍占用成片，只有满足安全条件的明确放弃才释放。
+同 UID 多窗口仍不能并行；跨平台共用同一个浏览器 Profile 的任务，还须按 2.2 和 4.2 串行领取。取消保留成片占用，只有安全放弃才释放；不能因为一次历史检查结果允许重试或释放。
 
-核实／补录在任务结果字段保存平台作品身份与公开依据，作品管理复用该事实的查询投影。Cloud 对可核实的同平台作品身份实施去重，重复补录复用已有关联，冲突关联返回核实问题；具体唯一键与 URL 规范化规则随平台契约落实，不另建发布结果表，也不把 URL 格式有效等同公开。
+作品公开后在任务上保存平台作品 ID、链接及证据，复用已有作品关联，不另建结果表。同平台作品去重键必须按平台身份规则确认，不能把“链接格式合法”当作公开成功。
 
-### 3.5 执行尝试
+### 3.5 执行尝试：`publication_attempt`
 
-| 字段组 | 内容与约束 |
-| --- | --- |
-| 身份 | `publication_id`、递增 `attempt_no`、`executor_user_id`、冻结的 Cloud `browser_profile_id`、`claim_request_key`；任务与次数唯一，执行用户与领取请求键唯一 |
-| 不可变输入 | `input_snapshot_json`：领取时的实际内容、UID、Profile 引用、成片与封面 ID／摘要、模板配置及发布修订；不随编辑或模板更新改变 |
-| 执行事实 | `status`、`stage`、`started_at`、`heartbeat_at`、`submit_started_at`、`finished_at`、步骤及必要证据 |
-| 结果与核实 | `result_status`、错误、`report_seq`、`result_hash`、核实人／时间／依据；平台后续核实不改写原上报证据 |
+| 字段 | 建议类型 / 是否可空 | 含义 |
+| --- | --- | --- |
+| `id` | BIGINT UNSIGNED，自增主键 | 执行编号 |
+| `publication_id` | BIGINT UNSIGNED，必填 | 所属正式任务 |
+| `attempt_no` | INT UNSIGNED，必填 | 此任务的第几次领取 |
+| `executor_user_id/browser_profile_id` | BIGINT UNSIGNED，必填 | 实际执行用户及领取时冻结的 Cloud Profile |
+| `claim_request_key` | VARCHAR(64)，必填 | 领取防重键 |
+| `input_snapshot_json` | JSON，必填且创建后不可改 | 此次真实使用的账号、内容、文件、封面及版本 |
+| `status/stage` | VARCHAR(24)/VARCHAR(32)，必填 | 执行进程状态和当前步骤 |
+| `report_seq` | BIGINT UNSIGNED，默认 0 | 上报顺序，拒绝过期结果 |
+| `started_at/heartbeat_at` | DATETIME(6)，必填 | 领取与最后心跳时间 |
+| `submit_started_at/finished_at` | DATETIME(6)，可空 | 提交开始、执行结束 |
+| `result_status/error_code/error_message` | VARCHAR(24)/VARCHAR(64)/VARCHAR(1000)，可空 | 本次结果或错误 |
+| `steps_json/evidence_json` | JSON，必填 | 必要步骤与原始证据，不含 Cookie 或签名 URL |
+| `result_hash` | CHAR(64)，可空 | 结果去重与冲突识别 |
+| `resolved_by/resolved_at/resolution_note` | BIGINT UNSIGNED/DATETIME(6)/VARCHAR(2000)，可空 | 后续人工核实记录 |
 
-attempt 状态为 running、awaiting_human、completed、interrupted；表达执行进程，不替代平台结果。排队不建 attempt，合法重试在下次领取时新增；人工继续沿用原 attempt。completed 仍可能对应 uncertain，失联标为 interrupted 也不证明旧进程停止。
+**索引：** `UNIQUE(publication_id,attempt_no)`、`UNIQUE(executor_user_id,claim_request_key)`；`(status,heartbeat_at,id)` 供失联扫描；`(browser_profile_id,status,id)` 供同一 Profile 领取前检查。
 
-当前任务内容与历史执行快照是两类事实，不做未执行编辑的历史版本。必要输入快照可重复少量文字与文件引用，媒体文件不复制；旧尝试保留原证据，人工核实追加依据，不能伪装为 Agent 原始回执。
+状态只有 running、awaiting_human、completed、interrupted，描述**执行过程**，不表示是否公开。排队不产生 attempt；人工介入继续原 attempt；合法重试下次领取才新增一条。旧执行证据不能因新结果而改写。失联仅表示还需核实，不能据此自动启动新发布。
 
-### 3.6 图片、模板与文件
+### 3.6 图片库与封面模板
 
-| 对象 | 字段与约束 |
-| --- | --- |
-| 图片 | `team_id`、唯一 `file_id`、名称、`allow_as_cover/allow_as_background`、类目数组、`enabled`、修订及审计；至少一种用途，空类目表示通用，原文件不可替换 |
-| 模板基础信息 | 团队、名称、画布宽高、适用范围、推荐平台／类目；基础信息固定，改规格通过复制；无全局默认项 |
-| 模板内容 | `draft_config_json`、`published_config_json`、`published_revision`、当前正式缩略图文件 ID、`enabled`、对象修订及创建防重；图层不建表 |
-| 文件扩展 | 在已有 `operations_files` 增加 `metadata_json`：实际宽高／格式、生成用途、输入摘要、模板发布快照、底图 ID／摘要、实际标题和渲染器版本；只由服务端写入 |
+**图片库只登记用途，实际文件继续由 `operations_files` 保存。模板保存一份草稿和一份生效配置。**
 
-图片上传复用文件上传再登记，按文件逐条反馈；同 file_id 同配置重复登记返回已有记录，改配置走编辑。尺寸由真实解码取得，图片库不重复保存对象地址、大小和 SHA。生成封面直接登记文件，不强制加入图片库。
+#### 图片库 `image_asset`
 
-模板一行最多一份草稿和一份当前发布配置，内容标签据此计算，启停另列。打开编辑器不写草稿；保存实际差异才更新 draft，与发布配置一致时清除差异。发布读取已保存草稿，校验、真实渲染后在事务中复查修订，再替换 published、增加发布修订并清草稿；保持原启停，首次发布仍停用。
+| 字段 | 建议类型 / 是否可空 | 含义 |
+| --- | --- | --- |
+| `id` | BIGINT UNSIGNED，自增主键 | 图片业务编号 |
+| `team_id` | BIGINT UNSIGNED，必填 | 团队 |
+| `file_id` | BIGINT，必填 | 已上传文件 ID；必须与现有文件表类型一致 |
+| `name` | VARCHAR(160)，必填 | 展示名称 |
+| `allow_as_cover/allow_as_background` | TINYINT(1)，默认 1/0 | 至少一种用途，可同时勾选 |
+| `category_ids_json` | JSON，必填 | 类目 ID 数组，空数组为通用 |
+| `enabled` | TINYINT(1)，默认 1 | 是否允许新选用 |
+| `revision`、审计公共列 | 见 3.1 | 修改与审计 |
 
-模板样例校验与实际业务渲染共用排版实现和字体资源。样例产物标为 `cover_preview`，业务成品标为 `cover_render`；只有实际输入匹配的业务成品或合格现成图可创建任务。复制优先使用已保存草稿，否则用当前发布配置；新画布调整区域与裁切，不拉伸字形，产生独立停用草稿。已发布或有引用的模板只能停用，历史发布内容由各成品与 attempt 快照保留，不建设模板历史版本界面。
+**索引：** `UNIQUE(file_id)`，以及 `(team_id,enabled,created_at,id)`。文件登记只能使用已完成上传且有权限的图片，尺寸由文件实际解码取得。停用不破坏旧任务的成品；被正式引用时不允许删除。
+
+#### 封面模板 `cover_template`
+
+| 字段 | 建议类型 / 是否可空 | 含义 |
+| --- | --- | --- |
+| `id` | BIGINT UNSIGNED，自增主键 | 模板编号 |
+| `team_id` | BIGINT UNSIGNED，必填 | 团队 |
+| `name` | VARCHAR(128)，必填 | 名称 |
+| `canvas_width/canvas_height` | INT UNSIGNED，必填 | 画布规格，均须大于 0 |
+| `scope` | VARCHAR(16)，默认 general | 适用范围 |
+| `platform_codes_json/category_ids_json` | JSON，必填 | 推荐平台与类目，不能代替规格校验 |
+| `draft_config_json/published_config_json` | JSON，可空 | 一份草稿、一份当前发布配置 |
+| `published_revision` | INT UNSIGNED，默认 0 | 当前发布配置版本，不建历史版本表 |
+| `published_thumbnail_file_id` | BIGINT，可空 | 当前模板缩略图文件 |
+| `enabled` | TINYINT(1)，默认 0 | 未发布不能启用 |
+| `request_key/request_hash` | VARCHAR(64)/CHAR(64)，必填 | 创建防重 |
+| `revision`、审计公共列 | 见 3.1 | 修改与审计 |
+
+**索引：** `UNIQUE(created_by,request_key)`、`(team_id,enabled,canvas_width,canvas_height,id)`。保存草稿只更新 draft；发布时校验当前保存的草稿、生成真实缩略图，再原子替换 published 并提升 `published_revision`。首次发布仍停用，后续更新保持已有启停。基础信息与规格固定，调整规格通过复制生成新模板。
+
+图层、底图、动态标题、样式与排版保存在模板 JSON，不另建图层表；正式封面只用当前生效的模板配置渲染。样例预览不是正式成品；已有成品保存当时输入与模板快照，不因模板更新而改变。
+
+#### 已有文件表扩展
+
+`operations_files` 保持既有自增主键及文件字段。仅按需增加 `metadata_json JSON NULL`（宽高、格式、模板输入与渲染来源）和 `delete_state VARCHAR(16) NOT NULL DEFAULT 'ready'`（ready/deleting），以实现 4.6 的安全删除。**不新增文件表或引用计数表。**
 
 ### 3.7 本地存储
 
