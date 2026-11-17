@@ -11,7 +11,7 @@
 | 通用图片库 | [PRD 6.6](../product/prd/详细文档/第六章_发布管理.md#66-图片库) |
 | 封面模板的制作、发布、启停与历史成品 | [PRD 6.7](../product/prd/详细文档/第六章_发布管理.md#67-封面模板)；[编辑器专项交互](cover-templates.md) |
 | 页面、交互和视觉公共规则 | [前端规范索引](../standards/frontend/README.md) |
-| 架构、模型、并发及执行实现 | [发布管理 Engineering Spec](../engineering/specs/publishing-management.md)；正式字段契约由提供方维护，三项产品选择待裁定，不代表已实现 |
+| 架构、模型、并发及执行实现 | [发布管理 Engineering Spec](../engineering/specs/publishing-management.md)；正式字段契约由提供方维护；V1 范围见 PRD，工程实施边界见该设计 §1.3，不代表已实现 |
 | 正式实施与验收 | [发布 Milestone 路线](../../delivery/milestones/README.md#发布管理实施路线)、[Delivery](../../delivery/LEDGER.md) |
 | 已验收原型的证据 | [任务与批次](../../delivery/completed/CHG-20261111-101/change.md)、[计划](../../delivery/completed/CHG-20261113-101/change.md)、[统一详情](../../delivery/completed/CHG-20261114-101/change.md)、[封面模板](../../delivery/completed/CHG-20261114-102/change.md)；仅证明原型交付 |
 

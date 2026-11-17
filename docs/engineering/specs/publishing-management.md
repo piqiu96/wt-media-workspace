@@ -52,15 +52,13 @@ flowchart LR
 
 当前 Agent 运行入口注册的是文件下载执行器；文案模型客户端、模板封面渲染与三平台发布适配也不能由原型演示推定为已经实现。不新建 MQ、Redis 锁、工作流引擎、设备节点或通用执行许可系统。
 
-### 1.3 待产品负责人裁定
+### 1.3 V1 实施边界
 
-**以下三项只用于评估成本，不是已批准的产品限制；实现与验收范围须在裁定后确定。**
+产品范围以 [PRD 平台范围](../../product/prd/详细文档/第六章_发布管理.md)和[批次资源配置](../../product/prd/详细文档/第六章_发布管理.md#632-新建批次)为准。工程实现沿用已有身份、任务和能力开关：
 
-| 事项 | 推荐评估方案 | 裁定前的边界与影响 |
-| --- | --- | --- |
-| 跨用户批次 | 本期不新增负责人指派与多人协同；评估同批使用单一所属用户账号 | 本机只能执行本人账号已由既有权限确定，但不能据此认定批次必须单一归属。若支持混合归属，任务仍按账号所属用户领取，需评估协同待办与离线等待；不允许一台 Agent 代执行他人账号 |
-| 三平台分阶段开放 | B站、百家号先完成联通，小红书通过专用验收后开放 | PRD 的三平台目标不变；是否允许分阶段交付待裁定。各平台分别维护能力开关，未接通时明确拒绝创建或执行，不让任务运行后必然失败 |
-| 质量等级维护 | 暂缓新增账号、成片质量字段及人工维护入口 | 不从标签、登录状态或分辨率猜测质量。若质量优先分配必须落地，先确认权威来源与维护范围，再由所属模块提供；不把模拟质量写成正式输入 |
+- 正式创建按每个账号的所属用户确定 task 的 `operator_id`，不使用批次负责人或创建人统一代填。领取时将 Agent 认证用户与该任务及账号归属核对；离线保留待办，不转派、不新增协作服务。
+- 平台适配按 PRD 顺序推进，各平台真实发布与结果核实验收通过后才打开能力开关。未开放平台在创建、授权及领取时明确拒绝，不能让任务运行后必然失败。
+- 资源查询与推荐只消费已有资格、顺序和数量，不新增质量评级字段、维护 API／页面或等级匹配输入。
 
 ## 2. 服务交互
 
@@ -128,7 +126,7 @@ sequenceDiagram
     C->>DB: 去重校验、保存真实结果与审计
 ```
 
-领取时检查真实平台 UID、Profile 归属、当前输入、成片占用和文件引用；Agent 还须在本机实读 UID 与文件摘要，不能以最近一次 Cloud 登录检查替代。同一浏览器 Profile 即使绑定了不同平台的账号，也不能同时执行发布。Cloud 领取时锁定已有 `browser_profiles` 行，检查该 Profile 的旧执行现场是否已安全结束；Agent 在本机也按实际 BitBrowser Profile 串行。编辑与领取竞争时按对象修订阻止覆盖。
+领取时先核对 Agent 认证用户、任务 `operator_id` 与账号所属用户一致，再检查真实平台 UID、Profile 归属、当前输入、成片占用和文件引用；Agent 还须在本机实读 UID 与文件摘要，不能以最近一次 Cloud 登录检查替代。同一浏览器 Profile 即使绑定了不同平台的账号，也不能同时执行发布。Cloud 领取时锁定已有 `browser_profiles` 行，检查该 Profile 的旧执行现场是否已安全结束；Agent 在本机也按实际 BitBrowser Profile 串行。编辑与领取竞争时按对象修订阻止覆盖。
 
 到时判断使用 `not_before`；批次间隔使用上一条执行结束时间加间隔。同一真实平台账号有执行、人工或结果未知任务时，不领取下一条；不同账号若共用一个浏览器 Profile，也不能并行。不同账号且不同 Profile 才允许受控并行。时间到达不会自动授权尚未启动的任务。
 
@@ -198,7 +196,7 @@ flowchart TD
 
 配对先过滤权限、平台、类目、身份和占用，再按用户确定的类目优先级、账号顺序与每号本批上限分配；同账号跨类目共享剩余数量，不把本批上限当作日额度。保留兼容的人工配对，短缺指出原因；推荐不预占，最终创建重新验证。
 
-计划“AI 推荐”调用真实模型，结果仍须通过平台分组、逐格守恒及锁定行位置校验。不用确定性分配结果冒充 AI 输出；模型不可用时反馈失败，用户仍可手动拆批。质量优先输入受 [1.3](#13-待产品负责人裁定)约束，不隐式新增评级机制。
+计划“AI 推荐”调用真实模型，结果仍须通过平台分组、逐格守恒及锁定行位置校验。不用确定性分配结果冒充 AI 输出；模型不可用时反馈失败，用户仍可手动拆批。推荐遵循 [V1 实施边界](#13-v1-实施边界)，不引入质量等级输入或等级匹配。
 
 ### 2.6 新建续编与正式记录
 
@@ -292,7 +290,7 @@ erDiagram
 | 字段 | 建议类型 / 是否可空 | 含义 |
 | --- | --- | --- |
 | `id` | BIGINT UNSIGNED，自增主键 | 正式任务编号 |
-| `team_id/operator_id` | BIGINT UNSIGNED，必填 | 归属团队、实际执行用户 |
+| `team_id/operator_id` | BIGINT UNSIGNED，必填 | 归属团队、账号所属用户；后者由账号事实确定，不取批次创建人或当前操作者 |
 | `batch_id` | BIGINT UNSIGNED，可空 | 为空表示快速发布的独立任务；不另存 plan_id |
 | `platform` | VARCHAR(32)，必填 | 发布平台 |
 | `category_id/media_account_id/composite_output_id` | BIGINT UNSIGNED，必填 | 类目、Cloud 账号、成片身份；外键类型最终核对提供方 |
@@ -552,7 +550,7 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 | 快速创建任务 `POST /publications` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
 | 修改待执行任务 `PUT /publications/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
 | 首次启动／人工继续 `start、confirm-next` | `expected_revision`；继续还需 `expected_current_batch_id,next_batch_id` | `status,current_batch_id,revision` | 任务未决、未准备好、阈值需确认、位置已变化 |
-| Agent 领取 `claim` | `request_key`；执行用户从认证令牌获取 | `task_id,attempt_id,input_snapshot,platform_uid,profile_id,file_ids/digests,download_urls,not_before` | 无有效授权、账号或 Profile 忙、资源身份不符 |
+| Agent 领取 `claim` | `request_key`；执行用户从认证令牌获取 | `task_id,attempt_id,input_snapshot,platform_uid,profile_id,file_ids/digests,download_urls,not_before` | 无有效授权、账号所属用户不符、账号或 Profile 忙、资源身份不符 |
 | Agent 完成 `complete` | `attempt_id,report_seq,result_hash,result,evidence` | `task_status,attempt_status` | 非当前 attempt、序号过期、同键结果冲突 |
 | 核实／补录 `POST /publications/{id}/resolve` | `attempt_id,expected_revision,conclusion,evidence`；确认公开还需 `platform_work_id/work_url,published_at` | `task_status,work_id/work_url,revision` | 不能证明公开、冲突作品身份、历史尝试不匹配 |
 

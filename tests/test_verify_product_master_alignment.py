@@ -261,7 +261,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         root = self.publishing_root()
         for path in (root / "delivery").rglob("*.md"):
             text = path.read_text(encoding="utf-8")
-            text = re.sub(r"\b(?:M6|M7|PLAN|OPS)-[ABC]\b|PLATFORM-(?:百度|小红书)", "新候选", text)
+            text = re.sub(r"\b(?:M6|M7|PLAN|OPS)-[ABC]\b|PLATFORM-(?:B站|小红书)", "新候选", text)
             path.write_text(text, encoding="utf-8")
         self.assertEqual(self.module.validate_alignment(root), [])
 
