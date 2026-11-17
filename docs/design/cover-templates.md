@@ -8,7 +8,7 @@
 - [模板业务流程](../product/prd/详细文档/第六章_发布管理.md#67-封面模板)：制作、校验、发布、更新、复制、启停与删除。
 - [实际内容中的封面使用](../product/prd/详细文档/第六章_发布管理.md#653-为内容选择或制作封面)：直接使用图片或按实际标题合成。
 - 公共页面、反馈及视觉分别遵循 [AdminUI](../standards/frontend/AdminUI页面规范.md)、[交互规范](../standards/frontend/前端交互规范.md)、[视觉规范](../standards/frontend/前端架构与视觉规范.md)。
-- 实施与走查证据见既有 [CHG-20261114-102](../../delivery/active/CHG-20261114-102/change.md)；此处不维护交付状态。
+- 实施与走查证据见既有 [CHG-20261114-102](../../delivery/completed/CHG-20261114-102/change.md)；此处不维护交付状态。
 
 ## 2. 编辑页与预览布局
 

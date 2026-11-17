@@ -1,10 +1,11 @@
 ---
 id: CHG-20261114-102
 parent: delivery/milestones/M-publishing-prototype.md#封面模板v1原型闭环
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-workspace", "wt-media-cloud"]
 risk: M
+merge_commits: {"wt-media-workspace": "92e8606e5c56fab160aa2e408f21efb06f8e7d6d", "wt-media-cloud": "d3f666f9f90f50a3c052c6ad38453a57a97a842c"}
 ---
 
 # CHG-20261114-102：封面模板 V1 原型闭环
@@ -23,6 +24,14 @@ Cloud 原型中的图片库、封面模板位于运营工具。模板按新建�
 - 图片库筛选、只读详情及编辑器布局符合 common，定向测试和浏览器验证通过。
 - 用户最终评审和合并前保持 VERIFYING。
 
-## 当前验证与交接
+## 验收与合并
 
-2026-11-17：本轮验证覆盖图片库、模板编辑与发布、启停、封面使用和失败恢复，结果通过。自动测试、完整浏览器回归、构建及独立审查汇总见 [验收与清理](../CHG-20261111-101/change.md#当前验证与交接)。待两仓 PR 检查、合并及主干回读，保持 VERIFYING；不代表正式平台或执行器验收。
+2026-11-17 已按用户授权完成本地原型验收、独立审查和两仓合并，并回读本地及远端 `main`：
+
+- [Cloud PR #40](https://github.com/piqiu96/wt-media-cloud/pull/40)：实现提交 `bbf95a8`，主干合并 `d3f666f`。
+- [Workspace PR #44](https://github.com/piqiu96/wt-media-workspace/pull/44)：产品与规范提交 `9130148`，主干合并 `92e8606`。
+- 自动验证：发布原型 349 项、计划 34 项、example 21 项、Web 1001 项；完整浏览器回归 20 文件、96 项。example、Cloud、Desktop 构建，CI 数据库迁移及发布打包检查均通过。Workspace 单仓校验和测试通过。
+
+验收、修复边界与过程清理汇总见 [发布原型闭环](../CHG-20261111-101/change.md#验收与合并)。
+
+本记录只证明本地交互原型及共享呈现交付，不代表真实资源、AI、平台发布或正式执行器验收。
