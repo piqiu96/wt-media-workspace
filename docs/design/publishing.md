@@ -12,11 +12,14 @@
 | 封面模板的制作、发布、启停与历史成品 | [PRD 6.7](../product/prd/详细文档/第六章_发布管理.md#67-封面模板)；[编辑器专项交互](cover-templates.md) |
 | 页面、交互和视觉公共规则 | [前端规范索引](../standards/frontend/README.md) |
 | 架构、模型、并发及执行实现 | [发布管理 Engineering Spec](../engineering/specs/publishing-management.md)；正式字段契约由提供方维护，三项产品选择待裁定，不代表已实现 |
-| 实施与验收 | [Delivery](../../delivery/LEDGER.md)、[原型 Milestone](../../delivery/milestones/M-publishing-prototype.md) |
+| 正式实施与验收 | [发布 Milestone 路线](../../delivery/milestones/README.md#发布管理实施路线)、[Delivery](../../delivery/LEDGER.md) |
+| 已验收原型的证据 | [任务与批次](../../delivery/completed/CHG-20261111-101/change.md)、[计划](../../delivery/completed/CHG-20261113-101/change.md)、[统一详情](../../delivery/completed/CHG-20261114-101/change.md)、[封面模板](../../delivery/completed/CHG-20261114-102/change.md)；仅证明原型交付 |
 
-统一原型：[内容运营工作台](http://127.0.0.1:8768/example/operations/production/materials)。计划、批次、任务分别位于 `/example/operations/publishing/plans`、`/batches`、`/tasks`；图片和模板位于 `/example/operations/tools/images`、`/templates`。旧 `?view=publishing` 仅保留兼容跳转。
+统一原型：内容运营工作台，业务路由为 `/example/operations/production/materials`。预览先启动 Cloud 原型服务，使用启动输出中的实际访问地址，主机和端口以本次启动结果为准。计划、批次、任务分别位于 `/example/operations/publishing/plans`、`/batches`、`/tasks`；图片和模板位于 `/example/operations/tools/images`、`/templates`。旧 `?view=publishing` 仅保留兼容跳转。
 
 源码唯一维护在 [Cloud web/example/proto/publishing-design](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design)。Workspace 不复制运行时代码。菜单包含内容生产、发布管理、运营工具；作品和互动暂缓迁入。成片单选带入快速发布，多选带入批次配置，保留生产数据和原人工评审意见。
+
+正式页面必须继承已验收原型的布局、交互与视觉；产品规则归 PRD，技术方案归 Engineering Spec。具体引用与一致性验收按[Milestone 页面基线要求](../../delivery/milestones/README.md#页面实施与验收基线)执行，需要调整原型时先由产品负责人裁定。
 
 本地预览从 Workspace 运行 `python3 scripts/wt.py dev example`，可读取已保存但尚未提交的工作稿。GitHub 仅显示已推送内容。原型中的账号、资源、AI、渲染与发布演示不能代替正式服务验收。
 

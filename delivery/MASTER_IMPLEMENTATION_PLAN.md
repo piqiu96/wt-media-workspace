@@ -1,6 +1,6 @@
 # 模块化自媒体运营平台：代码实施总计划
 
-> 日期：2026-07-15
+> 路线更新：2026-11-18（发布管理重整；M0—M5 历史验收保持原样）
 > 适用项目：WT Media 模块化自媒体运营平台  
 > 执行方式：一个总路线、当前工作树选一个 CHG、每个 CHG 一次只完成一个可验证闭环
 > 运行仓库：`wt-media-cloud`、`wt-media-agent`、`wt-media-desktop`  
@@ -19,12 +19,14 @@ M0 项目治理与工程基线
 → M3 内容挖掘自动化入口建设
 → M4 Cloud 内容生产闭环
 → M5 策略自动生产与 Worker 资源控制
-→ M6 发布通用底座与 B站辅助发布
-→ M7 百家号辅助发布
-→ M8 互动管理闭环
-→ M9 效果采集与数据统计
+→ M6 单任务真实自动发布
+→ M7 多任务批次真实发布
+→ M-publishing-plan 发布计划推进与结束
+→ M-publishing-operations 运营工具、三平台与整体回归
 → M10 打包、升级、诊断与稳定性验收
 ```
+
+发布分四个可独立验收的业务阶段，不把数据库、API 或基础设施单列为业务完成。M6/M7 复用原编号并替换未实施内容；新增阶段使用名称标识，不占用历史 M8/M9 编号。M8 互动管理、M9 效果采集退出当前未来实施路线，不保留未来实施章节或候选，原编号不复用；发布任务结果、目标进度和成功率继续随发布业务交付。
 
 每个阶段都必须产生可以运行、可以测试、可以演示的闭环。M1 Cloud-Agent-Desktop 最小任务闭环完成前，不进入大规模业务模块开发。
 
@@ -122,7 +124,7 @@ wt-media-workspace/
 
 | 状态 | 含义 | 当前处于该态的里程碑 |
 |---|---|---|
-| `NOT_STARTED` | 未进入该里程碑 | M6～M10 |
+| `NOT_STARTED` | 未进入该里程碑 | M6、M7、M-publishing-plan、M-publishing-operations、M10 |
 | `IN_PROGRESS` | 开发中 | 无 |
 | `VERIFYING` | 自动综合验收完成，等待人工整体验收 | 无 |
 | `DONE` | 人工整体验收通过 | M2、M3、M4、M5、M-launch-engineering |
@@ -161,7 +163,9 @@ wt-media-workspace/
 | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
 | M4 | `DONE` | M4 各实施 CHG、M4-H1 视觉整改与 M4-H2 统一走查均已完成；机器闭环与真实页面签收均有证据。 | 2026-10-28 用户签收 M4-H2；M4 冻结为 Cloud 内容生产闭环基线。 |
 | M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
-| M6-M10 | `NOT_STARTED` | 无达到当前里程碑退出条件的正式完成项 | 按本计划顺序执行 |
+| M6、M7 | `NOT_STARTED` | 已有交互原型，无生产自动发布验收 | 依次完成单任务、批次真实发布 |
+| M-publishing-plan、M-publishing-operations | `NOT_STARTED` | 目标设计已确认，生产能力未验收 | 完成计划、工具和三平台回归 |
+| M10 | `NOT_STARTED` | 首次上线已有部分打包部署证据 | 依赖发布四阶段，补验升级、恢复及发布业务 |
 
 2026-10-26 M3–M5 易用性增量已确认：CHG-101 已合并；[M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)已完成并归档（Cloud PR #8，`cb26c66`），团队公共内容池与 Desktop 共用 Cloud 页面入口上线；CHG-106 前端状态色死表已删除并归档（Cloud PR #9，`d793d92`）；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)已完成并归档（Cloud PR #10，`2cd341d`），策略→任务→成片负责人事实与代创建链路已上线；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)已完成并归档（Cloud PR #11，`fc8504e`），以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)已完成并归档（Cloud PR #12，`c509ee8`），自动候选改为团队素材库且任务/成片归策略负责人；M5 总体当时仍为 `IN_PROGRESS`，待 CHG-098 统一走查 M5-AC-13 与 M4-H2；2026-10-28 用户签收 M4-H2 与 M5-AC-13，M4 与 M5 进入 `DONE`。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
 
@@ -473,241 +477,119 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 - HTTP Server 单独运行不会启动 Scheduler / Worker；
 - M5-C7 通过真实计划时间、对象存储、并发压力、Worker 重启、故障注入、UI 和独立提交验收。
 
-### M6：发布通用底座与 B站辅助发布
+### M6：单任务真实自动发布
 
 | 字段 | 内容 |
-|---|---|
+| --- | --- |
 | 状态 | `NOT_STARTED` |
-| 目标 | 先建立发布通用模型，再完成第一个真实平台发布闭环。 |
-| 依赖 | M5 `DONE` |
+| 目标 | 真实账号、成片和内容准备后创建任务，授权 Agent 自动提交，并在任务及作品管理核对公开结果 |
+| 依赖 | M2 账号/环境、M4/M5 成片及文件服务可用；本轮复查真实资源 |
+| 业务验收 | [M6 单任务](milestones/M6-single-publishing.md) |
 | Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
-| 完成日期 | None |
-| Commit/Tag | None |
-
-目标闭环：
-
-```text
-composite_output
-→ publication
-→ task
-→ Agent 打开指定 Profile
-→ 上传和填写
-→ pending_manual_submit
-→ 运营人工提交
-→ 链接校验/补录
-→ published
-→ tracked_object
-```
+| Evidence | None，未进入生产发布验收 |
 
 候选 CHG：
 
 ```text
-M6-C1 publication 模型、正式状态、创建规则与权限
-M6-C2 发布管理工作台、状态页签、预检、重复和链接校验
-M6-C3 发布 task Contract、Profile 串行队列与重启恢复
-M6-C4 平台 Adapter、platform_publish_config 和版本
-M6-C5 B站字段、固定流程、元素 JSON 与 Executor
-M6-C6 B站单条辅助发布和 pending_manual_submit
-M6-C7 批量配置、账号筛选快照和连续严格串行发布
-M6-C8 人工提交、链接补录/纠正、手工补录和 tracked_object
-M6-C9 failed、cancelled、result_uncertain、精确重试与审计
-M6-C10 B站真实辅助发布综合验收
+M6-A 正式任务、真实资源及文件安全
+→ M6-B 首次浏览器自动提交与真实回执
+→ M6-C 核实、补录、安全处置、作品关联与单任务验收
 ```
 
-关键约束：
+Cloud 先交付本条链路所需契约、创建占用和文件保护，Agent/共用 Vue/Desktop 随同一业务结果接入。首个真实平台暂按 B站作成本分析，开放顺序待裁定。浏览器自动提交是必须能力；审核中不算公开成功，断网后必须核实且不重复投稿。
 
-- Agent 不点击最终发布按钮；
-- 同一 Profile 一次只执行一个敏感任务；
-- 结果不明确时不得盲目重试；
-- 不建设运营可视化流程编排器。
-
-退出条件：
-
-- 发布管理提供待发布、执行中、待人工提交、待补链接、失败、已发布和全部页签；
-- 正式状态统一使用 `pending_manual_submit` 和 `cancelled`，`result_uncertain` 是任务/错误结果，不是新的 publication 主状态；
-- 完成一条真实 B站辅助发布；
-- 批量任务严格串行；
-- 人工提交后可以补录或纠正链接，链接有效且 publication=`published` 时创建或复用 `tracked_object`；
-- 重试创建新的实际 task，不覆盖历史尝试；
-- 异常、取消、结果不确定和精确重试行为明确；
-- Agent 重启后可以识别未完成任务；
-- M6-C10 通过真实 B站、三角色 UI、Profile 串行、人工提交/补录、重启恢复和独立提交验收。
-
-### M7：百家号辅助发布
+### M7：多任务批次真实发布
 
 | 字段 | 内容 |
-|---|---|
+| --- | --- |
 | 状态 | `NOT_STARTED` |
-| 目标 | 通过第二个平台验证 Adapter 边界，而不是复制一套发布系统。 |
+| 目标 | 完成资源配置、内容配置和结果总览，真实执行多个任务并处理局部异常、安全停止 |
 | 依赖 | M6 `DONE` |
+| 业务验收 | [M7 批次](milestones/M7-batch-publishing.md) |
 | Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
-| 完成日期 | None |
-| Commit/Tag | None |
+| Evidence | None，未进入生产批次验收 |
 
 候选 CHG：
 
 ```text
-M7-C1 百家号字段、元素配置和版本
-M7-C2 百家号 Adapter 与 Executor
-M7-C3 百家号单条、批量和连续辅助发布
-M7-C4 人工提交、手工补录、链接校验和异常恢复
-M7-C5 百家号真实发布与 B站完整回归验收
+M7-A 配置并正式创建批次
+→ M7-B 批次执行、账号/Profile 安全调度与停止
+→ M7-C 真实内容辅助与批次综合验收
 ```
 
-退出条件：
+共用 M6 的任务与执行结果，不按仓库分成独立计划。部分创建/执行明确确认，目标和缺口不被隐藏；同 UID 或同 Profile 串行，独立账号/Profile 可受控并行。混合所属用户批次等待范围裁定，不阻塞已确定的创建、防重及同用户多账号验证。
 
-- 没有复制 B站通用发布逻辑；
-- Cloud 不包含页面元素操作细节；
-- Adapter 不直接修改 Cloud 正式状态；
-- 百家号单条、批量、连续发布和手工补录均可完成；
-- 链接校验、`tracked_object` 创建和异常恢复复用通用发布底座；
-- M7-C5 完成百家号真实辅助发布、B站完整回归、UI/恢复/安全和独立提交验收。
-
-### M8：互动管理闭环
+### M-publishing-plan：发布计划推进与结束
 
 | 字段 | 内容 |
-|---|---|
+| --- | --- |
 | 状态 | `NOT_STARTED` |
-| 目标 | 完成点赞、收藏和评论任务闭环。 |
+| 目标 | 制定周期目标及有序批次，首次人工启动后自动推进，支持人工确认、暂停恢复、终止、补量及最终结束 |
 | 依赖 | M7 `DONE` |
+| 业务验收 | [发布计划](milestones/M-publishing-plan.md) |
 | Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
-| 完成日期 | None |
-| Commit/Tag | None |
-
-核心对象：
-
-```text
-tracked_object
-→ interaction_task
-→ 每个账号一个实际 task
-```
+| Evidence | None，已验收计划原型不代表生产能力 |
 
 候选 CHG：
 
 ```text
-M8-C1 外部 tracked_object 录入、去重、状态和目标列表
-M8-C2 interaction_task、账号级 task 和动作快照
-M8-C3 公共评论模板和个人评论模板
-M8-C4 DeepSeek 候选评论生成与人工确认
-M8-C5 全局基础风控、执行预检和账号/Profile 校验
-M8-C6 点赞和收藏 Executor、状态预判与幂等
-M8-C7 评论 Executor、提交确认和结果不确定处理
-M8-C8 任务台、队列、暂停/继续/取消、验证码接管、精确重试、审计与导出
-M8-C9 互动真实业务综合验收
+PLAN-A 制定目标并启动首批
+→ PLAN-B 自动推进与人工控制
+→ PLAN-C 核实、补量与最终结束
 ```
 
-明确不建设：
+必须验证 10% 边界、未知阻断、等待配置与人工暂停的区别，以及迟到结果不重复推进。计划目标与发布成功率由任务真实结果汇总，不依赖 M9。
 
-- 关注；
-- 转发；
-- 私信；
-- 主动搜索互动作品。
-- 独立 `interaction_batch`；
-- `interaction_item`。
-
-这些不是暂缓功能，不允许创建占位接口或未来状态。
-
-退出条件：
-
-- 一个 `tracked_object` 对应一个 `interaction_task`；
-- 批量选择多个作品时分别创建 `interaction_task`，批量操作不形成独立核心对象；
-- 每个账号直接生成一个实际 `task`，并保存动作快照；
-- 每次真实执行和重试产生新的 `task`；
-- 个人模板仅本人可见；
-- 风控、账号、Profile、代理和登录状态预检通过后才执行；
-- 支持暂停、继续、取消、验证码人工接管和动作级精确重试；
-- 高风险结果不确定时停止自动重试；
-- 不存在明确排除能力的残留实现；
-- M8-C9 通过真实点赞/收藏/评论、UI、并发、人工接管、恢复、安全和独立提交验收。
-
-### M9：效果采集与数据统计
+### M-publishing-operations：运营工具、三平台与整体回归
 
 | 字段 | 内容 |
-|---|---|
+| --- | --- |
 | 状态 | `NOT_STARTED` |
-| 目标 | 让发布、互动、素材和策略形成可追踪的数据闭环。 |
-| 依赖 | M8 `DONE` |
+| 目标 | 图片库和模板正式可用；B站、小红书、百度各自真实自动发布并通过任务/批次/计划整体回归 |
+| 依赖 | 整体验收依赖 M-publishing-plan `DONE`；工具与平台候选按各自直接依赖实施 |
+| 业务验收 | [运营工具与三平台](milestones/M-publishing-operations.md) |
 | Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
-| 完成日期 | None |
-| Commit/Tag | None |
+| Evidence | None，原型与正式服务分别验收 |
 
 候选 CHG：
 
 ```text
-M9-C1 platform_metric_snapshot 模型、采集 Contract 与调度
-M9-C2 B站效果采集
-M9-C3 百家号效果采集
-M9-C4 工作量和内容发现/素材/生产/发布/互动业务聚合
-M9-C5 用户、账号、Profile、代理和运行环境统计与新鲜度
-M9-C6 看板、趋势、排名、漏斗、积压、提醒和下钻
-M9-C7 Excel 导出、权限、历史范围快照与明细对账
-M9-C8 数据统计综合验收
+OPS-A 通用图片库 → OPS-B 模板制作与实际封面
+PLATFORM-百度 / PLATFORM-小红书：按裁定顺序复用 M7 的真实执行链路
+OPS-B + 三平台适配 + PLAN-C → OPS-C 三平台综合验收
 ```
 
-关键约束：
-
-- Analytics 只读取正式业务事实；
-- 统计异常不能修改原始业务数据；
-- 原始快照和聚合结果分离；
-- 首版不建设复杂实时数仓；
-- 不建设 `production_signal`，生产提示和重复风险从正式业务事实派生。
-
-退出条件：
-
-- `tracked_object` 已由 M6/M8 创建，M9 不重新定义或延迟创建；
-- 定时采集生成不可变快照；
-- 可以按用户、游戏、平台、账号、Profile、代理、素材、策略和时间查询工作与效果；
-- 支持趋势、排名、漏斗、积压、提醒、下钻、Excel 导出和明细对账；
-- 历史范围使用业务发生时快照，不随后续主数据变化改写；
-- 采集失败不影响发布业务；
-- M9-C8 通过真实 B站/百家号采集、调度恢复、权限、UI、导出、对账和独立提交验收。
+图片库直接依赖 M6-A；模板依赖图片库和 M7-A；剩余平台依赖 M7-B 及开放裁定，可先用合格现成图验证，不等模板编辑器。共同基础设施先合并，再启动依赖候选；不并行修改同一执行器或契约。三平台目标不变，全部完成才结束本阶段。未决事项统一见[Milestone 索引](milestones/README.md#待裁定事项)。
 
 ### M10：打包、升级、诊断与稳定性验收
 
 | 字段 | 内容 |
-|---|---|
+| --- | --- |
 | 状态 | `NOT_STARTED` |
-| 目标 | 将开发环境可运行升级为运营人员可安装、可升级、可诊断、可恢复。 |
-| 依赖 | M9 `DONE` |
+| 目标 | 在真实发布能力上验证可安装、升级、诊断和恢复的交付组合 |
+| 依赖 | M-publishing-operations `DONE`，继承 M6、M7、M-publishing-plan；不依赖 M8/M9 |
+| 已有基线 | [首次全端上线](milestones/M-first-production-release.md)：已有 RC、部署和安装证据按原范围复用，不重复宣称发布业务通过 |
 | Active CHG | None |
-| Evidence | None，未进入里程碑验证。 |
-| 完成日期 | None |
-| Commit/Tag | None |
+| Evidence | 生产发布综合验收尚未执行；升级/回退等未验项仍需补验 |
 
 候选 CHG：
 
 ```text
-M10-C1 Cloud Docker Compose、反向代理、HTTPS、配置和 Migration 部署
-M10-C2 MySQL/Object Storage 备份、恢复和回滚
-M10-C3 Agent 正式打包、受控依赖和可复现构建
-M10-C4 Cloud Compose Worker 的 FFmpeg/FFprobe 镜像、Manifest、Hash、许可证和回滚
-M10-C5 Desktop 生产级 WebView、Sidecar 生命周期和本地数据目录
-M10-C6 Windows x64、macOS Intel/Apple Silicon 安装包、签名和公证
-M10-C7 组件更新、版本兼容、升级、回滚和用户数据保留
-M10-C8 Cloud/本地状态页、告警、日志脱敏和诊断包
-M10-C9 中断恢复、安全、备份恢复和升级故障演练
-M10-C10 全系统生产发布综合验收
+M10-C1 部署与数据恢复：HTTPS、Migration、MySQL/Object Storage 备份、恢复和回滚
+M10-C2 受控制品：Agent 正式打包、Cloud FFmpeg/FFprobe 镜像、Sidecar 生命周期、三平台签名和公证差距核查及补齐
+M10-C3 版本兼容、升级、回滚和用户数据保留
+M10-C4 日志脱敏和诊断包、中断/升级/备份恢复故障演练
+M10-C5 发布任务、批次、计划、工具和三平台的安装版综合验收
 ```
 
-退出条件：
+C1/C2 依据首次上线记录先核实差距，不重新开发已验证能力；两者合并后交付 C3，再以 C4 的故障演练支撑 C5。最终同时满足：
 
-- 用户不需要安装系统 Python；
-- Cloud Compose Worker 不依赖系统 PATH 中的 FFmpeg，Desktop / Agent 不打包或执行视频合成；
-- Cloud 可通过 HTTPS 部署，Migration、备份、恢复和回滚可演练；
-- MySQL 和 Object Storage 均有可验证备份/恢复；
-- 三种桌面目标可以构建、安装、启动、卸载，macOS 完成签名和公证；
-- Desktop 使用 M0/M1 的真实集成并完成生产级 Sidecar、目录、权限和更新加固；
-- 不兼容版本禁止执行敏感任务；
-- 升级失败可回滚且不删除用户数据；
-- 普通日志不存在敏感信息；
-- Cloud 和本地状态页、告警、诊断包可以定位关键故障；
-- 关键中断恢复场景通过；
-- `release-matrix.yaml` 存在正式可用版本组合；
-- M10-C10 通过安装、升级、回滚、备份恢复、安全、诊断、三平台和全业务回归验收。
+- 固定四仓版本组合可构建、安装、启动、卸载；Windows x64、macOS Intel/Apple Silicon 与适用签名/公证均有实际证据，用户不需要系统 Python。
+- Cloud 合成继续只在 Cloud Worker 执行，FFmpeg 依赖受控；HTTPS、迁移、MySQL/对象存储恢复及真实跨版本升级/回退可验证，失败不丢用户数据。
+- Desktop Sidecar 生命周期与认证正常；不兼容版本禁止敏感执行；日志和诊断不泄露凭据。
+- 在安装版中回归单任务、批次、计划、图片和模板、三平台真实自动提交及公开核实；断网/重启/停止/升级均不重复投稿，不丢在途结果。
+- 页面回归沿用[发布 Milestone 页面基线](milestones/README.md#页面实施与验收基线)与各阶段具体原型入口，实际页面须完成布局、交互、视觉一致性检查；差异先经产品负责人裁定。
+- 发布必需统计可对账；互动、效果采集和综合数据看板不进入本轮验收分母；`release-matrix.yaml` 仅记录真实验证组合。
 
 ### 内容生产原型落地增量（2026-11-05）
 

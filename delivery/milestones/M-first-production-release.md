@@ -3,6 +3,8 @@
 - 状态：执行中；RC 打包、Cloud 首次预发布部署和 Windows 部署修复已通过验收，`v0.1.0` 正式版制品已发布。真实 Cloud 跨版本升级及回退待下次升级验证。
 - 依据：[服务部署说明书](../../docs/devops/服务部署.md)、[ADR-0020](../../docs/decisions/0020-tagged-release-and-environment-config.md)；实施记录见 [CHG-20261003-077](../completed/CHG-20261003-077/change.md) 与 [CHG-20261010-078](../completed/CHG-20261010-078/change.md)。
 
+- 与后续路线的关系：本文件保留首次上线原范围的验收；发布业务及其升级/恢复回归由 [M10](../MASTER_IMPLEMENTATION_PLAN.md#m10打包升级诊断与稳定性验收) 承接，前置为单任务、批次、计划、工具与三平台，不再等待互动或效果采集。已有打包部署证据不能替代真实平台发布验收。
+
 ## 公开官网与桌面安装包下载
 
 - 用户目标：未登录访客可在 `/home` 了解起飞并获取与当前公开正式版一致的 Windows x64、macOS Intel、macOS Apple 芯片安装包；登录页与官网使用统一品牌视觉。
