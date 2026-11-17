@@ -296,6 +296,7 @@ erDiagram
 | `category_id/media_account_id/composite_output_id` | BIGINT UNSIGNED，必填 | 类目、Cloud 账号、成片身份；外键类型最终核对提供方 |
 | `platform_account_uid` | VARCHAR(255)，必填，精确比较 | 平台真实 UID，不等于 Cloud 账号 ID |
 | `resource_snapshot_json/content_json` | JSON，必填 | 选定资源和已确认内容；只存必要快照及文件 ID／摘要 |
+| `cover_file_id` | BIGINT，必填；外键类型沿用 `operations_files.id` | 当前已确认封面，与 content_json 中的文件 ID 同一事务更新；供固定引用检查及删除保护使用 |
 | `task_order` | INT UNSIGNED，默认 0 | 批次内顺序 |
 | `status` | VARCHAR(24)，默认 pending | 当前业务状态 |
 | `current_attempt_id` | BIGINT UNSIGNED，可空 | 最近一次执行 |
@@ -507,7 +508,7 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 1. 短事务中锁文件行，检查图片、模板、已定版批次、任务及历史执行是否引用它。无人引用才把文件标记为 `deleting` 并提交。标记后不能再建立新引用，也不再签发访问地址。
 2. 事务结束后删除对象存储里的文件，最后删除数据库文件记录。对象不存在视为物理删除已完成；若对象删除或数据库最终结算失败，保留 `deleting` 记录及对象键，允许原删除动作安全重试。对象已经删掉时绝不能把文件重新改成可用。
 
-现有 files Service 是先删除对象、后删数据库行，需要按上述规则改造。JSON 中的文件引用在写入时也必须锁同一文件行并检查 `delete_state`；不新增通用引用表、引用计数中心或后台自动回收系统。
+文件的删除状态为 `ready / deleting`。新上传明确初始化为 `ready`，数据库拒绝空值等非法状态；旧空值修复不能恢复 `deleting`。files Service 按上述顺序执行删除。JSON 中的文件引用在写入时也必须锁同一文件行并检查 `delete_state`；不新增通用引用表、引用计数中心或后台自动回收系统。
 
 ## 5. 接口契约
 

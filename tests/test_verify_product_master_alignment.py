@@ -162,6 +162,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         # Preserve formal references in this isolated fixture.
         (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
         (root / "delivery" / "completed").symlink_to(ROOT / "delivery" / "completed", target_is_directory=True)
+        (root / "delivery" / "active").symlink_to(ROOT / "delivery" / "active", target_is_directory=True)
         card = root / "delivery" / "milestones" / "M7-batch-publishing.md"
         text = card.read_text(encoding="utf-8")
         self.assertIn("](M6-single-publishing.md)", text)
@@ -177,6 +178,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         shutil.copytree(ROOT / "delivery" / "milestones", root / "delivery" / "milestones")
         (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
         (root / "delivery" / "completed").symlink_to(ROOT / "delivery" / "completed", target_is_directory=True)
+        (root / "delivery" / "active").symlink_to(ROOT / "delivery" / "active", target_is_directory=True)
         card = root / "delivery" / "milestones" / "M6-single-publishing.md"
         old = "`/example/operations/publishing/tasks`"
         text = card.read_text(encoding="utf-8")
@@ -194,6 +196,25 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
         (root / "config").symlink_to(ROOT / "config", target_is_directory=True)
         (root / "delivery" / "LEDGER.md").write_text("# Delivery Ledger\n", encoding="utf-8")
+        # Lifecycle mutations need a stable unstarted fixture, independent of the
+        # real checkout's current active delivery. The ROOT test above still
+        # validates that real state and every negative assertion stays exact.
+        master_path = root / "delivery" / MASTER_PATH.name
+        master = master_path.read_text(encoding="utf-8")
+        for name in (*self.module.PUBLISHING_CARDS, "M10"):
+            before = self.module.route_sections(master)[name]
+            after = re.sub(r"^\| 状态 \| .*", "| 状态 | `NOT_STARTED` |", before, flags=re.MULTILINE)
+            after = re.sub(r"^\| Active CHG \| .*", "| Active CHG | None |", after, flags=re.MULTILINE)
+            after = re.sub(r"^\| Evidence \| .*", "| Evidence | None |", after, flags=re.MULTILINE)
+            master = master.replace(before, after, 1)
+            if name in self.module.PUBLISHING_CARDS:
+                path = root / "delivery" / "milestones" / self.module.PUBLISHING_CARDS[name]
+                text = path.read_text(encoding="utf-8")
+                text = re.sub(r"状态：`[^`]+`", "状态：`NOT_STARTED`", text, count=1)
+                text = re.sub(r"Active CHG：[^；\n]+", "Active CHG：None", text, count=1)
+                text = re.sub(r"^- Evidence：.*\n?", "", text, flags=re.MULTILINE)
+                path.write_text(text, encoding="utf-8")
+        master_path.write_text(master, encoding="utf-8")
         return root
 
     def set_stage(self, root, name, status, active="None", evidence=None, retire_candidates=False):
