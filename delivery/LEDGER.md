@@ -7,4 +7,4 @@ Completed delivery records are removed after their final product, engineering, c
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
 
-当前无进行中的交付项。
+| [CHG-20261118-101](active/CHG-20261118-101/change.md) | M6-A 正式任务与文件安全 | IMPLEMENTING | wt-media-workspace、wt-media-cloud |
