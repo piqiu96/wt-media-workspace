@@ -82,6 +82,12 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         # candidate block, so the missing-block check has nothing to add here.
         self.assert_errors(changed, ["M0 status expected 'DONE', got 'VERIFYING'"])
 
+    def test_accepts_approved_browser_assisted_auto_submit_terminology(self) -> None:
+        self.assert_errors(
+            self.mutate("浏览器自动提交是必须能力", "浏览器辅助发布（自动提交）中浏览器自动提交是必须能力"),
+            [],
+        )
+
     def test_rejects_manual_final_submission_baseline(self) -> None:
         self.assert_errors(
             self.mutate("首次浏览器自动提交与真实回执", "首次 pending_manual_submit 与真实回执"),

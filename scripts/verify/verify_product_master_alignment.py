@@ -187,7 +187,7 @@ def validate_master_text(text: str) -> list[str]:
     errors.extend(require_all(sections[6], ("审核中不算公开成功", "断网后必须核实且不重复投稿"), "M6 gate"))
     for name in ("M6", "M7", "M-publishing-plan", "M-publishing-operations", "M10"):
         section = route.get(name, "")
-        for obsolete in ("pending_manual_submit", "Agent 不点击最终发布按钮", "运营人工提交", "辅助发布"):
+        for obsolete in ("pending_manual_submit", "Agent 不点击最终发布按钮", "运营人工提交", "B站辅助发布", "百家号辅助发布"):
             if obsolete in section:
                 errors.append(f"{name} contains obsolete publishing baseline {obsolete!r}")
 
