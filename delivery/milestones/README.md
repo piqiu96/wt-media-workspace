@@ -55,7 +55,7 @@ CHG 必须引用一张闭环卡，只描述本次差距、修改范围、任务�
 | 4 | [M-publishing-operations 工具与三平台](M-publishing-operations.md) | 管理真实图片和模板，在 B站、小红书、百度完成任务/批次/计划 | 整体依赖计划阶段；子候选可按直接依赖提前实施 |
 | 5 | [M10 交付验收](../MASTER_IMPLEMENTATION_PLAN.md#m10打包升级诊断与稳定性验收) | 使用通过安装、升级、恢复和诊断验证的发布版本组合 | 工具与三平台阶段；不依赖 M8/M9 |
 
-M6 为 `IN_PROGRESS`，Active CHG 为 [CHG-20261118-101](../active/CHG-20261118-101/change.md)、[CHG-20261118-102](../active/CHG-20261118-102/change.md)；其余发布阶段为 `NOT_STARTED`，Active CHG 为 None；原 M6/M7 未实施计划由新定义替换，M0—M5 历史验收不变。M8 互动、M9 效果采集退出当前未来路线，不保留未来实施章节或候选，原编号不复用。新增阶段用名称标识，不把历史编号分配给其他业务。
+M6 为 `IN_PROGRESS`，Active CHG 为 [CHG-20261118-101](../active/CHG-20261118-101/change.md)、[CHG-20261118-102](../active/CHG-20261118-102/change.md)、[CHG-20261118-103](../active/CHG-20261118-103/change.md)；其余发布阶段为 `NOT_STARTED`，Active CHG 为 None；原 M6/M7 未实施计划由新定义替换，M0—M5 历史验收不变。M8 互动、M9 效果采集退出当前未来路线，不保留未来实施章节或候选，原编号不复用。新增阶段用名称标识，不把历史编号分配给其他业务。
 
 执行时同步更新 Master 与闭环卡的状态、Active CHG，按实际 CHG 的 `parent` 核对归属；候选名称不是永久约束。`NOT_STARTED` 保留候选规划；`IN_PROGRESS` / `VERIFYING` 核对当前 CHG，无 Active CHG 的阶段间隙或待签收阶段需在两处 Evidence 字段引用已有交付证据；`DONE` 必须退出 Active CHG，并在两处引用验收证据。M10 的当前状态与证据由 Master 保存，不改写首次上线历史记录。
 

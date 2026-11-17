@@ -804,3 +804,35 @@ releases:
     residual_risks:
       - "The public domain can return nginx cached bytes after origin deletion; cached copies expire under its cache policy. No bucket ACL changes."
       - "Agent walkthroughs do not replace user visual sign-off."
+
+  - release: "chg103-publishing-preparation-20261118"
+    status: verifying
+    date: "2026-11-18"
+    scope: publication_owner_claim_and_real_preparation
+    environment: local_development
+    components:
+      cloud: "966cd3a4de2d72b3dac7dda94a0d7daa75560537 (unmerged, not released)"
+      cloud_agent: "Cloud 966cd3a4de2d72b3dac7dda94a0d7daa75560537 (not released)"
+      local_agent: "47e4d907cf7d17889f910090d9fa54abad6a0595 (unmerged, not released)"
+      desktop: "5cd5461243f1be90b4ea84e8ccacba188674eaed (unmerged, not released)"
+    contracts:
+      cloud_api: "v1@2026.11.18.2"
+      cloud_agent_api: "v1@2026.11.18.2"
+      cloud_error_codes: "2026.11.18.1"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Owner claim, frozen input, submit preflight and original result reporting verified; no browser submission implementation or publication loop enabled in this unit."
+    rollout_order:
+      - "Cloud#44 then Workspace#52, Agent#9 then Workspace#53 provide the prerequisite changes."
+      - "Cloud#45 applies migration 104 and the provider API, then Agent#10, Desktop#11 and this Workspace CHG. New code PRs await Review."
+    verification:
+      local:
+        - "106 fresh migrations and repeat-zero, 15 isolated MySQL execution tests, Agent 705, frontend 1006 and Desktop 538 passed (6 existing ignored)."
+        - "Real owner claim downloaded and verified actual output/cover and live Baidu UID. Task 1 was safely recorded as failed/not submitted after verified browser closure; original-result replay and replaced-session denial passed."
+        - "Shared Web/Desktop pages exercised actual authorization, cancellation and failed-attempt read-back; latest macOS DMG and official CHG verification passed. No final platform submission or native visual acceptance claimed."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "local DMG built and freshness verified; native visual walkthrough pending, not released"
+    residual_risks:
+      - "Execution flags remain disabled in repository and online configuration; only a private local test override enabled preparation checks."
+      - "Baidu browser upload/final submission, public result verification and safe retry remain later M6 work; this candidate does not complete M6."
