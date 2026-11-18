@@ -1,0 +1,19 @@
+{
+  "task_id": "3",
+  "original_attempt_id": "2",
+  "original_result_hash": "9630ce9293268ae7223f118fee54ef883aebc076b70437996a7dc97560fa9fa2",
+  "original_result_preserved": true,
+  "platform_works_pages_checked": 11,
+  "platform_works_total": 103,
+  "matching_title": false,
+  "drafts": 0,
+  "identity_matches": true,
+  "scene_mirror_and_socket_closed": true,
+  "local_original_phase": "settled",
+  "status": "queued",
+  "revision": "9",
+  "current_attempt_id": null,
+  "attempt_count": 1,
+  "page_errors": [],
+  "platform_submit": false
+}
