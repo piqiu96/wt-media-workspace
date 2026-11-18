@@ -163,7 +163,7 @@ wt-media-workspace/
 | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
 | M4 | `DONE` | M4 各实施 CHG、M4-H1 视觉整改与 M4-H2 统一走查均已完成；机器闭环与真实页面签收均有证据。 | 2026-10-28 用户签收 M4-H2；M4 冻结为 Cloud 内容生产闭环基线。 |
 | M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
-| M6 | `IN_PROGRESS` | M6-A、M6-B 本地防重及所属用户领取验证待 Review | 继续接入百度浏览器自动投稿及结果核实 |
+| M6 | `IN_PROGRESS` | M6-B 正式自动投稿取得真实回执，堆叠 PR 待 Review | 合并前置链，继续 M6-C 公开结果核实与单任务验收 |
 | M7 | `NOT_STARTED` | 已有交互原型，无生产批次验收 | 依赖 M6 完成 |
 | M-publishing-plan、M-publishing-operations | `NOT_STARTED` | 目标设计已确认，生产能力未验收 | 完成计划、工具和三平台回归 |
 | M10 | `NOT_STARTED` | 首次上线已有部分打包部署证据 | 依赖发布四阶段，补验升级、恢复及发布业务 |
