@@ -56,4 +56,4 @@ Agent 提交 `3f9033a550f51d745fe188e396f54b032a749061` 将本轮发布执行与
 
 最终复验 `PYTHONDONTWRITEBYTECODE=1 bash scripts/test.sh`：750 项通过；列表、字典、空值及未知状态/上报类型的 8 项补充边界检查仍按原行为拒绝。独立审查未发现待修问题；差异检查通过。本轮没有真实平台操作，原有 Workspace 整体验证限制仍适用。
 
-Review 按原有堆叠关系进行：[Agent CHG-104 PR #11](https://github.com/piqiu96/wt-media-agent/pull/11) 先审核核实与安全重试衔接，[Agent CHG-105 PR #12](https://github.com/piqiu96/wt-media-agent/pull/12) 再审核实际投稿与本轮后续修复；分别确认，不合并为一个新 CHG。当前后续修复与常量整改均在既有 `codex/CHG-20261118-105` 本地分支；截至本记录未推送，远端 PR 的最终 Review 需包含这些提交后进行。CHG-104 的独立 PR 不包含本轮后续修复。保持 VERIFYING，不自动合并。
+Review 按原有堆叠关系进行：[Agent CHG-104 PR #11](https://github.com/piqiu96/wt-media-agent/pull/11) 先审核核实与安全重试衔接，[Agent CHG-105 PR #12](https://github.com/piqiu96/wt-media-agent/pull/12) 再审核实际投稿与本轮后续修复；分别确认，不合并为一个新 CHG。首次记录时，后续修复与常量整改尚在既有 `codex/CHG-20261118-105` 本地分支，未推送。后续结构重整与本轮统一交付见 [CHG-105 最新验证](../../CHG-20261118-105/evidence/verification.md#2026-11-19-review-后的平台能力职责重整)；远端最终 Review 以现有 PR 的最新提交为准，包含本节修复与公共常量整改。CHG-104 的独立 PR 不包含本轮后续修复。保持 VERIFYING，不自动合并。
