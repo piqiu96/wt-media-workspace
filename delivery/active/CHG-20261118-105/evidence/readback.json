@@ -1,0 +1,30 @@
+{
+  "task_id": "3",
+  "attempt_id": "4",
+  "status": "uncertain",
+  "revision": "15",
+  "attempt_count": 3,
+  "platform_check": {
+    "account_matches": true,
+    "works_checked": 103,
+    "matching_title_found": false,
+    "draft_count": 0,
+    "previous_editor_restored": true
+  },
+  "cloud_and_desktop_browser": {
+    "cancel_preserves_task": true,
+    "incomplete_evidence_rejected": true,
+    "page_errors": [],
+    "horizontal_overflow": false
+  },
+  "isolated_bitbrowser_file": {
+    "bytes": 67108864,
+    "ffprobe_duration": "1.000000",
+    "browser_sha256_matches": true,
+    "bundled_driver": "1.58.0",
+    "platform_upload": false
+  },
+  "resolution_written": false,
+  "retry_requested": false,
+  "final_submission": false
+}
