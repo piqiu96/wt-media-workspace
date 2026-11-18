@@ -486,8 +486,8 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 | 目标 | 真实账号、成片和内容准备后创建任务，授权 Agent 自动提交，并在任务及作品管理核对公开结果 |
 | 依赖 | M2 账号/环境、M4/M5 成片及文件服务可用；本轮复查真实资源 |
 | 业务验收 | [M6 单任务](milestones/M6-single-publishing.md) |
-| Active CHG | [CHG-20261118-101](active/CHG-20261118-101/change.md)、[CHG-20261118-102](active/CHG-20261118-102/change.md)、[CHG-20261118-103](active/CHG-20261118-103/change.md) |
-| Evidence | None，未进入生产发布验收 |
+| Active CHG | [CHG-20261118-101](active/CHG-20261118-101/change.md)、[CHG-20261118-102](active/CHG-20261118-102/change.md)、[CHG-20261118-103](active/CHG-20261118-103/change.md)、[CHG-20261118-104](active/CHG-20261118-104/change.md) |
+| Evidence | 各 Active CHG 的 evidence；已验证任务准备、所属用户预检及核实页面，尚无真实投稿或公开作品验收 |
 
 候选 CHG：
 
