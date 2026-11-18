@@ -35,9 +35,13 @@ Agent 实现实际浏览器表单适配与 Local/Sidecar 串行领取循环；Cl
 | Local/Sidecar 仅运行下载循环 | Agent `runner/publication_loop.py`、`runtime/agent_token.py` 及 bootstrap 显式装配 | 无 Token 零领取、旧会话停止新动作、只补报原用户、Cloud 不启动 |
 | 打包仍为上一单元 | 现有打包入口重建 Sidecar/DMG，Workspace 记录已验证版本及证据 | 标准测试、真实开发页面与安装产物检查；各变更仓独立提交 |
 
+## 本轮真实页面适配
+
+使用 46 号窗口核对现有表单。串行修正封面上传判定：将本地图片解码校验限定到选中文件的上传控件，避免把视频抽帧缩略图误认为上传成功；最终提交前再次检查视频上传状态。先在隔离浏览器复现失败，再修改 `clients/baidu/publisher.py`，运行发布器浏览器检查和 Agent 标准检查。原恢复现场继续保留，不重新执行旧任务或修改 Cloud 契约。
+
 ## 当前验收
 
-发布器、串行领取与打包接入已实现。Workspace 211 项、Agent 739 项及隔离浏览器 7 项通过；实际 BitBrowser 和包内驱动均验证了 64 MiB 本地文件。真实表单完整填写、自动最终提交及可信平台回执尚未通过，原尝试恢复的编辑内容仍需安全处置，因此本单元保留 `VERIFYING`、M6 保留 `IN_PROGRESS`。[实际证据与限制](evidence/verification.md)。
+发布器、串行领取与打包接入已实现。既有 Workspace 211 项检查通过；本轮 Agent 739 项及隔离浏览器 11 项通过，46 号真实封面上传控件校验通过；实际 BitBrowser 和包内驱动均验证了 64 MiB 本地文件。真实表单完整填写、自动最终提交及可信平台回执尚未通过，原尝试恢复的编辑内容仍需安全处置，因此本单元保留 `VERIFYING`、M6 保留 `IN_PROGRESS`。[实际证据与限制](evidence/verification.md)。
 
 ## References
 

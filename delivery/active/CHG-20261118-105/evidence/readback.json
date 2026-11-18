@@ -26,5 +26,23 @@
   },
   "resolution_written": false,
   "retry_requested": false,
-  "final_submission": false
+  "final_submission": false,
+  "editor_adaptation": {
+    "agent_commit": "856dbdffad35a1570622e373d49565817ac3ed10",
+    "agent_tests": 739,
+    "isolated_browser_tests": 11,
+    "unique_live_upload_region": true,
+    "live_cover_upload_control": {
+      "new_blob": true,
+      "decoded": true,
+      "width": 1200,
+      "height": 900
+    },
+    "old_editor_preserved": true,
+    "new_video_upload": false,
+    "final_submission": false,
+    "new_platform_receipt": false,
+    "cloud_task_mutated": false,
+    "package_rebuilt": false
+  }
 }

@@ -43,3 +43,23 @@ Cloud 和 Desktop 开发入口分别运行现有 `web/scripts/test-publication-r
 - 未验证超过 50 MiB 文件在百家号完成上传和处理，也未验证安装包内完整发布流程；上述本机文件与驱动检查不能替代它们。
 - CHG-101～104 前置 PR 链先合并；随后 [Agent #12](https://github.com/piqiu96/wt-media-agent/pull/12) → Workspace CHG-105。各自以 `codex/CHG-20261118-104` 为 base，保留独立差异，不自动合并。
 - 当前堆叠 base 不触发既有 main-only workflow；以上为实际本地验证，不宣称远端 CI 通过。
+
+
+## 本轮 46 号窗口适配增量
+
+Agent 本地提交 `856dbdffad35a1570622e373d49565817ac3ed10`，在原 CHG-105 分支上修正现有 Playwright 发布器；没有推送、合并、重建安装包或更改 Cloud 任务状态。
+
+真实页面观察：新建发布页面仍恢复旧视频和文案。封面弹窗在上传控件之外同时产生多张视频抽帧 blob 缩略图。原判定扫描弹窗全部图片，会把这些缩略图误认为本地封面已成功解码。现在只读取本次文件输入控件中的新图片，要求 blob 地址、解码完成及非零自然宽度。视频上传状态限定到实际 `#cover-tabs-container`，提交前再次确认；正文及预览中的百分比和“上传中”文字不再被当作上传进度。
+
+| 检查 | 本轮实际结果 |
+| --- | --- |
+| Agent `PYTHONPATH=src .venv/bin/python -m unittest discover -s tests/browser -p 'test_*.py'` | PASS，11 项。新增封面解码失败但出现视频缩略图、填写后重新上传阻止最终点击、恢复现场不得再上传，以及包含“上传中”和“25%”的正常文案仍可完成一次模拟提交与匹配回执 |
+| Agent `bash scripts/test.sh` | PASS，739 项；最终状态区域修正后再次执行，29.593 秒、退出 0 |
+| Agent / Workspace `git diff --check` | PASS |
+| Workspace `python3 scripts/verify/verify_delivery_governance.py`、`python3 scripts/verify/verify_product_master_alignment.py` | PASS，Active 集合及产品/主计划一致；本轮未运行全套环境、契约和包体验收 |
+| 独立代码审查 | 首次发现整页进度检查会误认正常文案，补测试实际复现失败后修正；最终只读复核未发现新增实质缺陷 |
+| 46 号真实页面控件探测 | PASS，视频上传区域唯一；选取本机既有 1200×900 PNG 后，目标上传控件出现新的 blob 图片、解码完成、自然尺寸 1200×900。未把其它视频缩略图作为依据；取消封面弹窗并关闭探测页，原编辑页文案保持不变 |
+
+新增封面误判与重新上传用例均先在未修复生产代码上观察到失败。恢复现场用例首次因夹具初始化早于脚本定义而失败，修正为页面脚本加载后恢复现场；该用例验证已有保护，不算新增生产缺陷。审查发现的正文误判另行先复现错误，再修正并取得上述最终 11 项 PASS。
+
+本轮未上传新视频、未完整填写新的真实投稿、未最终提交，也没有本次平台稿件回执。旧任务 3 / attempt 4 的 uncertain 事实和既有回执均未改动，仍需核实旧现场。保留 CHG `VERIFYING` 和 M6 `IN_PROGRESS`；模拟提交及本机封面解码不替代真实投稿验收。未重新验证更新后的冻结 Sidecar / DMG。
