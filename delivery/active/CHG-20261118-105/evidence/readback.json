@@ -28,9 +28,9 @@
   "retry_requested": false,
   "final_submission": false,
   "editor_adaptation": {
-    "agent_commit": "856dbdffad35a1570622e373d49565817ac3ed10",
+    "agent_commit": "da35caf90f49db9d474195065e9f0e67cbf10090",
     "agent_tests": 739,
-    "isolated_browser_tests": 11,
+    "isolated_browser_tests": 14,
     "unique_live_upload_region": true,
     "live_cover_upload_control": {
       "new_blob": true,
@@ -38,11 +38,38 @@
       "width": 1200,
       "height": 900
     },
-    "old_editor_preserved": true,
-    "new_video_upload": false,
-    "final_submission": false,
-    "new_platform_receipt": false,
+    "old_editor_preserved": false,
+    "new_video_upload": true,
+    "final_submission": true,
+    "new_platform_receipt": true,
     "cloud_task_mutated": false,
-    "package_rebuilt": false
+    "package_rebuilt": false,
+    "old_editor_disposition": "replaced after user confirmed previous video was not published"
+  },
+  "direct_platform_verification": {
+    "agent_commit": "da35caf90f49db9d474195065e9f0e67cbf10090",
+    "user_confirmed_previous_not_published": true,
+    "video_size": 11119320,
+    "video_sha256": "2108ec50d268aceacbeb57e42cf7ea5fba4c3557158add79d950f6001533f0ce",
+    "account_matches": true,
+    "new_video_uploaded": true,
+    "fields_verified": true,
+    "covers_verified": 2,
+    "publish_button_clicks": 1,
+    "publish_requests": 1,
+    "accepted": true,
+    "platform_work_id": "1882173445914373676",
+    "platform_status": "published",
+    "public_success_verified": false,
+    "cloud_task_claimed": false,
+    "cloud_permission_requested": false,
+    "cloud_task_mutated": false,
+    "old_task_retried": false,
+    "package_rebuilt": false,
+    "platform_result_page_status": "reviewing",
+    "platform_visibility": "homepage_only",
+    "works_count": 104,
+    "matching_title_found": true,
+    "platform_list_published_at": "2026-11-18 13:41:37"
   }
 }
