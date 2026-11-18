@@ -21,7 +21,7 @@ Agent 实现实际浏览器表单适配与 Local/Sidecar 串行领取循环；Cl
 
 ### 2026-11-19 Review 后的职责重整
 
-按用户确认，将发布协议与百度发布能力独立到 platforms；BrowserSession 归公共服务，基础 API 留 clients。同文件保留 BaiduPublisher 与 BrowserPublisher，一期参数仅 browser，不建 workflow、API 投稿占位、用户选择页面或 Cloud 新字段。协调器保留任务授权、防重、现场关闭及补报；准备和提交前控制通过显式回调衔接。沿用当前 CHG-105 和现有 PR，更新后再次 Review，禁止自动合并。
+按用户确认，将发布协议与百度发布能力独立到 platforms；BrowserSession 归公共服务，基础 API 留 clients。同文件保留 BaiduPublisher 与 BrowserPublisher，一期参数仅 browser，不建 workflow、API 投稿占位、用户选择页面或 Cloud 新字段。协调器保留任务授权、防重、现场关闭及补报；准备和提交前控制通过显式回调衔接。沿用当前 CHG-105 和现有 PR。2026-11-19 用户已对更新后的 PR 明确批准并授权合并；本次按现有 base 合入 CHG-104，不扩大为前置 PR 的 main 合并。
 
 架构决定见 [ADR-0034](../../../docs/decisions/0034-agent-platform-capabilities-and-publish-boundary.md)，实施和验收清单见 [plan.md](plan.md)。历史真实投稿及包验收证据仍对应其原提交。本轮 Agent `5172dca0e2ff57adadf0ff3c8aa1f1c2fc43507d` 完成重构，766 项标准回归、20 项隔离浏览器、wheel/sdist、arm64 Sidecar 构建与鉴权健康、包内驱动及 60 MiB 文件读取通过；独立审查无待修问题。Workspace 整体 211 项仍有此前相同的 26 项外部基线失败，未把整体检查记为通过；详细结果及安装包/真实投稿限制见验证记录。
 
@@ -47,7 +47,7 @@ Agent 完成 Playwright 发布器、所属用户串行循环及 Sidecar 打包�
 
 此前真实投稿验收 Agent `89cfa1a`，743 项标准测试、20 项隔离浏览器测试及当时 Workspace 211 项检查通过；wheel / sdist、最新 macOS arm64 DMG、包内驱动及大文件路径读取通过。最新 DMG 的正式发布循环已取得本次匹配回执，本机原 packet 与 Cloud 哈希一致、补报已确认且本机已 settled。Cloud / Desktop 开发页面如实显示审核中，无重试入口。
 
-[验收记录](evidence/verification.md)与[脱敏读回](evidence/readback.json)记录结果和限制。Agent #12、Workspace #56 待 Review / 合并；CHG 保留 `VERIFYING`，M6 保留 `IN_PROGRESS`。不把审核中、独立适配投稿或包内大文件输入检查冒充公开作品闭环、原生视觉验收或大文件平台上传成功。
+[验收记录](evidence/verification.md)与[脱敏读回](evidence/readback.json)记录结果和限制。Agent #12、Workspace #56 用户 Review 已通过并授权合并到现有 CHG-104 base；前置链进入 main 尚未完成。CHG 保留 `VERIFYING`，M6 保留 `IN_PROGRESS`。不把审核中、独立适配投稿或包内大文件输入检查冒充公开作品闭环、原生视觉验收或大文件平台上传成功。
 
 ## References
 

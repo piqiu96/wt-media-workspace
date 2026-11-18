@@ -97,3 +97,10 @@ Windows / Intel Mac、超过 50 MiB 的平台实际上传处理、公开作品�
 本轮临时 Sidecar SHA256：`8d509f9ce4587145f62334e2a27550fea35b6930442c8b38757ea23ed0d61465`。构建和日志位于执行机临时目录，不提交可执行文件、凭据、签名下载地址或原始平台响应。
 
 本轮没有重建/安装 DMG，没有真实账号或平台写操作，也没有验证 API 投稿。此前 DMG 与稿件证据仍只对应原提交，不用其替代本轮重构后的真实平台验收。交付使用现有 [Agent #12](https://github.com/piqiu96/wt-media-agent/pull/12) 和 [Workspace #56](https://github.com/piqiu96/wt-media-workspace/pull/56)，先 Review CHG-104 再 Review 当前 CHG-105；状态保持 VERIFYING，更新后再次交用户 Review，禁止自动合并。
+
+
+## 2026-11-19 用户批准合并
+
+用户明确回复“同意pr通过并且合入”，解除上一轮对 Agent #12 / Workspace #56 的暂不合并要求。本次仅合并上述两个已 Review 的 PR，使用 merge commit，目标保持现有 `codex/CHG-20261118-104`。CHG-102～104 前置 PR 仍单独待 Review，不将本次授权扩大为整链 main 合并。GitHub PR 的 MERGED 状态及 merge commit 为实际合入凭据。
+
+CHG 保持 VERIFYING，M6 保持 IN_PROGRESS；前置链集成、重构后的完整安装包/真实发布以及公开作品验收限制均继续保留。其他 CHG101/UI 未提交文件不纳入提交。
