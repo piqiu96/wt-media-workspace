@@ -19,6 +19,12 @@ Agent 实现实际浏览器表单适配与 Local/Sidecar 串行领取循环；Cl
 
 按用户本轮临时授权，串行堆叠于 CHG-104，前置 PR 尚待 Review；不修改永久治理规则、不自动合并。用户已确认旧视频未发布。沿用正式核实与安全重试入口保留历史结果，最新 DMG Sidecar 已对任务 3 / attempt 8 完成所属用户领取、资源校验、真实上传填写、Cloud 提交前许可、一次自动投稿及结果回写，取得稿件号 `1882178508377049639`，Cloud 为 `reviewing`，现场关闭已确认。此前不同成片的独立适配投稿回执未绑定到本任务；公开作品核实与关联仍属后续 M6-C。
 
+### 2026-11-19 Review 后的职责重整
+
+按用户确认，将发布协议与百度发布能力独立到 platforms；BrowserSession 归公共服务，基础 API 留 clients。同文件保留 BaiduPublisher 与 BrowserPublisher，一期参数仅 browser，不建 workflow、API 投稿占位、用户选择页面或 Cloud 新字段。协调器保留任务授权、防重、现场关闭及补报；准备和提交前控制通过显式回调衔接。沿用当前 CHG-105 和现有 PR，更新后再次 Review，禁止自动合并。
+
+架构决定见 [ADR-0034](../../../docs/decisions/0034-agent-platform-capabilities-and-publish-boundary.md)，实施和验收清单见 [plan.md](plan.md)。历史真实投稿及包验收证据仍对应其原提交。本轮 Agent `5172dca0e2ff57adadf0ff3c8aa1f1c2fc43507d` 完成重构，766 项标准回归、20 项隔离浏览器、wheel/sdist、arm64 Sidecar 构建与鉴权健康、包内驱动及 60 MiB 文件读取通过；独立审查无待修问题。Workspace 整体 211 项仍有此前相同的 26 项外部基线失败，未把整体检查记为通过；详细结果及安装包/真实投稿限制见验证记录。
+
 ## Done When
 
 - 实际表单上传原快照对应视频及封面，读回确认文案、话题和声明；不自动替换内容或伪造平台能力。
@@ -39,7 +45,7 @@ Agent 实现实际浏览器表单适配与 Local/Sidecar 串行领取循环；Cl
 
 Agent 完成 Playwright 发布器、所属用户串行循环及 Sidecar 打包。真实页面修正覆盖首页折叠菜单、空封面、只在本地文件控件确认解码、等待对应槽位的新封面预览、未匹配话题确认及提交前实时 UID 复查；原恢复编辑器仍拒绝自动重入。打包脚本在副本中签名并原子替换 Python 动态库，避免修改运行中映射文件，兼容符号链接。
 
-最终 Agent `89cfa1a`，743 项标准测试、20 项隔离浏览器测试及 Workspace 211 项检查通过；wheel / sdist、最新 macOS arm64 DMG、包内驱动及大文件路径读取通过。最新 DMG 的正式发布循环已取得本次匹配回执，本机原 packet 与 Cloud 哈希一致、补报已确认且本机已 settled。Cloud / Desktop 开发页面如实显示审核中，无重试入口。
+此前真实投稿验收 Agent `89cfa1a`，743 项标准测试、20 项隔离浏览器测试及当时 Workspace 211 项检查通过；wheel / sdist、最新 macOS arm64 DMG、包内驱动及大文件路径读取通过。最新 DMG 的正式发布循环已取得本次匹配回执，本机原 packet 与 Cloud 哈希一致、补报已确认且本机已 settled。Cloud / Desktop 开发页面如实显示审核中，无重试入口。
 
 [验收记录](evidence/verification.md)与[脱敏读回](evidence/readback.json)记录结果和限制。Agent #12、Workspace #56 待 Review / 合并；CHG 保留 `VERIFYING`，M6 保留 `IN_PROGRESS`。不把审核中、独立适配投稿或包内大文件输入检查冒充公开作品闭环、原生视觉验收或大文件平台上传成功。
 

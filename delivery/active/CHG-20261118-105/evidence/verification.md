@@ -67,3 +67,33 @@ Cloud 和 Desktop 开发入口实际打开任务详情，均显示“平台审�
 Windows / Intel Mac、超过 50 MiB 的平台实际上传处理、公开作品链接和关联未验证。M6-C 与生产开放未完成，M6 不标记 DONE。
 
 交付为 [Agent #12](https://github.com/piqiu96/wt-media-agent/pull/12)、[Workspace #56](https://github.com/piqiu96/wt-media-workspace/pull/56)，均以 `codex/CHG-20261118-104` 为 base。按用户临时授权串行实施，不自动合并；先 Review / 合并 CHG-101～104 前置链，再处理本 CHG。既有 main-only workflow 不触发堆叠 base，上述为本地检查，不宣称远端 CI 通过。
+
+
+## 2026-11-19 Review 后的平台能力职责重整
+
+当前实现：Agent `5172dca0e2ff57adadf0ff3c8aa1f1c2fc43507d`。修改前重新 fetch 两仓 main；Agent `b8c2b259ec06e68eaac304bad753acf131fce598`、Workspace `afc76c498e3caa1715b4935febc27b7c0e776f31` 均已包含于现有 CHG-105 分支，无须再次合入。不新建 CHG，不合并任何 PR，保留其他任务未提交走查记录。
+
+### 最终结构和执行边界
+
+- `platforms/publish.py` 提供 Publisher、不可变载荷、回执和必填执行控制；`platforms/baidu/publisher.py` 同文件包含 BaiduPublisher 与 BrowserPublisher。公共接口不含 Page/Token/Cloud 任务或 SQLite；一期 method 默认并显式 browser，非法方式在发布动作前拒绝。没有 workflow、API 投稿占位、浏览器子目录或用户选择字段。
+- BrowserSession 原样迁至 `services/browser/session.py`。基础身份 API 保留 clients；身份组合与浏览器发布归平台能力。原下载逻辑迁到文件校验服务，通过现有基础下载客户端读字节，不增加网络或投稿重试。`image_upload_file` 的函数内容逐字比对保持一致，不改原图片字节、不新增尺寸或解码校验。
+- 初次实读 UID 通过后回调协调器落盘 prepared 并报告 ready，原有两个 ready 报告及序号次序保留。上传后再次核对 UID，提交前回调先落盘阶段、取得 Cloud 新鲜许可及记录 click_started；再次检查停止后只提交一次。释放 Playwright 连接后，协调器独立核实 Profile 关闭，再保存和补报原结果。
+- 同时包含前轮恢复修复 `38961c5` 与公共常量整改 `3f9033a`；缺失结果和人工处置早于补报的本地解除逻辑、已有 packet/hash、未投递历史标记与旧尝试屏障保持。详见 [CHG-102 补充证据](../../CHG-20261118-102/evidence/verification.md#2026-11-19-异常退出后的人工处置衔接)。它们属于当前后续分支，不是 PR #9/CHG-104 独立差异。
+
+### 本轮实际验证
+
+| 检查 | 结果 |
+| --- | --- |
+| 先复现后实现 | 独立发布入口首先因缺失 platforms 模块失败，落地后 9 项入口控制测试通过；新平台边界扫描先因缺失规则失败，随后正反例通过 |
+| Agent 标准回归 | PASS：`PYTHONDONTWRITEBYTECODE=1 bash scripts/test.sh`，766 项，基于前轮 750 项增加 16 项；原存储故障、停止、身份变化、许可丢失及补报断言保留 |
+| 隔离浏览器 | PASS：`PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src .venv/bin/python -m unittest discover -s tests/browser`，20 项；临时 Chrome Profile，外部请求由 fixture 拦截；不是实际平台发布证据 |
+| 独立审查 | 无待修问题；独立复验公开入口、协调器、准备、下载及依赖检查共 80 项通过 |
+| wheel / sdist | PASS：离线 uv build，两种归档都包含新平台模块、公共会话和文件校验服务，旧客户端发布模块已移除 |
+| 原生 Sidecar | PASS：macOS arm64 PyInstaller 构建、固定本地 API 路由比对、带鉴权 healthz；包内 Playwright 1.58.0 驱动 368 个文件可运行 |
+| 冻结包大文件探针 | PASS：隔离且禁止外网的 Chrome 页面读取 62,914,560 字节本地测试文件，`platform_submit=false` |
+| 文档与治理 | PASS：docs/check.py、verify_delivery_governance.py、verify_product_master_alignment.py、Agent/共享目录规则生成同步、差异检查 |
+| Workspace 全套 | 执行 211 项，26 项失败，与本轮之前记录一致：现有未提交 Milestone 引用未复制到测试副本的 CHG101 `app-walkthrough-fixes.md`；Cloud 本地提供方 2026.11.19.2 与主线 map 2026.11.19.1 不一致。没有修改该走查记录、提供方或降低断言，不将整体记为通过 |
+
+本轮临时 Sidecar SHA256：`8d509f9ce4587145f62334e2a27550fea35b6930442c8b38757ea23ed0d61465`。构建和日志位于执行机临时目录，不提交可执行文件、凭据、签名下载地址或原始平台响应。
+
+本轮没有重建/安装 DMG，没有真实账号或平台写操作，也没有验证 API 投稿。此前 DMG 与稿件证据仍只对应原提交，不用其替代本轮重构后的真实平台验收。交付使用现有 [Agent #12](https://github.com/piqiu96/wt-media-agent/pull/12) 和 [Workspace #56](https://github.com/piqiu96/wt-media-workspace/pull/56)，先 Review CHG-104 再 Review 当前 CHG-105；状态保持 VERIFYING，更新后再次交用户 Review，禁止自动合并。

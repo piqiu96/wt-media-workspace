@@ -138,10 +138,12 @@ sequenceDiagram
 
 | 组件 | 轻量实现思路 |
 | --- | --- |
-| `PublicationJob` | 组织准备、填写、提交前复查、最终提交及结果保存；沿用 SQLite 检查点和原结果补报，不把授权或重试判断下放给平台实现 |
+| `PublicationJob` | 组织所属任务资源准备、心跳、阶段持久化、提交许可、关闭核实和原结果保存/补报；通过必填控制回调调用独立发布入口，不直接执行平台页面步骤 |
 | `BrowserSession` | 根据 BitBrowser 启动响应取得动态 CDP 地址，连接对应 Profile 的现有默认 context；管理本次页面和连接，核对账号，不另起空白账号环境。断开 Playwright 不等于现场已安全结束，Profile 关闭仍须使用现有 BitBrowser 能力核实 |
-| `Publisher` | 用 Python `Protocol` 约定 `fill_form()`、`submit()`、`read_receipt()`；消费本次页面、已固定内容和本地文件，不依赖 Cloud ORM，不访问数据库或自行领取任务 |
-| `BaiduPublisher` 等平台实现 | 在 Agent 现有平台目录内组织各自的选择器、填写、平台校验与回执解析；按百度、B站、小红书的既定顺序实现。类名表达职责，使用 `Publisher`、`BrowserSession`、`PublishPayload`、`PublishReceipt` 等名词，避免 `BaiduPublishing` 这类含义不清的命名 |
+| `Publisher` | `platforms/publish.py` 用 Protocol 约定 `publish(payload, control, *, method=PublishMethod.BROWSER)`；消费固定内容、本地路径与预期 UID，返回本次回执。控制含停止检查、准备完成通知与提交前许可；公共入口不接收 Page、Token 或数据库模型 |
+| `BaiduPublisher` / `BrowserPublisher` | 同放 `platforms/baidu/publisher.py`。前者选择实现，组织两次身份核对、准备、提交许可与一次提交；后者封装当前页面、选择器、填写、平台检查与回执。基础 API 仍通过 clients，公共会话经 services/browser；一期只支持 browser，不创建 API 投稿占位或浏览器子目录 |
+
+目录和依赖边界见 [ADR-0034](../../decisions/0034-agent-platform-capabilities-and-publish-boundary.md)。首次实读 UID 成功后，准备完成回调才允许持久化 prepared 并报告 ready；上传后再次核实 UID，提交前回调记录屏障且取得新鲜许可后才可提交。业务入口通过参数固定 browser，暂不增加用户选择页面、Cloud 字段或外部契约。
 
 使用现有 bootstrap 显式装配，通过简单平台映射选择 Publisher；不引入动态插件、全局单例注册系统或通用工作流引擎。页面操作直接使用 Playwright API，不再包装一套同名浏览器操作接口。首版可使用同步 API 对接现有同步执行器，同一会话的 Playwright 调用留在同一执行线程；心跳线程只传递停止信号，不操作页面。
 
