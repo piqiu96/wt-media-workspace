@@ -31,7 +31,7 @@ flowchart LR
 
 | 位置 | 职责 | 实现边界 |
 | --- | --- | --- |
-| Cloud 发布管理 | 配置校验、正式创建、占用、授权、派发、结果核实、推进、统计和审计 | 在 `internal/modules/publishing` 内按 Handler → Service → Repository 组织；通过所属模块 Service 使用账号、成片、身份和文件 |
+| Cloud 发布管理 | 配置校验、正式创建、占用、授权、派发、结果核实、推进、统计和审计 | 在 `internal/modules/publish` 内按 Handler → Service → Repository 组织；通过所属模块 Service 使用账号、成片、身份和文件 |
 | Cloud 运营工具 | 图片库、模板草稿与发布配置、真实封面渲染 | 图片、模板、渲染按主题分文件，供发布管理引用；不拆独立部署服务或通用资源引擎 |
 | Cloud Scheduler | 到时入队、计划推进、失联检查 | 调用发布 Service，不访问浏览器或运营电脑，不自行改写另一套状态 |
 | Local Agent | 实读账号环境、取文件、上传、填写、提交、保留现场和执行证据、补报结果 | 只执行所属用户的账号；不直接写 Cloud 数据库，不自行授予重试权限 |
@@ -54,10 +54,10 @@ flowchart LR
 
 ### 1.3 V1 实施边界
 
-产品范围以 [PRD 平台范围](../../product/prd/详细文档/第六章_发布管理.md)和[批次资源配置](../../product/prd/详细文档/第六章_发布管理.md#632-新建批次)为准。工程实现沿用已有身份、任务和能力开关：
+产品范围以 [PRD 平台范围](../../product/prd/详细文档/第六章_发布管理.md)和[批次资源配置](../../product/prd/详细文档/第六章_发布管理.md#632-新建批次)为准。工程实现沿用已有身份与任务边界：
 
 - 正式创建按每个账号的所属用户确定 task 的 `operator_id`，不使用批次负责人或创建人统一代填。领取时将 Agent 认证用户与该任务及账号归属核对；离线保留待办，不转派、不新增协作服务。
-- 平台适配按 PRD 顺序推进，各平台真实发布与结果核实验收通过后才打开能力开关。未开放平台在创建、授权及领取时明确拒绝，不能让任务运行后必然失败。
+- 当前百度账号与待执行任务入口正常展示，不设置百度准备开关。创建任务只保存 pending，不等于授权执行或已接通投稿。其他平台按 PRD 顺序接入；授权及领取必须独立验证执行能力，不能靠隐藏准备入口代替执行校验。
 - 资源查询与推荐只消费已有资格、顺序和数量，不新增质量评级字段、维护 API／页面或等级匹配输入。
 
 ## 2. 服务交互
@@ -296,6 +296,7 @@ erDiagram
 | `category_id/media_account_id/composite_output_id` | BIGINT UNSIGNED，必填 | 类目、Cloud 账号、成片身份；外键类型最终核对提供方 |
 | `platform_account_uid` | VARCHAR(255)，必填，精确比较 | 平台真实 UID，不等于 Cloud 账号 ID |
 | `resource_snapshot_json/content_json` | JSON，必填 | 选定资源和已确认内容；只存必要快照及文件 ID／摘要 |
+| `cover_file_id` | BIGINT，必填；外键类型沿用 `operations_files.id` | 当前已确认封面，与 content_json 中的文件 ID 同一事务更新；供固定引用检查及删除保护使用 |
 | `task_order` | INT UNSIGNED，默认 0 | 批次内顺序 |
 | `status` | VARCHAR(24)，默认 pending | 当前业务状态 |
 | `current_attempt_id` | BIGINT UNSIGNED，可空 | 最近一次执行 |
@@ -310,6 +311,8 @@ erDiagram
 | `revision`、审计公共列 | 见 3.1 | 并发编辑与审计 |
 
 **索引：** `UNIQUE(platform,occupied_output_id)` 防止同一成片同平台重复占用；`UNIQUE(platform,executing_account_uid)` 保证真实 UID 串行；`UNIQUE(created_by,request_key)` 为独立快速创建防重；按 batch/status、operator/status/not_before、team/published_at 建查询索引。生成列在 `status=abandoned` 或不执行时返回 NULL；详细表达见下方 SQL 规则。
+
+Go 发布状态由 `internal/modules/publish/model.Status` 及同包常量维护，其他业务的任务状态留在各自模块，不建立通用 `TaskStatus`。发布业务错误码统一放在 Cloud 的 `internal/shared/errcode/publish.go`，与 `contracts/cloud-error-codes/v1/publish.yaml` 对齐；HTTP 状态使用框架常量。
 
 任务只使用十个状态；这里列出内部代码供迁移和 Contract 对齐，**允许动作以 [PRD 6.4.1](../../product/prd/详细文档/第六章_发布管理.md#641-任务列表) 为准**。
 
@@ -404,7 +407,7 @@ UNIQUE (platform, executing_account_uid)
 
 #### 已有文件表扩展
 
-`operations_files` 保持既有自增主键及文件字段。仅按需增加 `metadata_json JSON NULL`（宽高、格式、模板输入与渲染来源）和 `delete_state VARCHAR(16) NOT NULL DEFAULT 'ready'`（ready/deleting），以实现 4.6 的安全删除。**不新增文件表或引用计数表。**
+`operations_files` 保持既有自增主键及文件字段。仅按需增加 `metadata_json JSON NULL`（宽高、格式、模板输入与渲染来源）和 `deleted_at DATETIME(6) NULL`（删除开始时间），以实现 4.6 的安全删除。**不新增文件表或引用计数表。**
 
 ### 3.7 本地存储
 
@@ -504,10 +507,10 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 
 图片库与文件管理删除必须调用同一套引用检查。创建正式引用和删除都锁现有 `operations_files` 文件行；多文件按 ID 排序。**删除分为数据库确认和物理删除两步，不在数据库事务里删除对象。**
 
-1. 短事务中锁文件行，检查图片、模板、已定版批次、任务及历史执行是否引用它。无人引用才把文件标记为 `deleting` 并提交。标记后不能再建立新引用，也不再签发访问地址。
-2. 事务结束后删除对象存储里的文件，最后删除数据库文件记录。对象不存在视为物理删除已完成；若对象删除或数据库最终结算失败，保留 `deleting` 记录及对象键，允许原删除动作安全重试。对象已经删掉时绝不能把文件重新改成可用。
+1. 短事务中锁文件行，检查图片、模板、已定版批次、任务及历史执行是否引用它。无人引用才设置文件的 `deleted_at` 并提交。标记后不能再建立新引用，也不再签发访问地址。
+2. 事务结束后删除对象存储里的文件，最后删除数据库文件记录。对象不存在视为物理删除已完成；若对象删除或数据库最终结算失败，保留已有 `deleted_at` 的记录及对象键，允许原删除动作安全重试。对象已经删掉时绝不能把文件重新改成可用。
 
-现有 files Service 是先删除对象、后删数据库行，需要按上述规则改造。JSON 中的文件引用在写入时也必须锁同一文件行并检查 `delete_state`；不新增通用引用表、引用计数中心或后台自动回收系统。
+文件只用 `deleted_at` 表示删除是否已开始，不另加删除状态：为空表示可用，有值时拒绝访问和新的文件 ID 引用；删除重试保留第一次记录的时间。删除保护仅检查明确保存的 `file_id`；M6-A 已实现任务的 `cover_file_id` 检查，表中其他业务引用按对应功能落地。生产策略、批次和任务中保存的 URL（包括本站和外部链接）不反查、不锁文件行，也不阻止文件删除；实际生产读取不到资源时明确报错。不新增通用引用表、引用计数中心或后台自动回收系统。
 
 ## 5. 接口契约
 
@@ -525,14 +528,14 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 
 ### 5.2 按业务职责组织的命令与查询
 
-以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。
+以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。任务接口使用单数资源名 `/publication`；后端包名 `publish` 不决定接口路径。
 
 | 主题 | 查询／命令边界 | 必须保持的语义 |
 | --- | --- | --- |
 | 计划 | `/publication-plans` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batches`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
 | 批次准备 | `/publication-batches` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resources`、`content`、`confirm` | resources 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
 | 批次执行 | 列表／详情／分页任务、`execution-preview`、`start`、`stop`、`cancel` | 创建检查与执行检查职责不同；首次执行前终止、执行后停止按产品阶段使用；不提供恢复停止队列的命令 |
-| 任务 | `/publications` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempts` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
+| 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempts` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
 | 资源与推荐 | `/publication-capabilities`、`publication-resource-inventory`、`publication-account-options`、`publication-output-options`、`publication-plan-recommendations` | 复用原模块查询，增加发布资格／占用投影；不预占、不复制资源 CRUD、不把未知返回为零 |
 | 生成 | `POST /publication-content/generate`、`POST /covers/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不直接替用户采用或确认 |
 | 图片库 | `/image-assets` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`select-background` | 上传和资源访问仍复用 files；按 file_id 登记防重，选底图仅返回固定选择、不预占、不立即建立任务引用 |
@@ -547,12 +550,12 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 | --- | --- | --- | --- |
 | 创建计划 `POST /publication-plans` | `request_key,name,date_start/date_end,goals,batches` | `id,revision,batch_ids,status` | 同键异输入、目标矩阵不守恒、无权操作 |
 | 确认批次 `POST /publication-batches/{id}/confirm` | `expected_revision,included_row_keys,excluded_row_keys,allow_shortfall,expected_shortfalls` | `batch_id,revision,task_ids,target_count,created_count,creation_shortfall` | 资源／文件已变化、占用冲突、实际缺口与确认值不同 |
-| 快速创建任务 `POST /publications` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
-| 修改待执行任务 `PUT /publications/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
+| 快速创建任务 `POST /publication` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
+| 修改待执行任务 `PUT /publication/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
 | 首次启动／人工继续 `start、confirm-next` | `expected_revision`；继续还需 `expected_current_batch_id,next_batch_id` | `status,current_batch_id,revision` | 任务未决、未准备好、阈值需确认、位置已变化 |
 | Agent 领取 `claim` | `request_key`；执行用户从认证令牌获取 | `task_id,attempt_id,input_snapshot,platform_uid,profile_id,file_ids/digests,download_urls,not_before` | 无有效授权、账号所属用户不符、账号或 Profile 忙、资源身份不符 |
 | Agent 完成 `complete` | `attempt_id,report_seq,result_hash,result,evidence` | `task_status,attempt_status` | 非当前 attempt、序号过期、同键结果冲突 |
-| 核实／补录 `POST /publications/{id}/resolve` | `attempt_id,expected_revision,conclusion,evidence`；确认公开还需 `platform_work_id/work_url,published_at` | `task_status,work_id/work_url,revision` | 不能证明公开、冲突作品身份、历史尝试不匹配 |
+| 核实／补录 `POST /publication/{id}/resolve` | `attempt_id,expected_revision,conclusion,evidence`；确认公开还需 `platform_work_id/work_url,published_at` | `task_status,work_id/work_url,revision` | 不能证明公开、冲突作品身份、历史尝试不匹配 |
 
 创建类使用 `request_key`，同键同内容必须返回原结果；修改类使用 `expected_revision`，冲突时返回当前修订以便重新加载。ID 一律是十进制字符串；时间使用 RFC3339。失败响应沿用既有 `errcode/message/data/logid`，`data` 应包含可定位的冲突行、字段或原因，不允许返回假成功。具体枚举和错误码由提供方 Contract 最终定义。
 
@@ -613,7 +616,7 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 | 字段采用与批量配置 | 旧请求不能覆盖新手稿；采用标题后仍可采用未改标签；仅改封面不动文案；并发变化须重新审阅，已应用项不重放 |
 | 内容确认 | 无变化保存保持确认；实际修改只使受影响行待确认；模板输入变化必须更新受影响输出 |
 | 封面真实产物 | 自带／现成图无需生成记录；模板按实际标题生成全部必需比例，溢出报错，样例与正式成品不可混用 |
-| 图片、模板与历史文件 | 停用不破坏历史成品；两个删除入口均保护引用；标记 `deleting` 后不得再引用，物理删除失败或数据库结算失败可安全重试，不恢复为可用文件 |
+| 图片、模板与历史文件 | 停用不破坏历史成品；两个删除入口均保护引用；设置 `deleted_at` 后不得再引用，物理删除失败或数据库结算失败可安全重试，不恢复为可用文件 |
 | SSE 与网关 | 分块、代理缓冲、取消、单条失败、整体超时、断流；逐事件到达，已收结果保留，仅失败／未完成项重试 |
 | 续编与认证 | Desktop 重启可恢复本用户输入，Web 刷新清空；续编无正式行或占用；session 替换禁止新工作，已有结果按 report-safe 规则收尾 |
 | 查询与负载 | 代表性任务／attempt 数据验证 EXPLAIN、分页聚合与索引；100 QPS、500 条批次、100 批计划作为测试样本，记录耗时与资源后确定部署配置 |

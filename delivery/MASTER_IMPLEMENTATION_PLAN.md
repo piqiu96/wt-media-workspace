@@ -124,8 +124,8 @@ wt-media-workspace/
 
 | 状态 | 含义 | 当前处于该态的里程碑 |
 |---|---|---|
-| `NOT_STARTED` | 未进入该里程碑 | M6、M7、M-publishing-plan、M-publishing-operations、M10 |
-| `IN_PROGRESS` | 开发中 | 无 |
+| `NOT_STARTED` | 未进入该里程碑 | M7、M-publishing-plan、M-publishing-operations、M10 |
+| `IN_PROGRESS` | 开发中 | M6 |
 | `VERIFYING` | 自动综合验收完成，等待人工整体验收 | 无 |
 | `DONE` | 人工整体验收通过 | M2、M3、M4、M5、M-launch-engineering |
 
@@ -163,7 +163,8 @@ wt-media-workspace/
 | M3 | `DONE` | A～E1 已实施并有真实证据；C2、E2 已于 2026-09-23 暂停；E3 综合验收 2026-09-23 在 Cloud `aaf66c5` 执行，验收矩阵第 1～7 项全部通过（首轮硬阻断 D-scheduler 同日修复并复验通过，另补证 Desktop 走查与 `material_failed` 注入），**用户同日签收** | M3 冻结为内容挖掘自动化入口基线；验收期只登记未修的 D1～D10、D-scheduler-2、S-1 仍由 `CHG-20260923-054`（planned）处置，**用户裁定 D3 不阻塞 M3**；C2/E2 留待后续版本 |
 | M4 | `DONE` | M4 各实施 CHG、M4-H1 视觉整改与 M4-H2 统一走查均已完成；机器闭环与真实页面签收均有证据。 | 2026-10-28 用户签收 M4-H2；M4 冻结为 Cloud 内容生产闭环基线。 |
 | M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
-| M6、M7 | `NOT_STARTED` | 已有交互原型，无生产自动发布验收 | 依次完成单任务、批次真实发布 |
+| M6 | `IN_PROGRESS` | M6-A 已启动，尚无生产自动发布验收 | 先完成正式任务、资源占用和文件安全 |
+| M7 | `NOT_STARTED` | 已有交互原型，无生产批次验收 | 依赖 M6 完成 |
 | M-publishing-plan、M-publishing-operations | `NOT_STARTED` | 目标设计已确认，生产能力未验收 | 完成计划、工具和三平台回归 |
 | M10 | `NOT_STARTED` | 首次上线已有部分打包部署证据 | 依赖发布四阶段，补验升级、恢复及发布业务 |
 
@@ -481,11 +482,11 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 
 | 字段 | 内容 |
 | --- | --- |
-| 状态 | `NOT_STARTED` |
+| 状态 | `IN_PROGRESS` |
 | 目标 | 真实账号、成片和内容准备后创建任务，授权 Agent 自动提交，并在任务及作品管理核对公开结果 |
 | 依赖 | M2 账号/环境、M4/M5 成片及文件服务可用；本轮复查真实资源 |
 | 业务验收 | [M6 单任务](milestones/M6-single-publishing.md) |
-| Active CHG | None |
+| Active CHG | [CHG-20261118-101](active/CHG-20261118-101/change.md) |
 | Evidence | None，未进入生产发布验收 |
 
 候选 CHG：
