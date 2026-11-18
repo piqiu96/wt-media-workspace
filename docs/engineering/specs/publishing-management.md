@@ -31,7 +31,7 @@ flowchart LR
 
 | 位置 | 职责 | 实现边界 |
 | --- | --- | --- |
-| Cloud 发布管理 | 配置校验、正式创建、占用、授权、派发、结果核实、推进、统计和审计 | 在 `internal/modules/publishing` 内按 Handler → Service → Repository 组织；通过所属模块 Service 使用账号、成片、身份和文件 |
+| Cloud 发布管理 | 配置校验、正式创建、占用、授权、派发、结果核实、推进、统计和审计 | 在 `internal/modules/publish` 内按 Handler → Service → Repository 组织；通过所属模块 Service 使用账号、成片、身份和文件 |
 | Cloud 运营工具 | 图片库、模板草稿与发布配置、真实封面渲染 | 图片、模板、渲染按主题分文件，供发布管理引用；不拆独立部署服务或通用资源引擎 |
 | Cloud Scheduler | 到时入队、计划推进、失联检查 | 调用发布 Service，不访问浏览器或运营电脑，不自行改写另一套状态 |
 | Local Agent | 实读账号环境、取文件、上传、填写、提交、保留现场和执行证据、补报结果 | 只执行所属用户的账号；不直接写 Cloud 数据库，不自行授予重试权限 |
@@ -54,10 +54,10 @@ flowchart LR
 
 ### 1.3 V1 实施边界
 
-产品范围以 [PRD 平台范围](../../product/prd/详细文档/第六章_发布管理.md)和[批次资源配置](../../product/prd/详细文档/第六章_发布管理.md#632-新建批次)为准。工程实现沿用已有身份、任务和能力开关：
+产品范围以 [PRD 平台范围](../../product/prd/详细文档/第六章_发布管理.md)和[批次资源配置](../../product/prd/详细文档/第六章_发布管理.md#632-新建批次)为准。工程实现沿用已有身份与任务边界：
 
 - 正式创建按每个账号的所属用户确定 task 的 `operator_id`，不使用批次负责人或创建人统一代填。领取时将 Agent 认证用户与该任务及账号归属核对；离线保留待办，不转派、不新增协作服务。
-- 平台适配按 PRD 顺序推进，各平台真实发布与结果核实验收通过后才打开能力开关。未开放平台在创建、授权及领取时明确拒绝，不能让任务运行后必然失败。
+- 当前百度账号与待执行任务入口正常展示，不设置百度准备开关。创建任务只保存 pending，不等于授权执行或已接通投稿。其他平台按 PRD 顺序接入；授权及领取必须独立验证执行能力，不能靠隐藏准备入口代替执行校验。
 - 资源查询与推荐只消费已有资格、顺序和数量，不新增质量评级字段、维护 API／页面或等级匹配输入。
 
 ## 2. 服务交互
@@ -131,6 +131,45 @@ sequenceDiagram
 到时判断使用 `not_before`；批次间隔使用上一条执行结束时间加间隔。同一真实平台账号有执行、人工或结果未知任务时，不领取下一条；不同账号若共用一个浏览器 Profile，也不能并行。不同账号且不同 Profile 才允许受控并行。时间到达不会自动授权尚未启动的任务。
 
 提交前复查通过 progress 完成，不另设通用许可 API。允许响应与平台点击之间仍有竞态窗口：后发生的停止不能撤回平台提交，必须根据真实回执收尾。提交前响应丢失时，不能把旧允许响应当作永久许可，也不能自动重放点击。
+
+#### 浏览器操作与平台发布器
+
+**页面操作采用 Python Playwright，连接 BitBrowser 已启动的账号 Profile；任务授权和恢复仍由发布执行器负责。** 普通点击、输入、上传和等待使用 Playwright 的 `Page` / `Locator`；已有 CDP 能力按需保留，不再为普通表单重复实现点击命中、遮挡判断和轮询。
+
+| 组件 | 轻量实现思路 |
+| --- | --- |
+| `PublicationJob` | 组织所属任务资源准备、心跳、阶段持久化、提交许可、关闭核实和原结果保存/补报；通过必填控制回调调用独立发布入口，不直接执行平台页面步骤 |
+| `BrowserSession` | 根据 BitBrowser 启动响应取得动态 CDP 地址，连接对应 Profile 的现有默认 context；管理本次页面和连接，核对账号，不另起空白账号环境。断开 Playwright 不等于现场已安全结束，Profile 关闭仍须使用现有 BitBrowser 能力核实 |
+| `Publisher` | `platforms/publish.py` 用 Protocol 约定 `publish(payload, control, *, method=PublishMethod.BROWSER)`；消费固定内容、本地路径与预期 UID，返回本次回执。控制含停止检查、准备完成通知与提交前许可；公共入口不接收 Page、Token 或数据库模型 |
+| `BaiduPublisher` / `BrowserPublisher` | 同放 `platforms/baidu/publisher.py`。前者选择实现，组织两次身份核对、准备、提交许可与一次提交；后者封装当前页面、选择器、填写、平台检查与回执。基础 API 仍通过 clients，公共会话经 services/browser；一期只支持 browser，不创建 API 投稿占位或浏览器子目录 |
+
+目录和依赖边界见 [ADR-0034](../../decisions/0034-agent-platform-capabilities-and-publish-boundary.md)。首次实读 UID 成功后，准备完成回调才允许持久化 prepared 并报告 ready；上传后再次核实 UID，提交前回调记录屏障且取得新鲜许可后才可提交。业务入口通过参数固定 browser，暂不增加用户选择页面、Cloud 字段或外部契约。
+
+使用现有 bootstrap 显式装配，通过简单平台映射选择 Publisher；不引入动态插件、全局单例注册系统或通用工作流引擎。页面操作直接使用 Playwright API，不再包装一套同名浏览器操作接口。首版可使用同步 API 对接现有同步执行器，同一会话的 Playwright 调用留在同一执行线程；心跳线程只传递停止信号，不操作页面。
+
+**大文件通过本地路径上传，不转为内存 buffer。** Python Playwright 从 1.58 起支持 `connect_over_cdp(..., is_local=True)`；只有 Agent 与 BitBrowser 确实共用本机文件系统、浏览器能够读取该绝对路径时才启用。连接地址来自启动结果，不写死端口；文件沿用本次执行已校验摘要的私有文件，不重新下载或擅自改写内容。
+
+```python
+browser = playwright.chromium.connect_over_cdp(
+    endpoint_url=bitbrowser_endpoint,
+    is_local=True,
+)
+page = browser.contexts[0].new_page()
+page.locator(video_input_selector).set_input_files(video_path)
+```
+
+这是连接与传文件方式的示意，不包含任务授权和完整执行流程。该设置避免 CDP 远程文件传输分支的 50 MiB 限制，不能取消 buffer、平台文件规格或存储网关的限制；跨主机／文件系统隔离时不能靠设置此参数假定文件可读。依据：[官方 API](https://playwright.dev/python/docs/api/class-browsertype#browser-type-connect-over-cdp)、[1.58 上传实现](https://github.com/microsoft/playwright/blob/v1.58.0/packages/playwright-core/src/server/fileUploadUtils.ts)。
+
+平台实现按以下边界处理页面和结果：
+
+- 填写阶段使用明确的可见控件及当前弹窗范围，按上传进度、处理结果和实际封面预览等待；超时、封面失败或必填值不符即停止，不靠固定睡眠、默认 `force=True` 或静默降级继续。提交前读回本次已确认内容，不截断、改写或替换。
+- 先建立本次投稿请求的回执监听，再由执行器完成提交前复查与本地阶段记录，调用 `submit()` 点击最终发布。每次尝试最多发起一次最终提交，不把该操作放入业务重试循环；点击后超时、断网或结果不明，按本节及 [4.4](#44-安全停止与迟到结果) 核实，不再次点击。
+- `read_receipt()` 返回本次投稿的作品 ID 和必要证据，不只返回 `success: true`；按账号、本次请求和实际平台响应关联，作品 ID 使用字符串保留精度。上传／保存成功、HTTP 200、跳转或列表最新作品都不能单独证明投稿成功；平台接受与公开结果仍按既有任务状态分别核实。
+- 发现安全验证时停止自动操作，使用既有人工处理流程；更换浏览器驱动不改变原用户、原现场、原 attempt 和停止控制的约束。调试截图、响应或 trace 只保留必要且脱敏的证据，不记录凭据或完整会话。
+
+参考 [social-auto-upload](https://github.com/dreammis/social-auto-upload/tree/main/uploader) 的页面操作及上传判断，参考 [wt-media-flow 平台层](https://github.com/piqiu96/wt-media-flow/tree/main/src/platforms) 的协议与独立载荷组织；外部代码仅作实现参考，不是业务事实源。不沿用其中的人工最终提交、跳过封面、失败后继续或以最新作品猜测本次结果等做法，也不带入评论等本轮范围外能力。
+
+Playwright 作为 Local Agent 的运行依赖管理，固定经验证且不低于 1.58 的兼容版本；Cloud 模式不因发布能力启用浏览器。连接现有 BitBrowser 不需要另装一套 Playwright Chromium，但 Desktop Sidecar 仍须包含匹配的 Playwright 驱动及运行文件，不能依赖开发机环境。macOS 重签名须保留包内 Node 所需的 JIT 权限，不因修复驱动而关闭其 hardened runtime 或添加其他权限。兼容性、大文件与安装包验证见 [技术验证](#6-技术验证)。
 
 ### 2.3 计划推进与停止控制
 
@@ -312,6 +351,8 @@ erDiagram
 
 **索引：** `UNIQUE(platform,occupied_output_id)` 防止同一成片同平台重复占用；`UNIQUE(platform,executing_account_uid)` 保证真实 UID 串行；`UNIQUE(created_by,request_key)` 为独立快速创建防重；按 batch/status、operator/status/not_before、team/published_at 建查询索引。生成列在 `status=abandoned` 或不执行时返回 NULL；详细表达见下方 SQL 规则。
 
+Go 发布状态由 `internal/modules/publish/model.Status` 及同包常量维护，其他业务的任务状态留在各自模块，不建立通用 `TaskStatus`。发布业务错误码统一放在 Cloud 的 `internal/shared/errcode/publish.go`，与 `contracts/cloud-error-codes/v1/publish.yaml` 对齐；HTTP 状态使用框架常量。
+
 任务只使用十个状态；这里列出内部代码供迁移和 Contract 对齐，**允许动作以 [PRD 6.4.1](../../product/prd/详细文档/第六章_发布管理.md#641-任务列表) 为准**。
 
 | 内部状态 | 页面显示 | 内部状态 | 页面显示 |
@@ -405,7 +446,7 @@ UNIQUE (platform, executing_account_uid)
 
 #### 已有文件表扩展
 
-`operations_files` 保持既有自增主键及文件字段。仅按需增加 `metadata_json JSON NULL`（宽高、格式、模板输入与渲染来源）和 `delete_state VARCHAR(16) NOT NULL DEFAULT 'ready'`（ready/deleting），以实现 4.6 的安全删除。**不新增文件表或引用计数表。**
+`operations_files` 保持既有自增主键及文件字段。仅按需增加 `metadata_json JSON NULL`（宽高、格式、模板输入与渲染来源）和 `deleted_at DATETIME(6) NULL`（删除开始时间），以实现 4.6 的安全删除。**不新增文件表或引用计数表。**
 
 ### 3.7 本地存储
 
@@ -505,10 +546,10 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 
 图片库与文件管理删除必须调用同一套引用检查。创建正式引用和删除都锁现有 `operations_files` 文件行；多文件按 ID 排序。**删除分为数据库确认和物理删除两步，不在数据库事务里删除对象。**
 
-1. 短事务中锁文件行，检查图片、模板、已定版批次、任务及历史执行是否引用它。无人引用才把文件标记为 `deleting` 并提交。标记后不能再建立新引用，也不再签发访问地址。
-2. 事务结束后删除对象存储里的文件，最后删除数据库文件记录。对象不存在视为物理删除已完成；若对象删除或数据库最终结算失败，保留 `deleting` 记录及对象键，允许原删除动作安全重试。对象已经删掉时绝不能把文件重新改成可用。
+1. 短事务中锁文件行，检查图片、模板、已定版批次、任务及历史执行是否引用它。无人引用才设置文件的 `deleted_at` 并提交。标记后不能再建立新引用，也不再签发访问地址。
+2. 事务结束后删除对象存储里的文件，最后删除数据库文件记录。对象不存在视为物理删除已完成；若对象删除或数据库最终结算失败，保留已有 `deleted_at` 的记录及对象键，允许原删除动作安全重试。对象已经删掉时绝不能把文件重新改成可用。
 
-文件的删除状态为 `ready / deleting`。新上传明确初始化为 `ready`，数据库拒绝空值等非法状态；旧空值修复不能恢复 `deleting`。files Service 按上述顺序执行删除。JSON 中的文件引用在写入时也必须锁同一文件行并检查 `delete_state`；不新增通用引用表、引用计数中心或后台自动回收系统。
+文件只用 `deleted_at` 表示删除是否已开始，不另加删除状态：为空表示可用，有值时拒绝访问和新的文件 ID 引用；删除重试保留第一次记录的时间。删除保护仅检查明确保存的 `file_id`；M6-A 已实现任务的 `cover_file_id` 检查，表中其他业务引用按对应功能落地。生产策略、批次和任务中保存的 URL（包括本站和外部链接）不反查、不锁文件行，也不阻止文件删除；实际生产读取不到资源时明确报错。不新增通用引用表、引用计数中心或后台自动回收系统。
 
 ## 5. 接口契约
 
@@ -526,14 +567,14 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 
 ### 5.2 按业务职责组织的命令与查询
 
-以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。
+以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。任务接口使用单数资源名 `/publication`；后端包名 `publish` 不决定接口路径。
 
 | 主题 | 查询／命令边界 | 必须保持的语义 |
 | --- | --- | --- |
 | 计划 | `/publication-plans` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batches`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
 | 批次准备 | `/publication-batches` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resources`、`content`、`confirm` | resources 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
 | 批次执行 | 列表／详情／分页任务、`execution-preview`、`start`、`stop`、`cancel` | 创建检查与执行检查职责不同；首次执行前终止、执行后停止按产品阶段使用；不提供恢复停止队列的命令 |
-| 任务 | `/publications` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempts` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
+| 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempts` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
 | 资源与推荐 | `/publication-capabilities`、`publication-resource-inventory`、`publication-account-options`、`publication-output-options`、`publication-plan-recommendations` | 复用原模块查询，增加发布资格／占用投影；不预占、不复制资源 CRUD、不把未知返回为零 |
 | 生成 | `POST /publication-content/generate`、`POST /covers/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不直接替用户采用或确认 |
 | 图片库 | `/image-assets` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`select-background` | 上传和资源访问仍复用 files；按 file_id 登记防重，选底图仅返回固定选择、不预占、不立即建立任务引用 |
@@ -548,12 +589,12 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 | --- | --- | --- | --- |
 | 创建计划 `POST /publication-plans` | `request_key,name,date_start/date_end,goals,batches` | `id,revision,batch_ids,status` | 同键异输入、目标矩阵不守恒、无权操作 |
 | 确认批次 `POST /publication-batches/{id}/confirm` | `expected_revision,included_row_keys,excluded_row_keys,allow_shortfall,expected_shortfalls` | `batch_id,revision,task_ids,target_count,created_count,creation_shortfall` | 资源／文件已变化、占用冲突、实际缺口与确认值不同 |
-| 快速创建任务 `POST /publications` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
-| 修改待执行任务 `PUT /publications/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
+| 快速创建任务 `POST /publication` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
+| 修改待执行任务 `PUT /publication/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
 | 首次启动／人工继续 `start、confirm-next` | `expected_revision`；继续还需 `expected_current_batch_id,next_batch_id` | `status,current_batch_id,revision` | 任务未决、未准备好、阈值需确认、位置已变化 |
 | Agent 领取 `claim` | `request_key`；执行用户从认证令牌获取 | `task_id,attempt_id,input_snapshot,platform_uid,profile_id,file_ids/digests,download_urls,not_before` | 无有效授权、账号所属用户不符、账号或 Profile 忙、资源身份不符 |
 | Agent 完成 `complete` | `attempt_id,report_seq,result_hash,result,evidence` | `task_status,attempt_status` | 非当前 attempt、序号过期、同键结果冲突 |
-| 核实／补录 `POST /publications/{id}/resolve` | `attempt_id,expected_revision,conclusion,evidence`；确认公开还需 `platform_work_id/work_url,published_at` | `task_status,work_id/work_url,revision` | 不能证明公开、冲突作品身份、历史尝试不匹配 |
+| 核实／补录 `POST /publication/{id}/resolve` | `attempt_id,expected_revision,conclusion,evidence`；确认公开还需 `platform_work_id/work_url,published_at` | `task_status,work_id/work_url,revision` | 不能证明公开、冲突作品身份、历史尝试不匹配 |
 
 创建类使用 `request_key`，同键同内容必须返回原结果；修改类使用 `expected_revision`，冲突时返回当前修订以便重新加载。ID 一律是十进制字符串；时间使用 RFC3339。失败响应沿用既有 `errcode/message/data/logid`，`data` 应包含可定位的冲突行、字段或原因，不允许返回假成功。具体枚举和错误码由提供方 Contract 最终定义。
 
@@ -608,13 +649,16 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 | 停止与提交竞争 | 安全未领取可取消；已取得安全停止且未提交证据时运行任务可终止；提交复查通过后停止不伪造未提交或承诺撤稿 |
 | 停止不可逆 | 计划终止停止全部所属批次；更晚授权、安全重试或迟到回报都不能绕过停止标记；已停止批次只核实收尾 |
 | 失联与补报 | 断网／重启后补报原结果，重复完成幂等；失联不自动释放／重跑，旧 attempt 不覆盖新 attempt，冲突证据保留 |
+| Playwright 与本机大文件 | 使用实际 BitBrowser Profile 和动态 CDP 地址，以 `is_local=True` 上传有效且超过 50 MiB 的本地视频，确认真实上传及处理完成；不可读路径、上传失败和超时明确报错，不转 buffer 或压缩文件来冒充大文件验证 |
+| 平台页面与提交边界 | 浏览器验证正文、各必需封面、声明及弹窗；遮挡、失效控件或安全验证不强行继续。授权拒绝不点击，点击后断网／超时不二次提交；回执匹配本次请求，公开结果另行核实。本地 fixture 只验证操作与异常分支，不代替真实平台验收 |
+| Playwright 安装包 | 在不依赖开发机 Python／Node 环境的 Desktop 安装包中连接实际 BitBrowser，验证驱动资源、文件权限、填写、停止及退出；断开连接不误报 Profile 已关闭，不携带另一套无关浏览器 |
 | 派发收口与待办 | 审核／失败仍可有待办；仅未结束且未停止的合法失败可重试；迟到未知不把已结束控制改为运行 |
 | 公开结果与统计 | 目标 30、创建 28、公开 28，成功率约 93.33%、缺口 2；补录同平台作品不重复关联或计数，attempt 不增加任务数 |
 | 补量与迟到公开 | 并发只创建一轮合法补量；原目标不变；迟到公开重新提示缺口，不隐式改正式任务或重复推进 |
 | 字段采用与批量配置 | 旧请求不能覆盖新手稿；采用标题后仍可采用未改标签；仅改封面不动文案；并发变化须重新审阅，已应用项不重放 |
 | 内容确认 | 无变化保存保持确认；实际修改只使受影响行待确认；模板输入变化必须更新受影响输出 |
 | 封面真实产物 | 自带／现成图无需生成记录；模板按实际标题生成全部必需比例，溢出报错，样例与正式成品不可混用 |
-| 图片、模板与历史文件 | 停用不破坏历史成品；两个删除入口均保护引用；标记 `deleting` 后不得再引用，物理删除失败或数据库结算失败可安全重试，不恢复为可用文件 |
+| 图片、模板与历史文件 | 停用不破坏历史成品；两个删除入口均保护引用；设置 `deleted_at` 后不得再引用，物理删除失败或数据库结算失败可安全重试，不恢复为可用文件 |
 | SSE 与网关 | 分块、代理缓冲、取消、单条失败、整体超时、断流；逐事件到达，已收结果保留，仅失败／未完成项重试 |
 | 续编与认证 | Desktop 重启可恢复本用户输入，Web 刷新清空；续编无正式行或占用；session 替换禁止新工作，已有结果按 report-safe 规则收尾 |
 | 查询与负载 | 代表性任务／attempt 数据验证 EXPLAIN、分页聚合与索引；100 QPS、500 条批次、100 批计划作为测试样本，记录耗时与资源后确定部署配置 |

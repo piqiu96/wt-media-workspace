@@ -5,6 +5,8 @@
 - Scope: `wt-media-agent` 的包目录、分层职责、依赖方向、配置目录约定与健康检查端点
 - Supersedes: 架构基线 §5.2「推荐目录」、§5.4「分层关系」、§5.5「平台目录」；修正 §2.2 Cloud Agent 职责中与 ADR-0015 冲突的条目。不改变 M2 对外执行能力、Cloud-Agent Contract 语义与任何既有业务行为。
 
+部分取代说明：平台业务能力目录与相关依赖边界已由 [ADR-0034](0034-agent-platform-capabilities-and-publish-boundary.md) 修订。下文保留原决定，其余规则继续有效。
+
 ## Context
 
 `wt-media-agent` 的功能代码可运行，但不具备长期部署与迭代形态。核查确认四类问题：
