@@ -48,3 +48,12 @@ CI 在 Linux/Python 3.12 首次 WAL 初始化并发测试失败，保留原并�
 | 配置与运行环境检查 | `verify_m0_config.py` 被上述提供方版本不一致阻断；`bin/control.sh verify` 的 Cloud、Agent、Cloud worker、Compose worker 检查通过，Compose scheduler 因现有二进制早于最新源码而失败。本轮未重启、重建运行环境，不将其记为通过 |
 
 复现相关测试：`PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests .venv/bin/python -m unittest test_publication_job test_publication_execution`。本轮只验证 Agent 控制边界，未进行安装包重建、真实发布或公开作品验收。CHG 保持 VERIFYING，待既有跨仓基线问题处理及相应 Review/合并后再收口，不将本次修复测试替代整体交付验收。
+
+
+### 公共常量整改与 Review 范围
+
+Agent 提交 `3f9033a550f51d745fe188e396f54b032a749061` 将本轮发布执行与恢复涉及的重复常量集中到既有 `src/wt_media_agent/runtime/constants.py`，包括 Cloud 发布任务状态、Cloud 执行阶段、本机执行阶段、检查点状态、上报操作、错误码与默认心跳/轮询间隔。Cloud 阶段与本机阶段分别命名，防止混用；Cloud 仍裁决业务状态，Agent 只消费已有值。SQLite 使用参数传入公共常量，持久化值及 JSON/HTTP 字符串保持不变，没有数据库迁移。
+
+最终复验 `PYTHONDONTWRITEBYTECODE=1 bash scripts/test.sh`：750 项通过；列表、字典、空值及未知状态/上报类型的 8 项补充边界检查仍按原行为拒绝。独立审查未发现待修问题；差异检查通过。本轮没有真实平台操作，原有 Workspace 整体验证限制仍适用。
+
+Review 按原有堆叠关系进行：[Agent CHG-104 PR #11](https://github.com/piqiu96/wt-media-agent/pull/11) 先审核核实与安全重试衔接，[Agent CHG-105 PR #12](https://github.com/piqiu96/wt-media-agent/pull/12) 再审核实际投稿与本轮后续修复；分别确认，不合并为一个新 CHG。当前后续修复与常量整改均在既有 `codex/CHG-20261118-105` 本地分支；截至本记录未推送，远端 PR 的最终 Review 需包含这些提交后进行。CHG-104 的独立 PR 不包含本轮后续修复。保持 VERIFYING，不自动合并。
