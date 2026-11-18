@@ -4,7 +4,8 @@
 
 ## 修改结果
 
-- 后端模块改为 `internal/modules/publish`，接口统一 `/api/v1/publish`，前端使用 `createPublishClient`。契约改为 `publish.openapi.yaml` 与 `publish.yaml`，提供方 API 和错误码版本为 `2026.11.19.1`；数据库业务表名保留。
+- 后端模块改为 `internal/modules/publish`，接口统一 `/api/v1/publication`，前端使用 `createPublicationClient`。契约改为 `publication.openapi.yaml` 与 `publish.yaml`，提供方 API 和错误码版本为 `2026.11.19.1`；数据库业务表名保留。
+- 文件接口返回结构体命名为 `FileView`，与数据库 `File` 区分；新增 `DeletedAt` 放在原有字段末尾。
 - 发布状态由模块 `model.Status` 及常量维护；业务错误码在 `internal/shared/errcode/publish.go` 集中维护，数字不变，HTTP 状态使用框架常量。
 - 删除只检查明确的文件 ID 引用；当前为正式任务的 `cover_file_id`。移除生产 JSON 的 URL 扫描及对应写入锁。本站与外部链接采用相同规则，资源读取不到时由生产明确报错。
 - `deleted_at` 替换 `delete_state`。物理删除失败可重试，保留首次删除时间；记录仍可在恢复列表查看，但不能预览、下载或新增引用。
@@ -15,7 +16,7 @@
 | 范围 | 结果 |
 | --- | --- |
 | Go 相关包 | publish、files、production、bootstrap、config、shared/errcode 全部通过 |
-| 修改前后回归 | 单数接口、默认百度创建、删除时间三项先失败后通过；图片选择器删除记录渲染先因旧字段判断失败，修正后通过 |
+| 修改前后回归 | 接口命名、默认百度创建、删除时间三项先失败后通过；图片选择器删除记录渲染先因旧字段判断失败，修正后通过 |
 | 隔离 MySQL | 8 项通过；完整 106 个迁移的空库及重放、旧删除标记升级、文件 ID 引用/删除竞争、重试时间保持、URL 资源不阻止删除、权限分页、修订与审计回滚、新上传文件引用均通过 |
 | 共用前端 | 5 个测试文件、14 项通过，包括删除记录的图片选择器渲染 |
 | Cloud / Desktop 构建 | 两端通过；保留已有包体积提示 |
@@ -32,6 +33,12 @@
 
 ## 后续分支依赖
 
-尚未合并的执行分支需要同步 publish 包、接口和契约路径；Desktop 消费锁也需在对应集成中推进。这里只同步 #44 和 #52，不把后续执行代码并入 M6-A。提供方契约位于 Cloud，不在 Workspace 复制第二套定义。
+尚未合并的执行分支需要同步 publish 包、错误码契约路径及文件删除时间；任务 API 按用户要求统一为单数 `/publication`，对应调用方在其集成时同步。Desktop 消费锁也需在对应集成中推进。这里只同步 #44 和 #52，不把后续执行代码并入 M6-A。提供方契约位于 Cloud，不在 Workspace 复制第二套定义。
 
 CHG 保持 VERIFYING；M6 尚未完成。
+
+## 命名补充复核（2026-11-19）
+
+Cloud 提交 `b62d706` 将新增字段移到原有字段末尾，`788ab6b` 将文件响应类型改为 `FileView`，并按用户要求将任务接口统一为单数 `/api/v1/publication`。后端模块仍使用 `publish`；前端客户端为 `createPublicationClient`，API 契约为 `publication.openapi.yaml`。
+
+补充验证：files、publish、bootstrap、shared/errcode 相关 Go 包通过；共用前端 4 个测试文件、11 项通过；Cloud 和 Desktop 构建通过。文档治理、交付治理、产品与主计划一致性、差异空白检查通过。保留此前 8 项隔离数据库与 14 项前端验证记录；本次命名调整没有重复数据库和浏览器走查。

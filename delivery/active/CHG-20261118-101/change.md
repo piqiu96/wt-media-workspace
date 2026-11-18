@@ -41,11 +41,11 @@ risk: H
 
 ## 本轮审查修改（2026-11-19）
 
-代码继续更新在 [Cloud #44](https://github.com/piqiu96/wt-media-cloud/pull/44) 原分支 `chg/CHG-20261118-101`，修复提交 `3a7067c61ce8b1b98df3e15944f54a1a267dd070`；本仓继续使用 [Workspace #52](https://github.com/piqiu96/wt-media-workspace/pull/52)，不新建 PR。
+代码继续更新在 [Cloud #44](https://github.com/piqiu96/wt-media-cloud/pull/44) 原分支 `chg/CHG-20261118-101`，修复提交 `3a7067c61ce8b1b98df3e15944f54a1a267dd070`，字段顺序和命名补充提交 `b62d706`、`788ab6b`；本仓继续使用 [Workspace #52](https://github.com/piqiu96/wt-media-workspace/pull/52)，不新建 PR。
 
-- 后端模块使用 `publish`，接口统一 `/api/v1/publish`；发布状态归模块所有，错误码统一在 `internal/shared/errcode/publish.go`。
+- 后端模块使用 `publish`，接口统一 `/api/v1/publication`；发布状态归模块所有，错误码统一在 `internal/shared/errcode/publish.go`。
 - 文件删除只检查明确的文件 ID 引用，不扫描生产链接；删除过程使用 `deleted_at`，不保留第二套状态。
 - 移除百度准备开关及页面隐藏。创建仍只保存待执行任务，不授权执行。
-- 提供方 API 与错误码版本推进至 `2026.11.19.1`。后续尚未合并的执行分支及 Desktop 版本锁需在其集成时同步新路径和版本，本轮不修改这些分支。
+- 提供方 API 与错误码版本推进至 `2026.11.19.1`。后续尚未合并的执行分支及 Desktop 版本锁需在其集成时同步模块路径、错误码契约与版本，本轮不修改这些分支。
 
 本轮验证结果、迁移顺序和限制见 [审查修改验证](evidence/review-corrections.md)。此前真实页面验证保留在 [M6-A 验证记录](evidence/verification.md)，不作为本轮代码的重复走查结果。CHG 保持 VERIFYING，M6 不标记完成。
