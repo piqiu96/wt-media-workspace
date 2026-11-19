@@ -106,3 +106,12 @@ Agent本轮修订独立分支 `codex/chg103-104-review`，提交 `7b32e57`，原
 
 
 本轮已推送：[Cloud104 #46](https://github.com/piqiu96/wt-media-cloud/pull/46) / [Cloud103 #45](https://github.com/piqiu96/wt-media-cloud/pull/45)，[Agent草稿 #13](https://github.com/piqiu96/wt-media-agent/pull/13)。Workspace #54/#55同步正式设计和各自证据，文档、Delivery、产品路线校验通过。各PR保持未合并，保留工作树供逐个review。
+
+
+## 2026-11-20 第二轮基础查询与恢复审查
+
+Cloud104 顺序同步103 `42d9771`（基础九个 publication.go 删除、普通读取去锁、迁移109活动 Profile/用户槽唯一约束、通用 JSON 序列化且摘要不变），并提交 `e6f4847` 将 recovery 的输入复查改为普通事实读取，核实/重试事务采用 READ COMMITTED。恢复仍使用 task/attempt revision CAS，原报文/hash及核实审计保留；未决现场继续占用 Profile 和用户名额，只有完成或核实结束才释放；retry 后新领取在约束下取得新 attempt。
+
+本轮完整Go通过（`/private/tmp/chg104-go-final.log`），全部发布模块隔离MySQL通过（`/private/tmp/chg104-live-final.log`），涵盖核实与重试并发、原尝试读回及不覆盖、新尝试原子准入、输入变化停止、迁移回填/重放/错误历史拒绝和基础查询不阻塞修改。独立最终review审查103完整差异及104恢复改动，无可行动问题，独立publish/model测试通过。Workspace已同步103正式设计；迁移部署前停写、预检和DDL部分失败/回退要求见103本轮evidence。
+
+前端、Agent协议与报文摘要未变，本轮不重复构建；不真实投稿、不重建Desktop/DMG、不合并PR，CHG/M6继续验证中。Cloud45/46、Workspace54/55使用原PR更新。
