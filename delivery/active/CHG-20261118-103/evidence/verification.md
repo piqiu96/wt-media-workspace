@@ -48,3 +48,10 @@ Cloud/Agent 当前堆叠 PR 的目标是功能分支，现有 workflow 只对 ma
 当前隔离 Workspace 标准回归 207 项、18 项按既有条件跳过（`/private/tmp/chg103-workspace-full.log`）；文档治理、Delivery 与产品路线校验通过。跳过项依赖缺席的运行仓同级目录或专项条件，不将历史 211 项视作本轮数量。
 
 Desktop 新提交 `b4a649b` 的远端 verify 已通过（run 44436598469）。Agent 最新合入仅为前置 Linux 测试路径兼容修正，3 项故障断言复验通过；完整运行验证数量仍为上述 713 项。
+
+
+## 2026-11-19 存储清理适配
+
+Agent `dd29f29` 顺序合入 CHG102 `509304a`。`PublicationClaimStore` 并入 `storage/publication.py`，保留独立类，删除 `publication_claim.py`；领取创建使用共享 Database 的原子插入入口，保留请求键响应未知时的原值和并发唯一性。装配、准备和测试改为新导入位置，补报通过既有 Runner 的 `PublicationDelivery` 协调，HTTP 不进入数据库事务。
+
+本轮完整 Agent 标准回归 **716 项通过**（`/private/tmp/storage-cleanup-103-full.log`）。本轮不修改 Cloud/Desktop；此前 Desktop 验证归此前提交，本记录不声称再次构建 Desktop。最终冻结包和独立审查由 CHG104 集成完成，PR 保持未合并。

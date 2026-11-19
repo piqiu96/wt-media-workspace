@@ -80,3 +80,12 @@ Review 按原有堆叠关系进行：[Agent CHG-104 PR #11](https://github.com/p
 
 
 本轮首次 Linux/Python 3.12 CI（run 44436600277）失败于测试夹具写死 `/private/tmp`，在连接数据库前触发 PermissionError；其余运行断言未失败。修正提交 `e92b691` 仅将该路径改为系统 TemporaryDirectory，保留“连接非争锁错误只尝试一次”的原断言。3 项故障定向与 703 项完整回归再次通过（`/private/tmp/chg102-portable-full.log`），并顺序传递至 CHG103/104，各复验同一 3 项通过；运行时代码和包内依赖未变。最新远端结果以 PR 当前提交检查为准。
+
+
+## 2026-11-19 存储清理与数据库差异集中
+
+Agent `509304a`：数据库类型只在 `storage/database.py` 内声明，默认 SQLite，不新增 URL/类型配置或环境变量。SQLite 连接、PRAGMA、冲突写入、条件唯一索引及历史升级移入 `storage/dialect.py`；Store 使用共享 Session 和模型规则。正常事务、现有唯一性、数据路径和业务状态保持不变。
+
+删除 `records.py/OfflineResult`、未使用的检查点查询及路径属性；`TaskCheckpoint` 移至 `checkpoint_store.py`。待投递数量直接统计，发布发送协调移至既有 Runner，Journal 只读取原结果和记录确认。历史 DDL 原值保留，生产模型的时间默认值改用通用 UTC 函数。
+
+新增接口定向测试先失败后通过：默认目录初始化、未知适配拒绝且不建目录、跨环境/用户待投递统计及确认。完整 Agent 回归 **706 项通过**（`/private/tmp/storage-cleanup-102-full.log`）。迁移测试改为在实际适配上注入历史/新增版本，保留旧数据和增量升级断言。后续分支、冻结包和最终独立审查仍待本轮验证，不引用此前结果作为完成依据。
