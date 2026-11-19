@@ -426,7 +426,7 @@ Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也�
 
 同一个 Cloud task 可以产生多个 attempt，因此可对应多条检查点和结果。所有业务查询、更新和删除携带完整作用域。重复领取不能覆盖固定输入；相同结果写入幂等，冲突结果保留原记录并拒绝覆盖。提交阶段先落盘，最终结果和检查点更新同一事务保存；补报只发送原报文，检查点不构成重启后恢复点击的授权。原现场丢失时进入核实，不伪造可继续执行的现场。
 
-初始化由 `bootstrap/app.py` 显式装配：唯一配置入口 → 既有数据路径 → 一个 Engine/Session 工厂 → 版本化升级 → 各 Storage → 业务循环。`storage/database.py` 统一新连接的 WAL、`foreign_keys=ON`、`synchronous=FULL` 和超时；使用正常 ORM 事务，不在业务方法中设置 PRAGMA 或执行 `BEGIN IMMEDIATE`。Session 按操作创建且不跨线程共享，网络、浏览器及文件读取在数据库事务外；停止循环后再释放数据库资源。
+初始化由 `bootstrap/app.py` 显式装配：唯一配置入口 → 既有数据路径 → 一个 Engine/Session 工厂 → 版本化升级 → 各 Storage → 业务循环。`storage/database.py` 统一新连接的 WAL、`foreign_keys=ON`、`synchronous=FULL` 和超时；使用正常 ORM 事务，不在业务方法中设置 PRAGMA 或执行 `BEGIN IMMEDIATE`。Session 按操作创建且不跨线程共享，网络、浏览器及文件读取在数据库事务外；停止循环后再释放数据库资源。 SQLite 遇到 BUSY/LOCKED（包括快照写入冲突）时，只在配置超时内重试已回滚的纯数据库短事务，沿用同一份输入、结果和序号；不重放浏览器或 HTTP 操作。
 
 下载成功确认后删除续传检查点。未知现场、未确认投递和冲突证据保留；发布结算后保留最小防重标识、输入摘要、原报告及序号依据，可清理冗余输入，不按时间直接删除防重记录。结果投递和现场核实分别扫描：现场已经人工结算也不能隐藏未送达结果；Cloud 拒绝晚到结果时保留原结果，不伪造报告确认。
 
