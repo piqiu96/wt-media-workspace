@@ -19,3 +19,17 @@
 Agent PR：[wt-media-agent#9](https://github.com/piqiu96/wt-media-agent/pull/9)。依赖 M6-A [Cloud#44](https://github.com/piqiu96/wt-media-cloud/pull/44) 与 [Workspace#52](https://github.com/piqiu96/wt-media-workspace/pull/52)；本 Workspace PR 以 #52 的分支为基线，只显示本单元差异。用户本次已允许堆叠，未修改长期规则；标准 start 因前置未合并拒绝，本次仅按明确授权继续，未绕过或削弱校验脚本。
 
 CI 在 Linux/Python 3.12 首次 WAL 初始化并发测试失败，保留原并发断言；新增实际 SQLite 读锁测试确定性复现，只修复连接初始化的争锁重试与错误关闭；3 项定向测试及 695 项完整回归通过。不是重跑 CI 碰运气，也没有给平台操作增加自动重试。最终 GitHub CI PASS（run 44188903102）；`wt chg verify CHG-20261118-102` PASS，包含 Workspace 211 项与 Agent 695 项及配置/运行环境检查。当前安装包重建、签名与组件版本校验通过，包内 Agent 来自 `f663af1`；不据此宣称原生页面走查或平台投稿通过。实际平台领取、适配和最终提交继续留在后续 M6-B 范围。
+
+
+## 2026-11-19 ORM Review 整改
+
+本轮保留此前验证的历史，不用其测试数量证明新版本。Agent `4de3d1c` 将全部 SQLite 业务读写统一为 SQLAlchemy，旧连接模块移除，任务表改为 `task_checkpoint/task_result`。`cloud_env` 显式配置，原始任务 ID 分列隔离，Profile 互斥由数据库唯一索引保证。
+
+- 修改前标准回归：695 项通过。
+- 本轮完整回归：702 项通过（`/private/tmp/chg102-full2.log`）；最终存储/发布定向复验 25 项通过。
+- 真实 SQLite 验证：8 线程同 Profile 跨环境竞争仅一次登记、同类型/跨类型同号隔离、外键拒绝孤立结果、事务失败回滚、实际子进程强制退出保留提交屏障、原结果幂等且不可覆盖。
+- 升级验证：未知旧下载身份阻止升级并保留原行及四个历史版本；明确映射后转换。历史发布原报文摘要与待补报状态保留。未确认旧领取键未完成映射时不旋转，核实映射后保留同一请求值。
+- 连接验证：每个新连接启用 FULL/FK/WAL，真实首次 WAL 争锁测试保留，非争锁失败不重试且关闭连接。
+- Python 发布包：`uv build` 通过，源码分发与 wheel 均构建成功。依赖锁由 `uv sync --all-extras` 生成，未手工编辑。
+
+以上使用临时 SQLite，不进行真实平台投稿。最终安装包内依赖及后续消费者由 CHG104 集成验证；本记录不替代该证据。PR 尚未合并。
