@@ -49,3 +49,20 @@
 补验入口：Cloud 真实页面脚本仅显式 `WT_MEDIA_BROWSER_RETRY=1` 才确认重试，不能与 resolve 同轮执行。确认失败、旧版本 409、取消重试、实际重试与原结果读回全部通过，页面错误 0、无横向溢出；脚本语法与差异检查通过，未改运行时代码。补验未重新运行此前已通过的完整测试。
 
 补验脚本提交 Cloud `55fa6fc8753d26b7554793b7275da5ffaa78d48e`；[实际重试页面](same-task-retry.png)、[脱敏结果](same-task-retry-readback.json)。Workspace 文档治理、Delivery 和产品路线对齐检查均通过。
+
+
+## 2026-11-19 ORM 下游兼容与补报回归
+
+本轮基于 Agent CHG103 `e08e3bf`，兼容修改 `a0f6b7c` 与争锁修正合入 `35c14a7`；保留此前 CHG105 的平台 Publisher 分层、浏览器公共动作和一期 browser 协议。原 CHG104/105 的历史验证不能代替本轮证据。
+
+| 检查 | 本轮实际结果 |
+| --- | --- |
+| Agent 标准回归 | PASS：775 项（`/private/tmp/chg104-final-full.log`），完整保留实际准备、执行屏障、平台适配、重启、许可丢失及结果不可变断言 |
+| 人工结算与未投递结果 | 新增真实 SQLite 回归先失败再通过：结果保存后断网、Cloud 人工结算现场、重开日志、网络恢复。原 packet 仍被发现；模拟 Cloud 既有冲突回应时继续未投递，最终浏览器点击仍一次 |
+| 默认事务争锁 | CHG102 的 BUSY_SNAPSHOT 回归传递通过；仅重试本地短事务，reserve_report/settle_resolved 同样适配，HTTP 与浏览器均不重放 |
+| Desktop 标准回归 | PASS：Rust 540 项、6 项依既有规则忽略；控制入口 12 项、版本记录 20 项（`/private/tmp/chg104-desktop-test.log`）；Cloud 地址与 cloud_env 成对注入 |
+| 实际冻结 Agent | PASS：PyInstaller 构建 macOS arm64 Sidecar，含 SQLAlchemy；严格按工具生成锁文件安装成功。实际二进制分别用临时空库和历史四版本发布库启动，认证 healthz 可用；五个版本及单数新表落地，旧表退出，原结果摘要保留（`/private/tmp/chg104-frozen-orm-smoke.log`） |
+
+恢复扫描合并“未结算现场”和“未投递结果”；结算不会伪造投递回执。核对当前 Cloud 规则：人工结算且云端没有原结果摘要时，迟到报告可能被拒绝，因此不能声称恢复网络后一定投递成功。拒绝记录及原结果保留供核查，不更改 Cloud 状态机。
+
+独立审查唯一阻塞项为 SQLite 快照写入争锁，已在前置 CHG102 修正并通过三层完整回归。所有验证使用临时数据，任务轮询关闭；本轮未执行真实平台投稿、未重建完整 DMG、未做原生界面验收，不沿用历史截图声称通过。文档与代码同步在原 PR 链中，未自动合并。
