@@ -1,6 +1,6 @@
 # M6：单任务真实自动发布
 
-- 状态：`IN_PROGRESS`；Active CHG：[CHG-20261118-101](../active/CHG-20261118-101/change.md)、[CHG-20261118-102](../active/CHG-20261118-102/change.md)；尚无生产发布验收证据。
+- 状态：`IN_PROGRESS`；Active CHG：[CHG-20261118-101](../active/CHG-20261118-101/change.md)、[CHG-20261118-102](../active/CHG-20261118-102/change.md)、[CHG-20261118-103](../active/CHG-20261118-103/change.md)；尚无生产发布验收证据。
 - 依据：[PRD 第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.4、6.5、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md) §2.2、§4—6。
 - 依赖：M2 的真实账号与本机环境、M4/M5 的真实成片及文件服务可用；旧验收不代替本轮资源与权限复查。
 - 首个平台为百度（百家号），按 [PRD 平台范围](../../docs/product/prd/详细文档/第六章_发布管理.md)完成真实发布、结果核实并开放；B站与小红书在后续平台候选中依次交付。
