@@ -88,3 +88,6 @@ Agent 完整官方离线测试787项通过（/private/tmp/agent-review-full.log�
 Cloud103 最终提交 `1b5d8fd`，完整 Go 和全部发布隔离 MySQL 复验通过（/private/tmp/cloud103-final-go.log、/private/tmp/cloud103-final-live.log）。Agent 修订基于原105工作树，因原 #10/#11/#12 均已合并，建立 `codex/chg103-104-review` 独立修订分支并合入远端main，保留其中已交付的“现场已结算仍补报原结果”修复；最终提交 `7b32e57`，完整官方离线回归 **790项通过**（/private/tmp/agent-final-full.log）。此次没有真实浏览器、平台投稿或 Cookie 写入。
 
 最终取舍：复用单 Agent 进程的操作准入，已有 checkpoint 提供重启后的未决占位；不声称支持多个 Agent 进程同时操作同一数据库。保留现有单实例运行假设；若未来放开多实例，需要补充跨进程操作准入。MySQL 竞争使用隔离库实际复验，真实投稿继续归后续验收。独立审查无剩余已确认代码问题；未重建 Desktop/DMG。
+
+
+交付入口：[Cloud #45](https://github.com/piqiu96/wt-media-cloud/pull/45)、[Cloud104 #46](https://github.com/piqiu96/wt-media-cloud/pull/46)、[Agent本轮草稿 #13](https://github.com/piqiu96/wt-media-agent/pull/13)、[Workspace #54](https://github.com/piqiu96/wt-media-workspace/pull/54) / [#55](https://github.com/piqiu96/wt-media-workspace/pull/55)。Cloud与Agent代码已推送，45/46已追加最终review并更新说明。Workspace文档、Delivery、产品路线三项校验通过。保留各工作树供继续审查，不自动合并。

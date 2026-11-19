@@ -20,4 +20,4 @@
 - 引用竞争裁定：使用发布任务真实外键（冻结JSON存储生成列），服务层提供友好引用错误、数据库做原子裁决；不将跨域回调重新放回基础Repository。
 - Agent原有PR已合并，当前修订独立分支codex/chg103-104-review，合入远端main后复验；不向已合并PR冒充追加交付。
 - 单进程准入假设保留，checkpoint提供重启未决保护；无多进程能力承诺，不做真实平台验收。
-- 当前代码提交完成，Workspace与PR最终回写进行中。
+- Cloud PR45/46已推送并追加最终review，Agent草稿PR13已建立，Workspace PR54/55已回写；代码和文档工作树保持可继续review，不合并PR。
