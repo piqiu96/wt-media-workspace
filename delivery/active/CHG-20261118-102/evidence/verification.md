@@ -104,3 +104,7 @@ Agent `509304a`：数据库类型只在 `storage/database.py` 内声明，默认
 用户补充确认 Agent/Desktop 均使用 `dev/test/pre/prod`。Agent `6c31039` 将运行环境与 Cloud 环境共用公共枚举/校验，但两个字段独立；默认/开发配置为 dev，发布配置为 prod。正式环境判断及默认目录同步改为 prod，显式目录和冻结包目录规则保持。旧 development/production/staging 与未知值被配置校验拒绝，README 明确替换方式。
 
 新增两项回归先失败（prod 未识别、非法旧值未拒绝）再通过；配置/路径/迁移/发布配置定向 **88 项通过**，完整 Agent **708 项通过**（`/private/tmp/environment-names-102-full.log`）。后续 Agent103/104 完整回归分别 **718/780 项通过**，新冻结 Agent 的空库和历史发布库启动通过。本轮未变更表身份、Cloud 状态或历史数据，Desktop 接线证据归 CHG103。
+
+本轮命名差异独立跨仓审查通过，无阻塞项；独立复跑 Agent 配置 44 项、路径 13 项通过。核对 prod/冻结/显式目录、Desktop release floor 与生产校验、test/pre 非 prod 分支及 bundled/Python fallback 的同一环境参数，无遗留旧值分支。既有 ORM 不重新设计；Cloud Vue 无需改动；真实投稿、完整 DMG/Windows 实机不在本轮验收；Desktop 诊断继续沿用既有构建环境口径，仅统一值名。
+
+本轮三层 Workspace 各 **207 项、18 项按既有条件跳过**，文档、Delivery、产品路线、AI/Skills、允许缺席运行仓的配置校验均通过。原 Agent/Desktop 代码已推送；原 PR 描述同步本轮命名与新数量，保持未合并。远端结果以各 PR 最新提交为准。

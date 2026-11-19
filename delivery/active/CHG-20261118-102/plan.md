@@ -190,7 +190,7 @@ timeout_seconds = 5.0
 
 用户确认 `environment` 与 `cloud_env` 使用相同的 `dev/test/pre/prod` 命名，仍分别表达应用运行环境和连接的 Cloud 目标。Agent 默认/开发配置为 dev，发布配置为 prod；正式环境判断和默认目录同步改为 prod，打包应用仍按原规则使用安装目录。旧 development/production/staging 和未知值不再作为有效配置接受；不根据 environment 推导 cloud_env，不更改数据表身份或历史数据。
 
-- [ ] 先复现 prod 未被识别、旧/未知值未被拒绝，再更新公共枚举、解析、路径、配置和直接测试/说明。
-- [ ] 依次同步原 CHG102/103/104 分支，验证配置/路径和标准回归；更新原文档与 PR，保持未合并。
+- [x] 先复现 prod 未被识别、旧/未知值未被拒绝，再更新公共枚举、解析、路径、配置和直接测试/说明。
+- [x] 依次同步原 CHG102/103/104 分支，验证配置/路径和标准回归；更新原文档与 PR，保持未合并。
 
 用户进一步明确 Desktop 同步统一：在原 CHG103 Desktop #11、后续 CHG104 Desktop #12 更新配置/序列化/诊断环境名和 Agent 启动参数，允许 test/pre 作为非 prod 值；保留既有 release 构建强制 prod 校验、目录策略和 fallback 限制。Cloud Vue 消费点已核对，未按旧环境字符串分支，无需修改 Cloud 业务源码。Desktop 与 Agent 都分别保留运行环境与 Cloud 目标，不相互推导。
