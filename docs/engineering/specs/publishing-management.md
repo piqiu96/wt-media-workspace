@@ -461,7 +461,7 @@ Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也�
 | `agent_metadata` | 下载目录等小配置，以及按环境、用户隔离的未确认领取请求键 |
 | `schema_migrations` | 已执行的存储升级版本，沿用既有名称与历史 |
 
-`cloud_env` 为 `dev/test/pre/prod`，是明确配置的连接目标，独立于应用的 debug/release 或 development/production。URL 只用于通信，不作为身份或组合摘要。Desktop 成对传递 Cloud 地址和 `WT_MEDIA_CLOUD_ENV`。现有数据库路径保持不变；实际 Profile 的未结束现场在同一数据库内跨用户、跨环境互斥。
+`cloud_env` 为 `dev/test/pre/prod`，是明确配置的连接目标，Agent/Desktop 的运行环境 `environment` 也统一使用 `dev/test/pre/prod`；两个字段独立配置，例如应用 `dev` 连接 Cloud `prod`，debug/release 仍是构建模式。URL 只用于通信，不作为身份或组合摘要。Desktop 成对传递 Cloud 地址和 `WT_MEDIA_CLOUD_ENV`，另用 `WT_MEDIA_ENV` 传递自身有效运行环境。Desktop 保留既有 release 构建强制 prod 的策略和校验；test/pre 在非 release 下按非 prod 处理。现有数据库路径保持不变；实际 Profile 的未结束现场在同一数据库内跨用户、跨环境互斥。
 
 同一个 Cloud task 可以产生多个 attempt，因此可对应多条检查点和结果。所有业务查询、更新和删除携带完整作用域。重复领取不能覆盖固定输入；相同结果写入幂等，冲突结果保留原记录并拒绝覆盖。提交阶段先落盘，最终结果和检查点更新同一事务保存；补报只发送原报文，检查点不构成重启后恢复点击的授权。原现场丢失时进入核实，不伪造可继续执行的现场。
 

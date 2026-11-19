@@ -57,3 +57,12 @@ Agent `dd29f29` 顺序合入 CHG102 `509304a`。`PublicationClaimStore` 并入 `
 本轮完整 Agent 标准回归 **716 项通过**（`/private/tmp/storage-cleanup-103-full.log`）。本轮不修改 Cloud/Desktop；此前 Desktop 验证归此前提交，本记录不声称再次构建 Desktop。最终冻结包和独立审查由 CHG104 集成完成，PR 保持未合并。
 
 本轮 Workspace 文档、Delivery、产品路线、AI/Skills、配置校验通过；完整回归 **207 项、18 项按既有条件跳过**（`/private/tmp/storage-cleanup-chg103-docs-docs.log`）。独立最终审查结论、保留项及未来数据库接入边界沿用 CHG102 本轮 evidence。原 Agent #10 / Workspace #54 已更新描述，保持未合并；base 为前置 CHG102，未触发 main 目标限定的远端工作流不等于 CI 已通过。
+
+
+## 2026-11-19 Agent/Desktop environment 命名统一
+
+Agent `d46ee1a` 继承前置 `6c31039`，完整 **718 项通过**（`/private/tmp/environment-names-103-full.log`）。Desktop `c0fce05` 将配置和 serde/诊断值统一为 dev/test/pre/prod，并将有效运行环境通过 `WT_MEDIA_ENV` 传给 Agent；Cloud 目标另外传递，不按应用环境推导。
+
+新增三个真实配置/Sidecar 测试先失败再通过：四值解析与输出、旧/未知值拒绝、四值传给子进程且 Cloud 目标不变；release 仍强制 prod，非 prod 的目录用原字面路径断言覆盖 dev/test/pre。完整 Desktop **543 项通过、6 项既有忽略**，控制入口 **12 项**、版本资源检查 **20 项**通过（`/private/tmp/environment-desktop-103-full.log`）。严格参数数量断言增加到 7 并校验新增环境值，原 token/端口/目标校验保留。
+
+Cloud Vue 消费点已核对，无按旧 environment 字符串分支，未改 Cloud 业务代码。不重建完整 DMG、不真实投稿，未合并。独立最终核对和本轮文档校验待收口，不将此前审查/CI 当作新提交通过。

@@ -21,6 +21,8 @@ risk: H
 
 后续存储清理已落在同一 PR：`PublicationClaimStore` 归入 `storage/publication.py`，保留独立类，旧文件删除；插入差异委派 Database 适配，准备补报调用既有 Runner。领取键生命周期、原请求值、状态和报告摘要不改变，当前验证见原 evidence。
 
+用户进一步确认 Agent/Desktop 的 `environment` 也统一为 dev/test/pre/prod。Desktop 配置、页面/诊断输出和 Sidecar 的 `WT_MEDIA_ENV` 同步；`cloud_env` 独立，开发应用可连接 prod。原 release 强制 prod 校验、安装目录和 fallback 限制保持，非 release 的 test/pre 使用非 prod 策略；旧环境拼写须按配置说明更新。
+
 ## Done When
 
 - 实际共用页面单独确认执行，保存授权与审计；未来时间不提前领取，已授权输入不可被编辑覆盖。
