@@ -90,3 +90,5 @@ Agent `711fd45` 顺序继承 CHG102 `509304a`、CHG103 `dd29f29`。恢复已核�
 顺序继承前置环境命名：Agent `a9a49c0` 完整 **780 项通过**（`/private/tmp/environment-names-104-full.log`）；Desktop `05a7c16` 完整 **543 项通过、6 项既有忽略**，控制入口 **12 项**、版本资源检查 **20 项**通过（`/private/tmp/environment-desktop-104-full.log`）。两字段独立，Desktop 传入明确 `WT_MEDIA_ENV` 与 `WT_MEDIA_CLOUD_ENV`；发布构建的 prod floor 与安装目录策略保留，不变更本单元的发布/恢复状态。
 
 以新 Agent 代码和 prod 发布配置实际构建 macOS arm64 Sidecar（`/private/tmp/environment-names-build.log`），以临时空库和历史四版本发布库实际启动；认证健康接口、五版本升级、单数表、原结果摘要保留通过（`/private/tmp/environment-names-frozen-smoke.log`）。轮询关闭，未连接真实账号投稿。新旧环境配置替换方式见 Agent/Desktop README；未重建完整 DMG，不沿用此前原生页面验收。
+
+命名变更后的 Workspace 标准回归 **207 项、18 项按既有条件跳过**，各治理校验通过（`/private/tmp/storage-cleanup-environment-chg104-docs-docs.log`）。本轮独立跨仓核对无阻塞项；新旧库冻结启动验证来自本轮实际二进制，其他未验证边界沿用本轮 CHG102/103 明示范围。所有原 PR 保持未合并。
