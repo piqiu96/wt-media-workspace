@@ -70,3 +70,14 @@
 最终 Agent 提交 `545c890` 补齐工具生成的 Publisher 锁定依赖；`uv sync --all-extras --locked --offline` 通过后，用该分支独立环境复验完整 775 项通过（`/private/tmp/chg104-own-env-full.log`）。当前 Workspace 回归 207 项、18 项按既有条件跳过（`/private/tmp/chg104-workspace-full.log`）；文档、Delivery、产品路线和差异检查通过。所有原 PR 描述已按当前范围重写，原堆叠 base 保持。
 
 最终 Agent 分支 `e43ea50` 仅继续承接前置 Linux 测试目录兼容修正，3 项连接故障断言复验通过；运行时代码与 `545c890` 的包内依赖相同，775 项和实际冻结包验证的范围不变。历史 CI 及本轮首次失败均保留在对应前置 CHG 证据，最新状态以各 PR 当前提交检查为准。
+
+
+## 2026-11-19 存储清理集成验证
+
+Agent `711fd45` 顺序继承 CHG102 `509304a`、CHG103 `dd29f29`。恢复已核对同一 attempt/hash 后，直接调用 Journal 确认原 packet；删除全量 pending 扫描和伪发送回调。未知现场不重入、未确认原结果继续可见；未改变 Cloud 状态及本地执行阶段。
+
+- 完整 Agent 标准回归 **778 项通过**（`/private/tmp/storage-cleanup-104-full.log`）。三项旧恢复测试仅将删除的冗余路径属性替换为共享 Database 路径，原重启、手工结算和迟到报告断言保留。
+- 新建 macOS arm64 PyInstaller Sidecar 成功（`/private/tmp/storage-cleanup-build.log`）；实际新二进制分别用临时空库及历史四版本发布库启动，认证健康接口、五个升级版本、单数表、旧表退出及原报告摘要保留均通过（`/private/tmp/storage-cleanup-frozen-smoke.log`）。任务轮询关闭，未连接真实账号投稿。
+- 独立只读最终审查未发现 Critical/Important，另行执行 81 项存储/发布相关测试通过。唯一 Minor 为前置 dialect 文件末尾空行，按原清单留待后续，运行行为不受影响。范围差异检查会报告该格式项，不宣称其通过。
+
+本轮不修改 Cloud/Desktop，不重建完整 DMG、不执行真实投稿或原生页面验收；其他数据库尚未接入，未来须新增适配和迁移验证。原防重设计保留，本轮仅验证重构未破坏其行为。PR 保持未合并。
