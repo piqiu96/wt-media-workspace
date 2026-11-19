@@ -46,3 +46,5 @@ Cloud/Agent 当前堆叠 PR 的目标是功能分支，现有 workflow 只对 ma
 - Agent 后续实际 Sidecar 打包与旧库升级证据归 CHG104。本轮不复用此前 DMG/原生页面/真实准备证据证明新版本通过，未进行真实投稿。PR 保持未合并。
 
 当前隔离 Workspace 标准回归 207 项、18 项按既有条件跳过（`/private/tmp/chg103-workspace-full.log`）；文档治理、Delivery 与产品路线校验通过。跳过项依赖缺席的运行仓同级目录或专项条件，不将历史 211 项视作本轮数量。
+
+Desktop 新提交 `b4a649b` 的远端 verify 已通过（run 44436598469）。Agent 最新合入仅为前置 Linux 测试路径兼容修正，3 项故障断言复验通过；完整运行验证数量仍为上述 713 项。
