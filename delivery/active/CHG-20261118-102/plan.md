@@ -158,12 +158,12 @@ timeout_seconds = 5.0
 
 ### 任务 6：CHG102 数据库适配与旧代码清理
 
-- [ ] 新增小型 `storage/dialect.py`，集中 SQLite 连接、冲突写入、条件唯一索引及争锁识别；普通约束由模型声明，建表时创建，写入仅引用已有约束规则。
-- [ ] Store 使用普通 ORM 与统一冲突写入方法，不直接导入 SQLite 方言，不重复声明冲突列/条件；适配调用复用 Session，不自行提交。
-- [ ] 保留迁移历史、旧库映射与失败回滚；迁移入口按 Database 的适配调用对应升级；普通时间默认值使用统一时间函数。
-- [ ] 删除 OfflineResult 和 records.py，TaskCheckpoint 移入 checkpoint_store.py；待投递数量直接统计；删除无调用方法、未用属性、旧导出和过期注释，收口跨模块常量。
-- [ ] 发布补报发送协调放入既有 runner/publication.py；Journal 只查询原 packet 和记录确认；校验原 hash 与作用域，重试不包含 HTTP 或浏览器。
-- [ ] 先验证新接口缺失，再以真实 SQLite 复验约束、隔离、事务、重启与原结果；完成 Agent 标准回归并提交。
+- [x] 新增小型 `storage/dialect.py`，集中 SQLite 连接、冲突写入、条件唯一索引及争锁识别；普通约束由模型声明，建表时创建，写入仅引用已有约束规则。
+- [x] Store 使用普通 ORM 与统一冲突写入方法，不直接导入 SQLite 方言，不重复声明冲突列/条件；适配调用复用 Session，不自行提交。
+- [x] 保留迁移历史、旧库映射与失败回滚；迁移入口按 Database 的适配调用对应升级；普通时间默认值使用统一时间函数。
+- [x] 删除 OfflineResult 和 records.py，TaskCheckpoint 移入 checkpoint_store.py；待投递数量直接统计；删除无调用方法、未用属性、旧导出和过期注释，收口跨模块常量。
+- [x] 发布补报发送协调放入既有 runner/publication.py；Journal 只查询原 packet 和记录确认；校验原 hash 与作用域，重试不包含 HTTP 或浏览器。
+- [x] 先验证新接口缺失，再以真实 SQLite 复验约束、隔离、事务、重启与原结果；完成 Agent 标准回归并提交。
 
 ### 任务 7：CHG103 领取组件合并
 
