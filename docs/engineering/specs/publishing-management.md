@@ -132,6 +132,45 @@ sequenceDiagram
 
 提交前复查通过 report 的 submitting 阶段完成，不另设通用许可 API。允许响应与平台点击之间仍有竞态窗口：后发生的停止不能撤回平台提交，必须根据真实回执收尾。提交前响应丢失时，不能把旧允许响应当作永久许可，也不能自动重放点击。
 
+#### 浏览器操作与平台发布器
+
+**页面操作采用 Python Playwright，连接 BitBrowser 已启动的账号 Profile；任务授权和恢复仍由发布执行器负责。** 普通点击、输入、上传和等待使用 Playwright 的 `Page` / `Locator`；已有 CDP 能力按需保留，不再为普通表单重复实现点击命中、遮挡判断和轮询。
+
+| 组件 | 轻量实现思路 |
+| --- | --- |
+| `PublicationJob` | 组织所属任务资源准备、心跳、阶段持久化、提交许可、关闭核实和原结果保存/补报；通过必填控制回调调用独立发布入口，不直接执行平台页面步骤 |
+| `BrowserSession` | 根据 BitBrowser 启动响应取得动态 CDP 地址，连接对应 Profile 的现有默认 context；管理本次页面和连接，核对账号，不另起空白账号环境。断开 Playwright 不等于现场已安全结束，Profile 关闭仍须使用现有 BitBrowser 能力核实 |
+| `Publisher` | `platforms/publish.py` 用 Protocol 约定 `publish(payload, control, *, method=PublishMethod.BROWSER)`；消费固定内容、本地路径与预期 UID，返回本次回执。控制含停止检查、准备完成通知与提交前许可；公共入口不接收 Page、Token 或数据库模型 |
+| `BaiduPublisher` / `BrowserPublisher` | 同放 `platforms/baidu/publisher.py`。前者选择实现，组织两次身份核对、准备、提交许可与一次提交；后者封装当前页面、选择器、填写、平台检查与回执。基础 API 仍通过 clients，公共会话经 services/browser；一期只支持 browser，不创建 API 投稿占位或浏览器子目录 |
+
+目录和依赖边界见 [ADR-0034](../../decisions/0034-agent-platform-capabilities-and-publish-boundary.md)。首次实读 UID 成功后，准备完成回调才允许持久化 prepared 并报告 ready；上传后再次核实 UID，提交前回调记录屏障且取得新鲜许可后才可提交。业务入口通过参数固定 browser，暂不增加用户选择页面、Cloud 字段或外部契约。
+
+使用现有 bootstrap 显式装配，通过简单平台映射选择 Publisher；不引入动态插件、全局单例注册系统或通用工作流引擎。页面操作直接使用 Playwright API，不再包装一套同名浏览器操作接口。首版可使用同步 API 对接现有同步执行器，同一会话的 Playwright 调用留在同一执行线程；心跳线程只传递停止信号，不操作页面。
+
+**大文件通过本地路径上传，不转为内存 buffer。** Python Playwright 从 1.58 起支持 `connect_over_cdp(..., is_local=True)`；只有 Agent 与 BitBrowser 确实共用本机文件系统、浏览器能够读取该绝对路径时才启用。连接地址来自启动结果，不写死端口；文件沿用本次执行已校验摘要的私有文件，不重新下载或擅自改写内容。
+
+```python
+browser = playwright.chromium.connect_over_cdp(
+    endpoint_url=bitbrowser_endpoint,
+    is_local=True,
+)
+page = browser.contexts[0].new_page()
+page.locator(video_input_selector).set_input_files(video_path)
+```
+
+这是连接与传文件方式的示意，不包含任务授权和完整执行流程。该设置避免 CDP 远程文件传输分支的 50 MiB 限制，不能取消 buffer、平台文件规格或存储网关的限制；跨主机／文件系统隔离时不能靠设置此参数假定文件可读。依据：[官方 API](https://playwright.dev/python/docs/api/class-browsertype#browser-type-connect-over-cdp)、[1.58 上传实现](https://github.com/microsoft/playwright/blob/v1.58.0/packages/playwright-core/src/server/fileUploadUtils.ts)。
+
+平台实现按以下边界处理页面和结果：
+
+- 填写阶段使用明确的可见控件及当前弹窗范围，按上传进度、处理结果和实际封面预览等待；超时、封面失败或必填值不符即停止，不靠固定睡眠、默认 `force=True` 或静默降级继续。提交前读回本次已确认内容，不截断、改写或替换。
+- 先建立本次投稿请求的回执监听，再由执行器完成提交前复查与本地阶段记录，调用 `submit()` 点击最终发布。每次尝试最多发起一次最终提交，不把该操作放入业务重试循环；点击后超时、断网或结果不明，按本节及 [4.4](#44-安全停止与迟到结果) 核实，不再次点击。
+- `read_receipt()` 返回本次投稿的作品 ID 和必要证据，不只返回 `success: true`；按账号、本次请求和实际平台响应关联，作品 ID 使用字符串保留精度。上传／保存成功、HTTP 200、跳转或列表最新作品都不能单独证明投稿成功；平台接受与公开结果仍按既有任务状态分别核实。
+- 发现安全验证时停止自动操作，使用既有人工处理流程；更换浏览器驱动不改变原用户、原现场、原 attempt 和停止控制的约束。调试截图、响应或 trace 只保留必要且脱敏的证据，不记录凭据或完整会话。
+
+参考 [social-auto-upload](https://github.com/dreammis/social-auto-upload/tree/main/uploader) 的页面操作及上传判断，参考 [wt-media-flow 平台层](https://github.com/piqiu96/wt-media-flow/tree/main/src/platforms) 的协议与独立载荷组织；外部代码仅作实现参考，不是业务事实源。不沿用其中的人工最终提交、跳过封面、失败后继续或以最新作品猜测本次结果等做法，也不带入评论等本轮范围外能力。
+
+Playwright 作为 Local Agent 的运行依赖管理，固定经验证且不低于 1.58 的兼容版本；Cloud 模式不因发布能力启用浏览器。连接现有 BitBrowser 不需要另装一套 Playwright Chromium，但 Desktop Sidecar 仍须包含匹配的 Playwright 驱动及运行文件，不能依赖开发机环境。macOS 重签名须保留包内 Node 所需的 JIT 权限，不因修复驱动而关闭其 hardened runtime 或添加其他权限。兼容性、大文件与安装包验证见 [技术验证](#6-技术验证)。
+
 ### 2.3 计划推进与停止控制
 
 **自动检查、人工恢复、确认继续和批次接管共用一个推进 Service，事务内重检位置和当前事实。** 条件优先级直接遵守 [PRD 6.2.4](../../product/prd/详细文档/第六章_发布管理.md#624-执行与推进计划)。
@@ -603,8 +642,8 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 
 | 调用链 | 路径意图 | 必要语义 |
 | --- | --- | --- |
-| Agent → Cloud | `POST /cloud-agent/publication-task/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
-| Agent → Cloud | `/{id}/report`、`complete` | 均绑定 attempt；report 不带 stage 时只保活并读停止指令，带 stage 时兼阶段上报及提交前复查，complete 去重保存证据与结果 |
+| Agent → Cloud | `POST /api/v1/cloud-agent/publication-task/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
+| Agent → Cloud | `/api/v1/cloud-agent/publication-task/{id}/report`、`complete` | 均绑定 attempt；report 不带 stage 时只保活并读取停止指令，带 stage 时上报进度并兼提交前复查；保活不追加进度历史或授予提交许可，complete 去重保存原证据与结果 |
 | Agent → Cloud | 当前 attempt 的文件资源读取／续签 | 复用文件 Service；只允许快照已绑定文件，提供方在发布协议内定义，不新建下载任务或存储凭证体系 |
 | Desktop → Agent | `POST /publication-runs/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
 | Desktop → Agent | `GET/PUT/DELETE /publication-drafts/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
@@ -647,6 +686,9 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 | 停止与提交竞争 | 安全未领取可取消；已取得安全停止且未提交证据时运行任务可终止；提交复查通过后停止不伪造未提交或承诺撤稿 |
 | 停止不可逆 | 计划终止停止全部所属批次；更晚授权、安全重试或迟到回报都不能绕过停止标记；已停止批次只核实收尾 |
 | 失联与补报 | 断网／重启后补报原结果，重复完成幂等；失联不自动释放／重跑，旧 attempt 不覆盖新 attempt，冲突证据保留 |
+| Playwright 与本机大文件 | 使用实际 BitBrowser Profile 和动态 CDP 地址，以 `is_local=True` 上传有效且超过 50 MiB 的本地视频，确认真实上传及处理完成；不可读路径、上传失败和超时明确报错，不转 buffer 或压缩文件来冒充大文件验证 |
+| 平台页面与提交边界 | 浏览器验证正文、各必需封面、声明及弹窗；遮挡、失效控件或安全验证不强行继续。授权拒绝不点击，点击后断网／超时不二次提交；回执匹配本次请求，公开结果另行核实。本地 fixture 只验证操作与异常分支，不代替真实平台验收 |
+| Playwright 安装包 | 在不依赖开发机 Python／Node 环境的 Desktop 安装包中连接实际 BitBrowser，验证驱动资源、文件权限、填写、停止及退出；断开连接不误报 Profile 已关闭，不携带另一套无关浏览器 |
 | 派发收口与待办 | 审核／失败仍可有待办；仅未结束且未停止的合法失败可重试；迟到未知不把已结束控制改为运行 |
 | 公开结果与统计 | 目标 30、创建 28、公开 28，成功率约 93.33%、缺口 2；补录同平台作品不重复关联或计数，attempt 不增加任务数 |
 | 补量与迟到公开 | 并发只创建一轮合法补量；原目标不变；迟到公开重新提示缺口，不隐式改正式任务或重复推进 |

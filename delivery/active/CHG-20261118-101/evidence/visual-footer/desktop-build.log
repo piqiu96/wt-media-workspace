@@ -1,0 +1,134 @@
+
+> wt-media-cloud-web@0.1.0 build:desktop
+> vite build --config vite.config.desktop.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 4159 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-desktop/index.desktop.html                                1.17 kB │ gzip:   0.82 kB
+dist-desktop/assets/BusinessSelect-BwLB8Cm3.css                0.06 kB │ gzip:   0.07 kB
+dist-desktop/assets/production-BDT0BjEm.css                    0.20 kB │ gzip:   0.14 kB
+dist-desktop/assets/ResourceDateRange-BuOofDU9.css             0.21 kB │ gzip:   0.13 kB
+dist-desktop/assets/work-env-status-D3jPHhVO.css               0.23 kB │ gzip:   0.19 kB
+dist-desktop/assets/ResourceAdvancedToggle-Dm0N6SOo.css        0.34 kB │ gzip:   0.19 kB
+dist-desktop/assets/ResourceEmptyState-DheSRzza.css            0.56 kB │ gzip:   0.27 kB
+dist-desktop/assets/FeedbackAlert-0JOyVvQz.css                 0.61 kB │ gzip:   0.20 kB
+dist-desktop/assets/DiscoveryStrategiesPage-BiDZP7iq.css       0.61 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatusBadge-C-0az_zx.css           0.63 kB │ gzip:   0.27 kB
+dist-desktop/assets/ResourceReorderActions-ZjwJLaJ5.css        0.69 kB │ gzip:   0.29 kB
+dist-desktop/assets/KeywordTags-DnVk0HLt.css                   0.75 kB │ gzip:   0.29 kB
+dist-desktop/assets/LocalSettingsPage-DOu2-ZMD.css             0.80 kB │ gzip:   0.33 kB
+dist-desktop/assets/BrandLogo-D-uQMfd7.css                     0.82 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceSelectionToolbar-lwR0kNrS.css      0.82 kB │ gzip:   0.34 kB
+dist-desktop/assets/MyMaterialsPage-CFhMIoJ2.css               0.94 kB │ gzip:   0.37 kB
+dist-desktop/assets/ResourceForm-B4mB_Yv-.css                  1.03 kB │ gzip:   0.42 kB
+dist-desktop/assets/ResourceChoiceCards-j9aq2F2f.css           1.24 kB │ gzip:   0.50 kB
+dist-desktop/assets/FilesPage-BHw7vM2D.css                     1.26 kB │ gzip:   0.48 kB
+dist-desktop/assets/ResourceFilterBar-Crgd0uCo.css             1.29 kB │ gzip:   0.43 kB
+dist-desktop/assets/ContentPoolPage-CCr-sP2O.css               1.35 kB │ gzip:   0.51 kB
+dist-desktop/assets/MyOutputsPage-CVHSmGdC.css                 1.47 kB │ gzip:   0.45 kB
+dist-desktop/assets/ProxyPage-CuKTNqoU.css                     1.58 kB │ gzip:   0.52 kB
+dist-desktop/assets/ResourceStatGrid-Dal4Qt81.css              1.62 kB │ gzip:   0.57 kB
+dist-desktop/assets/CrawlTasksPage-BzXcg5Dk.css                1.66 kB │ gzip:   0.55 kB
+dist-desktop/assets/ComposeBatchProgress-BTfTBYol.css          1.72 kB │ gzip:   0.55 kB
+dist-desktop/assets/ResourceDescriptions-CxagPHXG.css          1.73 kB │ gzip:   0.46 kB
+dist-desktop/assets/LocalLogsPage-C84vgdtr.css                 1.96 kB │ gzip:   0.67 kB
+dist-desktop/assets/ResourcePageHeader-CgJ8aYVz.css            2.28 kB │ gzip:   0.69 kB
+dist-desktop/assets/MaterialLibraryPage-Bq4bQWmC.css           2.28 kB │ gzip:   0.69 kB
+dist-desktop/assets/ResourceOverlay-DK7lHPgj.css               2.35 kB │ gzip:   0.69 kB
+dist-desktop/assets/ResourceSection-CNVUAwHH.css               2.81 kB │ gzip:   0.81 kB
+dist-desktop/assets/OperationProgressDialog-DR_YBe1K.css       2.88 kB │ gzip:   0.84 kB
+dist-desktop/assets/ResourceNotice-7qp2uJBQ.css                3.02 kB │ gzip:   0.83 kB
+dist-desktop/assets/labels-3kWfKiHy.css                        3.15 kB │ gzip:   0.95 kB
+dist-desktop/assets/MaterialDetailDrawer-Bi4EGiQt.css          3.76 kB │ gzip:   0.98 kB
+dist-desktop/assets/PersonalInfoPage-pGeBEcZR.css              4.28 kB │ gzip:   1.23 kB
+dist-desktop/assets/ComposeTasksPage-C6pU094S.css              4.36 kB │ gzip:   1.11 kB
+dist-desktop/assets/ComposeStrategyPage-BHCPXBvy.css           4.58 kB │ gzip:   1.10 kB
+dist-desktop/assets/AccountsPage-BdKpleNI.css                  7.19 kB │ gzip:   1.65 kB
+dist-desktop/assets/AppLayout-BiwT9QqE.css                     7.74 kB │ gzip:   1.97 kB
+dist-desktop/assets/LoginPage-B7XaU2z4.css                     9.13 kB │ gzip:   2.48 kB
+dist-desktop/assets/ComposeTaskCreateDialog-o41xBDPb.css       9.30 kB │ gzip:   1.92 kB
+dist-desktop/assets/PublishingPage-CHIcyknz.css               11.30 kB │ gzip:   2.32 kB
+dist-desktop/assets/ProfilesPage-DRFIqqhg.css                 12.43 kB │ gzip:   2.46 kB
+dist-desktop/assets/index-BO2r6CPt.css                       476.52 kB │ gzip:  55.53 kB
+dist-desktop/assets/downloadCentre-DTu-Ex51.js                 0.15 kB │ gzip:   0.14 kB
+dist-desktop/assets/datetime-Qj9aAQHL.js                       0.17 kB │ gzip:   0.15 kB
+dist-desktop/assets/bitAccount-CLoP5tTm.js                     0.21 kB │ gzip:   0.19 kB
+dist-desktop/assets/categories-B2Rt1YYr.js                     0.25 kB │ gzip:   0.23 kB
+dist-desktop/assets/ResourceFilterBar-B377-m22.js              0.26 kB │ gzip:   0.23 kB
+dist-desktop/assets/platforms-DptTiT_Q.js                      0.29 kB │ gzip:   0.24 kB
+dist-desktop/assets/ResourceForm-HE2kvP0-.js                   0.32 kB │ gzip:   0.26 kB
+dist-desktop/assets/objectReadUrl-DPxEZT3X.js                  0.32 kB │ gzip:   0.23 kB
+dist-desktop/assets/fileTransfer-4xrVd05P.js                   0.35 kB │ gzip:   0.23 kB
+dist-desktop/assets/ComingSoon-BhqWH-EG.js                     0.35 kB │ gzip:   0.30 kB
+dist-desktop/assets/ResourceStatusBadge-CPB5ckKV.js            0.35 kB │ gzip:   0.28 kB
+dist-desktop/assets/ResourceDateRange-DAAk1NfN.js              0.40 kB │ gzip:   0.34 kB
+dist-desktop/assets/useAutoRefresh-Scjcs8dQ.js                 0.47 kB │ gzip:   0.33 kB
+dist-desktop/assets/createdRange-B6admxoS.js                   0.57 kB │ gzip:   0.38 kB
+dist-desktop/assets/session-BxhQ5WLD.js                        0.60 kB │ gzip:   0.37 kB
+dist-desktop/assets/BusinessSelect-BxqIRUPn.js                 0.73 kB │ gzip:   0.54 kB
+dist-desktop/assets/files-DmoqYUH2.js                          0.77 kB │ gzip:   0.47 kB
+dist-desktop/assets/FeedbackAlert-ChKcGYC-.js                  0.82 kB │ gzip:   0.41 kB
+dist-desktop/assets/ResourceAdvancedToggle-jFOyNMsl.js         0.83 kB │ gzip:   0.54 kB
+dist-desktop/assets/ResourceChoiceCards-DOTbWuNw.js            1.00 kB │ gzip:   0.56 kB
+dist-desktop/assets/BrandLogo-CZilk1Mr.js                      1.01 kB │ gzip:   0.63 kB
+dist-desktop/assets/ResourceDescriptions-DQOA3qKB.js           1.05 kB │ gzip:   0.74 kB
+dist-desktop/assets/managementInteractions-Cp5DNBRK.js         1.07 kB │ gzip:   0.65 kB
+dist-desktop/assets/index-ClhaVsWC.js                          1.14 kB │ gzip:   0.60 kB
+dist-desktop/assets/ResourceNotice-uZuxHAKj.js                 1.15 kB │ gzip:   0.60 kB
+dist-desktop/assets/ResourceStatGrid-DiMA4WdI.js               1.17 kB │ gzip:   0.66 kB
+dist-desktop/assets/ResourceSelectionToolbar-CDgGci4h.js       1.18 kB │ gzip:   0.64 kB
+dist-desktop/assets/ResourcePageHeader-P-bih7a0.js             1.33 kB │ gzip:   0.76 kB
+dist-desktop/assets/usersApi-CismfsRK.js                       1.46 kB │ gzip:   0.60 kB
+dist-desktop/assets/mediaAccounts-CJfTUGS-.js                  1.52 kB │ gzip:   0.62 kB
+dist-desktop/assets/DashboardPage-CJExFiZu.js                  1.61 kB │ gzip:   0.86 kB
+dist-desktop/assets/ResourceReorderActions-Bt_SacwT.js         1.76 kB │ gzip:   0.90 kB
+dist-desktop/assets/proxy-lid4JG3P.js                          1.78 kB │ gzip:   0.84 kB
+dist-desktop/assets/miningRules-CXzii-PH.js                    1.83 kB │ gzip:   0.87 kB
+dist-desktop/assets/labels-B5nwhzuv.js                         1.83 kB │ gzip:   0.83 kB
+dist-desktop/assets/app-ICP6BjpS.js                            1.87 kB │ gzip:   0.75 kB
+dist-desktop/assets/eligibility-CIyWeJKW.js                    1.95 kB │ gzip:   1.12 kB
+dist-desktop/assets/error-circle-DlKbc7Qb.js                   2.57 kB │ gzip:   0.98 kB
+dist-desktop/assets/compose-DUD_xFKv.js                        2.84 kB │ gzip:   0.91 kB
+dist-desktop/assets/KeywordTags-BWSylktJ.js                    2.89 kB │ gzip:   1.44 kB
+dist-desktop/assets/ResourceEmptyState-DXuC7Xpm.js             2.97 kB │ gzip:   1.24 kB
+dist-desktop/assets/mediaAccountLabels-BDxBkgZ5.js             4.24 kB │ gzip:   2.04 kB
+dist-desktop/assets/ResourceSection-DOblzqlF.js                4.33 kB │ gzip:   1.85 kB
+dist-desktop/assets/work-env-status-C-Dm3EtO.js                4.61 kB │ gzip:   2.53 kB
+dist-desktop/assets/TeamsPage-BM89s4rU.js                      6.44 kB │ gzip:   2.80 kB
+dist-desktop/assets/ResourceOverlay-Da7IrgSv.js                6.52 kB │ gzip:   2.52 kB
+dist-desktop/assets/LocalLogsPage-BjHgTXgH.js                  7.10 kB │ gzip:   3.13 kB
+dist-desktop/assets/LoginPage-DmfUEPyW.js                      7.86 kB │ gzip:   3.25 kB
+dist-desktop/assets/PersonalInfoPage-CY28z5Hb.js              10.52 kB │ gzip:   4.43 kB
+dist-desktop/assets/ComposeBatchProgress-C7-983Z5.js          10.55 kB │ gzip:   4.58 kB
+dist-desktop/assets/OperationProgressDialog-TrNcHX2t.js       11.26 kB │ gzip:   3.71 kB
+dist-desktop/assets/LocalSettingsPage-B0qBI9GZ.js             11.56 kB │ gzip:   4.63 kB
+dist-desktop/assets/CategoriesPage-B8k-ajWq.js                12.59 kB │ gzip:   4.62 kB
+dist-desktop/assets/FilesPage-DQY829qW.js                     13.23 kB │ gzip:   5.06 kB
+dist-desktop/assets/MaterialLibraryPage-vB-EnzTX.js           13.33 kB │ gzip:   5.00 kB
+dist-desktop/assets/MyMaterialsPage-GQDc7zl0.js               13.96 kB │ gzip:   5.24 kB
+dist-desktop/assets/local-settings-view-BX22r3y9.js           15.40 kB │ gzip:   5.36 kB
+dist-desktop/assets/UsersPage-Do9HscRy.js                     15.43 kB │ gzip:   4.92 kB
+dist-desktop/assets/CrawlTasksPage-BBstAAAP.js                17.39 kB │ gzip:   6.19 kB
+dist-desktop/assets/AppLayout-CB9aC_b-.js                     19.80 kB │ gzip:   7.49 kB
+dist-desktop/assets/MyOutputsPage-CCvjaqkU.js                 24.99 kB │ gzip:   8.75 kB
+dist-desktop/assets/MaterialDetailDrawer-mBbAvK_X.js          25.71 kB │ gzip:   9.30 kB
+dist-desktop/assets/ComposeTasksPage-Dr3eQAM7.js              25.78 kB │ gzip:   8.95 kB
+dist-desktop/assets/DiscoveryStrategiesPage-BAl3dzEz.js       28.44 kB │ gzip:   9.11 kB
+dist-desktop/assets/ContentPoolPage-CmzfB466.js               36.73 kB │ gzip:  11.45 kB
+dist-desktop/assets/PublishingPage-DK19DvBQ.js                38.87 kB │ gzip:  12.55 kB
+dist-desktop/assets/ComposeStrategyPage-vodW8mZq.js           47.65 kB │ gzip:  14.77 kB
+dist-desktop/assets/ProxyPage-Dxivi9YY.js                     49.38 kB │ gzip:  15.52 kB
+dist-desktop/assets/index-D3im8pCt.js                         64.58 kB │ gzip:  18.92 kB
+dist-desktop/assets/ComposeTaskCreateDialog-CvuAhpLB.js       68.49 kB │ gzip:  21.41 kB
+dist-desktop/assets/AccountsPage-DYlsMDky.js                  76.44 kB │ gzip:  23.43 kB
+dist-desktop/assets/ProfilesPage-D0S3XQzw.js                 113.39 kB │ gzip:  31.48 kB
+dist-desktop/assets/index.desktop-BPc2jxfh.js              1,399.79 kB │ gzip: 380.92 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 14.21s

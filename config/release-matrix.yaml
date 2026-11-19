@@ -836,3 +836,34 @@ releases:
     residual_risks:
       - "Execution flags remain disabled in repository and online configuration; only a private local test override enabled preparation checks."
       - "Baidu browser upload/final submission, public result verification and safe retry remain later M6 work; this candidate does not complete M6."
+
+  - release: "chg104-publication-recovery-20261118"
+    status: verifying
+    date: "2026-11-18"
+    scope: original_publication_verification_and_safe_retry
+    environment: local_development
+    components:
+      cloud: "af665b255941a32e36d45b0c20edfe4f01776f13 (unmerged, not released)"
+      cloud_agent: "Cloud af665b255941a32e36d45b0c20edfe4f01776f13 (not released)"
+      local_agent: "04190410f7248c81f84a71e4a7a23910b9e0e449 (unmerged, not released)"
+      desktop: "577146e797ec7ae3950ed2cf6f14967f0f3bb5bf (unmerged, not released)"
+    contracts:
+      cloud_api: "v1@2026.11.18.3"
+      cloud_agent_api: "v1@2026.11.18.3"
+      cloud_error_codes: "2026.11.18.1"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Revision-bound failure verification and retry; original-attempt acknowledgement is read only and never grants browser re-entry."
+    rollout_order:
+      - "Complete the CHG-101/102/103 PR chain first; Cloud#46 applies migration 105, then Agent#11, Desktop#12 and this Workspace CHG. All await Review."
+    verification:
+      local:
+        - "Cloud Go/frontend 1007, 19 isolated MySQL checks with 107 fresh migrations and repeat-zero, Agent 719, Desktop 538 (6 existing ignored), Workspace 211 passed."
+        - "Cloud and Desktop development pages exercised cancellation, missing-evidence rejection and original-result preservation; real Cloud task remains uncertain behind Baidu safety verification."
+        - "Fresh signed macOS DMG uses shared frontend a4ab664 (unchanged by migration-only follow-up), Agent 0419041 and Desktop 577146e; component digests, configuration and official CHG verification passed."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "DMG built and verified; native visual acceptance pending, not released"
+    residual_risks:
+      - "Baidu safety verification needs human completion before original-account reconciliation and real posting can continue. No platform upload or final submission is claimed."
+      - "No autonomous publication loop or platform submission adapter is enabled by this unit. Execution remains disabled in repository/online configuration; M6 is IN_PROGRESS."

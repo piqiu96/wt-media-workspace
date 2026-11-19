@@ -1,0 +1,35 @@
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+{
+  "checks": 59,
+  "evidence": "/private/tmp/publication-footer-review",
+  "pageErrors": [],
+  "writes": []
+}
+9:58:26 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+✔ 发布任务: common title, table surface, filter and pagination (4778.089792ms)
+✔ 发布批次: common title, table surface, filter and pagination (2364.285042ms)
+✔ 图片库: common title, table surface, filter and pagination (2494.786542ms)
+✔ 封面模板: common title, table surface, filter and pagination (2450.302583ms)
+✔ 发布计划: common title, table surface, filter and pagination (2259.52275ms)
+✔ batch new and editable content share title/section/footer and safe return (3801.841208ms)
+✔ plan new/edit uses common hierarchy, contextual help and fixed return (3779.321541ms)
+✔ image short new/edit dialogs and image preview retain their suitable containers (3989.36075ms)
+✔ template editor and preview reflow without page overflow at 390px (3695.725125ms)
+✔ new task uses the list title style and all page actions stay in the footer (3689.572833ms)
+✔ new task footer preserves unsaved draft protection and resume (3015.78975ms)
+✔ editing only saves content, returns safely and leaves new-task draft untouched (3075.716958ms)
+✔ readonly detail footer returns to filtered and scrolled list without unsafe actions (1923.445833ms)
+✔ narrow new, edit and detail keep footer visible and reserve final content space (2652.940625ms)
+✔ batch pages retain their existing shared header and navigation (1499.092125ms)
+✔ AI fill in new has pending protection and a transient toast without overwriting manual content (4905.111541ms)
+✔ AI fill in edit has pending protection and a transient toast without overwriting manual content (4705.787917ms)
+✔ four task views share spacing and type hierarchy while the table header has a distinct surface (3486.797958ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 30024.878708

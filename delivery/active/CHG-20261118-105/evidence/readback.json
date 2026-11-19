@@ -1,0 +1,116 @@
+{
+  "verified_at": "2026-11-18",
+  "versions": {
+    "agent": "89cfa1a1f7c7624a658eb15c6e05aa32562e2f67",
+    "cloud": "55fa6fc8753d26b7554793b7275da5ffaa78d48e",
+    "desktop": "577146e797ec7ae3950ed2cf6f14967f0f3bb5bf",
+    "playwright": "1.58.0"
+  },
+  "checks": {
+    "workspace_tests": 211,
+    "agent_tests": 743,
+    "isolated_browser_tests": 20,
+    "aggregate_exit_code": 0,
+    "wheel_and_sdist": true,
+    "independent_code_review": "no material findings"
+  },
+  "package": {
+    "platform": "macOS arm64",
+    "sidecar_sha256": "403f5b2ca77dc4a7ce5d65166fe9b8cab722dced3f980215fc7a09710a841aa1",
+    "dmg_sha256": "89eb17e601dc16985f3cc6a644d418a59ab0793640bb5be326c621d13bbb0445",
+    "mounted_and_launched": true,
+    "authenticated_healthz": true,
+    "venv_startup_after_build": true
+  },
+  "isolated_bundled_driver": {
+    "files": 368,
+    "file_bytes": 62988854,
+    "browser_connection": true,
+    "platform_upload": false,
+    "scene_closed": true
+  },
+  "formal_publication": {
+    "id": "3",
+    "status": "reviewing",
+    "current_attempt_id": "8",
+    "attempt_count": 7,
+    "revision": "31",
+    "owner_desktop_login_verified": true,
+    "token_handoff_in_memory": true,
+    "frozen_sidecar_from_current_dmg": true,
+    "account_matches": true,
+    "video_size": 13683509,
+    "video_sha256": "121734561ce9b445236c5cb1f1e3a0428de9cc570c7ee7619ee63fad31816c55",
+    "cover_size": 85779,
+    "cover_sha256": "e60608d814bc3940c83888845bc2029dc4f87a96c94cbe10e38be1900131a98c",
+    "fields_verified": true,
+    "covers_verified": 2,
+    "fresh_cloud_submit_permission": true,
+    "publish_button_clicks": 1,
+    "publish_requests": 1,
+    "accepted": true,
+    "platform_work_id": "1882178508377049639",
+    "result_hash": "4aea15f26932fa09579a671d21ee5840eda16611b6d8cd862ead923858d28c8e",
+    "stages": [
+      "preparing",
+      "ready",
+      "ready",
+      "submitting"
+    ],
+    "scene_closed": true,
+    "local_phase": "settled",
+    "local_report_pending": false,
+    "cloud_hash_matches_saved_packet": true,
+    "all_prior_results_preserved": true,
+    "public_success_verified": false
+  },
+  "prior_attempt_disposition": {
+    "user_confirmed_original_not_published": true,
+    "resolved_failed_via_official_ui": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "attempts_5_to_7_reached_submit": false,
+    "known_unsubmitted_editor_cache_backed_up": true,
+    "only_matching_temporary_cache_removed": true,
+    "new_editor_verified_empty": true,
+    "runtime_still_rejects_restored_editor": true
+  },
+  "cloud_and_desktop_browser": [
+    {
+      "surface": "cloud",
+      "status": "reviewing",
+      "attempt_id": "8",
+      "platform_work_id": "1882178508377049639",
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "retry_available": false
+    },
+    {
+      "surface": "desktop_dev",
+      "status": "reviewing",
+      "attempt_id": "8",
+      "platform_work_id": "1882178508377049639",
+      "page_errors": [],
+      "horizontal_overflow": false,
+      "retry_available": false
+    }
+  ],
+  "earlier_direct_platform_verification": {
+    "separate_from_formal_task": true,
+    "platform_work_id": "1882173445914373676",
+    "platform_status": "published",
+    "platform_visibility": "homepage_only",
+    "public_success_verified": false,
+    "cloud_task_mutated": false
+  },
+  "limitations": [
+    "public-work verification and linking belong to M6-C",
+    "native Desktop visual login flow not re-accepted",
+    "Windows and Intel Mac not verified",
+    "greater-than-50-MiB upload and processing on Baidu not verified",
+    "stacked PRs await review and merge; no remote CI run on the stacked base"
+  ]
+}

@@ -1,0 +1,136 @@
+
+> wt-media-cloud-web@0.1.0 build:cloud
+> vite build --config vite.config.cloud.js
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 4157 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-cloud/index.cloud.html                                  1.17 kB │ gzip:   0.82 kB
+dist-cloud/assets/BusinessSelect-BwLB8Cm3.css                0.06 kB │ gzip:   0.07 kB
+dist-cloud/assets/production-BDT0BjEm.css                    0.20 kB │ gzip:   0.14 kB
+dist-cloud/assets/ResourceDateRange-BuOofDU9.css             0.21 kB │ gzip:   0.13 kB
+dist-cloud/assets/work-env-status-D3jPHhVO.css               0.23 kB │ gzip:   0.19 kB
+dist-cloud/assets/ResourceAdvancedToggle-Dm0N6SOo.css        0.34 kB │ gzip:   0.19 kB
+dist-cloud/assets/ResourceEmptyState-DheSRzza.css            0.56 kB │ gzip:   0.27 kB
+dist-cloud/assets/FeedbackAlert-0JOyVvQz.css                 0.61 kB │ gzip:   0.20 kB
+dist-cloud/assets/DiscoveryStrategiesPage-BiDZP7iq.css       0.61 kB │ gzip:   0.30 kB
+dist-cloud/assets/ResourceStatusBadge-C-0az_zx.css           0.63 kB │ gzip:   0.27 kB
+dist-cloud/assets/ResourceReorderActions-ZjwJLaJ5.css        0.69 kB │ gzip:   0.29 kB
+dist-cloud/assets/KeywordTags-DnVk0HLt.css                   0.75 kB │ gzip:   0.29 kB
+dist-cloud/assets/BrandLogo-D-uQMfd7.css                     0.82 kB │ gzip:   0.41 kB
+dist-cloud/assets/ResourceSelectionToolbar-lwR0kNrS.css      0.82 kB │ gzip:   0.34 kB
+dist-cloud/assets/MyMaterialsPage-CFhMIoJ2.css               0.94 kB │ gzip:   0.37 kB
+dist-cloud/assets/ResourceForm-B4mB_Yv-.css                  1.03 kB │ gzip:   0.42 kB
+dist-cloud/assets/ResourceChoiceCards-j9aq2F2f.css           1.24 kB │ gzip:   0.50 kB
+dist-cloud/assets/FilesPage-BHw7vM2D.css                     1.26 kB │ gzip:   0.48 kB
+dist-cloud/assets/ResourceFilterBar-Crgd0uCo.css             1.29 kB │ gzip:   0.43 kB
+dist-cloud/assets/ContentPoolPage-CCr-sP2O.css               1.35 kB │ gzip:   0.51 kB
+dist-cloud/assets/MyOutputsPage-CVHSmGdC.css                 1.47 kB │ gzip:   0.45 kB
+dist-cloud/assets/ProxyPage-CuKTNqoU.css                     1.58 kB │ gzip:   0.52 kB
+dist-cloud/assets/ResourceStatGrid-Dal4Qt81.css              1.62 kB │ gzip:   0.57 kB
+dist-cloud/assets/CrawlTasksPage-BzXcg5Dk.css                1.66 kB │ gzip:   0.55 kB
+dist-cloud/assets/ComposeBatchProgress-BTfTBYol.css          1.72 kB │ gzip:   0.55 kB
+dist-cloud/assets/ResourceDescriptions-CxagPHXG.css          1.73 kB │ gzip:   0.46 kB
+dist-cloud/assets/ResourcePageHeader-CgJ8aYVz.css            2.28 kB │ gzip:   0.69 kB
+dist-cloud/assets/MaterialLibraryPage-Bq4bQWmC.css           2.28 kB │ gzip:   0.69 kB
+dist-cloud/assets/ResourceOverlay-DK7lHPgj.css               2.35 kB │ gzip:   0.69 kB
+dist-cloud/assets/ResourceSection-CNVUAwHH.css               2.81 kB │ gzip:   0.81 kB
+dist-cloud/assets/OperationProgressDialog-DR_YBe1K.css       2.88 kB │ gzip:   0.84 kB
+dist-cloud/assets/ResourceNotice-7qp2uJBQ.css                3.02 kB │ gzip:   0.83 kB
+dist-cloud/assets/labels-3kWfKiHy.css                        3.15 kB │ gzip:   0.95 kB
+dist-cloud/assets/MaterialDetailDrawer-Bi4EGiQt.css          3.76 kB │ gzip:   0.98 kB
+dist-cloud/assets/PersonalInfoPage-pGeBEcZR.css              4.28 kB │ gzip:   1.23 kB
+dist-cloud/assets/ComposeTasksPage-C6pU094S.css              4.36 kB │ gzip:   1.11 kB
+dist-cloud/assets/ComposeStrategyPage-BHCPXBvy.css           4.58 kB │ gzip:   1.10 kB
+dist-cloud/assets/AccountsPage-BdKpleNI.css                  7.19 kB │ gzip:   1.65 kB
+dist-cloud/assets/AppLayout-DaoET1ea.css                     7.96 kB │ gzip:   2.03 kB
+dist-cloud/assets/LoginPage-B7XaU2z4.css                     9.13 kB │ gzip:   2.48 kB
+dist-cloud/assets/ComposeTaskCreateDialog-o41xBDPb.css       9.30 kB │ gzip:   1.92 kB
+dist-cloud/assets/HomePage-BQ3D-fe4.css                     10.70 kB │ gzip:   2.55 kB
+dist-cloud/assets/PublishingPage-Ds8znosv.css               11.30 kB │ gzip:   2.32 kB
+dist-cloud/assets/ProfilesPage-DRFIqqhg.css                 12.43 kB │ gzip:   2.46 kB
+dist-cloud/assets/index-BO2r6CPt.css                       476.52 kB │ gzip:  55.53 kB
+dist-cloud/assets/downloadCentre-DfQy5Kw4.js                 0.15 kB │ gzip:   0.15 kB
+dist-cloud/assets/datetime-Qj9aAQHL.js                       0.17 kB │ gzip:   0.15 kB
+dist-cloud/assets/bitAccount-BZvTXYis.js                     0.20 kB │ gzip:   0.18 kB
+dist-cloud/assets/categories-B2Rt1YYr.js                     0.25 kB │ gzip:   0.23 kB
+dist-cloud/assets/opColumnWidth-tclpsyWl.js                  0.25 kB │ gzip:   0.22 kB
+dist-cloud/assets/ResourceFilterBar-B0Hp_5dR.js              0.26 kB │ gzip:   0.23 kB
+dist-cloud/assets/platforms-DptTiT_Q.js                      0.29 kB │ gzip:   0.24 kB
+dist-cloud/assets/ResourceForm-r8Od7wgH.js                   0.31 kB │ gzip:   0.26 kB
+dist-cloud/assets/objectReadUrl-DPxEZT3X.js                  0.32 kB │ gzip:   0.23 kB
+dist-cloud/assets/ComingSoon-DoBntpIz.js                     0.35 kB │ gzip:   0.30 kB
+dist-cloud/assets/ResourceStatusBadge-l16D4GWR.js            0.35 kB │ gzip:   0.28 kB
+dist-cloud/assets/utils-CQ88_Ts9.js                          0.37 kB │ gzip:   0.22 kB
+dist-cloud/assets/ResourceDateRange-CXr4OkOx.js              0.40 kB │ gzip:   0.34 kB
+dist-cloud/assets/appVersion-TRH9hxL1.js                     0.47 kB │ gzip:   0.31 kB
+dist-cloud/assets/useAutoRefresh-DCEfmg-g.js                 0.47 kB │ gzip:   0.33 kB
+dist-cloud/assets/createdRange-B6admxoS.js                   0.57 kB │ gzip:   0.38 kB
+dist-cloud/assets/session-Bx9raiWh.js                        0.58 kB │ gzip:   0.35 kB
+dist-cloud/assets/BrandLogo-BbisXSxc.js                      0.58 kB │ gzip:   0.43 kB
+dist-cloud/assets/BusinessSelect-CODfmkkA.js                 0.73 kB │ gzip:   0.54 kB
+dist-cloud/assets/files-DeE5jTbC.js                          0.75 kB │ gzip:   0.46 kB
+dist-cloud/assets/ResourceAdvancedToggle-BwfJ-1NX.js         0.83 kB │ gzip:   0.54 kB
+dist-cloud/assets/ResourceChoiceCards-CofxACQt.js            1.00 kB │ gzip:   0.56 kB
+dist-cloud/assets/ResourceDescriptions-vA8XT_45.js           1.05 kB │ gzip:   0.74 kB
+dist-cloud/assets/ResourcePageHeader-CenG1pEd.js             1.06 kB │ gzip:   0.58 kB
+dist-cloud/assets/managementInteractions-Dtfwy8yl.js         1.06 kB │ gzip:   0.65 kB
+dist-cloud/assets/ResourceNotice-DSGTfRmg.js                 1.15 kB │ gzip:   0.61 kB
+dist-cloud/assets/ResourceStatGrid-tdbXWDLr.js               1.17 kB │ gzip:   0.66 kB
+dist-cloud/assets/ResourceSelectionToolbar-DzzsPwhT.js       1.18 kB │ gzip:   0.64 kB
+dist-cloud/assets/usersApi-Dj62Fos7.js                       1.45 kB │ gzip:   0.59 kB
+dist-cloud/assets/mediaAccounts-CHcdBVoa.js                  1.51 kB │ gzip:   0.61 kB
+dist-cloud/assets/init-Xcl6OwlA.js                           1.60 kB │ gzip:   0.88 kB
+dist-cloud/assets/DashboardPage-CK47Hg1t.js                  1.64 kB │ gzip:   0.87 kB
+dist-cloud/assets/proxy-DZyaRmlv.js                          1.77 kB │ gzip:   0.83 kB
+dist-cloud/assets/ResourceReorderActions-BZuLE3Ci.js         1.77 kB │ gzip:   0.91 kB
+dist-cloud/assets/miningRules-CXzii-PH.js                    1.83 kB │ gzip:   0.87 kB
+dist-cloud/assets/labels-DjTCpVJy.js                         1.86 kB │ gzip:   0.84 kB
+dist-cloud/assets/app-CTQUaiJV.js                            1.86 kB │ gzip:   0.75 kB
+dist-cloud/assets/FeedbackAlert-CvI2Z9Nu.js                  1.91 kB │ gzip:   0.90 kB
+dist-cloud/assets/eligibility-CoX_t2kI.js                    1.94 kB │ gzip:   1.11 kB
+dist-cloud/assets/core-BX_dIN5Q.js                           2.00 kB │ gzip:   0.83 kB
+dist-cloud/assets/error-circle-7d78ISqu.js                   2.57 kB │ gzip:   0.98 kB
+dist-cloud/assets/http-MoWWpydt.js                           2.84 kB │ gzip:   1.47 kB
+dist-cloud/assets/KeywordTags-ClxQkaX6.js                    2.89 kB │ gzip:   1.44 kB
+dist-cloud/assets/compose-BLQ1hg6i.js                        2.92 kB │ gzip:   0.96 kB
+dist-cloud/assets/ResourceEmptyState-BFGUcS5X.js             2.97 kB │ gzip:   1.23 kB
+dist-cloud/assets/mediaAccountLabels-BTYRyOqO.js             4.23 kB │ gzip:   2.03 kB
+dist-cloud/assets/ResourceSection-0lrrCVkX.js                4.33 kB │ gzip:   1.84 kB
+dist-cloud/assets/work-env-status-hqctqHjZ.js                4.64 kB │ gzip:   2.55 kB
+dist-cloud/assets/service-BBlCt1-Q.js                        6.40 kB │ gzip:   1.77 kB
+dist-cloud/assets/TeamsPage-DvvXOZDN.js                      6.47 kB │ gzip:   2.82 kB
+dist-cloud/assets/ResourceOverlay-DFTBzxBI.js                6.51 kB │ gzip:   2.52 kB
+dist-cloud/assets/HomePage-CN9imoDg.js                       7.74 kB │ gzip:   3.54 kB
+dist-cloud/assets/LoginPage-BNFlJjlW.js                      7.93 kB │ gzip:   3.30 kB
+dist-cloud/assets/ComposeBatchProgress-BWpQNuAa.js          10.55 kB │ gzip:   4.58 kB
+dist-cloud/assets/PersonalInfoPage-FF8KcUAj.js              10.64 kB │ gzip:   4.48 kB
+dist-cloud/assets/OperationProgressDialog-C7DBsGLT.js       11.26 kB │ gzip:   3.71 kB
+dist-cloud/assets/CategoriesPage-ollhTDdw.js                12.62 kB │ gzip:   4.63 kB
+dist-cloud/assets/FilesPage-DGSyiW6z.js                     13.27 kB │ gzip:   5.09 kB
+dist-cloud/assets/MaterialLibraryPage-Tmc9AtGj.js           13.38 kB │ gzip:   5.02 kB
+dist-cloud/assets/MyMaterialsPage-BiIaKOre.js               14.01 kB │ gzip:   5.27 kB
+dist-cloud/assets/UsersPage-C9qe35-R.js                     15.47 kB │ gzip:   4.93 kB
+dist-cloud/assets/CrawlTasksPage-BnnXvtfn.js                17.43 kB │ gzip:   6.20 kB
+dist-cloud/assets/AppLayout-CCZ6jeuL.js                     19.81 kB │ gzip:   7.56 kB
+dist-cloud/assets/MyOutputsPage-CQfV2F-g.js                 25.04 kB │ gzip:   8.78 kB
+dist-cloud/assets/ComposeTasksPage-SM63KSdA.js              25.83 kB │ gzip:   8.98 kB
+dist-cloud/assets/MaterialDetailDrawer-Bba23MPv.js          26.04 kB │ gzip:   9.38 kB
+dist-cloud/assets/DiscoveryStrategiesPage-53daqlI1.js       28.47 kB │ gzip:   9.13 kB
+dist-cloud/assets/ContentPoolPage-Bv9W7KPf.js               36.77 kB │ gzip:  11.46 kB
+dist-cloud/assets/PublishingPage-B7zda2ML.js                38.22 kB │ gzip:  12.32 kB
+dist-cloud/assets/ComposeStrategyPage-BQC3iXKZ.js           47.71 kB │ gzip:  14.81 kB
+dist-cloud/assets/ProxyPage-BUGnsHcP.js                     49.52 kB │ gzip:  15.58 kB
+dist-cloud/assets/index-D3im8pCt.js                         64.58 kB │ gzip:  18.92 kB
+dist-cloud/assets/ComposeTaskCreateDialog-DBDdh_op.js       68.49 kB │ gzip:  21.40 kB
+dist-cloud/assets/AccountsPage-mejpHP70.js                  76.55 kB │ gzip:  23.48 kB
+dist-cloud/assets/ProfilesPage-Ca9fTcHk.js                 113.52 kB │ gzip:  31.54 kB
+dist-cloud/assets/index.cloud-DSG61TBa.js                1,384.73 kB │ gzip: 375.97 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 8.85s

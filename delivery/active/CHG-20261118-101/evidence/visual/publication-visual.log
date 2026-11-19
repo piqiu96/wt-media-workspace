@@ -1,0 +1,40 @@
+9:16:09 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+{
+  "checks": 41,
+  "evidence": "/tmp/wt-media-publication-visual",
+  "pageErrors": [],
+  "writes": []
+}
+9:16:27 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+✔ 发布任务: common title, table surface, filter and pagination (5075.819791ms)
+✔ 发布批次: common title, table surface, filter and pagination (2374.823083ms)
+✔ 图片库: common title, table surface, filter and pagination (2689.280708ms)
+✔ 封面模板: common title, table surface, filter and pagination (2696.14725ms)
+✔ 发布计划: common title, table surface, filter and pagination (2550.986833ms)
+9:16:43 PM [vite] (client) page reload dist-cloud/index.cloud.html
+9:16:45 PM [vite] (client) page reload dist-cloud/index.cloud.html
+✔ batch new and editable content share title/section/footer and safe return (3860.154375ms)
+✔ plan new/edit uses common hierarchy, contextual help and fixed return (3906.730416ms)
+✔ image short new/edit dialogs and image preview retain their suitable containers (4230.470291ms)
+9:16:58 PM [vite] (client) page reload dist-desktop/index.desktop.html
+✔ template editor and preview reflow without page overflow at 390px (3990.295958ms)
+9:16:59 PM [vite] (client) page reload dist-desktop/index.desktop.html
+✔ new task uses the list title style and all page actions stay in the footer (4219.248708ms)
+✔ new task footer preserves unsaved draft protection and resume (2960.001208ms)
+✔ editing only saves content, returns safely and leaves new-task draft untouched (3277.290125ms)
+✔ readonly detail footer returns to filtered and scrolled list without unsafe actions (2024.726792ms)
+✔ narrow new, edit and detail keep footer visible and reserve final content space (3267.695541ms)
+✔ batch pages retain their existing shared header and navigation (2141.260458ms)
+✔ AI fill in new has pending protection and a transient toast without overwriting manual content (5156.187542ms)
+✔ AI fill in edit has pending protection and a transient toast without overwriting manual content (5283.242166ms)
+✔ four task views share spacing and type hierarchy while the table header has a distinct surface (3929.481416ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32857.059333

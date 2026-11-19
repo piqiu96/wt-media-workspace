@@ -193,6 +193,11 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         root = Path(self.tmp.name) / f"publishing-{self._root_count}"
         shutil.copytree(ROOT / "delivery" / "milestones", root / "delivery" / "milestones")
         shutil.copy2(MASTER_PATH, root / "delivery" / MASTER_PATH.name)
+        # Milestone cards link to real evidence as well as lifecycle metadata.
+        # Preserve those targets without importing active change statuses into
+        # the deliberately unstarted lifecycle fixture below.
+        for evidence in (ROOT / "delivery" / "active").glob("*/evidence"):
+            shutil.copytree(evidence, root / evidence.relative_to(ROOT))
         (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
         (root / "config").symlink_to(ROOT / "config", target_is_directory=True)
         (root / "delivery" / "LEDGER.md").write_text("# Delivery Ledger\n", encoding="utf-8")
