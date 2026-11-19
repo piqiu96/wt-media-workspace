@@ -10,3 +10,5 @@ Completed delivery records are removed after their final product, engineering, c
 | CHG-20261118-101 | M6-A 正式任务与文件安全 | VERIFYING | wt-media-workspace |
 | CHG-20261118-102 | M6-B 本地提交防重与补报 | VERIFYING | wt-media-workspace |
 | CHG-20261118-103 | M6-B 所属用户领取与执行前检查 | VERIFYING | wt-media-workspace |
+| CHG-20261118-104 | M6-B 原尝试核实与安全重试 | VERIFYING | wt-media-workspace |
+| CHG-20261118-105 | M6-B 百度真实自动投稿 | VERIFYING | wt-media-workspace |

@@ -50,7 +50,7 @@ contracts:
     # 由活源对比抓出）。
     # 2026.10.23.1：Agent Token 鉴权保留；通用 task lease/report、preflight 和
     # sensitive permit 契约已退役，文件传输使用独立契约。
-    contract_revision: "2026.11.18.2"
+    contract_revision: "2026.11.18.3"
     minimum_agent_contract_revision: "2026.10.23.1"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:

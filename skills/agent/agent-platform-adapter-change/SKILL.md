@@ -9,12 +9,17 @@ Use this skill when changing platform-specific execution behavior.
 
 ## Check
 
-- Platform differences stay under `src/wt_media_agent/clients/<platform>/`; the shared
-  cookie-based path is `src/wt_media_agent/clients/platform_identity.py`, and
-  `src/wt_media_agent/clients/bilibili/identity.py` is what a platform with its own
-  in-page or server-side rules looks like.
+- Platform API calls stay under `src/wt_media_agent/clients/<platform>/`.
+  Independent capabilities belong under `src/wt_media_agent/platforms/` (ADR-0034):
+  `publish.py` defines the publication contract; `baidu/publisher.py` contains
+  BaiduPublisher and BrowserPublisher. Common browser sessions/CDP/Cookie access
+  remain in `services/browser/`. Capabilities may combine API and browser work.
+- Publication method is explicitly/default `PublishMethod.BROWSER` for the current
+  implementation. Unsupported methods fail before publication actions; do not
+  add API stubs, automatic channel fallback or default submit permission.
 - High-risk actions report uncertain results when confirmation fails.
-- Runtime adapters do not contain platform business rules.
+- Capabilities organize execution steps, but never duplicate Cloud authorization,
+  formal state transitions, task persistence or retry decisions.
 - Agent does not decide formal Cloud business status.
 - External e2e actions require explicit opt-in.
 
