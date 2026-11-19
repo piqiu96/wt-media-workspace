@@ -91,3 +91,20 @@ Cloud103 最终提交 `1b5d8fd`，完整 Go 和全部发布隔离 MySQL 复验�
 
 
 交付入口：[Cloud #45](https://github.com/piqiu96/wt-media-cloud/pull/45)、[Cloud104 #46](https://github.com/piqiu96/wt-media-cloud/pull/46)、[Agent本轮草稿 #13](https://github.com/piqiu96/wt-media-agent/pull/13)、[Workspace #54](https://github.com/piqiu96/wt-media-workspace/pull/54) / [#55](https://github.com/piqiu96/wt-media-workspace/pull/55)。Cloud与Agent代码已推送，45/46已追加最终review并更新说明。Workspace文档、Delivery、产品路线三项校验通过。保留各工作树供继续审查，不自动合并。
+
+
+## 2026-11-20 第二轮基础查询与并发审查
+
+Cloud103 `42d9771` 删除 identity/mediaaccount/profilebinding/production 的 Service、Repository 及 files Service 共九个 `publication.go`。执行复查复用身份/类目、所属账号、当前作用域 Profile、文件及成片事实读取；发布资格和冻结输入比较放回发布 Service。基础普通读取七处 FOR SHARE 和 Profile/owner FOR UPDATE 删除，执行复查不再重复锁文件；正式创建/编辑文件引用的删除一致性保护保持。
+
+迁移109在 attempt 中保存1–3执行槽，以活动生成列的唯一索引原子保护每用户最多三个未结束现场及 Profile 排他。未核实 interrupted 继续占位，completed/resolved 自动释放；Claim 槽碰撞有限重试并在新事务重读，不用计数或基础行锁作为准入保证。task/attempt 仍用 revision CAS，执行复查使用 READ COMMITTED。
+
+`model/report.go` 的手写 JSON 排序、容器拼接和逐字符转义删除。标准库解析及整数检查配合通用 JSON 库 go-json v0.11.2 序列化，保持 Agent 的 UTF-8 排序报文与原摘要；原三份 Python 样例及新增嵌套容器、全部控制字符、Unicode 分隔符、emoji、整数上下界样例通过。无需修改 Agent 或协议。
+
+先失败回归：`TestLiveAdmissionConstraintsAndRelease` 在旧实现因缺少原子约束失败，`TestLiveResourceReadsDoNotBlockMetadataUpdates` 复现基础查询阻塞修改；实施后全部通过。后者在执行读事务尚未结束时更新账号、用户、类目、范围、Profile、成片、来源任务和文件，均不阻塞。直接插入验证命中 Profile/用户槽对应唯一索引及完成/核实释放；迁移测试验证三槽回填、重放、超限和重复 Profile 拒绝且原历史不改写。
+
+本轮完整 Go 通过（`/private/tmp/chg103-go-final.log`），全部发布模块隔离 MySQL 通过（`/private/tmp/chg103-live-final.log`），包括完整迁移链与重放、用户并发上限、失联占位、输入变化、CAS 和引用竞争。前端/Agent 接口及产物未改，本轮不重复构建，不以先前验证冒充本轮。
+
+迁移部署须停止 Cloud 写入并先核对现有活动 Profile 无重复、每用户未结束现场不超过3。MySQL DDL 不跨语句回滚；若109最后约束拒绝旧数据，新增 admission_slot 可能已存在，而版本尚未登记，需核实历史后删除该新增列再重跑，不能静默释放现场。回退须停写，依次移除两个唯一索引、活动生成列、槽 CHECK 和 admission_slot，并恢复旧版原子准入保护后再启用写入。
+
+复查后资料变化仍由后续阶段/Agent现场检查发现；不承诺跨资源读取与浏览器动作原子性。未真实投稿、未重建 Desktop/DMG、不合并PR，CHG/M6不标记DONE。独立最终review审查42d9771全量差异及104恢复改动，未发现可行动问题，并独立运行publish/model测试通过。Cloud103已提交42d9771，Cloud104同步后提交e6f4847；均进入原PR45/46，保持未合并。

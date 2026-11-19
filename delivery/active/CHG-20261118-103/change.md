@@ -25,6 +25,8 @@ risk: H
 
 2026-11-20 按已确认 PR review 修订：删除发布执行开关且不兼容旧字段；统一 report、单数 attempt 与 `/api/v1/cloud-agent/publication-task`，任务/尝试更新改为 revision 条件更新。基础资料普通修改不反查发布；必要删除引用检查内聚基础 service/reference.go，发布负责输入变化后的停止原因，Agent 统一实际 Profile 操作互斥与安全失败分类。本轮授权同时顺序检查 CHG104 Cloud 并在其原分支修订核实重试，不合并 PR。
 
+2026-11-20 第二轮用户确认：删除基础 publication.go 专用文件并复用已有事实查询；移除执行普通读取的悲观锁，以 attempt 活动 Profile/用户执行槽唯一约束替代领取准入行锁；报告 JSON 改通用库序列化，保持既有摘要协议。同步检查104恢复路径并提交现有PR。
+
 ## Done When
 
 - 实际共用页面单独确认执行，保存授权与审计；未来时间不提前领取，已授权输入不可被编辑覆盖。

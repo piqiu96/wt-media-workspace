@@ -21,3 +21,14 @@
 - Agent原有PR已合并，当前修订独立分支codex/chg103-104-review，合入远端main后复验；不向已合并PR冒充追加交付。
 - 单进程准入假设保留，checkpoint提供重启未决保护；无多进程能力承诺，不做真实平台验收。
 - Cloud PR45/46已推送并追加最终review，Agent草稿PR13已建立，Workspace PR54/55已回写；代码和文档工作树保持可继续review，不合并PR。
+
+## 第二轮基础边界与并发清理（已授权实施）
+
+1. 先更新发布工程设计；删除基础九个 publication.go，将有用查询并回 identity/mediaaccount/profilebinding/production 的现有 Service/Repository 及 files/service.go，基础 Repository 不判断发布资格。
+2. migration109 为 attempt 增加执行槽和活动 Profile/用户槽唯一约束，回填旧数据；覆盖并发、释放、未决占位及迁移拒绝错误历史。移除普通读取七处 FOR SHARE 和 Profile/owner FOR UPDATE；执行复查事务使用 READ COMMITTED，正式文件引用锁保留。
+3. 发布 Service 统一比较资格/冻结输入，Repository 只读取所属事实；report.go 改通用 JSON 序列化并保持现有 Python 摘要样例一致。
+4. 先跑失败回归，再实施并运行相关 Go、隔离 MySQL；完成103提交后同步104、检查恢复路径并复验；最终独立 review、修复、推送原PR45/46，回写 Workspace PR54/55。不合并PR。
+
+- 第二轮103已提交42d9771；两项数据库/阻塞回归RED→GREEN，完整Go与全部发布隔离MySQL通过，原摘要及扩展边界样例一致。104已顺序同步，恢复路径当前事实读取与原现场释放验证进行中。
+
+- 第二轮104完整Go与全部发布隔离MySQL通过，恢复使用当前已提交输入；最终独立review无可行动发现，模型摘要测试独立通过。Cloud103提交42d9771，Cloud104提交e6f4847，推送原PR45/46；Workspace按原PR54/55提交。无额外裁定或延后minor。
