@@ -1,0 +1,44 @@
+[
+  {
+    "client_timezone": "UTC",
+    "task_id": "3",
+    "display": "2026/11/18 05:48",
+    "input": "2026-11-18T05:48",
+    "utc_minute": "2026-11-17T21:48:00.000Z"
+  },
+  {
+    "client_timezone": "UTC",
+    "task_id": "1",
+    "display": "2026/11/18 05:46",
+    "input": "2026-11-18T05:46",
+    "utc_minute": "2026-11-17T21:46:00.000Z"
+  },
+  {
+    "client_timezone": "Pacific/Auckland",
+    "task_id": "3",
+    "display": "2026/11/18 05:48",
+    "input": "2026-11-18T05:48",
+    "utc_minute": "2026-11-17T21:48:00.000Z"
+  },
+  {
+    "client_timezone": "Pacific/Auckland",
+    "task_id": "1",
+    "display": "2026/11/18 05:46",
+    "input": "2026-11-18T05:46",
+    "utc_minute": "2026-11-17T21:46:00.000Z"
+  },
+  {
+    "client_timezone": "America/New_York",
+    "task_id": "3",
+    "display": "2026/11/18 05:48",
+    "input": "2026-11-18T05:48",
+    "utc_minute": "2026-11-17T21:48:00.000Z"
+  },
+  {
+    "client_timezone": "America/New_York",
+    "task_id": "1",
+    "display": "2026/11/18 05:46",
+    "input": "2026-11-18T05:46",
+    "utc_minute": "2026-11-17T21:46:00.000Z"
+  }
+]

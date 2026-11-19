@@ -1,0 +1,49 @@
+{
+  "observed_at": "2026-11-19T00:05:52.534697+08:00",
+  "repositories": {
+    "workspace": {
+      "commit": "e11d0f6254ac7e77d104aada514fd03e691bd8c3",
+      "dirty": true
+    },
+    "cloud": {
+      "commit": "55fa6fc8753d26b7554793b7275da5ffaa78d48e",
+      "dirty": true
+    },
+    "agent": {
+      "commit": "89cfa1a1f7c7624a658eb15c6e05aa32562e2f67",
+      "dirty": false
+    },
+    "desktop": {
+      "commit": "577146e797ec7ae3950ed2cf6f14967f0f3bb5bf",
+      "dirty": false
+    }
+  },
+  "frontend": {
+    "source_commit": "55fa6fc",
+    "source_dirty": true,
+    "files": 128,
+    "digest": "7ecc7a5c0c355248ff9dd00a9c7e04a752fc7f4b825bdfa087994d3065b10ee0"
+  },
+  "existing_navigation_preserved": true,
+  "sidecar_manifest_matches": true,
+  "current_http": {
+    "cloud": 200,
+    "cloud_web": 200,
+    "desktop_web": 200,
+    "agent": "<urlopen error [Errno 61] Connection refused>"
+  },
+  "package": {
+    "path": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/起飞_0.1.0_aarch64.dmg",
+    "signature": "PASS",
+    "component_versions": "PASS",
+    "agent_configuration": "PASS",
+    "mounted": true
+  },
+  "after_operator_login": {
+    "desktop_page": "quick_publish",
+    "work_environment_indicator": "green",
+    "agent_unauthenticated_probe": 401,
+    "agent_status_authenticated": "not verified in current packaged session",
+    "publication_writes": 0
+  }
+}

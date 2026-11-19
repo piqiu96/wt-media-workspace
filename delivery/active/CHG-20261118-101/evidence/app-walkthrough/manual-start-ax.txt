@@ -1,0 +1,80 @@
+Window: "起飞 · 内容运营平台", App: 起飞.
+0 standard window 起飞 · 内容运营平台, Secondary Actions: Raise
+	1 scroll area
+		2 HTML content Description: 起飞 · 内容运营平台, URL: tauri://localhost/publish
+			3 text 起飞
+			4 text 内容运营平台
+			5 text 桌面端
+			6 text v0.1.0
+			7 container
+				8 container 内容挖掘
+					9 image
+					10 text 内容挖掘
+					11 container
+						12 text 内容池 挖掘策略 挖掘任务
+				13 container 内容生产
+					14 image
+					15 text 内容生产
+					16 container
+						17 text 素材库 我的素材 合成策略 合成任务 成片管理
+				18 container 运营执行
+					19 image
+					20 text 运营执行
+					21 content list
+						22 container 发布管理
+							23 list marker ◦
+							24 text 发布管理
+							25 text 发布任务
+						26 text 互动管理
+				27 container 运营资源
+					28 image
+					29 text 运营资源
+					30 container
+						31 text 浏览器窗口 代理管理 社媒账号
+				32 container 运营工具
+					33 image
+					34 text 运营工具
+					35 text 文件管理
+				36 container 桌面环境
+					37 image
+					38 text 桌面环境
+					39 container
+						40 text 本地日志 本机设置
+			41 container
+				42 button
+				43 container 当前页面位置
+					44 text 运营执行 发布管理 发布任务
+				45 button 工作环境状态
+				46 button 下载中心
+				47 button 打开个人菜单
+			48 container 快速发布
+				49 container 快速发布
+					50 heading 快速发布, Value: 1
+						51 text 快速发布
+				52 container
+					53 heading 01 选择发布平台与账号, Value: 3
+						54 text 01 选择发布平台与账号
+					55 text * 发布平台
+					56 text field (disabled) * 发布平台 百度（百家号）, Value: 百度（百家号）, Placeholder: 请选择
+					57 text * 发布类目
+					58 container 发布类目
+						59 text field * 发布类目, Placeholder: 请选择
+					60 text * 发布账号
+					61 text field (disabled) * 发布账号 选择, Placeholder: 请选择发布账号
+					62 button (disabled) * 发布账号
+					63 text 选择本次要发布的成片 只安排账号支持、同平台未占用的成片。
+					64 button (disabled) 选择成片
+				65 container 页面操作
+					66 button 返回
+					67 button 创建任务
+	68 close button
+	69 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	70 minimize button
+	71 text 起飞 · 内容运营平台
+72 menu bar
+	73 起飞
+	74 File
+	75 Edit
+	76 View
+	77 Window
+	78 Help

@@ -1,0 +1,141 @@
+{
+  "observed_at": "2026-11-19T01:12:34.364655+08:00",
+  "build_exit_code": 0,
+  "frontend": {
+    "source_commit": "55fa6fc",
+    "source_dirty": true,
+    "files": 127,
+    "digest": "8186d88f60ad33734b09327230b819a515237f3382ca4b5dcf6920d36ed06016"
+  },
+  "checks": {
+    "frontend_tests": {
+      "files": 139,
+      "passed": 1025
+    },
+    "prototype_tests": {
+      "files": 27,
+      "passed": 351
+    },
+    "prototype_build": true,
+    "cloud_build": true,
+    "desktop_bundle": true,
+    "signature": true,
+    "package_versions": true,
+    "user_navigation_preserved": true
+  },
+  "source_sha256": {
+    "web/src/modules/publication/pages/PublishingPage.vue": "9c57ab36ca003fee2d3cd51e31fd4a1cf6380f3c8d105e9cdf739295007c358e",
+    "web/src/modules/publication/components/PublishingExecutionHistory.vue": "c3f1f2330890b2dc958f2f6e2acf91a0e7da952384cf2918a9e0cf4832051e59",
+    "web/src/modules/publication/components/PublishingExecutionHistory.test.js": "afd0b6dc0c7c0b1868061e912e18071ca9a8a23af0ba886e7f6bd4be30d691b1",
+    "web/src/modules/publication/title.js": "1ee154bcd26b2528c2033b792a13c6c79664f132d4fd52ed9a7cdc28732bd105",
+    "web/src/modules/publication/title.test.js": "607e2466db3aac35c6c0a58cf2acd1fc5b52ef1014d25cca1993a2c577970141",
+    "web/src/shared/styles/resource-list.css": "a58a66366fb41d512629778d15772620ab677055ab512fa08d773e0049ac9207"
+  },
+  "actual_ui": {
+    "app": "packaged Desktop",
+    "account": "operator01",
+    "page": "/publish",
+    "list_filter_and_cover_verified": true,
+    "history_and_title_selection": "manual verification pending; native controls inaccessible and coordinate automation returned noWindowsAvailable"
+  },
+  "task_readback": {
+    "tasks": [
+      {
+        "id": "3",
+        "status": "reviewing",
+        "revision": "31",
+        "attempt_count": 7
+      },
+      {
+        "id": "1",
+        "status": "failed",
+        "revision": "6",
+        "attempt_count": 1
+      }
+    ],
+    "output": {
+      "id": 130,
+      "material_title": "学会架点了吧宝宝~超简单的！ #三角洲行动 #宝宝洲 #三角洲新手教学 #洲同学报到",
+      "name": "学会架点了吧宝宝~超简单的！ #三角洲行动 #宝宝洲 #三角洲新手教学 #洲同学报到 · 百度发布验收成片"
+    },
+    "attempts": [
+      {
+        "id": "2",
+        "attempt_no": 1,
+        "status": "interrupted",
+        "result_status": "uncertain",
+        "stage": "finished",
+        "steps_count": 1,
+        "has_input_title": true,
+        "has_receipt": false,
+        "has_verification": true
+      },
+      {
+        "id": "3",
+        "attempt_no": 2,
+        "status": "interrupted",
+        "result_status": "uncertain",
+        "stage": "finished",
+        "steps_count": 3,
+        "has_input_title": true,
+        "has_receipt": false,
+        "has_verification": true
+      },
+      {
+        "id": "4",
+        "attempt_no": 3,
+        "status": "interrupted",
+        "result_status": "uncertain",
+        "stage": "finished",
+        "steps_count": 3,
+        "has_input_title": true,
+        "has_receipt": false,
+        "has_verification": true
+      },
+      {
+        "id": "5",
+        "attempt_no": 4,
+        "status": "interrupted",
+        "result_status": "uncertain",
+        "stage": "finished",
+        "steps_count": 3,
+        "has_input_title": true,
+        "has_receipt": false,
+        "has_verification": true
+      },
+      {
+        "id": "6",
+        "attempt_no": 5,
+        "status": "interrupted",
+        "result_status": "uncertain",
+        "stage": "finished",
+        "steps_count": 3,
+        "has_input_title": true,
+        "has_receipt": false,
+        "has_verification": true
+      },
+      {
+        "id": "7",
+        "attempt_no": 6,
+        "status": "interrupted",
+        "result_status": "uncertain",
+        "stage": "finished",
+        "steps_count": 3,
+        "has_input_title": true,
+        "has_receipt": false,
+        "has_verification": true
+      },
+      {
+        "id": "8",
+        "attempt_no": 7,
+        "status": "completed",
+        "result_status": "reviewing",
+        "stage": "finished",
+        "steps_count": 4,
+        "has_input_title": true,
+        "has_receipt": true,
+        "has_verification": false
+      }
+    ]
+  }
+}

@@ -556,7 +556,7 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 | 计划 | `/publication-plans` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batches`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
 | 批次准备 | `/publication-batches` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resources`、`content`、`confirm` | resources 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
 | 批次执行 | 列表／详情／分页任务、`execution-preview`、`start`、`stop`、`cancel` | 创建检查与执行检查职责不同；首次执行前终止、执行后停止按产品阶段使用；不提供恢复停止队列的命令 |
-| 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempts` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
+| 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempt` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
 | 资源与推荐 | `/publication-capabilities`、`publication-resource-inventory`、`publication-account-options`、`publication-output-options`、`publication-plan-recommendations` | 复用原模块查询，增加发布资格／占用投影；不预占、不复制资源 CRUD、不把未知返回为零 |
 | 生成 | `POST /publication-content/generate`、`POST /covers/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不直接替用户采用或确认 |
 | 图片库 | `/image-assets` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`select-background` | 上传和资源访问仍复用 files；按 file_id 登记防重，选底图仅返回固定选择、不预占、不立即建立任务引用 |
@@ -587,8 +587,8 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 
 | 调用链 | 路径意图 | 必要语义 |
 | --- | --- | --- |
-| Agent → Cloud | `POST /cloud-agent/publication-tasks/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
-| Agent → Cloud | `/{id}/heartbeat`、`progress`、`complete` | 均绑定 attempt；心跳读停止指令，progress 兼提交前复查，complete 去重保存证据与结果 |
+| Agent → Cloud | `POST /api/v1/cloud-agent/publication-task/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
+| Agent → Cloud | `/api/v1/cloud-agent/publication-task/{id}/report`、`complete` | 均绑定 attempt；report 不带 stage 时只保活并读取停止指令，带 stage 时上报进度并兼提交前复查；保活不追加进度历史或授予提交许可，complete 去重保存原证据与结果 |
 | Agent → Cloud | 当前 attempt 的文件资源读取／续签 | 复用文件 Service；只允许快照已绑定文件，提供方在发布协议内定义，不新建下载任务或存储凭证体系 |
 | Desktop → Agent | `POST /publication-runs/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
 | Desktop → Agent | `GET/PUT/DELETE /publication-drafts/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
