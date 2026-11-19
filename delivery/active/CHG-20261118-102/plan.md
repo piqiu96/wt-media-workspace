@@ -47,14 +47,15 @@ wt-media-agent/
     runtime/config.py               # 唯一配置读取、校验入口
     runtime/constants.py            # 公共默认值和枚举
     runtime/paths.py                # 保留现有数据目录规则
-    storage/database.py             # 新增：Engine、Session 工厂、连接初始化、关闭
+    storage/database.py             # Engine、Session 工厂、模块内选型、关闭
+    storage/dialect.py              # SQLite 连接、冲突写入、条件索引与历史升级
     storage/models.py               # 新增：ORM 表、索引与约束
     storage/migration.py            # 同一 Engine 上的版本化升级
     storage/checkpoint_store.py     # ORM 检查点访问
-    storage/publication.py          # 发布防重、原结果及投递记录
+    storage/publication.py          # 发布防重、原结果及投递记录；CHG103 领取独立类
     storage/save_directory.py       # ORM 读写 agent_metadata
-    storage/publication_claim.py    # CHG103：持久化领取请求键
-    bootstrap/app.py                # 按顺序显式装配
+    runner/publication.py           # 既有执行边界和原结果发送协调
+    bootstrap/app.py                # 按顺序显式装配，不选择数据库
 ```
 
 配置沿用“环境变量 > 文件 > 默认值”，凭据仍只来自环境变量。
@@ -167,8 +168,8 @@ timeout_seconds = 5.0
 
 ### 任务 7：CHG103 领取组件合并
 
-- [ ] 合入 CHG102；PublicationClaimStore 并入 storage/publication.py，保留独立类；删除 publication_claim.py，更新装配、准备和测试。
-- [ ] 领取键创建引用统一插入方法，保留原请求值；准备补报使用现有 Runner 协调；定向及标准回归通过。
+- [x] 合入 CHG102；PublicationClaimStore 并入 storage/publication.py，保留独立类；删除 publication_claim.py，更新装配、准备和测试。
+- [x] 领取键创建引用统一插入方法，保留原请求值；准备补报使用现有 Runner 协调；定向及标准回归通过。
 
 ### 任务 8：CHG104 恢复消费者衔接
 
