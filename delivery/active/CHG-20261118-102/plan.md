@@ -26,7 +26,7 @@ CHG103 原有 Cloud 授权、领取、检查和报告业务范围保留；本轮
 
 - 业务状态、执行阶段和三个操作入口的业务含义保持不变。重启不能依靠 checkpoint 自动重放可能产生投稿副作用的动作；只补报已经保存的原结果。
 - `task_id` 保存 Cloud 原始任务 ID；`task_type`、`cloud_env`、`user_id`、`attempt_id` 独立存列，不再用 `publication:摘要` 充当业务 ID。
-- `cloud_env` 取 `dev/test/pre/prod`，表示连接的 Cloud 环境。与应用的 debug/release、运行期 development/production 分开；URL 只用于连接，不推算环境。
+- `cloud_env` 取 `dev/test/pre/prod`，表示连接的 Cloud 环境。应用运行期 `environment` 同样取 `dev/test/pre/prod`，二者独立；debug/release 是构建模式；URL 只用于连接，不推算环境。
 - 沿用现有 SQLite 文件路径，不按 `cloud_env` 拆文件。实际 Profile 的未结束现场在同一数据库内跨用户、跨 Cloud 环境互斥。
 - 所有新连接统一启用 `synchronous=FULL`、`foreign_keys=ON`，集中处理 WAL 与连接超时；业务方法不再设置 PRAGMA 或执行 `BEGIN IMMEDIATE`。
 - 采用 ORM 正常事务，依靠唯一约束、条件更新和受影响行数处理竞争；移除提前写锁后必须用真实 SQLite 并发测试证明防重仍成立。
@@ -184,3 +184,13 @@ timeout_seconds = 5.0
 范围确认：本轮不改变业务状态、表职责、原结果内容或数据路径，不新增运行时对 Workspace 的依赖。Cloud/Desktop 无本轮新增修改。未来数据库接入须新增适配和迁移、验证相同约束，不声称只改类型即可搬迁历史数据。
 
 本轮最终证据：Agent102/103/104 标准回归分别 706/716/778 项通过；三层 Workspace 各 207 项、18 项按既有条件跳过；各治理校验通过。实际冻结新旧库启动通过，独立审查无阻塞项。原 Agent #9/#10/#11 及 Workspace #53/#54/#55 描述已更新，后续推送只同步文档证据；不合并。唯一非阻塞末尾空行详见原 evidence。
+
+
+### 任务 10：运行环境命名统一
+
+用户确认 `environment` 与 `cloud_env` 使用相同的 `dev/test/pre/prod` 命名，仍分别表达应用运行环境和连接的 Cloud 目标。Agent 默认/开发配置为 dev，发布配置为 prod；正式环境判断和默认目录同步改为 prod，打包应用仍按原规则使用安装目录。旧 development/production/staging 和未知值不再作为有效配置接受；不根据 environment 推导 cloud_env，不更改数据表身份或历史数据。
+
+- [ ] 先复现 prod 未被识别、旧/未知值未被拒绝，再更新公共枚举、解析、路径、配置和直接测试/说明。
+- [ ] 依次同步原 CHG102/103/104 分支，验证配置/路径和标准回归；更新原文档与 PR，保持未合并。
+
+用户进一步明确 Desktop 同步统一：在原 CHG103 Desktop #11、后续 CHG104 Desktop #12 更新配置/序列化/诊断环境名和 Agent 启动参数，允许 test/pre 作为非 prod 值；保留既有 release 构建强制 prod 校验、目录策略和 fallback 限制。Cloud Vue 消费点已核对，未按旧环境字符串分支，无需修改 Cloud 业务源码。Desktop 与 Agent 都分别保留运行环境与 Cloud 目标，不相互推导。
