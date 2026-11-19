@@ -92,3 +92,14 @@ Agent `711fd45` 顺序继承 CHG102 `509304a`、CHG103 `dd29f29`。恢复已核�
 以新 Agent 代码和 prod 发布配置实际构建 macOS arm64 Sidecar（`/private/tmp/environment-names-build.log`），以临时空库和历史四版本发布库实际启动；认证健康接口、五版本升级、单数表、原结果摘要保留通过（`/private/tmp/environment-names-frozen-smoke.log`）。轮询关闭，未连接真实账号投稿。新旧环境配置替换方式见 Agent/Desktop README；未重建完整 DMG，不沿用此前原生页面验收。
 
 命名变更后的 Workspace 标准回归 **207 项、18 项按既有条件跳过**，各治理校验通过（`/private/tmp/storage-cleanup-environment-chg104-docs-docs.log`）。本轮独立跨仓核对无阻塞项；新旧库冻结启动验证来自本轮实际二进制，其他未验证边界沿用本轮 CHG102/103 明示范围。所有原 PR 保持未合并。
+
+
+## 2026-11-20 Cloud104 同类问题 review
+
+Cloud104 `b0ea139`、`11ea457`、`0f8724c` 同步103修订并保留本单元 resolve/retry/原尝试只读能力。原有 heartbeat/progress 与复数 attempt 接口移除，切换 singular `/api/v1/cloud-agent/publication-task/{id}/attempt/{attempt_id}`，与 Agent 对齐；无需执行开关。recovery task/attempt 更新改用 revision CAS，移除其 FOR UPDATE 与基础 LockPublicationScene，状态和核实结论使用同一组常量。原 packet/hash、核实记录、审计和冻结输入保留，uncertain 不能直接 retry；并发核实/重试各只允许一次成功。提供方兼容元数据版本2026.11.20.2。
+
+验证：完整 Go 通过（/private/tmp/cloud104-final-go.log）；全部发布模块隔离 MySQL 通过（/private/tmp/cloud104-final-live.log），覆盖原尝试读回、安全重试、双核实并发、原结果不覆盖、迁移与重放，并继承103的输入变化/乐观更新/Profile引用竞争回归。前端137文件、1008项通过，生产构建通过（/private/tmp/cloud104-web.log、/private/tmp/cloud104-web-build.log）。独立最终审查未发现104额外阻塞；跨仓Cookie与Profile引用竞争四项发现已在103/Agent修复并合入本分支。
+
+Agent本轮修订独立分支 `codex/chg103-104-review`，提交 `7b32e57`，原 #10/#11/#12 已合并，未向已关闭PR声称追加交付。完整官方离线790项通过；Cookie真实stage参数、cookie-read互斥、首次READY停止原因回归先失败后通过，保留原报文补报和单次点击屏障。基于远端main保留“现场已结算仍补报未送达原结果”的既有修复。
+
+本轮不操作真实浏览器、不真实投稿、不重建Desktop/DMG、不合并PR。迁移108若发现既有无效Profile引用会失败，需核实数据，不能静默重写历史。操作互斥保留单Agent进程假设，持久checkpoint负责重启后占位，不承诺多实例同时操作同一数据库。CHG/M6维持现有验证状态。

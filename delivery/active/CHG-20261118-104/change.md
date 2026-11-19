@@ -23,6 +23,8 @@ Cloud 先提供 resolve/retry 和所属用户原尝试只读契约、事务与�
 
 本轮承接 CHG102/103 的存储清理：领取类合并、SQLite 差异集中；恢复在核对同一 attempt/hash 后直接确认原 packet，不再全量扫描并传入伪发送回调。Cloud 状态、本地阶段、原结果与一次点击屏障保持原义。
 
+2026-11-20 按用户补充授权顺序 review Cloud104：同步103的 report、单数 attempt、publication-task、删除开关和基础引用边界；核实与重试改为 task/attempt revision 条件更新，去除仅为核实新增的基础 scene 锁接口及 task/attempt 悲观锁，统一状态常量。保留原始结果、hash、审计、原尝试查询与 uncertain 不可直接重试的约束。继承迁移108解决冻结 Profile 引用与删除竞争；未进行真实投稿或新增成功结论。
+
 ## Done When
 
 - 核实与重试服从现有角色、团队及类目范围；版本或当前尝试变化、原 UID 不匹配、现场未结束时拒绝确认失败。可如实保留 uncertain。

@@ -68,3 +68,23 @@ Agent `d46ee1a` 继承前置 `6c31039`，完整 **718 项通过**（`/private/tm
 Cloud Vue 消费点已核对，无按旧 environment 字符串分支，未改 Cloud 业务代码。不重建完整 DMG、不真实投稿，未合并。本轮独立跨仓核对与文档校验已通过，不将此前审查/CI 当作新提交通过。
 
 命名变更后的 Workspace 标准回归 **207 项、18 项按既有条件跳过**，各治理校验通过（`/private/tmp/storage-cleanup-environment-chg103-docs-docs.log`）。新独立审查无阻塞项，原 PR 描述更新为本轮范围与数量，保持未合并。
+
+
+## 2026-11-20 发布边界与 report review 修订
+
+Cloud103 提交 `424e19c`、`7695d57`：去除六个 publication_guard、账号重绑整批 Profile 锁和普通资料更新的发布拦截；删除 Profile 通过基础 Service 的引用检查保护未领取任务与历史 attempt，files 既有引用装配集中于 service/reference.go。不新增 shared/reference 或 bootstrap/reference.go。删除执行开关无兼容；接口统一 report、单数 attempt、singular publication-task；状态常量集中，迁移107为 attempt 增加 revision。task/attempt 的 revision 条件更新仍与审计在一个事务内。
+
+发布 preparing/ready/submitting 检查冻结输入失效时保存 PUBLICATION_INPUT_CHANGED，返回 stop_requested/stop_reason，不推进阶段或授予提交；无 stage 的保活不重查资源，仍能读取停止原因。只有 Agent 可以用实际未提交和关闭证据报失败，失联按 uncertain 保留现场。领取用户并发上限与 Profile 排他的最小资源锁、文件删除引用锁保留，未声称所有 FOR UPDATE 已删除。
+
+验证：完整 Go `go test ./...` 通过（/private/tmp/cloud103-go-full.log）；`WT_MEDIA_TEST_LIVE_DB=1` 的全部发布模块隔离 MySQL 测试通过，包含完整 migration 重放、两报告版本竞争、原子回滚、绑定变化停止、历史与未领取引用保护（/private/tmp/cloud103-publish-live.log）。基础模块相关包通过；最后引用文件归拢后 files 包复验通过。前端137文件、1007项通过并构建通过（/private/tmp/cloud103-web.log、/private/tmp/cloud103-web-build.log）；最后页面变量改名后的相关6项通过。
+
+Agent 完整官方离线测试787项通过（/private/tmp/agent-review-full.log）。report 单序号、原报文与 hash 保持；HTTP 本地操作与发布登记共用 runtime/ProfileOperations，持久未决占位复用既有 checkpoint。确认无提交许可且已关闭现场才 failed，许可响应丢失/可能点击/关闭未知均 uncertain。操作互斥测试覆盖本地入口拒绝、登记竞争与重启后占位。无真实浏览器或平台调用，本轮未重建 Desktop/DMG，不以离线结果宣称真实投稿完成。
+
+实施取舍：仅对真实删除入口添加引用 checker，不为 mediaaccount/proxy 增加空接口；保留有实际并发一致性作用的资源准入锁；复用 Agent 单进程操作屏障及既有持久 checkpoint，不再增加一套租约表。CHG103/M6 继续保留原验证状态，不自动合并。
+
+
+最终独立审查发现并已修复：Cookie prepare/apply/inspect 的原始 `(stage, body)` 参数未被互斥包装正确绑定；cookie-read 可开浏览器却漏用保护；Profile 删除与冻结任务保存的引用竞争；首次 READY 停止原因未进入最终结果。对应离线/隔离数据库回归先失败再通过（/private/tmp/agent-final-review-red.log、/private/tmp/agent-final-review-green.log、/private/tmp/cloud-profile-reference-red.log、/private/tmp/cloud-profile-reference-green.log）。Cookie 包装按实际方法签名绑定，读取也受保护；READY 只上报一次，输入变化原因随原报文保留。Profile 新增迁移108，冻结JSON派生存储列并加外键，两个提交顺序都受到原子保护，无需在普通资料修改中重新增加发布检测或锁。
+
+Cloud103 最终提交 `1b5d8fd`，完整 Go 和全部发布隔离 MySQL 复验通过（/private/tmp/cloud103-final-go.log、/private/tmp/cloud103-final-live.log）。Agent 修订基于原105工作树，因原 #10/#11/#12 均已合并，建立 `codex/chg103-104-review` 独立修订分支并合入远端main，保留其中已交付的“现场已结算仍补报原结果”修复；最终提交 `7b32e57`，完整官方离线回归 **790项通过**（/private/tmp/agent-final-full.log）。此次没有真实浏览器、平台投稿或 Cookie 写入。
+
+最终取舍：复用单 Agent 进程的操作准入，已有 checkpoint 提供重启后的未决占位；不声称支持多个 Agent 进程同时操作同一数据库。保留现有单实例运行假设；若未来放开多实例，需要补充跨进程操作准入。MySQL 竞争使用隔离库实际复验，真实投稿继续归后续验收。独立审查无剩余已确认代码问题；未重建 Desktop/DMG。

@@ -23,12 +23,14 @@ risk: H
 
 用户进一步确认 Agent/Desktop 的 `environment` 也统一为 dev/test/pre/prod。Desktop 配置、页面/诊断输出和 Sidecar 的 `WT_MEDIA_ENV` 同步；`cloud_env` 独立，开发应用可连接 prod。原 release 强制 prod 校验、安装目录和 fallback 限制保持，非 release 的 test/pre 使用非 prod 策略；旧环境拼写须按配置说明更新。
 
+2026-11-20 按已确认 PR review 修订：删除发布执行开关且不兼容旧字段；统一 report、单数 attempt 与 `/api/v1/cloud-agent/publication-task`，任务/尝试更新改为 revision 条件更新。基础资料普通修改不反查发布；必要删除引用检查内聚基础 service/reference.go，发布负责输入变化后的停止原因，Agent 统一实际 Profile 操作互斥与安全失败分类。本轮授权同时顺序检查 CHG104 Cloud 并在其原分支修订核实重试，不合并 PR。
+
 ## Done When
 
 - 实际共用页面单独确认执行，保存授权与审计；未来时间不提前领取，已授权输入不可被编辑覆盖。
 - 仅所属用户有效 Desktop 会话的 Agent 能领取；原请求键重放同一 attempt，跨用户代执行、同 UID/实际 Profile 并发及未完成现场复用均拒绝。
 - 冻结输入不含临时 URL；传输地址只在响应签发；本机实读 UID、文件大小和摘要，错误输入不得进入提交。
-- progress 的提交前复查读取当前授权、资源及停止状态，响应丢失不重放点击；旧会话不能领取或开始新动作，原 attempt 的合法结果仍可 report-safe 补报。
+- report 的 submitting 阶段复查读取当前授权、资源及停止状态，响应丢失不重放点击；旧会话不能领取或开始新动作，原 attempt 的合法结果仍可 report-safe 补报。
 - 单调序号和原结果摘要防止旧报告或冲突结果覆盖；失联保留结果待确认，不派新尝试、不释放现场。审核回执不冒充公开成功。
 - 实际隔离 MySQL、协议、Agent 与页面测试通过；现有安装包组合可构建，记录未验证内容。M6 不标记 DONE。
 
