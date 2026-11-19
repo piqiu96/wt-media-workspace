@@ -40,7 +40,7 @@ and never appear in responses.
 
 ### Session-only auth and Agent Token revision (CHG-20261023-101)
 
-Cloud owns the current revisions across `cloud-api`, `cloud-agent-api`, `business-schemas`, `business-enums` and `cloud-error-codes`. `user_sessions` becomes the only authentication fact: Web allows multiple sessions, Desktop allows one valid session per user, and a second Desktop login returns `DESKTOP_LOGIN_CONFLICT` until the caller confirms with the current session id. Desktop exchanges a valid desktop session for a signed, stateless Agent Token at `POST /api/v1/local-agent/agent-token`; its `exp` equals the session `expires_at`, strict mode gates new work and report-safe mode closes already-claimed tasks. Device, node, presence and binding-ticket contracts are retired. Generic task claim/report and recovery are retired; the surviving Cloud-Agent surface is compatibility, Agent Token, and dedicated file-transfer routes.
+Cloud owns the current revisions across `cloud-api`, `cloud-agent-api`, `business-schemas`, `business-enums` and `cloud-error-codes`. `user_sessions` becomes the only authentication fact: Web allows multiple sessions, Desktop allows one valid session per user, and a second Desktop login returns `DESKTOP_LOGIN_CONFLICT` until the caller confirms with the current session id. Desktop exchanges a valid desktop session for a signed, stateless Agent Token at `POST /api/v1/local-agent/agent-token`; its `exp` equals the session `expires_at`, strict mode gates new work and report-safe mode closes already-claimed tasks. Device, node, presence and binding-ticket contracts are retired. Generic task claim/report and recovery are retired; the surviving Cloud-Agent surface is compatibility, Agent Token, dedicated file-transfer routes, and the publication-specific claim/heartbeat/progress/complete routes introduced by CHG-20261118-103. Publication attempts and results belong to publishing, not a revived generic task protocol; new actions use strict session validation while an original attempt may submit its result in report-safe mode.
 
 The Agent-owned `local-agent-api` and `local-error-codes` are active formal definitions. The local Agent stores the Agent Token in memory only and accepts BitBrowser binding from Agent-read facts. Generic sensitive preflight/permit and task claim/report interfaces are retired. Desktop `contracts.lock.json` pins the surviving Cloud-Agent and Local Agent contracts.
 
@@ -122,7 +122,7 @@ Admins can search proxy teams by name or ID; operators stay within their own tea
 ## Consumers
 
 - `wt-media-cloud/web` consumes Cloud API contracts.
-- `wt-media-agent` consumes Cloud-Agent API and task schemas.
+- `wt-media-agent` consumes Cloud-Agent API, including provider-owned file-transfer and publication execution definitions; generic task schemas remain retired.
 - `wt-media-desktop` consumes Cloud API and Local Agent contracts.
 
 ## Readiness Rule

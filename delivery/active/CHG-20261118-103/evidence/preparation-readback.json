@@ -1,0 +1,20 @@
+{
+  "task_id": "1",
+  "attempt_id": "1",
+  "owner_user_id": "3",
+  "live_uid_verified": true,
+  "video_bytes": 13603237,
+  "video_sha256": "9a9e224c29fd366719133fd85dd84ee8d12b652e007ad122f14e0c6e673656a8",
+  "cover_bytes": 85779,
+  "cloud_status": "failed",
+  "profile_closed": true,
+  "recovered_without_browser_reentry": true,
+  "old_session_new_work_status": 409,
+  "old_session_result_accepted": true,
+  "original_result_replay_accepted": true,
+  "local_phase": "settled",
+  "platform_uploaded": false,
+  "platform_submitted": false,
+  "old_session_claim_status": 401,
+  "old_session_claim_error": "AUTH_DESKTOP_REPLACED"
+}
