@@ -192,3 +192,5 @@ timeout_seconds = 5.0
 
 - [ ] 先复现 prod 未被识别、旧/未知值未被拒绝，再更新公共枚举、解析、路径、配置和直接测试/说明。
 - [ ] 依次同步原 CHG102/103/104 分支，验证配置/路径和标准回归；更新原文档与 PR，保持未合并。
+
+用户进一步明确 Desktop 同步统一：在原 CHG103 Desktop #11、后续 CHG104 Desktop #12 更新配置/序列化/诊断环境名和 Agent 启动参数，允许 test/pre 作为非 prod 值；保留既有 release 构建强制 prod 校验、目录策略和 fallback 限制。Cloud Vue 消费点已核对，未按旧环境字符串分支，无需修改 Cloud 业务源码。Desktop 与 Agent 都分别保留运行环境与 Cloud 目标，不相互推导。
