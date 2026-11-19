@@ -1,0 +1,41 @@
+....................................................................................................
+== Building and starting Compose scheduler ==
+
+== Building and starting Compose scheduler ==
+
+== Stopping stale Cloud/Agent/Worker processes ==
+
+== Starting Agent on 127.0.0.1:8765 ==
+compose-worker: stopped orphan pid 4512 holding /var/folders/xb/3xygqqks7hxf3vpmc1s_z26h0000gn/T/tmpr3u3eoze/wt-media-cloud/.compose/compose-worker.lock
+
+== Building and starting Compose scheduler ==
+
+== Building and starting Compose scheduler ==
+
+== Stopping stale Cloud/Agent/Worker processes ==
+compose-scheduler: stopped pid 4321 from pid file
+
+== Stopping stale Cloud/Agent/Worker processes ==
+compose-scheduler: stopped pid 4321 from pid file
+
+== Building and starting Compose worker ==
+
+== Building and starting Compose scheduler ==
+
+== Building and starting Compose worker ==
+
+== Building and starting Compose scheduler ==
+
+== Verifying Compose scheduler ==
+
+== Verifying Compose scheduler ==
+Compose scheduler: PASS pid=123
+waiting for release.yml run 123
+downloading and checking 6 release assets
+.waiting for release.yml run 123
+downloading and checking 6 release assets
+..............................................................................................................
+----------------------------------------------------------------------
+Ran 211 tests in 23.734s
+
+OK
