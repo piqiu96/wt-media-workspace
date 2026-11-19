@@ -55,3 +55,5 @@ Desktop 新提交 `b4a649b` 的远端 verify 已通过（run 44436598469）。Ag
 Agent `dd29f29` 顺序合入 CHG102 `509304a`。`PublicationClaimStore` 并入 `storage/publication.py`，保留独立类，删除 `publication_claim.py`；领取创建使用共享 Database 的原子插入入口，保留请求键响应未知时的原值和并发唯一性。装配、准备和测试改为新导入位置，补报通过既有 Runner 的 `PublicationDelivery` 协调，HTTP 不进入数据库事务。
 
 本轮完整 Agent 标准回归 **716 项通过**（`/private/tmp/storage-cleanup-103-full.log`）。本轮不修改 Cloud/Desktop；此前 Desktop 验证归此前提交，本记录不声称再次构建 Desktop。最终冻结包和独立审查由 CHG104 集成完成，PR 保持未合并。
+
+本轮 Workspace 文档、Delivery、产品路线、AI/Skills、配置校验通过；完整回归 **207 项、18 项按既有条件跳过**（`/private/tmp/storage-cleanup-chg103-docs-docs.log`）。独立最终审查结论、保留项及未来数据库接入边界沿用 CHG102 本轮 evidence。原 Agent #10 / Workspace #54 已更新描述，保持未合并；base 为前置 CHG102，未触发 main 目标限定的远端工作流不等于 CI 已通过。
