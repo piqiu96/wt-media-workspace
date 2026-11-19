@@ -130,7 +130,7 @@ sequenceDiagram
 
 到时判断使用 `not_before`；批次间隔使用上一条执行结束时间加间隔。同一真实平台账号有执行、人工或结果未知任务时，不领取下一条；不同账号若共用一个浏览器 Profile，也不能并行。不同账号且不同 Profile 才允许受控并行。时间到达不会自动授权尚未启动的任务。
 
-提交前复查通过 progress 完成，不另设通用许可 API。允许响应与平台点击之间仍有竞态窗口：后发生的停止不能撤回平台提交，必须根据真实回执收尾。提交前响应丢失时，不能把旧允许响应当作永久许可，也不能自动重放点击。
+提交前复查通过 report 的 submitting 阶段完成，不另设通用许可 API。允许响应与平台点击之间仍有竞态窗口：后发生的停止不能撤回平台提交，必须根据真实回执收尾。提交前响应丢失时，不能把旧允许响应当作永久许可，也不能自动重放点击。
 
 ### 2.3 计划推进与停止控制
 
@@ -460,7 +460,7 @@ Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也�
 
 ### 4.2 事务与约束
 
-需要同时修改父子对象时，按 **plan → batch → Profile／文件 → task → attempt** 的固定次序取锁；同类多行按 ID 升序。领取、账号绑定修改、文件正式引用都要遵守各自的互斥规则，只锁涉及的行，防止并发操作绕过检查。事务内只做数据库读写；模型、渲染、对象存储删除及平台操作都在事务外。只有纯数据库事务死锁才可有限重试，绝不自动重放已产生外部副作用的操作。
+需要同时修改父子对象时，按 **plan → batch → Profile／文件 → task → attempt** 的固定次序处理；必要的资源行锁同类多行按 ID 升序。task 与 attempt 使用 revision 条件更新，竞争失败回滚。账号普通资料修改不因发布运行而拒绝；领取准入及文件正式引用继续使用保障各自一致性的最小锁范围。事务内只做数据库读写；模型、渲染、对象存储删除及平台操作都在事务外。只有纯数据库事务死锁才可有限重试，绝不自动重放已产生外部副作用的操作。
 
 | 命令 | 必须原子完成的写入 |
 | --- | --- |
@@ -514,6 +514,18 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 
 文件短效链接过期后，只有原任务及其当前执行可以申请同一个文件的新链接；不能改选资源。普通下载允许的超时重领或断点续传，不能直接用于恢复可能已经提交的平台发布。
 
+### 基础资料与执行现场的边界
+
+基础模块允许账号、Profile、代理的普通资料、启停和 Cloud 绑定修改，不反向查询发布运行状态。发布在准备、就绪及取得提交许可前复查冻结的执行条件；条件失效时明确请求停止并保留原因。已明确没有获得提交许可、且实际现场已结束，才可记为失败；许可响应丢失、可能已点击或现场不能确认结束，都保留结果待确认。
+
+涉及实际浏览器的 Cookie 写入、代理应用/移除、关闭/删除/重建 Profile 与发布共用 Agent 的 Profile 操作互斥。未决发布的占位持久化，重启不自动释放。只修改 Cloud 资料不等于操作真实浏览器。
+
+任务冻结快照中的 Profile ID 同时派生为存储生成列，并由真实外键保护。新建任务与删除 Profile 的并发由数据库引用完整性裁决；缺失的旧 Profile 引用会阻止迁移，需先核实既有数据，不静默改写历史。
+
+确有删除引用保护的基础模块，在自己的 `service/reference.go` 集中组织依赖检查，使用消费方定义的最小函数或接口调用外部 Service；Repository 只保留所属数据查询。发布的引用查询放在现有 Service/Repository 中。不新增 `shared/reference`、`bootstrap/reference.go`、发布专用 reference 文件或基础 Repository reference 文件；既有启动装配只负责注入具体实现，不承载业务判定。
+
+任务与 attempt 更新采用 revision 条件更新。移除仅为基础资料发布拦截而增加的行锁；领取的用户并发上限、实际 Profile 排他和文件删除引用一致性仍需原子准入，不在没有等价并发保证时直接去锁。
+
 ### 4.6 引用与文件删除保护
 
 **保护已知业务引用，不维护通用引用表或易失真的引用计数。**
@@ -556,7 +568,7 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 | 计划 | `/publication-plans` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batches`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
 | 批次准备 | `/publication-batches` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resources`、`content`、`confirm` | resources 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
 | 批次执行 | 列表／详情／分页任务、`execution-preview`、`start`、`stop`、`cancel` | 创建检查与执行检查职责不同；首次执行前终止、执行后停止按产品阶段使用；不提供恢复停止队列的命令 |
-| 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempts` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
+| 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempt` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
 | 资源与推荐 | `/publication-capabilities`、`publication-resource-inventory`、`publication-account-options`、`publication-output-options`、`publication-plan-recommendations` | 复用原模块查询，增加发布资格／占用投影；不预占、不复制资源 CRUD、不把未知返回为零 |
 | 生成 | `POST /publication-content/generate`、`POST /covers/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不直接替用户采用或确认 |
 | 图片库 | `/image-assets` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`select-background` | 上传和资源访问仍复用 files；按 file_id 登记防重，选底图仅返回固定选择、不预占、不立即建立任务引用 |
@@ -587,8 +599,8 @@ Agent 在本地记录领取和提交阶段。平台操作有结果后，先把�
 
 | 调用链 | 路径意图 | 必要语义 |
 | --- | --- | --- |
-| Agent → Cloud | `POST /cloud-agent/publication-tasks/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
-| Agent → Cloud | `/{id}/heartbeat`、`progress`、`complete` | 均绑定 attempt；心跳读停止指令，progress 兼提交前复查，complete 去重保存证据与结果 |
+| Agent → Cloud | `POST /cloud-agent/publication-task/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
+| Agent → Cloud | `/{id}/report`、`complete` | 均绑定 attempt；report 不带 stage 时只保活并读停止指令，带 stage 时兼阶段上报及提交前复查，complete 去重保存证据与结果 |
 | Agent → Cloud | 当前 attempt 的文件资源读取／续签 | 复用文件 Service；只允许快照已绑定文件，提供方在发布协议内定义，不新建下载任务或存储凭证体系 |
 | Desktop → Agent | `POST /publication-runs/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
 | Desktop → Agent | `GET/PUT/DELETE /publication-drafts/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
