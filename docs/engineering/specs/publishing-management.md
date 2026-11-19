@@ -413,7 +413,24 @@ UNIQUE (platform, executing_account_uid)
 
 Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也使用自增主键 `id INTEGER PRIMARY KEY AUTOINCREMENT`**；另加 `UNIQUE(environment,user_id,draft_type)`，保证同一环境、用户、类型只保留一份。`environment/user_id/draft_type/payload_json/saved_at` 为必填 TEXT，`schema_version INTEGER NOT NULL DEFAULT 1`。`draft_type` 只允许 plan、batch、task；保存时按组合唯一键更新原行，不建草稿历史或状态机。环境与用户取自当前已认证上下文，前端不能指定别人的身份。
 
-发布执行复用 checkpoint/outbox 的存储方式，与续编分开。记录键区分业务域，避免下载与发布的任务 ID 相互覆盖；适配层保存 Cloud task/attempt 映射。补报循环仅发送原结果，检查点用于识别已发生阶段，不能据其存在自动恢复提交。原现场丢失时进入核实，不伪造可继续执行的现场。
+发布执行与续编分开，Agent 使用 SQLAlchemy ORM 访问既有 SQLite 文件；不保留第二套业务 SQL 或双写路径。历史版本 DDL 只保留在同一 Engine 上的迁移层。
+
+| 本地表 | 职责与关联 |
+| --- | --- |
+| `task_checkpoint` | 本地自增主键 `id`；保存 Cloud 原始 `task_id`、`task_type`、`cloud_env`、`user_id`、`attempt_id`、设备 `agent_id`，以及固定输入摘要、执行阶段和现场占用。发布按 attempt 隔离；下载按环境、用户、类型和任务隔离，保留跨租约重领的断点信息 |
+| `task_result` | 本地自增主键 `id`；`checkpoint_id` 是外键且唯一，每个 checkpoint 有 0 或 1 条原始最终结果；保存原报文、原摘要及投递情况，不按裸 task_id 关联 |
+| `agent_metadata` | 下载目录等小配置，以及按环境、用户隔离的未确认领取请求键 |
+| `schema_migrations` | 已执行的存储升级版本，沿用既有名称与历史 |
+
+`cloud_env` 为 `dev/test/pre/prod`，是明确配置的连接目标，独立于应用的 debug/release 或 development/production。URL 只用于通信，不作为身份或组合摘要。Desktop 成对传递 Cloud 地址和 `WT_MEDIA_CLOUD_ENV`。现有数据库路径保持不变；实际 Profile 的未结束现场在同一数据库内跨用户、跨环境互斥。
+
+同一个 Cloud task 可以产生多个 attempt，因此可对应多条检查点和结果。所有业务查询、更新和删除携带完整作用域。重复领取不能覆盖固定输入；相同结果写入幂等，冲突结果保留原记录并拒绝覆盖。提交阶段先落盘，最终结果和检查点更新同一事务保存；补报只发送原报文，检查点不构成重启后恢复点击的授权。原现场丢失时进入核实，不伪造可继续执行的现场。
+
+初始化由 `bootstrap/app.py` 显式装配：唯一配置入口 → 既有数据路径 → 一个 Engine/Session 工厂 → 版本化升级 → 各 Storage → 业务循环。`storage/database.py` 统一新连接的 WAL、`foreign_keys=ON`、`synchronous=FULL` 和超时；使用正常 ORM 事务，不在业务方法中设置 PRAGMA 或执行 `BEGIN IMMEDIATE`。Session 按操作创建且不跨线程共享，网络、浏览器及文件读取在数据库事务外；停止循环后再释放数据库资源。
+
+下载成功确认后删除续传检查点。未知现场、未确认投递和冲突证据保留；发布结算后保留最小防重标识、输入摘要、原报告及序号依据，可清理冗余输入，不按时间直接删除防重记录。结果投递和现场核实分别扫描：现场已经人工结算也不能隐藏未送达结果；Cloud 拒绝晚到结果时保留原结果，不伪造报告确认。
+
+旧库通过追加版本迁移还原原始身份和关联，保留原报告、摘要、序号及防重信息。缺少可靠环境/用户的下载或领取记录须先核实映射；无法确认时事务回滚并保留原库，不自动归给当前登录用户，也不重新生成请求键绕过未知领取。
 
 ### 3.8 查询投影
 
