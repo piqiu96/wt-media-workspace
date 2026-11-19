@@ -44,3 +44,5 @@ Cloud/Agent 当前堆叠 PR 的目标是功能分支，现有 workflow 只对 ma
 - Desktop 标准回归通过：Rust 540 项通过、6 项依既有规则忽略；控制入口 12 项、版本记录 20 项通过（`/private/tmp/chg103-desktop-green2.log`）。新增 debug 连接 prod、非法标签拒绝及 Cloud 地址/环境成对注入检查。
 - 核对 Cloud #45 的领取幂等、原报告摘要与 report-safe 边界；本轮不修改 Cloud，也不改变线上状态或重放平台动作。
 - Agent 后续实际 Sidecar 打包与旧库升级证据归 CHG104。本轮不复用此前 DMG/原生页面/真实准备证据证明新版本通过，未进行真实投稿。PR 保持未合并。
+
+当前隔离 Workspace 标准回归 207 项、18 项按既有条件跳过（`/private/tmp/chg103-workspace-full.log`）；文档治理、Delivery 与产品路线校验通过。跳过项依赖缺席的运行仓同级目录或专项条件，不将历史 211 项视作本轮数量。
