@@ -34,3 +34,13 @@ Cloud/Agent 当前堆叠 PR 的目标是功能分支，现有 workflow 只对 ma
 前置 [Cloud#44](https://github.com/piqiu96/wt-media-cloud/pull/44) → [Workspace#52](https://github.com/piqiu96/wt-media-workspace/pull/52) → [Agent#9](https://github.com/piqiu96/wt-media-agent/pull/9) → [Workspace#53](https://github.com/piqiu96/wt-media-workspace/pull/53)。本单元按 [Cloud#45](https://github.com/piqiu96/wt-media-cloud/pull/45) → [Agent#10](https://github.com/piqiu96/wt-media-agent/pull/10) → [Desktop#11](https://github.com/piqiu96/wt-media-desktop/pull/11) → 本 Workspace PR 审查及合并，不自动合并。
 
 仅按用户本轮授权临时串行堆叠；没有改写 start 的前置合并限制或项目治理规则。代码库与线上配置默认关闭执行开关，真实准备使用私有本地覆盖配置。真实百度上传、最终提交、公开作品核实及安全重试尚待后续 M6 单元；原生安装包页面走查未验证，不将开发浏览器走查替代原生验收。
+
+
+## 2026-11-19 ORM 与环境参数整改
+
+本轮 Agent 基于 CHG102 `787ae55`，最终适配提交 `e08e3bf`；Desktop 配置提交 `b4a649b`。领取键只存 `publication.claim.<cloud_env>.<user_id>`，原请求值在响应未知时保留；并发领取使用 ORM 唯一键，不重新生成请求绕过未知结果。Preparation 和补报使用同一显式环境标签，Cloud 地址仅供通信；输入、序号与报告哈希算法不变。
+
+- Agent 最终完整回归 713 项通过（`/private/tmp/chg103-final-full.log`）；包含真实 SQLite 并发请求键、旧领取键映射保留、跨环境隔离、准备失败及快照写入竞争回归。
+- Desktop 标准回归通过：Rust 540 项通过、6 项依既有规则忽略；控制入口 12 项、版本记录 20 项通过（`/private/tmp/chg103-desktop-green2.log`）。新增 debug 连接 prod、非法标签拒绝及 Cloud 地址/环境成对注入检查。
+- 核对 Cloud #45 的领取幂等、原报告摘要与 report-safe 边界；本轮不修改 Cloud，也不改变线上状态或重放平台动作。
+- Agent 后续实际 Sidecar 打包与旧库升级证据归 CHG104。本轮不复用此前 DMG/原生页面/真实准备证据证明新版本通过，未进行真实投稿。PR 保持未合并。

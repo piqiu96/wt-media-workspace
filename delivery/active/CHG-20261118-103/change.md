@@ -17,6 +17,8 @@ risk: H
 
 本轮继续按用户明确授权串行堆叠：Workspace 基于 CHG-102，Cloud 基于 CHG-101，Agent 基于 CHG-102，Desktop 基于 main；分别保留可审查差异与 PR，不自动合并。既有 start 的前置合并限制不改写；本次临时例外在这里记录。
 
+2026-11-19 按已确认 ORM 方案适配：领取键改用共享 Database/Session，身份按显式 `cloud_env/user_id` 隔离；准备阶段使用原始 task/attempt ID。Desktop 将 Cloud 地址和环境成对传给 Sidecar，开发包可连接 prod；不改 Cloud 状态、报文摘要算法或平台准备范围。
+
 ## Done When
 
 - 实际共用页面单独确认执行，保存授权与审计；未来时间不提前领取，已授权输入不可被编辑覆盖。
