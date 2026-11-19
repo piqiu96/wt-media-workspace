@@ -65,4 +65,6 @@ Agent `d46ee1a` 继承前置 `6c31039`，完整 **718 项通过**（`/private/tm
 
 新增三个真实配置/Sidecar 测试先失败再通过：四值解析与输出、旧/未知值拒绝、四值传给子进程且 Cloud 目标不变；release 仍强制 prod，非 prod 的目录用原字面路径断言覆盖 dev/test/pre。完整 Desktop **543 项通过、6 项既有忽略**，控制入口 **12 项**、版本资源检查 **20 项**通过（`/private/tmp/environment-desktop-103-full.log`）。严格参数数量断言增加到 7 并校验新增环境值，原 token/端口/目标校验保留。
 
-Cloud Vue 消费点已核对，无按旧 environment 字符串分支，未改 Cloud 业务代码。不重建完整 DMG、不真实投稿，未合并。独立最终核对和本轮文档校验待收口，不将此前审查/CI 当作新提交通过。
+Cloud Vue 消费点已核对，无按旧 environment 字符串分支，未改 Cloud 业务代码。不重建完整 DMG、不真实投稿，未合并。本轮独立跨仓核对与文档校验已通过，不将此前审查/CI 当作新提交通过。
+
+命名变更后的 Workspace 标准回归 **207 项、18 项按既有条件跳过**，各治理校验通过（`/private/tmp/storage-cleanup-environment-chg103-docs-docs.log`）。新独立审查无阻塞项，原 PR 描述更新为本轮范围与数量，保持未合并。
