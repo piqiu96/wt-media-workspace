@@ -163,6 +163,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
         (root / "delivery" / "completed").symlink_to(ROOT / "delivery" / "completed", target_is_directory=True)
         (root / "delivery" / "active").symlink_to(ROOT / "delivery" / "active", target_is_directory=True)
+        (root / "delivery" / "planned").symlink_to(ROOT / "delivery" / "planned", target_is_directory=True)
         card = root / "delivery" / "milestones" / "M7-batch-publishing.md"
         text = card.read_text(encoding="utf-8")
         self.assertIn("](M6-single-publishing.md)", text)
@@ -179,6 +180,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
         (root / "delivery" / "completed").symlink_to(ROOT / "delivery" / "completed", target_is_directory=True)
         (root / "delivery" / "active").symlink_to(ROOT / "delivery" / "active", target_is_directory=True)
+        (root / "delivery" / "planned").symlink_to(ROOT / "delivery" / "planned", target_is_directory=True)
         card = root / "delivery" / "milestones" / "M6-single-publishing.md"
         old = "`/example/operations/publishing/tasks`"
         text = card.read_text(encoding="utf-8")
@@ -198,6 +200,16 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         # the deliberately unstarted lifecycle fixture below.
         for evidence in (ROOT / "delivery" / "active").glob("*/evidence"):
             shutil.copytree(evidence, root / evidence.relative_to(ROOT))
+        (root / "delivery" / "planned").symlink_to(ROOT / "delivery" / "planned", target_is_directory=True)
+        # Carry only archive files linked by current cards. Keep the fixture's
+        # completed directory writable for synthetic lifecycle records.
+        for card in (ROOT / "delivery" / "milestones").glob("*.md"):
+            for target in re.findall(r"\]\((\.\./completed/[^)#]+)(?:#[^)]*)?\)", card.read_text()):
+                source = (card.parent / target).resolve()
+                if source.is_file():
+                    destination = root / source.relative_to(ROOT)
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source, destination)
         (root / "docs").symlink_to(ROOT / "docs", target_is_directory=True)
         (root / "config").symlink_to(ROOT / "config", target_is_directory=True)
         (root / "delivery" / "LEDGER.md").write_text("# Delivery Ledger\n", encoding="utf-8")
