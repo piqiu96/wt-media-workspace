@@ -92,7 +92,7 @@ class ProductMasterAlignmentTests(unittest.TestCase):
 
     def test_rejects_manual_final_submission_baseline(self) -> None:
         self.assert_errors(
-            self.mutate("首次浏览器自动提交与真实回执", "首次 pending_manual_submit 与真实回执"),
+            self.mutate("浏览器自动提交是必须能力", "pending_manual_submit，浏览器自动提交是必须能力"),
             ["M6 contains obsolete publishing baseline 'pending_manual_submit'"],
         )
 
@@ -211,6 +211,11 @@ class ProductMasterAlignmentTests(unittest.TestCase):
             after = re.sub(r"^\| 状态 \| .*", "| 状态 | `NOT_STARTED` |", before, flags=re.MULTILINE)
             after = re.sub(r"^\| Active CHG \| .*", "| Active CHG | None |", after, flags=re.MULTILINE)
             after = re.sub(r"^\| Evidence \| .*", "| Evidence | None |", after, flags=re.MULTILINE)
+            # Active stages legitimately retire their candidate plans. This
+            # synthetic NOT_STARTED fixture must supply its own candidate,
+            # rather than requiring production docs to retain obsolete slices.
+            if not self.module.candidate_block(after):
+                after += "\n候选 CHG：\n\n```text\n完整快速发布闭环\n```\n"
             master = master.replace(before, after, 1)
             if name in self.module.PUBLISHING_CARDS:
                 path = root / "delivery" / "milestones" / self.module.PUBLISHING_CARDS[name]
@@ -218,6 +223,13 @@ class ProductMasterAlignmentTests(unittest.TestCase):
                 text = re.sub(r"状态：`[^`]+`", "状态：`NOT_STARTED`", text, count=1)
                 text = re.sub(r"Active CHG：[^；\n]+", "Active CHG：None", text, count=1)
                 text = re.sub(r"^- Evidence：.*\n?", "", text, flags=re.MULTILINE)
+                if "## 候选 CHG" not in text:
+                    text += (
+                        "\n## 候选 CHG\n\n"
+                        "| 候选 | 工作内容及仓库 | 直接依赖 | 可独立验证的完成条件 |\n"
+                        "| --- | --- | --- | --- |\n"
+                        "| 完整快速发布闭环 | Cloud/Agent/Desktop | 真实资源 | 公开作品及完整工具验收 |\n"
+                    )
                 path.write_text(text, encoding="utf-8")
         master_path.write_text(master, encoding="utf-8")
         return root
@@ -293,13 +305,13 @@ class ProductMasterAlignmentTests(unittest.TestCase):
 
     def test_not_started_card_still_requires_candidate_work(self) -> None:
         root = self.publishing_root()
-        path = root / "delivery" / "milestones" / "M6-single-publishing.md"
+        path = root / "delivery" / "milestones" / "M7-batch-publishing.md"
         text = path.read_text(encoding="utf-8")
-        changed, count = re.subn(r"^\| M6-[ABC] .*\n", "", text, flags=re.MULTILINE)
-        self.assertEqual(count, 3)
+        changed, count = re.subn(r"^\| M7 批次发布闭环 .*\n", "", text, flags=re.MULTILINE)
+        self.assertEqual(count, 1)
         path.write_text(changed, encoding="utf-8")
         self.assertEqual(self.module.validate_publishing_cards(root), [
-            "M6-single-publishing.md carries no candidate CHG rows",
+            "M7-batch-publishing.md carries no candidate CHG rows",
         ])
 
     def test_rejects_invalid_publishing_statuses_and_master_card_disagreement(self) -> None:

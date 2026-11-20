@@ -49,13 +49,15 @@ CHG 必须引用一张闭环卡，只描述本次差距、修改范围、任务�
 
 | 顺序 | Milestone | 完成后用户可做什么 | 前置 |
 | --- | --- | --- | --- |
-| 1 | [M6 单任务](M6-single-publishing.md) | 用百度真实账号自动提交一条成片，核实公开作品并处理断网、失败与安全终止 | 真实账号/环境、成片和文件服务 |
+| 1 | [M6 完整快速发布](M6-single-publishing.md) | 使用真实图片库、模板、AI和续编完成百度自动发布、全部结果处置、公开核实与成功统计 | 真实账号/环境、成片和文件服务；工具不依赖M7 |
 | 2 | [M7 批次](M7-batch-publishing.md) | 配置并执行混合账号归属的百度真实任务，处理资源缺口、人工卡点和未知结果，停止后安全收尾 | M6 |
 | 3 | [M-publishing-plan 计划](M-publishing-plan.md) | 按周期目标逐批推进，按 10% 规则确认，暂停/恢复，核实后补量或结束 | M7 |
-| 4 | [M-publishing-operations 工具与三平台](M-publishing-operations.md) | 管理真实图片和模板，在 B站、小红书、百度完成任务/批次/计划 | 整体依赖计划阶段；子候选可按直接依赖提前实施 |
+| 4 | [M-publishing-operations 后续平台](M-publishing-operations.md) | 依次开放B站、小红书并完成三平台任务/批次/计划回归，工具复用M6 | 整体依赖计划；B站适配可在M7及百度验收后先实施 |
 | 5 | [M10 交付验收](../MASTER_IMPLEMENTATION_PLAN.md#m10打包升级诊断与稳定性验收) | 使用通过安装、升级、恢复和诊断验证的发布版本组合 | 工具与三平台阶段；不依赖 M8/M9 |
 
-M6 为 `IN_PROGRESS`，Active CHG 为 [CHG-20261118-101](../active/CHG-20261118-101/change.md)、[CHG-20261118-102](../active/CHG-20261118-102/change.md)、[CHG-20261118-103](../active/CHG-20261118-103/change.md)、[CHG-20261118-104](../active/CHG-20261118-104/change.md)；其余发布阶段为 `NOT_STARTED`，Active CHG 为 None；原 M6/M7 未实施计划由新定义替换，M0—M5 历史验收不变。M8 互动、M9 效果采集退出当前未来路线，不保留未来实施章节或候选，原编号不复用。新增阶段用名称标识，不把历史编号分配给其他业务。
+M6为`IN_PROGRESS`，仅[CHG-20261118-101](../active/CHG-20261118-101/change.md)处于Active。102～105已合并技术切片由101统一承接并退出Active；后续实现和整体验收不得因PR已合并而宣称完成。其余发布阶段为`NOT_STARTED`、Active CHG为None。2026-11-20用户确认图片库、模板和快速发布依赖前移M6，百度先交付，其他平台后续；M7只增加批量场景，计划及平台各保留完整业务闭环。每阶段原则上一个闭环CHG，阶段内部按任务串行，不按接口/技术层继续拆单。
+
+M8互动、M9效果采集退出当前未来路线，原编号不复用；任务结果及发布成功统计仍随对应发布阶段交付。M0—M5历史验收不变。
 
 执行时同步更新 Master 与闭环卡的状态、Active CHG，按实际 CHG 的 `parent` 核对归属；候选名称不是永久约束。`NOT_STARTED` 保留候选规划；`IN_PROGRESS` / `VERIFYING` 核对当前 CHG，无 Active CHG 的阶段间隙或待签收阶段需在两处 Evidence 字段引用已有交付证据；`DONE` 必须退出 Active CHG，并在两处引用验收证据。M10 的当前状态与证据由 Master 保存，不改写首次上线历史记录。
 
