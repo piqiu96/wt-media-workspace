@@ -17,7 +17,7 @@ risk: H
 
 2026-11-21确认命名与落位：接口实体统一单数；选图使用 `POST /image-asset/select`，文案生成使用 `POST /publication/generate`，用途和类目通过请求条件表达。图片、封面模板与渲染统一归 Cloud `internal/modules/image/` 及共用前端 `web/src/modules/image/`；生成文案仍归 `publish`。英文类型使用单数名词，函数使用明确动词并遵循各语言命名惯例。提供方实现时补齐正式契约，再同步调用方；两个新名称不改变既定状态、动作、选图引用或文案审阅确认规则。具体接口与 Handler 映射见发布工程设计 §5.2。
 
-本轮命名同步仅修改 Workspace 工程设计与本记录；检索 Cloud 的 `contracts/`、`internal/` 和 `web/src/` 未发现这两个接口的实现或旧名称调用，不新增占位接口。文档治理、Product/Master 对齐及 Delivery 治理检查通过；完整工具和发布功能仍待后续实施与验收，本CHG保持IMPLEMENTING。
+命名同步提交 `e35098f` 仅修改 Workspace 工程设计与本记录；同步时这两个接口尚未实现。2026-11-21按用户指令执行 `wt chg start CHG-20261120-106`，四仓依赖、分支及干净工作区检查通过，开始实际代码实施。本CHG保持IMPLEMENTING，首批后端交付与剩余工作见[执行检查点](checkpoint.md)。
 
 已交付基线与真实审核中回执继承[CHG101最终证据](../../completed/CHG-20261118-101/evidence/verification.md)；已有两条稿件沿原任务核实，不重复投稿。原型覆盖完整目标，现有页面不代表功能已全实现。公开作品、完整工具及剩余状态动作须由本CHG实际验收。
 

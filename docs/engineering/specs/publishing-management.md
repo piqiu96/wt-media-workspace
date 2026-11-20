@@ -39,7 +39,7 @@ flowchart LR
 
 ### 1.2 复用范围与新增实现
 
-**已有底层能力可以复用，但发布执行器、发布接口和封面渲染仍需要开发。**
+**现有文件能力、单任务接口和百度投稿执行链路可以复用；CHG106继续补齐图片工具、内容准备、结果处置和公开核验。** 下表说明复用边界，不替代当前CHG的实际完成记录。
 
 | 已有能力与代码依据 | 可以复用 | 发布管理仍需实现 |
 | --- | --- | --- |
@@ -47,10 +47,10 @@ flowchart LR
 | Cloud `mediaaccount`、`production` Service | 授权范围、账号身份、成片与文件事实 | 发布资格、同平台占用及资源盘点投影；不复制账号或成片管理模块 |
 | [Cloud files Service](https://github.com/piqiu96/wt-media-cloud/blob/main/internal/modules/files/service/service.go) | 上传、对象存储、摘要、文件登记和短效访问地址 | 图片尺寸、生成来源元信息、渲染文件登记及业务引用删除保护 |
 | [Cloud Agent 鉴权](https://github.com/piqiu96/wt-media-cloud/blob/main/internal/modules/localagent/auth.go) | 新工作严格鉴权、已领取工作 report-safe 收尾 | 为每次发布执行增加归属、状态和证据校验；不能像普通下载那样超时后自动重领 |
-| [Agent checkpoint/outbox](https://github.com/piqiu96/wt-media-agent/blob/main/src/wt_media_agent/storage/checkpoint_store.py) | 本机保存执行进度和未成功上报结果的能力 | 新增发布执行器；提交前记录现场，断网后只补报原结果 |
+| [Agent checkpoint/outbox](https://github.com/piqiu96/wt-media-agent/blob/main/src/wt_media_agent/storage/checkpoint_store.py) | 本机保存发布执行进度、现场与未成功上报原结果的能力 | 补齐原现场人工继续及指定稿件核验，不在补报时重新投稿 |
 | [Desktop 本机调用](https://github.com/piqiu96/wt-media-desktop/blob/main/src-tauri/src/commands/account.rs) | Tauri → Local Agent 的受控桥接方式 | 发布现场继续及新建续编接口的桥接 |
 
-当前 Agent 运行入口注册的是文件下载执行器；文案模型客户端、模板封面渲染与三平台发布适配也不能由原型演示推定为已经实现。不新建 MQ、Redis 锁、工作流引擎、设备节点或通用执行许可系统。
+Agent已有文件下载与百度单任务投稿能力；其余平台、真实文案生成和模板封面渲染不能由原型演示推定为已经实现。不新建 MQ、Redis 锁、工作流引擎、设备节点或通用执行许可系统。
 
 ### 1.3 V1 实施边界
 
@@ -526,6 +526,10 @@ Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也�
 | 失联检查 | 活动 attempt 超过心跳阈值，标记 interrupted／uncertain，不创建新尝试、不释放资源 | 30 秒 |
 
 Cloud 重启从业务表恢复观察；多实例重复扫描通过行锁、对象条件及游标收敛，不新增调度租约。审核中的任务不作为活动执行心跳超时处理，也不后台轮询全部平台作品。
+
+百度投稿被平台接收后，沿用 `reviewing`，保存原任务／attempt、投稿回执 ID 及平台实际提供的目标链接；投稿 ID 与公开作品 ID 不假定相同。链接尚未取得时，Agent 按指定投稿定位获取，不能拼造地址或用账号最新作品替代。Cloud 在现有 Scheduler 内安排定向周期核验，由所属用户的 Agent 检查该稿件；不新建发布 attempt、不再上传，也不增加任务状态或页面动作。
+
+定向核验回报与原投稿结果分开保存，不修改已冻结输入或原结果摘要。只有与原账号、指定稿件匹配的可信公开依据才能按既定规则收敛为 `published` 并关联作品；HTTP 200、登录后预览或审核页面不能单独证明公开。网络／登录异常或暂时不可访问不直接判定投稿失败。平台实际发布时间与首次核验公开时间分别记录，人工核实／补录与周期回报通过修订及原尝试校验防止互相覆盖。
 
 心跳 15 秒／失联 90 秒、每用户并发 3、AI 分组 10 条／流截止 180 秒、单候选封面截止 60 秒、单份配置约 2 MiB 为部署与验证初值，不是已验证容量或新增产品承诺。同账号并发始终为 1；服务繁忙在建流／领取前反馈，不引入通用容量平台。批次 500 条、计划 100 批及总 API 100 QPS 用作代表性压力样本，不直接写成产品硬上限。
 
