@@ -458,6 +458,10 @@ UNIQUE (platform, executing_account_uid)
 
 Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也使用自增主键 `id INTEGER PRIMARY KEY AUTOINCREMENT`**；另加 `UNIQUE(environment,user_id,draft_type)`，保证同一环境、用户、类型只保留一份。`environment/user_id/draft_type/payload_json/saved_at` 为必填 TEXT，`schema_version INTEGER NOT NULL DEFAULT 1`。`draft_type` 只允许 plan、batch、task；保存时按组合唯一键更新原行，不建草稿历史或状态机。环境与用户取自当前已认证上下文，前端不能指定别人的身份。
 
+M6只开放 `task` 新建续编。增加单调 `revision INTEGER NOT NULL`，接口按字符串返回，保存和清除均携带 `expected_revision`；冲突先读取核对，不自动覆盖。清除将原行的 `payload_json` 置为 JSON `null`，保留修订号，防止迟到自动保存恢复已清除的输入。未保存时返回空输入和修订 `"0"`；相同请求的响应丢失可按原修订找回当前一次结果，不重放后续修改。输入上限2MiB，不保存凭据或临时签名地址。
+
+环境由Agent已配置的运行环境 `environment` 决定，不以连接目标 `cloud_env` 代替；例如 test 与 pre 即使连接同一Cloud，续编仍相互隔离。用户来自Cloud已认证Desktop会话签发执行凭证时返回的字符串 `user_id`，由Rust在内存中持有。受控草稿命令只接受页面当前用户用于比对，发往Agent的身份由Rust填入；不能以解析未验签Token内容作为授权。Agent草稿接口必须配置本机Runtime Token，身份只通过此受控通道传递。退出只停用续编身份，保留在途结果上报所需Agent Token；切换账号必须重新换取凭证，不复用上一账号身份。
+
 发布执行与续编分开，Agent 使用 SQLAlchemy ORM 访问既有 SQLite 文件；不保留第二套业务 SQL 或双写路径。历史版本 DDL 只保留在同一 Engine 上的迁移层。
 
 | 本地表 | 职责与关联 |
@@ -666,6 +670,8 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 | Agent → Cloud | 当前 attempt 的文件资源读取／续签 | 复用文件 Service；只允许快照已绑定文件，提供方在发布协议内定义，不新建下载任务或存储凭证体系 |
 | Desktop → Agent | `POST /publication-run/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
 | Desktop → Agent | `GET/PUT/DELETE /publication-draft/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
+
+快速发布创建响应丢失时，先以原 `request_key` 查询 `GET /publication/request?request_key=...`。只返回当前创建用户有权访问的原任务；没有结果时才允许沿用原请求键及冻结输入再次提交，不自动换键或清除续编。请求键找回不扩大任务读取权限。
 
 领取结果的文件身份与快照固定，短效地址可重签。空领取返回空任务，不是执行失败；领取响应丢失先按原键核对，不用下一次轮询掩盖结果未知。
 

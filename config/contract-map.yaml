@@ -51,7 +51,7 @@ contracts:
     # 由活源对比抓出）。
     # 2026.10.23.1：Agent Token 鉴权保留；通用 task lease/report、preflight 和
     # sensitive permit 契约已退役，文件传输使用独立契约。
-    contract_revision: "2026.11.20.2"
+    contract_revision: "2026.11.21.1"
     minimum_agent_contract_revision: "2026.10.23.1"
     compatibility_endpoint: /api/v1/cloud-agent/compatibility
     consumers:
@@ -131,7 +131,7 @@ contracts:
     # 交还、Profile CRUD 与 Cookie 读取；扫描带 observed_at。
     # 2026.10.27.1：AccountCheckRequest.platform 枚举改为 baidu。
     # 2026.10.29.2：Cloud 检测接管代理健康；Agent 停止暴露 proxy-check，窗口/账号/代理同步接口保留。
-    contract_revision: "2026.10.30.3"
+    contract_revision: "2026.11.21.1"
     consumers:
       - wt-media-desktop
   local_event_schemas:
@@ -160,6 +160,6 @@ contracts:
     # refusals and transfer errors to 2026.10.23.1. CHG-20261028-099 added
     # explicit proxy assignment outcomes, moving `v1/bitbrowser.yaml` to
     # 2026.10.29.1.
-    error_revision: "2026.10.30.2"
+    error_revision: "2026.11.21.1"
     consumers:
       - wt-media-desktop
