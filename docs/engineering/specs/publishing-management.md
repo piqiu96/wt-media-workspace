@@ -32,7 +32,7 @@ flowchart LR
 | 位置 | 职责 | 实现边界 |
 | --- | --- | --- |
 | Cloud 发布管理 | 配置校验、正式创建、占用、授权、派发、结果核实、推进、统计和审计 | 在 `internal/modules/publish` 内按 Handler → Service → Repository 组织；通过所属模块 Service 使用账号、成片、身份和文件 |
-| Cloud 运营工具 | 图片库、模板草稿与发布配置、真实封面渲染 | 图片、模板、渲染按主题分文件，供发布管理引用；不拆独立部署服务或通用资源引擎 |
+| Cloud 图片模块 | 图片库、模板草稿与发布配置、真实封面渲染 | 后端归 `internal/modules/image/`，共用前端归 `web/src/modules/image/`；图片、模板、渲染按主题分文件，供发布管理引用，不使用 `cover` 作为领域根目录；不拆独立部署服务或通用资源引擎 |
 | Cloud Scheduler | 到时入队、计划推进、失联检查 | 调用发布 Service，不访问浏览器或运营电脑，不自行改写另一套状态 |
 | Local Agent | 实读账号环境、取文件、上传、填写、提交、保留现场和执行证据、补报结果 | 只执行所属用户的账号；不直接写 Cloud 数据库，不自行授予重试权限 |
 | 共用 Vue / Desktop | 配置与审阅、显示进度、调用本机能力 | Vue 不直连 SQLite；Tauri 不复制业务校验、平台自动化或 Cloud 页面源码 |
@@ -594,7 +594,7 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 
 ### 5.1 提供方与认证
 
-**现在先明确接口要做什么、关键字段是什么；开始实现时，再由接口提供方提交正式契约。** 目前发布接口尚未实现，不能让开发者只看旧代码猜字段。
+**现有任务接口以 Cloud 提供方的正式契约 `contracts/cloud-api/v1/publication.openapi.yaml` 为准；未实现的工具和生成接口由提供方在对应实现中补齐契约。** 本文记录业务边界和路径约定，不替代正式契约，也不表示下列接口均已上线。
 
 | 提供方 | 契约范围 | 消费方 |
 | --- | --- | --- |
@@ -606,28 +606,37 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 
 ### 5.2 按业务职责组织的命令与查询
 
-以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。任务接口使用单数资源名 `/publication`；后端包名 `publish` 不决定接口路径。
+以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。接口实体名统一使用单数，多词资源用短横线连接，业务操作使用明确动词；列表与详情通过 HTTP 方法及 ID 区分，不通过实体变复数区分。任务资源为 `/publication`，后端包名 `publish` 不决定接口路径。既有复数路径的调整须同步提供方契约与全部调用方，不凭本文直接删除已使用的接口。
+
+英文类型名使用单数名词，如 `ImageAsset`、`CoverTemplate`；函数使用动词表达行为，如 Go 的 `ListImageAsset`、`SelectImageAsset`、`GeneratePublicationContent`，前端对应使用 camelCase。Go 导出名使用 PascalCase，未导出名使用 camelCase；缩写遵循语言惯例，如 Go 的 `TaskID`、`WorkURL` 和前端的 `taskId`、`workUrl`。不使用含义模糊的 `handleData`、`processResult` 作为业务函数名。
 
 | 主题 | 查询／命令边界 | 必须保持的语义 |
 | --- | --- | --- |
-| 计划 | `/publication-plans` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batches`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
-| 批次准备 | `/publication-batches` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resources`、`content`、`confirm` | resources 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
+| 计划 | `/publication-plan` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batch`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
+| 批次准备 | `/publication-batch` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resource`、`content`、`confirm` | resource 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
 | 批次执行 | 列表／详情／分页任务、`execution-preview`、`start`、`stop`、`cancel` | 创建检查与执行检查职责不同；首次执行前终止、执行后停止按产品阶段使用；不提供恢复停止队列的命令 |
 | 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempt` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
-| 资源与推荐 | `/publication-capabilities`、`publication-resource-inventory`、`publication-account-options`、`publication-output-options`、`publication-plan-recommendations` | 复用原模块查询，增加发布资格／占用投影；不预占、不复制资源 CRUD、不把未知返回为零 |
-| 生成 | `POST /publication-content/generate`、`POST /covers/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不直接替用户采用或确认 |
-| 图片库 | `/image-assets` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`select-background` | 上传和资源访问仍复用 files；按 file_id 登记防重，选底图仅返回固定选择、不预占、不立即建立任务引用 |
-| 模板 | `/cover-templates` 新建／查询；草稿保存、`validate`、`publish`、`usage`、`copy` 及合法删除 | 校验不发布，发布不启用；内容与启停分开；复制有明确的新规格适配职责 |
+| 资源与推荐 | `/publication-capability`、`publication-resource-inventory`、`publication-account-option`、`publication/output`、`publication-plan-recommendation` | 复用原模块查询，成片复用已有 `/publication/output`，不增加同义接口；增加发布资格／占用投影，不预占、不复制资源 CRUD、不把未知返回为零 |
+| 生成 | `POST /publication/generate`、`POST /cover/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不创建发布任务，不直接替用户采用或确认 |
+| 图片库 | `/image-asset` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`POST /image-asset/select` | 上传和资源访问仍复用现有文件能力；按 file_id 登记防重；选图用途（如 background）和类目作为请求条件，保持既定候选规则，仅返回固定选择、不预占、不立即建立任务引用 |
+| 模板 | `/cover-template` 新建／查询；草稿保存、`validate`、`publish`、`usage`、`copy` 及合法删除 | 校验不发布，发布不启用；内容与启停分开；复制有明确的新规格适配职责 |
 | 统计与记录 | 计划统计、各主体操作记录及任务尝试分页 | 聚合同一事实，不重复建设统计写入；复制取已有详情在新建表单填充，不另建复制任务 API |
+
+本轮确认的两个接口按以下位置实现；这是后续代码落位约定，不表示文件或接口已存在：
+
+| 路由 | Handler 位置（Cloud 仓） | 业务函数 |
+| --- | --- | --- |
+| `POST /image-asset/select` | `internal/modules/image/asset_handler.go` | `SelectImageAsset`；图片选择规则放在 `service/image_asset.go`，数据查询归 Repository |
+| `POST /publication/generate` | `internal/modules/publish/content_handler.go` | `GeneratePublicationContent`；生成规则放在 `service/content_generation.go`，外部模型调用归 `internal/infra/client/` |
 
 #### 关键接口在编码前需要明确哪些字段
 
-**现在尚无正式发布 Contract，不能只靠未来代码猜测接口。** 下表固定会影响多端协作的最少字段；其他筛选和表单字段按 PRD 与平台配置整理。实施对应 CHG 时，由 Cloud／Agent 的提供方发布正式 OpenAPI／Schema，再由消费者生成或锁定版本；不要在 Workspace 维护第二套可写契约。
+**已实现部分查提供方正式 Contract；下表固定其余设计中会影响多端协作的最少字段，不覆盖已有契约。** 其他筛选和表单字段按 PRD 与平台配置整理。实施对应 CHG 时，由 Cloud／Agent 的提供方补齐正式 OpenAPI／Schema，再由消费者生成或锁定版本；不要在 Workspace 维护第二套可写契约。
 
 | 操作 | 必要输入 | 主要返回 | 必须拒绝的情况 |
 | --- | --- | --- | --- |
-| 创建计划 `POST /publication-plans` | `request_key,name,date_start/date_end,goals,batches` | `id,revision,batch_ids,status` | 同键异输入、目标矩阵不守恒、无权操作 |
-| 确认批次 `POST /publication-batches/{id}/confirm` | `expected_revision,included_row_keys,excluded_row_keys,allow_shortfall,expected_shortfalls` | `batch_id,revision,task_ids,target_count,created_count,creation_shortfall` | 资源／文件已变化、占用冲突、实际缺口与确认值不同 |
+| 创建计划 `POST /publication-plan` | `request_key,name,date_start/date_end,goals,batches` | `id,revision,batch_ids,status` | 同键异输入、目标矩阵不守恒、无权操作 |
+| 确认批次 `POST /publication-batch/{id}/confirm` | `expected_revision,included_row_keys,excluded_row_keys,allow_shortfall,expected_shortfalls` | `batch_id,revision,task_ids,target_count,created_count,creation_shortfall` | 资源／文件已变化、占用冲突、实际缺口与确认值不同 |
 | 快速创建任务 `POST /publication` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
 | 修改待执行任务 `PUT /publication/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
 | 首次启动／人工继续 `start、confirm-next` | `expected_revision`；继续还需 `expected_current_batch_id,next_batch_id` | `status,current_batch_id,revision` | 任务未决、未准备好、阈值需确认、位置已变化 |
@@ -647,8 +656,8 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 | Agent → Cloud | `POST /api/v1/cloud-agent/publication-task/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
 | Agent → Cloud | `/api/v1/cloud-agent/publication-task/{id}/report`、`complete` | 均绑定 attempt；report 不带 stage 时只保活并读取停止指令，带 stage 时上报进度并兼提交前复查；保活不追加进度历史或授予提交许可，complete 去重保存原证据与结果 |
 | Agent → Cloud | 当前 attempt 的文件资源读取／续签 | 复用文件 Service；只允许快照已绑定文件，提供方在发布协议内定义，不新建下载任务或存储凭证体系 |
-| Desktop → Agent | `POST /publication-runs/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
-| Desktop → Agent | `GET/PUT/DELETE /publication-drafts/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
+| Desktop → Agent | `POST /publication-run/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
+| Desktop → Agent | `GET/PUT/DELETE /publication-draft/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
 
 领取结果的文件身份与快照固定，短效地址可重签。空领取返回空任务，不是执行失败；领取响应丢失先按原键核对，不用下一次轮询掩盖结果未知。
 
