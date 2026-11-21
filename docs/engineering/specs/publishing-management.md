@@ -691,11 +691,18 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 | Agent → Cloud | `/api/v1/cloud-agent/publication-task/{id}/report`、`complete` | 均绑定 attempt；report 不带 stage 时只保活并读取停止指令，带 stage 时上报进度并兼提交前复查；保活不追加进度历史或授予提交许可，complete 去重保存原证据与结果 |
 | Agent → Cloud | 当前 attempt 的文件资源读取／续签 | 复用文件 Service；只允许快照已绑定文件，提供方在发布协议内定义，不新建下载任务或存储凭证体系 |
 | Desktop → Agent | `POST /publication-run/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
+| Desktop → Agent | `POST /publication-run/{attempt_id}/scene` | 只把仍存活的原现场带到前台，不打开替代窗口，不上传或提交 |
 | Desktop → Agent | `GET/PUT/DELETE /publication-draft/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
 
 快速发布创建响应丢失时，先以原 `request_key` 查询 `GET /publication/request?request_key=...`。只返回当前创建用户有权访问的原任务；没有结果时才允许沿用原请求键及冻结输入再次提交，不自动换键或清除续编。请求键找回不扩大任务读取权限。
 
 领取结果的文件身份与快照固定，短效地址可重签。空领取返回空任务，不是执行失败；领取响应丢失先按原键核对，不用下一次轮询掩盖结果未知。
+
+人工卡点在提交屏障之前保留当前浏览器连接和调用栈，Agent上报既定 `awaiting_human` 并持续保活。平台能力通过执行控制回调等待用户处理，不依赖Cloud客户端或本地任务表；继续后复读真实UID并从原调用位置继续，不能重入上传函数。提交屏障之后不能以“已经处理”恢复点击，只能核实原结果。
+
+Cloud `GET /cloud-agent/publication-task/{id}/attempt/{attempt_id}/scene` 与 `POST /cloud-agent/publication-task/{id}/resume` 均要求当前Desktop会话、原所属用户、任务revision和原attempt。前者只读核对现场资格；后者在同一事务复核固定输入、停止标记、未提交及保存的暂停前阶段，恢复原阶段并审计，不产生新attempt或文件授权。attempt保存 `paused_stage` 及 `last_resume_revision`，用于同一继续请求丢失响应后的精确确认；原输入和结果不改写。
+
+本地仅保留当前存活调用的等待控制，不把重启检查点当成可继续现场。Native桥从受信身份取得用户，页面只提供期望身份和任务／尝试／修订；Agent核对当前令牌及活动等待现场后才显示或继续。现场丢失、身份改变、输入改变、已进入提交或停止时拒绝继续，并沿原尝试收尾／核实。显示现场与继续均不允许重新打开已丢失的浏览器。Web保留同一业务入口，并明确要求在Desktop处理本机现场。
 
 ### 5.4 生成流与接口反馈
 

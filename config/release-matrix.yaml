@@ -898,3 +898,35 @@ releases:
     residual_risks:
       - "Real public-work confirmation, exact periodic checks, AI provider and original-scene continuation remain incomplete; M6 is IN_PROGRESS."
       - "Existing real submissions 7/8 must be checked in place and never reposted. Installed desktop acceptance still requires an unlocked Mac."
+
+
+  - release: "chg106-human-scene-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: original_live_publication_human_continuation
+    environment: local_development
+    components:
+      cloud: "d09eb85 (local CHG branch, not merged or released)"
+      cloud_agent: "Cloud d09eb85 (not released)"
+      local_agent: "2af6db3 (local CHG branch, not merged or released)"
+      desktop: "1af3cdb (local CHG branch, not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.2"
+      cloud_agent_api: "v1@2026.11.21.3"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.2"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Strict original scene/revision/session continuation; immutable original input/result and fresh submit barrier retained. Local commands never open a replacement scene."
+    rollout_order:
+      - "Cloud migration and strict provider, Agent live-scene consumer, Desktop trusted native bridge and shared Vue; CHG106 only."
+    verification:
+      local:
+        - "Go full suite, publication isolated MySQL, frontend 156 files/1118 tests and production build passed."
+        - "Agent 819 tests, isolated Chrome editor 32 tests and native 550 tests passed; 6 native tests remain ignored by existing conditions. Independent review closed."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "source verified; package rebuild and real human-scene acceptance pending"
+    residual_risks:
+      - "Exact periodic public-result checks, real AI, installed business acceptance and M6 signoff remain incomplete."
+      - "Original external submissions 7/8 are preserved; no repost. Runtime still uses the earlier verified-work candidate until the next full rebuild."
