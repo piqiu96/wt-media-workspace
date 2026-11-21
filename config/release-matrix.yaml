@@ -930,3 +930,34 @@ releases:
     residual_risks:
       - "Exact periodic public-result checks, real AI, installed business acceptance and M6 signoff remain incomplete."
       - "Original external submissions 7/8 are preserved; no repost. Runtime still uses the earlier verified-work candidate until the next full rebuild."
+
+  - release: "chg106-public-check-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: exact_original_submission_public_check
+    environment: local_development
+    components:
+      cloud: "014d37a (local CHG branch, not merged or released)"
+      cloud_agent: "Cloud 014d37a (not released)"
+      local_agent: "6f92dfe (local CHG branch, not merged or released)"
+      desktop: "1103b02 (local CHG branch, not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.3"
+      cloud_agent_api: "v1@2026.11.21.4"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.2"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Additive original-submission observations; owner/revision/generation fences and immutable original attempts. Public media requires an anonymous decoded frame and exact original identity."
+    rollout_order:
+      - "Cloud observation migration/provider, Agent read-only consumer, shared Vue and Desktop contract lock; CHG106 only."
+    verification:
+      local:
+        - "Go full suite, publication isolated MySQL, frontend 156 files/1119 tests and production build passed."
+        - "Agent 833 tests and isolated Chrome 35 tests passed; independent Cloud/Agent review findings fixed and closed."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "source verified; full rebuild and real original-submission check acceptance pending"
+    residual_risks:
+      - "Actual Baidu loaded-list lookup, public metadata/media, installed workflows and AI remain unverified; M6 stays IN_PROGRESS."
+      - "Original submissions 7/8 remain intact; no repost and no false public-work projection. Native CUA still reports Mac locked."
