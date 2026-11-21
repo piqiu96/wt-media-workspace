@@ -986,10 +986,11 @@ releases:
       local:
         - "Full Go, frontend 157 files/1126 tests, production build and independent review passed."
         - "Real DeepSeek JSON invocation passed; ignored local credential excluded from commit."
+        - "Fresh full runtime/DMG rebuild and operator login gates passed; actual authenticated generation returned all three complete fields without changing any of the five publication tasks."
     target_status:
       windows_x64: "not_built_for_this_revision"
       macos_x86_64: "not_built_for_this_revision"
-      macos_arm64: "full rebuild pending; installed business acceptance incomplete"
+      macos_arm64: "fresh full rebuild and login gates passed; installed business acceptance incomplete"
     residual_risks:
-      - "Actual generation API, UI adoption, platform cover specifications and original-owner public verification remain pending."
+      - "UI adoption, platform cover specifications and original-owner public verification remain pending; QA compose task 727 is preparing an unoccupied output through the normal workflow."
       - "Native CUA still reports Mac locked despite user unlock; M6 stays IN_PROGRESS."
