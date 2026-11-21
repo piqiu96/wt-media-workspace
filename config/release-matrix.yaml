@@ -962,3 +962,34 @@ releases:
     residual_risks:
       - "Anonymous exact Task 8 public metadata and decoded media verified by HTTP; fresh original-owner scene, loaded-list lookup, installed workflows and AI remain unverified. M6 stays IN_PROGRESS."
       - "Original submissions 7/8 remain intact; no repost and no false public-work projection. Native CUA still reports Mac locked."
+
+  - release: "chg106-ai-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: single_publication_ai_review
+    environment: local_development
+    components:
+      cloud: "056b034 (CHG branch; not merged or released)"
+      cloud_agent: "Cloud 056b034 (not released)"
+      local_agent: "6f92dfe (CHG branch; not merged or released)"
+      desktop: "1103b02 (CHG branch; not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.4"
+      cloud_agent_api: "v1@2026.11.21.4"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.2"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Additive single-row generation SSE; generated suggestions, field adoption and content confirmation remain separate."
+    rollout_order:
+      - "Cloud provider and shared Vue, then rebuild Desktop from the same shared source."
+    verification:
+      local:
+        - "Full Go, frontend 157 files/1126 tests, production build and independent review passed."
+        - "Real DeepSeek JSON invocation passed; ignored local credential excluded from commit."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "full rebuild pending; installed business acceptance incomplete"
+    residual_risks:
+      - "Actual generation API, UI adoption, platform cover specifications and original-owner public verification remain pending."
+      - "Native CUA still reports Mac locked despite user unlock; M6 stays IN_PROGRESS."
