@@ -229,3 +229,13 @@ Cloud `056b034`：新增 `POST /publication/generate`，先经Production提供�
 当前真实发布→公开核验→作品登记仍未通过，不关闭CHG106／M6，不把故障提示修复当作成功率闭环。平台封面全部规格、旧稿分页定位及实际作品登记仍需原账号现场验证。
 
 本次Agent提交`5adadb8`推送未成功：Git提示无法读取GitHub Username，终端当前未取得认证；现有草稿PR尚未包含此修复。未合入main。
+
+
+## 比特浏览器恢复与最新组合重建
+
+用户回复“已启动”后，Agent实际扫描返回bitbrowser_status=normal，原主账号与原Profile可见，消除上一轮浏览器本地API不可达的环境阻塞。
+
+- 从Cloud `056b034`／Agent `5adadb8`／Desktop `1103b02`执行统一 `bin/control.sh start`，退出0。Cloud、Worker／Compose Worker／Scheduler、Agent、BitBrowser、双前端、Desktop资源新鲜度、DMG新鲜度及运营账号登录门禁全部通过；最新安装包已挂载启动，包含断连提示修复。此为环境准备通过，不能代替真实业务验收。
+- 使用运营账号只读复查：原任务7仍reviewing／attempt21／revision69，原任务8仍reviewing／attempt27／revision38；原投稿ID保留，公开作品ID及链接均为空，作品summary为all=0／today=0。最后核验时间仍为上一轮21:45，不能把服务恢复等同于原稿件核验已完成。
+- 当前node_repl／@oai/sky仍返回“Trusted RPC service is not configured: sky”，不能代为操作新安装版。已请用户在刚启动的安装版登录运营账号，让产品本机核验正常恢复；未通过其他浏览器技术绕过桌面限制。
+- 未清理数据库，未重新投稿、手工改写任务状态或补造作品；CHG106与M6保持进行中。
