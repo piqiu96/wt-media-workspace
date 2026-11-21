@@ -76,7 +76,8 @@ contracts:
     # 2026.10.29.2：三块运营资源统一 enabled、bit_/platform_/last_check_ 前缀；
     # 删除扫描候选、账号标签冗余列和旧代理字段。
     # 2026.10.30.1：browser-profile 的代理引用改为整数（ADR-0029）。
-    schema_revision: "2026.11.07.1"
+    # CHG106：成片增加真实PNG缩略图投影，引用ID按字符串保存。
+    schema_revision: "2026.11.21.1"
     consumers:
       - wt-media-cloud/web
       - wt-media-agent
