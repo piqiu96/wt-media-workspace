@@ -867,3 +867,34 @@ releases:
     residual_risks:
       - "Baidu safety verification needs human completion before original-account reconciliation and real posting can continue. No platform upload or final submission is claimed."
       - "No autonomous publication loop or platform submission adapter is enabled by this unit. Execution remains disabled in repository/online configuration; M6 is IN_PROGRESS."
+
+  - release: "chg106-verified-work-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: verified_public_work_and_original_result_resolution
+    environment: local_development
+    components:
+      cloud: "c1091bb (local CHG branch, not merged or released)"
+      cloud_agent: "Cloud c1091bb (not released)"
+      local_agent: "894faa3 (local CHG branch, not merged or released)"
+      desktop: "d5666a5 (local CHG branch, not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.2"
+      cloud_agent_api: "v1@2026.11.21.2"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.1"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "ADR-0035 coordinates receipt/public-work field semantics; original attempt packets remain immutable. Owner-scoped work records and actual-publication-time summary share one canonical fact."
+    rollout_order:
+      - "Cloud provider migration/API/shared Vue, then Agent original-scene consumers and Desktop contract lock; current CHG106 only."
+    verification:
+      local:
+        - "Full Go suite and isolated publication MySQL suite passed; work deduplication, receipt preservation, revision race, audit rollback, scope and business-day checks passed."
+        - "Frontend 155 files/1114 tests, production build and Agent 813 tests passed. Independent review findings fixed and rechecked."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "new slice awaits complete environment rebuild and installed acceptance"
+    residual_risks:
+      - "Real public-work confirmation, exact periodic checks, AI provider and original-scene continuation remain incomplete; M6 is IN_PROGRESS."
+      - "Existing real submissions 7/8 must be checked in place and never reposted. Installed desktop acceptance still requires an unlocked Mac."

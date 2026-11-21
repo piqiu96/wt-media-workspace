@@ -1,6 +1,6 @@
 # 发布管理与运营工具工程设计
 
-**发布管理继续使用现有 Cloud、Local Agent 和 Desktop。Cloud 管任务和执行授权，Agent 操作浏览器，Desktop 连接本机能力。数据库新增六张业务表，文件仍由现有文件服务管理。**
+**发布管理继续使用现有 Cloud、Local Agent 和 Desktop。Cloud 管任务、作品事实和执行授权，Agent 操作浏览器，Desktop 连接本机能力。业务表按模块保存，文件仍由现有文件服务管理。**
 
 本文回答三个问题：系统由谁负责、数据怎么保存、出现并发和故障时怎么处理。**这是待实现的设计，不表示功能已经上线。** 用户流程和操作规则见 [PRD 第六章](../../product/prd/详细文档/第六章_发布管理.md)，页面见 [原型](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design)。本文的字段、接口和状态是实施建议；实际数据库迁移与接口契约由提供方在开发时落地。
 
@@ -33,6 +33,7 @@ flowchart LR
 | --- | --- | --- |
 | Cloud 发布管理 | 配置校验、正式创建、占用、授权、派发、结果核实、推进、统计和审计 | 在 `internal/modules/publish` 内按 Handler → Service → Repository 组织；通过所属模块 Service 使用账号、成片、身份和文件 |
 | Cloud 图片模块 | 图片库、模板草稿与发布配置、真实封面渲染 | 后端归 `internal/modules/image/`，共用前端归 `web/src/modules/image/`；图片、模板、渲染按主题分文件，供发布管理引用，不使用 `cover` 作为领域根目录；不拆独立部署服务或通用资源引擎 |
+| Cloud 作品管理 | 可信公开作品去重、权限查询及实际发布时间统计 | 后端归 `internal/modules/work/`，共用前端归 `web/src/modules/work/`；发布Service调用作品Service完成事务内关联，不操作本机浏览器 |
 | Cloud Scheduler | 到时入队、计划推进、失联检查 | 调用发布 Service，不访问浏览器或运营电脑，不自行改写另一套状态 |
 | Local Agent | 实读账号环境、取文件、上传、填写、提交、保留现场和执行证据、补报结果 | 只执行所属用户的账号；不直接写 Cloud 数据库，不自行授予重试权限 |
 | 共用 Vue / Desktop | 配置与审阅、显示进度、调用本机能力 | Vue 不直连 SQLite；Tauri 不复制业务校验、平台自动化或 Cloud 页面源码 |
@@ -350,7 +351,8 @@ erDiagram
 | `attempt_count` | INT UNSIGNED，默认 0 | 已领取的次数 |
 | `not_before/authorized_at/cancel_requested_at` | DATETIME(6)，可空 | 执行时间、授权和停止请求 |
 | `accepted_at/published_at` | DATETIME(6)，可空 | 平台接收与确认公开时间 |
-| `platform_work_id/work_url` | VARCHAR(255)/VARCHAR(2048)，可空 | 平台稿件身份与可信作品链接 |
+| `platform_submission_id/target_url` | VARCHAR(255)/VARCHAR(2048)，可空 | 实际投稿回执与平台提供的目标链接，不作为公开成功依据 |
+| `work_id/platform_work_id/work_url` | BIGINT UNSIGNED/VARCHAR(255)/VARCHAR(2048)，可空 | 去重作品关联、真实公开作品 ID与公开链接 |
 | `failure_code/failure_message` | VARCHAR(64)/VARCHAR(1000)，可空 | 明确失败的原因 |
 | `request_key/request_hash` | VARCHAR(64)/CHAR(64)，可空 | 独立任务创建防重 |
 | `occupied_output_id` | BIGINT UNSIGNED，生成列，可空 | 非 abandoned 时固定为成片 ID |
@@ -387,7 +389,13 @@ UNIQUE (platform, executing_account_uid)
 
 同 UID 多窗口仍不能并行；跨平台共用同一个浏览器 Profile 的任务，还须按 2.2 和 4.2 串行领取。取消保留成片占用，只有安全放弃才释放；不能因为一次历史检查结果允许重试或释放。
 
-作品公开后在任务上保存平台作品 ID、链接及证据，复用已有作品关联，不另建结果表。同平台作品去重键必须按平台身份规则确认，不能把“链接格式合法”当作公开成功。
+作品公开后由 Cloud `work` 模块保存正式作品事实，并在原发布任务关联 `work_id`；同平台作品 ID唯一，重复核实复用，账号或成片不符则拒绝覆盖。作品管理菜单与发布管理平级，子菜单作品列表，共用Vue归 `web/src/modules/work/`，业务路由 `/work`。只读列表与详情遵循[作品管理产品规则](../../product/作品管理.md)，不额外提供作品新建或结果日志系统。
+
+`internal/modules/work/{model,repository,service}` 分别保存作品模型、SQL及权限／事实校验，模块Handler只处理HTTP协议；发布Service调用作品Service，在同一事务内完成原任务修订、原attempt核对、作品去重关联和审计。Repository不得调用其他模块Service。作品记录保留平台、真实作品 ID、公开链接、平台UID、账号／用户／团队／类目、来源任务／尝试／成片、标题、封面、视频摘要、平台实际发布时间及首次核实时间。原attempt输入、原结果与摘要不改写。
+
+新增 `GET /api/v1/work`（权限、查询、筛选与分页）、`GET /api/v1/work/:id`（只读详情）、`GET /api/v1/work/summary`（同权限下去重总数与今日数量）。所有实体名为单数；汇总按Asia/Shanghai下平台实际发布时间计算，不按入库或首次核实时间计算。共享页面从作品跳转原发布任务，并从已发布任务打开关联作品。
+
+现有原始执行结果中的 `platform_work_id` 字段曾承载投稿回执；该不可变报文及摘要保留。正式任务字段按真实语义分为投稿 ID和公开作品 ID，保留已发生的外部投稿身份，不增加兼容双读或补造公开作品。人工核实/补录以原attempt、任务revision和原账号为条件；published要求明确的公开及内容匹配证据、真实作品身份和实际发布时间，reviewing只登记指定回执。链接校验只检查身份绑定，不能替代公开证据。
 
 ### 3.5 执行尝试：`publication_attempt`
 
