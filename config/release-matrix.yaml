@@ -992,5 +992,5 @@ releases:
       macos_x86_64: "not_built_for_this_revision"
       macos_arm64: "fresh full rebuild and login gates passed; installed business acceptance incomplete"
     residual_risks:
-      - "UI adoption, platform cover specifications and original-owner public verification remain pending; QA compose task 727 is preparing an unoccupied output through the normal workflow."
+      - "UI adoption, platform cover specifications and original-owner public verification remain pending. Normal QA compose task 727 produced output 134; browser automation subsequently timed out, so adoption is unverified."
       - "Native CUA still reports Mac locked despite user unlock; M6 stays IN_PROGRESS."
