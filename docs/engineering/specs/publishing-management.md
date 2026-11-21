@@ -1,6 +1,6 @@
 # 发布管理与运营工具工程设计
 
-**发布管理继续使用现有 Cloud、Local Agent 和 Desktop。Cloud 管任务和执行授权，Agent 操作浏览器，Desktop 连接本机能力。数据库新增六张业务表，文件仍由现有文件服务管理。**
+**发布管理继续使用现有 Cloud、Local Agent 和 Desktop。Cloud 管任务、作品事实和执行授权，Agent 操作浏览器，Desktop 连接本机能力。业务表按模块保存，文件仍由现有文件服务管理。**
 
 本文回答三个问题：系统由谁负责、数据怎么保存、出现并发和故障时怎么处理。**这是待实现的设计，不表示功能已经上线。** 用户流程和操作规则见 [PRD 第六章](../../product/prd/详细文档/第六章_发布管理.md)，页面见 [原型](https://github.com/piqiu96/wt-media-cloud/tree/main/web/example/proto/publishing-design)。本文的字段、接口和状态是实施建议；实际数据库迁移与接口契约由提供方在开发时落地。
 
@@ -32,14 +32,15 @@ flowchart LR
 | 位置 | 职责 | 实现边界 |
 | --- | --- | --- |
 | Cloud 发布管理 | 配置校验、正式创建、占用、授权、派发、结果核实、推进、统计和审计 | 在 `internal/modules/publish` 内按 Handler → Service → Repository 组织；通过所属模块 Service 使用账号、成片、身份和文件 |
-| Cloud 运营工具 | 图片库、模板草稿与发布配置、真实封面渲染 | 图片、模板、渲染按主题分文件，供发布管理引用；不拆独立部署服务或通用资源引擎 |
+| Cloud 图片模块 | 图片库、模板草稿与发布配置、真实封面渲染 | 后端归 `internal/modules/image/`，共用前端归 `web/src/modules/image/`；图片、模板、渲染按主题分文件，供发布管理引用，不使用 `cover` 作为领域根目录；不拆独立部署服务或通用资源引擎 |
+| Cloud 作品管理 | 可信公开作品去重、权限查询及实际发布时间统计 | 后端归 `internal/modules/work/`，共用前端归 `web/src/modules/work/`；发布Service调用作品Service完成事务内关联，不操作本机浏览器 |
 | Cloud Scheduler | 到时入队、计划推进、失联检查 | 调用发布 Service，不访问浏览器或运营电脑，不自行改写另一套状态 |
 | Local Agent | 实读账号环境、取文件、上传、填写、提交、保留现场和执行证据、补报结果 | 只执行所属用户的账号；不直接写 Cloud 数据库，不自行授予重试权限 |
 | 共用 Vue / Desktop | 配置与审阅、显示进度、调用本机能力 | Vue 不直连 SQLite；Tauri 不复制业务校验、平台自动化或 Cloud 页面源码 |
 
 ### 1.2 复用范围与新增实现
 
-**已有底层能力可以复用，但发布执行器、发布接口和封面渲染仍需要开发。**
+**现有文件能力、单任务接口和百度投稿执行链路可以复用；CHG106继续补齐图片工具、内容准备、结果处置和公开核验。** 下表说明复用边界，不替代当前CHG的实际完成记录。
 
 | 已有能力与代码依据 | 可以复用 | 发布管理仍需实现 |
 | --- | --- | --- |
@@ -47,10 +48,10 @@ flowchart LR
 | Cloud `mediaaccount`、`production` Service | 授权范围、账号身份、成片与文件事实 | 发布资格、同平台占用及资源盘点投影；不复制账号或成片管理模块 |
 | [Cloud files Service](https://github.com/piqiu96/wt-media-cloud/blob/main/internal/modules/files/service/service.go) | 上传、对象存储、摘要、文件登记和短效访问地址 | 图片尺寸、生成来源元信息、渲染文件登记及业务引用删除保护 |
 | [Cloud Agent 鉴权](https://github.com/piqiu96/wt-media-cloud/blob/main/internal/modules/localagent/auth.go) | 新工作严格鉴权、已领取工作 report-safe 收尾 | 为每次发布执行增加归属、状态和证据校验；不能像普通下载那样超时后自动重领 |
-| [Agent checkpoint/outbox](https://github.com/piqiu96/wt-media-agent/blob/main/src/wt_media_agent/storage/checkpoint_store.py) | 本机保存执行进度和未成功上报结果的能力 | 新增发布执行器；提交前记录现场，断网后只补报原结果 |
+| [Agent checkpoint/outbox](https://github.com/piqiu96/wt-media-agent/blob/main/src/wt_media_agent/storage/checkpoint_store.py) | 本机保存发布执行进度、现场与未成功上报原结果的能力 | 补齐原现场人工继续及指定稿件核验，不在补报时重新投稿 |
 | [Desktop 本机调用](https://github.com/piqiu96/wt-media-desktop/blob/main/src-tauri/src/commands/account.rs) | Tauri → Local Agent 的受控桥接方式 | 发布现场继续及新建续编接口的桥接 |
 
-当前 Agent 运行入口注册的是文件下载执行器；文案模型客户端、模板封面渲染与三平台发布适配也不能由原型演示推定为已经实现。不新建 MQ、Redis 锁、工作流引擎、设备节点或通用执行许可系统。
+Agent已有文件下载与百度单任务投稿能力；其余平台、真实文案生成和模板封面渲染不能由原型演示推定为已经实现。不新建 MQ、Redis 锁、工作流引擎、设备节点或通用执行许可系统。
 
 ### 1.3 V1 实施边界
 
@@ -206,7 +207,7 @@ flowchart TD
 
 **生成结果必须先让运营审阅。生成文字、采用文字、确认内容、创建发布任务，是四件不同的事。**
 
-文案由 Cloud 调用模型生成。只有一条内容完整返回并通过检查，页面才显示「采用」；不能把生成到一半的文字直接写进表单。模板封面由 Cloud 生成实际图片，再交给文件服务保存。两者通过同一套流式进度反馈返回结果，见 [5.4](#54-生成流与接口反馈)。
+文案由 Cloud 调用模型生成。M6 使用用户指定的 DeepSeek，通过其 Chat Completions JSON 输出生成一条完整建议；模型名称与HTTP连接配置可配置，密钥由部署凭据文件提供，不进入代码或前端。只传经授权的成片素材标题、当前文案和本次要求，不发送平台凭据、视频文件或未经选择的声明。无密钥、限流、超时或不完整结果明确失败，不自动重放模型请求。只有一条内容完整返回并通过检查，页面才显示「采用」；不能把生成到一半的文字直接写进表单。模板封面由 Cloud 生成实际图片，再交给文件服务保存。两者通过同一套流式进度反馈返回结果，见 [5.4](#54-生成流与接口反馈)。
 
 | 检查什么 | 为什么需要 |
 | --- | --- |
@@ -223,7 +224,13 @@ flowchart TD
 | 素材自带图片／图片库现成封面 | 检查实际文件、权限与平台规格；无需模板、封面文字或生成记录，替换后重新确认 |
 | 模板合成 | 固定实际底图、短标题和各必要规格的启用发布模板；逐规格校验实际排版、渲染并登记文件，收齐输出才可确认 |
 
+快速发布的业务底图可来自当前成片的真实缩略图，或图片库中允许作底图的图片。`POST /cover/render` 用 `background_output_id` 或 `background_image_asset_id` 二选一表达业务底图；Cloud分别通过 production Service 或图片 Service 取得已鉴权的实际文件，不接受任意底图文件ID。固定图片和纯色模板使用其发布快照中的背景，不接受额外业务底图。成品快照记录成片/图片、实际文件、短标题、发布模板及修订和渲染版本。
+
+`GET /cover/{id}` 只读取当前用户有权访问的真实正式模板成品及其快照，供续编恢复；不重新生成、不要求原模板仍启用。任务内容中的 `cover_render` 固定本次短标题、模板/发布修订、业务底图和输入摘要，创建/编辑时与实际成品来源核对；模板成品缺少该依据、输入不符或预览样例均拒绝。封面短标题与发布正文分别保存，正文变化不隐式改写短标题或重绘封面。没有模板的现成图片不要求生成记录。
+
 随机底图按当前类目、再通用范围选择启用且用途匹配的图片；最终选定的 ID 固定保存，不随查看重选，不实时生成底图或提取关键帧。模板标签仅用于推荐，可用性按实际输出要求判断；图片停用不参与新渲染。
+
+真实栅格渲染在 Cloud 图片模块内使用 Go 图像与 OpenType 能力，随程序固定分发 Noto CJK 字体及许可；编辑器加载相同字体，正式预览和出图均以服务端结果为准。不依赖运营电脑字体，不引入浏览器渲染服务。缺字、缺少底图及溢出明确报错。
 
 模板渲染复用编辑器定义的画布、图层、字体、描边和行距参数。唯一动态主标题绑定业务短标题，隐藏仍计入数量；先换行再在允许范围缩字，仍溢出则报错，不截断标题或拉伸其他比例。样例预览标记为预览文件，不能代替实际标题的正式封面。
 
@@ -344,7 +351,8 @@ erDiagram
 | `attempt_count` | INT UNSIGNED，默认 0 | 已领取的次数 |
 | `not_before/authorized_at/cancel_requested_at` | DATETIME(6)，可空 | 执行时间、授权和停止请求 |
 | `accepted_at/published_at` | DATETIME(6)，可空 | 平台接收与确认公开时间 |
-| `platform_work_id/work_url` | VARCHAR(255)/VARCHAR(2048)，可空 | 平台稿件身份与可信作品链接 |
+| `platform_submission_id/target_url` | VARCHAR(255)/VARCHAR(2048)，可空 | 实际投稿回执与平台提供的目标链接，不作为公开成功依据 |
+| `work_id/platform_work_id/work_url` | BIGINT UNSIGNED/VARCHAR(255)/VARCHAR(2048)，可空 | 去重作品关联、真实公开作品 ID与公开链接 |
 | `failure_code/failure_message` | VARCHAR(64)/VARCHAR(1000)，可空 | 明确失败的原因 |
 | `request_key/request_hash` | VARCHAR(64)/CHAR(64)，可空 | 独立任务创建防重 |
 | `occupied_output_id` | BIGINT UNSIGNED，生成列，可空 | 非 abandoned 时固定为成片 ID |
@@ -381,7 +389,13 @@ UNIQUE (platform, executing_account_uid)
 
 同 UID 多窗口仍不能并行；跨平台共用同一个浏览器 Profile 的任务，还须按 2.2 和 4.2 串行领取。取消保留成片占用，只有安全放弃才释放；不能因为一次历史检查结果允许重试或释放。
 
-作品公开后在任务上保存平台作品 ID、链接及证据，复用已有作品关联，不另建结果表。同平台作品去重键必须按平台身份规则确认，不能把“链接格式合法”当作公开成功。
+作品公开后由 Cloud `work` 模块保存正式作品事实，并在原发布任务关联 `work_id`；同平台作品 ID唯一，重复核实复用，账号或成片不符则拒绝覆盖。作品管理菜单与发布管理平级，子菜单作品列表，共用Vue归 `web/src/modules/work/`，业务路由 `/work`。只读列表与详情遵循[作品管理产品规则](../../product/作品管理.md)，不额外提供作品新建或结果日志系统。
+
+`internal/modules/work/{model,repository,service}` 分别保存作品模型、SQL及权限／事实校验，模块Handler只处理HTTP协议；发布Service调用作品Service，在同一事务内完成原任务修订、原attempt核对、作品去重关联和审计。Repository不得调用其他模块Service。作品记录保留平台、真实作品 ID、公开链接、平台UID、账号／用户／团队／类目、来源任务／尝试／成片、标题、封面、视频摘要、平台实际发布时间及首次核实时间。原attempt输入、原结果与摘要不改写。
+
+新增 `GET /api/v1/work`（权限、查询、筛选与分页）、`GET /api/v1/work/:id`（只读详情）、`GET /api/v1/work/summary`（同权限下去重总数与今日数量）。所有实体名为单数；汇总按Asia/Shanghai下平台实际发布时间计算，不按入库或首次核实时间计算。共享页面从作品跳转原发布任务，并从已发布任务打开关联作品。
+
+现有原始执行结果中的 `platform_work_id` 字段曾承载投稿回执；该不可变报文及摘要保留。正式任务字段按真实语义分为投稿 ID和公开作品 ID，保留已发生的外部投稿身份，不增加兼容双读或补造公开作品。人工核实/补录以原attempt、任务revision和原账号为条件；published要求明确的公开及内容匹配证据、真实作品身份和实际发布时间，reviewing只登记指定回执。链接校验只检查身份绑定，不能替代公开证据。
 
 ### 3.5 执行尝试：`publication_attempt`
 
@@ -409,6 +423,8 @@ UNIQUE (platform, executing_account_uid)
 ### 3.6 图片库与封面模板
 
 **图片库只登记用途，实际文件继续由 `operations_files` 保存。模板保存一份草稿和一份生效配置。**
+
+图片库删除仅移除无引用的业务登记，原始文件继续由文件管理独立维护；模板、正式任务和历史尝试均保护实际文件。删除检查与业务引用写入共用原始文件行锁，失败保留登记。批量启停和双用途维护逐项校验修订并返回结果，保留未成功项供重试。
 
 #### 图片库 `image_asset`
 
@@ -453,6 +469,10 @@ UNIQUE (platform, executing_account_uid)
 ### 3.7 本地存储
 
 Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也使用自增主键 `id INTEGER PRIMARY KEY AUTOINCREMENT`**；另加 `UNIQUE(environment,user_id,draft_type)`，保证同一环境、用户、类型只保留一份。`environment/user_id/draft_type/payload_json/saved_at` 为必填 TEXT，`schema_version INTEGER NOT NULL DEFAULT 1`。`draft_type` 只允许 plan、batch、task；保存时按组合唯一键更新原行，不建草稿历史或状态机。环境与用户取自当前已认证上下文，前端不能指定别人的身份。
+
+M6只开放 `task` 新建续编。增加单调 `revision INTEGER NOT NULL`，接口按字符串返回，保存和清除均携带 `expected_revision`；冲突先读取核对，不自动覆盖。清除将原行的 `payload_json` 置为 JSON `null`，保留修订号，防止迟到自动保存恢复已清除的输入。未保存时返回空输入和修订 `"0"`；相同请求的响应丢失可按原修订找回当前一次结果，不重放后续修改。输入上限2MiB，不保存凭据或临时签名地址。
+
+环境由Agent已配置的运行环境 `environment` 决定，不以连接目标 `cloud_env` 代替；例如 test 与 pre 即使连接同一Cloud，续编仍相互隔离。用户来自Cloud已认证Desktop会话签发执行凭证时返回的字符串 `user_id`，由Rust在内存中持有。受控草稿命令只接受页面当前用户用于比对，发往Agent的身份由Rust填入；不能以解析未验签Token内容作为授权。Agent草稿接口必须配置本机Runtime Token，身份只通过此受控通道传递。退出只停用续编身份，保留在途结果上报所需Agent Token；切换账号必须重新换取凭证，不复用上一账号身份。
 
 发布执行与续编分开，Agent 使用 SQLAlchemy ORM 访问既有 SQLite 文件；不保留第二套业务 SQL 或双写路径。历史版本 DDL 只保留在同一 Engine 上的迁移层。
 
@@ -527,6 +547,16 @@ Agent 在现有 SQLite 中维护一张 `publication_draft`。**本地草稿也�
 
 Cloud 重启从业务表恢复观察；多实例重复扫描通过行锁、对象条件及游标收敛，不新增调度租约。审核中的任务不作为活动执行心跳超时处理，也不后台轮询全部平台作品。
 
+百度投稿被平台接收后，沿用 `reviewing`，保存原任务／attempt、投稿回执 ID 及平台实际提供的目标链接；投稿 ID 与公开作品 ID 不假定相同。链接尚未取得时，Agent 按指定投稿定位获取，不能拼造地址或用账号最新作品替代。Cloud 在现有 Scheduler 内安排定向周期核验，由所属用户的 Agent 检查该稿件；不新建发布 attempt、不再上传，也不增加任务状态或页面动作。
+
+定向核验回报与原投稿结果分开保存，不修改已冻结输入或原结果摘要。只有与原账号、指定稿件匹配的可信公开依据才能按既定规则收敛为 `published` 并关联作品；HTTP 200、登录后预览或审核页面不能单独证明公开。网络／登录异常或暂时不可访问不直接判定投稿失败。平台实际发布时间与首次核验公开时间分别记录，人工核实／补录与周期回报通过修订及原尝试校验防止互相覆盖。
+
+M6 定向核验复用现有 Scheduler 和 Agent 串行发布循环：Scheduler 为 `reviewing` 且有原投稿回执的任务安排 `next_check_at`；所属 Agent 通过 `POST /cloud-agent/publication-task/check/claim` 读取一条到时任务、原 attempt 冻结输入、任务修订和核验代次，不领取文件、不创建新发布尝试。领取只推进下一次核验时间和代次；即使读取或回报中断，下个周期也只重新读取指定稿件，不触发投稿。默认间隔五分钟，不增加调度租约或另一套任务引擎。
+
+`POST /cloud-agent/publication-task/{id}/check` 接收当前代次的独立观察，沿用既定核实事实结构，但仅允许未知、已接收和已公开三种观察，不允许据此自动判失败或重试。观察单独保存于 `publication_observation`，按任务／代次去重；同一原请求应答丢失可读取原确认，改变内容不能覆盖。当前代次、原 attempt、原账号、冻结输入及任务修订共同约束回报，人工补录和后一个核验代次均使旧回报失效。公开投影、作品去重关联、观察和审计同事务提交；原 attempt 的输入、结果、哈希与人工核实记录不改写。详情展示最近核验时间和说明，暂时不可访问仍保留审核中。
+
+Agent 只在原 Profile 没有在途执行或人工占用时进行只读核验，不接管或关闭已经打开的人工窗口。先核对真实UID，再按原投稿ID定位平台实际链接；身份不符或无法唯一定位时保留未知。公开依据要求指定原链接实际跳转、匿名上下文中相同作品与内容、可加载媒体和平台实际发布时间同时成立；匿名上下文不复用运营账号登录态。任何证据缺失都不得登记为公开作品。
+
 心跳 15 秒／失联 90 秒、每用户并发 3、AI 分组 10 条／流截止 180 秒、单候选封面截止 60 秒、单份配置约 2 MiB 为部署与验证初值，不是已验证容量或新增产品承诺。同账号并发始终为 1；服务繁忙在建流／领取前反馈，不引入通用容量平台。批次 500 条、计划 100 批及总 API 100 QPS 用作代表性压力样本，不直接写成产品硬上限。
 
 ### 4.4 安全停止与迟到结果
@@ -546,6 +576,14 @@ Cloud 重启从业务表恢复观察；多实例重复扫描通过行锁、对�
 安全重试必须确认未形成可发布作品、旧执行已结束、原资源及内容仍有效，且任务与父级均允许；只新增原任务的尝试。原资源恢复不等于改账号或成片；失败任务不新增任意编辑、改期或父级停止后的执行入口。
 
 结果核实由有权用户在 Desktop 查看原账号稿件，沿用 resolve 保存明确接收、公开、确认失败或仍未知的证据。公开时间不得在未来；无作品与旧执行停止均有依据后才能安全放弃。取消与放弃不是可互相自动转换的恢复流程，现有入口条件仍以 PRD 为准。
+
+单任务 `cancel` 携带字符串 `expected_revision` 和必填终止原因（最多200字）；未领取的 pending/queued 任务以当前修订原子取消，保留占用与原授权记录，写入取消时间和操作审计。审计同时保留操作者、原因及实际未领取状态依据。与领取竞争时只能有一方成功；已经领取不能按未领取分支处理。
+
+执行中可在原尝试尚未取得提交许可时发出停止请求：与提交许可共用任务修订的原子竞争检查，保存停止时间及原因，主状态仍为 running，不立即显示已取消。原执行器通过既有心跳／提交前复查收到停止；只有原尝试回报账号、Profile、视频及封面哈希均匹配的安全关闭且未提交结果时，任务才投影为 cancelled，原 attempt 的 failed 观察、输入、结果和哈希保持原值。回报不确定则保留 uncertain，已接收回执则按 reviewing 收尾；不得改写实际投稿结果。读接口 `can_cancel` 仅表示当前可发起上述命令；提交许可已发出、已有停止请求或非适用状态时为 false，命令端仍原子复查。界面须区分“已请求安全停止”与“已取消”，不新增业务状态。提交前明确收到 `stop_requested=true/allow_submit=false` 且现场安全关闭时，执行器可回报未投稿；许可响应缺失、竞争冲突或关闭失败仍按未知结果处理，不能推断安全。
+
+条件复制使用只读 `GET /publication/{id}/copy?expected_revision=` 取得当前可复用内容：已发布、已取消、已放弃可复制；失败须原 attempt 已安全结束且结论为未发布。服务端复查权限、修订和原尝试，仅返回平台、类目、文案、话题和声明，不携带账号、成片、封面成品、请求键、确认或授权。页面进入既有新建／续编选择，继续原草稿时不得覆盖；选择新建后生成新请求键并带入可复用内容，账号、成片、封面重新选择，人工重新确认。读取复制内容不创建正式任务、不取得占用，也不改变旧任务。
+
+`abandon` 携带字符串 `expected_revision/attempt_id` 及原账号 UID、原因、核实依据、现场已结束和无可发布稿件的明确确认。仅 failed 的当前原尝试有可信安全失败结论时允许，不能依赖状态文字或临时资源不可用。事务同时更新任务为 abandoned、通过既有占用生成列释放成片并记录操作依据；不修改历史输入、原结果或核实记录。普通取消、审核中和结果不明不提供放弃入口。
 
 ### 4.5 本地补报与认证失效
 
@@ -583,6 +621,8 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 
 引用详情通过这些固定模式查询；图片停用只影响新选用，不释放或破坏历史。仅本地续编、未保存表单和未采用建议不阻止 Cloud 文件删除，恢复时重新校验。
 
+成片缩略图由Cloud生产Worker从最终视频实际取帧，保存为既有文件引用；字段与成功事务见生产工程设计§3.5。快速发布读取已授权成片的 `thumbnail`，不以素材图、占位图或失效旧图补造。新建选择成片可默认采用真实缩略图；图片库替换及模板合成仍需重新校验与确认。
+
 图片库与文件管理删除必须调用同一套引用检查。创建正式引用和删除都锁现有 `operations_files` 文件行；多文件按 ID 排序。**删除分为数据库确认和物理删除两步，不在数据库事务里删除对象。**
 
 1. 短事务中锁文件行，检查图片、模板、已定版批次、任务及历史执行是否引用它。无人引用才设置文件的 `deleted_at` 并提交。标记后不能再建立新引用，也不再签发访问地址。
@@ -594,7 +634,7 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 
 ### 5.1 提供方与认证
 
-**现在先明确接口要做什么、关键字段是什么；开始实现时，再由接口提供方提交正式契约。** 目前发布接口尚未实现，不能让开发者只看旧代码猜字段。
+**现有任务接口以 Cloud 提供方的正式契约 `contracts/cloud-api/v1/publication.openapi.yaml` 为准；未实现的工具和生成接口由提供方在对应实现中补齐契约。** 本文记录业务边界和路径约定，不替代正式契约，也不表示下列接口均已上线。
 
 | 提供方 | 契约范围 | 消费方 |
 | --- | --- | --- |
@@ -606,28 +646,37 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 
 ### 5.2 按业务职责组织的命令与查询
 
-以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。任务接口使用单数资源名 `/publication`；后端包名 `publish` 不决定接口路径。
+以下为路径意图，统一省略 `/api/v1`；不是按表生成 CRUD，也不以接口数量作为验收目标。接口实体名统一使用单数，多词资源用短横线连接，业务操作使用明确动词；列表与详情通过 HTTP 方法及 ID 区分，不通过实体变复数区分。任务资源为 `/publication`，后端包名 `publish` 不决定接口路径。既有复数路径的调整须同步提供方契约与全部调用方，不凭本文直接删除已使用的接口。
+
+英文类型名使用单数名词，如 `ImageAsset`、`CoverTemplate`；函数使用动词表达行为，如 Go 的 `ListImageAsset`、`SelectImageAsset`、`GeneratePublicationContent`，前端对应使用 camelCase。Go 导出名使用 PascalCase，未导出名使用 camelCase；缩写遵循语言惯例，如 Go 的 `TaskID`、`WorkURL` 和前端的 `taskId`、`workUrl`。不使用含义模糊的 `handleData`、`processResult` 作为业务函数名。
 
 | 主题 | 查询／命令边界 | 必须保持的语义 |
 | --- | --- | --- |
-| 计划 | `/publication-plans` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batches`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
-| 批次准备 | `/publication-batches` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resources`、`content`、`confirm` | resources 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
+| 计划 | `/publication-plan` 列表／创建；`/{id}` 详情；`precheck`、`structure`、`start`、`pause`、`resume`、`confirm-next`、`makeup-batch`、`finish`、`cancel` | 结构编辑仅合法范围；首次启动、人工恢复、确认继续／跳过是不同意图，确认绑定当前位置；自动推进仅内部调用 |
+| 批次准备 | `/publication-batch` 创建；`allocation-preview`、`precheck`；已有骨架的 `/{id}/resource`、`content`、`confirm` | resource 明确区分保存与确认锁定；confirm 原子创建任务，独立批次直接提交完整配置 |
 | 批次执行 | 列表／详情／分页任务、`execution-preview`、`start`、`stop`、`cancel` | 创建检查与执行检查职责不同；首次执行前终止、执行后停止按产品阶段使用；不提供恢复停止队列的命令 |
 | 任务 | `/publication` 列表／快速创建／预检；`/{id}` 详情；`content` 编辑、`start`、`retry`、`cancel`、`resolve`、`abandon`、`attempt` | 一次编辑保存内容及执行时间，只允许 pending 且未领取；核实与补录共用结果写入，失败重试与原现场继续分开 |
-| 资源与推荐 | `/publication-capabilities`、`publication-resource-inventory`、`publication-account-options`、`publication-output-options`、`publication-plan-recommendations` | 复用原模块查询，增加发布资格／占用投影；不预占、不复制资源 CRUD、不把未知返回为零 |
-| 生成 | `POST /publication-content/generate`、`POST /covers/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不直接替用户采用或确认 |
-| 图片库 | `/image-assets` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`select-background` | 上传和资源访问仍复用 files；按 file_id 登记防重，选底图仅返回固定选择、不预占、不立即建立任务引用 |
-| 模板 | `/cover-templates` 新建／查询；草稿保存、`validate`、`publish`、`usage`、`copy` 及合法删除 | 校验不发布，发布不启用；内容与启停分开；复制有明确的新规格适配职责 |
-| 统计与记录 | 计划统计、各主体操作记录及任务尝试分页 | 聚合同一事实，不重复建设统计写入；复制取已有详情在新建表单填充，不另建复制任务 API |
+| 资源与推荐 | `/publication-capability`、`publication-resource-inventory`、`publication-account-option`、`publication/output`、`publication-plan-recommendation` | 复用原模块查询，成片复用已有 `/publication/output`，不增加同义接口；增加发布资格／占用投影，不预占、不复制资源 CRUD、不把未知返回为零 |
+| 生成 | `POST /publication/generate`、`POST /cover/render` | 分别生成文案与真实封面，复用流式事件；只返回结果，不创建发布任务，不直接替用户采用或确认 |
+| 图片库 | `/image-asset` 登记／列表；详情、属性、批量修改、引用查询及无引用删除；`POST /image-asset/select` | 上传和资源访问仍复用现有文件能力；按 file_id 登记防重；选图用途（如 background）和类目作为请求条件，保持既定候选规则，仅返回固定选择、不预占、不立即建立任务引用 |
+| 模板 | `/cover-template` 新建／查询；草稿保存、`validate`、`publish`、`usage`、`copy` 及合法删除 | 校验不发布，发布不启用；内容与启停分开；复制有明确的新规格适配职责 |
+| 统计与记录 | 计划统计、各主体操作记录及任务尝试分页 | 聚合同一事实，不重复建设统计写入；复制使用 §4.4 的只读白名单输入填充新建，不提供另一个创建复制任务的命令 |
+
+本轮确认的两个接口按以下位置实现；这是后续代码落位约定，不表示文件或接口已存在：
+
+| 路由 | Handler 位置（Cloud 仓） | 业务函数 |
+| --- | --- | --- |
+| `POST /image-asset/select` | `internal/modules/image/asset_handler.go` | `SelectImageAsset`；图片选择规则放在 `service/image_asset.go`，数据查询归 Repository |
+| `POST /publication/generate` | `internal/modules/publish/content_handler.go` | `GeneratePublicationContent`；生成规则放在 `service/content_generation.go`，外部模型调用归 `internal/infra/client/` |
 
 #### 关键接口在编码前需要明确哪些字段
 
-**现在尚无正式发布 Contract，不能只靠未来代码猜测接口。** 下表固定会影响多端协作的最少字段；其他筛选和表单字段按 PRD 与平台配置整理。实施对应 CHG 时，由 Cloud／Agent 的提供方发布正式 OpenAPI／Schema，再由消费者生成或锁定版本；不要在 Workspace 维护第二套可写契约。
+**已实现部分查提供方正式 Contract；下表固定其余设计中会影响多端协作的最少字段，不覆盖已有契约。** 其他筛选和表单字段按 PRD 与平台配置整理。实施对应 CHG 时，由 Cloud／Agent 的提供方补齐正式 OpenAPI／Schema，再由消费者生成或锁定版本；不要在 Workspace 维护第二套可写契约。
 
 | 操作 | 必要输入 | 主要返回 | 必须拒绝的情况 |
 | --- | --- | --- | --- |
-| 创建计划 `POST /publication-plans` | `request_key,name,date_start/date_end,goals,batches` | `id,revision,batch_ids,status` | 同键异输入、目标矩阵不守恒、无权操作 |
-| 确认批次 `POST /publication-batches/{id}/confirm` | `expected_revision,included_row_keys,excluded_row_keys,allow_shortfall,expected_shortfalls` | `batch_id,revision,task_ids,target_count,created_count,creation_shortfall` | 资源／文件已变化、占用冲突、实际缺口与确认值不同 |
+| 创建计划 `POST /publication-plan` | `request_key,name,date_start/date_end,goals,batches` | `id,revision,batch_ids,status` | 同键异输入、目标矩阵不守恒、无权操作 |
+| 确认批次 `POST /publication-batch/{id}/confirm` | `expected_revision,included_row_keys,excluded_row_keys,allow_shortfall,expected_shortfalls` | `batch_id,revision,task_ids,target_count,created_count,creation_shortfall` | 资源／文件已变化、占用冲突、实际缺口与确认值不同 |
 | 快速创建任务 `POST /publication` | `request_key,platform,category_id,media_account_id,composite_output_id,content,not_before` | `id,status,revision` | 账号不合格、平台未开放、同平台成片已占用 |
 | 修改待执行任务 `PUT /publication/{id}/content` | `expected_revision,content,not_before` | `id,revision,content_ready` | 非 pending、已领取、父级不允许、输入已变化 |
 | 首次启动／人工继续 `start、confirm-next` | `expected_revision`；继续还需 `expected_current_batch_id,next_batch_id` | `status,current_batch_id,revision` | 任务未决、未准备好、阈值需确认、位置已变化 |
@@ -647,10 +696,19 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 | Agent → Cloud | `POST /api/v1/cloud-agent/publication-task/claim` | 按用户领取，输入请求键；同一事务检查真实 UID 串行及浏览器 Profile 互斥，返回 task/attempt、冻结快照、UID／Profile、文件摘要及短效地址 |
 | Agent → Cloud | `/api/v1/cloud-agent/publication-task/{id}/report`、`complete` | 均绑定 attempt；report 不带 stage 时只保活并读取停止指令，带 stage 时上报进度并兼提交前复查；保活不追加进度历史或授予提交许可，complete 去重保存原证据与结果 |
 | Agent → Cloud | 当前 attempt 的文件资源读取／续签 | 复用文件 Service；只允许快照已绑定文件，提供方在发布协议内定义，不新建下载任务或存储凭证体系 |
-| Desktop → Agent | `POST /publication-runs/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
-| Desktop → Agent | `GET/PUT/DELETE /publication-drafts/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
+| Desktop → Agent | `POST /publication-run/{attempt_id}/resume` | 原用户、原现场、原 attempt 安全继续；父级停止后只允许收尾，不再提交 |
+| Desktop → Agent | `POST /publication-run/{attempt_id}/scene` | 只把仍存活的原现场带到前台，不打开替代窗口，不上传或提交 |
+| Desktop → Agent | `GET/PUT/DELETE /publication-draft/{draft_type}` | 当前环境／用户／类型的一份 SQLite 输入；Web 不调用，正式创建成功或明确丢弃后清理 |
+
+快速发布创建响应丢失时，先以原 `request_key` 查询 `GET /publication/request?request_key=...`。只返回当前创建用户有权访问的原任务；没有结果时才允许沿用原请求键及冻结输入再次提交，不自动换键或清除续编。请求键找回不扩大任务读取权限。
 
 领取结果的文件身份与快照固定，短效地址可重签。空领取返回空任务，不是执行失败；领取响应丢失先按原键核对，不用下一次轮询掩盖结果未知。
+
+人工卡点在提交屏障之前保留当前浏览器连接和调用栈，Agent上报既定 `awaiting_human` 并持续保活。平台能力通过执行控制回调等待用户处理，不依赖Cloud客户端或本地任务表；继续后复读真实UID并从原调用位置继续，不能重入上传函数。提交屏障之后不能以“已经处理”恢复点击，只能核实原结果。
+
+Cloud `GET /cloud-agent/publication-task/{id}/attempt/{attempt_id}/scene` 与 `POST /cloud-agent/publication-task/{id}/resume` 均要求当前Desktop会话、原所属用户、任务revision和原attempt。前者只读核对现场资格；后者在同一事务复核固定输入、停止标记、未提交及保存的暂停前阶段，恢复原阶段并审计，不产生新attempt或文件授权。attempt保存 `paused_stage` 及 `last_resume_revision`，用于同一继续请求丢失响应后的精确确认；原输入和结果不改写。
+
+本地仅保留当前存活调用的等待控制，不把重启检查点当成可继续现场。Native桥从受信身份取得用户，页面只提供期望身份和任务／尝试／修订；Agent核对当前令牌及活动等待现场后才显示或继续。现场丢失、身份改变、输入改变、已进入提交或停止时拒绝继续，并沿原尝试收尾／核实。显示现场与继续均不允许重新打开已丢失的浏览器。Web保留同一业务入口，并明确要求在Desktop处理本机现场。
 
 ### 5.4 生成流与接口反馈
 

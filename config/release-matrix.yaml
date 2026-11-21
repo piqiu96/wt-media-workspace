@@ -867,3 +867,130 @@ releases:
     residual_risks:
       - "Baidu safety verification needs human completion before original-account reconciliation and real posting can continue. No platform upload or final submission is claimed."
       - "No autonomous publication loop or platform submission adapter is enabled by this unit. Execution remains disabled in repository/online configuration; M6 is IN_PROGRESS."
+
+  - release: "chg106-verified-work-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: verified_public_work_and_original_result_resolution
+    environment: local_development
+    components:
+      cloud: "c1091bb (local CHG branch, not merged or released)"
+      cloud_agent: "Cloud c1091bb (not released)"
+      local_agent: "894faa3 (local CHG branch, not merged or released)"
+      desktop: "d5666a5 (local CHG branch, not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.2"
+      cloud_agent_api: "v1@2026.11.21.2"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.1"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "ADR-0035 coordinates receipt/public-work field semantics; original attempt packets remain immutable. Owner-scoped work records and actual-publication-time summary share one canonical fact."
+    rollout_order:
+      - "Cloud provider migration/API/shared Vue, then Agent original-scene consumers and Desktop contract lock; current CHG106 only."
+    verification:
+      local:
+        - "Full Go suite and isolated publication MySQL suite passed; work deduplication, receipt preservation, revision race, audit rollback, scope and business-day checks passed."
+        - "Frontend 155 files/1114 tests, production build and Agent 813 tests passed. Independent review findings fixed and rechecked."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "complete local rebuild/114 migrations/fresh DMG and actual work API checks passed; installed business acceptance blocked by Mac lock"
+    residual_risks:
+      - "Real public-work confirmation, exact periodic checks, AI provider and original-scene continuation remain incomplete; M6 is IN_PROGRESS."
+      - "Existing real submissions 7/8 must be checked in place and never reposted. Installed desktop acceptance still requires an unlocked Mac."
+
+
+  - release: "chg106-human-scene-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: original_live_publication_human_continuation
+    environment: local_development
+    components:
+      cloud: "d09eb85 (local CHG branch, not merged or released)"
+      cloud_agent: "Cloud d09eb85 (not released)"
+      local_agent: "2af6db3 (local CHG branch, not merged or released)"
+      desktop: "1af3cdb (local CHG branch, not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.2"
+      cloud_agent_api: "v1@2026.11.21.3"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.2"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Strict original scene/revision/session continuation; immutable original input/result and fresh submit barrier retained. Local commands never open a replacement scene."
+    rollout_order:
+      - "Cloud migration and strict provider, Agent live-scene consumer, Desktop trusted native bridge and shared Vue; CHG106 only."
+    verification:
+      local:
+        - "Go full suite, publication isolated MySQL, frontend 156 files/1118 tests and production build passed."
+        - "Agent 819 tests, isolated Chrome editor 32 tests and native 550 tests passed; 6 native tests remain ignored by existing conditions. Independent review closed."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "source verified; package rebuild and real human-scene acceptance pending"
+    residual_risks:
+      - "Exact periodic public-result checks, real AI, installed business acceptance and M6 signoff remain incomplete."
+      - "Original external submissions 7/8 are preserved; no repost. Runtime still uses the earlier verified-work candidate until the next full rebuild."
+
+  - release: "chg106-public-check-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: exact_original_submission_public_check
+    environment: local_development
+    components:
+      cloud: "9984215 (CHG branch, pushed; not merged or released)"
+      cloud_agent: "Cloud 9984215 (not released)"
+      local_agent: "6f92dfe (CHG branch, pushed; not merged or released)"
+      desktop: "1103b02 (CHG branch, pushed; not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.3"
+      cloud_agent_api: "v1@2026.11.21.4"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.2"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Additive original-submission observations; owner/revision/generation fences and immutable original attempts. Public media requires an anonymous decoded frame and exact original identity."
+    rollout_order:
+      - "Cloud observation migration/provider, Agent read-only consumer, shared Vue and Desktop contract lock; CHG106 only."
+    verification:
+      local:
+        - "Go full suite, publication isolated MySQL, frontend 156 files/1119 tests and production build passed."
+        - "Assigned-image scope, cover validation and error classification passed full Go and isolated image/publication MySQL regression; independent review closed."
+        - "Agent 833 tests and isolated Chrome 35 tests passed; independent Cloud/Agent review findings fixed and closed."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "full local rebuild, fresh DMG and operator login passed; installed business acceptance pending"
+    residual_risks:
+      - "Anonymous exact Task 8 public metadata and decoded media verified by HTTP; fresh original-owner scene, loaded-list lookup, installed workflows and AI remain unverified. M6 stays IN_PROGRESS."
+      - "Original submissions 7/8 remain intact; no repost and no false public-work projection. Native CUA still reports Mac locked."
+
+  - release: "chg106-ai-20261121"
+    status: verifying
+    date: "2026-11-21"
+    scope: single_publication_ai_review
+    environment: local_development
+    components:
+      cloud: "056b034 (CHG branch; not merged or released)"
+      cloud_agent: "Cloud 056b034 (not released)"
+      local_agent: "6f92dfe (CHG branch; not merged or released)"
+      desktop: "1103b02 (CHG branch; not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.4"
+      cloud_agent_api: "v1@2026.11.21.4"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.2"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Additive single-row generation SSE; generated suggestions, field adoption and content confirmation remain separate."
+    rollout_order:
+      - "Cloud provider and shared Vue, then rebuild Desktop from the same shared source."
+    verification:
+      local:
+        - "Full Go, frontend 157 files/1126 tests, production build and independent review passed."
+        - "Real DeepSeek JSON invocation passed; ignored local credential excluded from commit."
+        - "Fresh full runtime/DMG rebuild and operator login gates passed; actual authenticated generation returned all three complete fields without changing any of the five publication tasks."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "fresh full rebuild and login gates passed; installed business acceptance incomplete"
+    residual_risks:
+      - "UI adoption, platform cover specifications and original-owner public verification remain pending. Normal QA compose task 727 produced output 134; browser automation subsequently timed out, so adoption is unverified."
+      - "Native CUA still reports Mac locked despite user unlock; M6 stays IN_PROGRESS."
