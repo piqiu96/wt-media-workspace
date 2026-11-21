@@ -124,4 +124,12 @@ Cloud `c3bf468`：`GET /publication/{id}/copy` 按当前权限、修订及原失
 
 实际隔离DB及发布模块回归PASS，核实前不可复制，安全核实后可读取，原任务修订、结果hash及任务数不变。前端全量153文件1106项与正式构建PASS。独立审查发现的账号切换期间复制迟到问题已先红再绿修复：读草稿前及清除前后核对身份，离开页面后丢弃响应；最终复查PASS。当前运行环境未重建该切片，真实页面验收仍待完成。
 
+## 最新完整环境与真实接口复验
+
+从Cloud `c3bf468`、Agent `98811ef`、Desktop `1985f73`执行统一环境重启，完整流程退出0。迁移、Cloud/Agent及Worker/Scheduler、BitBrowser、双前端、安装版资源来源、新DMG、运营登录门禁通过，最新安装版已挂载启动。先前“快照比较／安全停止／复制尚未重建”的限制已消除；安装版业务操作仍因桌面工具报告Mac锁屏而未验收。
+
+最新实际Cloud接口读取任务9：只读复制仅返回平台、类目、文案/话题/声明；旧修订、reviewing任务8复制均409拒绝。前后任务9均cancelled、revision2、current_attempt_id=null，can_cancel=false；没有新建任务或平台投稿。
+
+GitHub同步未通过：Cloud/Agent/Desktop推送均返回HTTP2 framing layer错误，HTTP1.1限时连接仍失败；官方SSH的已有密钥不获授权。远端Cloud分支查询404，没有创建PR或合入main；未更改全局配置、增加权限或绕过主机校验。代码和验证事实已本地独立提交。
+
 本摘要不代表快速发布、完整状态动作、指定稿件周期核验、安装版或M6验收通过。当前剩余工作以change.md与checkpoint.md为准。
