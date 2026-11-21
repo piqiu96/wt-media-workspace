@@ -894,7 +894,7 @@ releases:
     target_status:
       windows_x64: "not_built_for_this_revision"
       macos_x86_64: "not_built_for_this_revision"
-      macos_arm64: "new slice awaits complete environment rebuild and installed acceptance"
+      macos_arm64: "complete local rebuild/114 migrations/fresh DMG and actual work API checks passed; installed business acceptance blocked by Mac lock"
     residual_risks:
       - "Real public-work confirmation, exact periodic checks, AI provider and original-scene continuation remain incomplete; M6 is IN_PROGRESS."
       - "Existing real submissions 7/8 must be checked in place and never reposted. Installed desktop acceptance still requires an unlocked Mac."
