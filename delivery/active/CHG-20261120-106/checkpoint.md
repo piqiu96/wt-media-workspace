@@ -23,10 +23,10 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。用户要求先完成其余事�
 
 ## 最近验证
 
-- Cloud：Go全量、发布/图片真实隔离MySQL及后续补录停止回归PASS；前端全量1129项，最新发布模块89项PASS，Desktop前端构建PASS。
+- Cloud：Go全量、发布/图片真实隔离MySQL及后续补录停止回归PASS；最新前端全量1148项PASS，Desktop前端构建PASS。
 - Agent：全量856项、隔离Chrome46项，最终源码处理时序/旧稿替换/上传失败/提交前重验5项再次PASS。
 - Workspace：211项PASS；文档、配置、M2静态跨仓、Delivery治理和产品计划对齐PASS。静态校验不替代真实平台效果。
-- 最终组合Cloud7a9e6dd/Agent95ddc34/Desktopabac304统一重建和启动退出0，服务、BitBrowser、资源、DMG新鲜度及运营登录门禁PASS。
+- 最终组合Cloud897c9f4/Agent95ddc34/Desktopabac304统一重建和启动退出0，服务、BitBrowser、资源、DMG新鲜度及运营登录门禁PASS。
 - 原生桌面连接已恢复。以挂载DMG完整路径选择应用，避免同bundle ID多安装包歧义；operator01实际登录、接管既有授权会话、任务11双封面详情/回执、作品4关联/详情/列表/今日2、SQLite草稿跨重启恢复均PASS。
 - 最新原生快速发布实际使用成片134和图片库资源1分别生成竖版模板封面，预览及“已生成实际封面”反馈PASS；更换底图使旧封面失效，最终封面选图比例不符被正确拦截，保存返回不创建任务或占用成片。双规格布局实际截图观察通过，截图不入Git。
 - 最终重启后正式API再次核对任务11/作品4/attempt34/成片136及累计4/今日2正确；对应比特Profile保持关闭。
@@ -39,3 +39,7 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。用户要求先完成其余事�
 - 管理员Agent禁用的功能影响边界按用户要求稍后讨论，不在此轮扩展角色规则。
 
 详细命令、失败先行和实际结果见[验证摘要](evidence/verification.md)；只保存结论，不提交原始日志、截图或临时测试数据。
+
+## 状态色补充走查
+
+- 依据用户截图及既定视觉规范，修复发布列表/详情缺少颜色映射，以及合成/挖掘任务待执行橙色偏差；统一使用BusinessStatus与现有浅色Token。全前端1148项、Desktop构建PASS；最新挂载DMG实际登录后，发布列表已发布绿、平台审核中橙、失败红、取消灰，失败详情与列表一致，合成列表/挖掘详情成功绿，原生复验PASS。未修改业务状态或动作，仍不合入main。

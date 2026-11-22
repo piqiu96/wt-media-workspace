@@ -1030,7 +1030,7 @@ releases:
     scope: baidu_separate_landscape_portrait_cover
     environment: local_development
     components:
-      cloud: "7a9e6dd (CHG branch)"
+      cloud: "897c9f4 (CHG branch)"
       local_agent: "95ddc34 (CHG branch)"
       desktop: "abac304 (CHG branch)"
     contracts:
@@ -1041,8 +1041,9 @@ releases:
       - "Cloud provider, matching Agent and fresh Desktop sidecar; no mixed-version new execution."
     verification:
       - "Real editor observed 16:9 / 3:4 and 5M limit, no submission."
-      - "Go all, publication live isolated MySQL, frontend 1129, Agent 851 and Chrome 40 passed."
+      - "Go all, publication live isolated MySQL, frontend 1148, Agent 851 and Chrome 40 passed."
       - "Final two separate local cover uploads passed isolated Chrome assertion; current video processing gate passed Agent856/Chrome46 and final focused5 tests."
+      - "Canonical light status colors passed fresh DMG native verification: published green, reviewing orange, failed red, cancelled gray; task list/detail consistent."
     residual_risks:
       - "Task10 completed formal Web supplement; different material188/output136/task11/attempt34 automatically published and registered work4 (12052878563859428344), summary all4/today2."
       - "Final package rebuilt/launched with all gates passing. Native login, published task/work linkage, today2 statistics, restart draft recovery, corrected dual-cover form and actual output/image-background rendering passed; no release or M6 closure claimed."
