@@ -268,3 +268,11 @@ Cloud `056b034`：新增 `POST /publication/generate`，先经Production提供�
 - 从Cloud `8d7de7e`／Agent `026dfd8`／Desktop `5923595`执行统一`bin/control.sh start`退出0，迁移115已应用、服务／BitBrowser／双前端／资源及DMG新鲜度／运营账号登录门禁均PASS，最新安装包已挂载启动。仅证明新包构建与环境，不冒充安装版界面交互验收。
 - 新环境正式API读回：任务7仍reviewing／attempt21，说明为“已超过24小时自动核验期限，请人工核实或补录结果”；数据库只读确认check_stopped_at已保存、next_check_at为空。任务3／8仍published、原attempt8／27及作品2／1未变，next_check_at均为空；作品累计2、今日0。超时停止来自新Scheduler，非手工设置业务状态。
 - 本切片已落地并完成上述验证；完整CHG106／M6、安装版界面交互、生产远端代理出口和长期多账号稳定性不在本节已验收声明内。
+
+## 双规格封面收尾（2026-11-22）
+
+- 真实原账号编辑器检查：横版弹窗明确16:9、竖版3:4，单张最大5M；仅上传已有验收视频进入封面区，没有点击发布。完成后由原BitBrowser客户端核实本次Profile关闭。
+- Cloud `a9adef9`、Agent `8c9b648`、Desktop `abac304`：新建/编辑/执行分别核对横竖文件与模板来源，冻结两份摘要、独立短期授权及执行证据；竖图参与引用与删除保护。页面按比例筛选模板/图片，分开生成预览和续编。原审核状态动作不变，按钮按PRD统一为“补录结果”。正式取舍见ADR-0036。
+- 失败先行：新增规格测试在无实现时编译失败；旧同图与缺少竖图输入不能通过新检查。同步测试前置数据后，`WT_MEDIA_CLOUD_HOME=<Cloud根目录> WT_MEDIA_TEST_LIVE_DB=1 go test ./internal/modules/publish/...` PASS，覆盖竖图引用/删除保护、错误比例/超限不占用及并发编辑。首次隔离回归因旧测试数据缺失而停止重跑，不作为通过证据。
+- Go全量PASS；共用前端157文件1129项PASS，Cloud与Desktop前端正式构建PASS；Agent全量851项PASS、隔离Chrome40项PASS；最终定向适配器10项及实际两个控件上传不同固定文件1项PASS。Workspace211项、contract-map和M2静态契约验证PASS。
+- 尚未将以上结果冒充真实新投稿、整套新安装包或安装版GUI验收；继续下一步重建与生命周期验证。管理员禁用Agent的既定规则保持。

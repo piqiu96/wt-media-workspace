@@ -1023,3 +1023,25 @@ releases:
       - "Fresh packaged runtime gates and original-task 24-hour persisted-stop read-back passed; installed UI interaction remains unverified."
       - "No production remote proxy exit IP or long-running multi-account acceptance was performed."
       - "Whole CHG106 and M6 remain in progress; no PR merge or release is claimed."
+
+  - release: "chg106-dual-cover-20261122"
+    status: verifying
+    date: "2026-11-22"
+    scope: baidu_separate_landscape_portrait_cover
+    environment: local_development
+    components:
+      cloud: "a9adef9 (CHG branch)"
+      local_agent: "8c9b648 (CHG branch)"
+      desktop: "abac304 (CHG branch)"
+    contracts:
+      cloud_api: "v1@2026.11.22.1"
+      cloud_agent_api: "v1@2026.11.22.2"
+      minimum_agent_contract_revision: "2026.11.22.2"
+    rollout_order:
+      - "Cloud provider, matching Agent and fresh Desktop sidecar; no mixed-version new execution."
+    verification:
+      - "Real editor observed 16:9 / 3:4 and 5M limit, no submission."
+      - "Go all, publication live isolated MySQL, frontend 1129, Agent 851 and Chrome 40 passed."
+      - "Final two separate local cover uploads passed isolated Chrome assertion."
+    residual_risks:
+      - "Fresh package and full new submission lifecycle are pending; no release or M6 closure claimed."
