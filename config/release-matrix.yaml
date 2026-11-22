@@ -1030,8 +1030,8 @@ releases:
     scope: baidu_separate_landscape_portrait_cover
     environment: local_development
     components:
-      cloud: "d06675b (CHG branch)"
-      local_agent: "6c932fd (CHG branch)"
+      cloud: "7a9e6dd (CHG branch)"
+      local_agent: "95ddc34 (CHG branch)"
       desktop: "abac304 (CHG branch)"
     contracts:
       cloud_api: "v1@2026.11.22.1"
@@ -1042,7 +1042,7 @@ releases:
     verification:
       - "Real editor observed 16:9 / 3:4 and 5M limit, no submission."
       - "Go all, publication live isolated MySQL, frontend 1129, Agent 851 and Chrome 40 passed."
-      - "Final two separate local cover uploads passed isolated Chrome assertion."
+      - "Final two separate local cover uploads passed isolated Chrome assertion; current video processing gate passed Agent856/Chrome46 and final focused5 tests."
     residual_risks:
-      - "New task 10 received real Baidu receipt 1882533334712398198; API check found original submission reviewing. Public work read-back is pending."
-      - "Final combination rebuilt and launched with all environment gates passing; installed GUI acceptance is blocked by desktop-tool connection timeout. No release or M6 closure claimed."
+      - "Task10 completed formal Web supplement; different material188/output136/task11/attempt34 automatically published and registered work4 (12052878563859428344), summary all4/today2."
+      - "Final package rebuilt/launched with all gates passing. Native login, published task/work linkage, today2 statistics, restart draft recovery, corrected dual-cover form and actual output/image-background rendering passed; no release or M6 closure claimed."
