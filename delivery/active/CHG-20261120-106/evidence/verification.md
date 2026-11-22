@@ -246,3 +246,25 @@ Cloud `056b034`：新增 `POST /publication/generate`，先经Production提供�
 - 桌面工具当前返回`Trusted RPC service is not configured: sky`，无法操作安装版。此前锁屏误报已恢复，当前问题不能误报为锁屏；未通过其他GUI技术绕过。
 - 本次`gh auth status`退出1，明确当前GitHub token已失效；本轮新增提交尚未进入远端草稿PR或main。既有四仓草稿PR保持未合入。
 - 未清理数据库。完整新投稿生命周期、百度全部必需封面规格及其余安装版动作仍待完成；两条原稿成功不代表CHG106／M6整体验收通过。
+
+## 本机API与原Profile只读对照实验
+
+2026-11-22按用户要求验证本机请求复用比特账号环境的可行性。只读原账号、未改Profile、未投稿；代理和Cookie仅本机内存使用，不输出或保存凭据。实验依赖curl_cffi仅安装在临时目录，未修改正式工程依赖或运行逻辑。
+
+- 原Profile详情实际为`noproxy`，没有代理地址或认证，因此本轮不能证明代理出口、代理DNS或认证的一致性。
+- 原浏览器内GET `/pcui/article/lists?currentPage=1&pageSize=10`返回HTTP200、errno0。读取实时UA／Client Hints和域名匹配Cookie后，确认关闭本轮自建窗口，再由本机curl_cffi客户端请求同一接口；禁用环境代理，保持原直连配置。返回HTTP200、errno0，10个稿件ID及顺序与浏览器基线一致。
+- 实际浏览器UA为Chrome130，与Profile详情中的静态UA值不相同；不能直接将详情中的UA视作实际请求特征。实验使用实时UA及Client Hints。
+- 实验客户端无Chrome130的具名预设，本轮使用通用Chrome模拟。未测得原浏览器及本机客户端的TLS／HTTP指纹一致性；比特详情也没有直接提供完整JA3／JA4或HTTP2指纹。不能将接口成功视为指纹一致或多账号稳定性验收。
+- 结论：本机接口访问技术上可用，但用户要求的代理／指纹一致性尚未验证完整；本实验不替换现有正式核验逻辑，不承诺多账号可直接上线。
+
+## 有限调度与API优先实施验证
+
+- 失败先行：真实隔离DB复现原逻辑固定5分钟、到24小时仍领取；新增API代理／分页测试先因缺少实现失败，再实施。
+- Cloud：`WT_MEDIA_CLOUD_HOME=<Cloud根目录> WT_MEDIA_TEST_LIVE_DB=1 go test ./internal/modules/publish/...`通过，覆盖三次未找到后停排、首次45～75秒与第二次150～210秒重试、24小时原接收截止、重启不复活、网络异常不计次数、兜底记录保留及原有代次／人工竞争和作品事务回滚。区间随机边界测试通过；Go全量通过。
+- Agent：全量851项PASS，隔离Chrome40项PASS。fixture已改为JSON接口定位／分页，不访问作品列表UI或点击分页；原HTTPS／观测HTTP升级、原稿第二页、匿名解码媒体、未知及错误账号保护仍通过。
+- 新正式API读取代码实际查询原任务7：11页、lookup_result=not_found、结论uncertain，原Profile前后均关闭；未上传或投稿，也未由实验直接修改正式业务结果。
+- 代理实验：原Profile当前为直连，在内存中复制环境并配置本机受控认证CONNECT代理，实际API返回HTTP200、errno0、10条；确认代理被使用。关闭该测试代理后请求失败，不直连降级；原比特代理配置未改。没有生产远端代理账号，因此未声明已验证其出口IP／长期稳定性。
+- 按用户补充要求，旧自动刷页已暂停并确认原窗口关闭，已公开任务3／8清空next_check_at。任务7暂缓旧检查等待部署；没有手改业务状态、原attempt或作品。
+- 从Cloud `8d7de7e`／Agent `026dfd8`／Desktop `5923595`执行统一`bin/control.sh start`退出0，迁移115已应用、服务／BitBrowser／双前端／资源及DMG新鲜度／运营账号登录门禁均PASS，最新安装包已挂载启动。仅证明新包构建与环境，不冒充安装版界面交互验收。
+- 新环境正式API读回：任务7仍reviewing／attempt21，说明为“已超过24小时自动核验期限，请人工核实或补录结果”；数据库只读确认check_stopped_at已保存、next_check_at为空。任务3／8仍published、原attempt8／27及作品2／1未变，next_check_at均为空；作品累计2、今日0。超时停止来自新Scheduler，非手工设置业务状态。
+- 本切片已落地并完成上述验证；完整CHG106／M6、安装版界面交互、生产远端代理出口和长期多账号稳定性不在本节已验收声明内。

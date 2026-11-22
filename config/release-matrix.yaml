@@ -994,3 +994,32 @@ releases:
     residual_risks:
       - "UI adoption, platform cover specifications and original-owner public verification remain pending. Normal QA compose task 727 produced output 134; browser automation subsequently timed out, so adoption is unverified."
       - "Native CUA still reports Mac locked despite user unlock; M6 stays IN_PROGRESS."
+
+  - release: "chg106-api-check-20261122"
+    status: verifying
+    date: "2026-11-22"
+    scope: bounded_api_first_publication_check
+    environment: local_development
+    components:
+      cloud: "8d7de7e (CHG branch; not merged or released)"
+      cloud_agent: "Cloud 8d7de7e (not released)"
+      local_agent: "026dfd8 (CHG branch; not merged or released)"
+      desktop: "5923595 (CHG branch; not merged or released)"
+    contracts:
+      cloud_api: "v1@2026.11.21.4"
+      cloud_agent_api: "v1@2026.11.22.1"
+      cloud_error_codes: "2026.11.21.2"
+      local_agent_api: "v1@2026.11.21.2"
+      minimum_agent_contract_revision: "2026.10.23.1"
+    contract_state: "Additive lookup outcomes and persisted browser fallback allowance; original result and public-media proof unchanged."
+    rollout_order:
+      - "Cloud migration 115 and provider, then matching Agent and Desktop package."
+    verification:
+      - "Cloud publishing isolated database regression and Go tests passed."
+      - "Agent 851 tests and isolated Chrome 40 tests passed."
+      - "Original task lookup completed 11 API pages with its Profile closed."
+      - "Controlled authenticated CONNECT proxy returned API success; unavailable proxy did not fall back to direct."
+    residual_risks:
+      - "Fresh packaged runtime gates and original-task 24-hour persisted-stop read-back passed; installed UI interaction remains unverified."
+      - "No production remote proxy exit IP or long-running multi-account acceptance was performed."
+      - "Whole CHG106 and M6 remain in progress; no PR merge or release is claimed."
