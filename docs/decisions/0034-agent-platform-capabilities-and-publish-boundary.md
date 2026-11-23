@@ -18,6 +18,8 @@
 5. runner 领取与准备所属任务，负责心跳、阶段持久化、Cloud 提交前许可、现场关闭核实、原结果保存和恢复补报。平台发布器通过必填的准备完成和提交前回调衔接；未知结果不自动重试或换通道。准备完成的持久化和 ready 报告必须发生在初次实读 UID 通过后，上传后再次核实 UID，提交屏障先于一次最终提交。
 6. 新增依赖：bootstrap → platforms/services，runner → platforms/services，platforms → clients/services/runtime/utils，services → clients。platforms 不直接导入 runner/executors/storage/bootstrap/local_api、Cloud 任务客户端或底层 HTTP/数据库模块；API 请求经 clients。clients/services 不依赖 platforms；不通过放宽例外绕过现有依赖检查。
 7. 业务状态、持久化结构、外部接口及已有恢复语义不变。浏览器断开不代表现场关闭；同一旧尝试不能凭检查点重放。Playwright 仍在同一执行线程，心跳仅传递停止信号。
+8. **发布与原稿核验职责（2026-11-24 用户确认）。** `platforms/publish.py` 与 `platforms/publication_check.py` 分别定义发布和指定原稿核验的对外接口、输入、执行控制与结果。`platforms/baidu/publisher.py` 完整承担上传、文案解析与表单校验、提交及回执；原稿公开核验独立于本次投稿，在 `platforms/baidu/publication_check.py` 内完整组织 API 查询、浏览器降级、匿名公开证据，不按 API/浏览器手段拆出对外能力。真实复用的浏览器身份读取可独立保留；不为单项能力内部的解析、校验或异常单独拆文件。
+9. runner 可以直接使用 services，平台能力可以使用 services/clients；不要求调用逐层经过。runner 管任务身份、授权、Profile 互斥、结果持久化与上报，并向核验接口提供受控资源入口；百度的通道选择和降级条件留在百度实现。`services/browser/session.py` 管只读 Profile 的打开、连接及关闭证据，任何打开尝试前清除原关闭证据，打开结果不明不接管或盲目关闭现场。clients 仅报告协议事实或协议错误，不决定切换浏览器。正式状态仍由 Cloud 裁决，对外 HTTP 契约不变。
 
 ## Consequences
 
