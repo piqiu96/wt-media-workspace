@@ -648,7 +648,7 @@ attempt 保存用户执行槽（1–3），以活动状态生成列的唯一索�
 | --- | --- | --- |
 | Cloud | 发布业务、运营工具、SSE；Cloud-Agent 发布领取、过程、结果与文件访问 | 共用 Vue、Local Agent |
 | Agent | Local API：原现场继续、本地续编；本地事件／状态／错误 | Desktop 原生桥 |
-| Desktop | 引用提供方版本并更新 `contracts.lock.json` 与生成消费代码 | 不自行另定义 Cloud 状态或让 Vue 直调本机地址 |
+| Desktop | 引用提供方版本并更新 `contracts.lock.json` 与生成消费代码 | 不自行另定义Cloud 状态或让 Vue 直调本机地址 |
 
 业务接口使用用户 session；Agent 接口使用 Agent Token；本机调用沿用 Tauri 安全桥。权限复用身份、团队、负责类目及账号所属规则，不新建发布专用策略引擎，也不因管理角色扩大本机执行权限。
 
