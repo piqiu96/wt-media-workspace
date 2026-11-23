@@ -349,3 +349,11 @@ Cloud `056b034`：新增 `POST /publication/generate`，先经Production提供�
 - 首次最新安装版实际复验：登录接管确认弹窗布局正常，恢复草稿出现右上角Toast，页顶普通草稿提示已移除、说明与保存草稿操作同区。提交72/50字草稿只触发前端拦截，发现字段校验仍在顶部；继续将原校验映射到资源/文字/双封面/声明/确认位置，复用FormError，保留原校验顺序与一般请求错误区域。补充字段目标回归后全前端1152项PASS；待最终重打包复验。未创建新发布任务。
 
 - 最终组合Cloudf082b7e/Agent95ddc34/Desktopabac304统一重建启动退出0，全部环境及登录门禁PASS。原生实际登录、继续原草稿、72/50字前端拦截后滚动核对：顶部无重复Alert，错误位于标题输入区下方，底部草稿说明/按钮可见，任务仍7条。确认弹窗与恢复Toast已实际观察；未逐页GUI验收全部消费者，也未实际缩小原生窗口逐尺寸验收，窄屏约束经实现Review及构建验证。无新增投稿。
+
+
+## Agent PR #15 审核修复：独立 Local 原现场继续（2026-11-23）
+
+- 修复独立 `wt-media-local-agent` 入口缺少 `publication_job` 装配的问题，与 Sidecar 一样传入当前 `components.publications.job`；显示现场和继续接口由同一发布执行器检查原现场。未新增接口、修改权限或 Cloud 裁决规则。
+- 新增双入口回归，使用真实装配的发布执行器检查 `scene` / `resume`；没有原现场时应返回409，不能因漏接执行对象固定返回503。修改前Local两个子场景失败（503 != 409），Sidecar通过；补齐装配后通过。
+- `PYTHONPATH=src .venv/bin/python -m unittest discover -s tests`：857项PASS；`git diff --check` PASS。首次定向测试中的2项本机HTTP测试因端口权限受限报错，允许临时本机端口后完整回归通过。
+- Agent修复提交`42ff72a`已推送PR #15，并更新PR说明；提交前再次完整复跑857项PASS。仅修改Agent入口及回归测试，本轮未重新运行隔离Chrome测试、构建安装包或真实投稿。生产代理与多账号验收边界保留；CHG106仍IMPLEMENTING，不合入main或关闭M6。
