@@ -357,3 +357,14 @@ Cloud `056b034`：新增 `POST /publication/generate`，先经Production提供�
 - 新增双入口回归，使用真实装配的发布执行器检查 `scene` / `resume`；没有原现场时应返回409，不能因漏接执行对象固定返回503。修改前Local两个子场景失败（503 != 409），Sidecar通过；补齐装配后通过。
 - `PYTHONPATH=src .venv/bin/python -m unittest discover -s tests`：857项PASS；`git diff --check` PASS。首次定向测试中的2项本机HTTP测试因端口权限受限报错，允许临时本机端口后完整回归通过。
 - Agent修复提交`42ff72a`已推送PR #15，并更新PR说明；提交前再次完整复跑857项PASS。仅修改Agent入口及回归测试，本轮未重新运行隔离Chrome测试、构建安装包或真实投稿。生产代理与多账号验收边界保留；CHG106仍IMPLEMENTING，不合入main或关闭M6。
+
+
+## Agent 百度能力分层整理与关闭证据修复（2026-11-23）
+
+- 按用户确认的四点清单实施，沿用ADR-0034，不修改对外契约、正式状态、授权或运行依赖。Agent两项提交`1e539b1`、`55e8406`已推送PR #15。
+- `1e539b1`：API优先核验切入浏览器之前使旧关闭证据失效。打开应答丢失、关闭超时或BitBrowser服务不可达均保留`scene_closed=false`。新增两项回归，修改前3个子场景复现旧值true，修复后通过。
+- `55e8406`：公共Profile HTTP会话显式接收端点/Cookie范围及请求头，移除百度地址、域名和Referer；`clients/baidu/publication.py`负责百度请求范围、账号/列表客户端及原稿/作品链接规则。HTTP、浏览器与既有Cookie身份通道共用`clients/baidu/identity.py`的接口定义和响应解析，平台明确拒绝时不接受残留UID。
+- 确认文案规则移至`platforms/baidu/content.py`供发布和核验共用。API核验和浏览器核验不再相互导入，也不再由只读核验依赖发布器。平台层保留浏览器动作和业务证据判定；runner继续负责任务授权、现场关闭与上报。
+- 新增非百度域名的显式HTTP范围验证，覆盖Cookie隔离、过期Cookie和非授权请求拒绝；三种身份通道对整数/字符串UID、两种实际响应形状、失效和非法UID得到一致结果。旧代理认证、禁用环境代理、失败不直连、精确原稿及匿名媒体证明边界保留。
+- 实际验证：定向83项PASS（含原有依赖边界检查），全量862项PASS，隔离Chrome46项PASS，`git diff --check` PASS。浏览器运行中有Playwright路由取消回调日志及Node弃用提示，测试最终全部通过；不据此声明真实平台或安装版重新验收。
+- 本轮不重建安装包、不新增真实投稿、不修改Cloud/Desktop。Workspace中其他会话的桌面环境隔离change.md和plan.md改动保留，不纳入本次提交。生产远端代理和多账号限制保留，CHG106/M6状态不变。
