@@ -44,11 +44,11 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 | A06 新增 | POST /publication-plan/validate | 完整新建或拟编辑结构/revision→守恒/合法顺序/逐格问题；只读 |
 | A07 新增 | GET /publication-plan/{id}/batch | 状态/待办/分页→有序骨架/配置批次/正式批次及对应allowed_actions/action_blockers |
 | A08 新增 | GET /publication-plan/{id}/record | 分页→人工/系统操作与推进依据 |
-| A09 新增 | POST /publication-plan/{id}/start | request_key/expected_revision/合法首批/全部待执行批次expected_revision及明确范围与缺口→计划位置/首批tasks/控制；复查全部配置后冻结，内部调用108同一启动器 |
+| A09 新增 | POST /publication-plan/{id}/start | request_key/expected_revision/合法首批/全部待执行批次expected_revision及明确范围与缺口→计划位置/首批tasks/控制；复查全部配置及每批包含/排除row_key、明确缺口后持久化冻结；内部调用108同一事务启动内核 |
 | A10 新增 | POST /publication-plan/{id}/pause | expected_revision/reason→人工暂停后续批，当前批已授权执行继续 |
 | A11 新增 | POST /publication-plan/{id}/resume | expected_revision→实际控制/进展/阻断；重新检查，不默默解除批次自身异常暂停 |
-| A12 新增 | POST /publication-plan/{id}/confirm-next | request_key/expected_revision/当前批/下一批/continue或skip/reason→位置/修订；未决执行、位置变化、下一批资源冲突拒绝 |
-| A13 新增 | POST /publication-plan/{id}/takeover | expected_revision/current_batch_id/expected_batch_revision/reason→计划暂停/本批合法授权；只本人当前合法位置 |
+| A12 新增 | POST /publication-plan/{id}/confirm-next | request_key/expected_revision/当前批/下一批/实时判断依据/continue或skip/reason→位置/修订；已启动前缀任一未决、位置或判断依据变化、下一批资源冲突拒绝 |
+| A13 新增 | POST /publication-plan/{id}/takeover | expected_revision/current_batch_id/expected_batch_revision/reason→计划暂停/本批合法授权；仅已首启计划的本人当前位置，首启必须A09完整冻结 |
 | A15 新增 | POST /publication-plan/{id}/finish | expected_revision/逐格缺口/end_reason/end_note→ended/真实结果；未达成须说明，结束后不重开 |
 | A16 新增 | GET /publication-plan/{id}/copy | expected_revision→目标/拆批等白名单；新周期/资源重查，新键，无任务/占用/授权继承 |
 | A17 新增 | POST /publication-plan/{id}/cancel | expected_revision/reason→全计划停止围栏/影响范围/收尾状态；覆盖骨架与全部批次 |
@@ -60,13 +60,13 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 
 - 新建publication_plan：身份/团队/本人owner与created_by、名称/周期/备注、goals_json、status/pause_reason/current_batch_id、首次启动/停止/结束时间、end_reason/note、revision、request_key/hash。UNIQUE(created_by,request_key)，team/owner+时间、status+id索引。
 - 先建plan再扩batch.plan_id/FK、平台组/批次顺序、handoff依据；不建补量类型/轮次/请求关联。旧独立batch保持plan_id=NULL；task不冗余plan_id，通过batch关联。
-- 创建plan/全部骨架/审计同事务，无task/占用。启动调用108统一事务：当前plan及全部所属batch按固定顺序锁定，复查全部待执行批次配置及修订并冻结；首批候选定版、全部task/占用/授权、首次时间/当前位置和审计同一事务提交。不可先授权任务再写计划游标。
+- 创建plan/全部骨架/审计同事务，无task/占用。启动调用108统一事务：当前plan及全部所属batch按固定顺序锁定，复查全部待执行批次配置及修订并冻结，同时持久化每批已确认包含/排除row_key、目标缺口；跨批纳入行的(platform,composite_output_id)重复须拒绝并定位两行，避免未来永久等待；后续推进不能重新选子集。首批候选定版、全部task/占用/授权、首次时间/当前位置和审计同一事务提交。不可先授权任务再写计划游标。
 - 首次启动后计划目标/结构及全部所属批次候选、资源、内容、时间与执行设置固定，暂停不解锁；107 configuration及任务content写入口均校验父计划冻结，不因本批尚未启动而开放编辑。保留原批次的继续/安全重试/核实/终止等执行处理。计划内顺序启动；批内分组并发；不同计划/批次共用全局UID/Profile/用户容量。
-- 推进检查：停止/结束→人工暂停→当前批未决与失败处置→零明确结果跳过确认→超10%继续确认→下一批配置/资源/本人条件→原子调用108启动并推进。等待原资源恢复仍running；不自动换视频或降低目标，不跳过不就绪批。
+- 推进检查：停止/结束→人工暂停→全部已启动前缀批次的真实未决与当前批失败处置→零明确结果跳过确认→超10%继续确认→下一批配置/资源/本人条件→原子调用108启动并推进。等待原资源恢复仍running；不自动换视频或降低目标，不跳过不就绪批。
 - 10%计算沿PRD：failed*10 <= published+reviewing+failed可自动衔接；取消/放弃不计分母，审核只参与明确结果不计公开目标。失败明确接受结束后仍failed保留分子；未知/人工不能靠确认绕过。原批handoff后不能再次retry回头发稿。
-- 全计划终止先持久化父级永久围栏，所有批次/单任务start/retry/claim立即受限，再安全取消未领取和收尾在途；单批终止不误停整个计划。
+- 全计划终止先持久化父级永久围栏，所有批次/单任务start/retry/claim/resume及report提交前许可/心跳控制反馈立即受限，再安全取消未领取和收尾在途；单批终止不误停整个计划。
 - 全部既有批次处理完、最终公开结果核实后，按平台×类目展示逐格公开数与缺口；平台A超额不能抵消B缺口。原目标不变，不向原计划追加批次或补量。
-- finish用计划锁/当前revision/真实未决及公开聚合，达成结束或填写原因未达成结束。迟到公开只更新统计/提示合法处置，不静默删正式任务、不重开结束计划。
+- finish用计划锁/当前revision/全部既有批次真实未决及公开聚合，达成结束或填写原因未达成结束。迟到公开只更新统计/提示合法处置，不静默删正式任务、不重开结束计划。
 
 ## 4. 执行落地步骤
 
@@ -99,3 +99,13 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 - [发布工程设计](../../../docs/engineering/specs/publishing-management.md)
 - [前端规范](../../../docs/standards/frontend/README.md)
 - [设计入口](../../../docs/design/publishing.md)
+
+## T01工程review收敛
+
+109不另造调度或执行器。108 StartBatch提取显式tx内核，plan外层锁plan及全部batch后调用，同事务写首批task、占用、授权和游标。首次确认把每批包含/排除row_key及缺口完整持久化，后续资源失效等待原资源，不换子集。已推进旧批的真实未决也阻下一次推进；确认必须核对当前实时判断依据，不能仅依赖未随任务变更的旧batch revision。全计划永久停止围栏同时覆盖领取与提交前许可等新执行入口；人工pause只阻后续批启动，不停止当前批。A13只限已首启计划的当前位置，不能绕过A09全批冻结。以上为既有安全边界的实现落字，未增加用户操作。
+
+T01独立预审进一步收敛：正常9公开+1确认失败不要求先人工结束批次，满足原批次自身控制与10%条件即可原子移交并封住旧批retry。首启排除跨批同平台重复成片，不提前占未来成片。确认输入使用服务端`expected_basis_fingerprint`，由全部已启动前缀task修订/状态/原attempt及batch/当前位置等生成；事务内重算并重跑规则，不以fingerprint代替准入。
+
+最终核实复用既有四种结果结论和原核实入口，补齐本人reviewing在有真实依据时可核实未公开失败、仍审核、未知或公开；他人管理补录权限不扩张。核验停止/超过有效核验期但仍reviewing且无更新的明确人工核实，作为计划待办阻后续推进；人工确认仍审核可计衔接明确结果，但依然不能最终finish。确定未公开需原身份、可信关闭、no_publishable_work与核实依据，不以超时或一句备注自动当失败，不删除原submission、历史或占用。
+
+核实实现采用Task最新人工核实投影（verified_at/conclusion/attempt_id/task_revision），含人工仍未知也记录时间，原publication.resolve审计继续留存；不建第二套任务状态或统计表。`verification_required`结合原回执、核验停止/有效期和最新人工结论计算；handoff fingerprint同时包含这些事实及实时待核实判断，不能因未变plan revision放行旧确认。

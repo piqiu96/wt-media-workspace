@@ -165,7 +165,8 @@ wt-media-workspace/
 | M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
 | M6 | `DONE` | CHG106工具、内容准备/续编、结果处置与统计已交付；任务11/attempt34自动核实公开作品4，四仓改动已合入main | 已有真实业务、安装版关键流程与异常回归证据；2026-11-25用户签收，已归档 |
 | M7 | `VERIFYING` | 107/108技术交付与真实单Profile双端闭环通过，多Profile受控验证 | 用户指定107–109后统一整体验收；109可按已完成技术依赖启动 |
-| M-publishing-plan、M-publishing-operations | `NOT_STARTED` | 计划与后续平台未验收；工具已归M6 | 完成计划、后续平台和三平台回归 |
+| M-publishing-plan | `IN_PROGRESS` | 108技术依赖已交付，109已通过四仓预检；计划生产代码尚未实施 | 先固定现有example原型，再契约、实现和真实多批闭环 |
+| M-publishing-operations | `NOT_STARTED` | 后续平台未验收；工具已归M6 | 完成后续平台和三平台回归 |
 | M10 | `NOT_STARTED` | 首次上线已有部分打包部署证据 | 依赖发布四阶段，补验升级、恢复及发布业务 |
 
 2026-10-26 M3–M5 易用性增量已确认：CHG-101 已合并；[M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)已完成并归档（Cloud PR #8，`cb26c66`），团队公共内容池与 Desktop 共用 Cloud 页面入口上线；CHG-106 前端状态色死表已删除并归档（Cloud PR #9，`d793d92`）；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)已完成并归档（Cloud PR #10，`2cd341d`），策略→任务→成片负责人事实与代创建链路已上线；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)已完成并归档（Cloud PR #11，`fc8504e`），以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)已完成并归档（Cloud PR #12，`c509ee8`），自动候选改为团队素材库且任务/成片归策略负责人；M5 总体当时仍为 `IN_PROGRESS`，待 CHG-098 统一走查 M5-AC-13 与 M4-H2；2026-10-28 用户签收 M4-H2 与 M5-AC-13，M4 与 M5 进入 `DONE`。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
