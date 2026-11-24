@@ -8,7 +8,7 @@
 
 ## 执行约定
 
-本文件是2026-11-25实施与验收基线，与change.md配套；状态只在change.md，用户已授权全流程执行，本项VERIFYING，代码须经依赖与分支预检后实施。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
+本文件是2026-11-25实施与验收基线，与change.md配套；状态只在change.md，用户已授权全流程执行，本项DONE，代码须经依赖与分支预检后实施。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
 产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。本轮配置准备原型固定Cloud提交dabc473786098d8215a6db7e332d927d13fc8d96，隔离预览?review=chg107；工程视觉/三角色入口及窄窗已核对，见设计入口§4.3。该原型fixture不代替正式Web和安装版验收，用户仍最后统一验收。
 
@@ -75,7 +75,7 @@ config的候选使用row_key/input_revision/field_revisions，保存账号/成�
 - [x] T06 Agent/Desktop：本机未提交batch续编、受控桥、提供方版本/消费锁同步。产物：重启恢复/修订竞争/身份切换证据；若无契约变更不制造空改动。
 - [x] T07 Cloud共用Vue：列表、三段工作区、候选整体编辑、批量审阅、配置区和返回。产物：Web/Desktop同源码，发布按钮待108接通。
 - [x] T08 联调/独立review：按以下V清单验证，净差异review并修复。产物：evidence摘要、未验收范围；不预填发布成功。
-- [ ] T09 各仓PR：提供方先行合并main，回写merge证据/用户验收，满足change后归档。
+- [x] T09 各仓PR：提供方先行合并main，回写merge证据/用户验收，满足change后归档。
 
 ## 5. 验收与证据
 
