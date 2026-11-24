@@ -105,5 +105,5 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。管理员仅保留基础Cloud�
 
 - 按用户要求重建macOS Apple Silicon开发版debug和正式身份release安装包，已更新当前使用位置的“起飞 Dev.app”及两个DMG，保留旧app备份；未变更用户配置或业务数据。
 - 最终Agent提交`77f1e30`已推送，代码树与原`6d27ca5`一致。167项回归再次通过，两个镜像/签名/版本记录/包内清理模块与源码一致；冻结Agent独立启动分别5.04秒和2.83秒，健康及状态200，未启用任务循环。
-- Agent PR[#17](https://github.com/piqiu96/wt-media-agent/pull/17)已打开，确认无合并冲突，未合并。当前应用启动至登录页；接管operator01既有会话被自动审批拒绝，已请求用户明确授权，未绕过或声称登录通过。
-- 后续：用户决定是否接管会话，按PR进行代码审核；CHG/M6仍进行中。Windows/Intel、线上发布及真实发布后删除未执行；详情见[evidence](evidence/publication-cache-cleanup.md)。前端包版本如实带dirty标识，其已有未提交修改不混入本次PR。
+- Agent PR[#17](https://github.com/piqiu96/wt-media-agent/pull/17)已打开，确认无合并冲突，未合并。当前更新版已按用户明确授权完成operator01会话接管并进入工作台，显示云端服务正常、工作环境绿色；实际登录验证通过，未操作上传或投稿。
+- 后续：按PR进行代码审核；接管授权与登录验证已完成，CHG/M6仍进行中。Windows/Intel、线上发布及真实发布后删除未执行；详情见[evidence](evidence/publication-cache-cleanup.md)。前端包版本如实带dirty标识，其已有未提交修改不混入本次PR。
