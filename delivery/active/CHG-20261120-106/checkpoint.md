@@ -120,4 +120,4 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。管理员仅保留基础Cloud�
 
 - 用户确认后补齐 Workspace Manifest→Desktop CLI覆盖层→原生版本／安装包／getVersion显示链路；Web登录与侧栏隐藏版本。组件Tag独立保留来源，缺失产品Tag的正式入口拒绝打包，本地包带构建标识。
 - 当前已通过11项前端定向测试、4个Playwright页面场景、16项Desktop打包Python测试、20项版本记录shell回归、558项Rust测试及Workspace发布定向检查；实际macOS开发app内部三处版本一致且完整签名通过。详情见[evidence/desktop-product-version.md](evidence/desktop-product-version.md)。
-- 下一步：提交各仓PR供审核，下一次产品发布选择含本改动的组件Tag。Windows／Intel原生打包和新正式Release未执行；无代码阻塞，不合并或关闭CHG/M6。
+- 已提交Desktop PR #16（6523bfc），Cloud PR #49（65cdbc2）及Workspace PR #60（536fdaf）；下一步等待审核，下一次产品发布选择含本改动的组件Tag。Windows／Intel原生打包和新正式Release未执行；无代码阻塞，不合并或关闭CHG/M6。

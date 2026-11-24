@@ -25,4 +25,4 @@
 - Windows安装后 ProductVersion／DisplayVersion／内置来源一致性已接入 release.yml 的既有安装／重装／卸载回归；本机为macOS，未实际执行Windows或Intel原生打包。
 - 本次没有新建产品／组件 Tag、发布正式Release、部署线上或合并PR。现有已发布旧包不会被代码提交追溯改写。下一次Manifest需选择包含本改动的Desktop与Cloud组件Tag。
 
-代码提交：Desktop `6523bfc`，Cloud `65cdbc2`；Workspace 随本记录提交。
+代码提交：[Desktop PR #16](https://github.com/piqiu96/wt-media-desktop/pull/16) `6523bfc`、[Cloud PR #49](https://github.com/piqiu96/wt-media-cloud/pull/49) `65cdbc2`、[Workspace PR #60](https://github.com/piqiu96/wt-media-workspace/pull/60) `536fdaf`。Workspace远端[PR checks #152](https://github.com/piqiu96/wt-media-workspace/actions/runs/45370154256)已通过；记录时Desktop #60与Cloud #192仍在运行，不计为远端全部通过。
