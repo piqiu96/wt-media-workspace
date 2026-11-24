@@ -1,6 +1,6 @@
 """Cross-repository arms for the four `bin/control.sh` entries.
 
-What this adds over the per-repository checks (desktop `tests/control.test.sh`,
+What this adds over the per-repository checks (desktop `tests/op/control.test.sh`,
 cloud `scripts/verify/test-control.sh`, agent `tests/test_control_sh.py`,
 workspace `scripts/verify/verify-control.sh`): one place that sees all four entries at
 once, so the defect class that CHG-20260926-067 missed cannot be visible in one

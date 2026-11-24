@@ -60,3 +60,7 @@ Agent PR：[CHG106：自动清理已确认投稿的本地缓存 #17](https://git
 两个安装包取当前Cloud前端工作区构建，版本记录如实为`0.1.0+313aa57.dirty`，包含此前已确认的前端调整。本次PR只承接缓存清理，不提交Cloud已有其他修改；此处是本地重建包，不是已发布的正式产品Tag。Windows/Intel构建、线上更新渠道和真实发布后删除均未执行。
 
 GUI首次登录时Cloud提示operator01已有桌面会话；“继续登录”会使另一台电脑退出。自动审批首次拒绝后暂停，未绕过。用户随后明确回复“允许接管并验证登录”，据此在当前更新版原生GUI重新登录并确认继续，成功进入工作台；页面显示当前用户operator01、角色operator、云端服务正常，工作环境胶囊绿色。实际登录验证PASS，之前的待授权项已解除。仅操作登录和状态检查，未操作上传/投稿，账号密码未写入证据或PR。
+
+## 2026-11-24 合并前评审修复
+
+Agent PR #17 的P2意见已复现：旧回执scene_closed=false、恢复时Cloud已确认原尝试published，settle只保留成功状态，后续清理不再补查关窗事实，导致缓存长期保留。新增真实临时SQLite／文件回归先失败，再将“成功但缺少关窗依据”归为需要确认；仍读取原attempt并校验结果摘要，不凭成功状态直接删除。原现场未结束时保留，随后原尝试确认结束后可补清。发布相关137项测试通过，CI [M0 Agent #68](https://github.com/piqiu96/wt-media-agent/actions/runs/45386080391)通过；修复提交9a77962，评审线程已解决。按用户“全部合并main”授权，[PR #17](https://github.com/piqiu96/wt-media-agent/pull/17)以merge commit 1b1d58efab5554a69c484f98e66fcd45bc4e9d59合入。

@@ -93,6 +93,27 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。管理员仅保留基础Cloud�
 - 本轮不重新打包、不新增安装版手工验收或真实平台发布，沿用上一节实际证据与限制。Cloud #48和Workspace #59更新供用户review；Agent #15、Desktop #15没有新增本地修改。CHG106仍IMPLEMENTING，等待审核，不自动合入main。
 
 
+## Desktop 环境隔离补充（2026-11-24）
+
+- 已按用户确认实现 dev/test/prod 固定身份、DEV/TEST 原生及页面标记、独立系统目录和 Agent 数据根；测试 release 包允许 cloud_env=prod，正式流水线继续强制 release+prod。Windows 清理范围与身份一致。
+- Rust 558 项、相关前端65项、Workspace212项与打包4项通过；三种 macOS .app 本地构建、实际 stable+test 拒绝、临时三 SQLite 草稿隔离通过。Agent 与 Cloud 后端未修改。
+- 代码与自动化验证已完成，未执行真实 Windows 安装／卸载、三个应用并行登录或正式签名发布。完整范围及限制见[环境隔离验证](evidence/desktop-environment.md)。保持 CHG106/M6 状态，不合并或关闭。
+
+
+## 开发版 Agent 不可达修复（2026-11-24）
+
+- 实机发现环境打包入口漏执行签名后 Agent 清单收尾，及冻结本机 HTTPServer 反向DNS阻塞约35秒。已修复 Desktop 打包与 Agent 启动代码，重新冻结和打包。
+- Agent相关77项、打包7项、release-versions20项通过；真实包内Agent启动4.69秒，healthz/status均200。用户在最终Dev app登录后18765已监听、原生健康检查通过，GUI工作环境显示本机服务已连接。未执行发布任务，正式进程保留。
+- 详见[环境隔离验证的实机补充](evidence/desktop-environment.md)。本次开始涉及Agent源码，修正此前仅指隔离阶段的“Agent未改”结论。CHG/M6保持原状态，不合并发布。
+
+
+## Cloud PR #48 审查修复与合并（2026-11-24）
+
+- 用户确认修复并合并 Cloud PR #48。修复封面模板选择仅取前100条的遗漏：保留所有同宽高比规格，自动翻过无匹配页，提供加载更多；搜索/比例/类目变化隔离旧响应，下一页失败可重试。未使用精确尺寸筛选，避免排除1280×720等合法模板。同步把账号边界测试中已删除说明文案的断言改为实际Desktop操作限制断言。
+- 修复提交 `313aa5741e0446cbd7f1237f2d018bbb5e47e9da`。独立源码前端160文件1165项通过，Cloud与Desktop构建通过；远端完整检查 [M0 Cloud #187](https://github.com/piqiu96/wt-media-cloud/actions/runs/45246998672)通过，含Go/Web测试、原型验证、浏览器交互、MySQL迁移、发布构建和打包检查。
+- [Cloud PR #48](https://github.com/piqiu96/wt-media-cloud/pull/48)已按merge commit合入main：`5fe3ec71f811c81e78ed19ac8dae8021320a8aa4`。仅合并Cloud PR，不关闭CHG106/M6，不代为合并其他仓PR或发布版本。Cloud工作区既有Desktop标记相关未提交修改保留，本次未纳入提交。
+
+
 ## 发布执行缓存自动清理（2026-11-24）
 
 - 用户确认的Task 3清理已在Agent完成并独立提交`6d27ca5`。原尝试投稿已接收、Cloud确认且原现场安全结束后，仅清理该尝试的视频/横竖封面及临时文件；保留摘要、回执、日志和业务占用。
@@ -121,3 +142,10 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。管理员仅保留基础Cloud�
 - 用户确认后补齐 Workspace Manifest→Desktop CLI覆盖层→原生版本／安装包／getVersion显示链路；Web登录与侧栏隐藏版本。组件Tag独立保留来源，缺失产品Tag的正式入口拒绝打包，本地包带构建标识。
 - 当前已通过11项前端定向测试、4个Playwright页面场景、16项Desktop打包Python测试、20项版本记录shell回归、558项Rust测试及Workspace发布定向检查；实际macOS开发app内部三处版本一致且完整签名通过。详情见[evidence/desktop-product-version.md](evidence/desktop-product-version.md)。
 - 已提交Desktop PR #16（6523bfc），Cloud PR #49（65cdbc2）及Workspace PR #60（536fdaf）；下一步等待审核，下一次产品发布选择含本改动的组件Tag。Windows／Intel原生打包和新正式Release未执行；无代码阻塞，不合并或关闭CHG/M6。
+
+## 2026-11-24 全部合入main与状态核对
+
+- 用户明确授权全部合并main后处理CHG106状态，覆盖四仓待合并PR及已确认但尚未提交的同CHG修改。
+- Desktop PR #16已合入4214b65f34bd8537a6a7e367700f8655f5b54a16；Agent PR #17在修复已复现的P2缓存遗漏后合入1b1d58efab5554a69c484f98e66fcd45bc4e9d59。两仓最新PR检查通过。
+- Cloud补齐桌面品牌原生环境初始化、内容池默认待处理与去除重复ID条件、高级条件计数文案；完整前端1169项及双端构建通过，双入口三角色走查、冷启动／刷新4场景、内容池初始／变更／重置／精确关联跳转实测通过，无真实业务写入。
+- 正在将剩余Cloud与Workspace改动合入，完成后统一核对闭环与用户签收边界；合并本身不等于业务签收。
