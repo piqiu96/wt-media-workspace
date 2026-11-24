@@ -8,13 +8,13 @@
 
 ## 执行约定
 
-本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前PLANNED，按依赖逐项激活。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
+本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前IMPLEMENTING，108四仓main依赖已合入。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
 产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。原型查阅基线ac29c1a7cefaace40501c61a10bb618309b39002尚不是本轮视觉签收；补齐新场景、review并固定SHA后再实施正式页面。
 
 Cloud内部按Handler→Service→Repository落位，跨模块复用所属Service；共用Vue只在Cloud维护，Agent管本机，Desktop管桥。正式OpenAPI/枚举/错误码由提供方维护，本稿API字段是定版输入，不是第二份可写契约。接口省略/api/v1；session/AgentToken/本地受信身份按调用链区分。ID/revision字符串、RFC3339时间，沿用errcode/message/data/logid；查询先授权再分页聚合。保存用revision，创建/启动用请求键与服务端摘要防重，同键异输入拒绝；结果未知先查询原结果，不换键重试。
 
-每步交付填写：修改文件/对应功能与API/实际验证命令和结果/PR或commit/未验收边界。多仓提供方先行，消费生成及Desktop契约锁同步；净差异review通过再按CHG独立PR合入main，用户验收后才关闭。文档检查不代替运行测试，模拟不代替真实平台验收。
+每步交付填写：修改文件/对应功能与API/实际验证命令和结果/PR或commit/未验收边界。多仓提供方先行，消费生成及Desktop契约锁同步；净差异review通过再按CHG独立PR合入main，完成技术交付后归档，用户按已确认安排在107–109后统一整体验收。文档检查不代替运行测试，模拟不代替真实平台验收。
 
 ## 1. 业务、页面与API对应
 
@@ -78,7 +78,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 - [ ] T06 Cloud结果Service：最终核实/逐格缺口/结束原因及迟到结果；不新建统计事实表。
 - [ ] T07 共用Vue/Agent/Desktop：计划页面、批次同名快捷操作/只读Drawer和上下文返回、本机plan新建续编；不复制浏览器执行器，不另造授权系统。
 - [ ] T08 联调/独立review：真实多批顺序、资源竞争、阈值/暂停/配置冻结/结束，Web和安装版固定原型验收。
-- [ ] T09 各仓交付：真实命令/结果、PR/main merge证据、用户签收后归档；计划阶段不能宣称其他平台已开放。
+- [ ] T09 各仓交付：真实命令/结果、PR/main merge证据、技术归档与最终统一用户验收安排；计划阶段不能宣称其他平台已开放。
 
 ## 5. 验收与证据
 
