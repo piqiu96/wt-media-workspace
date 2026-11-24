@@ -106,10 +106,12 @@ class ProductMasterAlignmentTests(unittest.TestCase):
                 )
 
     def test_rejects_unfinished_milestone_without_candidate_block(self) -> None:
-        block = self.module.candidate_block(self.module.milestone_sections(self.master)[7])
+        section = self.module.milestone_sections(self.master)[7]
+        block = self.module.candidate_block(section)
         self.assertNotEqual(block, "")
+        unstarted = re.sub(r"^\| 状态 \| .*", "| 状态 | `NOT_STARTED` |", section, flags=re.MULTILINE)
         self.assert_errors(
-            self.mutate(block, ""),
+            self.master.replace(section, unstarted.replace(block, ""), 1),
             ["M7 is 'NOT_STARTED' but carries no candidate CHG block"],
         )
 
@@ -200,6 +202,19 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         # the deliberately unstarted lifecycle fixture below.
         for evidence in (ROOT / "delivery" / "active").glob("*/evidence"):
             shutil.copytree(evidence, root / evidence.relative_to(ROOT))
+        # Active definitions linked by the current cards must remain readable,
+        # without becoming active CHGs in this synthetic NOT_STARTED fixture.
+        for card in (root / "delivery" / "milestones").glob("*.md"):
+            text = card.read_text(encoding="utf-8")
+            for target in re.findall(r"\]\((\.\./active/[^)#]+)(?:#[^)]*)?\)", text):
+                source = (ROOT / "delivery" / "milestones" / target).resolve()
+                if source.is_file():
+                    relative = source.relative_to(ROOT / "delivery" / "active")
+                    destination = root / "linked-active" / relative
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source, destination)
+                    text = text.replace(target, "../../linked-active/" + relative.as_posix())
+            card.write_text(text, encoding="utf-8")
         (root / "delivery" / "planned").symlink_to(ROOT / "delivery" / "planned", target_is_directory=True)
         # Carry only archive files linked by current cards. Keep the fixture's
         # completed directory writable for synthetic lifecycle records.
@@ -319,8 +334,8 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         root = self.publishing_root()
         path = root / "delivery" / "milestones" / "M7-batch-publishing.md"
         text = path.read_text(encoding="utf-8")
-        changed, count = re.subn(r"^\| M7 批次发布闭环 .*\n", "", text, flags=re.MULTILINE)
-        self.assertEqual(count, 1)
+        changed, count = re.subn(r"^\| \[[^]]+\]\([^)]+\).*\n", "", text, flags=re.MULTILINE)
+        self.assertGreater(count, 0)
         path.write_text(changed, encoding="utf-8")
         self.assertEqual(self.module.validate_publishing_cards(root), [
             "M7-batch-publishing.md carries no candidate CHG rows",

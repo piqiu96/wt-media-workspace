@@ -242,7 +242,7 @@ def validate_publishing_cards(root: Path) -> list[str]:
                 "候选 CHG", "工作内容及仓库", "直接依赖", "可独立验证的完成条件",
             ), f"{filename} candidate plan"))
             plan = card.partition("## 候选 CHG")[2]
-            if not re.search(r"^\| (?!候选|[- :]+\|)[^|]+\|[^|]+\|[^|]+\|[^|]+\|", plan, re.MULTILINE):
+            if not re.search(r"^\| (?!候选|CHG\s*\||[- :]+\|)[^|]+\|[^|]+\|[^|]+\|[^|]+\|", plan, re.MULTILINE):
                 errors.append(f"{filename} carries no candidate CHG rows")
         errors.extend(require_all(card, (
             "用户目标", "前置能力", "用户操作",
