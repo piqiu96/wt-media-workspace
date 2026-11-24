@@ -68,7 +68,9 @@ AGENT_PYTHON = Path(os.environ.get("PYTHON_BIN", AGENT_DIR / ".venv" / "bin" / "
 # Where launch_dmg attaches the freshly built DMG. A fixed private mountpoint
 # (instead of the default /Volumes/<product>) so the script never depends on the
 # product or volume name, and never opens a leftover mount instead of the new build.
-DMG_MOUNT = RUNTIME_DIR / "dmg-mount"
+# Keep the legacy dmg-mount untouched: old DiskImages registrations can leave
+# a ghost read-only mount there even after diskutil reports it unmounted.
+DMG_MOUNT = RUNTIME_DIR / "desktop-review-mount"
 
 # The Cloud worker's build output. A built binary rather than `go run` because
 # `go run` compiles into a child of the `go` process, and the stop path can only
@@ -640,13 +642,18 @@ def launch_dmg() -> None:
             raise RuntimeError(f"Desktop review mount is still mounted: {DMG_MOUNT}")
     DMG_MOUNT.mkdir(parents=True, exist_ok=True)
     run(["hdiutil", "attach", "-mountpoint", str(DMG_MOUNT), str(dmg)])
+    if not DMG_MOUNT.is_mount():
+        raise RuntimeError(f"DMG did not mount at the private review path: {DMG_MOUNT}")
     apps = sorted(DMG_MOUNT.glob("*.app"))
     if len(apps) != 1:
         raise RuntimeError(
             f"DMG mount: expected one .app under {DMG_MOUNT}, found {[p.name for p in apps]}"
         )
     relative_record = Path("Contents/Resources/versions.json")
-    built_record = DESKTOP_DIR / "target/release/bundle/macos" / apps[0].name / relative_record
+    built = built_app_bundle()
+    if apps[0].name != built.name:
+        raise RuntimeError("mounted Desktop source differs from the finalized build")
+    built_record = built / relative_record
     try:
         expected = json.loads(built_record.read_text(encoding="utf-8"))
         mounted = json.loads((apps[0] / relative_record).read_text(encoding="utf-8"))

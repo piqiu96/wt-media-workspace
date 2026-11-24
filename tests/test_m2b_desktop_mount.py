@@ -29,6 +29,7 @@ class DesktopMountTests(unittest.TestCase):
             target.write_text(json.dumps(self.record))
         self.stack.enter_context(mock.patch.object(harness, 'DMG_MOUNT', self.mount))
         self.stack.enter_context(mock.patch.object(harness, 'DESKTOP_DIR', self.desktop))
+        self.stack.enter_context(mock.patch.object(harness, 'built_app_bundle', return_value=self.expected.parents[2]))
         self.stack.enter_context(mock.patch.object(harness, 'current_dmg', return_value=root/'new.dmg'))
         self.stack.enter_context(mock.patch.object(harness, 'close_desktop_app'))
         self.stack.enter_context(mock.patch.object(harness.subprocess, 'run', return_value=SimpleNamespace(returncode=16)))
@@ -51,7 +52,7 @@ class DesktopMountTests(unittest.TestCase):
         self.assertFalse(any(call.args[0][0]=='open' for call in self.run.call_args_list))
 
     def test_stale_bundle_record_refuses_handover_and_open(self):
-        self.stack.enter_context(mock.patch.object(Path, 'is_mount', return_value=False))
+        self.stack.enter_context(mock.patch.object(Path, 'is_mount', side_effect=[False, True]))
         self.actual.write_text(json.dumps(dict(self.record,frontend_build_version='old-source')))
         with self.assertRaisesRegex(RuntimeError, 'mounted Desktop source differs'):
             harness.launch_dmg()
@@ -59,7 +60,14 @@ class DesktopMountTests(unittest.TestCase):
         self.assertFalse(any(call.args[0][0]=='open' for call in self.run.call_args_list))
 
     def test_matching_finalized_bundle_opens_after_verification(self):
-        self.stack.enter_context(mock.patch.object(Path, 'is_mount', return_value=False))
+        self.stack.enter_context(mock.patch.object(Path, 'is_mount', side_effect=[False, True]))
         harness.launch_dmg()
         self.handover.assert_called_once_with()
         self.assertEqual(self.run.call_args_list[-1],mock.call(['open',str(self.app)]))
+
+    def test_successful_attach_without_private_mount_refuses_open(self):
+        self.stack.enter_context(mock.patch.object(Path, 'is_mount', return_value=False))
+        with self.assertRaisesRegex(RuntimeError, 'did not mount'):
+            harness.launch_dmg()
+        self.handover.assert_not_called()
+        self.assertFalse(any(call.args[0][0]=='open' for call in self.run.call_args_list))
