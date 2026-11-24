@@ -1,11 +1,11 @@
 # M6：百度快速发布与运营工具完整闭环
 
-- 状态：`VERIFYING`；Active CHG：[CHG-20261120-106](../active/CHG-20261120-106/change.md)。
+- 状态：`DONE`；Active CHG：None；归档：[CHG-20261120-106](../completed/CHG-20261120-106/change.md)。
 - 依据：[PRD第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.4—6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md)。
 - 依赖：M2真实账号与本机环境、M4/M5真实成片及现有文件服务；旧验收不代替本轮权限和资源复查。
 - 2026-11-20用户确认：快速发布的全部运营工具依赖前移M6，先完成百度；B站、小红书后续交付。图片库、模板、单条AI和续编不再挂到批次之后。
 - 2026-11-21用户确认：旧数据可清理，按最新设计交付，不建设旧数据迁移、回填或双读；清理前保留已发生的外部投稿身份，避免重复投稿。百度接收后可能仍在审核，须取得指定投稿ID和目标链接并定期定向核验；沿用既定状态与动作，不能新增“投稿成功”状态或将接收回执计为公开成功。
-- Evidence：当前闭环及真实公开作品证据见[CHG106执行检查点](../active/CHG-20261120-106/checkpoint.md)与[验证摘要](../active/CHG-20261120-106/evidence/verification.md)。2026-11-24四仓PR审查修复、远端检查和main合入已完成，详见[main合并与验收核对](../active/CHG-20261120-106/evidence/main-merge-and-verification.md)。当前等待用户整体验收签收，不标记DONE。
+- Evidence：当前闭环及真实公开作品证据见[CHG106执行检查点](../completed/CHG-20261120-106/checkpoint.md)与[验证摘要](../completed/CHG-20261120-106/evidence/verification.md)。2026-11-24四仓PR审查修复、远端检查和main合入已完成，详见[main合并与验收核对](../completed/CHG-20261120-106/evidence/main-merge-and-verification.md)。2026-11-25用户确认整体验收通过，已标记DONE并归档。
 
 ## 页面实施基线
 

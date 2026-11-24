@@ -319,8 +319,8 @@ class ProductMasterAlignmentTests(unittest.TestCase):
         root = self.publishing_root()
         path = root / "delivery" / "milestones" / "M7-batch-publishing.md"
         text = path.read_text(encoding="utf-8")
-        changed, count = re.subn(r"^\| M7 批次发布闭环 .*\n", "", text, flags=re.MULTILINE)
-        self.assertEqual(count, 1)
+        changed, count = re.subn(r"^\| \[[^]]+\]\([^)]+\).*\n", "", text, flags=re.MULTILINE)
+        self.assertGreater(count, 0)
         path.write_text(changed, encoding="utf-8")
         self.assertEqual(self.module.validate_publishing_cards(root), [
             "M7-batch-publishing.md carries no candidate CHG rows",

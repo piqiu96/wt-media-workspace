@@ -2,7 +2,7 @@
 
 - 日期：2026-11-21
 - 状态：Accepted
-- 关联：[CHG106](../../delivery/active/CHG-20261120-106/change.md)、[作品管理](../product/作品管理.md)
+- 关联：[CHG106](../../delivery/completed/CHG-20261120-106/change.md)、[作品管理](../product/作品管理.md)
 
 ## 背景
 
