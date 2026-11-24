@@ -1,7 +1,7 @@
 ---
 id: CHG-20261120-106
 parent: delivery/milestones/M6-single-publishing.md#单任务从内容准备到真实作品
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: ["CHG-20261118-101"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
@@ -10,6 +10,8 @@ risk: H
 # CHG-20261120-106：M6 图片库、封面模板与快速发布补全
 
 ## Change
+
+2026-11-24已按用户授权收齐四仓改动、完成PR审查修复并合入各仓main，进入VERIFYING。真实公开作品与安装版关键流程已有证据，尚待用户整体验收签收，不关闭或归档；验收对照及合并记录见[main合并与验收核对](evidence/main-merge-and-verification.md)。
 
 交付一个完整用户结果：用真实图片库/模板、手工或AI内容准备百度快速发布，保存和恢复填写，授权自动投稿，处理人工卡点与异常，核实公开作品并得到正确成功统计。2026-11-20用户确认将快速发布依赖的全部运营工具前移M6；B站、小红书后续交付。批次及计划不进入本CHG。
 

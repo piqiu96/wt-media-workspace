@@ -13,4 +13,4 @@
 
 Review重点：测试包使用 release 仍为 test；Cloud URL 不决定桌面身份；环境配置失败不偷偷落入正式目录；清理和导出仅当前环境；正式流水线拒绝 dev/test/debug。
 
-本轮实现与自动化验证完成，实际安装器和并行登录限制见 [验证记录](evidence/desktop-environment.md)。CHG106 与 M6 状态保持原样，不以本次环境隔离完成代替整项签收。
+本轮实现与自动化验证完成，实际安装器和并行登录限制见 [验证记录](evidence/desktop-environment.md)。2026-11-24四仓合入后，当前状态见[CHG定义](change.md)；环境隔离完成不代替整项签收。
