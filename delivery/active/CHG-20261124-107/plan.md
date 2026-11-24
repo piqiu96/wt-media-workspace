@@ -43,7 +43,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 | A05 新增 | GET /publication/account | 平台/类目/搜索/分页→本人账号/资格/原因；禁止选择其他用户账号 |
 | A06 扩展 | GET /publication/output | 原筛选及带入ID→真实成片/缩略图/当前occupied；不返回他人任务细节 |
 | A07 新增 | POST /publication-batch/allocate | targets/账号顺序和上限/成片/人工映射→候选配对/逐格差额；无写入/预留 |
-| A08 新增 | POST /publication-batch/validate | 平台/目标/候选/内容/设置→发布前就绪及逐行issues/缺口；只读不签许可 |
+| A08 新增 | POST /publication-batch/validate | 平台/目标/候选/内容/设置，已有编辑携带batch_id/expected_revision→发布前就绪及逐行issues/缺口；只读不签许可，已采用文件按受权保存记录复查 |
 | A09 新增 | POST /publication-batch | request_key/name/platform/targets/config/execution_setting→id/revision/配置就绪；只保存batch/文件引用/审计，不写task/占用 |
 | A10 新增 | PUT /publication-batch/{id}/configuration | expected_revision/完整允许配置→新revision/就绪问题；首次启动前允许候选增删/替换/重排，本批或所属计划已启动均拒绝；计划继承目标不改 |
 | A11 新增 | GET /publication-batch/{id}/record | 分页→时间/操作者/事件；不泄露本地凭据 |

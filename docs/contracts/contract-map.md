@@ -150,3 +150,9 @@ Cloud composition additions (`2026.11.06.2`, CHG-20261106-124): template reads e
 CHG-20261106-125 (`2026.11.07.1`) retires the two request schemas shared by three old composition templates and keeps DynamicPIPEndingV1Config as the current catalog configuration. This intentionally removes old execution capabilities under ADR-0032; new templates still register by code/version. Shared Vue reads template schemas dynamically; Agent download contracts are unchanged.
 
 CHG-20261107-126 (`2026.11.07.2`) compatibly adds required `OperationsFile.public_url`, a permanent public HTTPS URL constructed by Cloud from the persisted bucket/object reference and files-specific public origin. Copy uses this field; display rename leaves it stable. Existing `resource_path` and capability endpoints remain compatible for previews, attachment names and saved composition URLs. Shared Cloud/Desktop Vue is the consumer; there is no generated files client or Agent/Desktop contract change.
+
+## Batch preparation contracts (CHG107)
+
+Cloud owns `cloud-api/v1/publication-batch.openapi.yaml` and the additive batch forms of publication generation and cover rendering (HTTP area revision `2026.11.25.1`). Configuration saves create no execution task or output occupation; actual startup belongs to CHG108. Existing single-item requests remain compatible.
+
+Agent owns the additive `batch` type in `local-agent-api/v1/local-agent.openapi.yaml` (`2026.11.25.1`); `task` remains the default in the Desktop bridge and `plan` is deferred to CHG109. Desktop consumes the provider revision through `contracts.lock.json`, with authenticated user checks unchanged. Cloud-Agent execution API and minimum Agent execution revision remain unchanged in this CHG. Verified runtime combinations are recorded in the release matrix only after integration acceptance.
