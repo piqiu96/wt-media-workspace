@@ -5,11 +5,7 @@ status: DONE
 depends_on: ["CHG-20261118-101"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
-merge_commits:
-  wt-media-workspace: 1337f6a
-  wt-media-cloud: ac29c1a7cefaace40501c61a10bb618309b39002
-  wt-media-agent: 1b1d58efab5554a69c484f98e66fcd45bc4e9d59
-  wt-media-desktop: 4214b65f34bd8537a6a7e367700f8655f5b54a16
+merge_commits: {"wt-media-workspace": "1337f6a", "wt-media-cloud": "ac29c1a7cefaace40501c61a10bb618309b39002", "wt-media-agent": "1b1d58efab5554a69c484f98e66fcd45bc4e9d59", "wt-media-desktop": "4214b65f34bd8537a6a7e367700f8655f5b54a16"}
 ---
 
 # CHG-20261120-106：M6 图片库、封面模板与快速发布补全
