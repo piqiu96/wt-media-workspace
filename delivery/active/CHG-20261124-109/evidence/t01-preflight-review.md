@@ -11,3 +11,11 @@
 - 后端调查结论：契约在Cloud新增publication-plan.openapi.yaml；数据新plan/batch关联和冻结选择，Task不冗余plan_id；Scheduler接现有worker。Local plan续编由Agent提供方扩展，Desktop消费。当前无阻断业务疑问。
 
 本记录为定义/源码审查结果，不是实现完成、测试通过或真实E2E证据。各实现Task仍按清单顺序执行。
+
+## 原型基线完成
+
+Cloud固定930553217cf5a3c8a1750178da4974d5b46dfeac，22文件仅web/example。沿既有PlanPage/PlanList/PlanDetail/PublishComposer/BatchManager/BatchDetailContent/common，隔离review=chg109，默认/107/108保留。页面映射在Cloud原型README。
+
+实现方：366领域单测、34旧计划、21 example、16 Chromium（109专项3+旧五文件13）、example构建通过。根独立执行`npm run test:publishing-prototype`退出0，30文件366通过，日志/tmp/chg109-t01-prototype-root.log；逐张查看/private/tmp/wt-chg109-review的准备、首启、推进表、只读Drawer、10%/20%、零分母、人工未知/暂停、停查核实、重复成片、审核阻结束/缺口结束及两角色列表截图，布局/关键按钮与本轮规则相符。
+
+CUA原型连接连续超时，未通过CUA点击fixture；已结束活动。采用上述实际Chromium截图独立审阅及浏览器交互断言，不冒称根做过失败的CUA交互。原型全部数据为演示，不代替T08真实发布/E2E。

@@ -10,7 +10,7 @@
 
 本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前IMPLEMENTING，108四仓main依赖已合入。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
-产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。原型查阅基线ac29c1a7cefaace40501c61a10bb618309b39002尚不是本轮视觉签收；补齐新场景、review并固定SHA后再实施正式页面。
+产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。本轮example原型固定930553217cf5a3c8a1750178da4974d5b46dfeac，隔离?review=chg109；根已独立核对截图及单测，后续正式页面沿此基线与提供方契约实施。
 
 Cloud内部按Handler→Service→Repository落位，跨模块复用所属Service；共用Vue只在Cloud维护，Agent管本机，Desktop管桥。正式OpenAPI/枚举/错误码由提供方维护，本稿API字段是定版输入，不是第二份可写契约。接口省略/api/v1；session/AgentToken/本地受信身份按调用链区分。ID/revision字符串、RFC3339时间，沿用errcode/message/data/logid；查询先授权再分页聚合。保存用revision，创建/启动用请求键与服务端摘要防重，同键异输入拒绝；结果未知先查询原结果，不换键重试。
 
@@ -70,7 +70,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 
 ## 4. 执行落地步骤
 
-- [ ] T01 产品/Workspace：确认本人计划范围、全部批次启动前准备/启动后冻结、不追加补量、保留10%推进及批次同名快捷操作与最终结束边界，回写正式事实和固定原型SHA；团队协作若提出则独立明确，不能隐式扩权。
+- [x] T01 产品/Workspace：确认本人计划范围、全部批次启动前准备/启动后冻结、不追加补量、保留10%推进及批次同名快捷操作与最终结束边界，回写正式事实和固定原型SHA；团队协作若提出则独立明确，不能隐式扩权。
 - [ ] T02 Cloud契约：定版A01–13、A15–17与plan续编类型（A14补量草案撤除，其他编号不重排）；去除旧confirm/跨成员authorize意图，公布版本/消费生成/锁同步。
 - [ ] T03 Cloud迁移：plan表→batch关联/顺序/配置冻结；旧独立批次/快速任务兼容。产物：真MySQL迁移/守恒/原子骨架证据。
 - [ ] T04 Cloud Service：目标校验、真实AI建议、结构编辑/查询/复制；复用107候选准备，未启动不占成片。
