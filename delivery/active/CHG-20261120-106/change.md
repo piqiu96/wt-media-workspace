@@ -62,3 +62,5 @@ risk: H
 - [发布工程设计](../../../docs/engineering/specs/publishing-management.md)
 - 原型固定基线：Cloud `9f132dd375477c116809b48507f6fd7a8b28d567` 的 `web/example/proto/publishing-design/`：QuickPublish.vue、PublishingTaskPage.vue、TaskDetail.vue、ImageLibraryDetail.vue、CoverTemplateManager.vue、CoverTemplateWorkspace.vue。后续已确认原型修改须固定新SHA并记录净差异，再用其验收，不能跟随main漂移。
 - [封面编辑器专项交互](../../../docs/design/cover-templates.md)、[前端规范](../../../docs/standards/frontend/README.md)
+
+2026-11-24 用户确认执行发布缓存清理，纳入 Task 3：原尝试已被平台接收（reviewing/published）、对应结果已获 Cloud 确认且原浏览器安全结束后，Agent 自动清理该尝试下载的视频、横竖封面及临时文件；保留回执、摘要、检查点和业务占用。失败、未知、人工处理中、未补报或未关闭现场保留；删除失败独立重试，重启补清有确切依据的历史缓存，不按目录年龄猜测。仅 Agent 内部执行日志增加清理状态，不新增表或对外契约；验收使用真实隔离目录/SQLite、模拟Cloud回执覆盖边界，不额外真实投稿。
