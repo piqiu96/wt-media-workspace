@@ -72,3 +72,12 @@ T02–T07实现和独立审查均闭环，状态VERIFYING。最终Cloud27b8aca�
 
 - fresh all初次失败：Desktop build.rs106明确拒绝无version overlay的release包；未绕过构建检查。修正Workspace local_env.build_dmg为调用Desktop现有build-desktop-environment.py --environment prod --profile release --bundles dmg --no-sign，移除旧手工签名和基础版本命名逻辑。提供方负责版本、最终sidecar摘要/签名和DMG校验；保留本机数据身份和原Cloud连接，无产品Tag时为local未发行版本。
 - 限定独立审查通过；现有m2b定向17项与Workspace完整215项通过。完整fresh all重新从头运行中，会话67021，日志/tmp/chg107-full-bringup-fixed.log，未宣称环境全绿。
+
+## 最新安装版实际走查（2026-11-25 02:32）
+
+- fresh all修正版完整退出0：Cloud/Workers/Agent/BitBrowser、CORS、Web5173/Desktop5174、资源/包新鲜度与operator登录通过，DMG已挂载启动；日志/tmp/chg107-full-bringup-fixed.log。安装版0.1.0-local.99b0e12fbb，frontend0.1.0+27b8aca，sidecar摘要2f91da001d99d9cea5cba5762b058a4c793abef39eedaf69b83dcdb0a3a7e139。Cloud PR50最终CI#198已全部成功。
+- 原生CUA：登录/已有桌面会话替换成功；工作环境显示本机已连接无任务、BitBrowser已登录指定账号、执行凭证已配置。
+- 原生新建“QA CHG107 安装版续编 1125”：名称/目标三角洲60保存续编；Cmd+Q后重新登录/新建入口成功恢复名称/目标60。载入本人账号1和可用成片1、自动配对1，缺口59。
+- 真实DeepSeek原生生成3字段并逐项采用；无需声明；横版采用实际成片封面；竖版图片选择器首开自动加载，并拒绝唯一16:9图片直接当3:4。改用真实正式模板“CHG106成片及图片底图验收 ·1080×1440”和实际图库底图渲染，预览后采用真实3:4产物，显式内容确认成功。
+- 四设置选5并发/2秒/异常暂停/3上限，实际保存Cloud批次2，目标60/候选1/缺口59/未开始/正式任务0，操作记录保存批次1条。还需Web编辑/读回及零增量基线比对、清续编检查和最终证据收口。
+- CUA无活动待关闭，nativeQaApp在批次2操作记录详情。IAB batchQaTab仍可用，qaViewport已reset。
