@@ -78,3 +78,11 @@ python3 desktop_downloads.py --tag v0.1.0 \
 人工验收确认后，增加 `releases/manifests/vX.Y.Z.yaml`，`channel: stable`，记录固定组件 Tag 和生产环境 Cloud origin。提交并推送 Manifest 后，先按上一节 Review 四个 Compare 页面，再用 `submit_tag.py vX.Y.Z --push --verify` 触发相同的构建和资产校验。
 
 正式版只能从 `main` 提交：`--push` 先创建并推送 `release/vX.Y.Z`（与产品 Tag 同一 commit），再创建并推送产品 Tag。分支或 Tag 已存在且指向同一 commit 时重试幂等；指向不同 commit 时拒绝。发布分支不移动、不删除、不触发工作流；RC 不建发布分支。Tag 仍是唯一发布触发器。正式版工作流先创建 Draft Release 并复验资产名与 SHA256，校验全部通过后**自动公开发布**（`publish-release` job 内 `gh release edit --draft=false --prerelease=false` 并回读断言状态），无需人工执行公开命令；`submit_tag.py --verify` 只核对资产与摘要、不区分草稿与公开状态。正式版从 Tag 重新构建，不把 RC 附件改名；构建期已把对应版本的官网下载清单烙入 Cloud 包，CI 绿即公开，按上一节部署即可。
+
+## 客户端产品版本同步
+
+`release.yml` 仅将已校验的产品 Tag 注入 Desktop 构建：`WT_MEDIA_PRODUCT_TAG`、`WT_MEDIA_DESKTOP_SOURCE_TAG` 和 `WT_MEDIA_DESKTOP_SOURCE_COMMIT`。组件 Tag 不随产品版本重命名，历史 Manifest 也不改写。下一次发布必须选择包含版本覆盖层支持的新 Desktop 组件 Tag，以及包含 Web 版本隐藏规则的 Cloud 组件 Tag；旧组件不支持时构建应失败，不能仅改下载文件名补救。
+
+Desktop 正式 macOS 入口在调用 Tauri CLI 前生成版本覆盖层；Windows 使用 `scripts/build-desktop-environment.py --environment prod --bundles nsis`，同样先生成覆盖层。本地未发布包使用环境构建入口，不提供产品 Tag，得到 dev／test／local 后缀。正式入口缺产品 Tag 时直接拒绝。
+
+打包校验同时核对产品版本与组件来源：macOS 检查应用 Info.plist、`desktop-build.json`、`versions.json` 及挂载的 DMG；Windows 安装回归核对原生程序 ProductVersion、卸载登记 DisplayVersion 和内置来源记录。最终资产汇总再检查 macOS ZIP 内部记录与 Manifest 输入一致。Web 登录页与侧栏不显示版本，官网下载清单仍声明可下载客户端版本。

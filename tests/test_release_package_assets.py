@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import plistlib
+import subprocess
+import sys
 import tarfile
 import tempfile
 import unittest
@@ -13,6 +16,7 @@ from scripts.release.package_assets import PLATFORMS, package
 
 TAG = "v0.1.0-rc.1"
 ORIGIN = "https://wt.longyanyue.cn"
+DESKTOP_TAG = "v0.1.0-rc.9"
 SOURCES = {name: "a" * 40 for name in ("workspace", "cloud", "agent", "desktop")}
 
 
@@ -85,25 +89,52 @@ class ReleasePackageAssetsTest(unittest.TestCase):
                 archive.writestr(prefix + "config/agent.toml", f'[cloud]\nbase_url = "{mac_origin}"')
                 archive.writestr(prefix + "resources/desktop.production.toml", f'[cloud]\nbase_url = "{mac_origin}"')
                 archive.writestr(prefix + "sidecar-manifest.json", "{}")
-                archive.writestr(prefix + "versions.json", "{}")
+                build = {"product_tag": TAG, "desktop_version": TAG[1:], "desktop_source_tag": DESKTOP_TAG, "desktop_source_commit": SOURCES["desktop"]}
+                archive.writestr(prefix + "desktop-build.json", json.dumps(build))
+                archive.writestr(prefix + "versions.json", json.dumps({"desktop_version": TAG[1:], "desktop_build": build}))
+                archive.writestr("release/app.app/Contents/Info.plist", plistlib.dumps({"CFBundleShortVersionString": TAG[1:]}))
                 archive.writestr("release/app.dmg", "dmg")
         return manifest, assets, cloud, agent
 
     def test_accepts_complete_candidate_and_records_all_sources(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             manifest, assets, cloud, agent = self.fixture(Path(temporary))
-            package(TAG, ORIGIN, manifest, assets, cloud, agent, SOURCES)
+            package(TAG, ORIGIN, manifest, assets, cloud, agent, SOURCES, DESKTOP_TAG)
             info = json.loads((assets / "build-info.json").read_text(encoding="utf-8"))
             self.assertEqual(info["source_commits"], SOURCES)
             self.assertEqual(len(info["desktop_assets"]), 3)
             self.assertIn("WT-Media_v0.1.0-rc.1_windows-x64-setup.exe", (assets / "SHA256SUMS").read_text(encoding="utf-8"))
             self.assertFalse(list(assets.glob("起飞_*")), "non-ASCII artifact names must not reach GitHub")
 
+    def test_package_cli_accepts_separate_product_and_component_tags(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest, assets, cloud, agent=self.fixture(Path(temporary))
+            command=[sys.executable,"scripts/release/package_assets.py","--tag",TAG,"--desktop-source-tag",DESKTOP_TAG,"--cloud-origin",ORIGIN,"--manifest",str(manifest),"--assets",str(assets),"--cloud-artifact",str(cloud),"--agent-artifacts",str(agent)]
+            for component, commit in SOURCES.items(): command.extend(["--source-commit",f"{component}={commit}"])
+            subprocess.run(command,check=True,capture_output=True,text=True)
+            self.assertTrue((assets/"build-info.json").is_file())
+
+    def test_rejects_macos_with_wrong_native_version_or_source(self):
+        from scripts.release.package_assets import verify_mac
+        for key, value in [("desktop_version", "0.1.0"), ("desktop_source_commit", "b"*40), ("desktop_source_tag", "v9.0.0"), ("product_tag", "v0.1.1")]:
+            with self.subTest(key=key), tempfile.TemporaryDirectory() as temporary:
+                _, assets, _, _ = self.fixture(Path(temporary))
+                source = next(assets.glob("*x64.zip"))
+                changed = Path(temporary)/"changed.zip"
+                with zipfile.ZipFile(source) as old, zipfile.ZipFile(changed, "w") as new:
+                    for name in old.namelist():
+                        data = old.read(name)
+                        if name.endswith("/desktop-build.json"):
+                            record=json.loads(data); record[key]=value; data=json.dumps(record).encode()
+                        new.writestr(name,data)
+                with self.assertRaisesRegex(ValueError, "version|source|Tag"):
+                    verify_mac(changed, ORIGIN, TAG, SOURCES["desktop"], DESKTOP_TAG)
+
     def test_rejects_macos_package_with_different_cloud_origin(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             manifest, assets, cloud, agent = self.fixture(Path(temporary), "https://wrong.example")
             with self.assertRaisesRegex(ValueError, "wrong Cloud origin"):
-                package(TAG, ORIGIN, manifest, assets, cloud, agent, SOURCES)
+                package(TAG, ORIGIN, manifest, assets, cloud, agent, SOURCES, DESKTOP_TAG)
 
 
 if __name__ == "__main__":

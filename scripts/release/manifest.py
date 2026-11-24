@@ -71,6 +71,7 @@ def main() -> int:
         parser.exit(1, f"release manifest invalid: {exc}\n")
     if args.github_output:
         lines = {
+            "product_tag": data["product_tag"],
             "channel": data["channel"],
             "environment": data["environment"],
             "cloud_origin": data["cloud_origin"],

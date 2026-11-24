@@ -115,3 +115,9 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。管理员仅保留基础Cloud�
 - Cloud提交`463fb0a`、`53d7e81`，独立PR[#49](https://github.com/piqiu96/wt-media-cloud/pull/49)已打开。Web与Desktop入口的1024/1280/1440/1600四种宽度共8组Playwright验收通过，含布局、无页面溢出、展开不查询、草稿/生效计数、查询/重置、键盘展开；21项相关定向测试及Desktop前端生产构建通过。浏览器使用受控只读响应，不代表真实上传或投稿验收。
 - 已重建并替换当前使用的macOS Apple Silicon“起飞 Dev.app”及开发版DMG，保留旧版备份。镜像校验、完整签名校验通过；前端记录指向`53d7e81`、digest `90468853c23d156c29112a0cedaf9a46b2cfe1ac2872c2ec73e068a7c8caeabd`，如实保留既有本地修改的dirty标志。原生GUI按既有授权恢复operator01会话后，实看当前窗口五字段和按钮同行、高级入口下一行左对齐，停留图片库。未执行上传/编辑/删除/投稿；本轮未重建正式身份release包，不将开发版更新称为正式发布。CHG/M6保持进行中。
 - 自动规范检查发现查询按钮需显式标记Primary，已用`718854f`补齐；该声明与组件已有默认行为一致，不改变已验收安装包的视觉和交互。当前工作区完整前端161文件1169项PASS（含未纳入本PR的既有桌面品牌4项测试）。[M0 Cloud #191](https://github.com/piqiu96/wt-media-cloud/actions/runs/45362866961)的后端/前端测试及原型预览已通过，记录时原型交互与后续构建检查仍在运行；不将该远端检查表述为全部通过。PR保持打开供审核，未合并。
+
+## 2026-11-24 客户端产品版本同步
+
+- 用户确认后补齐 Workspace Manifest→Desktop CLI覆盖层→原生版本／安装包／getVersion显示链路；Web登录与侧栏隐藏版本。组件Tag独立保留来源，缺失产品Tag的正式入口拒绝打包，本地包带构建标识。
+- 当前已通过11项前端定向测试、4个Playwright页面场景、16项Desktop打包Python测试、20项版本记录shell回归、558项Rust测试及Workspace发布定向检查；实际macOS开发app内部三处版本一致且完整签名通过。详情见[evidence/desktop-product-version.md](evidence/desktop-product-version.md)。
+- 下一步：提交各仓PR供审核，下一次产品发布选择含本改动的组件Tag。Windows／Intel原生打包和新正式Release未执行；无代码阻塞，不合并或关闭CHG/M6。

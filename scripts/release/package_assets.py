@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import re
+import plistlib
 import tarfile
 import zipfile
 from pathlib import Path
@@ -148,7 +149,7 @@ def normalize_public_asset(
     return target
 
 
-def verify_mac(path: Path, origin: str) -> None:
+def verify_mac(path: Path, origin: str, tag: str, source_commit: str, source_tag: str) -> None:
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
         for suffix in ("/Contents/Resources/config/agent.toml", "/Contents/Resources/resources/desktop.production.toml", "/Contents/Resources/sidecar-manifest.json", "/Contents/Resources/versions.json"):
@@ -157,11 +158,26 @@ def verify_mac(path: Path, origin: str) -> None:
                 raise ValueError(f"{path.name} omits or duplicates {suffix}")
             if suffix.endswith(".toml") and origin.encode() not in archive.read(matching[0]):
                 raise ValueError(f"{path.name} has wrong Cloud origin in {suffix}")
+        def read_one(suffix):
+            matching = [name for name in names if name.endswith(suffix)]
+            if len(matching) != 1:
+                raise ValueError(f"{path.name} omits or duplicates {suffix}")
+            return archive.read(matching[0])
+        build = json.loads(read_one("/Contents/Resources/desktop-build.json"))
+        versions = json.loads(read_one("/Contents/Resources/versions.json"))
+        info = plistlib.loads(read_one("/Contents/Info.plist"))
+        if build.get("product_tag") != tag:
+            raise ValueError("Desktop product Tag differs from Release Manifest")
+        if (build.get("desktop_version") != tag[1:] or versions.get("desktop_version") != tag[1:]
+                or info.get("CFBundleShortVersionString") != tag[1:] or versions.get("desktop_build") != build):
+            raise ValueError("Desktop native version or version record differs from product Tag")
+        if build.get("desktop_source_commit") != source_commit or build.get("desktop_source_tag") != source_tag:
+            raise ValueError("Desktop source differs from Release Manifest")
         if not any(name.endswith(".dmg") for name in names):
             raise ValueError(f"{path.name} has no DMG")
 
 
-def package(tag: str, origin: str, manifest: Path, assets: Path, cloud_artifact: Path, agent_artifacts: Path, source_commits: dict[str, str]) -> None:
+def package(tag: str, origin: str, manifest: Path, assets: Path, cloud_artifact: Path, agent_artifacts: Path, source_commits: dict[str, str], desktop_source_tag: str) -> None:
     if not manifest.is_file() or not assets.is_dir() or not agent_artifacts.is_dir():
         raise ValueError("Manifest, Desktop assets, and Agent artifacts are required")
     if set(source_commits) != {"workspace", "cloud", "agent", "desktop"} or any(not re.fullmatch(r"[0-9a-f]{40}", commit) for commit in source_commits.values()):
@@ -193,11 +209,12 @@ def package(tag: str, origin: str, manifest: Path, assets: Path, cloud_artifact:
     )
     if set(installers) != {windows_source, intel_source, arm_source}:
         raise ValueError("unexpected Desktop release assets")
+    # Validate the internal version before public filenames hide component names.
+    for path in (intel_source, arm_source):
+        verify_mac(path, origin, tag, source_commits["desktop"], desktop_source_tag)
     windows = normalize_public_asset(windows_source, assets, tag, "windows-x64-setup", ".exe")
     intel = normalize_public_asset(intel_source, assets, tag, "macos-x64", ".zip")
     arm = normalize_public_asset(arm_source, assets, tag, "macos-arm64", ".zip")
-    for path in (intel, arm):
-        verify_mac(path, origin)
     (assets / manifest.name).write_bytes(manifest.read_bytes())
     info = {
         "schema_version": 1,
@@ -217,6 +234,7 @@ def package(tag: str, origin: str, manifest: Path, assets: Path, cloud_artifact:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--tag", required=True)
+    parser.add_argument("--desktop-source-tag", required=True)
     parser.add_argument("--cloud-origin", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--assets", type=Path, required=True)
@@ -226,7 +244,7 @@ def main() -> int:
     args = parser.parse_args()
     try:
         source_commits = dict(pair.split("=", 1) for pair in args.source_commit)
-        package(args.tag, args.cloud_origin, args.manifest, args.assets, args.cloud_artifact, args.agent_artifacts, source_commits)
+        package(args.tag, args.cloud_origin, args.manifest, args.assets, args.cloud_artifact, args.agent_artifacts, source_commits, args.desktop_source_tag)
     except (OSError, ValueError, KeyError, tarfile.TarError, zipfile.BadZipFile, json.JSONDecodeError) as exc:
         parser.exit(1, f"release package invalid: {exc}\n")
     return 0
