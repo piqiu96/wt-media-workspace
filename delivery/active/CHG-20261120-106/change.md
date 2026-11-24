@@ -62,3 +62,11 @@ risk: H
 - [发布工程设计](../../../docs/engineering/specs/publishing-management.md)
 - 原型固定基线：Cloud `9f132dd375477c116809b48507f6fd7a8b28d567` 的 `web/example/proto/publishing-design/`：QuickPublish.vue、PublishingTaskPage.vue、TaskDetail.vue、ImageLibraryDetail.vue、CoverTemplateManager.vue、CoverTemplateWorkspace.vue。后续已确认原型修改须固定新SHA并记录净差异，再用其验收，不能跟随main漂移。
 - [封面编辑器专项交互](../../../docs/design/cover-templates.md)、[前端规范](../../../docs/standards/frontend/README.md)
+
+2026-11-23 用户确认并授权执行桌面环境隔离补齐：Desktop `environment=dev/test/prod` 独立于 Cloud 连接目标，dev/test 允许连接线上且不改变身份；DEV/TEST 图标与应用名称、标识和系统数据目录同步隔离。正式版沿用现有目录，正式流水线保持 release+prod 门禁。复用 Agent 显式目录能力；Cloud 只修改共用桌面前端，不改后端业务。实施及验证见 plan.md 与对应 evidence。
+
+开发包实机补充：修复环境打包入口漏执行签名后 Agent 运行记录收尾，复用既有 macOS 签名链；Agent 本机 API 启动取消无业务用途的反向 DNS，避免冻结应用约35秒阻塞超过 Desktop 15秒时限。HTTP 协议与执行权限不变。
+
+2026-11-24 用户确认执行发布缓存清理，纳入 Task 3：原尝试已被平台接收（reviewing/published）、对应结果已获 Cloud 确认且原浏览器安全结束后，Agent 自动清理该尝试下载的视频、横竖封面及临时文件；保留回执、摘要、检查点和业务占用。失败、未知、人工处理中、未补报或未关闭现场保留；删除失败独立重试，重启补清有确切依据的历史缓存，不按目录年龄猜测。仅 Agent 内部执行日志增加清理状态，不新增表或对外契约；验收使用真实隔离目录/SQLite、模拟Cloud回执覆盖边界，不额外真实投稿。
+
+2026-11-24 用户确认客户端版本同步整改，纳入 Task 4：Web 登录页及侧栏不显示版本；Desktop 官方版本以 Workspace Release Manifest 的 product_tag 为唯一输入，构建前传入 Tauri CLI 的配置覆盖层，同步原生版本、安装包及页面显示。Desktop 组件 Tag／Commit 独立保留溯源，不要求与产品 Tag 相同；无产品 Tag 的本地包标识为未发布构建，正式发布缺失或版本不一致时拒绝交付。仅涉及 Workspace 发布协调、Desktop 打包和 Cloud 共用 Vue，不改 Cloud 后端或 Agent，不创建新发布 Tag。

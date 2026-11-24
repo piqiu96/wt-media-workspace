@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import subprocess
+import sys
 from pathlib import Path
 
 from scripts.release.manifest import validate_manifest
@@ -29,6 +31,17 @@ class ReleaseManifestTest(unittest.TestCase):
             path = Path(temporary) / f"{tag}.yaml"
             path.write_text(content, encoding="utf-8")
             return validate_manifest(path, tag)
+
+    def test_ci_receives_validated_product_tag_independent_of_component_tag(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            manifest=root/"v0.1.0-rc.1.yaml"
+            manifest.write_text(RC.replace("desktop: v0.1.0-rc.1", "desktop: v0.1.0-rc.9"))
+            output=root/"output"
+            subprocess.run([sys.executable,"scripts/release/manifest.py","--file",str(manifest),"--tag","v0.1.0-rc.1","--github-output",str(output)], check=True, capture_output=True)
+            values=dict(line.split("=",1) for line in output.read_text().splitlines())
+            self.assertEqual(values["product_tag"],"v0.1.0-rc.1")
+            self.assertEqual(values["desktop_tag"],"v0.1.0-rc.9")
 
     def test_rc_requires_matching_tag_and_fixed_target_matrix(self) -> None:
         result = self.validate(RC)

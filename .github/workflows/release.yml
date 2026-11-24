@@ -16,6 +16,7 @@ jobs:
   validate:
     runs-on: ubuntu-24.04
     outputs:
+      product_tag: ${{ steps.manifest.outputs.product_tag }}
       channel: ${{ steps.manifest.outputs.channel }}
       environment: ${{ steps.manifest.outputs.environment }}
       cloud_origin: ${{ steps.manifest.outputs.cloud_origin }}
@@ -192,7 +193,12 @@ jobs:
             target: aarch64-apple-darwin
     runs-on: ${{ matrix.os }}
     env:
+      WT_MEDIA_PRODUCT_TAG: ${{ needs.validate.outputs.product_tag }}
+      WT_MEDIA_DESKTOP_SOURCE_TAG: ${{ needs.validate.outputs.desktop_tag }}
+      WT_MEDIA_DESKTOP_SOURCE_COMMIT: ${{ needs.validate.outputs.desktop_commit }}
       WT_MEDIA_RELEASE_PREBUILT: '1'
+      WT_MEDIA_DESKTOP_ENVIRONMENT: 'prod'
+      WT_MEDIA_DESKTOP_RELEASE_CHANNEL: 'stable'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -264,9 +270,9 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tests/windows_installer_agent_stop.ps1
-          cargo tauri build --bundles nsis
-          powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tests/windows_installer_roundtrip.ps1 "$(find target/release/bundle/nsis -maxdepth 1 -name '*.exe' -print -quit)"
+          powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tests/pack/windows_installer_agent_stop.ps1
+          python3 scripts/build-desktop-environment.py --environment prod --bundles nsis
+          powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tests/pack/windows_installer_roundtrip.ps1 "$(find target/release/bundle/nsis -maxdepth 1 -name '*.exe' -print -quit)"
           bash scripts/release-versions.sh --check
           mkdir -p "$GITHUB_WORKSPACE/desktop-release"
           cp target/release/bundle/nsis/*.exe "$GITHUB_WORKSPACE/desktop-release/"
@@ -309,6 +315,7 @@ jobs:
             --source-commit 'cloud=${{ needs.validate.outputs.cloud_commit }}' \
             --source-commit 'agent=${{ needs.validate.outputs.agent_commit }}' \
             --source-commit 'desktop=${{ needs.validate.outputs.desktop_commit }}' \
+            --desktop-source-tag '${{ needs.validate.outputs.desktop_tag }}' \
             --assets release-assets \
             --cloud-artifact cloud-artifact \
             --agent-artifacts agent-artifacts
