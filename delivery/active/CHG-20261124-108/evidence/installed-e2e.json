@@ -1,7 +1,7 @@
 {
   "change": "CHG-20261124-108",
   "date": "2026-11-25",
-  "status": "IN_PROGRESS",
+  "status": "PASS",
   "initial_runtime": {
     "cloud": "89f49b6b6bb90e2edc7fc06dd102cb05b0853385",
     "agent": "0d507e1f7440841c4081c8fb1b289325eff24ae1",
@@ -10,10 +10,14 @@
     "all_gates": "PASS"
   },
   "latest_runtime": {
-    "cloud": "7ba7844704f18989a9d1e0ff6b2d3be59f4b47a7",
-    "bringup_log": "/tmp/chg108-full-bringup-final.log",
+    "cloud": "fe741fe9db64111c7a75885e1bcc293154f33c95",
+    "bringup_log": "/tmp/chg108-final-fe741fe-bringup.log",
     "all_gates": "PASS",
-    "corrected_native_pill_readback": "PENDING"
+    "corrected_native_pill_readback": "PASS; actual packaged panel shows 本机服务 已连接 / 比特浏览器 已登录指定账号 / 执行凭证 已配置",
+    "agent": "0d507e1f7440841c4081c8fb1b289325eff24ae1",
+    "desktop": "ca44cba8eb5782d08bf6e2b0d7f8ec8e1eabf826",
+    "mounted_source_verification": "PASS; frontend 0.1.0+fe741fe matches finalized bundle",
+    "mount": "/Users/aqiuye/Develop/workspace/wt-media/.local/m2b/desktop-review-mount/起飞.app"
   },
   "account_scope": {
     "operator": "operator01",
@@ -46,11 +50,15 @@
       "configuration_edit_action": false
     },
     "execution": {
-      "status": "reviewing",
+      "status": "published",
       "attempt_status": "completed",
       "attempt_count": 1,
       "platform_submission_id": "1882771499985646302",
-      "publicly_verified": false
+      "publicly_verified": true,
+      "check_generation": 2,
+      "work_id": "5",
+      "platform_work_id": "11733113375672752567",
+      "work_url": "https://mbd.baidu.com/newspage/data/videolanding?nid=sv_11733113375672752567"
     },
     "batch_after_automatic_steps": {
       "status": "ended",
@@ -61,7 +69,27 @@
     },
     "original_task_link_and_return": "PASS; task12/from_batch2 and task pagination preserved",
     "public_rate_explanation": "PASS; only verified public tasks with linked works count",
-    "final_public_readback": "PENDING"
+    "final_public_readback": {
+      "status": "PASS",
+      "source": "actual final fe741fe packaged macOS UI via CUA",
+      "published_count": 1,
+      "target_count": 60,
+      "public_rate": "1 / 60 · 1.67%",
+      "pending_public": 0,
+      "target_gap": 59,
+      "task_row": "已发布",
+      "original_attempt_count": 1,
+      "work_detail": "work5 with exact platform ID 11733113375672752567, task12/attempt35/output134 and public URL"
+    },
+    "public_identity_readback": {
+      "task_id": "12",
+      "attempt_id": "35",
+      "work_id": "5",
+      "output_id": "134",
+      "linked_works": 1,
+      "attempt_result_status": "reviewing",
+      "attempt_result_note": "immutable original receipt result retained; later public observation updates task and links work"
+    }
   },
   "web_flow": {
     "method": "actual existing logged-in localhost5173 IAB tab via documented CUA Playwright; no fixtures",
@@ -81,6 +109,20 @@
       "final_status": "cancelled",
       "formal_task_count": 0,
       "edit_start_resume_absent": true
+    },
+    "final_public_readback": {
+      "status": "PASS",
+      "source": "real localhost5173 UI via documented CUA Playwright",
+      "published_count": 1,
+      "target_count": 60,
+      "public_rate": "1 / 60 · 1.67%",
+      "pending_public": 0,
+      "task_row": "已发布",
+      "task_receipt": "1882771499985646302",
+      "linked_work": "5",
+      "return_url": "/publish-batches?view=detail&id=2&tab=tasks&task_page=1&task_page_size=10",
+      "viewport": 1024,
+      "viewport_reset": true
     }
   },
   "readback_after_rebuild": {
@@ -94,13 +136,29 @@
   "limitations": [
     "Windows and unopened platforms not run as real platform acceptance",
     "No real multi-Profile claim beyond the one available owned profile",
-    "Platform public result pending; do not count as success",
     "Resource cache conservatively retained diagnostic companions; not claimed cleaned"
   ],
-  "pending": [
-    "latest native connectivity copy readback",
-    "formal chg verify after artifact rebuild",
-    "actual public task/attempt/work consistency",
-    "PR final checks and merge"
-  ]
+  "pending": [],
+  "found_and_fixing": [
+    {
+      "code": "ended_public_poll",
+      "status": "CLOSED",
+      "commits": [
+        "431efde",
+        "3fc7f6a"
+      ],
+      "verification": "same-page controlled Chromium automatic and reversed manual response ordering; independent review passed; final Web/native public counts match"
+    }
+  ],
+  "formal_chg_verify": {
+    "log": "/tmp/chg108-chg-verify-final.log",
+    "exit_code": 0,
+    "workspace_tests": 215,
+    "agent_tests": 949,
+    "desktop_passed": 560,
+    "desktop_existing_ignored": 6,
+    "all_environment_gates": "PASS",
+    "scope_note": "Command passed on Cloud7ba/Agent0d/Desktopca44; later final Go full suite, frontend1220, Workspace220 and fe741fe all-gates runtime verified independently."
+  },
+  "pr_merge_status": "pending separately; this PASS records E2E and UI acceptance, not merged delivery or final user signoff"
 }

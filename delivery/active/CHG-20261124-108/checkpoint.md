@@ -2,27 +2,31 @@
 
 ## 已完成
 
-- 107四仓PR50/18/17/63已合入并归档；本项激活be58b71，唯一执行CHG108，109尚未启动。
-- 用户明确要求example原型作为输入：Cloud web/example/proto/publishing-design复用既有BatchManager/BatchDetailContent/PublishComposer/common，108基线2512d342，页面映射见该目录README；根已看启动范围、单Profile、可信公开统计和稳定启动弹窗截图。
-- Cloud API/Cloud-Agent/发布错误2026.11.25.2；最低新工作Agent同版本，Local API仍.1。提供方契约独立审查关闭；Workspace contract-map、Desktop ca44cba和Agent消费同步。ADR-0037记录协调升级与原核验安全结算。
-- Cloud运行时7b4f523：原子start、固定组/暂停依据、Profile实际互斥、双容量、原键结算及迁移117。实现方Go全套及隔离MySQL发布/图片回归通过；独立Go源码审查无P1/P2。
-- Vue89f49b6：164文件1212测试、Cloud/Desktop构建及受控Chromium通过，前端两轮发现已关闭。包括原版本/导航启动绑定、两标签原命令占有、未知重放与正式拒绝、stopping持续读回。
-- Agent新增有界原线程执行、多现场可靠停车/恢复、跨scope原子Profile登记、核验原键Strict恢复、真实开窗前屏障、观察ACK hash和慢字节read1。独立审查8项及跟进发现均已分修，最终受控与真实验收仍未完成。
+- 107四仓已合入本地main并归档；108唯一Active VERIFYING，109未启动。用户授权依次完整交付107–109，最终统一人工验收。
+- 按用户要求采用Cloud web/example/proto/publishing-design及common，108原型固定2512d342，映射见原型README。未建立第二套原型。
+- Cloud最终fe741fe9db64111c7a75885e1bcc293154f33c95：首次原子建单/占用/授权、固定组、双容量、实际Profile互斥、可靠停车/原线程恢复、暂停/终止与公开核验。最终CloudAPI2026.11.25.3，Cloud-Agent/错误码.2、LocalAPI.1。ADR0037与迁移117切换证据已记录。
+- Agent最终0d507e1f7440841c4081c8fb1b289325eff24ae1完整949项、独立审查通过；Desktop ca44cba8eb5782d08bf6e2b0d7f8ec8e1eabf826完整560项/6既有ignore，协议锁及打包回归通过。
+- Cloud全部独立审查及PR51四条已知P2已修复、复验和resolved：原key不可由row_keys冒认；组及实际queued扫描越过100个无效候选；批次无操作JSON显式[]而独立任务可省略；公开核验keyset越过20个失效输入，保留原key优先及满窗口早停。
+- Go完整全套与隔离MySQL补测通过；前端164文件1220测试、双构建及Chromium权限/竞态/空操作负例通过。真实HTTP .3另key启动409明确未生效，task集合不变，见start-receipt-http.json。
+- Workspace挂载helper380b5d8/63de2d2及文档2186239：detach失败停止、attach须真挂载、唯一canonical同名与完整versions一致才open，独立审查通过；相关22项、全套220通过。source Skill更新并由sync工具同步副本。
 
-## 当前
+## 真实验证
 
-Agent0d507e1最终949项通过，独立限定复审无阻断；Cloud7ba7844修真实安装版浮层“当前无任务”误导，23项定向和双构建通过，根已核对窄diff。四仓PR Cloud51、Agent19、Desktop18、Workspace64均已建立；前三项ready，Workspace待最终证据。Agent CI72、Desktop64和Workspace161通过，Cloud201执行中。
+- 现有本人百度Profile只有1个，配置并发5，按用户确认向下兼容实际group1成员1。batch2目标60、候选1、明确确认缺口59后仅建task12/attempt35/output134；真实submission1882771499985646302，generation2核验公开并关联唯一work5，平台ID11733113375672752567。重启后仍一次attempt，不重复投稿。原attempt保留completed/reviewing投稿历史，后续公开观察更新task与work。
+- 最终fe741fe完整all PASS，日志/tmp/chg108-final-fe741fe-bringup.log。最新挂载frontend0.1.0+fe741fe与构建一致；路径/Users/aqiuye/Develop/workspace/wt-media/.local/m2b/desktop-review-mount/起飞.app。
+- 最终Web及安装版实际走查均为1/60·1.67%、待公开0、差额59、任务行已发布。原任务/作品关联及返回分页正确；真实Web零候选批次1禁止start，带原因终止后cancelled且零task。开始后配置冻结；复制显示原成片已占用。
+- 正式wt chg verify在Cloud7ba/Agent0d/Desktopca44退出0，215/949/560及全部环境门禁通过；后续最终Go、前端1220、Workspace220和fe741fe全环境分别验证通过，范围如实列于证据。Windows及真实多Profile未宣称已跑，受控并发/故障与真实单Profile分列，V01–V11见acceptance-matrix.md。
 
-真实安装版批次2已显式确认60目标/1候选/59缺口，创建唯一task12/attempt35/group1，实际百度投稿1882771499985646302进入reviewing，自动步骤结束、批次ended，公开仍0/60。Web同批读回/复制占用提示/1024视口通过；批次1零候选start被阻止，填写原因终止后cancelled且0正式任务。总task7→8、attempt34→35，重建后仍唯一原attempt。
+## 当前与下一步
 
-## 下一步
+四仓PR为Cloud51、Agent19、Desktop18、Workspace64。尚未合并；Cloud最新CI204运行中，Agent72/Desktop64绿；Workspace待提交最终证据并ready。接着检查所有最新CI/review thread，更新PR，合入运行仓并确认本地main，最后Workspace归档合入，再按依赖门禁启动109。不再次要求已授权权限或逐CHG用户签收。
 
-最新Cloud7ba7844的完整环境all已通过并重包；正在独立Agent稳定环境重跑正式wt chg verify（此前并发build移除DMG时检查器报no dmg，未掩盖）。随后launch-dmg重新登录，核对新浮层文案和实际公开结果。补齐V证据、CI/PR问题、main合入归档108后才启动109。用户授权完整流程持续有效。
+## 现场与限制
 
-## 升级现场
+旧核验安全切换：旧服务停止、8188/8765无监听，原Profile正式API两次读回closed后才按117 README开放cutover，UTC2026-11-24 20:03:40.261007；未改业务结果。详见legacy-cutover.md。
 
-2026-11-25旧DB存在5个核验task（3/7/8/10/11），均涉及实际Profile dadb60405c354150a42811540654814f。已执行统一local_env.py stop，旧Cloud/Agent/Desktop及Worker/开发服务停止；8188/8765无监听。随后通过正式BitBrowserClient.is_profile_closed只读查询，返回closed=true。117实际迁移后legacy_check_count=5且门禁关闭，活跃holder0；再次核实原Profile关闭与旧PID退出后按README单行开放。DB UTC2026-11-24 20:03:40.261007读回verified，引用evidence/legacy-cutover.md，后续最新all门禁全部通过。
+旧dmg-mount遗留只读ghost未被当最新包使用；canonical改同Runtime根desktop-review-mount并逐次验证挂载来源。3fc构建临时image校验失败已精确卸载本次临时镜像后完整重跑，没有跳过门禁。
 
-## 授权与限制
+CUA无活动/无takeover，最后completion为Verified final cross-client public results。现有browserForFinalWeb/browserForFinalReadback实际变量为browserForFinalWeb及webForFinalReadback，tab1最终batch2；acceptedDesktop为新路径App。公开作品临时tab3已关闭。IAB避免getTab/reload/goto的focus超时，使用browser.tabs.get('1')与Playwright。原生截图2560坐标直接使用。
 
-用户授权编码/测试/PR修复/真实E2E及最终走查，107–109由用户最后统一验收；测试凭据仅用会话指定值、不落仓。真实DeepSeek只发送已授权的标题/文案/要求/目标和资源数，不发送视频或凭证。实际仅1个本人百度账号，按用户确认少于N向下兼容；受控多Profile与真实单Profile证据分列。批次2修订2、目标60/候选1/缺口59，已保存真实AI与双封面、尚未启动，可供108使用。
+凭据仅用会话值不落仓；DeepSeek只发送用户允许的标题/文案/要求/目标资源数，不发送视频或凭证。没有阻断业务疑问；剩余仅PR交付步骤。用户107–109整体最终验收尚未发生。

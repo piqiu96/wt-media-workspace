@@ -37,7 +37,7 @@ contracts:
     # 2026.10.30.1：CHG099 代理 ID 改为自增整数，窗口代理关系及操作回执同步迁移；
     # 代理列表新增管理员团队文本搜索（ADR-0029）。
     # CHG106：新增单数 image-asset 接口，文件响应增加实际图片元信息；兼容性新增。
-    contract_revision: "2026.11.25.2"
+    contract_revision: "2026.11.25.3"
     consumers:
       - wt-media-cloud/web
       - wt-media-desktop
