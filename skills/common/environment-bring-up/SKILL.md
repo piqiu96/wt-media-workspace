@@ -38,7 +38,7 @@ Before relying on any process, enforce freshness:
    - Desktop frontend via `wt-media-workspace/scripts/build-desktop-frontend.sh` and DMG via `cargo tauri build --bundles dmg --no-sign`;
    - Regenerate Cloud desktop artifacts (`npm run build:desktop`).
 3. **Freshness gate.** Confirm each running artifact was built after the latest source commit it contains (compare process start time and build artifact mtime against `git log -1 --format=%ci` in the owning repo). If any artifact is older than its source, restart/re-build it. Do not proceed with a stale Cloud or Agent.
-4. **Mount and launch** the freshly built DMG. The harness does this itself: it attaches the DMG at a private mountpoint under its runtime dir (`.local/m2b/desktop-review-mount`), verifies that this path is actually mounted and its version record matches the finalized bundle, then opens the product-named app bundle (currently `起飞.app`). A busy prior mount stops launch; it is never overlaid with another image. The legacy `dmg-mount` is left untouched when macOS retains a ghost mount there.
+4. **Mount and launch** the freshly built DMG. The harness does this itself: it attaches the DMG at a private mountpoint under its runtime dir (`<runtime-dir>/desktop-review-mount`), verifies that this path is actually mounted and its version record matches the finalized bundle, then opens the product-named app bundle (currently `起飞.app`). A busy prior mount stops launch; it is never overlaid with another image. The legacy `dmg-mount` is left untouched when macOS retains a ghost mount there.
 5. **Verification gates** — all must pass, no partial-pass shortcut:
    - Cloud `GET /api/v1/health` → `{"errcode":0}`;
    - Agent `GET /healthz` and `GET /api/v1/status` → `bitbrowser_status == "normal"`;
@@ -56,7 +56,7 @@ Reuse these prior conclusions instead of re-debugging them:
 - Wrong password / account disabled returns `errcode 11001` with message `请先登录或凭证已过期` — this is the generic auth-failed message, NOT a session message. If the operator cannot log in, the credential is wrong or disabled; reset via admin `POST /api/v1/users/:user_id/reset-password` (convention: reset password equals the username, e.g. `operator01`/`operator01`).
 - Valid credentials with an existing session return `errcode 20010 当前账号已在其他位置登录`; the client must resend with `replace_existing: true`. The Desktop `LoginPage` already handles this — verify the flow, do not treat 20010 as a hard failure.
 - Login "works from curl but fails in the packaged app": check the Cloud origin the app resolved against `csp_connect_src` in its bundled config, the CORS preflight from `http://tauri.localhost`, and that the running Cloud is the latest build (stale `go run` process serves old routes).
-- Before reopening a rebuilt DMG: stop old `wt-media-desktop-shell` processes and detach the task's `.local/m2b/desktop-review-mount`. Do not unmount unrelated user images. A legacy busy/ghost `dmg-mount` must not be reused as proof that the fresh image is mounted.
+- Before reopening a rebuilt DMG: stop old `wt-media-desktop-shell` processes and detach the task's `<runtime-dir>/desktop-review-mount`. Do not unmount unrelated user images. A legacy busy/ghost `dmg-mount` must not be reused as proof that the fresh image is mounted.
 - Environment non-determinism from multiple historical databases: always use the single fixed DSN `wt_media_cloud` and never switch to `wt-media-cloud`, `wt_media_acceptance`, or other schemas.
 
 ## Failure handling
