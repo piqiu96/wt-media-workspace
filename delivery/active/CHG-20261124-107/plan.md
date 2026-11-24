@@ -8,9 +8,9 @@
 
 ## 执行约定
 
-本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，本项IMPLEMENTING，代码须经依赖与分支预检后实施。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
+本文件是2026-11-25实施与验收基线，与change.md配套；状态只在change.md，用户已授权全流程执行，本项VERIFYING，代码须经依赖与分支预检后实施。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
-产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。原型查阅基线ac29c1a7cefaace40501c61a10bb618309b39002尚不是本轮视觉签收；补齐新场景、review并固定SHA后再实施正式页面。
+产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。本轮配置准备原型固定Cloud提交dabc473786098d8215a6db7e332d927d13fc8d96，隔离预览?review=chg107；工程视觉/三角色入口及窄窗已核对，见设计入口§4.3。该原型fixture不代替正式Web和安装版验收，用户仍最后统一验收。
 
 Cloud内部按Handler→Service→Repository落位，跨模块复用所属Service；共用Vue只在Cloud维护，Agent管本机，Desktop管桥。正式OpenAPI/枚举/错误码由提供方维护，本稿API字段是定版输入，不是第二份可写契约。接口省略/api/v1；session/AgentToken/本地受信身份按调用链区分。ID/revision字符串、RFC3339时间，沿用errcode/message/data/logid；查询先授权再分页聚合。保存用revision，创建/启动用请求键与服务端摘要防重，同键异输入拒绝；结果未知先查询原结果，不换键重试。
 
@@ -67,11 +67,11 @@ config的候选使用row_key/input_revision/field_revisions，保存账号/成�
 
 ## 4. 执行落地步骤
 
-- [ ] T01 Workspace产品/架构：同步PRD/M7/工程设计的保存不占用、本人账号、候选编辑、四项设置；固定调整后的原型SHA。产物：无旧口径冲突的基线。
-- [ ] T02 Cloud契约：定版A01–15的DTO/OpenAPI/错误和兼容，明确基础保存合法性与发布完整校验区别。产物：生成/契约检查结果。
-- [ ] T03 Cloud migrations/model/repository：batch迁移、唯一键、修订保存、文件引用事务。产物：隔离MySQL新建/回滚/旧系统兼容证据。
-- [ ] T04 Cloud service/handler：本人资源查询、分配、validate、保存/编辑/复制/记录。产物：功能与A接口逐项对应，保存后task/占用增量为0。
-- [ ] T05 Cloud publish/image：AI/封面批量SSE、字段版本、取消/断流/逐条失败。产物：真实依赖成功和明确失败、单条兼容。
+- [x] T01 Workspace产品/架构：同步PRD/M7/工程设计的保存不占用、本人账号、候选编辑、四项设置；固定调整后的原型SHA。产物：无旧口径冲突的基线。
+- [x] T02 Cloud契约：定版A01–15的DTO/OpenAPI/错误和兼容，明确基础保存合法性与发布完整校验区别。产物：生成/契约检查结果。
+- [x] T03 Cloud migrations/model/repository：batch迁移、唯一键、修订保存、文件引用事务。产物：隔离MySQL新建/回滚/旧系统兼容证据。
+- [x] T04 Cloud service/handler：本人资源查询、分配、validate、保存/编辑/复制/记录。产物：功能与A接口逐项对应，保存后task/占用增量为0。
+- [x] T05 Cloud publish/image：AI/封面批量SSE、字段版本、取消/断流/逐条失败。产物：真实依赖成功和明确失败、单条兼容。
 - [ ] T06 Agent/Desktop：本机未提交batch续编、受控桥、提供方版本/消费锁同步。产物：重启恢复/修订竞争/身份切换证据；若无契约变更不制造空改动。
 - [ ] T07 Cloud共用Vue：列表、三段工作区、候选整体编辑、批量审阅、配置区和返回。产物：Web/Desktop同源码，发布按钮待108接通。
 - [ ] T08 联调/独立review：按以下V清单验证，净差异review并修复。产物：evidence摘要、未验收范围；不预填发布成功。

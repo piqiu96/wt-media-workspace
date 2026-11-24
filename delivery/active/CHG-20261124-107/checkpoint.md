@@ -9,7 +9,7 @@
 
 ## 当前工作
 
-T02–T06已实现并定向验证；Cloud后端首轮5项审查已修复（ab0f108），限定复审中。T07共用Vue与新版原型收尾；API阶段真实资源保存及真实AI已通过，尚待最新完整环境、安装版、E2E与页面走查。
+T02–T07实现和独立审查均闭环，状态VERIFYING。最终Cloud27b8aca、Agent44c7b81、Desktop99b0e12；真实API/AI及1195前端测试通过。完整环境首次打包暴露旧harness遗漏Desktop版本overlay，已改用提供方正式入口并通过限定审查/Workspace215，fresh all重跑中，等待安装版/E2E及页面走查。
 
 ## 下一步
 
@@ -53,3 +53,22 @@ T02–T06已实现并定向验证；Cloud后端首轮5项审查已修复（ab0f1
 - Cloud后端首轮修复ab0f108：发布类目范围、图片库删除MVCC、必填数值结构、A08已有配置上下文。定向Go与实际隔离MySQL回归通过，限定复审中。
 - Web真实页面读取batch1：目标60、候选0、未开始、正式任务0，四项执行设置与HTTP一致。此为增量开发站点检查，未代替最新打包安装版验收。
 - 实际发布资源仍仅1个本人账号；107零正式任务，108之后按现有Profile数向下兼容，多Profile路径须另有受控测试。
+
+## 前端与完整校验阶段（2026-11-25）
+
+- Cloud生产共用Vue240cbd9、批量确认97b2bbc；完整前端163文件/1195项及受控Chrome回归通过，初版两端构建通过。独立前端首轮发现2个P2（旧封面覆盖新标题、初次图片选择不加载），由原实现者修复，尚未合入。
+- 原型固定dabc473，主会话核对4张全页、三角色入口与1024窄窗列表；这是fixture工程review，不代表真实后台或用户最终验收。
+- 主线wt chg verify已通过Workspace215、Go模块、Agent892、Desktop560/6既有忽略及其契约定向检查；最终环境verify因scheduler构建早于新Cloud提交而失败。按fresh all重建后再核实，不将该总命令记为全绿。
+- 原生CUA已可读取起飞安装版登录页；尚未在旧包操作业务。最新生产修复提交后执行完整all与打包，继续Web/原生走查。
+- PR关联：Cloud50、Agent18、Desktop17、Workspace63均为draft；不在验收前合并。
+
+## 进入VERIFYING（2026-11-25）
+
+- 后端064451a两轮限定复审通过；前端27b8aca修复首轮2项P2，并补97b2bbc批量确认；限定增量复审通过，无新P1/P2。最终前端1195项与同一受控Chrome回归通过。
+- Cloud最终候选27b8aca已推送PR50；Workspace63/Agent18/Desktop17均等待完整联调。
+- `local_env.py all --force-restart`正运行，日志/tmp/chg107-full-bringup.log，会话5084；使用用户指定账号，不重置密码。原生CUA可用；已绑定nativeQaApp。IAB batchQaTab为真实页面，prototypeQaTab已关闭，qaViewport已reset。没有浏览器活动待关闭或takeover。
+
+## 打包入口兼容修正（2026-11-25）
+
+- fresh all初次失败：Desktop build.rs106明确拒绝无version overlay的release包；未绕过构建检查。修正Workspace local_env.build_dmg为调用Desktop现有build-desktop-environment.py --environment prod --profile release --bundles dmg --no-sign，移除旧手工签名和基础版本命名逻辑。提供方负责版本、最终sidecar摘要/签名和DMG校验；保留本机数据身份和原Cloud连接，无产品Tag时为local未发行版本。
+- 限定独立审查通过；现有m2b定向17项与Workspace完整215项通过。完整fresh all重新从头运行中，会话67021，日志/tmp/chg107-full-bringup-fixed.log，未宣称环境全绿。
