@@ -17,3 +17,5 @@ T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型
 启动前108四仓main与验收source tree一致。当前真实只有1个本人百度Profile，实际多批按此顺序执行，受控多Profile分列。109真实验收需通过合法成片生产流程准备新的本人可用输出，不能复用已占用output134或改库伪造。无阻断业务疑问；凭据不落仓，真实DeepSeek仅发送已授权文本/目标和资源数量。
 
 T01独立预审发现三项实现定义遗漏，已在plan落字：全部已启动前缀未决、永久停止含report提交许可/心跳、每批选择范围与缺口持久冻结；确认绑定实时依据，takeover不可绕过首启。无新增产品决策。
+
+T02本机提供方：Agent6f565d2发布LocalAPI2026.11.25.2追加plan enum；独立只读OpenAPI兼容性复审无P1/P2，契约文档8项通过。Desktop3f09248同步消费锁（仅锁，Plan桥运行分支留T07）；Workspace map同步，verify_m0_config通过。Cloud .4 plan正式schema仍由独立契约实施者进行，尚未进入运行实现。
