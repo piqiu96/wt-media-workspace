@@ -9,6 +9,7 @@
 | 主题 | 工作稿 |
 | --- | --- |
 | 内容运营整体导航 | [内容运营](content-operations.md) |
+| 运营资源与文件管理、个人信息、本机设置与日志 | [交互评审稿](resource-filter-and-settings.md)（已确认部分已实施；其他筛选行为建议待review） |
 | 发布管理：产品与原型入口 | [PRD 第六章](../product/prd/详细文档/第六章_发布管理.md)维护最终产品规则；[发布管理导航](publishing.md)保留专项交互、待对齐项与平台调研 |
 | 发布管理与运营工具工程设计 | [Engineering Spec](../engineering/specs/publishing-management.md)维护三端交互、六表、并发恢复与契约职责；产品未决事项集中在该规格 1.3，设计不代表已实现 |
 | 运营工具 → 图片库 | [PRD 6.6](../product/prd/详细文档/第六章_发布管理.md#66-图片库)维护上传、查找、启停与引用规则；[原型入口](publishing.md) |
