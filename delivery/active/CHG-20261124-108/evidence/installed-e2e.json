@@ -1,0 +1,106 @@
+{
+  "change": "CHG-20261124-108",
+  "date": "2026-11-25",
+  "status": "IN_PROGRESS",
+  "initial_runtime": {
+    "cloud": "89f49b6b6bb90e2edc7fc06dd102cb05b0853385",
+    "agent": "0d507e1f7440841c4081c8fb1b289325eff24ae1",
+    "desktop": "ca44cba8eb5782d08bf6e2b0d7f8ec8e1eabf826",
+    "bringup_log": "/tmp/chg108-full-bringup.log",
+    "all_gates": "PASS"
+  },
+  "latest_runtime": {
+    "cloud": "7ba7844704f18989a9d1e0ff6b2d3be59f4b47a7",
+    "bringup_log": "/tmp/chg108-full-bringup-final.log",
+    "all_gates": "PASS",
+    "corrected_native_pill_readback": "PENDING"
+  },
+  "account_scope": {
+    "operator": "operator01",
+    "platform": "baidu",
+    "available_owned_profiles": 1,
+    "configured_concurrency": 5,
+    "actual_group_size": 1,
+    "multi_profile_evidence": "controlled MySQL/SQLite/thread tests, not real multi-account platform submissions"
+  },
+  "native_flow": {
+    "method": "actual packaged macOS app via CUA; real Cloud and BitBrowser; no route or platform mocks",
+    "batch_id": "2",
+    "task_id": "12",
+    "attempt_id": "35",
+    "output_id": "134",
+    "group_no": 1,
+    "pre_start": {
+      "target_count": 60,
+      "candidate_count": 1,
+      "formal_tasks_in_batch": 0
+    },
+    "explicit_start_confirmation": {
+      "included_count": 1,
+      "acknowledged_shortfall": 59
+    },
+    "after_start": {
+      "target_count": 60,
+      "created_count": 1,
+      "creation_shortfall": 59,
+      "configuration_edit_action": false
+    },
+    "execution": {
+      "status": "reviewing",
+      "attempt_status": "completed",
+      "attempt_count": 1,
+      "platform_submission_id": "1882771499985646302",
+      "publicly_verified": false
+    },
+    "batch_after_automatic_steps": {
+      "status": "ended",
+      "pending_public": 1,
+      "published_count": 0,
+      "public_rate": "0 / 60 · 0%",
+      "gap_to_public_goal": 60
+    },
+    "original_task_link_and_return": "PASS; task12/from_batch2 and task pagination preserved",
+    "public_rate_explanation": "PASS; only verified public tasks with linked works count",
+    "final_public_readback": "PENDING"
+  },
+  "web_flow": {
+    "method": "actual existing logged-in localhost5173 IAB tab via documented CUA Playwright; no fixtures",
+    "same_batch_counts": "PASS; 60 target / 1 task / gap59 / reviewing not public",
+    "started_configuration_frozen": "PASS; only copy available after end",
+    "copy_in_use_resource": "PASS; new unsaved configuration shows original output already occupied; return leaves exactly 2 batches",
+    "viewport_check": {
+      "inner_width": 1024,
+      "document_width": 1024,
+      "scroll_width": 1024,
+      "override_reset": true
+    },
+    "zero_candidate_start": "PASS; batch1 modal says no candidates, no start confirmation or task creation",
+    "stop_configuration": {
+      "batch_id": "1",
+      "required_reason": true,
+      "final_status": "cancelled",
+      "formal_task_count": 0,
+      "edit_start_resume_absent": true
+    }
+  },
+  "readback_after_rebuild": {
+    "total_task_count": 8,
+    "previous_total_task_count": 7,
+    "total_attempt_count": 35,
+    "previous_total_attempt_count": 34,
+    "batch2_task_count": 1,
+    "batch2_attempt_count": 1
+  },
+  "limitations": [
+    "Windows and unopened platforms not run as real platform acceptance",
+    "No real multi-Profile claim beyond the one available owned profile",
+    "Platform public result pending; do not count as success",
+    "Resource cache conservatively retained diagnostic companions; not claimed cleaned"
+  ],
+  "pending": [
+    "latest native connectivity copy readback",
+    "formal chg verify after artifact rebuild",
+    "actual public task/attempt/work consistency",
+    "PR final checks and merge"
+  ]
+}

@@ -11,15 +11,17 @@
 
 ## 当前
 
-Agent0d507e1正在收口最终全套和有限复审。最新定向18轮询、37核验、19装配、8下载与24Source通过；此前091b333全套运行日志/tmp/chg108-agent-final-091b333.log待核对完整结果。Desktop既有Rust/打包/协议锁测试已通过。本项各仓尚无108PR，验收清单保持未勾选。
+Agent0d507e1最终949项通过，独立限定复审无阻断；Cloud7ba7844修真实安装版浮层“当前无任务”误导，23项定向和双构建通过，根已核对窄diff。四仓PR Cloud51、Agent19、Desktop18、Workspace64均已建立；前三项ready，Workspace待最终证据。Agent CI72、Desktop64和Workspace161通过，Cloud201执行中。
+
+真实安装版批次2已显式确认60目标/1候选/59缺口，创建唯一task12/attempt35/group1，实际百度投稿1882771499985646302进入reviewing，自动步骤结束、批次ended，公开仍0/60。Web同批读回/复制占用提示/1024视口通过；批次1零候选start被阻止，填写原因终止后cancelled且0正式任务。总task7→8、attempt34→35，重建后仍唯一原attempt。
 
 ## 下一步
 
-最终复审/全套→提交Workspace共同定义与证据→四仓PR/CI→最新全流程环境重建及旧核验安全门禁→Web/安装版真实单Profile和故障验收→修复→main合入归档108→启动109。用户已授权整个流程，不重复请求106签收或AI许可。
+最新Cloud7ba7844的完整环境all已通过并重包；正在独立Agent稳定环境重跑正式wt chg verify（此前并发build移除DMG时检查器报no dmg，未掩盖）。随后launch-dmg重新登录，核对新浮层文案和实际公开结果。补齐V证据、CI/PR问题、main合入归档108后才启动109。用户授权完整流程持续有效。
 
 ## 升级现场
 
-2026-11-25旧DB存在5个核验task（3/7/8/10/11），均涉及实际Profile dadb60405c354150a42811540654814f。已执行统一local_env.py stop，旧Cloud/Agent/Desktop及Worker/开发服务停止；8188/8765无监听。随后通过正式BitBrowserClient.is_profile_closed只读查询，返回closed=true。尚未运行117实际迁移或写开放门禁，后续必须记录迁移后状态及证据引用，不能依代次/超时放行。
+2026-11-25旧DB存在5个核验task（3/7/8/10/11），均涉及实际Profile dadb60405c354150a42811540654814f。已执行统一local_env.py stop，旧Cloud/Agent/Desktop及Worker/开发服务停止；8188/8765无监听。随后通过正式BitBrowserClient.is_profile_closed只读查询，返回closed=true。117实际迁移后legacy_check_count=5且门禁关闭，活跃holder0；再次核实原Profile关闭与旧PID退出后按README单行开放。DB UTC2026-11-24 20:03:40.261007读回verified，引用evidence/legacy-cutover.md，后续最新all门禁全部通过。
 
 ## 授权与限制
 
