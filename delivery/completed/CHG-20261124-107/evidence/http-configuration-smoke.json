@@ -1,0 +1,41 @@
+{
+  "batch_id": "1",
+  "revision": "3",
+  "request_key": "48cc74b7-413e-45f6-a867-698c5e638fbc",
+  "real_candidate_count": 1,
+  "retained_candidate_count": 0,
+  "targets": [
+    {
+      "category_id": "4",
+      "target_count": 60
+    }
+  ],
+  "visible_task_count_before_after": [
+    7,
+    7
+  ],
+  "visible_attempt_count_before_after": [
+    34,
+    34
+  ],
+  "selected_outputs_still_unoccupied": [
+    "134"
+  ],
+  "checks": [
+    "incomplete precheck",
+    "incomplete config save",
+    "same-key replay",
+    "original-key recovery",
+    "same-key changed input refused",
+    "actual candidate deletion preserves goals/retained row keys",
+    "old-revision conflict",
+    "server readback and audit",
+    "zero visible task/attempt increment",
+    "no output occupation"
+  ],
+  "limits": [
+    "Only configured available own accounts used.",
+    "60-row atomicity and delete races belong to isolated MySQL tests.",
+    "No task start or platform submission occurred."
+  ]
+}

@@ -11,11 +11,9 @@ import argparse
 import json
 import os
 import re
-import shutil
 import signal
 import subprocess
 import sys
-import tempfile
 import time
 import tomllib
 import urllib.error
@@ -610,56 +608,18 @@ def clean_artifacts() -> None:
 
 
 def build_dmg() -> None:
-    """Build the DMG in the shape the app's own integrity check accepts.
+    """Let Desktop own version, identity, final sidecar signing and DMG contents.
 
-    `cargo tauri build --bundles dmg` produces a bundle with no
-    `Contents/Resources/sidecar-manifest.json`, and *inside a bundle* that file is
-    what `src-tauri/src/sidecar/integrity.rs` reads before it will start the Agent:
-    bundle + sidecar + no record is a refusal, not a warning. Measured on the
-    2026-10-02 build -- the packaged app logged "包内缺少记录文件" from 21:52 on and
-    never claimed a task, so the one `local_agent` download in the queue sat there
-    while every health check in this script read green.
-
-    The record is written by `scripts/repair-macos-signing.sh`, which belongs to
-    the release path -- that is why a plain `--bundles dmg` never runs it. The
-    sequence below mirrors `scripts/build-release-macos.sh`, minus
-    `stage-release-config.sh`: that one rebuilds the sidecar against
-    `config_online/`, and this environment is deliberately built against the local
-    config.
+    The prod identity keeps this local application's existing data directory.
+    Without a product tag the provider records an unpublished local version,
+    preserving the checked-out runtime configuration and Cloud connection.
     """
     clean_artifacts()
-    log("Building Desktop frontend")
-    run(["bash", str(SCRIPTS_DIR / "build-desktop-frontend.sh")])
-    log("Building Desktop app bundle")
-    run(["cargo", "tauri", "build", "--bundles", "app", "--no-sign"], cwd=DESKTOP_DIR)
-    app = built_app_bundle()
-    log("Writing the sidecar record into the bundle and re-signing")
-    run(["bash", str(DESKTOP_DIR / "scripts" / "repair-macos-signing.sh"), str(app)])
-    dmg = _dmg_path(app)
-    log("Packing the DMG")
-    staging = Path(tempfile.mkdtemp(prefix="wt-media-dmg.", dir="/private/tmp"))
-    try:
-        run(["cp", "-R", str(app), str(staging / app.name)])
-        (staging / "Applications").symlink_to("/Applications")
-        DMG_DIR.mkdir(parents=True, exist_ok=True)
-        run([
-            "hdiutil", "create", "-volname", app.stem, "-srcfolder", str(staging),
-            "-ov", "-format", "UDZO", str(dmg),
-        ])
-    finally:
-        shutil.rmtree(staging, ignore_errors=True)
-
-
-def _dmg_path(app: Path) -> Path:
-    """Where this script's DMG goes, named the way the release path names it.
-
-    `<product>_<version>_<arch>.dmg` -- the product name is the app bundle's own
-    name and the version comes from `tauri.conf.json`, so a rename or a version
-    bump lands in the filename instead of breaking it.
-    """
-    config = json.loads((DESKTOP_DIR / "src-tauri" / "tauri.conf.json").read_text(encoding="utf-8"))
-    arch = {"arm64": "aarch64", "x86_64": "x64"}.get(os.uname().machine, os.uname().machine)
-    return DMG_DIR / f"{app.stem}_{config['version']}_{arch}.dmg"
+    log("Building Desktop package through its identity/version entry point")
+    run([
+        sys.executable, str(DESKTOP_DIR / "scripts" / "build-desktop-environment.py"),
+        "--environment", "prod", "--profile", "release", "--bundles", "dmg", "--no-sign",
+    ], cwd=DESKTOP_DIR)
 
 
 def rebuild_cloud_dist() -> None:

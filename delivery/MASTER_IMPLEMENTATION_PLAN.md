@@ -501,8 +501,8 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 | 目标 | 本人批次候选保存、批量内容、启动原子建单、分组并发、异常保护与公开结果 |
 | 依赖 | M6 `DONE` |
 | 业务验收 | [M7批次](milestones/M7-batch-publishing.md) |
-| Active CHG | [CHG-20261124-107](active/CHG-20261124-107/change.md) |
-| Evidence | None，尚无生产批次验收 |
+| Active CHG | None |
+| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；执行验收由108完成 |
 
 候选 CHG：
 
@@ -511,7 +511,7 @@ M7-准备：本人资源＋批量内容＋候选配置保存（无task/占用）
 → M7-执行：start原子建单＋分组/间隔＋跨批互斥＋异常暂停与公开结果
 ```
 
-2026-11-25按用户最新裁定，[CHG107](active/CHG-20261124-107/plan.md)只保存本人候选配置，不创建task/占用；[CHG108](planned/CHG-20261124-108/plan.md)首次start原子建单、占用并授权，按组运行、组间等待，组间处理和异常任务上限控制暂停/继续/终止。旧混合归属授权与滚动补位不进入本轮。两项已获用户执行授权，107为IMPLEMENTING、108为PLANNED，步骤/API/迁移/验收详见清单；依赖M6及相关review完成后预检启动。
+2026-11-25按用户最新裁定，[CHG107](completed/CHG-20261124-107/plan.md)只保存本人候选配置，不创建task/占用；[CHG108](planned/CHG-20261124-108/plan.md)首次start原子建单、占用并授权，按组运行、组间等待，组间处理和异常任务上限控制暂停/继续/终止。旧混合归属授权与滚动补位不进入本轮。两项已获用户执行授权，107技术交付DONE、108为PLANNED，步骤/API/迁移/验收详见清单；依赖M6及相关review完成后预检启动。
 
 ### M-publishing-plan：发布计划推进与结束
 

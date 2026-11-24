@@ -1,0 +1,122 @@
+{
+  "scope": "CHG107 configuration only; no batch start or platform submission",
+  "tested_components": {
+    "cloud": "27b8acac12c27395c8cc23354517a0117b85df72",
+    "agent": "44c7b8150b5a6675e26775492efecd2011b6a0bc",
+    "desktop": "99b0e12fbb70d36ea621f9b04165c652a2a91bf0",
+    "workspace": "de6da4d57ace711a2ada89b388c4bd6a0e2d476d"
+  },
+  "environment": {
+    "command": "local_env.py all --force-restart",
+    "result": "PASS (exit 0) after using Desktop-owned version/identity packaging entry",
+    "database": "wt_media_cloud",
+    "migration_total": 118,
+    "package": "起飞_0.1.0-local.99b0e12fbb_aarch64.dmg",
+    "frontend_version": "0.1.0+27b8aca",
+    "sidecar_sha256": "2f91da001d99d9cea5cba5762b058a4c793abef39eedaf69b83dcdb0a3a7e139",
+    "gates": [
+      "Cloud health and rebuilt workers/scheduler",
+      "Agent readiness and BitBrowser normal before handover",
+      "Cloud/desktop frontend entrypoints",
+      "fresh desktop assets; origin from packaged configuration; no baked loopback API base",
+      "CORS",
+      "fresh verified DMG and mount",
+      "operator login",
+      "native trusted environment panel: connected/no task, correct BitBrowser identity, execution credential configured"
+    ]
+  },
+  "readbacks": {
+    "before": {
+      "observed_at": "2026-11-24T18:22:46.642696+00:00",
+      "task_total": 7,
+      "visible_attempt_total": 34,
+      "task_states": {
+        "published": 4,
+        "cancelled": 1,
+        "reviewing": 1,
+        "failed": 1
+      },
+      "selected_output_134_unoccupied": true,
+      "batches": [
+        {
+          "id": "1",
+          "revision": "3",
+          "execution_status": "not_started"
+        }
+      ]
+    },
+    "native_saved": {
+      "observed_at": "2026-11-24T18:32:42.488953+00:00",
+      "task_total": 7,
+      "visible_attempt_total": 34,
+      "task_states": {
+        "published": 4,
+        "cancelled": 1,
+        "reviewing": 1,
+        "failed": 1
+      },
+      "selected_output_134_unoccupied": true,
+      "batches": [
+        {
+          "id": "2",
+          "revision": "1",
+          "execution_status": "not_started"
+        },
+        {
+          "id": "1",
+          "revision": "3",
+          "execution_status": "not_started"
+        }
+      ]
+    },
+    "web_edited": {
+      "observed_at": "2026-11-24T18:34:43.573583+00:00",
+      "task_total": 7,
+      "visible_attempt_total": 34,
+      "task_states": {
+        "published": 4,
+        "cancelled": 1,
+        "reviewing": 1,
+        "failed": 1
+      },
+      "selected_output_134_unoccupied": true,
+      "batches": [
+        {
+          "id": "2",
+          "revision": "2",
+          "execution_status": "not_started"
+        },
+        {
+          "id": "1",
+          "revision": "3",
+          "execution_status": "not_started"
+        }
+      ]
+    }
+  },
+  "actual_native_flow": [
+    "Saved local batch input: name and category target60",
+    "Exited with Cmd+Q and relogged; new entry restored name/target60",
+    "Loaded one eligible own account and one output; paired1, target60, shortfall59",
+    "Real DeepSeek generated description, topics, cover_title; reviewed and individually adopted",
+    "Source landscape thumbnail adopted; incompatible library image correctly refused as portrait",
+    "Real 1080x1440 template and real library background rendered a portrait image; visually reviewed and explicitly adopted",
+    "Content explicitly confirmed; settings5/2s/pause_on_exception/3; saved batch2 revision1",
+    "Cloud save cleared local draft: reopening new batch had blank name and no targets",
+    "Reloaded same batch from list after Web edit; observed new description and3-second interval"
+  ],
+  "actual_web_flow": [
+    "Read the batch created in native client",
+    "Edited description; previous confirmation invalidated",
+    "Selected candidate and explicitly confirmed reviewed content; A08 returned1 confirmable",
+    "Saved same batch2 to revision2 with interval3s",
+    "At1024x768 measured documentWidth=scrollWidth=1024 and visually checked detail/footer; restored viewport"
+  ],
+  "boundaries": [
+    "Only one real own Baidu account/output was available; 60-to58, multi-owner denial, races and failures use isolated database/controlled tests",
+    "Three-role prototype controls are fixture checks, server role boundaries covered by backend tests",
+    "macOS arm64 packaged acceptance; no Windows/x64 package acceptance or platform publishing claimed",
+    "Actual batch target remains60 with1 candidate and59 shortfall; configuration incomplete is truthful",
+    "Plan freeze behavior is a CHG109 integration gate, not implemented by CHG107"
+  ]
+}

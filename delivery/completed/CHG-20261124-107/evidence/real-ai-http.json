@@ -1,0 +1,27 @@
+{
+  "total": 2,
+  "success": 2,
+  "failed": 0,
+  "rows": [
+    {
+      "row_key": "chg107-http-a",
+      "event": "item_result",
+      "fields": [
+        "description",
+        "topics"
+      ],
+      "message": null
+    },
+    {
+      "row_key": "chg107-http-b",
+      "event": "item_result",
+      "fields": [
+        "description",
+        "topics"
+      ],
+      "message": null
+    }
+  ],
+  "adopted": false,
+  "created_tasks": false
+}

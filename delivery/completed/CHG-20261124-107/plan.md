@@ -8,9 +8,9 @@
 
 ## 执行约定
 
-本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，本项IMPLEMENTING，代码须经依赖与分支预检后实施。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
+本文件是2026-11-25实施与验收基线，与change.md配套；状态只在change.md，用户已授权全流程执行，本项DONE，代码须经依赖与分支预检后实施。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
-产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。原型查阅基线ac29c1a7cefaace40501c61a10bb618309b39002尚不是本轮视觉签收；补齐新场景、review并固定SHA后再实施正式页面。
+产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。本轮配置准备原型固定Cloud提交dabc473786098d8215a6db7e332d927d13fc8d96，隔离预览?review=chg107；工程视觉/三角色入口及窄窗已核对，见设计入口§4.3。该原型fixture不代替正式Web和安装版验收，用户仍最后统一验收。
 
 Cloud内部按Handler→Service→Repository落位，跨模块复用所属Service；共用Vue只在Cloud维护，Agent管本机，Desktop管桥。正式OpenAPI/枚举/错误码由提供方维护，本稿API字段是定版输入，不是第二份可写契约。接口省略/api/v1；session/AgentToken/本地受信身份按调用链区分。ID/revision字符串、RFC3339时间，沿用errcode/message/data/logid；查询先授权再分页聚合。保存用revision，创建/启动用请求键与服务端摘要防重，同键异输入拒绝；结果未知先查询原结果，不换键重试。
 
@@ -43,7 +43,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 | A05 新增 | GET /publication/account | 平台/类目/搜索/分页→本人账号/资格/原因；禁止选择其他用户账号 |
 | A06 扩展 | GET /publication/output | 原筛选及带入ID→真实成片/缩略图/当前occupied；不返回他人任务细节 |
 | A07 新增 | POST /publication-batch/allocate | targets/账号顺序和上限/成片/人工映射→候选配对/逐格差额；无写入/预留 |
-| A08 新增 | POST /publication-batch/validate | 平台/目标/候选/内容/设置→发布前就绪及逐行issues/缺口；只读不签许可 |
+| A08 新增 | POST /publication-batch/validate | 平台/目标/候选/内容/设置，已有编辑携带batch_id/expected_revision→发布前就绪及逐行issues/缺口；只读不签许可，已采用文件按受权保存记录复查 |
 | A09 新增 | POST /publication-batch | request_key/name/platform/targets/config/execution_setting→id/revision/配置就绪；只保存batch/文件引用/审计，不写task/占用 |
 | A10 新增 | PUT /publication-batch/{id}/configuration | expected_revision/完整允许配置→新revision/就绪问题；首次启动前允许候选增删/替换/重排，本批或所属计划已启动均拒绝；计划继承目标不改 |
 | A11 新增 | GET /publication-batch/{id}/record | 分页→时间/操作者/事件；不泄露本地凭据 |
@@ -67,26 +67,26 @@ config的候选使用row_key/input_revision/field_revisions，保存账号/成�
 
 ## 4. 执行落地步骤
 
-- [ ] T01 Workspace产品/架构：同步PRD/M7/工程设计的保存不占用、本人账号、候选编辑、四项设置；固定调整后的原型SHA。产物：无旧口径冲突的基线。
-- [ ] T02 Cloud契约：定版A01–15的DTO/OpenAPI/错误和兼容，明确基础保存合法性与发布完整校验区别。产物：生成/契约检查结果。
-- [ ] T03 Cloud migrations/model/repository：batch迁移、唯一键、修订保存、文件引用事务。产物：隔离MySQL新建/回滚/旧系统兼容证据。
-- [ ] T04 Cloud service/handler：本人资源查询、分配、validate、保存/编辑/复制/记录。产物：功能与A接口逐项对应，保存后task/占用增量为0。
-- [ ] T05 Cloud publish/image：AI/封面批量SSE、字段版本、取消/断流/逐条失败。产物：真实依赖成功和明确失败、单条兼容。
-- [ ] T06 Agent/Desktop：本机未提交batch续编、受控桥、提供方版本/消费锁同步。产物：重启恢复/修订竞争/身份切换证据；若无契约变更不制造空改动。
-- [ ] T07 Cloud共用Vue：列表、三段工作区、候选整体编辑、批量审阅、配置区和返回。产物：Web/Desktop同源码，发布按钮待108接通。
-- [ ] T08 联调/独立review：按以下V清单验证，净差异review并修复。产物：evidence摘要、未验收范围；不预填发布成功。
-- [ ] T09 各仓PR：提供方先行合并main，回写merge证据/用户验收，满足change后归档。
+- [x] T01 Workspace产品/架构：同步PRD/M7/工程设计的保存不占用、本人账号、候选编辑、四项设置；固定调整后的原型SHA。产物：无旧口径冲突的基线。
+- [x] T02 Cloud契约：定版A01–15的DTO/OpenAPI/错误和兼容，明确基础保存合法性与发布完整校验区别。产物：生成/契约检查结果。
+- [x] T03 Cloud migrations/model/repository：batch迁移、唯一键、修订保存、文件引用事务。产物：隔离MySQL新建/回滚/旧系统兼容证据。
+- [x] T04 Cloud service/handler：本人资源查询、分配、validate、保存/编辑/复制/记录。产物：功能与A接口逐项对应，保存后task/占用增量为0。
+- [x] T05 Cloud publish/image：AI/封面批量SSE、字段版本、取消/断流/逐条失败。产物：真实依赖成功和明确失败、单条兼容。
+- [x] T06 Agent/Desktop：本机未提交batch续编、受控桥、提供方版本/消费锁同步。产物：重启恢复/修订竞争/身份切换证据；若无契约变更不制造空改动。
+- [x] T07 Cloud共用Vue：列表、三段工作区、候选整体编辑、批量审阅、配置区和返回。产物：Web/Desktop同源码，发布按钮待108接通。
+- [x] T08 联调/独立review：按以下V清单验证，净差异review并修复。产物：evidence摘要、未验收范围；不预填发布成功。
+- [x] T09 各仓PR：提供方先行合并main，回写merge证据/用户验收，满足change后归档。
 
 ## 5. 验收与证据
 
-- [ ] V01 保存60条候选后batch存在、task/attempt/占用增量均0；未完善内容能保存且标出问题，非法身份/结构仍拒绝。
-- [ ] V02 编辑增删/换账号视频/重排，row_key稳定；目标60删至58仍目标60、缺口2；没有级联删除正式任务；109接入后，所属计划已启动而本批未启动也禁止配置修改。
-- [ ] V03 只选本人账号，成员和管理员不能通过直调绕过边界；资源冲突/未知/读失败准确显示。
-- [ ] V04 同键同输入返回原batch、异输入冲突、响应丢失找回；旧revision编辑全拒绝并保留输入。
-- [ ] V05 AI旧响应/换视频/字段人工改动、仅改封面、断流重试；逐行采用与内容确认分开，正式封面缺规格/样例/过期拒绝。
-- [ ] V06 批次文件引用与删除竞争，配置修改/审计同事务；无成片占用不丢封面引用保护。
-- [ ] V07 四项设置保存、编辑、恢复一致；已有编辑只保存Cloud，新建续编不混成正式批次。
-- [ ] V08 固定原型逐页/三角色/窄窗/键盘/返回上下文，Web和安装版均核对；留真实检查证据。
+- [x] V01 保存60条候选后batch存在、task/attempt/占用增量均0；未完善内容能保存且标出问题，非法身份/结构仍拒绝。
+- [x] V02 编辑增删/换账号视频/重排，row_key稳定；目标60删至58仍目标60、缺口2；没有级联删除正式任务；109接入后，所属计划已启动而本批未启动也禁止配置修改。
+- [x] V03 只选本人账号，成员和管理员不能通过直调绕过边界；资源冲突/未知/读失败准确显示。
+- [x] V04 同键同输入返回原batch、异输入冲突、响应丢失找回；旧revision编辑全拒绝并保留输入。
+- [x] V05 AI旧响应/换视频/字段人工改动、仅改封面、断流重试；逐行采用与内容确认分开，正式封面缺规格/样例/过期拒绝。
+- [x] V06 批次文件引用与删除竞争，配置修改/审计同事务；无成片占用不丢封面引用保护。
+- [x] V07 四项设置保存、编辑、恢复一致；已有编辑只保存Cloud，新建续编不混成正式批次。
+- [x] V08 固定原型逐页/三角色/窄窗/键盘/返回上下文，Web和安装版均核对；留真实检查证据。
 
 ## 事实源
 
@@ -94,3 +94,7 @@ config的候选使用row_key/input_revision/field_revisions，保存账号/成�
 - [发布工程设计](../../../docs/engineering/specs/publishing-management.md)
 - [前端规范](../../../docs/standards/frontend/README.md)
 - [设计入口](../../../docs/design/publishing.md)
+
+## 本轮验收读数（2026-11-25）
+
+V01/V02的60→58及事务竞争由实际隔离MySQL验证；真实运行库两端验证批次2：目标60、候选1、缺口59，修订1→2，任务7→7、尝试34→34、成片134始终未占用。V05真实AI及实际3:4渲染/采用、V07本机重启续编和成功保存清理、V08两端页面已完成，三角色入口为固定原型fixture，服务端权限由角色负例测试核对；详见evidence/installed-e2e.json及backend-verification.md。109所属计划启动冻结在109集成时复验，107不提前实现。复制仅允许已结束/取消批次，与PRD一致，当前服务受控终态用例覆盖，真实执行结束由108提供。用户仍最后统一整体验收。

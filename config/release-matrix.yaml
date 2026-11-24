@@ -1048,3 +1048,33 @@ releases:
     residual_risks:
       - "Task10 completed formal Web supplement; different material188/output136/task11/attempt34 automatically published and registered work4 (12052878563859428344), summary all4/today2."
       - "Final package rebuilt/launched with all gates passing. Native login, published task/work linkage, today2 statistics, restart draft recovery, corrected dual-cover form and actual output/image-background rendering passed; no release or M6 closure claimed."
+
+  - release: "chg107-batch-configuration-20261125"
+    status: verified
+    date: "2026-11-25"
+    scope: batch_configuration_without_tasks_or_output_occupation
+    environment: local_development
+    components:
+      cloud: "27b8aca (CHG107 PR50 candidate)"
+      cloud_agent: "Cloud 27b8aca; execution protocol unchanged"
+      local_agent: "44c7b81 (CHG107 PR18 candidate)"
+      desktop: "99b0e12 (CHG107 PR17 candidate)"
+    contracts:
+      cloud_api: "v1@2026.11.25.1"
+      cloud_agent_api: "v1@2026.11.22.2"
+      cloud_error_codes: "2026.11.25.1"
+      local_agent_api: "v1@2026.11.25.1"
+      minimum_agent_contract_revision: "2026.11.22.2"
+    rollout_order:
+      - "Cloud and Local Agent providers, Desktop consumer, Workspace evidence; merge commits recorded in CHG107."
+    verification:
+      - "Full rebuilt runtime, verified fresh arm64 DMG, CORS, trusted native environment and specified operator login passed."
+      - "1195 frontend, 892 Agent, 560 native with 6 existing ignored, 215 Workspace tests; Go and isolated MySQL passed; independent review fixes closed."
+      - "Real native AI adoption, real portrait render/adoption, restart draft recovery/clear and Web edit/native readback passed."
+      - "Batch2 revision1-to2 retains target60/candidate1/gap59; task7/attempt34 unchanged, output134 unoccupied."
+    target_status:
+      windows_x64: "not_built_for_this_revision"
+      macos_x86_64: "not_built_for_this_revision"
+      macos_arm64: "fresh packaged configuration E2E and walkthrough passed"
+    residual_risks:
+      - "No execution or publication in CHG107; CHG108/109 and final whole-user acceptance remain pending."
