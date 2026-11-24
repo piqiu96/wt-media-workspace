@@ -160,5 +160,5 @@
     "all_environment_gates": "PASS",
     "scope_note": "Command passed on Cloud7ba/Agent0d/Desktopca44; later final Go full suite, frontend1220, Workspace220 and fe741fe all-gates runtime verified independently."
   },
-  "pr_merge_status": "pending separately; this PASS records E2E and UI acceptance, not merged delivery or final user signoff"
+  "pr_merge_status": "Runtime PR51/19/18 merged and local main trees match verified sources. Workspace64 closes this record; final user whole acceptance remains after109."
 }

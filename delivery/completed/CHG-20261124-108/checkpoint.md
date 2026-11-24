@@ -2,7 +2,7 @@
 
 ## 已完成
 
-- 107四仓已合入本地main并归档；108唯一Active VERIFYING，109未启动。用户授权依次完整交付107–109，最终统一人工验收。
+- 107四仓已合入本地main并归档；108技术交付DONE并以本PR归档，109未启动。用户授权依次完整交付107–109，最终统一人工验收。
 - 按用户要求采用Cloud web/example/proto/publishing-design及common，108原型固定2512d342，映射见原型README。未建立第二套原型。
 - Cloud最终fe741fe9db64111c7a75885e1bcc293154f33c95：首次原子建单/占用/授权、固定组、双容量、实际Profile互斥、可靠停车/原线程恢复、暂停/终止与公开核验。最终CloudAPI2026.11.25.3，Cloud-Agent/错误码.2、LocalAPI.1。ADR0037与迁移117切换证据已记录。
 - Agent最终0d507e1f7440841c4081c8fb1b289325eff24ae1完整949项、独立审查通过；Desktop ca44cba8eb5782d08bf6e2b0d7f8ec8e1eabf826完整560项/6既有ignore，协议锁及打包回归通过。
@@ -19,7 +19,7 @@
 
 ## 当前与下一步
 
-四仓PR为Cloud51、Agent19、Desktop18、Workspace64。尚未合并；Cloud最新CI204运行中，Agent72/Desktop64绿；Workspace待提交最终证据并ready。接着检查所有最新CI/review thread，更新PR，合入运行仓并确认本地main，最后Workspace归档合入，再按依赖门禁启动109。不再次要求已授权权限或逐CHG用户签收。
+Cloud51/Agent19/Desktop18均已合入，三个本地main实际快进并与已验收源码tree一致，短期分支退场。CloudCI204、Agent72、Desktop64及Workspace163绿。Workspace64以本关闭提交归档，合入后核对本地main，再启动109。不再次要求已授权权限或逐CHG用户签收。
 
 ## 现场与限制
 

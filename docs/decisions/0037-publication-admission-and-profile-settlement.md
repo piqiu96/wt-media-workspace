@@ -28,4 +28,4 @@ Accepted — 2026-11-25。由已授权的 CHG108 实施；本决策不表示运�
 - 必须覆盖实际 MySQL 竞争、旧已领未开窗切换、满人工挂起后独立环境继续、应答丢失后换会话仅凭原键结算，以及后继持有人保护。
 - 原型输入仍来自 Cloud `web/example/`；原型与受控测试不替代真实平台及安装版验收。
 
-执行与证据见 [CHG108](../../delivery/active/CHG-20261124-108/plan.md)；模型和边界见[发布工程设计](../engineering/specs/publishing-management.md#4-并发与恢复)。
+执行与证据见 [CHG108](../../delivery/completed/CHG-20261124-108/plan.md)；模型和边界见[发布工程设计](../engineering/specs/publishing-management.md#4-并发与恢复)。

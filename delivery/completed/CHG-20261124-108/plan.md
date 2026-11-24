@@ -6,7 +6,7 @@
 
 ## 执行约定
 
-本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前VERIFYING，107四仓main基线已确认。任务按顺序执行，勾选表示已完成并有证据的交付项。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
+本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前技术交付DONE，107四仓main基线已确认。任务按顺序执行，勾选表示已完成并有证据的交付项。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
 产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。原型输入为Cloud main60847fdeda19ef4d889de3ded3be2e9521ba6d93下web/example/proto/publishing-design（BatchManager、BatchDetailContent、PublishComposer、batchLifecycle等）及web/example/common；用户再次明确必须参考example。T01先核对组间/异常/终止与最新启动语义，固定108原型SHA后再实施正式页面，不从零另造交互。
 
@@ -83,7 +83,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 - [x] T06 Agent场景：可靠挂起与恢复准入、慢代理/上传阶段截止、核验协调；代理失败不自动直连，不无限开窗或重放点击。
 - [x] T07 共用Vue/Desktop：接107一次点击保存后启动、组进度/待办、固定配置文案、暂停原因和继续/终止；本机桥有字段变化才扩展。
 - [x] T08 联调：按V清单跑正常/故障/并发，并按当前本人Profile向下兼容完成真实发布；跨平台互斥定向证据与开放平台实发分别记录。
-- [ ] T09 独立review与交付：净差异、各仓PR/main merge与技术交付证据；用户已指定107–109后统一整体验收，不在此逐项重复要求签收。完成后为109提供依赖。
+- [x] T09 独立review与交付：净差异、各仓PR/main merge与技术交付证据；用户已指定107–109后统一整体验收，不在此逐项重复要求签收。完成后为109提供依赖。
 
 ## 5. 验收与证据
 
