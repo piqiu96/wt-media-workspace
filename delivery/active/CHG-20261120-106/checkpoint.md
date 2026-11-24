@@ -99,3 +99,11 @@ CHG106保持IMPLEMENTING，M6保持IN_PROGRESS。管理员仅保留基础Cloud�
 - 当前结果收敛后立即清理，启动及10分钟周期补清；失败独立重试，不重放投稿。旧记录缺少明确依据时只读核对原尝试；未知/失败/活动/未确认/未关闭记录、链接和未知条目保留。复用检查点JSON，无迁移或接口变化。
 - 最近验证：16个定向测试模块167项全部通过，真实隔离文件/SQLite回读通过；文档15个索引、Delivery和产品计划对齐校验通过。详见[evidence](evidence/publication-cache-cleanup.md)。
 - 下一步将本提交纳入后续Agent/安装包交付与Review；本轮未替换当前安装版或清理真实运营缓存，Windows原生实测未执行，无代码阻塞。CHG/M6保持进行中，其余任务和已有工作区修改未合入本提交。
+
+
+## 缓存清理安装包及PR交付（2026-11-24）
+
+- 按用户要求重建macOS Apple Silicon开发版debug和正式身份release安装包，已更新当前使用位置的“起飞 Dev.app”及两个DMG，保留旧app备份；未变更用户配置或业务数据。
+- 最终Agent提交`77f1e30`已推送，代码树与原`6d27ca5`一致。167项回归再次通过，两个镜像/签名/版本记录/包内清理模块与源码一致；冻结Agent独立启动分别5.04秒和2.83秒，健康及状态200，未启用任务循环。
+- Agent PR[#17](https://github.com/piqiu96/wt-media-agent/pull/17)已打开，确认无合并冲突，未合并。当前应用启动至登录页；接管operator01既有会话被自动审批拒绝，已请求用户明确授权，未绕过或声称登录通过。
+- 后续：用户决定是否接管会话，按PR进行代码审核；CHG/M6仍进行中。Windows/Intel、线上发布及真实发布后删除未执行；详情见[evidence](evidence/publication-cache-cleanup.md)。前端包版本如实带dirty标识，其已有未提交修改不混入本次PR。
