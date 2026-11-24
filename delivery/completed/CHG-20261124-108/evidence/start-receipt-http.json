@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "method": "real authenticated HTTP; fresh different start key against started batch; no mocks",
+  "operator": "operator01",
+  "batch_id": "2",
+  "request_expected_revision": "2",
+  "http_status": 409,
+  "error_code": "publication_conflict",
+  "details": {
+    "batch_id": "2",
+    "current_revision": "5",
+    "execution_status": "ended",
+    "start_request_applied": false
+  },
+  "before_revision": "5",
+  "after_revision": "5",
+  "execution_status": "ended",
+  "task_ids": [
+    "12"
+  ],
+  "task_count": 1,
+  "winning_key_or_digest_disclosed": false,
+  "credentials_recorded": false
+}

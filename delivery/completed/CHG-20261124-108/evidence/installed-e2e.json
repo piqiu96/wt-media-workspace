@@ -1,0 +1,164 @@
+{
+  "change": "CHG-20261124-108",
+  "date": "2026-11-25",
+  "status": "PASS",
+  "initial_runtime": {
+    "cloud": "89f49b6b6bb90e2edc7fc06dd102cb05b0853385",
+    "agent": "0d507e1f7440841c4081c8fb1b289325eff24ae1",
+    "desktop": "ca44cba8eb5782d08bf6e2b0d7f8ec8e1eabf826",
+    "bringup_log": "/tmp/chg108-full-bringup.log",
+    "all_gates": "PASS"
+  },
+  "latest_runtime": {
+    "cloud": "fe741fe9db64111c7a75885e1bcc293154f33c95",
+    "bringup_log": "/tmp/chg108-final-fe741fe-bringup.log",
+    "all_gates": "PASS",
+    "corrected_native_pill_readback": "PASS; actual packaged panel shows 本机服务 已连接 / 比特浏览器 已登录指定账号 / 执行凭证 已配置",
+    "agent": "0d507e1f7440841c4081c8fb1b289325eff24ae1",
+    "desktop": "ca44cba8eb5782d08bf6e2b0d7f8ec8e1eabf826",
+    "mounted_source_verification": "PASS; frontend 0.1.0+fe741fe matches finalized bundle",
+    "mount": "/Users/aqiuye/Develop/workspace/wt-media/.local/m2b/desktop-review-mount/起飞.app"
+  },
+  "account_scope": {
+    "operator": "operator01",
+    "platform": "baidu",
+    "available_owned_profiles": 1,
+    "configured_concurrency": 5,
+    "actual_group_size": 1,
+    "multi_profile_evidence": "controlled MySQL/SQLite/thread tests, not real multi-account platform submissions"
+  },
+  "native_flow": {
+    "method": "actual packaged macOS app via CUA; real Cloud and BitBrowser; no route or platform mocks",
+    "batch_id": "2",
+    "task_id": "12",
+    "attempt_id": "35",
+    "output_id": "134",
+    "group_no": 1,
+    "pre_start": {
+      "target_count": 60,
+      "candidate_count": 1,
+      "formal_tasks_in_batch": 0
+    },
+    "explicit_start_confirmation": {
+      "included_count": 1,
+      "acknowledged_shortfall": 59
+    },
+    "after_start": {
+      "target_count": 60,
+      "created_count": 1,
+      "creation_shortfall": 59,
+      "configuration_edit_action": false
+    },
+    "execution": {
+      "status": "published",
+      "attempt_status": "completed",
+      "attempt_count": 1,
+      "platform_submission_id": "1882771499985646302",
+      "publicly_verified": true,
+      "check_generation": 2,
+      "work_id": "5",
+      "platform_work_id": "11733113375672752567",
+      "work_url": "https://mbd.baidu.com/newspage/data/videolanding?nid=sv_11733113375672752567"
+    },
+    "batch_after_automatic_steps": {
+      "status": "ended",
+      "pending_public": 1,
+      "published_count": 0,
+      "public_rate": "0 / 60 · 0%",
+      "gap_to_public_goal": 60
+    },
+    "original_task_link_and_return": "PASS; task12/from_batch2 and task pagination preserved",
+    "public_rate_explanation": "PASS; only verified public tasks with linked works count",
+    "final_public_readback": {
+      "status": "PASS",
+      "source": "actual final fe741fe packaged macOS UI via CUA",
+      "published_count": 1,
+      "target_count": 60,
+      "public_rate": "1 / 60 · 1.67%",
+      "pending_public": 0,
+      "target_gap": 59,
+      "task_row": "已发布",
+      "original_attempt_count": 1,
+      "work_detail": "work5 with exact platform ID 11733113375672752567, task12/attempt35/output134 and public URL"
+    },
+    "public_identity_readback": {
+      "task_id": "12",
+      "attempt_id": "35",
+      "work_id": "5",
+      "output_id": "134",
+      "linked_works": 1,
+      "attempt_result_status": "reviewing",
+      "attempt_result_note": "immutable original receipt result retained; later public observation updates task and links work"
+    }
+  },
+  "web_flow": {
+    "method": "actual existing logged-in localhost5173 IAB tab via documented CUA Playwright; no fixtures",
+    "same_batch_counts": "PASS; 60 target / 1 task / gap59 / reviewing not public",
+    "started_configuration_frozen": "PASS; only copy available after end",
+    "copy_in_use_resource": "PASS; new unsaved configuration shows original output already occupied; return leaves exactly 2 batches",
+    "viewport_check": {
+      "inner_width": 1024,
+      "document_width": 1024,
+      "scroll_width": 1024,
+      "override_reset": true
+    },
+    "zero_candidate_start": "PASS; batch1 modal says no candidates, no start confirmation or task creation",
+    "stop_configuration": {
+      "batch_id": "1",
+      "required_reason": true,
+      "final_status": "cancelled",
+      "formal_task_count": 0,
+      "edit_start_resume_absent": true
+    },
+    "final_public_readback": {
+      "status": "PASS",
+      "source": "real localhost5173 UI via documented CUA Playwright",
+      "published_count": 1,
+      "target_count": 60,
+      "public_rate": "1 / 60 · 1.67%",
+      "pending_public": 0,
+      "task_row": "已发布",
+      "task_receipt": "1882771499985646302",
+      "linked_work": "5",
+      "return_url": "/publish-batches?view=detail&id=2&tab=tasks&task_page=1&task_page_size=10",
+      "viewport": 1024,
+      "viewport_reset": true
+    }
+  },
+  "readback_after_rebuild": {
+    "total_task_count": 8,
+    "previous_total_task_count": 7,
+    "total_attempt_count": 35,
+    "previous_total_attempt_count": 34,
+    "batch2_task_count": 1,
+    "batch2_attempt_count": 1
+  },
+  "limitations": [
+    "Windows and unopened platforms not run as real platform acceptance",
+    "No real multi-Profile claim beyond the one available owned profile",
+    "Resource cache conservatively retained diagnostic companions; not claimed cleaned"
+  ],
+  "pending": [],
+  "found_and_fixing": [
+    {
+      "code": "ended_public_poll",
+      "status": "CLOSED",
+      "commits": [
+        "431efde",
+        "3fc7f6a"
+      ],
+      "verification": "same-page controlled Chromium automatic and reversed manual response ordering; independent review passed; final Web/native public counts match"
+    }
+  ],
+  "formal_chg_verify": {
+    "log": "/tmp/chg108-chg-verify-final.log",
+    "exit_code": 0,
+    "workspace_tests": 215,
+    "agent_tests": 949,
+    "desktop_passed": 560,
+    "desktop_existing_ignored": 6,
+    "all_environment_gates": "PASS",
+    "scope_note": "Command passed on Cloud7ba/Agent0d/Desktopca44; later final Go full suite, frontend1220, Workspace220 and fe741fe all-gates runtime verified independently."
+  },
+  "pr_merge_status": "Runtime PR51/19/18 merged and local main trees match verified sources. Workspace64 closes this record; final user whole acceptance remains after109."
+}

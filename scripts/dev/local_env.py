@@ -68,7 +68,9 @@ AGENT_PYTHON = Path(os.environ.get("PYTHON_BIN", AGENT_DIR / ".venv" / "bin" / "
 # Where launch_dmg attaches the freshly built DMG. A fixed private mountpoint
 # (instead of the default /Volumes/<product>) so the script never depends on the
 # product or volume name, and never opens a leftover mount instead of the new build.
-DMG_MOUNT = RUNTIME_DIR / "dmg-mount"
+# Keep the legacy dmg-mount untouched: old DiskImages registrations can leave
+# a ghost read-only mount there even after diskutil reports it unmounted.
+DMG_MOUNT = RUNTIME_DIR / "desktop-review-mount"
 
 # The Cloud worker's build output. A built binary rather than `go run` because
 # `go run` compiles into a child of the `go` process, and the stop path can only
@@ -634,17 +636,32 @@ def launch_dmg() -> None:
     # Mount at a fixed private mountpoint and detach it first: a leftover
     # /Volumes/<product> mount from an earlier run could otherwise be opened
     # instead of the fresh build, and its name is not scripted anywhere.
-    subprocess.run(
-        ["hdiutil", "detach", str(DMG_MOUNT)],
-        check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    )
+    if DMG_MOUNT.is_mount():
+        run(["hdiutil", "detach", str(DMG_MOUNT)])
+        if DMG_MOUNT.is_mount():
+            raise RuntimeError(f"Desktop review mount is still mounted: {DMG_MOUNT}")
     DMG_MOUNT.mkdir(parents=True, exist_ok=True)
     run(["hdiutil", "attach", "-mountpoint", str(DMG_MOUNT), str(dmg)])
+    if not DMG_MOUNT.is_mount():
+        raise RuntimeError(f"DMG did not mount at the private review path: {DMG_MOUNT}")
     apps = sorted(DMG_MOUNT.glob("*.app"))
     if len(apps) != 1:
         raise RuntimeError(
             f"DMG mount: expected one .app under {DMG_MOUNT}, found {[p.name for p in apps]}"
         )
+    relative_record = Path("Contents/Resources/versions.json")
+    built = built_app_bundle()
+    if apps[0].name != built.name:
+        raise RuntimeError("mounted Desktop source differs from the finalized build")
+    built_record = built / relative_record
+    try:
+        expected = json.loads(built_record.read_text(encoding="utf-8"))
+        mounted = json.loads((apps[0] / relative_record).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise RuntimeError("Cannot verify mounted Desktop source record") from error
+    if not expected or mounted != expected:
+        raise RuntimeError("mounted Desktop source differs from the finalized build")
+    print(f"Mounted Desktop source: PASS frontend={mounted.get('frontend_build_version')}")
     # After the mount, before the app opens: the app's own Agent needs the port,
     # and the mounted bundle is the only place the packaged sidecar lives.
     hand_over_agent_port()

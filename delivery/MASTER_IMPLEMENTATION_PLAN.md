@@ -124,10 +124,10 @@ wt-media-workspace/
 
 | 状态 | 含义 | 当前处于该态的里程碑 |
 |---|---|---|
-| `NOT_STARTED` | 未进入该里程碑 | M7、M-publishing-plan、M-publishing-operations、M10 |
-| `IN_PROGRESS` | 开发中 | M6 |
-| `VERIFYING` | 自动综合验收完成，等待人工整体验收 | 无 |
-| `DONE` | 人工整体验收通过 | M2、M3、M4、M5、M-launch-engineering |
+| `NOT_STARTED` | 未进入该里程碑 | M-publishing-plan、M-publishing-operations、M10 |
+| `IN_PROGRESS` | 开发中 | 无 |
+| `VERIFYING` | 自动综合验收完成，等待人工整体验收 | M7 |
+| `DONE` | 人工整体验收通过 | M2、M3、M4、M5、M6、M-launch-engineering |
 
 里程碑文件内部的子项状态（如 M2-D 的 `DEFERRED`）不是里程碑状态词，不占上表，只在其所属里程碑文件内自述。
 
@@ -164,7 +164,7 @@ wt-media-workspace/
 | M4 | `DONE` | M4 各实施 CHG、M4-H1 视觉整改与 M4-H2 统一走查均已完成；机器闭环与真实页面签收均有证据。 | 2026-10-28 用户签收 M4-H2；M4 冻结为 Cloud 内容生产闭环基线。 |
 | M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
 | M6 | `DONE` | CHG106工具、内容准备/续编、结果处置与统计已交付；任务11/attempt34自动核实公开作品4，四仓改动已合入main | 已有真实业务、安装版关键流程与异常回归证据；2026-11-25用户签收，已归档 |
-| M7 | `IN_PROGRESS` | 已有交互原型，无生产批次验收 | 依赖 M6 完成 |
+| M7 | `VERIFYING` | 107/108技术交付与真实单Profile双端闭环通过，多Profile受控验证 | 用户指定107–109后统一整体验收；109可按已完成技术依赖启动 |
 | M-publishing-plan、M-publishing-operations | `NOT_STARTED` | 计划与后续平台未验收；工具已归M6 | 完成计划、后续平台和三平台回归 |
 | M10 | `NOT_STARTED` | 首次上线已有部分打包部署证据 | 依赖发布四阶段，补验升级、恢复及发布业务 |
 
@@ -497,12 +497,12 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 
 | 字段 | 内容 |
 | --- | --- |
-| 状态 | `IN_PROGRESS` |
+| 状态 | `VERIFYING` |
 | 目标 | 本人批次候选保存、批量内容、启动原子建单、分组并发、异常保护与公开结果 |
 | 依赖 | M6 `DONE` |
 | 业务验收 | [M7批次](milestones/M7-batch-publishing.md) |
 | Active CHG | None |
-| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；执行验收由108完成 |
+| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；用户最终整体验收待109后 |
 
 候选 CHG：
 
@@ -511,7 +511,7 @@ M7-准备：本人资源＋批量内容＋候选配置保存（无task/占用）
 → M7-执行：start原子建单＋分组/间隔＋跨批互斥＋异常暂停与公开结果
 ```
 
-2026-11-25按用户最新裁定，[CHG107](completed/CHG-20261124-107/plan.md)只保存本人候选配置，不创建task/占用；[CHG108](planned/CHG-20261124-108/plan.md)首次start原子建单、占用并授权，按组运行、组间等待，组间处理和异常任务上限控制暂停/继续/终止。旧混合归属授权与滚动补位不进入本轮。两项已获用户执行授权，107技术交付DONE、108为PLANNED，步骤/API/迁移/验收详见清单；依赖M6及相关review完成后预检启动。
+2026-11-25按用户最新裁定，[CHG107](completed/CHG-20261124-107/plan.md)只保存本人候选配置，不创建task/占用；[CHG108](completed/CHG-20261124-108/plan.md)首次start原子建单、占用并授权，按组运行、组间等待，组间处理和异常任务上限控制暂停/继续/终止。旧混合归属授权与滚动补位不进入本轮。两项已获用户执行授权，107技术交付DONE、108技术交付DONE，步骤/API/迁移/验收详见清单；依赖M6及相关review完成后预检启动。
 
 ### M-publishing-plan：发布计划推进与结束
 
