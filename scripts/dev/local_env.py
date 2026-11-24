@@ -634,10 +634,10 @@ def launch_dmg() -> None:
     # Mount at a fixed private mountpoint and detach it first: a leftover
     # /Volumes/<product> mount from an earlier run could otherwise be opened
     # instead of the fresh build, and its name is not scripted anywhere.
-    subprocess.run(
-        ["hdiutil", "detach", str(DMG_MOUNT)],
-        check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    )
+    if DMG_MOUNT.is_mount():
+        run(["hdiutil", "detach", str(DMG_MOUNT)])
+        if DMG_MOUNT.is_mount():
+            raise RuntimeError(f"Desktop review mount is still mounted: {DMG_MOUNT}")
     DMG_MOUNT.mkdir(parents=True, exist_ok=True)
     run(["hdiutil", "attach", "-mountpoint", str(DMG_MOUNT), str(dmg)])
     apps = sorted(DMG_MOUNT.glob("*.app"))
@@ -645,6 +645,16 @@ def launch_dmg() -> None:
         raise RuntimeError(
             f"DMG mount: expected one .app under {DMG_MOUNT}, found {[p.name for p in apps]}"
         )
+    relative_record = Path("Contents/Resources/versions.json")
+    built_record = DESKTOP_DIR / "target/release/bundle/macos" / apps[0].name / relative_record
+    try:
+        expected = json.loads(built_record.read_text(encoding="utf-8"))
+        mounted = json.loads((apps[0] / relative_record).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise RuntimeError("Cannot verify mounted Desktop source record") from error
+    if not expected or mounted != expected:
+        raise RuntimeError("mounted Desktop source differs from the finalized build")
+    print(f"Mounted Desktop source: PASS frontend={mounted.get('frontend_build_version')}")
     # After the mount, before the app opens: the app's own Agent needs the port,
     # and the mounted bundle is the only place the packaged sidecar lives.
     hand_over_agent_port()
