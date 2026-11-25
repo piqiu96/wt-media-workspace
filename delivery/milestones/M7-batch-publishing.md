@@ -1,6 +1,6 @@
 # M7：多任务批次真实发布
 
-- 状态：`VERIFYING`；Active CHG：None；原型修复：[CHG-20261125-110](../completed/CHG-20261125-110/change.md)；107/108技术交付DONE，真实可用Profile下兼容实发与双端结果验证完成；用户整体最终验收待109后。
+- 状态：`IN_PROGRESS`；Active CHG：CHG-20261125-112；原型修复：[CHG-20261125-110](../completed/CHG-20261125-110/change.md)；107/108技术交付DONE，真实可用Profile下兼容实发与双端结果验证完成；用户整体最终验收待109后。
 - Evidence：[107配置准备实际双端E2E](../completed/CHG-20261124-107/evidence/installed-e2e.json)；[108执行验收](../completed/CHG-20261124-108/evidence/acceptance-matrix.md)、[真实双端E2E](../completed/CHG-20261124-108/evidence/installed-e2e.json)及[合入证据](../completed/CHG-20261124-108/evidence/merge-and-verification.md)。
 - 依据：[PRD 第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.3、6.5、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md) §2.1—2.5、§4—6。
 - 依赖：[M6](M6-single-publishing.md) `DONE`；在百度（百家号）验证批次，按 [PRD 批次规则](../../docs/product/prd/详细文档/第六章_发布管理.md#632-新建批次)真实可用本人Profile不足配置N时向下兼容；多账号分组及跨批Profile互斥另列受控证据。
@@ -45,7 +45,7 @@
 
 ## 启动条件
 
-当前VERIFYING，107/108技术交付已完成；相关事实已按2026-11-25裁定回写。启动前完成新原型review及固定SHA、提供方正式契约/容量参数、失败结束动作review、依赖归档与各仓main合并检查，再按CHG预检。其他平台真实发布在对应阶段开放验收。
+当前112修复IMPLEMENTING，107/108技术交付已完成；相关事实已按2026-11-25裁定回写。启动前完成新原型review及固定SHA、提供方正式契约/容量参数、失败结束动作review、依赖归档与各仓main合并检查，再按CHG预检。其他平台真实发布在对应阶段开放验收。
 
 2026-11-25用户授权107→108→109全流程执行，106已签收归档；107技术交付已归档，108已合入运行仓并技术归档，Workspace关闭PR收口。109可按已完成技术依赖及用户授权继续，M7最终用户签收不提前宣称。用户最终整体验收在三项技术交付后统一进行。
 
@@ -56,3 +56,5 @@
 111承接用户人工走查：列表始终可见详情，批次状态与配置就绪分开表达，已结束仅列表复制；新建沿原型保存草稿与创建/下一步，常规界面不新增独立检查按钮。执行操作复用正式命令与权限；不确定业务语义最终汇总。
 
 [111状态与按钮走查修复](../completed/CHG-20261125-111/evidence/final-delivery.md)已完成，范围内自测、受控回归与最终新包实际验证PASS；Cloud PR54已合入，Workspace关闭随PR67合并生效。无业务待确认项；里程碑整体仍待用户签收。
+
+112承接数量输入与步骤导航验收：数量控件沿固定原型恢复连体样式，资源确认后的回退与续编边界待本轮核实；验证包含异常E2E和实际安装版走查。
