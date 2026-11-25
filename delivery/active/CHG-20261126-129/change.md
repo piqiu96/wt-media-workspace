@@ -1,8 +1,9 @@
 ---
 id: CHG-20261126-129
 parent: delivery/milestones/M-publishing-operations.md#广告画中画成片准备
-status: PLANNED
+status: IMPLEMENTING
 depends_on: ["CHG-20261126-128"]
+dependency_merge_commits: {"CHG-20261126-128":{"wt-media-cloud":"eb1355ec1c202eedd4e9cf58d64402ef70d77f08","wt-media-workspace":"134ec829a515d7daee563b58c48945f0cd12ac89"}}
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: H
 ---

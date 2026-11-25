@@ -1,6 +1,6 @@
 # M-publishing-operations：后续平台与三平台整体回归
 
-- 状态：`NOT_STARTED`；Active CHG：None；没有B站/小红书生产发布验收证据。
+- 状态：`IN_PROGRESS`；Active CHG：CHG-20261126-129；没有B站/小红书生产发布验收证据。
 - 依据：[PRD第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.5、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md)。
 - 依赖：整体验收依赖[M-publishing-plan](M-publishing-plan.md) `DONE`；本轮B站在[M7](M7-batch-publishing.md)的128技术验收及百度、计划main基线核对后实施，整体人工签收放在最终交付后，小红书依赖B站真实验收开放。
 - 2026-11-20用户确认：图片库、模板制作与渲染等快速发布工具已前移[M6](M6-single-publishing.md)，本阶段只增加后续平台适配和三平台回归，不再承接未完成的百度基础工具。
@@ -29,7 +29,7 @@
 | 候选 | 工作内容及仓库 | 直接依赖 | 可独立验证的完成条件 |
 | --- | --- | --- | --- |
 | [CHG128](../completed/CHG-20261126-128/change.md) | Cloud/Workspace，计划与批次逐页复核和异常修复，父闭环见M7 | 已合入113；实施前固定原型 | 全页/状态/按钮、生产E2E及浏览器/安装版走查 |
-| [CHG129](../planned/CHG-20261126-129/change.md) | Cloud/Workspace，广告画中画与片尾合成 | 继承已验收M4执行底座；按128后顺序执行 | 真FFmpeg/存储/成片/下载及浏览器画面和听音核对 |
+| [CHG129](../active/CHG-20261126-129/change.md) | Cloud/Workspace，广告画中画与片尾合成 | 继承已验收M4执行底座；按128后顺序执行 | 真FFmpeg/存储/成片/下载及浏览器画面和听音核对 |
 | [CHG130](../planned/CHG-20261126-130/change.md) | Cloud/Agent/Desktop/Workspace，B站单条、批次、计划与原稿核验 | 128、129技术交付；百度既有能力回归 | 用129新模式成片真实发布，精确稿件公开与系统结果一致 |
 | 后续小红书与三平台回归 | 延续本阶段原目标，本轮不建实施CHG | B站真实验收开放及完整计划技术基线 | 三平台真实公开、异常核实与任务/批次/计划共同回归 |
 
@@ -44,7 +44,7 @@
 | 同时成立才算完成 | 无开头、广告期间只播广告声、正片从插入点继续、片尾正确；真实文件与快照一致、重试不重复产出 |
 | 必须排除的假成功 | 空intro绕过旧schema、静帧/循环补时、HTTP成功无成片、修改旧v1、只看视频不核对声音 |
 
-用户已确认播放规则；独立ad_pip_ending v1是推荐技术方案，待本轮设计review。详见[129设计/9步清单](../planned/CHG-20261126-129/plan.md)。旧M4签收不覆盖新增模板。
+用户已确认播放规则；独立ad_pip_ending v1是推荐技术方案，待本轮设计review。详见[129设计/9步清单](../active/CHG-20261126-129/plan.md)。旧M4签收不覆盖新增模板。
 
 ### B站发布闭环
 
