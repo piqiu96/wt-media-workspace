@@ -33,3 +33,9 @@ Cloud PR56：https://github.com/piqiu96/wt-media-cloud/pull/56；Workspace PR69�
 实际只读走查PASS：计划2→批次5详情Drawer展示实际任务15、公开1/1、设置仅一次及中文创建计划批次/安排本组任务/批次执行结束；关闭回原计划2、无路由跳转。独立批次2正式任务12及中文事件全部可读。最后原批次1详情再次核对取消原因、60/0/60/0及明确空态，无裸表头/重复目标区/虚假执行区，应用保留此处供用户复查。
 
 数据库复查仍2计划/7批次/12任务；本轮没有保存复制、新建批次、计划或发布任务，没有AI及发布调用。生产diff只含共享详情内容/记录呈现与定向回归，无Contract/DB/Agent/Desktop业务修改。自review按Done When逐项核对：原型信息结构、异常/未知、长内容/分页/窄屏、只读无副作用及正式任务投影均已测。远端最新CI正在原型交互步骤，暂不宣称合入。
+
+## PR与收口
+
+Cloud最新9da63af远端M0 Cloud/verify全部SUCCESS（run45642380831、job139304206622）：Go/Web、原型预览、完整原型交互、MySQL迁移、双端release构建及打包脚本。PR56正式评审已补齐最终说明；Codex自动review因usage limits失败，未生成任何行内代码问题，不能声称自动审查通过；本轮自review和实测均完成。计划三角色最终再跑PASS（/tmp/chg113-plan-drawer-final.log）。
+
+Cloud PR56由标准no-ff合并69e865c0进入本地及远端main，合并tree与已验证9da63af完全一致，不因merge元数据重复重建包。Workspace PR69承载本次归档及全部验证事实，最终随本PR合入main生效。所有CHG113验收PASS，无阻塞Q；M7仍VERIFYING，用户整体签收另行。本轮没有要求用户再次裁定已明确的原型差异。

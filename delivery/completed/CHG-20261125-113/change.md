@@ -1,7 +1,7 @@
 ---
 id: CHG-20261125-113
 parent: delivery/milestones/M7-batch-publishing.md#页面实施基线
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
@@ -22,4 +22,4 @@ risk: M
 - [x] 四列只读发布内容、空态、未知读取、长内容/多条分页及多类目数量不重叠；与原型对照验证。
 - [x] 未开始、未开始即取消、有候选、已执行及计划Drawer状态矩阵通过，无详情编辑/执行副作用。
 - [x] 受控异常、自测、双端构建和实际安装版核实通过，原批次真实数据保留。
-- [ ] PR/CI与交付收口完成；用户整体签收另行。
+- [x] PR/CI与交付收口完成；用户整体签收另行。
