@@ -523,7 +523,7 @@ M7-准备：本人资源＋批量内容＋候选配置保存（无task/占用）
 | 依赖 | M7 `DONE` |
 | 业务验收 | [发布计划](milestones/M-publishing-plan.md) |
 | Active CHG | [CHG-20261124-109](active/CHG-20261124-109/change.md) |
-| Evidence | [109编码与自测矩阵](active/CHG-20261124-109/evidence/implementation-selftest-checklist.md)；真实E2E两批公开2/2且达成结束已通过，最终双端UI整改后最后安装版复查中；用户整体人工验收另行 |
+| Evidence | [109编码与自测矩阵](active/CHG-20261124-109/evidence/implementation-selftest-checklist.md)；真实E2E两批公开2/2且达成结束已通过，最终d853e24双端UI及补验均通过；PR/main交付收口中，用户整体人工验收另行 |
 
 本轮执行例外：用户明确指定107–109依次自主技术交付后统一整体验收。107/108已技术归档且四仓main核对，故109可启动；M7仍保留`VERIFYING`，不提前宣称用户最终签收。
 

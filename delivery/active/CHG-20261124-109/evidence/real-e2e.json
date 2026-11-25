@@ -266,7 +266,7 @@
   "limitations": {
     "actualOwnedProfiles": 1,
     "multiProfile": "controlled tests only",
-    "finalUI": "in progress; see ui-walkthrough.md; latest fixes independently reviewed, final packaged recheck pending"
+    "finalUI": "PASS: final Web and macOS packaged walkthrough completed; see ui-walkthrough.md; user overall acceptance pending"
   },
   "databaseBeforeConfiguration": {
     "planId": "1",
@@ -457,5 +457,41 @@
         "37"
       ]
     ]
+  },
+  "finalSourceReadBack": {
+    "source": "d853e24",
+    "plan": {
+      "id": "1",
+      "status": "ended",
+      "revision": "6",
+      "end_reason": "achieved"
+    },
+    "tasks": [
+      {
+        "id": "13",
+        "status": "published"
+      },
+      {
+        "id": "14",
+        "status": "published"
+      }
+    ],
+    "attemptIds": [
+      [
+        "36"
+      ],
+      [
+        "37"
+      ]
+    ],
+    "database": {
+      "planCount": 1,
+      "batchCount": 4,
+      "eachPlanBatch": {
+        "tasks": 1,
+        "attempts": 1,
+        "matchedWorks": 1
+      }
+    }
   }
 }

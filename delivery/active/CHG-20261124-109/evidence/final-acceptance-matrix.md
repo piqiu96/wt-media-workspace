@@ -1,6 +1,6 @@
 # CHG109 交付验收证据矩阵
 
-最终组合Cloud610f9d3（业务a59b793、视觉303bad5/990b60d/字典d3aa625、补验398b3d7、三段bfb3d88/事实610f9d3），Agent81f6bf8，Desktop2e06487。以下区分真实平台闭环与受控场景；V10及技术合入仍待最终收口，不预填DONE。
+最终组合Cloudd853e24（业务a59b793、视觉303bad5/990b60d/字典d3aa625、补验398b3d7、三段bfb3d88/事实610f9d3、WebKit d853e24），Agent81f6bf8，Desktop2e06487。以下区分真实平台闭环与受控场景；V01–V10技术验证均PASS，技术合入仍待收口，不预填DONE。
 
 | 项 | 受控/隔离证据 | 真实证据 | 当前结论 |
 | --- | --- | --- | --- |
@@ -13,7 +13,7 @@
 | V07 | ReadScopeAcrossCountDetailsRecordsAndExactRequest、ManagerReviewingMayOnlySupplementPublicOriginal；TestLiveExecutionStaleSessionAndStopCannotStartSubmission；localagent.TestStrictModeRequiresATokenBoundToTheCurrentSession、TestReportSafeModeAcceptsAReportAfterTheDesktopIsReplaced、TestReportSafeModeDoesNotConsultTheDesktopSession；Agent会话切换原完整suite | 实际本人operator01、仅本人Profile，真实Desktop原会话替换后继续原授权 | PASS；非真实多用户E2E |
 | V08 | RealWorkOverageInOneCellCannotOffsetAnotherCell、冻结/归属/迟到结果不重开；正式契约无补量 | 目标2保持不变，启动后拒改；最终缺口0 | PASS；多格受控 |
 | V09 | FinishRejectsEveryUnresolvedStateAndKeepsEndExplanation、AchievedFinishUsesMatchedWorkAndLateResultsNeverReopen、cancel收敛 | 安装版实际结束plan1 ended/achieved/rev6；work6/7精确关联原task/attempt/output | PASS；unmet/cancel为受控 |
-| V10 | 三角色、1024/1440、四结论、Drawer及滚动恢复、原型代码映射；303/990/d3修复均独审通过 | Web列表/搜索重置/详情/三段配置/编辑/Drawer/原任务回跳实测，最终Web三段有候选筛选/编辑及安全状态已实测；最后安装版重建走查待补 | 待最终G3 |
+| V10 | 三角色、1024/1440、四结论、Drawer及滚动恢复、原型代码映射；303/990/d3修复均独审通过 | Web列表/搜索重置/详情/三段配置/编辑/Drawer/原任务回跳实测，最终Web三段有候选筛选/编辑及安全状态已实测；最终d853e24安装版两行长名/三段复查/原Editor/续编重启/原目标均实测通过 | PASS |
 
 ## 交付审计补测
 

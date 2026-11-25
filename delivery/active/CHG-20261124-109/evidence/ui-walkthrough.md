@@ -82,3 +82,13 @@ root /tmp/chg109-root-final-bfb3d88-web.log 首次并行DMG编译时164文件/12
 实际新安装版登录operator01并确认替换原Desktop会话，批次列表仍4条、有效三角洲1/60正确。原batch3已公开1/1，复制进入未提交表单1候选，内容配置实际显示宽搜索/类目/状态、发布文案/账号、成片137、未知时长—、未选封面明确占位、待完善/另3项。与Web相同数据且未保存或发布。
 
 发现最后一处本机CSS差异：WebChrome成片名限2行，WKWebView的ResourceNameLink按钮直接承接-webkit-line-clamp仍展开4行。已交局部内层span限行修复，保原click/title/全文和其他行为；该项复验前不签G3。
+
+## G3 最终结论：PASS
+
+2026-11-25 最终Cloud d853e24（Agent81f6bf8、Desktop2e06487）。根完整Web165/1237串行18.16s通过，/tmp/chg109-root-final-d853e24-web.log；markup有限独审及1440/1024内span/全文/title/两行几何通过。实际原生WKWebView是最终判据，不以Chrome代替。
+
+最终all --force-restart全门禁exit0，挂载frontend=0.1.0+d853e24，/tmp/chg109-final-d853e24-bringup.log。实际安装版本人登录并替换旧会话；复制原batch3的候选1，截图确认内容准备及结果总览长成片名均2行，全文可访问、原点击保留；发布内容组合列/状态多问题/明确封面占位/窄数字设置与原型结构对应。总览仅编辑，原Editor打开后关闭，返回确认离开本轮副本，没有保存Cloud/启动/发布或覆盖本机batch草稿。
+
+最后重新进入原计划列表：唯一plan1目标达成、2/2、2/2批。新建恢复原14:07本机样本“CHG109界面走查续编·未提交”、两批1+1、原始合计2/目标2，返回列表保留原样本。原型页、Web、Native截图已在本次CUA操作中逐页实际查看；本记录不虚构本地PNG文件。
+
+最终正式API与只读业务DB一致：plan1 ended/achieved/rev6；task13/14 published，唯一attempt36/37，batch3/4各1task/1attempt/1matched work。Cloud仍1plan/4batch。用户107–109整体人工验收另行；真实多Profile、Windows及其他平台未验证。G3技术走查完成，未将其当作用户签收。

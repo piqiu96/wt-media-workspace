@@ -39,7 +39,7 @@
 
 - [x] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
 - [x] G2 真实E2E：仅G1后重建新环境/DMG、真实本人资源与AI、真实至少两批顺序和公开事实；原目标/唯一任务/占用/attempt/work一致，真实单Profile与受控多Profile分别记载，不伪造资源或结果。
-- [ ] G3 最后UI走查：G2后Web与安装版逐页对照原型最终走查，覆盖角色、完整正常及必要异常路径、返回与视口。用户107–109最终统一整体验收仍另行进行。
+- [x] G3 最后UI走查：G2后Web与安装版逐页对照原型最终走查，覆盖角色、完整正常及必要异常路径、返回与视口。用户107–109最终统一整体验收仍另行进行。
 
 ## 分阶段证据记录
 
@@ -86,3 +86,5 @@ G2两批实际投稿13/36、14/37成功，自动移交3→4，无人工逐批con
 真实task13/14已各唯一关联work6/7，原attempt36/37 completed/finished且scene_closed=true；DB publish/check Profile持有共6行全部released，active_profile/slot均NULL，published任务next_check_at均NULL。可安全按a59b793全环境升级，验证重启不重复及最终结束；G2/G3仍未完成。
 
 G2最终通过：a59b793完整all门禁/source挂载通过；重启后仍task13/14、attempt36/37、work6/7，目标2/2且逐格缺口0。实际安装版登录/结束确认成功，API及业务DB读回plan1 ended/achieved/revision6，全部批次ended，各1task/1attempt/1work，计划仅copy动作、pending/verification均0。真实仅1本人Profile，N5→每批实际组1；多Profile/复杂阈值和异常为隔离受控验证，未冒称实机多账号或Windows。完整事实见real-e2e.json。G3最终双端原型走查现在开始，尚未签收。
+
+最终G3：d853e24完整Web165/1237、独审及实际Web/macOS安装版走查通过，全部发现关闭，见ui-walkthrough.md和final-acceptance-matrix.md；计划1真实达成2/2，最后API/DB无重复。用户整体人工验收另行。
