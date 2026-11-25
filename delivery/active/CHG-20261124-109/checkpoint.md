@@ -6,7 +6,7 @@
 
 ## 当前
 
-G1/G2已通过。a59b793最新安装环境重启不重复，实际安装版已结束plan1：ended/achieved/rev6，目标2/2缺口0，batch3/4均ended，各唯一task13/14、attempt36/37、公开work6/7；pending/verification0，保留copy动作。真实1Profile/N5下调实际1已验证，受控多Profile/阈值异常单列。现在开始G3最后Web/安装版逐页对照9305532原型走查，尚未完成；PR52/20/19/65均待最终CI与合入，用户统一整体验收另行。
+G1/G2已通过。a59b793最新安装环境重启不重复，实际安装版已结束plan1：ended/achieved/rev6，目标2/2缺口0，batch3/4均ended，各唯一task13/14、attempt36/37、公开work6/7；pending/verification0，保留copy动作。真实1Profile/N5下调实际1已验证，受控多Profile/阈值异常单列。G3进行中，已完成真实Web列表/搜索重置/详情/Drawer任务返回；303bad5整改列表/长名/结束提示与负责人，990b60d按原型18px补四卡片间距且独审通过。最终Web165/1236通过，正在统一重建安装版，尚未完成G3；PR52/20/19/65均待最终CI与合入，用户统一整体验收另行。
 
 ## 下一步
 
