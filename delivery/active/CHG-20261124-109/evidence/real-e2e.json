@@ -1,6 +1,6 @@
 {
   "date": "2026-11-25",
-  "status": "both_accepted_waiting_public_verification",
+  "status": "both_public_before_safe_final_upgrade",
   "source": {
     "cloud": "4daf991",
     "agent": "81f6bf8",
@@ -343,5 +343,45 @@
       "finishOffered": false,
       "fix": "provider readonly progress clarification in progress; no execution or finish guard change"
     }
-  ]
+  ],
+  "publicWorks": [
+    {
+      "id": "6",
+      "taskId": "13",
+      "attemptId": "36",
+      "outputId": "137",
+      "platformWorkId": "218369705454481110",
+      "url": "https://mbd.baidu.com/newspage/data/videolanding?nid=sv_218369705454481110",
+      "publishedAt": "2026-11-25T13:40:34+08:00",
+      "observedAt": "2026-11-25T13:45:53.590756+08:00"
+    },
+    {
+      "id": "7",
+      "taskId": "14",
+      "attemptId": "37",
+      "outputId": "138",
+      "platformWorkId": "6304603525194997413",
+      "url": "https://mbd.baidu.com/newspage/data/videolanding?nid=sv_6304603525194997413",
+      "publishedAt": "2026-11-25T13:41:26+08:00",
+      "observedAt": "2026-11-25T13:47:06.485041+08:00"
+    }
+  ],
+  "safeUpgrade": {
+    "attempts": [
+      {
+        "id": "36",
+        "status": "completed",
+        "stage": "finished",
+        "sceneClosed": true
+      },
+      {
+        "id": "37",
+        "status": "completed",
+        "stage": "finished",
+        "sceneClosed": true
+      }
+    ],
+    "bothPublic": true,
+    "willRebuildWith": "a59b793"
+  }
 }

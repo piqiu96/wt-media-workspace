@@ -37,7 +37,7 @@
 
 ## 三道收口门
 
-- [ ] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
+- [x] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
 - [ ] G2 真实E2E：仅G1后重建新环境/DMG、真实本人资源与AI、真实至少两批顺序和公开事实；原目标/唯一任务/占用/attempt/work一致，真实单Profile与受控多Profile分别记载，不伪造资源或结果。
 - [ ] G3 最后UI走查：G2后Web与安装版逐页对照原型最终走查，覆盖角色、完整正常及必要异常路径、返回与视口。用户107–109最终统一整体验收仍另行进行。
 
@@ -76,3 +76,7 @@ G2真实读取反馈：环境310577b/81f6bf8/2e06487全部门禁通过并挂载�
 真实反馈修复4daf991已独立关闭：计划所属批次start只读投影始终过滤，沿用plan_position_blocked提示统一计划确认；独立批次start、本人edit/合法stop、resume/takeover及内部StartPlan/Preview不变。独立service0.291s、真MySQL1.120s通过；root完整publish模块及隔离repository126.794s通过（/tmp/chg109-root-start-action-publish-live.log）。G1重新关闭，须以4daf991重建环境后继续原计划1的G2，不重新创建或重发。
 
 G2两批实际投稿13/36、14/37成功，自动移交3→4，无人工逐批confirm/finish。均正常reviewing，公开0且finish动作正确不可用；只读progress却显示ready_to_finish，需补全批执行后仍有reviewing时等待平台公开的投影及正式契约。当前回G1修该展示事实；不改变运行中原核验、10%推进或finish写guard，不重发。G3仍未开始。
+
+尾批正常审核展示修复已关闭：正式ede0c83、消费7e43de3、Go a59b793。只读awaiting_finish按全已启动前缀reviewing及noNext投影，保留stop/pause/verification/unknown优先级，既有finish写guard/10%不变；前端明确等待平台公开、当前批次暂停。root单场景真实隔离18.722s、schema18、完整Web165/1236、双build通过；实现者全TestPlan31.084s/fullGo通过，独立schema18/39unit/两browser及真MySQL最终审核+10%/查询25.451s通过，无未关闭P1/P2。G1重新关闭。
+
+真实task13/14已各唯一关联work6/7，原attempt36/37 completed/finished且scene_closed=true；DB publish/check Profile持有共6行全部released，active_profile/slot均NULL，published任务next_check_at均NULL。可安全按a59b793全环境升级，验证重启不重复及最终结束；G2/G3仍未完成。

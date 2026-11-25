@@ -6,7 +6,7 @@
 
 ## 当前
 
-G2两批真实投稿均成功：task13/attempt36/output137、task14/attempt37/output138，首批自动移交3→4，无人工逐批confirm或先结束；当前正常reviewing，原核验已实读首次结果并按原策略等待下一次检查。公开0/缺口2、finish动作正确不可用。真实读取又发现尾批progress过早ready_to_finish，正在G1最小补正式awaiting_finish只读进展及人话标签；不改调度或finish写guard，原Agent继续核验，不在可能核验途中重启/重发。G2未完成，G3未开始，详real-e2e.json。
+尾批待公开进度修复ede0c83/7e43de3/a59b793已独审关闭，root Web1236/schema18/双build和定向真实MySQL、实现者fullGo/全TestPlan均通过，G1重新关闭/VERIFYING。真实task13/36/output137→work6及task14/37/output138→work7均自动核实公开；原场景closed，所有publish/check Profile使用均released、无next_check或active_profile/slot。正在安全升级a59b793完整环境，随后验证不重复、2/2及正常结束再最终G3双端原型走查。G2尚未完成，不把投稿/测试成功替代最终收口。
 
 ## 下一步
 
