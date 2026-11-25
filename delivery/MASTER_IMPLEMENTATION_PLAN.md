@@ -124,8 +124,8 @@ wt-media-workspace/
 
 | 状态 | 含义 | 当前处于该态的里程碑 |
 |---|---|---|
-| `NOT_STARTED` | 未进入该里程碑 | M-publishing-plan、M-publishing-operations、M10 |
-| `IN_PROGRESS` | 开发中 | 无 |
+| `NOT_STARTED` | 未进入该里程碑 | M-publishing-operations、M10 |
+| `IN_PROGRESS` | 开发中 | M-publishing-plan |
 | `VERIFYING` | 自动综合验收完成，等待人工整体验收 | M7 |
 | `DONE` | 人工整体验收通过 | M2、M3、M4、M5、M6、M-launch-engineering |
 
@@ -165,7 +165,8 @@ wt-media-workspace/
 | M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
 | M6 | `DONE` | CHG106工具、内容准备/续编、结果处置与统计已交付；任务11/attempt34自动核实公开作品4，四仓改动已合入main | 已有真实业务、安装版关键流程与异常回归证据；2026-11-25用户签收，已归档 |
 | M7 | `VERIFYING` | 107/108技术交付与真实单Profile双端闭环通过，多Profile受控验证 | 用户指定107–109后统一整体验收；109可按已完成技术依赖启动 |
-| M-publishing-plan、M-publishing-operations | `NOT_STARTED` | 计划与后续平台未验收；工具已归M6 | 完成计划、后续平台和三平台回归 |
+| M-publishing-plan | `IN_PROGRESS` | 109契约、数据与服务已实现并独审；共用页面按原型源码对齐，正在收口编码自测 | 自测闭环后真实多批E2E，最后双端UI走查和PR/main交付 |
+| M-publishing-operations | `NOT_STARTED` | 后续平台未验收；工具已归M6 | 完成后续平台和三平台回归 |
 | M10 | `NOT_STARTED` | 首次上线已有部分打包部署证据 | 依赖发布四阶段，补验升级、恢复及发布业务 |
 
 2026-10-26 M3–M5 易用性增量已确认：CHG-101 已合并；[M3-F／CHG-102](milestones/M3-content-discovery-v2.md#m3-f-public-content-scope)已完成并归档（Cloud PR #8，`cb26c66`），团队公共内容池与 Desktop 共用 Cloud 页面入口上线；CHG-106 前端状态色死表已删除并归档（Cloud PR #9，`d793d92`）；[M4-I／CHG-103](milestones/M4-content-production.md#m4-i-production-operator)已完成并归档（Cloud PR #10，`2cd341d`），策略→任务→成片负责人事实与代创建链路已上线；[M4-J／CHG-104](milestones/M4-content-production.md#m4-j-material-usage)已完成并归档（Cloud PR #11，`fc8504e`），以该事实投影素材使用并收敛个人下载；[M5-F／CHG-105](milestones/M5-automatic-production.md#m5-f-team-material-candidates)已完成并归档（Cloud PR #12，`c509ee8`），自动候选改为团队素材库且任务/成片归策略负责人；M5 总体当时仍为 `IN_PROGRESS`，待 CHG-098 统一走查 M5-AC-13 与 M4-H2；2026-10-28 用户签收 M4-H2 与 M5-AC-13，M4 与 M5 进入 `DONE`。CHG-104 与 CHG-105 均依赖 CHG-103，按单 CHG 执行纪律逐项激活。M3 原 `DONE` 签收不重开，M4/M5 旧机器 PASS 不冒充新增闭环通过；P1 跨团队昂贵资源复用待成本与现有缓存能力核实后另立交付项。
@@ -517,12 +518,16 @@ M7-准备：本人资源＋批量内容＋候选配置保存（无task/占用）
 
 | 字段 | 内容 |
 | --- | --- |
-| 状态 | `NOT_STARTED` |
+| 状态 | `VERIFYING` |
 | 目标 | 目标矩阵与拆批、全部批次准备后首次人工授权并冻结、10%自动推进、批次快捷处理、核实和最终结束 |
 | 依赖 | M7 `DONE` |
 | 业务验收 | [发布计划](milestones/M-publishing-plan.md) |
 | Active CHG | None |
-| Evidence | None，原型不代表生产验收 |
+| Evidence | [109编码与自测矩阵](completed/CHG-20261124-109/evidence/implementation-selftest-checklist.md)；真实E2E两批公开2/2且达成结束已通过，最终d853e24双端UI及补验均通过；技术交付与归档随Workspace PR65合入main生效，用户整体人工验收另行 |
+
+门禁说明：上表依赖列记录标准门禁M7 `DONE`，不表示M7当前已签收。M7实际为技术交付完成、`VERIFYING`待用户整体人工验收。
+
+本轮执行例外：用户明确指定107–109依次自主技术交付后统一整体验收。107/108已技术归档且四仓main核对，故109可启动；M7仍保留`VERIFYING`，不提前宣称用户最终签收。
 
 候选 CHG：
 
@@ -530,7 +535,7 @@ M7-准备：本人资源＋批量内容＋候选配置保存（无task/占用）
 PLAN 计划闭环：全部批次准备与启动冻结 → 10%推进/批次快捷处理 → 核实与结束
 ```
 
-[CHG-20261124-109](planned/CHG-20261124-109/change.md)已获用户执行授权，登记为PLANNED，[review清单](planned/CHG-20261124-109/plan.md)逐项对应产品、页面、API、数据与验收。仍规划一个计划闭环CHG，内部依次完成目标与骨架/全部批次准备/启动冻结 → 10%推进与原批次快捷操作 → 核实/结束 → 整体验收。10%边界、零分母、未知阻断、原资源等待与人工暂停、迟到结果不重复推进必须验证；计划进度和发布成功率随本阶段交付，不依赖M9。2026-11-25裁定：启动后不修改计划及所属批次配置，不追加批次或补量；保留10%衔接和批次原有快捷操作，追加发布另建独立批次或新计划。
+[CHG-20261124-109](completed/CHG-20261124-109/change.md)已按授权完成技术实现、自测、真实E2E及最终双端走查并归档，[review清单](completed/CHG-20261124-109/plan.md)逐项对应产品、页面、API、数据与验收。本项作为一个计划闭环CHG，已依次完成目标与骨架/全部批次准备/启动冻结 → 10%推进与原批次快捷操作 → 核实/结束 → 技术验收。用户整体人工签收另行。10%边界、零分母、未知阻断、原资源等待与人工暂停、迟到结果不重复推进已按真实与受控边界验证；计划进度和发布成功率随本阶段交付，不依赖M9。2026-11-25裁定：启动后不修改计划及所属批次配置，不追加批次或补量；保留10%衔接和批次原有快捷操作，追加发布另建独立批次或新计划。
 
 ### M-publishing-operations：后续平台与三平台整体回归
 

@@ -1,0 +1,497 @@
+{
+  "date": "2026-11-25",
+  "status": "G1_G2_G3_pass_technical_archive_with_Workspace_PR65",
+  "source": {
+    "cloud": "a59b793",
+    "agent": "81f6bf8",
+    "desktop": "2e06487"
+  },
+  "bringup": {
+    "log": "/tmp/chg109-g2-bringup.log",
+    "allGates": "PASS",
+    "frontendVersion": "0.1.0+310577b",
+    "fixedRun": {
+      "log": "/tmp/chg109-g2-4daf991-bringup.log",
+      "allGates": "PASS",
+      "frontendVersion": "0.1.0+4daf991"
+    },
+    "finalRun": {
+      "log": "/tmp/chg109-g2-a59b793-bringup.log",
+      "allGates": "PASS",
+      "frontendVersion": "0.1.0+a59b793"
+    }
+  },
+  "resourceBaseline": {
+    "ownerId": "3",
+    "eligibleAccountId": "9",
+    "eligibleAccounts": 1,
+    "availableOutputs": 0
+  },
+  "production": {
+    "taskIds": [
+      730,
+      731
+    ],
+    "sourceOutputs": [
+      135,
+      136
+    ],
+    "newOutputs": [
+      137,
+      138
+    ],
+    "status": "success"
+  },
+  "ai": {
+    "provider": "configured DeepSeek via Wired().GenerateJSON",
+    "http": 200,
+    "events": [
+      "start",
+      "progress",
+      "item_result",
+      "done"
+    ],
+    "logid": "tr96921ff6b71b1b9a",
+    "result": {
+      "batches": [
+        {
+          "row_key": "baidu-4-b1",
+          "name": "百度类目4第1批",
+          "platform": "baidu",
+          "group_order": 1,
+          "batch_order": 1,
+          "targets": [
+            {
+              "category_id": "4",
+              "target_count": 1
+            }
+          ]
+        },
+        {
+          "row_key": "baidu-4-b2",
+          "name": "百度类目4第2批",
+          "platform": "baidu",
+          "group_order": 1,
+          "batch_order": 2,
+          "targets": [
+            {
+              "category_id": "4",
+              "target_count": 1
+            }
+          ]
+        }
+      ],
+      "resource_as_of": "2026-11-25T05:27:07.087663Z",
+      "issues": []
+    },
+    "adoptedAfterReview": true,
+    "noAutomaticSave": true,
+    "endpoint": "https://api.deepseek.com",
+    "model": "deepseek-flash"
+  },
+  "plan": {
+    "id": "1",
+    "batchIds": [
+      "3",
+      "4"
+    ],
+    "target": 2,
+    "createReplayIdentical": true,
+    "started": true,
+    "startReceipt": {
+      "plan_id": "1",
+      "revision": "4",
+      "first_started_at": "2026-11-25T05:38:42.852528Z",
+      "current_batch_id": "3",
+      "batch_confirmations": [
+        {
+          "batch_id": "3",
+          "expected_revision": "2",
+          "included_row_keys": [
+            "row-137"
+          ],
+          "excluded_row_keys": [],
+          "allow_shortfall": false,
+          "expected_shortfalls": [
+            {
+              "category_id": "4",
+              "shortfall": 0
+            }
+          ]
+        },
+        {
+          "batch_id": "4",
+          "expected_revision": "2",
+          "included_row_keys": [
+            "row-138"
+          ],
+          "excluded_row_keys": [],
+          "allow_shortfall": false,
+          "expected_shortfalls": [
+            {
+              "category_id": "4",
+              "shortfall": 0
+            }
+          ]
+        }
+      ],
+      "first_batch_receipt": {
+        "batch_id": "3",
+        "revision": "3",
+        "execution_status": "running",
+        "first_started_at": "2026-11-25T05:38:42.852528Z",
+        "task_ids": [
+          "13"
+        ],
+        "target_count": 1,
+        "created_count": 1,
+        "creation_shortfall": 0
+      }
+    },
+    "startReplayIdentical": true,
+    "freezeChecks": [
+      {
+        "entry": "future_batch_configuration",
+        "http": 409,
+        "code": "publication_conflict"
+      },
+      {
+        "entry": "plan_structure",
+        "http": 409,
+        "code": "publication_batch_parent_blocked"
+      }
+    ],
+    "zeroTasksAfterBothConfigured": true,
+    "firstRunning": {
+      "currentBatchId": "3",
+      "taskId": "13",
+      "attemptId": "36",
+      "phase": "preparing",
+      "secondBatchTaskCount": 0
+    },
+    "automaticHandoff": {
+      "fromBatch": "3",
+      "toBatch": "4",
+      "at": "2026-11-25T13:40:36.800715+08:00",
+      "firstStatus": "reviewing",
+      "firstSubmission": "1882807582575024395",
+      "noManualFinish": true,
+      "noManualConfirmNext": true,
+      "firstPublishedCount": 0
+    },
+    "secondTask": [
+      {
+        "id": "14",
+        "output": "138",
+        "attempt": "37",
+        "status": "running"
+      }
+    ],
+    "bothAccepted": {
+      "tasks": [
+        {
+          "id": "13",
+          "attempt": "36",
+          "output": "137",
+          "status": "reviewing",
+          "submission": "1882807582575024395",
+          "workId": null
+        },
+        {
+          "id": "14",
+          "attempt": "37",
+          "output": "138",
+          "status": "reviewing",
+          "submission": "1882807636727269814",
+          "workId": null
+        }
+      ],
+      "publishedCount": 0,
+      "targetGaps": [
+        {
+          "platform": "baidu",
+          "category_id": "4",
+          "target_count": 2,
+          "published_count": 0,
+          "shortfall": 2
+        }
+      ],
+      "finishOffered": false
+    },
+    "final": {
+      "status": "ended",
+      "revision": "6",
+      "endReason": "achieved",
+      "endNote": "两批均已通过原任务核验公开，目标2条实际公开2条，缺口0；按真实结果结束。",
+      "goalResults": [
+        {
+          "platform": "baidu",
+          "category_id": "4",
+          "target_count": 2,
+          "published_count": 2,
+          "shortfall": 0
+        }
+      ],
+      "published": 2,
+      "pending": 0,
+      "verification": 0,
+      "actions": [
+        "copy"
+      ],
+      "finishedThrough": "actual packaged macOS UI",
+      "batches": [
+        {
+          "id": "3",
+          "status": "ended",
+          "created": 1,
+          "published": 1
+        },
+        {
+          "id": "4",
+          "status": "ended",
+          "created": 1,
+          "published": 1
+        }
+      ]
+    }
+  },
+  "finding": {
+    "code": "unstarted_plan_batch_start_action_exposed",
+    "actual": "batch3/4 allowed_actions includes start before parent first start",
+    "action": "paused first start; minimal provider projection fix and review required",
+    "fixedBy": "4daf991",
+    "independentReview": "PASS",
+    "realReadBack": "only edit/stop, no start"
+  },
+  "limitations": {
+    "actualOwnedProfiles": 1,
+    "multiProfile": "controlled tests only",
+    "finalUI": "PASS: final Web and macOS packaged walkthrough completed; see ui-walkthrough.md; user overall acceptance pending"
+  },
+  "databaseBeforeConfiguration": {
+    "planId": "1",
+    "batches": [
+      {
+        "id": "3",
+        "status": "incomplete",
+        "execution": "not_started",
+        "taskCount": 0,
+        "occupationCount": 0
+      },
+      {
+        "id": "4",
+        "status": "incomplete",
+        "execution": "not_started",
+        "taskCount": 0,
+        "occupationCount": 0
+      }
+    ],
+    "newOutputs": [
+      {
+        "id": 137,
+        "operatorId": 3,
+        "categoryId": 4
+      },
+      {
+        "id": 138,
+        "operatorId": 3,
+        "categoryId": 4
+      }
+    ]
+  },
+  "content": [
+    {
+      "row_key": "row-137",
+      "events": [
+        "start",
+        "progress",
+        "item_result",
+        "done"
+      ],
+      "logid": "tr5321dea222098547",
+      "result": {
+        "content": {
+          "cover_title": "学会架点",
+          "description": "学会架点很简单，新手也能快速掌握",
+          "topics": "三角洲行动"
+        },
+        "field_revisions": {
+          "cover_title": "0",
+          "description": "0",
+          "topics": "0"
+        }
+      }
+    },
+    {
+      "row_key": "row-138",
+      "events": [
+        "start",
+        "progress",
+        "item_result",
+        "done"
+      ],
+      "logid": "tr92093fc5400ed16a",
+      "result": {
+        "content": {
+          "cover_title": "实战思考控全局",
+          "description": "实战多思考，才能掌控全局",
+          "topics": "三角洲行动"
+        },
+        "field_revisions": {
+          "cover_title": "0",
+          "description": "0",
+          "topics": "0"
+        }
+      }
+    }
+  ],
+  "covers": [
+    {
+      "outputId": 137,
+      "horizontalFileId": "39",
+      "portraitFileId": "41",
+      "width": 1080,
+      "height": 1440,
+      "title": "学会架点",
+      "renderInputHash": "091cac555672a0fbbc427e1a64e5b671bd2b80fec52fd8c9130c7ecd1d37298c",
+      "preview": false,
+      "visuallyReadBack": true
+    },
+    {
+      "outputId": 138,
+      "horizontalFileId": "40",
+      "portraitFileId": "42",
+      "width": 1080,
+      "height": 1440,
+      "title": "实战思考控全局",
+      "renderInputHash": "64c3fc4f89a7c9d6cf17034f950ef849751adc63f415a6edf95e3b48ec8c7c0a",
+      "preview": false,
+      "visuallyReadBack": true
+    }
+  ],
+  "findings": [
+    {
+      "code": "unstarted_plan_batch_start_action_exposed",
+      "actual": "batch3/4 allowed_actions includes start before parent first start",
+      "action": "paused first start; minimal provider projection fix and review required",
+      "fixedBy": "4daf991",
+      "independentReview": "PASS",
+      "realReadBack": "only edit/stop, no start"
+    },
+    {
+      "code": "last_batch_reviewing_progress_ready_to_finish",
+      "actual": "ready_to_finish",
+      "finishOffered": false,
+      "fix": "closed: formal ede0c83, frontend 7e43de3, provider a59b793 awaiting_finish; independent review and true MySQL regression PASS"
+    }
+  ],
+  "publicWorks": [
+    {
+      "id": "6",
+      "taskId": "13",
+      "attemptId": "36",
+      "outputId": "137",
+      "platformWorkId": "218369705454481110",
+      "url": "https://mbd.baidu.com/newspage/data/videolanding?nid=sv_218369705454481110",
+      "publishedAt": "2026-11-25T13:40:34+08:00",
+      "observedAt": "2026-11-25T13:45:53.590756+08:00"
+    },
+    {
+      "id": "7",
+      "taskId": "14",
+      "attemptId": "37",
+      "outputId": "138",
+      "platformWorkId": "6304603525194997413",
+      "url": "https://mbd.baidu.com/newspage/data/videolanding?nid=sv_6304603525194997413",
+      "publishedAt": "2026-11-25T13:41:26+08:00",
+      "observedAt": "2026-11-25T13:47:06.485041+08:00"
+    }
+  ],
+  "safeUpgrade": {
+    "attempts": [
+      {
+        "id": "36",
+        "status": "completed",
+        "stage": "finished",
+        "sceneClosed": true
+      },
+      {
+        "id": "37",
+        "status": "completed",
+        "stage": "finished",
+        "sceneClosed": true
+      }
+    ],
+    "bothPublic": true,
+    "rebuiltWith": "a59b793"
+  },
+  "restart": {
+    "sameTaskIds": [
+      "13",
+      "14"
+    ],
+    "sameAttemptIds": [
+      "36",
+      "37"
+    ],
+    "published": 2,
+    "noDuplicates": true
+  },
+  "uiRebuildReadBack": {
+    "source": "398b3d7",
+    "status": "ended",
+    "revision": "6",
+    "taskIds": [
+      "13",
+      "14"
+    ],
+    "statuses": [
+      "published",
+      "published"
+    ],
+    "attemptIds": [
+      [
+        "36"
+      ],
+      [
+        "37"
+      ]
+    ]
+  },
+  "finalSourceReadBack": {
+    "source": "d853e24",
+    "plan": {
+      "id": "1",
+      "status": "ended",
+      "revision": "6",
+      "end_reason": "achieved"
+    },
+    "tasks": [
+      {
+        "id": "13",
+        "status": "published"
+      },
+      {
+        "id": "14",
+        "status": "published"
+      }
+    ],
+    "attemptIds": [
+      [
+        "36"
+      ],
+      [
+        "37"
+      ]
+    ],
+    "database": {
+      "planCount": 1,
+      "batchCount": 4,
+      "eachPlanBatch": {
+        "tasks": 1,
+        "attempts": 1,
+        "matchedWorks": 1
+      }
+    }
+  }
+}
