@@ -15,7 +15,7 @@
 
 | 业务能力 | 主要实现位置（Cloud 除另标） | 必须证明的自测 | 当前事实与待补 |
 | --- | --- | --- | --- |
-| 列表、搜索、详情与范围 | publish/service/plan.go、repository/plan_query.go、PublishingPlansPage | 全目标类目授权后count/page；本人、同team高级只读、admin只读、跨范围拒绝 | 已有真MySQL scope断言；最终UI全部筛选/重置待统一核对 |
+| 列表、搜索、详情与范围 | publish/service/plan.go、repository/plan_query.go、PublishingPlansPage | 全目标类目授权后count/page；本人、同team高级只读、admin只读、跨范围拒绝 | 已有真MySQL scope断言；9bb0969进行中包含paused、全部goal授权/同goal筛选与count/page已独立真MySQL复验；新布局筛选/重置最终组合待核对 |
 | 创建/编辑/校验/目标守恒 | model/plan.go、repository/plan.go、PlanWorkbench、planPreparation | 每格守恒、稳定ID/归属、失败回滚、旧revision、原key重放 | 数据层及Service已定向/独审；完整手工操作待补 |
 | 本人资源盘点 | 复用BatchResources→PlanWorkbench | 账号/成片/可安排量/asof；known0、短缺、unknown、readfail、越权 | **发现缺实现，已分配补齐**；目标可超库存不静默降低 |
 | 手工新增/拆分/合并/排序 | PlanWorkbench、planPreparation，对照原型plan/app | A1+B1手动拆两批、目标增删重配、stableID、终止固定行、完整守恒 | **发现缺手工闭环，已分配补齐**；AI不能成为必经路径 |
