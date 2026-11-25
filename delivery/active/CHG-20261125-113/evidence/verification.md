@@ -15,3 +15,13 @@
 计划详情三角色Drawer与返回位置PASS（/tmp/chg113-plan-drawer.log）；G1计划骨架配置/冻结及正式任务回链PASS（/tmp/chg113-plan-g1.log）。完整批次与112向导8组、执行baseline及列表状态/跨成员回归PASS（/tmp/chg113-batch-regression.log、/tmp/chg113-wizard-regression.log、/tmp/chg113-execution-regression.log、/tmp/chg113-list-regression.log）。本次Web168文件1244项PASS（/tmp/chg113-web-tests.log）。
 
 生产源码提交bf6b2d1；新安装包与实际原数据走查正在完成，尚不以受控fixture认定安装版已通过。
+
+## 安装版走查发现与修复
+
+第一次新DMG只读走查operator01：原批次1取消前未启动，取消原因清晰、60/0/60/0真实数量保留，空态不再显示原生六列表头，无重复目标区及虚假执行统计；批次2首次执行时间及正式任务12/真实公开1条保留。误点列表组合AX单元格进入复制后立即返回，未保存任何业务对象。
+
+已执行批次操作记录另发现publication_batch.group_assigned/ended直接泄露技术事件，统一为安排本组任务/批次执行结束；共享格式器亦覆盖组结束、终止落定和计划骨架，未知事件显示批次业务记录，不暴露原始事件。提交9da63af。新12类浏览器增加实际record API中文断言后PASS（/tmp/chg113-detail-records.log）；最后Web168文件1244测试PASS（/tmp/chg113-web-final.log），Cloud构建PASS（/tmp/chg113-cloud-build-final.log）。
+
+最终环境强制重启、重新build-dmg、wt.py chg verify113全部PASS（/tmp/chg113-environment-final.log、/tmp/chg113-chg-verify-final.log）。正式verify含Go模块、Workspace220测试、Cloud/Agent/BitBrowser/双dev/新鲜资源/DMG/CORS与operator01真实登录。先校验再launch转交Agent，未绕过Desktop凭证保护。
+
+Cloud PR56：https://github.com/piqiu96/wt-media-cloud/pull/56；Workspace PR69：https://github.com/piqiu96/wt-media-workspace/pull/69。最终源码9da63af30324880690c2a4810b1d2d38b162fa2a；DMG SHA256 bf9621679e97c47bed4b1aa809ae01231a7df7d702f8cefd3cb176637931ccf9。最终安装版复核及远端CI仍待完成。
