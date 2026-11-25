@@ -42,3 +42,15 @@
 - [ ] G3 最后UI走查：G2后Web与安装版逐页对照原型最终走查，覆盖角色、完整正常及必要异常路径、返回与视口。用户107–109最终统一整体验收仍另行进行。
 
 当前不得将G1/G2/G3标记完成。原型预览、开发截图、fixture及测试总数仅能支持其实际覆盖的自测项。
+
+## T07 原型代码对齐实施映射（待独立验证，非视觉验收）
+
+| 页 | 已确认差异 | 使用的原型实现输入与修改范围 |
+| --- | --- | --- |
+| 计划列表 | 更新时间、ID复制/名称链接、状态/结束结果、进展二行、数量/比例、周期排版缺失或不同 | PlanList.columns及slots，正式ResourceNameLink/Badge/RowActions/EmptyState与分页；保持原shell导航 |
+| 计划详情 | 负责人/类目/批次数/创建更新不全，summary自绘，矩阵缺合计/完成率，批次表少结果/待办 | PlanDetail ResourceDescriptions顺序、ResourceStatGrid、Notice action、目标矩阵及九列表结构；真实read投影，不臆造名称 |
+| 计划编辑 | 日期/基础信息/目标区组织不同，缺盘点与完整分配dialog | PlanBasicForm/PlanGoalScope/plan/app结构与样式，名称周期同排/备注整行；盘点四态、手工新增分配及三态续编 |
+| 批次列表/详情 | tabs拆散原型纵向信息、执行/目标统计位置不同 | BatchManager列与BatchDetailContent纵向分区，正式共用主体供page+Drawer；保留任务过滤/分页/所有既有原操作 |
+| 批次配置 | 三段标题、字段同排、summary/底栏不同 | PublishComposer三段代码、common/Token、现有正式Resource组件；不复制AI/执行内核 |
+
+实施者负责以上逐页对齐；根和独立审查者按代码映射与开发验证核对，最终UI走查留G3。不能以现有开发截图的‘基本相同’替代本轮用户指出的视觉差异整改。
