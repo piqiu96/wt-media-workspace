@@ -29,3 +29,15 @@ Cloud1974df4恢复数字控件；后续提交实现确认摘要与单向内容�
 完整执行baseline、列表动作、11异常受控场景与计划baseline/editor/G1/controls/stale已PASS。首次stopping与统一环境重启重叠导致浏览器关闭，环境完成后单独重跑PASS（/tmp/chg112-execution-stopping.log）；未改断言/超时。1440/1024完整批次浏览器与390宽新增向导矩阵均PASS。
 
 最终生产代码b2bc9b9089aa4f2a887fbe00cf97cef18d8e5147；最终全量Web168/1244再次PASS（/tmp/chg112-full-web-final.log），新增8组矩阵与完整批次再次PASS（/tmp/chg112-wizard-final.log、/tmp/chg112-batch-final2.log）。Cloud PR55：https://github.com/piqiu96/wt-media-cloud/pull/55，检查与新安装版最终复核正在完成；尚无代码评论。
+
+## 最终包复核
+
+最终源b2bc9b9的Cloud生产构建PASS（/tmp/chg112-final-cloud-build.log）；统一all --force-restart再次退出0，所有服务/双端资产/登录/DMG新鲜度与挂载门禁PASS（/tmp/chg112-final-environment.log）。frontend0.1.0+b2bc9b9.dirty，dirty仅其他会话example修改，正式生产源码clean；shell0.1.0-local.0764ec2ed7，Agent0.3.0。
+
+本机重新挂载并实际登录operator01：新建草稿为空，证明上轮保存正式配置后已清理续编；名称必填失败后填写名称，旧错误即时消失；连体输入/确认摘要/内容无回资源/总览空态一致，最终总览不再出现“返回资源配置”误导。未保存本轮复核输入，返回出现离开确认，选择离开后批次列表仍7条，工作环境绿色，未新建Cloud记录或草稿；保留该安装版供用户走查。
+
+最终DMG：/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/起飞_0.1.0-local.0764ec2ed7_aarch64.dmg。SHA256 f90a6b205dbb23d64498e436861d6ecb3e2f82a3b88fd29d412a297c0c18a487。
+
+本次验证是配置/续编真实闭环加执行异常受控回归；未进行新增平台投稿，不把受控回执算新的真实发布证据。业务待确认项：无。用户最终整体签收仍另行。
+
+两端角色入口补充：test-publication-role-browser.mjs的Cloud/Desktop各admin/operator/senior_operator矩阵PASS（/tmp/chg112-dual-role.log）；管理员保留管理但不能执行，运营与高级运营仅处理本人，查看他人任务不获得执行或草稿能力。
