@@ -19,27 +19,31 @@
 | 创建/编辑/校验/目标守恒 | model/plan.go、repository/plan.go、PlanWorkbench、planPreparation | 每格守恒、稳定ID/归属、失败回滚、旧revision、原key重放 | 数据层及Service已定向/独审；0968b1a实际失衡拒绝无PUT→修正structure PUT、逐格守恒与stable IDs通过 |
 | 本人资源盘点 | 复用BatchResources→PlanWorkbench | 账号/成片/可安排量/asof；known0、短缺、unknown、readfail、越权 | 2fd6cd0已补正式本人资源盘点四态/asof/素材缺口；独立编辑器浏览器通过，容量未知不造假；最终expanded-editor组合已通过（资源四态/守恒/合并拆分排序/固定行） |
 | 手工新增/拆分/合并/排序 | PlanWorkbench、planPreparation，对照原型plan/app | A1+B1手动拆两批、目标增删重配、stableID、终止固定行、完整守恒 | 2fd6cd0已补手动新增/分格/A1B1拆分及固定行保护；独立编辑器浏览器及单测通过，AI不是必经 |
-| 真实AI建议与采用 | plan_recommendation.go、plan_handler.go、PlanWorkbench | 服务端本人数量；模型非法/截断/取消失败；SSE真实事件；审阅后采用、不自动保存 | Go/受控流已测；真实DeepSeek留最后E2E |
-| 全批配置准备 | 原PublishingBatchesPage及BatchResourceSetup/CandidateWorkspace | 继承目标只读；候选保存零task/占用；全部待执行批次就绪才首启 | 共享107数据守卫与两批configuration PUT实际受控验证通过；继承目标只读、响应零任务、无start/publication POST；真实DB见T03/T05，真实资源留G2 |
+| 真实AI建议与采用 | plan_recommendation.go、plan_handler.go、PlanWorkbench | 服务端本人数量；模型非法/截断/取消失败；SSE真实事件；审阅后采用、不自动保存 | Go/受控流已测；真实DeepSeek建议与内容生成均已实测，见real-e2e.json |
+| 全批配置准备 | 原PublishingBatchesPage及BatchResourceSetup/CandidateWorkspace | 继承目标只读；候选保存零task/占用；全部待执行批次就绪才首启 | 共享107数据守卫与两批configuration PUT实际受控验证通过；继承目标只读、响应零任务、无start/publication POST；真实DB见T03/T05；G2实际plan1/batch3/4配置零task/占用已读回 |
 | 首次原子启动/冻结 | shared startBatchTx、plan_execution.go、Plan命令journal | 一次task/占用/授权/cursor/receipt；全批冻结；跨批重复定位；失败全回滚 | 真MySQL及原回执测试通过；Provider/consumer权威未生效proof、缺字段false/0负例已修并独审关闭 |
 | 计划原请求恢复 | plan_command.go、planPreparation、PublishingPlansPage | 原key/原包先receipt；权威false绑定；普通409/读失败未知保留；跨标签CAS | Provider9a01a1f/0e722ce及嵌套回执72e54eb、前端2fa2ca0已独立复验；实际HTTP/15schema/原key矩阵通过，既有原请求browser及相应单测通过，最新全Web165/1235通过 |
-| 固定组与原批次执行入口 | 复用108、BatchExecutionControls及父plan投影 | 原N/间隔/异常/容量；同名按钮/权限/确认/API；future/移交不能旁路 | 108及109父锁隔离回归已有；最终真实联调后验收 |
+| 固定组与原批次执行入口 | 复用108、BatchExecutionControls及父plan投影 | 原N/间隔/异常/容量；同名按钮/权限/确认/API；future/移交不能旁路 | 108及109父锁隔离回归已有；G2真实两批N5→实际组1，原任务及批次详情已读回；复杂异常为隔离验证 |
 | 顺序衔接与确认 | planProgress/Advance、worker | 10%auto、20%confirm、0skip、prefix未决、旧basis、锁后实时截止 | 真MySQL已测、独审修复；UI实际请求严验需保持 |
 | 暂停/恢复/接管/终止 | ControlPlan、各执行入口父围栏 | pause仅后批；接管不重建单/授权；stop封提交许可；原结果安全收尾 | 真MySQL已有；UI接管/确认范围保持同谓词 |
 | 待办与分页 | PlanBatchPage、VerificationRequiredAt | 五类未决+停查/过期无新manual一致；count/page前过滤；manual仍审核清衔接待办不清finish | 8c5e64f已修，独立3项真MySQL2.863s及root3.195s通过，全TestPlan27.386s通过 |
 | 人工四结论及再核实 | recovery.go、LatestManualVerification、PublishingRecoveryDialog | 本人reviewing四结论、manager仅pub、unknown再核实、原结果/占用保留 | 0968b1a新增actual四结论dialog/payload、failed缺证据拒发、unknown原attempt再核实、manager仅published通过；0968b1a及310577b独审已关闭 |
-| 可信公开与逐格缺口 | matched-work join、plan_result.go、Plan详情/列表 | task/attempt/output/work精确关联；reviewing不算公开；跨格不抵消 | 实际隔离work Service回调已测；真实平台留E2E |
+| 可信公开与逐格缺口 | matched-work join、plan_result.go、Plan详情/列表 | task/attempt/output/work精确关联；reviewing不算公开；跨格不抵消 | 实际隔离work Service回调已测；G2真实公开work6/7精确关联13/36/137与14/37/138 |
 | 最终结束与迟到结果 | FinishPlan/ReconcileStoppedPlan | 未决/审核/错work/旧gap拒；unmet原因；cancel安全收敛；late不重开 | 后端已测；UI枚举unmet已59ef13e，actual请求schema断言已补 |
 | 新建续编及Cloud编辑 | Agent publication_draft、Native桥、JS plan类型 | 用户/环境/类型隔离、重启、CAS、明确重开才清、dismiss保留、Cloud edit不另存 | 本机951/Native561+独审；e1efd45三态恢复已修，独立单测/实际browser断言复验关闭，既有draft恢复browser与最终完整Web165/1235通过 |
 | 创建明确拒绝与未知 | PublishingPlansPage pendingCreate | 首次明确拒绝后可编辑/退出；未知找回不换key；原form/pending保留 | 2c5b50e已独立复验首次明确拒绝/未知分别处理 |
 | 原批次只读Drawer与回跳 | BatchReadonlyBody、ResourceOverlay、from_plan | 视口内header/close、独立滚动；读失败恢复overflow；关闭和配置/处理返回保page/filter/scroll | 顶部开发截图修正；2c5b50e失败出口/plan_scroll已有限复验；0968b1a实际tasks筛选/重置/page2、records page2、Drawer关闭及task→batch→plan原过滤/page/精确scroll返回通过；发现783→623布局时序负例已最小修复，独审已关闭 |
-| 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | e480c94按原型源码重组，独立代码映射与开发browser核对通过；最终G3 UI走查仍未进行，不能以过程证据签收 |
+| 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | e480c94按原型源码重组，独立代码映射与开发browser核对通过；G3真实Web与本机走查进行中，整改与最终复查见ui-walkthrough.md，不以过程证据签收 |
 
 ## 三道收口门
 
 - [x] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
 - [x] G2 真实E2E：仅G1后重建新环境/DMG、真实本人资源与AI、真实至少两批顺序和公开事实；原目标/唯一任务/占用/attempt/work一致，真实单Profile与受控多Profile分别记载，不伪造资源或结果。
 - [ ] G3 最后UI走查：G2后Web与安装版逐页对照原型最终走查，覆盖角色、完整正常及必要异常路径、返回与视口。用户107–109最终统一整体验收仍另行进行。
+
+## 分阶段证据记录
+
+以下“未开始”“待执行”等为对应阶段当时事实；当前结论以顶部三道收口门、checkpoint及最终走查证据为准。
 
 G1曾按以下证据完成并进入G2，真实读取发现未启动计划批次独立start动作投影遗漏，该修复已完成并独审关闭；G2/G3不得预填完成。原型预览、开发截图、fixture及测试总数仅能支持其实际覆盖的自测项。
 

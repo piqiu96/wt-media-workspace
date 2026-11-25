@@ -266,7 +266,7 @@
   "limitations": {
     "actualOwnedProfiles": 1,
     "multiProfile": "controlled tests only",
-    "finalUI": "not started"
+    "finalUI": "in progress; see ui-walkthrough.md; latest fixes independently reviewed, final packaged recheck pending"
   },
   "databaseBeforeConfiguration": {
     "planId": "1",
@@ -382,7 +382,7 @@
       "code": "last_batch_reviewing_progress_ready_to_finish",
       "actual": "ready_to_finish",
       "finishOffered": false,
-      "fix": "provider readonly progress clarification in progress; no execution or finish guard change"
+      "fix": "closed: formal ede0c83, frontend 7e43de3, provider a59b793 awaiting_finish; independent review and true MySQL regression PASS"
     }
   ],
   "publicWorks": [
@@ -423,7 +423,7 @@
       }
     ],
     "bothPublic": true,
-    "willRebuildWith": "a59b793"
+    "rebuiltWith": "a59b793"
   },
   "restart": {
     "sameTaskIds": [

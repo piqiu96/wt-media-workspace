@@ -8,7 +8,7 @@
 
 ## 执行约定
 
-本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前IMPLEMENTING，108四仓main依赖已合入。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
+本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前VERIFYING，108四仓main依赖已合入。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
 产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。本轮example原型固定930553217cf5a3c8a1750178da4974d5b46dfeac，隔离?review=chg109；根已独立核对截图及单测，后续正式页面沿此基线与提供方契约实施。
 
@@ -70,7 +70,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 
 ## 完整实现与验证顺序
 
-2026-11-25用户再次要求先依据PRD、publishing-management.md及其引用和本清单完成全部编码、自测，随后真实E2E，最后UI走查。逐项缺口和自测映射见[evidence/implementation-selftest-checklist.md](evidence/implementation-selftest-checklist.md)。现有原型/生产开发截图不构成最终视觉验收；当前批次/计划视觉差异重新按原型实现代码对齐，T07已完成编码/自测及独审，G2/G3仍待执行。
+2026-11-25用户再次要求先依据PRD、publishing-management.md及其引用和本清单完成全部编码、自测，随后真实E2E，最后UI走查。逐项缺口和自测映射见[evidence/implementation-selftest-checklist.md](evidence/implementation-selftest-checklist.md)。现有原型/生产开发截图不构成最终视觉验收；当前批次/计划视觉差异重新按原型实现代码对齐，T07已完成编码/自测及独审，G2真实两批2/2结束已通过，G3最终UI走查与交付审计补测进行中。
 
 ## 4. 执行落地步骤
 
