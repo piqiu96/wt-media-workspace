@@ -6,4 +6,4 @@ Completed or superseded slices leave this index after their remaining work has a
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261125-112 | 批次数量输入与资源确认流转 | IMPLEMENTING | wt-media-cloud |
+| CHG-20261125-112 | 批次数量输入与资源确认流转 | VERIFYING | wt-media-cloud |
