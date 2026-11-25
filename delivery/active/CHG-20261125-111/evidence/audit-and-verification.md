@@ -26,6 +26,19 @@
 
 ## 本次验证
 
-Cloud a254dae。全Web168文件/1244测试通过（/tmp/chg111-final-web-tests-2.log）。新增状态/权限用例与列表7状态、本人/其他成员控制矩阵通过；批次、执行、计划、计划编辑、G1、控制、旧请求证明共7组浏览器通过，另changed-revision/abandoned-navigation通过。创建确认初次用共享DialogPlugin缺少可访问名称的测试定位失败；改为原型同类ResourceOverlay摘要弹窗，按真实dialog标题与按钮复验通过，不降低业务断言。
+Cloud a254dae / 380cec8。全Web168文件/1244测试通过（最终审阅后/tmp/chg111-reviewed-web-tests-rerun.log，maxWorkers=2）。新增状态/权限用例与列表7状态、本人/其他成员控制矩阵通过；批次、执行、计划、计划编辑、G1、控制、旧请求证明共7组浏览器通过，另changed-revision/abandoned-navigation通过。创建确认初次用共享DialogPlugin缺少可访问名称的测试定位失败；改为原型同类ResourceOverlay摘要弹窗，按真实dialog标题与按钮复验通过，不降低业务断言。
 
 完整11项异常矩阵均通过：changed-revision、abandoned-navigation、rejected-replay、different-start-rejected、different-start、cross-tab、failed-task-actions、senior、manual-publication、late-publication、stopping（/tmp/chg111-*.log）。Cloud生产构建通过。继续PR与新安装包实际走查，未把未完成项记为PASS。
+
+## 实施后复查
+
+- 创建确认恢复原型ResourceOverlay摘要并绑定当次输入；离开页面/路由刷新时清除，校验返回后检查页面代次与输入未变化，取消不创建正式记录。380cec8补清理后计划/计划编辑浏览器重跑PASS。
+- 一轮全Web在localSettingsWiring既有动态导入超过5秒；未提高超时或削减断言，限制maxWorkers=2重跑全量168/1244 PASS。
+- 新增列表动作继续复用原详情确认器，导航仍绑定batch/revision/epoch/path，changed-revision与abandoned-navigation均PASS；没有在列表点击时直接发控制POST。
+- PR：[Cloud54](https://github.com/piqiu96/wt-media-cloud/pull/54)、[Workspace67](https://github.com/piqiu96/wt-media-workspace/pull/67)。Cloud正式审阅触发Codex，但Bot明确提示review额度耗尽，未声明自动review通过；本轮另行逐文件检查权限、未决统计、终态只读、创建与控制请求保护。
+
+## 380cec8安装版实际走查（2026-11-25 19:58）
+
+统一all退出0（/tmp/chg111-environment.log），实际新挂载frontend 0.1.0+380cec8.dirty；operator01原凭据登录通过。本机服务、比特浏览器指定账号、执行凭证均就绪。批次6/5/4/3/2真实列表均显示详情/复制，新建批次底栏返回/保存草稿/下一步；计划新建底栏返回/保存草稿/创建计划，无独立检查安排；计划2仍目标2/公开2/缺口0、批次锁定已结束、详情仅返回。新建均为空白输入，只读核对后返回，没有覆盖本机草稿或创建Cloud记录。
+
+实际旧批次1（已取消）暴露底层phase=ended又渲染出已结束副标题：1b6fd0e限定阶段副标题和停止派发提示仅对活动状态展示；新增浏览器断言已取消不得同时出现已结束。定向领域测试与7状态/跨成员列表回归PASS（/tmp/chg111-terminal-unit.log、/tmp/chg111-terminal-list.log）。正在从此提交重新构建最终包，不把380cec8当最终修复包。
