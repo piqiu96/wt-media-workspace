@@ -15,3 +15,7 @@
 - 再次制作任务737→成片144成功。短源任务738失败input_invalid，composite_output_id为空，未产生假成片。
 - 实际成片141广告中段与广告输入音轨相关系数0.99668。此为音轨数据核查，浏览器实际播放已观察；不将播放器扬声状态记为主观听音结论。
 - Cloud PR58、Workspace PR71均已转正式评审。核心代码review无发现；最新head c223f02的CI/审查及新安装版走查仍在完成。
+
+- 任务734资源快照仅source/ad/ending。新任务737种子与734不同；短源738由管理员重试后attempt_count=2再次失败，种子与初次一致，成片ID始终为空。普通运营重试未获授权，沿现有管理权限完成。取消任务739读回cancelled、attempt_count=0、成片ID为空。
+- 追加真实静音采样断言时，探测命令使用“.5”时长被FFmpeg拒绝，修正为“0.5”后通过（/tmp/chg129-silence-real.log）。最新测试提交c223f02。
+- 环境首次verify因提交更新后Compose scheduler新鲜度检查失败而停止，已按完整up --force-restart→build-dmg→verify→launch重跑，日志/tmp/chg129-environment-head.log。
