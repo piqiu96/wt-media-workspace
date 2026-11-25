@@ -39,3 +39,7 @@ T07间隙后端整体交叉审查新P2：24h后manual reviewing先于机械sweep
 GitHub连接器暂不可用、gh现有token无效；未读取或导出浏览器凭据。SSH正常推送Agent/Desktop后，根通过已登录native Chrome实际创建Agent PR20 https://github.com/piqiu96/wt-media-agent/pull/20 与Desktop PR19 https://github.com/piqiu96/wt-media-desktop/pull/19，已读回页面编号/Open与初始CI排队。均未合入，待最终CI/PR问题与跨仓E2E。CUA当前无活动，nativeChrome绑定githubChromeApp，当前Desktop PR19；IAB焦点连接仍超时，后续可用nativeChrome实际UI。
 
 T07接管接口联调：087b01c提供方只读takeover+16ba725运行predicate/guard/actions，独立复验通过，仅暂停后续不重复授权。bb6d0cc共享批次真实facts，计划详情/页内和独立批次同统计与actions，集合查无N+1；实现方全Go与完整隔离MySQL108.787s通过、独立两项1.523s无P1/P2；根facts/takeover定向隔离通过/tmp/chg109-root-batch-facts.log。正式web仍最终自审/回归，尚未独立代码审查/实际E2E。
+
+PR实际UI复核：Agent20、Desktop19均All checks passed。Desktop Codex Review Summary Completed；Agent首次自动review Failed为we could not complete this review（非code finding），根按页面提示提交@codex review重试，已读回comment7152685677。未合并，最终仍需后续检查review/CI。
+
+用户最新纠正：当前批次/计划视觉与原型差异大，不接受只功能相通；必须参考原型实际实现和publishing-management.md引用，先完整编码/自测后真实E2E、最后UI走查。T07保持未完成，新增implementation-selftest-checklist完整矩阵；独立完整性审计发现资源盘点、手工A1+B1分类拆批、恢复提示dismiss误清、A07待办漏核实四P2，已分别派web/backend补齐。旧开发截图不能当最终视觉签收。两执行agent中断后已恢复，未完成的fullMySQL空日志不计PASS。
