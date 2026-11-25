@@ -6,7 +6,7 @@
 
 ## 当前
 
-T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型366/计划34/example21、浏览器16项及构建通过。根独立看16类关键截图并重跑366项通过。T02已完成提供方发布及独立审查，T03 f0f19b3迁移与数据层独立审查通过；T04 a269207及fc9f7ff两P2修复独立审查通过，T05 119b726及c2402e8两P2修复已独立审查关闭，当前T06由chg109_contract实现人工核实/真实目标结果/A15结束与永久停止安全收尾；Web与本机plan运行续编留T07。计划只监控及推进准备好的批次，首次启动冻结全部配置，不追加补量；保留10%/零分母/未知阻断、人工暂停及原批次同名快捷操作。
+T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型366/计划34/example21、浏览器16项及构建通过。根独立看16类关键截图并重跑366项通过。T02已完成提供方发布及独立审查，T03 f0f19b3迁移与数据层独立审查通过；T04 a269207及fc9f7ff两P2修复独立审查通过，T05 119b726及c2402e8两P2修复已独立审查关闭，T06 265ffa9及审计ID契约ef12f35独立审查通过；当前T07由chg109_frontend实现Cloud web共用计划UI/API/journal/router，root负责Agent/Native plan续编运行，文件归属隔离。计划只监控及推进准备好的批次，首次启动冻结全部配置，不追加补量；保留10%/零分母/未知阻断、人工暂停及原批次同名快捷操作。
 
 ## 下一步
 
@@ -29,3 +29,5 @@ T04 root发布全包及隔离TestPlan2.939s通过；提供方SSE定点对齐3b83
 T05首启原子冻结/immutable receipt及首批冲突rollback两项隔离MySQL初步通过；推进/阈值/全部父入口围栏仍在补测试，尚未完成独立审查。提供方d9f42f6定点允许AdvanceResult.batch_receipt仅已合法终止的下一位置为null，保留未建单事实，该位置仍按零分母skip，不伪造zero receipt；正常启动必须真实回执。该变更先正式schema再消费，当前未交付不另增版本。
 
 T05最终全Go与完整repo隔离MySQL73.298s绿，rootTestPlan9.055s绿。独立审查2P2由c2402e8修复：重复成片实际409返回两批两row；父锁等待后新时钟重新算24h期限/basis。根发布全包及限定MySQL2.120s、schema11绿，独立有限复验关闭，无剩余T05阻断。详evidence/t05-execution-verification.md。
+
+T06完整Go+隔离repo90.216s及schema12通过；根发布包及结果专项9.966s，独立审查结果/双格/并发12.141s，无P1/P2。历史并发barrier按先Profile锁更新保留一成功/一旧修订冲突与单写断言。实际work callback验证逐格达成/未达成及latepublic不重开。T07后还需独立review/全流程E2E/PR修复合入和真实双端手工走查，用户整体验收尚未发生。
