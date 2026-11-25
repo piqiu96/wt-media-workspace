@@ -26,11 +26,11 @@
 | 固定组与原批次执行入口 | 复用108、BatchExecutionControls及父plan投影 | 原N/间隔/异常/容量；同名按钮/权限/确认/API；future/移交不能旁路 | 108及109父锁隔离回归已有；最终真实联调后验收 |
 | 顺序衔接与确认 | planProgress/Advance、worker | 10%auto、20%confirm、0skip、prefix未决、旧basis、锁后实时截止 | 真MySQL已测、独审修复；UI实际请求严验需保持 |
 | 暂停/恢复/接管/终止 | ControlPlan、各执行入口父围栏 | pause仅后批；接管不重建单/授权；stop封提交许可；原结果安全收尾 | 真MySQL已有；UI接管/确认范围保持同谓词 |
-| 待办与分页 | PlanBatchPage、VerificationRequiredAt | 五类未决+停查/过期无新manual一致；count/page前过滤；manual仍审核清衔接待办不清finish | **发现A07口径不一致，已分配单独修复** |
+| 待办与分页 | PlanBatchPage、VerificationRequiredAt | 五类未决+停查/过期无新manual一致；count/page前过滤；manual仍审核清衔接待办不清finish | 8c5e64f已修，独立3项真MySQL2.863s及root3.195s通过，全TestPlan27.386s通过 |
 | 人工四结论及再核实 | recovery.go、LatestManualVerification、PublishingRecoveryDialog | 本人reviewing四结论、manager仅pub、unknown再核实、原结果/占用保留 | 后端/原dialog接线已测；全部UI流程待独审闭环 |
 | 可信公开与逐格缺口 | matched-work join、plan_result.go、Plan详情/列表 | task/attempt/output/work精确关联；reviewing不算公开；跨格不抵消 | 实际隔离work Service回调已测；真实平台留E2E |
 | 最终结束与迟到结果 | FinishPlan/ReconcileStoppedPlan | 未决/审核/错work/旧gap拒；unmet原因；cancel安全收敛；late不重开 | 后端已测；UI枚举unmet已59ef13e，actual请求schema断言已补 |
-| 新建续编及Cloud编辑 | Agent publication_draft、Native桥、JS plan类型 | 用户/环境/类型隔离、重启、CAS、明确重开才清、dismiss保留、Cloud edit不另存 | 本机951/Native561+独审；**三态恢复缺口已分配补齐** |
+| 新建续编及Cloud编辑 | Agent publication_draft、Native桥、JS plan类型 | 用户/环境/类型隔离、重启、CAS、明确重开才清、dismiss保留、Cloud edit不另存 | 本机951/Native561+独审；e1efd45三态恢复已修，独立单测/实际browser断言复验关闭，最终组合待重跑 |
 | 创建明确拒绝与未知 | PublishingPlansPage pendingCreate | 首次明确拒绝后可编辑/退出；未知找回不换key；原form/pending保留 | 2c5b50e已独立复验首次明确拒绝/未知分别处理 |
 | 原批次只读Drawer与回跳 | BatchReadonlyBody、ResourceOverlay、from_plan | 视口内header/close、独立滚动；读失败恢复overflow；关闭和配置/处理返回保page/filter/scroll | 顶部开发截图修正；2c5b50e失败出口/plan_scroll已有限复验；完整新布局仍需校对 |
 | 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | **用户指出不符合，尚未通过；重新逐页对齐，不能以旧截图标完成** |
