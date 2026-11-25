@@ -1,0 +1,33 @@
+---
+id: CHG-20261125-112
+parent: delivery/milestones/M7-batch-publishing.md#页面实施基线
+status: DONE
+depends_on: []
+affected_repos: ["wt-media-cloud", "wt-media-workspace"]
+risk: M
+---
+
+# CHG-20261125-112：批次数量输入与资源确认流转
+
+## Change
+
+承接人工验收两张截图：恢复原型连体数字输入框；核实并落实资源确认后步骤边界，覆盖新建、续编、编辑及异常恢复。沿用Cloud原型930553217cf5a3c8a1750178da4974d5b46dfeac中PublishComposer.vue、batchCreation.css和example/common/number-stepper.css；当前其他会话原型修改不纳入。
+
+正式事实入口：M7页面实施基线、PRD第六章6.3、publishing-management.md 2.3/2.4/6。保留107保存配置零task/占用、108启动建单与109首次启动冻结。页面导航限制不擅自变更正式批次首次启动前的编辑权限。
+
+唯一执行器本会话；基线Cloud bbba813c、Workspace29b9bb4均已推送main。其他会话example及docs/design修改保留。范围仅Cloud共用Vue及相关测试、Workspace交付；无DB/Contract/Agent/Desktop运行源码变化，安装包按新Vue重建。
+
+顺序任务：1.原型/截图复现及数值输入定向失败回归→样式修复、自测、提交；2.步骤边界确认→导航及续编异常修复、自测、提交；3.既有E2E与新增异常矩阵、双端构建及安装版走查；4.PR/CI/review问题修复、证据与归档。数量样式任务不依赖下列流程问题。
+
+Q-01已裁定：用户确认本次新建/草稿资源确认后不回第一步；第二步只准备内容，第三步可返回内容配置；保存后首次启动前仍可重新进入继续配置调整资源。既有草稿step>=1视为已确认，旧待查询请求仍直达总览；重新打开Cloud编辑是新的配置会话。确认摘要只固定本次页面映射，不建单、占用或取得执行授权。资源为零及内容不完整仍可保存待完善配置；开始发布沿正式校验。
+
+## Done When
+
+- [x] 数字输入原型连体边框、焦点、禁用及窄屏布局验证通过，数值键盘/加减/清空语义保留。
+- [x] 资源确认、取消、内容/总览返回、新建/续编/已存编辑边界落实，并明确剩余问题。
+- [x] 缺少范围、零资源、盘点失败、确认中变更、异步迟到、保存失败/未知及修订冲突相关场景E2E通过，实际新安装版走查有证据。
+- [x] PR/CI与交付收口完成，未验证或待人工决定的事项如实说明；用户最终整体签收另行。
+
+## Delivery
+
+范围内验收全部PASS，Cloud PR55已合入main f99119bd，精确tree等于最终b2bc9b9安装包源码。详见[evidence/final-delivery.md](evidence/final-delivery.md)。Workspace PR68承载本项归档，随该PR合入main生效。待用户裁定事项为空；用户最终整体签收另行。

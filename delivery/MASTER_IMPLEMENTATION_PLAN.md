@@ -503,7 +503,7 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 | 依赖 | M6 `DONE` |
 | 业务验收 | [M7批次](milestones/M7-batch-publishing.md) |
 | Active CHG | None |
-| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；[110原型修复/本轮真实2批与main新包](completed/CHG-20261125-110/evidence/final-delivery.md)已验证，用户整体签收另行；[111状态与按钮修复验收](completed/CHG-20261125-111/evidence/final-delivery.md) |
+| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；[110原型修复/本轮真实2批与main新包](completed/CHG-20261125-110/evidence/final-delivery.md)已验证，用户整体签收另行；[111状态与按钮修复验收](completed/CHG-20261125-111/evidence/final-delivery.md)；[112数量与步骤修复验收](completed/CHG-20261125-112/evidence/final-delivery.md) |
 
 候选 CHG：
 
@@ -525,9 +525,9 @@ M7-准备：本人资源＋批量内容＋候选配置保存（无task/占用）
 | Active CHG | None |
 | Evidence | [109编码与自测矩阵](completed/CHG-20261124-109/evidence/implementation-selftest-checklist.md)；真实E2E两批公开2/2且达成结束已通过，最终d853e24双端UI及补验均通过；技术交付与归档随Workspace PR65合入main生效；[110修复与本轮真实验收](completed/CHG-20261125-110/evidence/final-delivery.md)通过，用户整体人工验收另行 |
 
-门禁说明：上表依赖列记录标准门禁M7 `DONE`，不表示M7当前已签收。M7实际为技术交付完成、`VERIFYING`待用户整体人工验收。
+门禁说明：上表依赖列记录标准门禁M7 `DONE`，不表示M7当前已签收。M7既有技术交付完成；本轮112修复与最终安装版复核已完成，仍待用户整体人工验收。
 
-本轮执行例外：用户明确指定107–109依次自主技术交付后统一整体验收。107/108已技术归档且四仓main核对，故109可启动；M7仍保留`VERIFYING`，不提前宣称用户最终签收。
+本轮执行例外：用户明确指定107–109依次自主技术交付后统一整体验收。107/108已技术归档且四仓main核对，故109可启动；M7本轮112修复完成后仍为`VERIFYING`，不提前宣称用户最终签收。
 
 候选 CHG：
 
