@@ -6,4 +6,4 @@ Cloud/API、发现worker、Compose worker/scheduler、Agent8765、BitBrowser5434
 
 之后 `launch-dmg` 实际挂载 `../.local/m2b/desktop-review-mount/起飞.app`；frontend `0.1.0+787d4e1.dirty`，shell `0.1.0-local.0764ec2ed7`，Agent0.3.0。dirty来自其他会话example原型工作，正式功能源码无未提交修改，生产不引用example。日志 `/tmp/chg110-delivery-launch.log`。
 
-18:34安装版实际登录operator01，读回已结束批次与计划，快速多类目勾选回归通过；工作环境显示三项就绪。真实发布证据见real-operations.md。合并main后的新包版本将在最终交付记录补齐。
+18:34安装版实际登录operator01，读回已结束批次与计划，快速多类目勾选回归通过；工作环境显示三项就绪。真实发布证据见real-operations.md。合并main b6ed883后再次all退出0，frontend 0.1.0+b6ed883.dirty；18:40安装版实际登录/结束计划读回/工作环境均PASS，见final-delivery.md。

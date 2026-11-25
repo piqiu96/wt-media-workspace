@@ -1,7 +1,7 @@
 ---
 id: CHG-20261125-110
 parent: delivery/milestones/M7-batch-publishing.md#页面实施基线
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
@@ -40,11 +40,11 @@ risk: M
 - [x] 代码自测与Cloud/Desktop构建通过；准备、执行、计划受控浏览器场景全部通过。
 - [x] 新环境所有门禁通过，安装包版本与本项源码一致。
 - [x] 真实本人资源的准备—保存零任务/占用—读取编辑—启动—结果，以及计划顺序推进可核实；不使用mock替代真实结果。
-- [ ] 最终产品运营走查问题关闭，提交/PR/检查状态真实记录；用户最终签收另行。
+- [x] 最终产品运营走查问题关闭，提交/PR/检查状态真实记录；用户最终签收另行。
 
-## Current facts / blockers
+## Delivery result
 
-- Cloud787d4e1运行时及新DMG已验证；全Web167/1242、受控7组/异常11组、Cloud/Desktop构建、wt chg verify及Workspace220测试通过。
-- 本轮真实计划2完成两批顺序执行与自动公开核实2/2，并已结束，证据见evidence/real-operations.md。
-- 最终运营安装包走查通过；Cloud PR53最新检查1/1成功，正在完成两个PR合并及合并main最终包收口。
-- 用户最终签收另行；其他会话docs/design与example变更保持原样，不纳入提交。
+- Cloud PR53已合并至main b6ed883，CI通过，运行仓local main及分支tree核对一致；Workspace PR66承载本项归档，合并main时生效。
+- 全Web167/1242、受控7组/异常11组、Cloud/Desktop构建、wt chg verify及Workspace220测试通过；本次真实计划2两批2/2公开并达成结束。
+- 合并main最终all环境退出0，新DMG frontend 0.1.0+b6ed883.dirty实际登录、结束结果与环境走查PASS。其他会话example/docs-design工作保留。
+- 验收矩阵与限制见[evidence/final-delivery.md](evidence/final-delivery.md)；用户最终整体验收另行，M7和计划里程碑保持VERIFYING。
