@@ -44,7 +44,8 @@ risk: M
 
 ## Current facts / blockers
 
-- Cloud分支codex/publishing-visual-alignment包含上述三次本地修复，工作树干净。
-- 上轮166个发布模块测试及两端前端构建通过；不是完整E2E或全状态视觉验收。
-- GitHub CLI token无效、HTTPS push缺少用户名；尚未推送/建PR。继续独立实现和本机验收，外部交付阻碍单独报告。
-- 本人目前只有一个Profile且已无可用成片；实测资源先盘点，通过已有生产流程准备合法新成片，不改库伪造资源。
+- Cloud/Workspace 当前分支均为 `chg/CHG-20261125-110`；Cloud d659a34 在继承三次修复后补齐推荐、行内匹配、封面预览与分区。
+- 全Web167文件/1242测试通过；受控批次/执行/计划回归通过，异常矩阵与原型缺口记录在evidence；不代表真实发布完成。
+- SSH读远端已成功；gh token/HTTPS认证失败不作为停止交付的理由，后续用SSH推送及已登录浏览器PR。
+- 正在强制重建完整环境；新的真实资源与两批顺序闭环、产品运营走查及PR尚未完成。
+- Workspace docs/design 和 Cloud example 中存在其他会话原型工作，保持原样，不纳入本项提交；本项采用 References 指定原型基线。
