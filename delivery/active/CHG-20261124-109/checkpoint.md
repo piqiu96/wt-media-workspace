@@ -31,3 +31,5 @@ T05首启原子冻结/immutable receipt及首批冲突rollback两项隔离MySQL�
 T05最终全Go与完整repo隔离MySQL73.298s绿，rootTestPlan9.055s绿。独立审查2P2由c2402e8修复：重复成片实际409返回两批两row；父锁等待后新时钟重新算24h期限/basis。根发布全包及限定MySQL2.120s、schema11绿，独立有限复验关闭，无剩余T05阻断。详evidence/t05-execution-verification.md。
 
 T06完整Go+隔离repo90.216s及schema12通过；根发布包及结果专项9.966s，独立审查结果/双格/并发12.141s，无P1/P2。历史并发barrier按先Profile锁更新保留一成功/一旧修订冲突与单写断言。实际work callback验证逐格达成/未达成及latepublic不重开。T07后还需独立review/全流程E2E/PR修复合入和真实双端手工走查，用户整体验收尚未发生。
+
+T07本机实现已提交Agent81f6bf8（plan续编集合+真实SQLite/HTTP测试）、Desktop2e06487（Plan固定桥path+三method/受信身份测试）。根RED→GREEN，完整Agent951通过43.5s/tmp/chg109-agent-full.log；Desktop561通过/6既有ignore及pack/Shell11+5通过/tmp/chg109-desktop-full.log。独立本机复审无P1/P2，Agent12/Desktop4定向各独立通过。仅targetRust文件rustfmt，cargo fmt--check发现无关app_paths旧格式未改。前端仍实施，T07不可勾全完成。
