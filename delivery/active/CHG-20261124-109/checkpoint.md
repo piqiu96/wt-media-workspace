@@ -6,7 +6,7 @@
 
 ## 当前
 
-尾批待公开进度修复ede0c83/7e43de3/a59b793已独审关闭，root Web1236/schema18/双build和定向真实MySQL、实现者fullGo/全TestPlan均通过，G1重新关闭/VERIFYING。真实task13/36/output137→work6及task14/37/output138→work7均自动核实公开；原场景closed，所有publish/check Profile使用均released、无next_check或active_profile/slot。正在安全升级a59b793完整环境，随后验证不重复、2/2及正常结束再最终G3双端原型走查。G2尚未完成，不把投稿/测试成功替代最终收口。
+G1/G2已通过。a59b793最新安装环境重启不重复，实际安装版已结束plan1：ended/achieved/rev6，目标2/2缺口0，batch3/4均ended，各唯一task13/14、attempt36/37、公开work6/7；pending/verification0，保留copy动作。真实1Profile/N5下调实际1已验证，受控多Profile/阈值异常单列。现在开始G3最后Web/安装版逐页对照9305532原型走查，尚未完成；PR52/20/19/65均待最终CI与合入，用户统一整体验收另行。
 
 ## 下一步
 

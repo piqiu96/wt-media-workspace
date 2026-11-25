@@ -1,8 +1,8 @@
 {
   "date": "2026-11-25",
-  "status": "both_public_before_safe_final_upgrade",
+  "status": "G2_pass_final_UI_pending",
   "source": {
-    "cloud": "4daf991",
+    "cloud": "a59b793",
     "agent": "81f6bf8",
     "desktop": "2e06487"
   },
@@ -14,6 +14,11 @@
       "log": "/tmp/chg109-g2-4daf991-bringup.log",
       "allGates": "PASS",
       "frontendVersion": "0.1.0+4daf991"
+    },
+    "finalRun": {
+      "log": "/tmp/chg109-g2-a59b793-bringup.log",
+      "allGates": "PASS",
+      "frontendVersion": "0.1.0+a59b793"
     }
   },
   "resourceBaseline": {
@@ -212,6 +217,42 @@
         }
       ],
       "finishOffered": false
+    },
+    "final": {
+      "status": "ended",
+      "revision": "6",
+      "endReason": "achieved",
+      "endNote": "两批均已通过原任务核验公开，目标2条实际公开2条，缺口0；按真实结果结束。",
+      "goalResults": [
+        {
+          "platform": "baidu",
+          "category_id": "4",
+          "target_count": 2,
+          "published_count": 2,
+          "shortfall": 0
+        }
+      ],
+      "published": 2,
+      "pending": 0,
+      "verification": 0,
+      "actions": [
+        "copy"
+      ],
+      "finishedThrough": "actual packaged macOS UI",
+      "batches": [
+        {
+          "id": "3",
+          "status": "ended",
+          "created": 1,
+          "published": 1
+        },
+        {
+          "id": "4",
+          "status": "ended",
+          "created": 1,
+          "published": 1
+        }
+      ]
     }
   },
   "finding": {
@@ -383,5 +424,17 @@
     ],
     "bothPublic": true,
     "willRebuildWith": "a59b793"
+  },
+  "restart": {
+    "sameTaskIds": [
+      "13",
+      "14"
+    ],
+    "sameAttemptIds": [
+      "36",
+      "37"
+    ],
+    "published": 2,
+    "noDuplicates": true
   }
 }
