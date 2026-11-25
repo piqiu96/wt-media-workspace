@@ -1,7 +1,7 @@
 ---
 id: CHG-20261126-130
 parent: delivery/milestones/M-publishing-operations.md#B站发布闭环
-status: DISCUSSION
+status: PLANNED
 depends_on: ["CHG-20261126-128", "CHG-20261126-129"]
 affected_repos: ["wt-media-cloud", "wt-media-agent", "wt-media-desktop", "wt-media-workspace"]
 risk: H

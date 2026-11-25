@@ -1,8 +1,9 @@
 ---
 id: CHG-20261126-128
 parent: delivery/milestones/M7-batch-publishing.md#逐页一致性复核
-status: DISCUSSION
+status: IMPLEMENTING
 depends_on: ["CHG-20261125-113"]
+dependency_merge_commits: {"CHG-20261125-113":{"wt-media-cloud":"69e865c03e5c90c4c9107ee2faf2323e3f753e8a","wt-media-workspace":"96a8bbed29b1e023b1bfba3c23a0e3fb84930bc0"}}
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
 ---
@@ -13,7 +14,7 @@ risk: M
 
 按2026-11-26用户“设计＋规划”要求，对计划和批次逐页建立原型—正式页面—业务事实映射，修复状态、按钮、布局、导航和异常反馈。继承107保存零任务/零占用、108启动原子建单、109冻结/10%推进、112单向步骤和113详情修复，不重做业务流程。先收敛原型旧样例，再固定可复核输入；接口不足沿现框架补齐，不为普通视觉差异反复让用户裁定。
 
-仅规划，未激活或编码。详细设计、已观察问题、页级清单与9步实施见[plan.md](plan.md)。前置113合入已核对：Cloud69e865c0、Workspace96a8bbed；实施前重新核对main及本轮其他会话原型修改。
+2026-11-26用户确认按128→129→130执行。详细设计、已观察问题、页级清单与9步实施见[plan.md](plan.md)。前置113合入已核对：Cloud69e865c0、Workspace96a8bbed；实施前重新核对main及本轮其他会话原型修改。
 
 ## Done When
 
