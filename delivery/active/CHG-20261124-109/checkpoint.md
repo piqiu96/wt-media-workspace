@@ -35,3 +35,5 @@ T06完整Go+隔离repo90.216s及schema12通过；根发布包及结果专项9.96
 T07本机实现已提交Agent81f6bf8（plan续编集合+真实SQLite/HTTP测试）、Desktop2e06487（Plan固定桥path+三method/受信身份测试）。根RED→GREEN，完整Agent951通过43.5s/tmp/chg109-agent-full.log；Desktop561通过/6既有ignore及pack/Shell11+5通过/tmp/chg109-desktop-full.log。独立本机复审无P1/P2，Agent12/Desktop4定向各独立通过。仅targetRust文件rustfmt，cargo fmt--check发现无关app_paths旧格式未改。前端仍实施，T07不可勾全完成。
 
 T07间隙后端整体交叉审查新P2：24h后manual reviewing先于机械sweep时会被晚stop无事实失效。6e914ca最小修复原Resolve逾期明确reviewing同tx停查，RED→GREEN且真正新stop仍阻；根定向真MySQL及独立限定复验通过，审查关闭。其他跨T03–06父围栏/原回执/finish/worker结合无新增阻断。前端仍实施中。
+
+GitHub连接器暂不可用、gh现有token无效；未读取或导出浏览器凭据。SSH正常推送Agent/Desktop后，根通过已登录native Chrome实际创建Agent PR20 https://github.com/piqiu96/wt-media-agent/pull/20 与Desktop PR19 https://github.com/piqiu96/wt-media-desktop/pull/19，已读回页面编号/Open与初始CI排队。均未合入，待最终CI/PR问题与跨仓E2E。CUA当前无活动，nativeChrome绑定githubChromeApp，当前Desktop PR19；IAB焦点连接仍超时，后续可用nativeChrome实际UI。
