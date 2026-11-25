@@ -2,7 +2,7 @@
 
 - 状态：`IN_PROGRESS`；Active CHG：[CHG-20261124-109](../active/CHG-20261124-109/change.md)；108技术依赖已完成，原型演示不代表生产能力。
 - 依据：[PRD 第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.2、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md) §2.3、§4—6。
-- 依赖：[M7](M7-batch-publishing.md) `DONE`；首先用百度（百家号）完成计划验证，全部三平台组合在工具与平台阶段验收。
+- 依赖：[M7](M7-batch-publishing.md) 技术交付完成；当前`VERIFYING`，用户已授权107–109统一整体验收前继续109。首先用百度（百家号）完成计划验证，全部三平台组合在工具与平台阶段验收。
 
 ## 页面实施基线
 

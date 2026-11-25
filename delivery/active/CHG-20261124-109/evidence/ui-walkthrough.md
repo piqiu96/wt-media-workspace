@@ -50,3 +50,27 @@ d3aa625根完整Web165文件1236 tests再次通过，/tmp/chg109-final-category-
 ## 当前剩余
 
 完成批次三段原型呈现整改、自测独审、最终构建和双端有候选复查；不重复真实发布，不改变G2原任务/作品。
+
+## 三段原型整改映射（开发验证，最终提交待补）
+
+- 资源配置：原型PublishComposer801–1019→BatchResourceSetup162–225；已有范围同排、类目优先表、资源池/上限及resourceOnly匹配表；补本批上限240px，不改变匹配逻辑。
+- 内容准备：原型BatchContentWorkspace348–373、BatchContentTable16–60→原BatchCandidateWorkspace；宽搜索、类目/配置状态过滤；发布封面+实际文案+类目、账号、成片ID/可读时长（未知—）、全部既有issues展开、原Editor。保留原配对/排序/删除在更多中，筛选不得变更候选或丢选择。
+- 结果总览：原型PublishComposer1030–1049、batchCreation.css1135–1136→PublishingBatchesPage735–775；名称/平台/候选数summary、两列设置label与240px数字、复用同一form的reviewOnly内容表及原Editor。总览不显示配对/删除/排序/选择，编辑走原修订/确认失效。
+
+本轮仍需最终SHA独审、构建与实机复查，以上不是预签。Native398实际batch列表四批均显示正确三角洲，batch3原任务13公开1/1，长名两行；复制batch3可在屏幕上读取原候选1供后续复查，未保存Cloud或本机batch草稿，未重复发布。
+
+## bfb3d88 独立复核反馈（已由610f9d3关闭）
+
+三段呈现已完成开发提交，作者完整Web165/1237、1440/1024有候选原107全流程与plan组合、双构建通过。首次新增筛选缺“全部”placeholder规范失败已修；一次新增测试未关闭原Editor导致点击正确被遮挡，修测试后通过，均保留日志。
+
+独审新增P2：rowState空content issues即显示已就绪，却未纳入既有catalog resourceIssue，完整confirmed但账号不合格/成片不可用时可能假就绪。根另查candidateCover在缺匹配真实coverFiles时回退视频thumbnail冒充发布封面；复制/保存恢复未必有cover资源路径，需真实引用匹配才显示，否则明确占位。实施者正在最小修复并补两段资源负例，暂不关闭G3。
+
+root /tmp/chg109-root-final-bfb3d88-web.log 首次并行DMG编译时164文件/1236通过，原localSettingsWiring动态imports单项5000ms超时（无业务断言失败）；该轮不能记完整PASS。最终补丁后避开打包串行重跑，不改timeout。独审browser首轮5173 connection refused为all重启窗口，root实读5173/5174/Cloud200恢复；不计生产缺陷，也不算测试通过。
+
+## 最终610f9d3验证
+
+- 610f9d3仅8行生产修复：既有resourceIssue纳入完整issues、未知账号保守提示、发布封面仅匹配真实fileId/resource_path，缺引用明确占位。8类场景×step2/3 RED→GREEN；独立精确事实browser、1440/1024原107全流程及plan组合全部PASS，20定向单测/净diff通过，无未关闭P1/P2。
+- 根避开打包后串行完整Web165文件1237项17.69s通过（/tmp/chg109-root-final-610f9d3-web.log）；原5秒timeout没有改动。实现者最终Cloud/Desktop双构建通过，进程全部退出后root才启动最终all，避免测试/重启窗口冲突。
+- 实际Web最终610：复制已结束batch3得到未提交候选1；step2内容文案、类目、账号、原成片137、未知时长—、未选发布封面明确占位，状态待完善且可展开原问题。宽搜索输入不存在项→0条，重置恢复同一候选；进入总览出现名称/平台/候选数、目标1/候选1/缺口0及真实成片占用/封面/确认问题，没有伪装就绪。
+- 总览实际截图发布设置为两列、数字控件240px；发布内容表存在且仅编辑，没有匹配/删除/排序/选择。点击原编辑器，文案改为“学会架点很简单，新手也能快速掌握（走查）”后关闭，复查表即时回写且仍待完善；未保存Cloud、未启动、未发布，返回列表仍原4批。此输入仅本轮浏览器会话内副本，不改原task13或batch3。
+- 最终610安装包all强制重建进行中，G3最后安装版复查尚待完成。
