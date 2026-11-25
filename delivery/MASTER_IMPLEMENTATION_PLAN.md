@@ -111,14 +111,14 @@ wt-media-workspace/
 
 | 状态 | 含义 | 活记录 | 归档记录 |
 |---|---|---|---|
-| `DISCUSSION` | 草案，方向待裁定；不激活 | 2 | 0 |
+| `DISCUSSION` | 草案，方向待裁定；不激活 | 5 | 0 |
 | `PLANNED` | 方向已定、已拆分，可激活 | 2 | 0 |
 | `IMPLEMENTING` | 实施中 | 0 | 2 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 68 |
-| `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 0 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 101 |
+| `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 4 |
 
-分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **82** 篇。归档列 71（`DONE` 68＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 82。planned 4 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
+分母（2026-11-26登记实测）：活记录＝`delivery/planned/*/change.md` **7** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **119** 篇。归档列108（`DONE`101＋`IMPLEMENTING`2＋`VERIFYING`1＋`SUPERSEDED`4）与退役词`CLOSED`4、`HANDOFF`2、`IN_PROGRESS`5合计119。planned中CHG-20260903-034使用块引用旧格式，按其明确PLANNED登记。只读取状态字段统计，不回改历史记录。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 
@@ -554,7 +554,7 @@ PLAN 计划闭环：全部批次准备与启动冻结 → 10%推进/批次快捷
 PLATFORM 三平台闭环：B站验收开放 → 小红书验收开放 → 三平台整体回归
 ```
 
-规划一个三平台扩展CHG，内部严格按B站真实验收开放 → 小红书真实验收开放 → 三平台整体回归推进。快速发布工具须先由M6完整交付，本阶段不再安排OPS-A/OPS-B。逐平台安全开放和提供方先于消费者的顺序不变；全部三平台通过才结束本阶段。
+2026-11-26设计规划按独立闭环拆分：先[128计划批次逐页复核](planned/CHG-20261126-128/plan.md)，再[129广告画中画与片尾](planned/CHG-20261126-129/plan.md)，最后[130B站与新模式全流程](planned/CHG-20261126-130/plan.md)；三项为DISCUSSION，尚未激活。后续仍按B站真实验收开放 → 小红书真实验收开放 → 三平台整体回归推进。快速发布工具须先由M6完整交付，本阶段不再安排OPS-A/OPS-B。逐平台安全开放和提供方先于消费者的顺序不变；全部三平台通过才结束本阶段。
 
 ### M10：打包、升级、诊断与稳定性验收
 
