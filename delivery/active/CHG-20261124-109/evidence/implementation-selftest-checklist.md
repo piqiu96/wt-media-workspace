@@ -17,8 +17,8 @@
 | --- | --- | --- | --- |
 | 列表、搜索、详情与范围 | publish/service/plan.go、repository/plan_query.go、PublishingPlansPage | 全目标类目授权后count/page；本人、同team高级只读、admin只读、跨范围拒绝 | 已有真MySQL scope断言；9bb0969进行中包含paused、全部goal授权/同goal筛选与count/page已独立真MySQL复验；新布局筛选/重置最终组合待核对 |
 | 创建/编辑/校验/目标守恒 | model/plan.go、repository/plan.go、PlanWorkbench、planPreparation | 每格守恒、稳定ID/归属、失败回滚、旧revision、原key重放 | 数据层及Service已定向/独审；完整手工操作待补 |
-| 本人资源盘点 | 复用BatchResources→PlanWorkbench | 账号/成片/可安排量/asof；known0、短缺、unknown、readfail、越权 | **发现缺实现，已分配补齐**；目标可超库存不静默降低 |
-| 手工新增/拆分/合并/排序 | PlanWorkbench、planPreparation，对照原型plan/app | A1+B1手动拆两批、目标增删重配、stableID、终止固定行、完整守恒 | **发现缺手工闭环，已分配补齐**；AI不能成为必经路径 |
+| 本人资源盘点 | 复用BatchResources→PlanWorkbench | 账号/成片/可安排量/asof；known0、短缺、unknown、readfail、越权 | 2fd6cd0已补正式本人资源盘点四态/asof/素材缺口；独立编辑器浏览器通过，容量未知不造假；最终组合待补指标修复后重跑 |
+| 手工新增/拆分/合并/排序 | PlanWorkbench、planPreparation，对照原型plan/app | A1+B1手动拆两批、目标增删重配、stableID、终止固定行、完整守恒 | 2fd6cd0已补手动新增/分格/A1B1拆分及固定行保护；独立编辑器浏览器及单测通过，AI不是必经 |
 | 真实AI建议与采用 | plan_recommendation.go、plan_handler.go、PlanWorkbench | 服务端本人数量；模型非法/截断/取消失败；SSE真实事件；审阅后采用、不自动保存 | Go/受控流已测；真实DeepSeek留最后E2E |
 | 全批配置准备 | 原PublishingBatchesPage及BatchResourceSetup/CandidateWorkspace | 继承目标只读；候选保存零task/占用；全部待执行批次就绪才首启 | 共享107数据守卫已有；完整页面与原型对齐待完成 |
 | 首次原子启动/冻结 | shared startBatchTx、plan_execution.go、Plan命令journal | 一次task/占用/授权/cursor/receipt；全批冻结；跨批重复定位；失败全回滚 | 真MySQL及原回执测试已测；原请求明确未生效恢复仍修复中 |
@@ -33,7 +33,7 @@
 | 新建续编及Cloud编辑 | Agent publication_draft、Native桥、JS plan类型 | 用户/环境/类型隔离、重启、CAS、明确重开才清、dismiss保留、Cloud edit不另存 | 本机951/Native561+独审；e1efd45三态恢复已修，独立单测/实际browser断言复验关闭，最终组合待重跑 |
 | 创建明确拒绝与未知 | PublishingPlansPage pendingCreate | 首次明确拒绝后可编辑/退出；未知找回不换key；原form/pending保留 | 2c5b50e已独立复验首次明确拒绝/未知分别处理 |
 | 原批次只读Drawer与回跳 | BatchReadonlyBody、ResourceOverlay、from_plan | 视口内header/close、独立滚动；读失败恢复overflow；关闭和配置/处理返回保page/filter/scroll | 顶部开发截图修正；2c5b50e失败出口/plan_scroll已有限复验；完整新布局仍需校对 |
-| 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | **用户指出不符合，尚未通过；重新逐页对齐，不能以旧截图标完成** |
+| 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | e480c94按原型源码重组，独立代码映射与开发browser核对通过；最终G3 UI走查仍未进行，不能以过程证据签收 |
 
 ## 三道收口门
 
@@ -56,3 +56,5 @@
 实施者负责以上逐页对齐；根和独立审查者按代码映射与开发验证核对，最终UI走查留G3。不能以现有开发截图的‘基本相同’替代本轮用户指出的视觉差异整改。
 
 自测口径裁定：现有BatchResources只有本人账号/成片及未知数，没有周期额度或最终可安排容量。页面不得自创“每账号1条”的容量公式；展示已知数量/asof/gaps，容量未知明确标待逐批配置核实，目标-可用成片数仅称成片缺口。继续允许超库存目标，不能把未知当0或无限。
+
+最后结构/完整能力审查：e480c94+2fd6cd0独立57项单测、编辑器/三角色受控浏览器通过，未发现手工盘点/分配/固定行/共享Reorder默认兼容新增P1/P2；唯一新增P2为三处将全部reviewing计待办，Provider只读verification_required_count与前端消费正在修，G1不能提前勾选。根完整Web165文件1234通过(/tmp/chg109-root-complete-web.log)，Workspace repo完整检查通过(/tmp/chg109-root-workspace-checks.log)。
