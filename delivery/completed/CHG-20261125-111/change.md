@@ -1,7 +1,7 @@
 ---
 id: CHG-20261125-111
 parent: delivery/milestones/M7-batch-publishing.md#页面实施基线
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
@@ -24,4 +24,8 @@ risk: M
 - [x] 原型/现状/处置表覆盖三张截图以及计划和批次的状态与操作条件。
 - [x] 明确差异已修复，角色/终态/未开始/运行/暂停/待处理/请求恢复回归通过。
 - [x] Cloud/Desktop构建与新安装包环境、实际登录及只读走查通过。
-- [ ] PR检查及交付收口完成，未决业务取舍用人话列出，不提前认定用户签收。
+- [x] PR检查及交付收口完成，未决业务取舍用人话列出，不提前认定用户签收。
+
+## Delivery
+
+全部验收PASS，见[evidence/final-delivery.md](evidence/final-delivery.md)。Cloud PR54/CI已通过并以bbba813c合入local main，精确tree等于最终f2ccc1b新安装包源码；Workspace关闭/归档随PR67合入main生效。待用户确认的业务清单为空，用户整体签收另行。

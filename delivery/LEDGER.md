@@ -6,4 +6,3 @@ Completed or superseded slices leave this index after their remaining work has a
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261125-111 | 发布状态与按钮原型对齐 | VERIFYING | wt-media-cloud |
