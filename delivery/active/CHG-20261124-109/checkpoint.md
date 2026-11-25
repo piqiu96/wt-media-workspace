@@ -6,7 +6,7 @@
 
 ## 当前
 
-T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型366/计划34/example21、浏览器16项及构建通过。根独立看16类关键截图并重跑366项通过。当前T02：Cloud正式plan契约由review_delivery_baseline实施；Agent本机plan续编提供方契约由root实施，均先契约、不写runtime。计划只监控及推进准备好的批次，首次启动冻结全部配置，不追加补量；保留10%/零分母/未知阻断、人工暂停及原批次同名快捷操作。
+T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型366/计划34/example21、浏览器16项及构建通过。根独立看16类关键截图并重跑366项通过。T02已完成提供方发布及独立审查，当前T03由chg109_contract实施Cloud迁移/model/repository数据层，暂不写Service/Handler/Web。计划只监控及推进准备好的批次，首次启动冻结全部配置，不追加补量；保留10%/零分母/未知阻断、人工暂停及原批次同名快捷操作。
 
 ## 下一步
 
@@ -18,4 +18,4 @@ T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型
 
 T01独立预审发现三项实现定义遗漏，已在plan落字：全部已启动前缀未决、永久停止含report提交许可/心跳、每批选择范围与缺口持久冻结；确认绑定实时依据，takeover不可绕过首启。无新增产品决策。
 
-T02本机提供方：Agent6f565d2发布LocalAPI2026.11.25.2追加plan enum；独立只读OpenAPI兼容性复审无P1/P2，契约文档8项通过。Desktop3f09248同步消费锁（仅锁，Plan桥运行分支留T07）；Workspace map同步，verify_m0_config通过。Cloud .4 plan正式schema仍由独立契约实施者进行，尚未进入运行实现。
+T02本机提供方：Agent6f565d2发布LocalAPI2026.11.25.2追加plan enum；独立只读OpenAPI兼容性复审无P1/P2，契约文档8项通过。Desktop3f09248同步消费锁（仅锁，Plan桥运行分支留T07）；Workspace map同步，verify_m0_config通过。Cloud017b3b6发布API.4完整16操作及Task/Batch核实投影，根独立重跑8项OpenAPI/JSONschema通过；唯一P2由09ab0b3修复，根与独立审查者分别复验9项通过，完整POST/PUT拒绝6个父计划投影且响应字段齐全；无剩余T02阻断。当前开始T03隔离MySQL数据层，不修改真实DB。
