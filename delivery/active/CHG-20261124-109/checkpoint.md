@@ -6,7 +6,7 @@
 
 ## 当前
 
-T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型366/计划34/example21、浏览器16项及构建通过。根独立看16类关键截图并重跑366项通过。T02已完成提供方发布及独立审查，T03 f0f19b3迁移与数据层独立审查通过；T04 a269207及fc9f7ff两P2修复独立审查通过，当前T05由chg109_contract实施共享事务启动/首启冻结/顺序推进/控制/调度及全父级围栏；T06最终结果和Web未实现。计划只监控及推进准备好的批次，首次启动冻结全部配置，不追加补量；保留10%/零分母/未知阻断、人工暂停及原批次同名快捷操作。
+T01完成，Cloud example原型930553217cf5a3c8a1750178da4974d5b46dfeac，原型366/计划34/example21、浏览器16项及构建通过。根独立看16类关键截图并重跑366项通过。T02已完成提供方发布及独立审查，T03 f0f19b3迁移与数据层独立审查通过；T04 a269207及fc9f7ff两P2修复独立审查通过，T05 119b726及c2402e8两P2修复已独立审查关闭，当前T06由chg109_contract实现人工核实/真实目标结果/A15结束与永久停止安全收尾；Web与本机plan运行续编留T07。计划只监控及推进准备好的批次，首次启动冻结全部配置，不追加补量；保留10%/零分母/未知阻断、人工暂停及原批次同名快捷操作。
 
 ## 下一步
 
@@ -25,3 +25,7 @@ T03完整repo隔离MySQL72.016s通过（修正pre118历史fixture Omit新字段�
 T04进行中发现recommend SSE草稿事件与既有StreamOneWithTimeout元信息不一致，已授权提供方在.4内定点对齐现有row_key/input_revision/logid/start/progress/done并先契约再消费，新增真实流断言；不造第二套流。T04尚未完成测试/审查，不冒称运行接口可用。
 
 T04 root发布全包及隔离TestPlan2.939s通过；提供方SSE定点对齐3b83cb5，schema9PASS。独立审查两P2（admin copy动作、batchname上限）fc9f7ff已关闭。T05将隐藏Plan内部pause_reason对齐schema，不新增用户参数；执行范围较大按共享事务与命令分提交，不能将T04假当完整推进。
+
+T05首启原子冻结/immutable receipt及首批冲突rollback两项隔离MySQL初步通过；推进/阈值/全部父入口围栏仍在补测试，尚未完成独立审查。提供方d9f42f6定点允许AdvanceResult.batch_receipt仅已合法终止的下一位置为null，保留未建单事实，该位置仍按零分母skip，不伪造zero receipt；正常启动必须真实回执。该变更先正式schema再消费，当前未交付不另增版本。
+
+T05最终全Go与完整repo隔离MySQL73.298s绿，rootTestPlan9.055s绿。独立审查2P2由c2402e8修复：重复成片实际409返回两批两row；父锁等待后新时钟重新算24h期限/basis。根发布全包及限定MySQL2.120s、schema11绿，独立有限复验关闭，无剩余T05阻断。详evidence/t05-execution-verification.md。
