@@ -37,7 +37,7 @@
 
 ## 三道收口门
 
-- [x] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
+- [ ] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
 - [ ] G2 真实E2E：仅G1后重建新环境/DMG、真实本人资源与AI、真实至少两批顺序和公开事实；原目标/唯一任务/占用/attempt/work一致，真实单Profile与受控多Profile分别记载，不伪造资源或结果。
 - [ ] G3 最后UI走查：G2后Web与安装版逐页对照原型最终走查，覆盖角色、完整正常及必要异常路径、返回与视口。用户107–109最终统一整体验收仍另行进行。
 
@@ -74,3 +74,5 @@ G1最后逐行核对仍补受控页面证据：列表筛选重置、edit PUT守�
 G2真实读取反馈：环境310577b/81f6bf8/2e06487全部门禁通过并挂载；真实DeepSeek建议两批1+1，正式重制730/731→新成片137/138成功。计划1与骨架3/4创建、同键重放一致且零正式任务。实际API未启动计划内批次allowed_actions仍含start，与首启必须计划全批确认不一致；暂停真实start，返回G1修只读动作投影。不得用已有fixture通过掩盖此真实遗漏。
 
 真实反馈修复4daf991已独立关闭：计划所属批次start只读投影始终过滤，沿用plan_position_blocked提示统一计划确认；独立批次start、本人edit/合法stop、resume/takeover及内部StartPlan/Preview不变。独立service0.291s、真MySQL1.120s通过；root完整publish模块及隔离repository126.794s通过（/tmp/chg109-root-start-action-publish-live.log）。G1重新关闭，须以4daf991重建环境后继续原计划1的G2，不重新创建或重发。
+
+G2两批实际投稿13/36、14/37成功，自动移交3→4，无人工逐批confirm/finish。均正常reviewing，公开0且finish动作正确不可用；只读progress却显示ready_to_finish，需补全批执行后仍有reviewing时等待平台公开的投影及正式契约。当前回G1修该展示事实；不改变运行中原核验、10%推进或finish写guard，不重发。G3仍未开始。

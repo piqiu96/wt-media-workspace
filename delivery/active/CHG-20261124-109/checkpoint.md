@@ -6,7 +6,7 @@
 
 ## 当前
 
-G1所有修复独审关闭，VERIFYING/G2真实多批执行中。4daf991新环境与安装包全部门禁通过，source readback 0.1.0+4daf991。真实DeepSeek拆批及两条内容生成通过，正式重制730/731→本人输出137/138，横封面39/40、正式竖封面41/42已实读。计划1/批次3、4全部保存ready后DB仍零task/占用；统一首启仅生成task13/attempt36，占用137，第二批零任务。原键回执一致、全批冻结及真实结构/未来配置写拒绝通过。安装版已登录operator01，首批运行中，等待真实提交/公开及自动推进第二批；G2未完成，G3未开始。详real-e2e.json，无凭据。
+G2两批真实投稿均成功：task13/attempt36/output137、task14/attempt37/output138，首批自动移交3→4，无人工逐批confirm或先结束；当前正常reviewing，原核验已实读首次结果并按原策略等待下一次检查。公开0/缺口2、finish动作正确不可用。真实读取又发现尾批progress过早ready_to_finish，正在G1最小补正式awaiting_finish只读进展及人话标签；不改调度或finish写guard，原Agent继续核验，不在可能核验途中重启/重发。G2未完成，G3未开始，详real-e2e.json。
 
 ## 下一步
 

@@ -1,6 +1,6 @@
 {
   "date": "2026-11-25",
-  "status": "running_actual_first_batch",
+  "status": "both_accepted_waiting_public_verification",
   "source": {
     "cloud": "4daf991",
     "agent": "81f6bf8",
@@ -163,6 +163,55 @@
       "attemptId": "36",
       "phase": "preparing",
       "secondBatchTaskCount": 0
+    },
+    "automaticHandoff": {
+      "fromBatch": "3",
+      "toBatch": "4",
+      "at": "2026-11-25T13:40:36.800715+08:00",
+      "firstStatus": "reviewing",
+      "firstSubmission": "1882807582575024395",
+      "noManualFinish": true,
+      "noManualConfirmNext": true,
+      "firstPublishedCount": 0
+    },
+    "secondTask": [
+      {
+        "id": "14",
+        "output": "138",
+        "attempt": "37",
+        "status": "running"
+      }
+    ],
+    "bothAccepted": {
+      "tasks": [
+        {
+          "id": "13",
+          "attempt": "36",
+          "output": "137",
+          "status": "reviewing",
+          "submission": "1882807582575024395",
+          "workId": null
+        },
+        {
+          "id": "14",
+          "attempt": "37",
+          "output": "138",
+          "status": "reviewing",
+          "submission": "1882807636727269814",
+          "workId": null
+        }
+      ],
+      "publishedCount": 0,
+      "targetGaps": [
+        {
+          "platform": "baidu",
+          "category_id": "4",
+          "target_count": 2,
+          "published_count": 0,
+          "shortfall": 2
+        }
+      ],
+      "finishOffered": false
     }
   },
   "finding": {
@@ -277,6 +326,22 @@
       "renderInputHash": "64c3fc4f89a7c9d6cf17034f950ef849751adc63f415a6edf95e3b48ec8c7c0a",
       "preview": false,
       "visuallyReadBack": true
+    }
+  ],
+  "findings": [
+    {
+      "code": "unstarted_plan_batch_start_action_exposed",
+      "actual": "batch3/4 allowed_actions includes start before parent first start",
+      "action": "paused first start; minimal provider projection fix and review required",
+      "fixedBy": "4daf991",
+      "independentReview": "PASS",
+      "realReadBack": "only edit/stop, no start"
+    },
+    {
+      "code": "last_batch_reviewing_progress_ready_to_finish",
+      "actual": "ready_to_finish",
+      "finishOffered": false,
+      "fix": "provider readonly progress clarification in progress; no execution or finish guard change"
     }
   ]
 }
