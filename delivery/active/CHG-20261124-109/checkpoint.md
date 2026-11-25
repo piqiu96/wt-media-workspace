@@ -45,3 +45,5 @@ PR实际UI复核：Agent20、Desktop19均All checks passed。Desktop Codex Revie
 用户最新纠正：当前批次/计划视觉与原型差异大，不接受只功能相通；必须参考原型实际实现和publishing-management.md引用，先完整编码/自测后真实E2E、最后UI走查。T07保持未完成，新增implementation-selftest-checklist完整矩阵；独立完整性审计发现资源盘点、手工A1+B1分类拆批、恢复提示dismiss误清、A07待办漏核实四P2，已分别派web/backend补齐。旧开发截图不能当最终视觉签收。两执行agent中断后已恢复，未完成的fullMySQL空日志不计PASS。
 
 T07已提交59ef13e修unmet枚举、2c5b50e修create明确拒绝/Drawer失败滚动与plan_scroll、2fa2ca0严格消费Provider权威false；已派独立有限复验，未提前宣称closed。前端已给5组原型代码差异映射，Root确认按PlanList/PlanDetail/PlanBasicForm/GoalScope/BatchManager/BatchDetailContent/PublishComposer完整对齐，映射写入implementation-selftest-checklist；不能只改色值。资源盘点/手工分类分配/三态续编仍编码中，不启动G2/G3。
+
+Providerfalse c592642/9a01a1f/0e722ce已完整隔离repo107.769s/fullGo/publish/schema15绿；独立审发现raw nested false/0缺失默认值问题72e54eb已修，原key损坏矩阵root4.341s/独审4.217s绿关闭P2。前端2fa2ca0 proof绑定消费旧P2也独审关闭。现Go agent正式做A07pending与VerificationRequiredAt同口径前分页过滤，web继续视觉/盘点/手工拆批/三态draft。资源容量不能假设每账号1条，未知明确展示，已给前端裁定。G1仍未完成，不E2E/最终UI。
