@@ -1,0 +1,133 @@
+{
+  "date": "2026-11-25",
+  "status": "in_progress_action_projection_fix_before_first_start",
+  "source": {
+    "cloud": "310577b",
+    "agent": "81f6bf8",
+    "desktop": "2e06487"
+  },
+  "bringup": {
+    "log": "/tmp/chg109-g2-bringup.log",
+    "allGates": "PASS",
+    "frontendVersion": "0.1.0+310577b"
+  },
+  "resourceBaseline": {
+    "ownerId": "3",
+    "eligibleAccountId": "9",
+    "eligibleAccounts": 1,
+    "availableOutputs": 0
+  },
+  "production": {
+    "taskIds": [
+      730,
+      731
+    ],
+    "sourceOutputs": [
+      135,
+      136
+    ],
+    "newOutputs": [
+      137,
+      138
+    ],
+    "status": "success"
+  },
+  "ai": {
+    "provider": "configured DeepSeek via Wired().GenerateJSON",
+    "http": 200,
+    "events": [
+      "start",
+      "progress",
+      "item_result",
+      "done"
+    ],
+    "logid": "tr96921ff6b71b1b9a",
+    "result": {
+      "batches": [
+        {
+          "row_key": "baidu-4-b1",
+          "name": "百度类目4第1批",
+          "platform": "baidu",
+          "group_order": 1,
+          "batch_order": 1,
+          "targets": [
+            {
+              "category_id": "4",
+              "target_count": 1
+            }
+          ]
+        },
+        {
+          "row_key": "baidu-4-b2",
+          "name": "百度类目4第2批",
+          "platform": "baidu",
+          "group_order": 1,
+          "batch_order": 2,
+          "targets": [
+            {
+              "category_id": "4",
+              "target_count": 1
+            }
+          ]
+        }
+      ],
+      "resource_as_of": "2026-11-25T05:27:07.087663Z",
+      "issues": []
+    },
+    "adoptedAfterReview": true,
+    "noAutomaticSave": true,
+    "endpoint": "https://api.deepseek.com",
+    "model": "deepseek-flash"
+  },
+  "plan": {
+    "id": "1",
+    "batchIds": [
+      "3",
+      "4"
+    ],
+    "target": 2,
+    "createReplayIdentical": true,
+    "started": false
+  },
+  "finding": {
+    "code": "unstarted_plan_batch_start_action_exposed",
+    "actual": "batch3/4 allowed_actions includes start before parent first start",
+    "action": "paused first start; minimal provider projection fix and review required"
+  },
+  "limitations": {
+    "actualOwnedProfiles": 1,
+    "multiProfile": "controlled tests only",
+    "finalUI": "not started"
+  },
+  "databaseBeforeConfiguration": {
+    "planId": "1",
+    "batches": [
+      {
+        "id": "3",
+        "status": "incomplete",
+        "execution": "not_started",
+        "taskCount": 0,
+        "occupationCount": 0
+      },
+      {
+        "id": "4",
+        "status": "incomplete",
+        "execution": "not_started",
+        "taskCount": 0,
+        "occupationCount": 0
+      }
+    ],
+    "newOutputs": [
+      {
+        "id": 137,
+        "operatorId": 3,
+        "categoryId": 4
+      },
+      {
+        "id": 138,
+        "operatorId": 3,
+        "categoryId": 4
+      }
+    ]
+  }
+}
