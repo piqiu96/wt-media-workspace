@@ -33,7 +33,7 @@
 | 新建续编及Cloud编辑 | Agent publication_draft、Native桥、JS plan类型 | 用户/环境/类型隔离、重启、CAS、明确重开才清、dismiss保留、Cloud edit不另存 | 本机951/Native561+独审；e1efd45三态恢复已修，独立单测/实际browser断言复验关闭，既有draft恢复browser与最终完整Web165/1235通过 |
 | 创建明确拒绝与未知 | PublishingPlansPage pendingCreate | 首次明确拒绝后可编辑/退出；未知找回不换key；原form/pending保留 | 2c5b50e已独立复验首次明确拒绝/未知分别处理 |
 | 原批次只读Drawer与回跳 | BatchReadonlyBody、ResourceOverlay、from_plan | 视口内header/close、独立滚动；读失败恢复overflow；关闭和配置/处理返回保page/filter/scroll | 顶部开发截图修正；2c5b50e失败出口/plan_scroll已有限复验；0968b1a实际tasks筛选/重置/page2、records page2、Drawer关闭及task→batch→plan原过滤/page/精确scroll返回通过；发现783→623布局时序负例已最小修复，独审已关闭 |
-| 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | e480c94按原型源码重组，独立代码映射与开发browser核对通过；G3真实Web与本机走查进行中，整改与最终复查见ui-walkthrough.md，不以过程证据签收 |
+| 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | e480c94按原型源码重组，独立代码映射与开发browser核对通过；G3真实Web与本机最终走查已完成，整改与复查见ui-walkthrough.md，用户整体人工签收另行 |
 
 ## 三道收口门
 
