@@ -9,3 +9,5 @@
 新结果专项12.192s；双格A超额不抵B的实际work记录回归1.553s。fixture使用service.NewExecutionStore(s.DB).RecordWork真实事务callback，不stub作品ID。
 
 根独立发布包全PASS及结果专项真MySQL9.966s（/tmp/chg109-t06-root-publish.log、-root-mysql.log），正式schema12项通过。独立审查结果/双格/并发MySQL12.141s通过，无P1/P2。未改真实业务库；受控模型/数据库测试不是实际平台计划E2E，正式UI及本机续编留T07，真实全流程留T08。
+
+整体结合复审补充：6e914ca修复manual@cutoff+1→expiry sweep@+2无新事实重卡的问题。旧行为RED/tmp/chg109-manual-sweep-red.log，修后12.005s结果相关回归及publish全包通过；根`TestExpiredManualReviewingRemainsEffectiveAfterLateCheckSweep`隔离MySQL独立通过(/tmp/chg109-root-manual-sweep.log)，独立审查者有限复验关闭P2。新stop仍阻，人工reviewing仍不能finish。
