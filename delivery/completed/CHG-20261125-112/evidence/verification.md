@@ -14,7 +14,7 @@ Cloud1974df4恢复数字控件；后续提交实现确认摘要与单向内容�
 
 既有候选事实浏览器的占用提示断言仍使用旧文案，本轮改为已存在的规范化提示“成片已被当前平台任务占用”，未改生产提示或弱化不可用判断；8类候选事实及所选封面不混用缩略图PASS（/tmp/chg112-candidate-facts.log）。
 
-本次全量Web168文件1244项PASS（/tmp/chg112-full-web.log）；Workspace220项PASS（/tmp/chg112-workspace-tests.log）。完整执行异常、计划回归及新安装版仍待完成，不能以这些受控结果替代真实安装走查。
+本次全量Web168文件1244项PASS（/tmp/chg112-full-web.log）；Workspace220项PASS（/tmp/chg112-workspace-tests.log）。完整执行异常、计划回归及新安装版后续均完成，实际结果见下文；受控结果不替代真实安装走查。
 
 ## 实际安装版闭环
 
@@ -28,7 +28,7 @@ Cloud1974df4恢复数字控件；后续提交实现确认摘要与单向内容�
 
 完整执行baseline、列表动作、11异常受控场景与计划baseline/editor/G1/controls/stale已PASS。首次stopping与统一环境重启重叠导致浏览器关闭，环境完成后单独重跑PASS（/tmp/chg112-execution-stopping.log）；未改断言/超时。1440/1024完整批次浏览器与390宽新增向导矩阵均PASS。
 
-最终生产代码b2bc9b9089aa4f2a887fbe00cf97cef18d8e5147；最终全量Web168/1244再次PASS（/tmp/chg112-full-web-final.log），新增8组矩阵与完整批次再次PASS（/tmp/chg112-wizard-final.log、/tmp/chg112-batch-final2.log）。Cloud PR55：https://github.com/piqiu96/wt-media-cloud/pull/55，检查与新安装版最终复核正在完成；尚无代码评论。
+最终生产代码b2bc9b9089aa4f2a887fbe00cf97cef18d8e5147；最终全量Web168/1244再次PASS（/tmp/chg112-full-web-final.log），新增8组矩阵与完整批次再次PASS（/tmp/chg112-wizard-final.log、/tmp/chg112-batch-final2.log）。Cloud PR55：https://github.com/piqiu96/wt-media-cloud/pull/55，全部CI与新安装版最终复核均PASS；无inline代码评论。
 
 ## 最终包复核
 
@@ -41,3 +41,11 @@ Cloud1974df4恢复数字控件；后续提交实现确认摘要与单向内容�
 本次验证是配置/续编真实闭环加执行异常受控回归；未进行新增平台投稿，不把受控回执算新的真实发布证据。业务待确认项：无。用户最终整体签收仍另行。
 
 两端角色入口补充：test-publication-role-browser.mjs的Cloud/Desktop各admin/operator/senior_operator矩阵PASS（/tmp/chg112-dual-role.log）；管理员保留管理但不能执行，运营与高级运营仅处理本人，查看他人任务不获得执行或草稿能力。
+
+两端独立Vite入口隔离检查PASS，Cloud/Desktop缓存及业务页面互不污染，pageErrors为空、业务写入0（/tmp/chg112-entry-isolation.log）；本机无Playwright自带headless-shell，按脚本既有CHROMIUM_EXECUTABLE参数指定已安装官方Chrome后完成，没有变更测试或下载依赖。
+
+PR55自动Codex审阅在标记ready后返回usage limits；summary虽标failed/has_unresolved_findings，但可见正文为无法完成审阅和额度耗尽，没有inline代码评论或具体缺陷。未将其宣称审阅通过，已逐文件复查新diff与上述业务/异常结果。
+
+官方CHG验证补充：在Desktop已接管Agent端口后直接wt chg verify，Go模块与220项Workspace测试通过，但control verify按设计拒绝用headless凭据检查Desktop的Agent；未当作通过。按既有up流程切换至headless Agent后，正式wt chg verify CHG-20261125-112全部退出0（/tmp/chg112-chg-verify-final.log），覆盖Go模块、Workspace220及control环境/BitBrowser/资产/DMG/登录。随后launch-dmg重新移交Desktop，frontend仍b2bc9b9，DMG SHA256未变（/tmp/chg112-final-relaunch.log）。
+
+Cloud CI run45621665492/job139231141665全部SUCCESS：Cloud/Web1m29s，原型预览21s、原型交互8m25s、迁移10s、双端构建51s及发布脚本均通过。PR55已合并并由GitHub API确认merged=true，merge commit f99119bd5295e9d11c1f2bd4c9faab16b3e3a937；main精确tree等于已验证b2bc9b9，未因合并元数据重建同一源码。
