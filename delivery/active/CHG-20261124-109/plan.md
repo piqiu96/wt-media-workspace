@@ -70,7 +70,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 
 ## 完整实现与验证顺序
 
-2026-11-25用户再次要求先依据PRD、publishing-management.md及其引用和本清单完成全部编码、自测，随后真实E2E，最后UI走查。逐项缺口和自测映射见[evidence/implementation-selftest-checklist.md](evidence/implementation-selftest-checklist.md)。现有原型/生产开发截图不构成最终视觉验收；当前批次/计划视觉差异重新按原型实现代码对齐，T07保持未完成。
+2026-11-25用户再次要求先依据PRD、publishing-management.md及其引用和本清单完成全部编码、自测，随后真实E2E，最后UI走查。逐项缺口和自测映射见[evidence/implementation-selftest-checklist.md](evidence/implementation-selftest-checklist.md)。现有原型/生产开发截图不构成最终视觉验收；当前批次/计划视觉差异重新按原型实现代码对齐，T07已完成编码/自测及独审，G2/G3仍待执行。
 
 ## 4. 执行落地步骤
 
@@ -80,7 +80,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 - [x] T04 Cloud Service：目标校验、真实AI建议、结构编辑/查询/复制；复用107候选准备，未启动不占成片。
 - [x] T05 Cloud推进Service/Scheduler：复用108启动事务与本人权限，首次启动/按序推进/暂停恢复/确认接管/终止；多实例不重复。
 - [x] T06 Cloud结果Service：最终核实/逐格缺口/结束原因及迟到结果；不新建统计事实表。
-- [ ] T07 共用Vue/Agent/Desktop：计划页面、批次同名快捷操作/只读Drawer和上下文返回、本机plan新建续编；不复制浏览器执行器，不另造授权系统。
+- [x] T07 共用Vue/Agent/Desktop：计划页面、批次同名快捷操作/只读Drawer和上下文返回、本机plan新建续编；不复制浏览器执行器，不另造授权系统。
 - [ ] T08 联调/独立review：真实多批顺序、资源竞争、阈值/暂停/配置冻结/结束，Web和安装版固定原型验收。
 - [ ] T09 各仓交付：真实命令/结果、PR/main merge证据、技术归档与最终统一用户验收安排；计划阶段不能宣称其他平台已开放。
 

@@ -15,35 +15,35 @@
 
 | 业务能力 | 主要实现位置（Cloud 除另标） | 必须证明的自测 | 当前事实与待补 |
 | --- | --- | --- | --- |
-| 列表、搜索、详情与范围 | publish/service/plan.go、repository/plan_query.go、PublishingPlansPage | 全目标类目授权后count/page；本人、同team高级只读、admin只读、跨范围拒绝 | 已有真MySQL scope断言；9bb0969进行中包含paused、全部goal授权/同goal筛选与count/page已独立真MySQL复验；新布局筛选/重置最终组合待核对 |
-| 创建/编辑/校验/目标守恒 | model/plan.go、repository/plan.go、PlanWorkbench、planPreparation | 每格守恒、稳定ID/归属、失败回滚、旧revision、原key重放 | 数据层及Service已定向/独审；完整手工操作待补 |
-| 本人资源盘点 | 复用BatchResources→PlanWorkbench | 账号/成片/可安排量/asof；known0、短缺、unknown、readfail、越权 | 2fd6cd0已补正式本人资源盘点四态/asof/素材缺口；独立编辑器浏览器通过，容量未知不造假；最终组合待补指标修复后重跑 |
+| 列表、搜索、详情与范围 | publish/service/plan.go、repository/plan_query.go、PublishingPlansPage | 全目标类目授权后count/page；本人、同team高级只读、admin只读、跨范围拒绝 | 已有真MySQL scope断言；9bb0969包含paused、全部goal授权/同goal筛选与count/page已独立真MySQL复验；0968b1a组合browser实际四项查询GET参数及重置通过 |
+| 创建/编辑/校验/目标守恒 | model/plan.go、repository/plan.go、PlanWorkbench、planPreparation | 每格守恒、稳定ID/归属、失败回滚、旧revision、原key重放 | 数据层及Service已定向/独审；0968b1a实际失衡拒绝无PUT→修正structure PUT、逐格守恒与stable IDs通过 |
+| 本人资源盘点 | 复用BatchResources→PlanWorkbench | 账号/成片/可安排量/asof；known0、短缺、unknown、readfail、越权 | 2fd6cd0已补正式本人资源盘点四态/asof/素材缺口；独立编辑器浏览器通过，容量未知不造假；最终expanded-editor组合已通过（资源四态/守恒/合并拆分排序/固定行） |
 | 手工新增/拆分/合并/排序 | PlanWorkbench、planPreparation，对照原型plan/app | A1+B1手动拆两批、目标增删重配、stableID、终止固定行、完整守恒 | 2fd6cd0已补手动新增/分格/A1B1拆分及固定行保护；独立编辑器浏览器及单测通过，AI不是必经 |
 | 真实AI建议与采用 | plan_recommendation.go、plan_handler.go、PlanWorkbench | 服务端本人数量；模型非法/截断/取消失败；SSE真实事件；审阅后采用、不自动保存 | Go/受控流已测；真实DeepSeek留最后E2E |
-| 全批配置准备 | 原PublishingBatchesPage及BatchResourceSetup/CandidateWorkspace | 继承目标只读；候选保存零task/占用；全部待执行批次就绪才首启 | 共享107数据守卫已有；完整页面与原型对齐待完成 |
-| 首次原子启动/冻结 | shared startBatchTx、plan_execution.go、Plan命令journal | 一次task/占用/授权/cursor/receipt；全批冻结；跨批重复定位；失败全回滚 | 真MySQL及原回执测试已测；原请求明确未生效恢复仍修复中 |
-| 计划原请求恢复 | plan_command.go、planPreparation、PublishingPlansPage | 原key/原包先receipt；权威false绑定；普通409/读失败未知保留；跨标签CAS | Provider9a01a1f/0e722ce及嵌套回执72e54eb、前端2fa2ca0已独立复验；实际HTTP/15schema/原key矩阵通过，最终组合仍需重跑 |
+| 全批配置准备 | 原PublishingBatchesPage及BatchResourceSetup/CandidateWorkspace | 继承目标只读；候选保存零task/占用；全部待执行批次就绪才首启 | 共享107数据守卫与两批configuration PUT实际受控验证通过；继承目标只读、响应零任务、无start/publication POST；真实DB见T03/T05，真实资源留G2 |
+| 首次原子启动/冻结 | shared startBatchTx、plan_execution.go、Plan命令journal | 一次task/占用/授权/cursor/receipt；全批冻结；跨批重复定位；失败全回滚 | 真MySQL及原回执测试通过；Provider/consumer权威未生效proof、缺字段false/0负例已修并独审关闭 |
+| 计划原请求恢复 | plan_command.go、planPreparation、PublishingPlansPage | 原key/原包先receipt；权威false绑定；普通409/读失败未知保留；跨标签CAS | Provider9a01a1f/0e722ce及嵌套回执72e54eb、前端2fa2ca0已独立复验；实际HTTP/15schema/原key矩阵通过，既有原请求browser及相应单测通过，最新全Web165/1235通过 |
 | 固定组与原批次执行入口 | 复用108、BatchExecutionControls及父plan投影 | 原N/间隔/异常/容量；同名按钮/权限/确认/API；future/移交不能旁路 | 108及109父锁隔离回归已有；最终真实联调后验收 |
 | 顺序衔接与确认 | planProgress/Advance、worker | 10%auto、20%confirm、0skip、prefix未决、旧basis、锁后实时截止 | 真MySQL已测、独审修复；UI实际请求严验需保持 |
 | 暂停/恢复/接管/终止 | ControlPlan、各执行入口父围栏 | pause仅后批；接管不重建单/授权；stop封提交许可；原结果安全收尾 | 真MySQL已有；UI接管/确认范围保持同谓词 |
 | 待办与分页 | PlanBatchPage、VerificationRequiredAt | 五类未决+停查/过期无新manual一致；count/page前过滤；manual仍审核清衔接待办不清finish | 8c5e64f已修，独立3项真MySQL2.863s及root3.195s通过，全TestPlan27.386s通过 |
-| 人工四结论及再核实 | recovery.go、LatestManualVerification、PublishingRecoveryDialog | 本人reviewing四结论、manager仅pub、unknown再核实、原结果/占用保留 | 后端/原dialog接线已测；全部UI流程待独审闭环 |
+| 人工四结论及再核实 | recovery.go、LatestManualVerification、PublishingRecoveryDialog | 本人reviewing四结论、manager仅pub、unknown再核实、原结果/占用保留 | 0968b1a新增actual四结论dialog/payload、failed缺证据拒发、unknown原attempt再核实、manager仅published通过；0968b1a及310577b独审已关闭 |
 | 可信公开与逐格缺口 | matched-work join、plan_result.go、Plan详情/列表 | task/attempt/output/work精确关联；reviewing不算公开；跨格不抵消 | 实际隔离work Service回调已测；真实平台留E2E |
 | 最终结束与迟到结果 | FinishPlan/ReconcileStoppedPlan | 未决/审核/错work/旧gap拒；unmet原因；cancel安全收敛；late不重开 | 后端已测；UI枚举unmet已59ef13e，actual请求schema断言已补 |
-| 新建续编及Cloud编辑 | Agent publication_draft、Native桥、JS plan类型 | 用户/环境/类型隔离、重启、CAS、明确重开才清、dismiss保留、Cloud edit不另存 | 本机951/Native561+独审；e1efd45三态恢复已修，独立单测/实际browser断言复验关闭，最终组合待重跑 |
+| 新建续编及Cloud编辑 | Agent publication_draft、Native桥、JS plan类型 | 用户/环境/类型隔离、重启、CAS、明确重开才清、dismiss保留、Cloud edit不另存 | 本机951/Native561+独审；e1efd45三态恢复已修，独立单测/实际browser断言复验关闭，既有draft恢复browser与最终完整Web165/1235通过 |
 | 创建明确拒绝与未知 | PublishingPlansPage pendingCreate | 首次明确拒绝后可编辑/退出；未知找回不换key；原form/pending保留 | 2c5b50e已独立复验首次明确拒绝/未知分别处理 |
-| 原批次只读Drawer与回跳 | BatchReadonlyBody、ResourceOverlay、from_plan | 视口内header/close、独立滚动；读失败恢复overflow；关闭和配置/处理返回保page/filter/scroll | 顶部开发截图修正；2c5b50e失败出口/plan_scroll已有限复验；完整新布局仍需校对 |
+| 原批次只读Drawer与回跳 | BatchReadonlyBody、ResourceOverlay、from_plan | 视口内header/close、独立滚动；读失败恢复overflow；关闭和配置/处理返回保page/filter/scroll | 顶部开发截图修正；2c5b50e失败出口/plan_scroll已有限复验；0968b1a实际tasks筛选/重置/page2、records page2、Drawer关闭及task→batch→plan原过滤/page/精确scroll返回通过；发现783→623布局时序负例已最小修复，独审已关闭 |
 | 原型视觉对齐 | 计划/批次所有生产页面、plan.css、正式Resource组件 | 区块/字段顺序、同排、表格列、宽度、间距、指标/进度、底栏、Drawer与既有原型代码逐页映射 | e480c94按原型源码重组，独立代码映射与开发browser核对通过；最终G3 UI走查仍未进行，不能以过程证据签收 |
 
 ## 三道收口门
 
-- [ ] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
+- [x] G1 编码与自测：上表所有缺口修复；新增负例、实际请求/响应schema、受控数据库/浏览器验证通过；差异和代码映射独立审查，无未关闭P1/P2。受影响完整Go/Web/Agent/Desktop及契约检查结果在最终SHA上可追溯。
 - [ ] G2 真实E2E：仅G1后重建新环境/DMG、真实本人资源与AI、真实至少两批顺序和公开事实；原目标/唯一任务/占用/attempt/work一致，真实单Profile与受控多Profile分别记载，不伪造资源或结果。
 - [ ] G3 最后UI走查：G2后Web与安装版逐页对照原型最终走查，覆盖角色、完整正常及必要异常路径、返回与视口。用户107–109最终统一整体验收仍另行进行。
 
-当前不得将G1/G2/G3标记完成。原型预览、开发截图、fixture及测试总数仅能支持其实际覆盖的自测项。
+G1已按以下最终证据完成；G2/G3不得预填完成。原型预览、开发截图、fixture及测试总数仅能支持其实际覆盖的自测项。
 
-## T07 原型代码对齐实施映射（待独立验证，非视觉验收）
+## T07 原型代码对齐实施映射（独立开发验证通过，非最终视觉验收）
 
 | 页 | 已确认差异 | 使用的原型实现输入与修改范围 |
 | --- | --- | --- |
@@ -62,3 +62,11 @@
 最新根验证：完整Web165文件1235通过（/tmp/chg109-final-web.log）；完整隔离MySQL repository110.751s通过（/tmp/chg109-root-final-live-repo.log，显式WT_MEDIA_CLOUD_HOME，首个未设路径的尝试未通过且不计PASS）；17项契约通过（/tmp/chg109-root-final-schema.log，专用/tmp/chg109-contract-validation环境，系统Python缺依赖的尝试不计PASS）。实施者完整Go及两端构建通过；独立复审MySQL计数3.465s、原投影/集合查询1.579s、45项Web及五场景三页浏览器、schema17均通过。根此前Workspace repo完整检查通过（/tmp/chg109-root-workspace-checks.log）。
 
 G1最后逐行核对仍补受控页面证据：列表筛选重置、edit PUT守恒、Drawer正式任务过滤/分页与records分页、from_plan返回位置、四结论原dialog操作。另计划关联批次配置页须仅保存并返回计划，隐藏容易误导的独立“开始发布”，保持计划全批确认入口。以上尚未独立闭环，G1/T07不能提前勾选，G2/G3未开始。
+
+0968b1a完成最后受控组合与必要修复：计划关联批次配置仅保存返回，首启仍走计划全批确认；返回计划等待共享布局首帧后精确恢复scroll，disposed/seq守卫防旧加载覆盖。新增组合browser与四结论browser、扩展editor真实操作均通过。最终提交正独立复审，root最终Web165/1235已通过、双端构建收尾，G1暂仍未勾选。
+
+## G1 最终结论（2026-11-25）
+
+- 最终Cloud310577b（生产代码0968b1a），Agent81f6bf8，Desktop2e06487；完整Go通过，完整隔离MySQL repository110.751s通过，17契约通过；root最终Web165文件1235项、Cloud/Desktop两构建均通过（/tmp/chg109-root-g1-final-{web,cloud-build,desktop-build}.log），Workspace完整治理检查通过（/tmp/chg109-root-g1-final-workspace.log）。Agent951、Desktop561通过/6既有ignore的原完整结果在未再修改的对应SHA上有效。
+- 独立最终复审：三组新增组合/编辑器/四结论browser实际通过，生产11行与原型实现映射无未关闭P1/P2。首次matrix暴露先点击后监听的测试竞态，不能以重跑偶过掩盖；310577b改为先注册promise后点击，独立新SHA整组通过，原scroll<2px断言未变。
+- G1完成依据为实现、数据库/契约/受控页面自测和独立审查；真实AI、真实平台公开及安装版最终走查分别留G2/G3。
