@@ -1,9 +1,9 @@
 ---
 id: CHG-20261125-110
 parent: delivery/milestones/M7-batch-publishing.md#页面实施基线
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: []
-affected_repos: ["wt-media-workspace", "wt-media-cloud"]
+affected_repos: ["wt-media-cloud", "wt-media-workspace"]
 risk: M
 ---
 
