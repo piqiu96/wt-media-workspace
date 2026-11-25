@@ -1,15 +1,20 @@
 {
   "date": "2026-11-25",
-  "status": "in_progress_action_projection_fix_before_first_start",
+  "status": "running_actual_first_batch",
   "source": {
-    "cloud": "310577b",
+    "cloud": "4daf991",
     "agent": "81f6bf8",
     "desktop": "2e06487"
   },
   "bringup": {
     "log": "/tmp/chg109-g2-bringup.log",
     "allGates": "PASS",
-    "frontendVersion": "0.1.0+310577b"
+    "frontendVersion": "0.1.0+310577b",
+    "fixedRun": {
+      "log": "/tmp/chg109-g2-4daf991-bringup.log",
+      "allGates": "PASS",
+      "frontendVersion": "0.1.0+4daf991"
+    }
   },
   "resourceBaseline": {
     "ownerId": "3",
@@ -87,12 +92,86 @@
     ],
     "target": 2,
     "createReplayIdentical": true,
-    "started": false
+    "started": true,
+    "startReceipt": {
+      "plan_id": "1",
+      "revision": "4",
+      "first_started_at": "2026-11-25T05:38:42.852528Z",
+      "current_batch_id": "3",
+      "batch_confirmations": [
+        {
+          "batch_id": "3",
+          "expected_revision": "2",
+          "included_row_keys": [
+            "row-137"
+          ],
+          "excluded_row_keys": [],
+          "allow_shortfall": false,
+          "expected_shortfalls": [
+            {
+              "category_id": "4",
+              "shortfall": 0
+            }
+          ]
+        },
+        {
+          "batch_id": "4",
+          "expected_revision": "2",
+          "included_row_keys": [
+            "row-138"
+          ],
+          "excluded_row_keys": [],
+          "allow_shortfall": false,
+          "expected_shortfalls": [
+            {
+              "category_id": "4",
+              "shortfall": 0
+            }
+          ]
+        }
+      ],
+      "first_batch_receipt": {
+        "batch_id": "3",
+        "revision": "3",
+        "execution_status": "running",
+        "first_started_at": "2026-11-25T05:38:42.852528Z",
+        "task_ids": [
+          "13"
+        ],
+        "target_count": 1,
+        "created_count": 1,
+        "creation_shortfall": 0
+      }
+    },
+    "startReplayIdentical": true,
+    "freezeChecks": [
+      {
+        "entry": "future_batch_configuration",
+        "http": 409,
+        "code": "publication_conflict"
+      },
+      {
+        "entry": "plan_structure",
+        "http": 409,
+        "code": "publication_batch_parent_blocked"
+      }
+    ],
+    "zeroTasksAfterBothConfigured": true,
+    "firstRunning": {
+      "currentBatchId": "3",
+      "taskId": "13",
+      "attemptId": "36",
+      "phase": "preparing",
+      "secondBatchTaskCount": 0
+    }
   },
   "finding": {
     "code": "unstarted_plan_batch_start_action_exposed",
     "actual": "batch3/4 allowed_actions includes start before parent first start",
-    "action": "paused first start; minimal provider projection fix and review required"
+    "action": "paused first start; minimal provider projection fix and review required",
+    "fixedBy": "4daf991",
+    "independentReview": "PASS",
+    "realReadBack": "only edit/stop, no start"
   },
   "limitations": {
     "actualOwnedProfiles": 1,
@@ -129,5 +208,75 @@
         "categoryId": 4
       }
     ]
-  }
+  },
+  "content": [
+    {
+      "row_key": "row-137",
+      "events": [
+        "start",
+        "progress",
+        "item_result",
+        "done"
+      ],
+      "logid": "tr5321dea222098547",
+      "result": {
+        "content": {
+          "cover_title": "学会架点",
+          "description": "学会架点很简单，新手也能快速掌握",
+          "topics": "三角洲行动"
+        },
+        "field_revisions": {
+          "cover_title": "0",
+          "description": "0",
+          "topics": "0"
+        }
+      }
+    },
+    {
+      "row_key": "row-138",
+      "events": [
+        "start",
+        "progress",
+        "item_result",
+        "done"
+      ],
+      "logid": "tr92093fc5400ed16a",
+      "result": {
+        "content": {
+          "cover_title": "实战思考控全局",
+          "description": "实战多思考，才能掌控全局",
+          "topics": "三角洲行动"
+        },
+        "field_revisions": {
+          "cover_title": "0",
+          "description": "0",
+          "topics": "0"
+        }
+      }
+    }
+  ],
+  "covers": [
+    {
+      "outputId": 137,
+      "horizontalFileId": "39",
+      "portraitFileId": "41",
+      "width": 1080,
+      "height": 1440,
+      "title": "学会架点",
+      "renderInputHash": "091cac555672a0fbbc427e1a64e5b671bd2b80fec52fd8c9130c7ecd1d37298c",
+      "preview": false,
+      "visuallyReadBack": true
+    },
+    {
+      "outputId": 138,
+      "horizontalFileId": "40",
+      "portraitFileId": "42",
+      "width": 1080,
+      "height": 1440,
+      "title": "实战思考控全局",
+      "renderInputHash": "64c3fc4f89a7c9d6cf17034f950ef849751adc63f415a6edf95e3b48ec8c7c0a",
+      "preview": false,
+      "visuallyReadBack": true
+    }
+  ]
 }
