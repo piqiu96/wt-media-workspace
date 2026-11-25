@@ -498,11 +498,11 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 
 | 字段 | 内容 |
 | --- | --- |
-| 状态 | `IN_PROGRESS` |
+| 状态 | `VERIFYING` |
 | 目标 | 本人批次候选保存、批量内容、启动原子建单、分组并发、异常保护与公开结果 |
 | 依赖 | M6 `DONE` |
 | 业务验收 | [M7批次](milestones/M7-batch-publishing.md) |
-| Active CHG | CHG-20261126-128 |
+| Active CHG | 无，128已完成技术交付 |
 | Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；[110原型修复/本轮真实2批与main新包](completed/CHG-20261125-110/evidence/final-delivery.md)已验证，用户整体签收另行；[111状态与按钮修复验收](completed/CHG-20261125-111/evidence/final-delivery.md)；[112数量与步骤修复验收](completed/CHG-20261125-112/evidence/final-delivery.md)；[113详情内容与阶段修复验收](completed/CHG-20261125-113/evidence/verification.md) |
 
 候选 CHG：
@@ -554,7 +554,7 @@ PLAN 计划闭环：全部批次准备与启动冻结 → 10%推进/批次快捷
 PLATFORM 三平台闭环：B站验收开放 → 小红书验收开放 → 三平台整体回归
 ```
 
-2026-11-26设计规划按独立闭环拆分：先[128计划批次逐页复核](active/CHG-20261126-128/plan.md)，再[129广告画中画与片尾](planned/CHG-20261126-129/plan.md)，最后[130B站与新模式全流程](planned/CHG-20261126-130/plan.md)；用户已确认执行。128已激活，129与130按依赖等待启动。后续仍按B站真实验收开放 → 小红书真实验收开放 → 三平台整体回归推进。快速发布工具须先由M6完整交付，本阶段不再安排OPS-A/OPS-B。逐平台安全开放和提供方先于消费者的顺序不变；全部三平台通过才结束本阶段。
+2026-11-26设计规划按独立闭环拆分：先[128计划批次逐页复核](completed/CHG-20261126-128/plan.md)，再[129广告画中画与片尾](planned/CHG-20261126-129/plan.md)，最后[130B站与新模式全流程](planned/CHG-20261126-130/plan.md)；用户已确认执行。128已完成技术交付，129与130按依赖接续启动。后续仍按B站真实验收开放 → 小红书真实验收开放 → 三平台整体回归推进。快速发布工具须先由M6完整交付，本阶段不再安排OPS-A/OPS-B。逐平台安全开放和提供方先于消费者的顺序不变；全部三平台通过才结束本阶段。
 
 ### M10：打包、升级、诊断与稳定性验收
 

@@ -1,10 +1,11 @@
 ---
 id: CHG-20261126-128
 parent: delivery/milestones/M7-batch-publishing.md#逐页一致性复核
-status: IMPLEMENTING
+status: DONE
 depends_on: ["CHG-20261125-113"]
 dependency_merge_commits: {"CHG-20261125-113":{"wt-media-cloud":"69e865c03e5c90c4c9107ee2faf2323e3f753e8a","wt-media-workspace":"96a8bbed29b1e023b1bfba3c23a0e3fb84930bc0"}}
 affected_repos: ["wt-media-cloud", "wt-media-workspace"]
+merge_commits: {"wt-media-cloud":"eb1355ec1c202eedd4e9cf58d64402ef70d77f08"}
 risk: M
 ---
 
@@ -18,7 +19,7 @@ risk: M
 
 ## Done When
 
-- [ ] 列表、创建/编辑/续编、三步批次、两类详情、计划Drawer/快捷入口及确认弹层逐项对照固定原型并留证。
-- [ ] 三角色、七类批次状态、计划推进门槛、未知/读取失败/冲突/恢复等矩阵通过；没有将演示状态当业务事实。
-- [ ] 编码与针对性自测完成后运行生产路由E2E，最后实际打开浏览器及新安装版逐页走查；问题修复并回归。
-- [ ] PR/CI、合并各仓main与交付归档完成；用户最终整体签收另行。
+- [x] 列表、创建/编辑/续编、三步批次、两类详情、计划Drawer/快捷入口及确认弹层逐项对照固定原型并留证。
+- [x] 三角色、七类批次状态、计划推进门槛、未知/读取失败/冲突/恢复等矩阵通过；没有将演示状态当业务事实。
+- [x] 编码与针对性自测完成后运行生产路由E2E，最后实际打开浏览器及新安装版逐页走查；问题修复并回归。
+- [x] PR/CI、合并各仓main与交付归档完成；用户最终整体签收另行。

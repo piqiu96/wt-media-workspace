@@ -1,6 +1,6 @@
 # M7：多任务批次真实发布
 
-- 状态：`IN_PROGRESS`；Active CHG：CHG-20261126-128；原型修复：[CHG-20261125-110](../completed/CHG-20261125-110/change.md)；107/108技术交付DONE，真实可用Profile下兼容实发与双端结果验证完成；用户整体最终验收待109后。
+- 状态：`VERIFYING`；Active CHG：无，128已完成技术交付；原型修复：[CHG-20261125-110](../completed/CHG-20261125-110/change.md)；107/108技术交付DONE，真实可用Profile下兼容实发与双端结果验证完成；用户整体最终验收待109后。
 - Evidence：[107配置准备实际双端E2E](../completed/CHG-20261124-107/evidence/installed-e2e.json)；[108执行验收](../completed/CHG-20261124-108/evidence/acceptance-matrix.md)、[真实双端E2E](../completed/CHG-20261124-108/evidence/installed-e2e.json)及[合入证据](../completed/CHG-20261124-108/evidence/merge-and-verification.md)。
 - 依据：[PRD 第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.3、6.5、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md) §2.1—2.5、§4—6。
 - 依赖：[M6](M6-single-publishing.md) `DONE`；在百度（百家号）验证批次，按 [PRD 批次规则](../../docs/product/prd/详细文档/第六章_发布管理.md#632-新建批次)真实可用本人Profile不足配置N时向下兼容；多账号分组及跨批Profile互斥另列受控证据。
@@ -67,6 +67,8 @@
 
 ## 逐页一致性复核
 
-2026-11-26用户要求设计＋规划，先以[CHG128](../active/CHG-20261126-128/plan.md)承接计划/批次全部页面与状态按钮的复核和增量修复。当前仅完成部分原型浏览器初查，不能宣称全页或生产E2E通过。普通视觉/交互缺口沿原型直接修复，后端不足沿原框架补齐；仅真实业务含义、权限或结果冲突由产品负责人裁定。
+2026-11-26用户要求设计＋规划，先以[CHG128](../completed/CHG-20261126-128/plan.md)承接计划/批次全部页面与状态按钮的复核和增量修复。当前仅完成部分原型浏览器初查，不能宣称全页或生产E2E通过。普通视觉/交互缺口沿原型直接修复，后端不足沿原框架补齐；仅真实业务含义、权限或结果冲突由产品负责人裁定。
 
 继承保存零正式任务/零占用、启动原子建单、执行后冻结、10%衔接和批次原有快捷操作；112单向步骤与113详情修复不回退。自测完整后才进入E2E，最终必须主动打开浏览器及新安装版走查并修复问题。M7在128实施期间为IN_PROGRESS，技术验收完成后恢复VERIFYING并等待用户整体签收。
+
+128已通过全量浏览器118项、正式路由回归、安装版走查与远端CI，Cloud PR57合入main，Workspace随PR70归档。用户最终整体签收仍待完成。
