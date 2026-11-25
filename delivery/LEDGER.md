@@ -6,4 +6,3 @@ Completed or superseded slices leave this index after their remaining work has a
 
 | Change | Title | Status | Current Repository |
 |---|---|---|---|
-| CHG-20261124-109 | 发布计划推进与结束 | VERIFYING | wt-media-workspace |

@@ -1,7 +1,7 @@
 ---
 id: CHG-20261124-109
 parent: delivery/milestones/M-publishing-plan.md#从周期目标到计划结束
-status: VERIFYING
+status: DONE
 depends_on: ["CHG-20261124-108"]
 affected_repos: ["wt-media-workspace", "wt-media-cloud", "wt-media-agent", "wt-media-desktop"]
 risk: H
@@ -21,3 +21,7 @@ dependency_merge_commits: {"CHG-20261124-108": {"wt-media-workspace": "bf190c945
 - 逐格目标守恒、骨架零task/占用、全部待执行批次准备及启动后配置冻结、首批合法启动可验证。
 - 按序推进、阈值/零分母/未决、人工暂停、终止与多实例重启不重复派发。
 - 批次快捷操作与原操作一致，逐格缺口及达成/未达成/终止结束准确，无计划内追加或补量，迟到公开不重开；双端技术走查及main证据完成，用户107–109最终整体验收另行进行。
+
+## Technical Delivery
+
+2026-11-25：G1/G2/G3、T01–T09、V01–V10技术验证完成，真实计划1公开2/2并达成结束；最终Web/macOS原型走查及独立review关闭，三运行仓PR与local main核实。见[evidence/delivery-main-verification.md](evidence/delivery-main-verification.md)。本DONE/技术归档随Workspace PR65合入主线一并生效；用户已指定107–109整体最终人工验收另行，M7和M-publishing-plan保持VERIFYING，不冒称用户签收。

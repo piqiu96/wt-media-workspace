@@ -8,7 +8,7 @@
 
 ## 执行约定
 
-本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，当前VERIFYING，108四仓main依赖已合入。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
+本文件是2026-11-25最新实施review稿，与change.md配套；状态只在change.md，用户已授权全流程执行，本清单技术交付完成，108四仓main依赖已合入。任务按顺序执行，勾选表示需检查的交付项，不预填完成事实。依赖CHG归档、各仓合入main、范围review及CHG预检满足后才开始运行代码。路径由config/repository-map.yaml定位。
 
 产品以PRD第六章、对应Milestone及本次已确认裁定为准；页面继承Cloud既有publishing-design原型，公共布局/行为/Token分别遵循AdminUI、交互和视觉规范。本轮example原型固定930553217cf5a3c8a1750178da4974d5b46dfeac，隔离?review=chg109；根已独立核对截图及单测，后续正式页面沿此基线与提供方契约实施。
 
@@ -70,7 +70,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 
 ## 完整实现与验证顺序
 
-2026-11-25用户再次要求先依据PRD、publishing-management.md及其引用和本清单完成全部编码、自测，随后真实E2E，最后UI走查。逐项缺口和自测映射见[evidence/implementation-selftest-checklist.md](evidence/implementation-selftest-checklist.md)。现有原型/生产开发截图不构成最终视觉验收；当前批次/计划视觉差异重新按原型实现代码对齐，T07已完成编码/自测及独审，G2真实两批2/2结束已通过，G3最终双端UI与交付审计补测均通过；逐项证据见evidence/final-acceptance-matrix.md，PR/CI与main交付收口中。
+2026-11-25用户再次要求先依据PRD、publishing-management.md及其引用和本清单完成全部编码、自测，随后真实E2E，最后UI走查。逐项缺口和自测映射见[evidence/implementation-selftest-checklist.md](evidence/implementation-selftest-checklist.md)。现有原型/生产开发截图不构成最终视觉验收；当前批次/计划视觉差异重新按原型实现代码对齐，T07已完成编码/自测及独审，G2真实两批2/2结束已通过，G3最终双端UI与交付审计补测均通过；逐项证据见evidence/final-acceptance-matrix.md，三运行仓PR/CI与local main已核实，Workspace归档随PR65合入生效。
 
 ## 4. 执行落地步骤
 
@@ -82,7 +82,7 @@ Cloud内部按Handler→Service→Repository落位，跨模块复用所属Servic
 - [x] T06 Cloud结果Service：最终核实/逐格缺口/结束原因及迟到结果；不新建统计事实表。
 - [x] T07 共用Vue/Agent/Desktop：计划页面、批次同名快捷操作/只读Drawer和上下文返回、本机plan新建续编；不复制浏览器执行器，不另造授权系统。
 - [x] T08 联调/独立review：真实多批顺序、资源竞争、阈值/暂停/配置冻结/结束，Web和安装版固定原型验收。
-- [ ] T09 各仓交付：真实命令/结果、PR/main merge证据、技术归档与最终统一用户验收安排；计划阶段不能宣称其他平台已开放。
+- [x] T09 各仓交付：真实命令/结果、PR/main merge证据、技术归档与最终统一用户验收安排；计划阶段不能宣称其他平台已开放。
 
 ## 5. 验收与证据
 
@@ -115,3 +115,5 @@ T01独立预审进一步收敛：正常9公开+1确认失败不要求先人工�
 核实实现采用Task最新人工核实投影（verified_at/conclusion/attempt_id/task_revision），含人工仍未知也记录时间，原publication.resolve审计继续留存；不建第二套任务状态或统计表。`verification_required`结合原回执、核验停止/有效期和最新人工结论计算；handoff fingerprint同时包含这些事实及实时待核实判断，不能因未变plan revision放行旧确认。
 
 T08/V01–V10技术验证结论：全部PASS，逐项实际/受控边界、测试名与结果在[evidence/final-acceptance-matrix.md](evidence/final-acceptance-matrix.md)，最终双端在[evidence/ui-walkthrough.md](evidence/ui-walkthrough.md)，真实闭环在[evidence/real-e2e.json](evidence/real-e2e.json)。用户107–109整体人工签收另行，Windows/多Profile/其他平台不冒称已实机验证。
+
+T09交付：三运行仓最终CI绿、PR合并及local main精确tree一致，详[evidence/delivery-main-verification.md](evidence/delivery-main-verification.md)；Workspace本次归档随PR65合入main一并生效，自身merge SHA以Git/PR权威记录为准，不预造哈希。用户整体最终验收另行。
