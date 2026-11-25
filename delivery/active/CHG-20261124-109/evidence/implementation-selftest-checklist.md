@@ -57,4 +57,8 @@
 
 自测口径裁定：现有BatchResources只有本人账号/成片及未知数，没有周期额度或最终可安排容量。页面不得自创“每账号1条”的容量公式；展示已知数量/asof/gaps，容量未知明确标待逐批配置核实，目标-可用成片数仅称成片缺口。继续允许超库存目标，不能把未知当0或无限。
 
-最后结构/完整能力审查：e480c94+2fd6cd0独立57项单测、编辑器/三角色受控浏览器通过，未发现手工盘点/分配/固定行/共享Reorder默认兼容新增P1/P2；唯一新增P2为三处将全部reviewing计待办，Provider只读verification_required_count与前端消费正在修，G1不能提前勾选。根完整Web165文件1234通过(/tmp/chg109-root-complete-web.log)，Workspace repo完整检查通过(/tmp/chg109-root-workspace-checks.log)。
+最后结构/完整能力审查：e480c94+2fd6cd0独立57项单测、编辑器/三角色受控浏览器通过，未发现手工盘点/分配/固定行/共享Reorder默认兼容新增P1/P2。三处将全部reviewing计待办的P2已由契约7c09ebe、共享投影e7eb30a、消费a914ed8修复并独立关闭；正常审核/最新有效人工仍审核为0，停查或过期未核实为1，unknown仅计uncertain，缺失字段显待刷新。没有新查询或异常上限规则变更。
+
+最新根验证：完整Web165文件1235通过（/tmp/chg109-final-web.log）；完整隔离MySQL repository110.751s通过（/tmp/chg109-root-final-live-repo.log，显式WT_MEDIA_CLOUD_HOME，首个未设路径的尝试未通过且不计PASS）；17项契约通过（/tmp/chg109-root-final-schema.log，专用/tmp/chg109-contract-validation环境，系统Python缺依赖的尝试不计PASS）。实施者完整Go及两端构建通过；独立复审MySQL计数3.465s、原投影/集合查询1.579s、45项Web及五场景三页浏览器、schema17均通过。根此前Workspace repo完整检查通过（/tmp/chg109-root-workspace-checks.log）。
+
+G1最后逐行核对仍补受控页面证据：列表筛选重置、edit PUT守恒、Drawer正式任务过滤/分页与records分页、from_plan返回位置、四结论原dialog操作。另计划关联批次配置页须仅保存并返回计划，隐藏容易误导的独立“开始发布”，保持计划全批确认入口。以上尚未独立闭环，G1/T07不能提前勾选，G2/G3未开始。
