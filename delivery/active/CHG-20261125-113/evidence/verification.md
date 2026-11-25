@@ -25,3 +25,11 @@
 最终环境强制重启、重新build-dmg、wt.py chg verify113全部PASS（/tmp/chg113-environment-final.log、/tmp/chg113-chg-verify-final.log）。正式verify含Go模块、Workspace220测试、Cloud/Agent/BitBrowser/双dev/新鲜资源/DMG/CORS与operator01真实登录。先校验再launch转交Agent，未绕过Desktop凭证保护。
 
 Cloud PR56：https://github.com/piqiu96/wt-media-cloud/pull/56；Workspace PR69：https://github.com/piqiu96/wt-media-workspace/pull/69。最终源码9da63af30324880690c2a4810b1d2d38b162fa2a；DMG SHA256 bf9621679e97c47bed4b1aa809ae01231a7df7d702f8cefd3cb176637931ccf9。最终安装版复核及远端CI仍待完成。
+
+## 最终安装版结果
+
+已挂载且实际启动0.1.0+9da63af.dirty（dirty仅其他会话example改动），operator01/operator123登录成功。初次工作环境弹层赶在Sidecar启动完成前显示未连接，点击重新检查即三项全绿：本机服务已连接、比特浏览器已登录指定账号、执行凭证已配置，这台电脑可以工作。
+
+实际只读走查PASS：计划2→批次5详情Drawer展示实际任务15、公开1/1、设置仅一次及中文创建计划批次/安排本组任务/批次执行结束；关闭回原计划2、无路由跳转。独立批次2正式任务12及中文事件全部可读。最后原批次1详情再次核对取消原因、60/0/60/0及明确空态，无裸表头/重复目标区/虚假执行区，应用保留此处供用户复查。
+
+数据库复查仍2计划/7批次/12任务；本轮没有保存复制、新建批次、计划或发布任务，没有AI及发布调用。生产diff只含共享详情内容/记录呈现与定向回归，无Contract/DB/Agent/Desktop业务修改。自review按Done When逐项核对：原型信息结构、异常/未知、长内容/分页/窄屏、只读无副作用及正式任务投影均已测。远端最新CI正在原型交互步骤，暂不宣称合入。
