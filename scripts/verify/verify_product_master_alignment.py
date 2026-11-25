@@ -492,7 +492,7 @@ def validate_alignment(root: Path = ROOT) -> list[str]:
     milestone_index = (root / "delivery" / "milestones" / "README.md").read_text(encoding="utf-8")
     errors.extend(require_all(milestone_index, (
         "## 页面实施与验收基线", "CHG 必须在 References 引用", "实际页面与同一原型基线逐项对照",
-        "Cloud 原型 commit SHA", "产品负责人裁定后再修改原型", "不得绕开原型重新设计",
+        "Cloud 原型 commit SHA", "接口/实现差异由研发在原框架内解决", "仅涉及业务规则", "不得绕开原型重新设计",
     ), "Publishing UI implementation policy"))
     errors.extend(validate_active_change(root))
     errors.extend(validate_product_identity(root))

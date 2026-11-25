@@ -503,7 +503,7 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 | 依赖 | M6 `DONE` |
 | 业务验收 | [M7批次](milestones/M7-batch-publishing.md) |
 | Active CHG | None |
-| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；用户最终整体验收待109后 |
+| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；[110原型修复/本轮真实2批与main新包](completed/CHG-20261125-110/evidence/final-delivery.md)已验证，用户整体签收另行 |
 
 候选 CHG：
 
@@ -523,7 +523,7 @@ M7-准备：本人资源＋批量内容＋候选配置保存（无task/占用）
 | 依赖 | M7 `DONE` |
 | 业务验收 | [发布计划](milestones/M-publishing-plan.md) |
 | Active CHG | None |
-| Evidence | [109编码与自测矩阵](completed/CHG-20261124-109/evidence/implementation-selftest-checklist.md)；真实E2E两批公开2/2且达成结束已通过，最终d853e24双端UI及补验均通过；技术交付与归档随Workspace PR65合入main生效，用户整体人工验收另行 |
+| Evidence | [109编码与自测矩阵](completed/CHG-20261124-109/evidence/implementation-selftest-checklist.md)；真实E2E两批公开2/2且达成结束已通过，最终d853e24双端UI及补验均通过；技术交付与归档随Workspace PR65合入main生效；[110修复与本轮真实验收](completed/CHG-20261125-110/evidence/final-delivery.md)通过，用户整体人工验收另行 |
 
 门禁说明：上表依赖列记录标准门禁M7 `DONE`，不表示M7当前已签收。M7实际为技术交付完成、`VERIFYING`待用户整体人工验收。
 
@@ -582,7 +582,7 @@ M10 跨端交付：Agent 正式打包、FFmpeg/FFprobe 镜像、Sidecar 生命�
 - Cloud 合成继续只在 Cloud Worker 执行，FFmpeg 依赖受控；HTTPS、迁移、MySQL/对象存储恢复及真实跨版本升级/回退可验证，失败不丢用户数据。
 - Desktop Sidecar 生命周期与认证正常；不兼容版本禁止敏感执行；日志和诊断不泄露凭据。
 - 在安装版中回归单任务、批次、计划、图片和模板、三平台真实自动提交及公开核实；断网/重启/停止/升级均不重复投稿，不丢在途结果。
-- 页面回归沿用[发布 Milestone 页面基线](milestones/README.md#页面实施与验收基线)与各阶段具体原型入口，实际页面须完成布局、交互、视觉一致性检查；差异先经产品负责人裁定。
+- 页面回归沿用[发布 Milestone 页面基线](milestones/README.md#页面实施与验收基线)与各阶段具体原型入口，实际页面须完成布局、交互、视觉一致性检查；接口/实现差异由研发在原型框架内解决，技术信息在原区域补充；改变业务规则时才由产品负责人确认。
 - 发布必需统计可对账；互动、效果采集和综合数据看板不进入本轮验收分母；`release-matrix.yaml` 仅记录真实验证组合。
 
 ### 内容生产原型落地增量（2026-11-05）
