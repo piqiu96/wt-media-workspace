@@ -112,13 +112,13 @@ wt-media-workspace/
 | 状态 | 含义 | 活记录 | 归档记录 |
 |---|---|---|---|
 | `DISCUSSION` | 草案，方向待裁定；不激活 | 2 | 0 |
-| `PLANNED` | 方向已定、已拆分，可激活 | 2 | 0 |
-| `IMPLEMENTING` | 实施中 | 0 | 2 |
+| `PLANNED` | 方向已定、已拆分，可激活 | 4 | 0 |
+| `IMPLEMENTING` | 实施中 | 1 | 2 |
 | `VERIFYING` | 实施完成，待验收 | 0 | 1 |
-| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 68 |
-| `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 0 |
+| `DONE` | 已收口归档；**活记录不得取此词** | 0 | 101 |
+| `SUPERSEDED` | 已被后续工作取代，不再独立激活 | 0 | 4 |
 
-分母：活记录＝`delivery/planned/*/change.md` **4** 篇 ＋ `delivery/active/*/change.md` **0** 篇；归档记录＝`delivery/completed/*/change.md` **82** 篇。归档列 71（`DONE` 68＋`IMPLEMENTING` 2＋`VERIFYING` 1）与退役词 `CLOSED` 4、`HANDOFF` 2、`IN_PROGRESS` 5 合计 82。planned 4 篇中 1 篇（CHG-20260903-034）使用块引用旧格式，状态同为 `PLANNED`。读数随归档动作变化；登记时按当时的实测值填写，不沿用旧数。
+分母（2026-11-26登记实测）：活记录＝`delivery/planned/*/change.md` **6** 篇 ＋ `delivery/active/*/change.md` **1** 篇；归档记录＝`delivery/completed/*/change.md` **119** 篇。归档列108（`DONE`101＋`IMPLEMENTING`2＋`VERIFYING`1＋`SUPERSEDED`4）与退役词`CLOSED`4、`HANDOFF`2、`IN_PROGRESS`5合计119。planned中CHG-20260903-034使用块引用旧格式，按其明确PLANNED登记。只读取状态字段统计，不回改历史记录。
 
 **里程碑**（现状见 `delivery/milestones/README.md`）：
 
@@ -126,7 +126,7 @@ wt-media-workspace/
 |---|---|---|
 | `NOT_STARTED` | 未进入该里程碑 | M-publishing-operations、M10 |
 | `IN_PROGRESS` | 开发中 | M-publishing-plan |
-| `VERIFYING` | 自动综合验收完成，等待人工整体验收 | M7 |
+| `VERIFYING` | 自动综合验收完成，等待人工整体验收 | 见各阶段当前状态 |
 | `DONE` | 人工整体验收通过 | M2、M3、M4、M5、M6、M-launch-engineering |
 
 里程碑文件内部的子项状态（如 M2-D 的 `DEFERRED`）不是里程碑状态词，不占上表，只在其所属里程碑文件内自述。
@@ -164,7 +164,7 @@ wt-media-workspace/
 | M4 | `DONE` | M4 各实施 CHG、M4-H1 视觉整改与 M4-H2 统一走查均已完成；机器闭环与真实页面签收均有证据。 | 2026-10-28 用户签收 M4-H2；M4 冻结为 Cloud 内容生产闭环基线。 |
 | M5 | `DONE` | M5-C1～C7（含 C2a）与 M5-F 均已归档；真实 Scheduler/Worker/FFmpeg/对象存储全链与页面走查有证据。 | 2026-10-28 用户签收 M5-AC-13 与 M4-H2；M5 冻结为策略自动生产基线。 |
 | M6 | `DONE` | CHG106工具、内容准备/续编、结果处置与统计已交付；任务11/attempt34自动核实公开作品4，四仓改动已合入main | 已有真实业务、安装版关键流程与异常回归证据；2026-11-25用户签收，已归档 |
-| M7 | `VERIFYING` | 107/108技术交付与真实单Profile双端闭环通过，多Profile受控验证 | 用户指定107–109后统一整体验收；109可按已完成技术依赖启动 |
+| M7 | `IN_PROGRESS` | 107/108技术交付与真实单Profile双端闭环通过，多Profile受控验证 | 用户指定107–109后统一整体验收；109可按已完成技术依赖启动 |
 | M-publishing-plan | `IN_PROGRESS` | 109契约、数据与服务已实现并独审；共用页面按原型源码对齐，正在收口编码自测 | 自测闭环后真实多批E2E，最后双端UI走查和PR/main交付 |
 | M-publishing-operations | `NOT_STARTED` | 后续平台未验收；工具已归M6 | 完成后续平台和三平台回归 |
 | M10 | `NOT_STARTED` | 首次上线已有部分打包部署证据 | 依赖发布四阶段，补验升级、恢复及发布业务 |
@@ -543,7 +543,7 @@ PLAN 计划闭环：全部批次准备与启动冻结 → 10%推进/批次快捷
 | --- | --- |
 | 状态 | `NOT_STARTED` |
 | 目标 | 在完整百度能力上依次扩展B站、小红书，完成三平台任务/批次/计划回归 |
-| 依赖 | 整体验收依赖 M-publishing-plan `DONE`；B站适配可在M7完成且百度已验收开放后先实施 |
+| 依赖 | 整体验收依赖 M-publishing-plan `DONE`；本轮B站适配在128技术验收且百度、计划main基线核对后开始 |
 | 业务验收 | [后续平台与三平台](milestones/M-publishing-operations.md) |
 | Active CHG | None |
 | Evidence | None，B站/小红书真实发布尚未验收 |
@@ -554,7 +554,7 @@ PLAN 计划闭环：全部批次准备与启动冻结 → 10%推进/批次快捷
 PLATFORM 三平台闭环：B站验收开放 → 小红书验收开放 → 三平台整体回归
 ```
 
-规划一个三平台扩展CHG，内部严格按B站真实验收开放 → 小红书真实验收开放 → 三平台整体回归推进。快速发布工具须先由M6完整交付，本阶段不再安排OPS-A/OPS-B。逐平台安全开放和提供方先于消费者的顺序不变；全部三平台通过才结束本阶段。
+2026-11-26设计规划按独立闭环拆分：先[128计划批次逐页复核](completed/CHG-20261126-128/plan.md)，再[129广告画中画与片尾](planned/CHG-20261126-129/plan.md)，最后[130B站与新模式全流程](planned/CHG-20261126-130/plan.md)；用户已确认执行。128已完成技术交付，129与130按依赖接续启动。后续仍按B站真实验收开放 → 小红书真实验收开放 → 三平台整体回归推进。快速发布工具须先由M6完整交付，本阶段不再安排OPS-A/OPS-B。逐平台安全开放和提供方先于消费者的顺序不变；全部三平台通过才结束本阶段。
 
 ### M10：打包、升级、诊断与稳定性验收
 
