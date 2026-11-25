@@ -503,7 +503,7 @@ M5-C7 真实定时、批量、并发、恢复和回归综合验收
 | 依赖 | M6 `DONE` |
 | 业务验收 | [M7批次](milestones/M7-batch-publishing.md) |
 | Active CHG | None |
-| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；[110原型修复/本轮真实2批与main新包](completed/CHG-20261125-110/evidence/final-delivery.md)已验证，用户整体签收另行；[111状态与按钮修复验收](completed/CHG-20261125-111/evidence/final-delivery.md)；[112数量与步骤修复验收](completed/CHG-20261125-112/evidence/final-delivery.md) |
+| Evidence | [107配置准备实际双端E2E](completed/CHG-20261124-107/evidence/installed-e2e.json)；[108实际双端验收](completed/CHG-20261124-108/evidence/installed-e2e.json)及合入核对完成；[110原型修复/本轮真实2批与main新包](completed/CHG-20261125-110/evidence/final-delivery.md)已验证，用户整体签收另行；[111状态与按钮修复验收](completed/CHG-20261125-111/evidence/final-delivery.md)；[112数量与步骤修复验收](completed/CHG-20261125-112/evidence/final-delivery.md)；[113详情内容与阶段修复验收](completed/CHG-20261125-113/evidence/verification.md) |
 
 候选 CHG：
 
