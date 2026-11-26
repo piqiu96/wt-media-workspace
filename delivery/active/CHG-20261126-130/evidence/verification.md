@@ -373,3 +373,17 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - Cloud平台编辑修复d07fe0d已SSH推送，三条Cloud审查4707851694/4707918438/4708555461均在核对相应用例通过后正常resolve，GraphQL返回isResolved=true。
 - python3 scripts/dev/local_env.py build-dmg exit0（/tmp/chg130-platform-lock-build.log）。新包frontend0.1.0+d07fe0d.dirty、Desktop31fd8e1，最终Sidecar SHA2565393b46fef97144f7e5f9e38e397495afd9e742d280473604ed69ddb50e95ab8，约70MB。dirty为保留的web/example原有修改；只构建，尚未停止旧包/切换运行环境。
 - go test ./internal/modules/... exit0（/tmp/chg130-latest-cloud-modules.log）。现有995 Agent单测与39 B站/52百度浏览器回归仍对应9e77ffb，未新增Agent源码。
+
+### 20:58–21:03 原26第五标签的真实拒绝及可理解错误
+
+- 26/77完整下载后正常进入同原Profile的发布准备。第5标签的匹配校验HTTP200/外层code0，但内部data.code=-1、schema含content；UI输入已清空且第5标签不在可见标签中。20:58:54等待超时，本次无submit、not_submitted=true、scene_closed=true，26failed/rev36；Plan3正常进入waiting_continue并提供confirm-next。不能把内部拒绝称为程序误拦，也不擅删冻结标签或继续重复相同失败。下一批11仍未建任务，其正常AI配置为四标签。
+- 修清楚、及时地报告平台拒绝：只对匹配本次标签、内部明确非零code且具content校验结构记录拒绝；在等待本标签时抛出结构化PublicationTagRejected（仅安全标签序号），Runner从该序号生成固定中文，不保存上游content/异常原文。不改冻结标签或最终POST核对，不在回调里发起发布。
+- 新隔离浏览器旧用例FAIL：期待第1个标签拒绝，实得通用表单超时（/tmp/chg130-rejected-tag-before.log）。修后单项浏览器与41项Job共42测试PASS3.720秒；17发布器单测PASS0.496秒（/tmp/chg130-rejected-tag-after.log、-unit.log）；新增Job用例把异常args换成私有原文，回传仍仅固定序号说明，未投稿。diff检查通过。
+- 单条25原自动核验20:59:41停止，产品实跑日志selected_sources=0/media_responses95/bound_sources0，Chrome无痕已实看可播放。正在用全新隔离匿名浏览器调用产品原_anonymous_proof定位公开页面内嵌播放数据，绝不读BitBrowser私有页面或人工伪造自动成功。
+
+### 21:04–21:10 原稿公开核验遗漏内嵌播放来源
+
+- 25的正常Runner原稿核验已匹配后台开放浏览，但匿名证据selected_sources0而停止。主动Chrome无痕可播放；进一步在全新隔离、无Cookie浏览器调用原产品_anonymous_proof，同一原稿仍返回False（/tmp/chg130-live-public-proof-before.log）。只观察官方公开页面，不读取或绕过BitBrowser私有页面。匿名页面__playinfo__包含code0/data.dash；原页面videoData精确aid/CID，实际video ready4/width640/duration120/blob，播放器已加载媒体而未另发playurl请求（/tmp/chg130-live-public-bootstrap.log）。
+- 新同场景隔离浏览器用例旧实现FAIL22.287秒（/tmp/chg130-bootstrap-proof-before.log）。补同页内嵌来源：原aid/BV/UID/标题/CID/pubdate及播放时长全部匹配才提取实际选定媒体地址，仍须与实际媒体请求/重定向及唯一已解码视频绑定，不以元数据或HTTP200代替媒体。跨仓契约未变，工程正式依据已同步。
+- 修后三项PASS44.677秒，包含无playurl的正常Blob媒体、错误页面CID拒绝、其他已加载媒体拒绝（/tmp/chg130-bootstrap-proof-after.log）。同一真实公开25在全新匿名浏览器调用产品proof返回True，实际video ready4/width640/duration120/time0.485/paused=false（/tmp/chg130-live-public-proof-after.log）。这是公开能力真实回归，尚不等同25的正式Cloud自动回写；没有重新上传或人工修改25状态。
+- 全996单测PASS49.074秒、完整43 B站浏览器PASS150.638秒（/tmp/chg130-bootstrap-full-unit.log、-full-browser.log），diff检查通过。标签拒绝修复4ad42fc已推送。旧安装版已用原生菜单快捷键退出，并实际确认isRunning=false；26failed且25自动检查已停，无在途任务。下一步重新构建/重启整套环境，原生界面验证再推进计划下一批。
