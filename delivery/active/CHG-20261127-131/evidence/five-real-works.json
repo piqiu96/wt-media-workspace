@@ -1,0 +1,87 @@
+[
+  {
+    "id": "16",
+    "platform_work_id": "117683798410574",
+    "metrics": {
+      "view": 7,
+      "like": 1,
+      "favorite": 2,
+      "coin": 0,
+      "reply": 0,
+      "danmaku": 0,
+      "collected_at": "2026-11-27T02:33:31.05492+08:00",
+      "last_attempt_at": "2026-11-27T02:33:30.899851+08:00",
+      "status": "ready",
+      "last_error": "",
+      "source": "bilibili_public_api"
+    }
+  },
+  {
+    "id": "15",
+    "platform_work_id": "117683395757096",
+    "metrics": {
+      "view": 6,
+      "like": 1,
+      "favorite": 0,
+      "coin": 0,
+      "reply": 0,
+      "danmaku": 0,
+      "collected_at": "2026-11-27T02:23:32.653124+08:00",
+      "last_attempt_at": "2026-11-27T02:23:32.54107+08:00",
+      "status": "ready",
+      "last_error": "",
+      "source": "bilibili_public_api"
+    }
+  },
+  {
+    "id": "14",
+    "platform_work_id": "117683378980067",
+    "metrics": {
+      "view": 5,
+      "like": 1,
+      "favorite": 0,
+      "coin": 0,
+      "reply": 0,
+      "danmaku": 0,
+      "collected_at": "2026-11-27T02:23:32.399613+08:00",
+      "last_attempt_at": "2026-11-27T02:23:32.148976+08:00",
+      "status": "ready",
+      "last_error": "",
+      "source": "bilibili_public_api"
+    }
+  },
+  {
+    "id": "13",
+    "platform_work_id": "117682791777077",
+    "metrics": {
+      "view": 202,
+      "like": 1,
+      "favorite": 0,
+      "coin": 0,
+      "reply": 0,
+      "danmaku": 0,
+      "collected_at": "2026-11-27T02:23:32.02564+08:00",
+      "last_attempt_at": "2026-11-27T02:23:31.851448+08:00",
+      "status": "ready",
+      "last_error": "",
+      "source": "bilibili_public_api"
+    }
+  },
+  {
+    "id": "12",
+    "platform_work_id": "117682405968275",
+    "metrics": {
+      "view": 192,
+      "like": 3,
+      "favorite": 1,
+      "coin": 2,
+      "reply": 0,
+      "danmaku": 0,
+      "collected_at": "2026-11-27T02:23:31.652705+08:00",
+      "last_attempt_at": "2026-11-27T02:23:31.442708+08:00",
+      "status": "ready",
+      "last_error": "",
+      "source": "bilibili_public_api"
+    }
+  }
+]

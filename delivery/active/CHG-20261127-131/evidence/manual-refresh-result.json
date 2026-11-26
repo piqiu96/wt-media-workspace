@@ -1,0 +1,30 @@
+{
+  "queued": {
+    "view": 7,
+    "like": 1,
+    "favorite": 2,
+    "coin": 0,
+    "reply": 0,
+    "danmaku": 0,
+    "collected_at": "2026-11-27T02:26:23.164295+08:00",
+    "last_attempt_at": "2026-11-27T02:31:25.613806+08:00",
+    "status": "queued",
+    "last_error": "rate_limited",
+    "source": "bilibili_public_api"
+  },
+  "after": {
+    "view": 7,
+    "like": 1,
+    "favorite": 2,
+    "coin": 0,
+    "reply": 0,
+    "danmaku": 0,
+    "collected_at": "2026-11-27T02:33:31.05492+08:00",
+    "last_attempt_at": "2026-11-27T02:33:30.899851+08:00",
+    "status": "ready",
+    "last_error": "",
+    "source": "bilibili_public_api"
+  },
+  "unsupported_null": true,
+  "publication_unchanged": true
+}

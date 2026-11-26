@@ -1,7 +1,7 @@
 ---
 id: CHG-20261127-131
 parent: delivery/milestones/M-publishing-operations.md#B站作品指标
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-agent", "wt-media-desktop", "wt-media-workspace"]
 risk: M
@@ -27,8 +27,8 @@ References: [发布工程](../../../docs/engineering/specs/publishing-management
 
 ## Done When
 
-- [ ] 六项最新值和更新时间在列表/详情可见，真实0与未知有区别。
-- [ ] 手动刷新和自动到期由Agent真实API采集并读回，原aid/UID一致，原发布事实不变。
-- [ ] 失败/限流/错误UID/字段缺失不写假0，保留最后成功值；重试退避。
-- [ ] 角色/类目范围、多领取竞争、租约过期及迟到回报验证通过，历史快照可追溯。
+- [x] 六项最新值和更新时间在列表/详情可见，真实0与未知有区别。
+- [x] 手动刷新和自动到期由Agent真实API采集并读回，原aid/UID一致，原发布事实不变。
+- [x] 失败/限流/错误UID/字段缺失不写假0，保留最后成功值；重试退避。
+- [x] 角色/类目范围、多领取竞争、租约过期及迟到回报验证通过，历史快照可追溯。
 - [ ] 定向Go/Python/Vue测试、真实HTTP到Cloud到浏览器全流程、独立PR及CI证据完成；不以mock代替真实验收。
