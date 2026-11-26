@@ -1,0 +1,46 @@
+{
+  "environment_exit_code": 0,
+  "review_combination": {
+    "wt-media-cloud": "3739e7c2cfa152b9e7bde0228a5acc86a752fac9",
+    "wt-media-agent": "079a2318878af5b67cc9ff5d22372be55684646b",
+    "wt-media-desktop": "4a2692d3f7bb8e570bf7e131979ba2c38a963219"
+  },
+  "cloud_feature_commit": "8c0b12193be240ffd527f00b20550ce7d9e36492",
+  "dmg": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/起飞_0.1.0-local.4a2692d3f7_aarch64.dmg",
+  "dmg_size": 73172462,
+  "dmg_sha256": "e0829903196e89a1a1f8a545c7181e9a78bf000603e7738405ede91908e3db61",
+  "sidecar_sha256": "c901c514a58ea7ba9cf7b5651e46f8c19b232616d16eb4ab3fcf1694e62c2ca0",
+  "gates": [
+    "Cloud: PASS http://127.0.0.1:8188/api/v1/health",
+    "Agent: PASS http://127.0.0.1:8765/healthz",
+    "web-dev: PASS http://127.0.0.1:5173/",
+    "desktop-dev: PASS http://127.0.0.1:5174/",
+    "BitBrowser via Agent: PASS",
+    "Cloud: PASS http://127.0.0.1:8188/api/v1/health",
+    "Agent: PASS http://127.0.0.1:8765/healthz",
+    "Cloud worker: PASS pid=21362",
+    "Compose worker: PASS pid=21367",
+    "Compose scheduler: PASS pid=21373",
+    "BitBrowser via Agent: PASS",
+    "Desktop assets: PASS (origin http://127.0.0.1:8188 from the packaged config)",
+    "Web dev server: PASS http://127.0.0.1:5173/",
+    "Desktop dev server: PASS http://127.0.0.1:5174/",
+    "DMG: PASS /private/tmp/wt-media-chg131-review/wt-media-desktop/target/release/bundle/dmg/起飞_0.1.0-local.4a2692d3f7_aarch64.dmg",
+    "Login smoke: PASS user=operator01",
+    "Mounted Desktop source: PASS frontend=0.1.0+3739e7c"
+  ],
+  "native_formal_sidecar": {
+    "login": "operator01",
+    "work_id": "16",
+    "last_success_display": "2026/11/27 02:45",
+    "counts": {
+      "view": 7,
+      "like": 1,
+      "favorite": 2,
+      "coin": 0,
+      "reply": 0,
+      "danmaku": 0
+    },
+    "credential_and_bitbrowser_status": "configured and normal"
+  }
+}
