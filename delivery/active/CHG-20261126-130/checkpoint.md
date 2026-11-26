@@ -1,48 +1,40 @@
 # CHG130 执行检查点
 
-- 唯一状态change.md=VERIFYING。128/129依赖已合入，单执行器串行，不启动未来CHG；B站真实公开/两批计划/最终整体验收未完成，不得归档或提前合并。
-- 用户授权自主编码/修复/测试/PR/E2E/真实发布，不逐项确认。文案必须素材→正式AI→核对采用→封面，不可任写测试/制作/验收标题。用户确认百度41正常、34正常；34答复后已在原生UI恢复原attempt60并成功发布。
-- 数据：固定wt_media_cloud，仅admin/senior01/operator01，密码不改；一级新建选择仅游戏，历史类型仅解析。账号18–21/Profile967–970为1B站/3百度。B站18/#51/UID3706971620379308；百度19/#41/UID6949353902，20/#39/UID4908760199，21/#34/UID6572476037。未删平台作品。
-- 新广告file56，策略1016/template12 ad_pip_ending v1；素材195–200/合成75/任务746–751成功，成片145–150。无开头，10–15秒广告PIP、广告声、正片原插入点继续、6秒尾部。画面/客观音轨已核验；主观听音仍无证据。
-- 私有证据根目录相邻.local/m2b/chg130-new-data。normal-publication-content.json/normal-prepared-publication-content.json保存145–150正常内容与封面；normal-baidu-regression-*保存146/147正常百度AI、cover96–99、分配/批次启动。四张百度封面已逐张实看。旧18/19测试文案不重试；19正常abandon、20诊断cancel，均有可信未提交/现场关闭。不能SQL改业务状态。
+## 当前范围与约束
 
-## 真实当前结果
+- change.md唯一状态VERIFYING，128/129已合入；单执行器串行，不启动未来CHG。用户要求编码、自测、PR审查修复、真实E2E、主动浏览器与安装包走查直到交付，不逐项等待确认。当前真实闭环和最终main合并未完成，不能标DONE。
+- 正常发布内容必须素材→真实AI→核对采用→双封面；不任写测试标题/简介、不删除原标签规避问题。计划执行后目标、批次及配置冻结。107保存零任务/占用、108启动原子建单/占用/授权、109按10%推进的结论不变。
+- 固定数据库wt_media_cloud，用户仅admin/senior01/operator01，密码沿用原值且不入文档。一级类目只提供游戏，历史类型只解析。四账号18–21/Profile967–970：B站18/#51/UID3706971620379308；百度19/#41、20/#39、21/#34。用户已确认51/41/34正常登录，DeepSeek范围与真实上传/发布授权已给，无待确认项。
+- 新广告file56来自用户三角洲_网站.mp4，策略1016/template12 ad_pip_ending v1，无开头、10–15秒广告PIP/广告声、原插入点续播、6秒尾部。素材195–200/合成75/任务746–751/成片145–150成功；已核验画面/客观音轨，主观听音与平台全片尾部仍未证明。
 
-- 百度22/56受理17:02:49，submission1882910900152502022，仍reviewing；原稿核验后停止，提示接口读取需人工核对。不能重复投稿22或伪造公开。黑底缩略图尚需最终质量核对，不能当整片全黑。
-- 百度双账号batch12真实结束：target2/created2/published2/shortfall0/verification_required0。23/62投稿17:45:29、受理17:45:35、公开ID8351506294205442839、实际published_at17:45:32，18:09:05完成可信核验。24/60原现场继续后17:37:35受理，公开ID7277548266066867187、实际published_at17:37:33，17:59:13可信核验。两条均published，不再重试。
-- 两条公开URL已存私有verified-publications.json，均为 https://mbd.baidu.com/newspage/data/videolanding?nid=sv_<公开ID> 。本次已主动用CUA原生Chrome新标签实看两页正常标题/话题、未登录入口、02:00时长、视频游戏画面，24还实看广告PIP。只关闭本轮新标签，未动其他标签；尾部及主观听音未证明，不能冒称完整看完。
-- 原生批次12列表100%/已结束/无待处理，详情公开2、失败0、待处理0、待公开0、差额0，任务/操作记录一致，结束后没有编辑/再次执行动作。计划3/batch10/11未启动，预检can_start=true/issues=[]/零缺口，目标2/公开0。独立B站batch9含20(cancelled诊断)/21，未成功闭环。
-- B站21最新attempt64已failed/completed，无submit，not_submitted/scene_closed=true。真实已通过本次File→视频CID绑定、标签、二创、双封面同步、两张封面文件/画布校验。18:15:35两张导出均guard接受、两笔HTTP200、dialog关闭，但receipts0，于18:16:05超时；证据表明本地回执校验误拦截。不能称平台拒绝或已受理。
+## 真实业务结果
 
-## 当前源码、包与验证
+- 百度双账号batch12已结束，target2/created2/published2/shortfall0/verification_required0。23/62公开8351506294205442839，24/60公开7277548266066867187；主动Chrome检查两页正常标题/话题/02:00游戏播放，24实看广告PIP。原生列表/详情数量及结束按钮一致。不再重试23/24。
+- 百度22/56已受理1882910900152502022，但自动原稿核验停止需人工核实；不能重复投稿或伪造公开。旧18/19已正常abandon，20诊断cancelled，历史保留。不能SQL改业务状态。
+- B站21/69真实受理aid117682405968275，19:26后台开放浏览但匿名媒体证明未齐全而停止自动核验。之后工程师主动Chrome独立无痕窗口实看登录入口、原稿标题/作者/营销声明、00:17/02:00、游戏与广告PIP；官方无cookie公开元数据aid/owner/title/state=0逐项匹配。经正常resolve人工补录为published/work12/rev88，平台published_at19:06:31。明确是人工补录，不冒称自动核验通过；不再重试21。batch9已结束：目标2/公开1/诊断取消1/缺口1。原生作品列表查询显示总3/今日3，新增B站作品12关联正确。
+- 正常单条25（output145，真实AI/cover83/84）19:09授权产生71；上传就绪等待900秒超时，file-list根节点一直0；无submit/not_submitted/scene_closed=true，failed。尚未重试25，上传未开始原因仍待解决。
+- Plan3原生全批确认已启动，batch10目标1/output148，batch11目标1/output149；首批只建task26，第二批尚未建任务。70/72/73/74均在第5标签等待失败，无submit、已关闭，任务可正常retry；计划按10%停在当前批次，不改变冻结配置。74的约4分钟preparing实查为46MB下载，不能误称死锁。
+- 第5标签诊断：index4、observed_count4/expected5、input_empty=true、trim/casefold=false、validation_busy=false；所有匹配tag接口HTTP200/code0/data dict，但尚未看到内部业务状态，不能据外层code0断定业务接受或据此删标签。74已failed/rev24左右，以API实时读取为准。
 
-- Cloud49afaf3运行：已修取消素材投影、操作栏裁切、计划平台硬编码、启动误用百度校验和B站竖封面0加锁。模块及隔离MySQL事务锁回归通过，真实batch9原子建2并同Profile串行。Desktop31fd8e1。
-- Agent已提交并SSH推送：5f7e73a稳定百度入口/短暂Passport；9d421ce本次File对象绑定（真实57验证）；d4281f9原CID播放来源与已解码媒体绑定；5e13f70标签真实input（真实58验证）；f9aee0e二创组件状态（真实61验证）；1f98f70网络回执也强制当前文件完成；09bb371固定缓存副本清理（真实22/24目录已清）；fbafd6b原稿核验安全分类；999a2d3双封面同步组件（真实63验证）；e06f18b后台封面响应及固定诊断（真实64确认2次200、无回执接受）。
-- 前一运行Agent e06f18b，sidecar SHA256=3438fececc4f2f40b0fe5da4114ab6b6ca80b0c30a58360823d0f35cf6a416fe，Cloud49afaf3/Desktop31fd8e1。原生登录operator01/operator123、环境三项正常。该轮64已安全结束；现新包65在途。
-- 最新Agent b6bb028已提交推送：官方上传回执作为封面地址事实源，接受官方客户端支持的数字/字符串零码、有效HTTP(S)/网络路径，不写死旧hdslb CDN；仍逐张绑定本次成功回执并精确核对最终POST。异常地址/凭据/控制字符/片段与错配仍拒绝。正式工程规格已回写，内部平台适配未改Cloud契约。
-- b6bb028验证：新CDN/网络路径旧用例先FAIL；990全量PASS（/tmp/chg130-cover-url-unit.log）；15项相关单测PASS（/tmp/chg130-cover-url-after.log，实际此日志旧14+新增1）；2项完整表单浏览器PASS（/tmp/chg130-cover-url-browser.log）、额外新地址贯穿POST用例1项PASS（/tmp/chg130-cover-url-contract-browser.log）。仅最后空白格式调整，无行为变化。build-dmg已完成/tmp/chg130-cover-url-build.log，正常二次launch成功，原生环境三项正常；sidecar SHA256=b0c5f692374bca30273aa8b0240819a7806c0efa401327295ef1fe8a052f949c。21/65于18:24:43真实双回执接纳成功；code_kind=int、data对象、absolute URL、legacy_cdn=False，确认旧CDN硬编码误拦截。随后因当前缩略图是CSS背景、旧代码只查img而在_fill_covers:539失败；无submit且已关闭。
-- 早前990之前：999a2d3 30浏览器PASS；首次987单测旧MagicMock未定义evaluate导致1错误，补模拟结构后987全量PASS。e06f18b 988全量/14相关/2浏览器PASS，CI45798921071成功。不要把首轮失败隐去。
-- 完整all在5f7e73a时已通过；后续各包均build+挂载源记录+sidecar hash+原生环境复核。首次launch卸载旧mount通常资源忙，正常退出后第二次成功，无强制卸载。Desktop接管后脚本verify因Agent归属门禁失败，不能冒称全绿。启动瞬间环境短暂不可达后自动正常，未修该提示。
+## 当前源码与运行包
 
-## PR、工具与下一步
+- Cloud源码e7dc60c，运行Go49afaf3（后端未改），Desktop31fd8e1。Agent源码bb814a7，已提交推送。Agent6f834ea的38完整浏览器150.229秒PASS，17标签诊断定向PASS，最新992全量49.182秒PASS；详见evidence/verification.md。
+- 当前运行包是Agent6b55005/前端0f1862a，sidecar SHA256=fb2aa147ddb0af182b2338fcd2962834668007a540b581164dbd24b60925d4a8。原生登录和三项环境正常；启动瞬间误报未运行数秒后恢复，尚未修该提示。
+- 最新bb814a7/e7dc60c组合build已exit0（/tmp/chg130-tag-business-build.log），正在launch（/tmp/chg130-tag-business-launch.log）。若旧review mount资源忙，正常第二次launch，不强制卸载。部署后核对实际版本/hash、原生登录/三项环境，再仅正常retry原26一次诊断，不重试已受理/公开任务。
+- bb814a7只增加安全诊断：tag返回体schema字段、固定数值标记、重复/长度/无效/活动分类及预期标签在可见标签区是否出现，不输出正文/地址/标签。旧隐私用例FAIL→17PASS，992全量PASS。接下来根据业务标记/expected_label_visible判断平台拒绝还是特殊控件，禁止盲改文案或放松最终POST绑定。
+- 096a4f1已经包含于新运行包：匿名播放器未启动时点击一次正常播放按钮，仍要求原CID/实际媒体解码；旧需手势用例FAIL→37浏览器112.545秒/991全量46.398秒PASS，实际自动公开仍需复测。匿名Chrome确实可播21，但未证明原自动失败就是这个原因；没有放松URL、时长或CID绑定。
+- 原B站上传身份、标签输入、二创、双封面同步/回执、非旧CDN、CSS保存预览、异步标签、缓存清理及PR旧问题已修，过程失败与回归见evidence，不重开额外隐藏画布作为保存条件。当前真实第5标签问题仍未关闭。
 
-- 四仓PR均open未合并：Agent21、Desktop20、Workspace72、Cloud59(Draft)。用户回复ok后gh auth status已确认登录恢复，Cloud59已创建；无认证阻塞。Cloud CI45793563267成功（14m13s），Desktop31 CI成功，Workspace264bf24之前CI成功，Agent e06 CI成功；b6最新CI45800454775 success。Agent/Cloud PR正文已更新真实进展，所有Done When完成前不合并。
-- 旧PR尾换行/可选Playwright导入、原CID媒体来源、封面URL绑定、网络回执绕过均已修。最新反馈4706058925由1f98f70解决。继续核对新Review和CI，不冒称无人审查已通过。
-- 工具：先前CUA拒绝BitBrowser私有平台URL，不临时CDP/Playwright或换工具绕过；正常产品Runner/API继续授权。公开作品是不同的匿名页面，CUA原生Chrome已可查看。IAB连续超时、Chrome browser-provider不可用；原生Chrome键盘导航/AX/截图有效，坐标/滚动偶有windowNotFoundAtPosition。原生起飞控件正常。无接管等待，无待用户登录问题。
-- 下一步：等b6包build完成→正常launch（资源忙可正常第二次）→原生登录/环境及sidecar hash→确认64未提交已关闭后正常retry21→据实际封面shape/最终POST继续修。不要重试22/23/24。B站可正常投稿后推进计划3两批，按真实10%规则推进与各批按钮处理；完成原稿/公开读回、逐页/尾部/新包整体验证、PR/CI/merge commit入main、组合重建后再归档。
-- 当前Workspace已提交264bf24，自此checkpoint及工程规格尚有自有改动待提交。保留其他会话Cloud web/example及Workspace docs/design六个脏文件，不暂存/还原。
+## PR与验证
 
-- task23公开页也已用原生Chrome主动打开实看：正常标题/话题、作者白变小灵、02:00游戏视频播放；只关闭本轮标签。两条百度公开页均完成基础实看。
+- Agent21、Desktop20、Workspace72、Cloud59均open未合并；Cloud59已ready触发正式审查。gh登录已恢复，SSH推送正常。Agent6f审查completed/无未解决findings，bb最新CI成功；Cloud e7 CI/新审查在途。未满足验收前不合并。
+- Cloud4707851694修0f1862a：移除平台后重排组号/批次号，影响幸存固定批次则拒绝。4707918438修e7dc60c：切换批次平台时重排、拒绝不连续平台组和改变固定顺序；保存前也同后端校验结构。旧2+3+2相关用例FAIL→24定向PASS、发布模块23文件192测试PASS。最新组合尚待安装版复核。
+- PR4707605028已修169a934，从PATH查FFmpeg；5媒体证明浏览器47.735秒PASS，不冒称实跑Intel。完整all在早前5f7时通过，后来包均独立build/挂载源/hash/原生环境检查；Desktop接管后脚本verify因Agent归属门禁失败，不能称全绿。
 
-- c2a02c5已提交推送：支持CSS背景和旧img预览、实际解码就绪；等待重新打开编辑器时画布恢复后再核对原指纹。旧CSS及延迟恢复复现均FAIL→相关18项PASS、独立篡改1项PASS、完整34项B站浏览器PASS（/tmp/chg130-cover-preview-final-browser.log，101.140秒）；990全量PASS（/tmp/chg130-cover-preview-unit.log），CI45802700716 success。首轮完整浏览器在测试Worker残留后的Context.route卡住，主动中断exit130，未计PASS；测试专用localhost Worker补unregister清理后完整重跑通过，没有改用户平台Worker。
-- c2包build完成/tmp/chg130-cover-preview-build.log，launch正在/tmp/chg130-cover-preview-launch.log。已实际部署并正常登录/三项环境；sidecar SHA256=3d87b96933172d5a17653b059bb8b58b220fbe99d940640bb4931fd73fa53a72，确认65安全闭合后正常retry21，产生66，18:38执行中，勿重启。勿重试百度已受理或公开任务。
+## 工具、文件与下一步
 
-- c2a02c5真实66通过CSS预览，但初次_assert_form字段综合比对失败（632），无submit且现场关闭。具体字段未观察到，不能声称内容或平台被谁改动。
-- 最新eb03e65已提交/推送/部署，sidecar SHA256=b86511a461c48870861e47eb496f49666689cf1ac1b9404e6a8ecd871084c918。补本次授权投稿request的Context.response接收（旧用例FAIL→PASS），表单比对改固定字段名诊断，简介仅字符/换行数量、标签仅数量/trim比较，不输出内容。991全量PASS、18相关（含2浏览器）PASS，CI45804039506 success。build/launch均成功，原密码登录/环境三项正常；正常retry21产生67，18:47当前在途，勿重启。下一看fields诊断修实际剩余字段，不能绕过比对或改写正常标题/简介。
-- 额外真实闭环仍需补：当前18为旧测试标题failed，20为诊断cancelled，均有not_submitted/scene_closed；不可重试坏标题。若需释放145/146给本CHG正常单条/独立批次，只能检查正常abandon是否支持并经原接口释放，不SQL改历史。计划3仍未启动。不要把23/24双账号公开和21反复提交前失败混为B站验收成功。
-
-- eb03e65真实67定位仅tags字段不符：observed_count2/expected_count6、trim不匹配；标题/简介/分区/声明/可见性/封面均匹配。67无submit、已关闭。官方setCustomTag在checkCustomTagLoading时忽略Enter；原快速连填导致丢标签。2b6bc83已提交推送，删除等待数量减少、每条等待已确认标签前缀及清空输入后继续。旧异步校验复现FAIL→完整35项B站浏览器PASS（/tmp/chg130-async-tags-browser.log，105.162秒），19项定向单测PASS；最新build/tmp/chg130-async-tags-build.log正在完成。下一部署后正常retry21（预计68），不要绕过标签/最终POST校验。
-
-- 2b6bc83实际部署并正常登录/环境三项，SHA256=4ee01724bd17b73f6c43563b3e56ee129da7b83db1cc62927166825b6e370e48，CI45805313308成功。真实68已收齐6标签、所有字段匹配，但重开编辑器的显示画布指纹始终不匹配，15秒超时；无submit，已关闭。这是额外显示渲染比较，不是已保存图片或内容变化证据。
-- af196b0已提交推送：保留上传前两图独立验证、本次成功双回执、保存后预览及最终POST精确URL校验，移除重复重开编辑器比较显示像素。隐藏未应用画布不能替换已保存图片；真正上传时覆盖主图、最终交换/无关URL仍拒绝。旧未应用画布用例先超时FAIL→3项聚焦PASS、19定向单测PASS、完整36浏览器98.811秒PASS（/tmp/chg130-saved-covers-browser.log）。build正在/tmp/chg130-saved-covers-build.log，exec11339；尚未部署，下一确认68安全闭合后正常retry21（预计69）。
-- 旧18经原API以原尝试not_submitted/scene_closed可信证据正常abandon，历史保留、释放145；正常AI内容/cover83/84创建单条task25（私有normal-single-create-request.json/normal-single-created.json），pending/rev1/authorized_at=None/attempt=None，尚未启动。20为cancelled，当前Abandon接口仅支持failed，不可伪改状态释放146。可用25完成正常单条；独立batch9保留一条取消负例，百度batch12已2/2达标；plan3两批仍待执行。
+- 私有证据根：相邻.local/m2b/chg130-new-data；/tmp/chg130_api.py正常API辅助，op.call/stream，Cloud http://127.0.0.1:8188/api/v1，cookie /tmp/chg130-new-operator01.cookies。不要输出Token/签名URL。/publication/:id/attempt是单数路径且返回按历史顺序列表。
+- CUA先前拒绝BitBrowser私有平台URL，不临时CDP/Playwright/其他工具绕过。正常产品Runner/API、隔离测试、公开页面走查可继续。Chrome原生公开页已实际成功；IAB公开页反复30秒超时。只关闭本轮新建窗口/标签，保留用户页面。原生起飞路径为相邻.local/m2b/desktop-review-mount/起飞.app。
+- CUA每段活动结束前必须独立输出browser-complete；当前无接管等待。若活动开放，先完成再用非CUA工具。用户操作Chrome会触发状态变化，先重读状态，不干扰其DNF等页面。登录UI沿用会话凭据，不重置密码。
+- 保留Cloud web/example大量他人修改及Workspace docs/design六文件，不暂存、还原、覆盖。只提交本CHG自有显式路径。不创建第二套任务/context。
+- 下一步：完成bb/e7组合launch与原生环境核对→26一次诊断复测→按实际业务标记/控件证据修复→正常单条25→计划10/11顺序与自动公开→Cloud Web和安装包逐页/平台原稿与公开完整走查→PR审查/CI/main merge commit/最终组合重建→完成后再收口。仍有真实私有平台走查与主观听音工具限制，不能冒称已完成。
