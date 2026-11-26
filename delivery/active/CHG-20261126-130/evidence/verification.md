@@ -117,3 +117,5 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 新包构建成功，前端来源0.1.0+6a366f7（digest b57ae1f87ac471e87840f0a770a1aec3fe0e4afcb39b8f7b846e61f783c51bf1），DMG位于Desktop target/release/bundle/dmg；未冒充已完成包内UI人工走查。
 
 - 修正基础容量后，local_env.py up --force-restart及verify均退出0；Cloud、文件Worker、合成Worker、合成Scheduler、Agent、BitBrowser、双前端入口、前端来源/新鲜度、DMG与operator01原密码登录烟测全部PASS。日志/tmp/chg130-reset-environment-final.log、/tmp/chg130-reset-final-verify.log。配置治理、Product/Master对齐、Delivery治理检查PASS。已注销临时维护Desktop会话，避免用户登录时被维护会话占用。
+
+- launch-dmg退出0，已从新DMG挂载并打开起飞.app；挂载来源校验读回frontend=0.1.0+6a366f7.dirty（Cloud另有其他会话原型工作区改动，未纳入本次提交）。这证明新包来源，不代表已完成界面走查。
