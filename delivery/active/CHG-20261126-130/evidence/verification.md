@@ -272,3 +272,12 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - b6bb028以本次官方上传成功回执绑定封面地址，移除旧单一CDN作为前提，兼容官方客户端数字/字符串零码、有效HTTP(S)/网络路径，最终POST仍精确匹配已确认两张回执。新CDN/网络路径旧用例FAIL（/tmp/chg130-cover-url-before.log）；990全量、15定向及3项浏览器PASS（/tmp/chg130-cover-url-unit.log、-after.log、-browser.log、-contract-browser.log）。暂未将推测的CDN/成功码类型冒称真实观察。
 - build-dmg成功，正常二次launch成功，原密码登录和三项环境正常，sidecar SHA256=b0c5f692374bca30273aa8b0240819a7806c0efa401327295ef1fe8a052f949c；CI45800454775 success。确认64可信未提交/现场关闭后正常retry21，产生65，18:24本轮执行中，不能提前记投稿通过。
 - task23公开URL已原生Chrome主动打开，正常标题/话题、作者白变小灵、02:00及游戏画面播放，关闭本轮标签。task24此前已实看游戏与广告PIP；全片尾部/听音仍未完成。
+
+
+## 18:24–18:36 CSS封面预览与真实CDN结论
+
+- b6bb028真实21/65在18:24:43接纳两张封面成功回执：code_kind=int/data_object=True/url_form=absolute/legacy_cdn=False。确认旧CDN前提导致64误拦截；无需猜测具体域名，不输出平台URL。随后预览检查只找img而失败，无submit、现场已关闭；官方CoverSlot实际以cover-img的backgroundImage显示。
+- c2a02c5兼容CSS背景/旧img、实际解码就绪，等待编辑器重建原画布，不以瞬时空画布误判。CSS延迟预览和重开恢复旧代码FAIL；修复18项定向及1项CSS篡改拒绝PASS，990全量PASS。首轮完整浏览器在测试Worker残留后的Context.route卡住，主动中断exit130，未冒称通过；只清理测试创建的localhost Worker注册，完整34项重跑101.140秒PASS（/tmp/chg130-cover-preview-final-browser.log）。CI45802700716 success。
+- 新c2包build完成；launch进行中，仍未记真实投稿通过。下一步保持正常内容，从65安全闭合后重试21，不重复百度受理/公开任务。
+
+- c2a02c5新包已实际部署，sidecar SHA256=3d87b96933172d5a17653b059bb8b58b220fbe99d940640bb4931fd73fa53a72；原密码登录、三项环境正常。确认65未提交/现场关闭后正常retry21产生66，18:38执行中；未提前计投稿通过。

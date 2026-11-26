@@ -20,7 +20,7 @@
 - Agent已提交并SSH推送：5f7e73a稳定百度入口/短暂Passport；9d421ce本次File对象绑定（真实57验证）；d4281f9原CID播放来源与已解码媒体绑定；5e13f70标签真实input（真实58验证）；f9aee0e二创组件状态（真实61验证）；1f98f70网络回执也强制当前文件完成；09bb371固定缓存副本清理（真实22/24目录已清）；fbafd6b原稿核验安全分类；999a2d3双封面同步组件（真实63验证）；e06f18b后台封面响应及固定诊断（真实64确认2次200、无回执接受）。
 - 前一运行Agent e06f18b，sidecar SHA256=3438fececc4f2f40b0fe5da4114ab6b6ca80b0c30a58360823d0f35cf6a416fe，Cloud49afaf3/Desktop31fd8e1。原生登录operator01/operator123、环境三项正常。该轮64已安全结束；现新包65在途。
 - 最新Agent b6bb028已提交推送：官方上传回执作为封面地址事实源，接受官方客户端支持的数字/字符串零码、有效HTTP(S)/网络路径，不写死旧hdslb CDN；仍逐张绑定本次成功回执并精确核对最终POST。异常地址/凭据/控制字符/片段与错配仍拒绝。正式工程规格已回写，内部平台适配未改Cloud契约。
-- b6bb028验证：新CDN/网络路径旧用例先FAIL；990全量PASS（/tmp/chg130-cover-url-unit.log）；15项相关单测PASS（/tmp/chg130-cover-url-after.log，实际此日志旧14+新增1）；2项完整表单浏览器PASS（/tmp/chg130-cover-url-browser.log）、额外新地址贯穿POST用例1项PASS（/tmp/chg130-cover-url-contract-browser.log）。仅最后空白格式调整，无行为变化。build-dmg已完成/tmp/chg130-cover-url-build.log，正常二次launch成功，原生环境三项正常；sidecar SHA256=b0c5f692374bca30273aa8b0240819a7806c0efa401327295ef1fe8a052f949c。21正常retry产生65，18:24上传已完成、正在本轮填表，勿重启。仍不能断言64的实际域名/成功码类型，下一真实日志会给固定形状。
+- b6bb028验证：新CDN/网络路径旧用例先FAIL；990全量PASS（/tmp/chg130-cover-url-unit.log）；15项相关单测PASS（/tmp/chg130-cover-url-after.log，实际此日志旧14+新增1）；2项完整表单浏览器PASS（/tmp/chg130-cover-url-browser.log）、额外新地址贯穿POST用例1项PASS（/tmp/chg130-cover-url-contract-browser.log）。仅最后空白格式调整，无行为变化。build-dmg已完成/tmp/chg130-cover-url-build.log，正常二次launch成功，原生环境三项正常；sidecar SHA256=b0c5f692374bca30273aa8b0240819a7806c0efa401327295ef1fe8a052f949c。21/65于18:24:43真实双回执接纳成功；code_kind=int、data对象、absolute URL、legacy_cdn=False，确认旧CDN硬编码误拦截。随后因当前缩略图是CSS背景、旧代码只查img而在_fill_covers:539失败；无submit且已关闭。
 - 早前990之前：999a2d3 30浏览器PASS；首次987单测旧MagicMock未定义evaluate导致1错误，补模拟结构后987全量PASS。e06f18b 988全量/14相关/2浏览器PASS，CI45798921071成功。不要把首轮失败隐去。
 - 完整all在5f7e73a时已通过；后续各包均build+挂载源记录+sidecar hash+原生环境复核。首次launch卸载旧mount通常资源忙，正常退出后第二次成功，无强制卸载。Desktop接管后脚本verify因Agent归属门禁失败，不能冒称全绿。启动瞬间环境短暂不可达后自动正常，未修该提示。
 
@@ -33,3 +33,6 @@
 - 当前Workspace已提交264bf24，自此checkpoint及工程规格尚有自有改动待提交。保留其他会话Cloud web/example及Workspace docs/design六个脏文件，不暂存/还原。
 
 - task23公开页也已用原生Chrome主动打开实看：正常标题/话题、作者白变小灵、02:00游戏视频播放；只关闭本轮标签。两条百度公开页均完成基础实看。
+
+- c2a02c5已提交推送：支持CSS背景和旧img预览、实际解码就绪；等待重新打开编辑器时画布恢复后再核对原指纹。旧CSS及延迟恢复复现均FAIL→相关18项PASS、独立篡改1项PASS、完整34项B站浏览器PASS（/tmp/chg130-cover-preview-final-browser.log，101.140秒）；990全量PASS（/tmp/chg130-cover-preview-unit.log），CI45802700716 success。首轮完整浏览器在测试Worker残留后的Context.route卡住，主动中断exit130，未计PASS；测试专用localhost Worker补unregister清理后完整重跑通过，没有改用户平台Worker。
+- c2包build完成/tmp/chg130-cover-preview-build.log，launch正在/tmp/chg130-cover-preview-launch.log。已实际部署并正常登录/三项环境；sidecar SHA256=3d87b96933172d5a17653b059bb8b58b220fbe99d940640bb4931fd73fa53a72，确认65安全闭合后正常retry21，产生66，18:38执行中，勿重启。勿重试百度已受理或公开任务。
