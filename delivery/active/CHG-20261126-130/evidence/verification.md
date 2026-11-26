@@ -479,3 +479,39 @@ Cloud070d3ae CI run45830769360已success（13:50:49Z），包含Cloud/Web、原�
 - production/compose/executor/model/repository/service、jobs、storage相关包fresh回归PASS（/tmp/chg130-guide-transfer-regression.log）；完整业务模块Go回归PASS（/tmp/chg130-guide-full-modules.log）。无Schema/Contract变化，不改Worker总截止或发布授权。
 - 正常POST /compose-tasks/753/cancel，cancel_requested=true后实际cancelled，保留尝试345失败和346取消；752已success，无在途发布/合成后才强制正确配置all重建492（/tmp/chg130-guide-fixed-environment-all.log，执行中）。部署后再正常retry753，不修改输入和种子。
 - 已经正常图片库上传原未投稿视频游戏帧：素材196→file100/asset4，199→file101/asset5，可作新成片对应封面背景。前10秒FFmpeg blackdetect未发现持续>=0.5秒黑屏；不以黑色缩略图推断整片黑屏。
+
+
+## 23:14 新两批计划正常投稿与自动推进
+
+- 4922330正确配置完整all exit0（/tmp/chg130-guide-fixed-environment-all.log），前端4922330.dirty仅原型他人改动，Agent58f8102、Desktop31fd8e1，实际sidecar SHA256=441248e9ad2f48a7c24c6fb19479cb3d8f5eec5dbd340ed81f50deb0248b70b1。原运营安装版登录，22:52及23:03三项环境正常。Cloud492 CI run45842595801 PASS14分钟。
+- 正常admin重试753后成功output152，原失败/取消尝试保留；752成功151。两片正常时间线断言120秒、无intro、26.933秒广告PIP、6秒尾部、广告SHA匹配、源从插入点续播。真实AI结果正常审阅采用：151标题“盘点三角洲超绝跳拉 换做是你能破局吗”，152标题“感觉每次打三角洲像是在头上装了块吸铁石”，简介含原作者归属；仅常规三角洲行动/射击游戏两标签，不删原失败冻结内容。正常图片库实际游戏帧渲染双比例封面，151用同素材70秒asset6改善背景裁切，152用60秒asset5。
+- Plan4目标2，batch14/15各目标1/候选1/缺口0/保存正式任务0。原生实看14只读配置、零任务、继续配置资源确认/第二步不回第一步边界；未保存多余编辑。23:11逐批确认后正常一次开始，task28/80与output151绑定；短暂核对原计划请求为正常请求处理中，返回running，没有重复点击或重复任务。
+- 23:14:49原尝试80完成，受理117683378980067，reviewing、无错误，原生14显示正式1/审核1/失败0。23:14:53系统自动handed_off14、启动15，仅建task29/81绑定152，Plan4 current15/processed1/running。正常两批10%自动推进PASS；公开仍0/目标2，不能称自动公开或计划完成，继续等待原稿检查。
+
+
+## 2026-11-27 需求调整及标题检索回归
+
+- 用户确认后续广告切换文件95“三角洲微光.mp4”，SHA256=9c24396e88af86a6d14c1cb585b5d9273cf0831ce9a1f135b6f6fb24d25febee，230741877字节。本人文件列表精确核对ID/归属/未删除，ffprobe公开文件实际27.033333秒、7680×4320、有音轨。正常admin策略接口更新1016顶层与每个输出ad_video_url并读回一致，策略名“三角洲·广告画中画＋片尾·微光广告”；旧任务与成片不回写。operator无编辑权限403符合既有角色规则。
+- 用户明确B站普通即“内容无需标注”，新建固定并只读展示，历史已有其他声明保留；自制权利独立、不自动勾选。已回写Milestone及本CHG设计；两平台生成加入游戏语境、各自标题风格和不编造/去引流约束。
+- Cloud59新审查4709534276准确指出两处查询只检索description。隔离MySQL测试真实复现B站标题不在简介时列表/汇总/批次均查不到，/tmp/chg130-title-search-before.log（首轮测试配置路径错误已纠正，未计为业务复现）。最小修复只对B站增加title分支，百度仍description，原权限/筛选和通配语义保留。7个检索场景及owner/category隔离PASS3.13秒，/tmp/chg130-title-search-after.log。
+- 生成与新默认旧回归明确FAIL（/tmp/chg130-game-style-before.log），修复后publish service完整PASS0.657秒（/tmp/chg130-game-style-after.log）；25文件198发布Vue PASS6.36秒（/tmp/chg130-ordinary-publication-web.log），含实际SSR声明只读、历史营销值不覆盖、新建普通默认、重新分配仅新行初始化。真实DeepSeek和新组合尚待部署后核实，不能提前声称质量验收通过。
+- Plan4只读跟进已公开2/2、缺口0、ready_to_finish，28/80及29/81原自动核验，无人工补录；尚未执行正常结束动作，不称计划已结束。
+
+
+### 真实生成发现旧标签污染并继续修复
+
+首轮真实DeepSeek两平台建议仍沿用互动问句，B站还继承“双子星”，/tmp/chg130-platform-game-ai-real.log；不计内容质量PASS，未写入已投稿记录。新增素材正文与尾部标签隔离回归旧FAIL，移除附加源平台hashtags后再送模型，保留真实标题正文；强化重新组织、去评论/点赞括号动员和不沿用互动问句。正常接口只生成建议，不创建或发布任务。
+
+同时发现复制已发布任务/结束批次会把旧营销声明带入新建；用户固定普通应适用于副本。共享copyCandidateContent仅在副本置普通并清旧转载来源，原声明/原来源/标签深拷贝不变，旧回归FAIL后修复；publish四包重新PASS，/tmp/chg130-ordinary-copy-after.log。编辑旧空声明通过正常patch补齐，disabled不写回，2项真实SSR PASS1.25秒，/tmp/chg130-ordinary-draft-statement.log。
+
+首版ec79164完整all exit0，/tmp/chg130-weiguang-ordinary-environment-all.log；含副本/输入清理的最终组合再次完整重建中，/tmp/chg130-weiguang-final-environment-all.log，完成后重做真实生成。
+
+
+### 最终风格真实生成读回
+
+运行bb9b9e6后使用同一真实素材151、空初稿、正常生成接口，B站建议“三角洲跳拉操作盘点：这些身法值得反复看”，简介“整理《三角洲》里几种跳拉身法片段，看看不同场景下的操作选择。”，标签三角洲/射击游戏/游戏操作/身法技巧，封面“三角洲跳拉名场面”；不再继承双子星/赛季/抖音推广或原互动问句。百度首请求返回item_error，未采用不完整内容，未自动重放；工程师明确28字标题/8字话题预算后正常重新生成得到“三角洲跳拉操作盘点与实战要点”，话题三角洲，封面“三角洲跳拉操作盘点”。两平台真实建议均经核对，仅作为建议保存私有证据，未更改原151已公开任务。日志/tmp/chg130-platform-game-ai-final.log、/tmp/chg130-baidu-game-ai-final.log；一次item_error如实保留，不称零错误率。
+
+最终完整Web173文件1276项PASS18.83秒（/tmp/chg130-ordinary-final-web.log）；publish四包完整PASS（/tmp/chg130-ordinary-copy-after.log），隔离数据库检索PASS及文档/Delivery/master/M0检查均PASS。
+
+
+最终正确配置完整all已exit0（/tmp/chg130-weiguang-final-environment-all.log），Cloud bb9b9e6、Agent58f8102、Desktop31fd8e1，挂载前端0.1.0+bb9b9e6.dirty仅原型非本人修改；sidecar SHA256=cc65941607c9f6c77094bd0323246780906e9bc218628d47e93a8d7b0c528d94。基础门禁/双端构建/DMG检查/正常登录smoke/挂载全部通过。规则实际读回2026.11.27.1、新建defaults.statement=内容无需标注。安装版本轮现场声明控件尚待核对；不称新广告已经合成为新成片或完成真实投稿。
