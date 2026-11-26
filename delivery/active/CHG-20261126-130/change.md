@@ -1,7 +1,7 @@
 ---
 id: CHG-20261126-130
 parent: delivery/milestones/M-publishing-operations.md#B站发布闭环
-status: IMPLEMENTING
+status: VERIFYING
 depends_on: ["CHG-20261126-128", "CHG-20261126-129"]
 dependency_merge_commits: {"CHG-20261126-128":{"wt-media-cloud":"eb1355ec1c202eedd4e9cf58d64402ef70d77f08","wt-media-workspace":"134ec829a515d7daee563b58c48945f0cd12ac89"},"CHG-20261126-129":{"wt-media-cloud":"2719e87f620742d2342278aa6449c74200bea799","wt-media-workspace":"c0dc6f13686cf87fcfa5c36b75dfc062abc4be20"}}
 affected_repos: ["wt-media-cloud", "wt-media-agent", "wt-media-desktop", "wt-media-workspace"]
@@ -14,7 +14,7 @@ risk: H
 
 补齐B站从成片进入单条任务、批次与计划，浏览器自动上传/填表/提交、原稿核验与可信公开结果的完整闭环。沿现有Cloud事实/调度、Agent平台能力、Desktop壳及共享Vue边界；完整规划见[plan.md](plan.md)，提供方契约先定版再更新消费者。
 
-本轮只开放经真实验收的B站，百度完整回归；小红书保留后续阶段，不因枚举存在而开放。最终必须以129新模式产出的视频完成真实发布，并由执行工程师主动打开浏览器检查平台后台与公开作品，问题自行修复；上传或审核受理不算已公开。当前已核实真实投稿页并完成Cloud平台规则、准备与核验基础实现；Agent、共享页面及真实闭环继续实施，未发起真实投稿，不计为验收完成。
+本轮只开放经真实验收的B站，百度完整回归；小红书保留后续阶段，不因枚举存在而开放。最终必须以129新模式产出的视频完成真实发布，并由执行工程师主动打开浏览器检查平台后台与公开作品，问题自行修复；上传或审核受理不算已公开。当前已核实真实投稿页，完成Cloud、Agent、共享Vue及Desktop契约消费实现，完整编码自测已记录。正在提交PR和准备新环境，尚未发起本轮正式B站投稿；真实单条、批次、计划和最终浏览器走查未计为验收完成。
 
 ## Done When
 
