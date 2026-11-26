@@ -248,3 +248,19 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 实际gh auth status恢复成功，Cloud Draft PR59已创建：https://github.com/piqiu96/wt-media-cloud/pull/59 。四仓PR均存在但未合并；Cloud CI仍运行中，572890e Agent CI成功。
 - PR4706058925所述网络回执路径确有漏洞：三个独立隔离浏览器用例（另一个File对象/多视频/未完成）旧代码均FAIL（/tmp/chg130-binding-before.log）。1f98f70要求每次就绪均有当前File完成绑定，最终表单再强制检查；09bb371识别已结算尝试的固定上传副本/诊断文件，原缓存回归先FAIL后PASS。47项浏览器+缓存PASS（/tmp/chg130-binding-cache-after.log），986项全量PASS（/tmp/chg130-binding-cache-unit.log），未知文件/链接保护保持。
 - fbafd6b补百度原稿核验回退的固定原因分类及HTTP/errno数值，不输出账号、Cookie、地址或平台原文；42项相关回归PASS（/tmp/chg130-check-diagnostics.log）。最新组合build-dmg=/tmp/chg130-binding-cache-build.log，仍未部署，不能当最终真实验证通过。
+
+
+## 17:42–18:07双账号结果及公开页走查
+
+- fbafd6b实际新包部署，sidecar SHA256=b276d4c7854d001517e8c6e6f4cc2614e67f7469fdba3ef254cd48bde37519de，原生工作环境三项正常。22/56、24/60缓存目录实际不存在，固定副本清理修复真实复验PASS。21/23均确认无submit且现场关闭后正常retry，没有重试已受理22/24。
+- 23/62提交17:45:29、受理17:45:35，submission1882913592059779284，reviewing；双账号批次12两条均取得真实受理。24/60在17:59:13读回published，work_id7277548266066867187、实际published_at17:37:33、URL=https://mbd.baidu.com/newspage/data/videolanding?nid=sv_7277548266066867187。不能将23审核中计为公开。
+- IAB公开页两次超时、Chrome browser-provider不可用；后使用同CUA原生Google Chrome新标签打开该公开URL，实际页面标题/话题、02:00时长、未登录入口及播放中的游戏画面、广告画中画画面可见。截图观察证据来自本次实际浏览器调用，已关闭本轮标签保留其他页面；尚未完成尾部及主观听音。原生坐标操作有windowNotFoundAtPosition，键盘导航和截图有效，不能将工具坐标问题当产品失败。
+- 21/61实际通过本次File绑定、标签和二创，后在封面同步native input数量检查失败、无submit。官方CoverEditor源证明两比例共享isSyncEnabled，999a2d3按组件状态和比例控件适配。旧隔离复现FAIL→30浏览器PASS（/tmp/chg130-cover-sync-after.log）；首次987单测1个旧mock结构缺失FAIL，补模拟evaluate后987全量PASS（/tmp/chg130-cover-sync-unit-final.log），CI45797607182 success。新包build完成，launch进行中，未宣称真实B站封面通过。
+- Cloud PR59 CI45793563267 success（14m13s），Agent fbafd6b CI success，Workspace72 CI success；PR仍未合并，真实B站/计划闭环及最终走查未完成。
+
+
+## 18:07–18:13封面回执与批次最终投影
+
+- 999a2d3包实际SHA256=ce26298581f01603bca33e6482ae436587c7ba43af34602d213d6d285a5814a4，正常登录后原生环境三项正常。21/63通过双封面同步及文件/画布校验，在完成保存后的30秒回执等待超时；无submit、现场关闭。不把超时猜成平台拒绝。
+- e06f18b补guard已绑定封面请求的Context.response读取，固定导出/HTTP/等待状态诊断不包含地址、图片、CSRF或正文。隔离context-cover旧代码FAIL（/tmp/chg130-cover-response-before.log）；14项定向、988全量、2项完整表单浏览器PASS（/tmp/chg130-cover-response-after.log、-unit.log、-browser.log）。新包构建中，真实效果待复测。
+- 23/24均可信公开；真实batch12结束，目标2/建2/公开2/差额0，待核实0。主动原生批次列表显示2/2、100%、已结束、无待处理；详情显示公开2、失败0、待处理0、待公开0、公开率100%，两个任务已发布、操作记录齐全，已结束动作无编辑/再次执行。仅计本次实看页面，不冒称全部逐页走查完成。
