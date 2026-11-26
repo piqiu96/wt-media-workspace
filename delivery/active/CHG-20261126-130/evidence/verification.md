@@ -453,3 +453,19 @@ Cloud070d3ae CI run45830769360已success（13:50:49Z），包含Cloud/Web、原�
 - 主动Chrome新独立无痕Cloud网页登录：计划3等待当前批次完成，首批已推进/0比1/当前待办无/仅详情，第二批执行中/0比1/原暂停终止接管入口；首批详情已推进至后续批次、失败1/待办0/差额1、历史异常结果和原task26均真实保留，PASS。关闭本次窗口，用户页面保留。
 - 追加81e4fa4隐藏已交接批次旧最早下一组时间，避免暗示可继续派发；197发布回归PASS6.82秒，/tmp/chg130-handoff-final-publication.log。新包正在后台构建，不停止在途79；必须79安全结束再换包。
 - Agent58f8102 CI run45832653307 PASS；Desktop31fd8e1与Workspace34fd9d8 CI均PASS，Cloud81最新CI跟进。
+
+
+## 22:12 原尝试79资源修复成功、真实平台标签拒绝
+
+三份资源实际文件分别与79冻结size/SHA完全匹配，stage ready，下载顺序修复真实通过。22:12:57第2标签三角洲行动手游请求匹配，第一路data.code0/msg，第二路data.code=-1/content；Runner及时报告第2标签未接受，22:12:59finished/failed/revision11，submit_started_at=null，not_submitted/scene_closed均true，未产生稿件或作品。日志仅输出固定序号、字段形状和非敏感代码，未输出原平台文本。
+
+复核既有官方公开投稿静态源码/tmp/chg130-bilibili-official-videoup.js：tx(tag)为Promise.all(checkCustomTag,checkTopicName)，后者/x/vupre/web/topic/tag/check在data.code非0时Promise.reject(Error(data.content))，界面setCustomTag只在then后插入并清空输入。这次确为平台校验拒绝，不能删冻结标签、忽略校验或盲重试假装成功。原两批计划真实公开0/2，等待正常失败结束。完整自动公开验收仍未通过。
+
+
+## 22:22 安装版失败结束与下一轮正常内容准备
+
+正确B站配置完整all再次exit0（/tmp/chg130-handoff-final-environment-all.log），最新前端81e4fa4挂载，原运营登录后三项工作环境正常。单独launch后登录前verify因无Agent失败；登录后verify虽确认Sidecar健康，但脚本没有该Sidecar key，按既有ownership guard拒绝BitBrowser检查；两次单独verify不标PASS，不把命令不适用当作产品故障。完整all基础门禁及安装版原生三项核实为实际证据。
+
+安装版原计划3结束弹窗明确按真实公开结果结束、保留目标和缺口，输入79字真实原因并逐字核对后确认。读回status ended/end_reason unmet，目标2/公开0/缺口2、processed2/2，两批均ended，只有详情，页脚只有返回；原21:22人工推进审计与结束记录保留。失败结束路径PASS，不计正常公开路径通过。
+
+22:22正常POST /compose-tasks source_output_id148/149、remake_confirmed=true，幂等键独立创建batch76/77、task752/753，使用尚未投稿的素材196/199。原策略1016快照/新广告SHA/120秒/6秒尾部不变，新的随机种子，原失败占用与历史不修改。不复制已公开成片反复投递。新任务运行中；成功后按正常AI生成与审阅采用流程再准备新两批计划。为避免黑色首帧封面，已从原未投稿视频60秒提取并实看游戏内容，后续可经正常图片库上传作为同素材封面背景；尚未上传。
