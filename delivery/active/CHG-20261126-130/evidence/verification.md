@@ -101,3 +101,17 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - Workspace PR72已由GitHub页面提交并由公开API确认open/非draft：https://github.com/piqiu96/wt-media-workspace/pull/72 。Cloud PR尚未建立，仅准备好表单。
 - Agent73a3829自动审查completed且无finding；其CI verify失败于Test Agent步骤。完整日志下载API无认证返回403（要求仓库管理权限），现有连接器不可用。Desktop31fd8e1与Workspace8f98503对应CI均success。
 - 为定位CI，创建本轮独立干净工作树`/tmp/chg130-agent-ci`，以已安装Python3.12运行`UV_PYTHON=3.12 scripts/bootstrap.sh`、`scripts/test.sh`：974项PASS，脚本退出0且未污染.local。日志`/tmp/chg130-agent-ci-python312.log`。本机3.12未复现Linux CI失败，未宣称CI已修复或通过；解锁后继续读取Actions完整日志定位。
+
+## 用户指定的干净数据基线（2026-11-26）
+
+- 先停止 Cloud、Worker、Scheduler、Agent、Desktop，再备份固定 `wt_media_cloud` 数据库与两种运行方式的 Agent SQLite/发布目录。备份保存在本机私有 `.local/backups/test-reset-20261126-114026`，不提交任何数据库、凭证或素材备份。
+- 事务清空36张旧业务/执行表；保留迁移、技术合成模板、不可变存储校验记录及准入切换标记。仅保留 admin、senior01、operator01 与原密码、默认运营团队和授权；删除其他用户/旧团队。保留游戏子类目火影忍者、绝区零、三角洲，其他一级类型无业务数据。未删除平台已发表作品，未修改比特浏览器实际窗口与登录。对象存储旧资源键已存入私有备份清单，未执行整个共享存储桶清空。
+- 源码 Agent 和安装包 Agent 的旧任务日志、待回报结果、发布草稿与发布工作目录均清理，防止已删除任务重放。旧 task17/attempt43不再执行。
+- 用正常 Desktop 会话换取 Agent Token，由 Agent 实读并绑定比特主账号，完整扫描→提交扫描→确认4个新镜像；随后逐个正常创建账号、绑定窗口、启动账号检查、Agent实时识别、回报结果。没有复制旧账号身份或伪造检查结果。
+- 新窗口：967/51（B站）、968/41、969/39、970/34（百度）；新账号18–21，全部归operator01/三角洲。B站UID3706971620379308（游戏魔王嘟嘟），百度UID6949353902（游戏主播甜甜）、4908760199（平台未返回昵称）、6572476037（你阿邱爷）；4/4登录检查normal。
+- 数据库与API读回：users=3，profiles=4，accounts=4（B站1/百度3）；materials/source_contents/operations_files/image_asset/cover_template/compose_strategies/compose_tasks/composite_outputs/publication_plan/publication_batch/publication_task/work均0。当前operator01可见2个已授权游戏类目，管理员目录共3个游戏类目，未擅自扩大用户授权。
+- 一级选项只保留游戏；历史AI/二次元类型保留解析兼容，新建请求只允许game。PRD、ADR0028、提供方identity契约已同步。Cloud提交6a366f7。定向identity全包测试PASS，共享类目/字段组件7项PASS；真实admin API创建AI类目返回HTTP400，未产生数据。
+- 全流程发布验收改用用户即将提供的新广告切片与新策略；本轮数据重建不等于B站公开、批次/计划或最终UI验收已完成。
+
+- 重建环境复核曾发现compose_worker_capacity基础行被清空，Worker因“sql: no rows”退出；已按迁移20261014_059恢复id=1/max_running=2（基础容量，非业务任务），随后重启并重新验证。首次wt chg verify的Cloud全模块、Agent974项、Desktop及Workspace220项测试阶段已运行，环境阶段因该基础行缺失失败；不将首次总命令标为通过，后续仅复核修正后的环境。
+- 新包构建成功，前端来源0.1.0+6a366f7（digest b57ae1f87ac471e87840f0a770a1aec3fe0e4afcb39b8f7b846e61f783c51bf1），DMG位于Desktop target/release/bundle/dmg；未冒充已完成包内UI人工走查。
