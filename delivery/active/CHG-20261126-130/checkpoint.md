@@ -27,12 +27,12 @@
 - 既有9e77ffb上传disabled初始化、b304b7e文件准备3600秒绝对截止/30秒单次网络/关闭现场实证、c424233百度隐藏菜单等修复已包含。52百度浏览器PASS82.770秒，详见evidence。默认3600秒只用于文件准备，浏览器填表仍900，不延长授权或反复重置截止。
 - Cloud782e0c3修暂停当前批次仅排队时显示batch_paused，保留在途/未知/核验优先级与推进阻断：旧排队失败→5隔离DB测试PASS5.809秒，发布四包/完整业务模块Go测试PASS。
 - Cloudd07fe0d修已有批次平台编辑锁定，复制/新建仍可切；旧2失败→29相关/196发布Vue PASS，现已在13实际走查验证。0f1862a/e7dc60c平台分组审查也已修。
-- **最新Cloud源码070d3ae，运行前端尚未更新**：9a9693b检查结果未到/手动检查中显示中性检查状态，抑制旧失败提示，就绪和调度不变；旧3失败→30定向PASS，172文件1273完整Web PASS20.25秒。070d3ae在任务列表/详情/批次正式表按verification_required补“公开结果需人工核实”，原状态/统计/动作不变，196发布回归PASS7.26秒。
-- 含070的新DMG后台构建已成功但未部署，需包含最新资源顺序修复再次构建；旧构建日志（/tmp/chg130-status-hints-build.log），未部署；待27/78安全结束再切换与走查。只build-dmg不会停止当前App。最后还需要main组合新包与整体验证。
+- **最新Cloud源码81e4fa4，运行前端070d3ae**：9a9693b检查结果未到/手动检查中显示中性检查状态，抑制旧失败提示，就绪和调度不变；旧3失败→30定向PASS，172文件1273完整Web PASS20.25秒。070d3ae在任务列表/详情/批次正式表按verification_required补“公开结果需人工核实”，原状态/统计/动作不变，196发布回归PASS7.26秒。
+- 含070的新DMG后台构建已成功但未部署，需包含最新资源顺序修复再次构建；旧构建日志（/tmp/chg130-status-hints-build.log），未部署；待27/78安全结束再切换与走查。只build-dmg不会停止当前App。最后还需要main组合新包与整体验证。a009dbb/81e4fa4修交接批次待办/状态/旧下一组时间，真实未决仍保留入口：旧1FAIL→197发布/1274完整WebPASS；Cloud网页已主动实查首批已推进、失败1/待办0/差额1和历史结果。含81新包后台build，不停止79。
 
 ## PR、治理与工具
 
-- Agent21、Cloud59、Desktop20、Workspace72 open未合并；Cloud59已ready。Agent6c/Cloud d07 CI实际通过，最新Cloud070 CI run45830769360已success；Agent58最新CI跟进中。Agent八条旧讨论、Cloud三条4707851694/4707918438/4708555461在对应修复与回归后已resolve。没有最新独立审查时不冒称已审。
+- Agent21、Cloud59、Desktop20、Workspace72 open未合并；Cloud59已ready。Agent6c/Cloud d07 CI实际通过，最新Cloud070 CI run45830769360已success；Agent58最新CI已PASS。Cloud81最新CI跟进。Agent八条旧讨论、Cloud三条4707851694/4707918438/4708555461在对应修复与回归后已resolve。没有最新独立审查时不冒称已审。
 - Workspace220单测PASS29.468秒、M0配置PASS；最新证据和工程规格已提交至caa7df4，后续原生走查证据7dcf4b8。全部未完成不能标DONE或提前合并。
 - 保留Cloud web/example大量他人修改及Workspace docs/design六文件，不暂存、还原或覆盖。只提交本CHG显式路径。无其他Agent并行写入。
 - 私有证据根为相邻.local/m2b/chg130-new-data。正常API helper /tmp/chg130_api.py，op.call/stream；8188/api/v1，已有cookie。attempt路径/publication/:id/attempt，历史顺序列表。不要输出凭据/签名URL，不SQL修改业务事实。
