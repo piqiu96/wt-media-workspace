@@ -18,7 +18,9 @@
 
 ## 当前源码与运行包
 
-- 当前运行Agent9e77ffb、前端Cloud e7dc60c、Desktop31fd8e1；Go后端仍49afaf3（后续仅前端修改）。新包build/launch均exit0（/tmp/chg130-ready-input-preparation-build.log/-launch.log），实际sidecar SHA256=64349a47b97bbfba7d1498200c6316f0f764abd97f7ee47617065179743dd730。operator01沿用原密码登录，原生环境三项正常。25/76已受理审核中；原生batch10恢复后26/77准备中，勿重启或重复授权。
+- 重建必须带既有测试配置：`WT_MEDIA_CLOUD_CONFIG_PATH=/tmp/chg130-cloud-config python3 scripts/dev/local_env.py all --force-restart`。该私有配置已核实B站enabled=true，不提交私有配置。21:10第一次all漏带该环境变量，基础门禁虽全PASS但B站恢复默认false，导致原生confirm-next原请求409/未建单；原journal与request_key保留，不换键。21:17已退出App、确认无在途后带正确配置重新all，当前在构建；恢复后先验证platform-rules B站enabled，再从原生“核对原计划请求”继续同一请求。不要宣称原21:10环境可验收B站。
+
+- 当前运行Agent6c7023c、前端Cloud d07fe0d、Desktop31fd8e1；Go后端d07fe0d。新包build/launch均exit0（/tmp/chg130-ready-input-preparation-build.log/-launch.log），实际sidecar SHA256=f7644145e8a93c116be651ce2de090d8f17cb598ae2f16fc34cb65daab5333ad。operator01沿用原密码登录，原生环境三项正常。25/76已受理审核中；原生batch10恢复后26/77准备中，勿重启或重复授权。
 - Agentbb814a7诊断包含tag schema字段、固定业务标记/错误分类及expected_label_visible；尚未实际读到第5标签内部结果，因为75在下载阶段遇到旧时限。不能假设为平台拒绝或特殊控件，也不能删标签/放松最终POST匹配。
 - c424233修百度隐藏菜单项误阻塞可见发布菜单：旧真实浏览器用例FAIL，4定向9.345秒PASS、52完整百度浏览器82.770秒PASS、11单测PASS。首轮修复后1条测试错误地读取跨导航window变量失败，改用测试sessionStorage后重跑通过，未隐去首轮失败。
 - b304b7e将文件准备独立绝对时限默认改3600秒，保留30秒单次网络等待/逐次授权核对/三文件同一截止，不延长浏览器填表时限。准备失败尚未返回现场时，只读核实Profile关闭才回报可重试未提交；仍打开/未知保留uncertain且不关闭无归属现场。旧健康20分钟下载和关闭现场失败分类两项FAIL→55相关PASS，995全量46.831秒PASS（/tmp/chg130-resource-preparation-*）；正式工程规格已同步，未改跨仓契约。
@@ -33,7 +35,12 @@
 
 - 新审查4708555461已修：已有批次edit锁定平台，避免前端清空重配后被后端拒绝保存；新建/复制切换保留。旧2失败→29相关/24文件196发布Vue通过7.47秒，d07fe0d已推送。新包build exit0，hash5393b46fef97144f7e5f9e38e397495afd9e742d280473604ed69ddb50e95ab8，尚未部署；Cloud全业务模块单测通过。三条Cloud讨论已核实resolve。26/77第5标签实得内部code=-1、UI未保留，未提交/已关闭，failed/rev36；Plan3 waiting_continue，11未建单。结构化标签拒绝提示已修，旧真实浏览器FAIL→42相关/17发布器单测PASS，不删原冻结标签或再盲重试。
 
-- 当前公开核验根因定位：25/76自动检查20:59:41停止（selected_sources0），但主动Chrome匿名可播放。全新隔离匿名浏览器调用产品原proof也返回False；实际window.__playinfo__有官方data.dash、video ready4/width640/duration120/blob。旧代码只追后续playurl请求而页面未发该请求。已补同页内嵌播放数据的原CID/实际媒体绑定，旧隔离用例FAIL→3项PASS/完整43浏览器150.638秒PASS/996全单测49.074秒PASS，真实同原稿匿名proof从False变True；25正式Cloud仍待人工/正常后续业务处理，不能冒称已自动回写；不借私有页面绕工具限制，未人工补录25。旧安装版已正常退出，尚未重启/换新包。
+- 当前公开核验根因定位：25/76自动检查20:59:41停止（selected_sources0），但主动Chrome匿名可播放。全新隔离匿名浏览器调用产品原proof也返回False；实际window.__playinfo__有官方data.dash、video ready4/width640/duration120/blob。旧代码只追后续playurl请求而页面未发该请求。已补同页内嵌播放数据的原CID/实际媒体绑定，旧隔离用例FAIL→3项PASS/完整43浏览器150.638秒PASS/996全单测49.074秒PASS，真实同原稿匿名proof从False变True；25正式Cloud仍待人工/正常后续业务处理，不能冒称已自动回写；不借私有页面绕工具限制，21:33已在新安装版正常人工补录25→published/work13/rev15，verification_required=false，实际时间20:43:03；原自动停止记录保留，不能称25正式自动通过。当前27/78在途，不能重启。
+
+- 安装版实际配置边界已通过：从12复制→切B站清资源保留目标→零候选确认/保存13（任务0）→继续配置平台disabled→目标2改1保存成功→空候选开始被清楚阻断→正常终止13为cancelled/rev3，始终任务0/候选0/无占用。13仅边界走查记录，不发布。
+- WorkEnvPill新修检查中不显示上次失败：旧3项FAIL→30相关PASS2.13秒，全Web172文件1273测试PASS20.25秒，已提交9a9693b并推送，待新包部署。只改提示，不放宽ready或调度。27/78仍在途，勿重启。
+
+- 任务A07提示补充：原生实际22/25核验停却仅审核中，现任务列表/详情/批次正式表按verification_required显示“公开结果需人工核实”，原状态/统计/动作不变。196相关回归PASS7.26秒，待提交/新包部署，27/78约33MB仍preparing。
 
 ## 工具、文件与下一步
 

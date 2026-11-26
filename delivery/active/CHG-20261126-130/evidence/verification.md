@@ -387,3 +387,34 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 新同场景隔离浏览器用例旧实现FAIL22.287秒（/tmp/chg130-bootstrap-proof-before.log）。补同页内嵌来源：原aid/BV/UID/标题/CID/pubdate及播放时长全部匹配才提取实际选定媒体地址，仍须与实际媒体请求/重定向及唯一已解码视频绑定，不以元数据或HTTP200代替媒体。跨仓契约未变，工程正式依据已同步。
 - 修后三项PASS44.677秒，包含无playurl的正常Blob媒体、错误页面CID拒绝、其他已加载媒体拒绝（/tmp/chg130-bootstrap-proof-after.log）。同一真实公开25在全新匿名浏览器调用产品proof返回True，实际video ready4/width640/duration120/time0.485/paused=false（/tmp/chg130-live-public-proof-after.log）。这是公开能力真实回归，尚不等同25的正式Cloud自动回写；没有重新上传或人工修改25状态。
 - 全996单测PASS49.074秒、完整43 B站浏览器PASS150.638秒（/tmp/chg130-bootstrap-full-unit.log、-full-browser.log），diff检查通过。标签拒绝修复4ad42fc已推送。旧安装版已用原生菜单快捷键退出，并实际确认isRunning=false；26failed且25自动检查已停，无在途任务。下一步重新构建/重启整套环境，原生界面验证再推进计划下一批。
+
+### 21:13–21:17 新环境走查与配置纠正
+
+- 首轮all --force-restart基础门禁/登录/挂载全部exit0（/tmp/chg130-bootstrap-environment-all.log），原生operator01用原凭据登录，三项环境正常。启动最初短暂提示Agent未运行，随后自动恢复；此启动提示问题仍需处理，不能声称无异常。Workspace220单测PASS29.468秒，M0配置PASS（/tmp/chg130-latest-workspace-unit.log、-m0-config.log）。
+- 原生Plan3列表/详情实看10%超限、首批26失败/第二批未开始、两批已锁定、首批快捷动作及目标2/公开0/缺口2。点击确认下一批，完整中文填写保留原失败与缺口的原因。原输入键入工具只输入数字，已在提交前用粘贴纠正并核实63字符完整原因。
+- confirm-next返回409，界面保留原请求，点击一次“核对原计划请求”仍409；读取实际计划仍current10/rev8，没有第二批任务。正常execution-preview揭示原资源execution_input_unavailable；实际platform-rules B站enabled=false，确定为本次重建遗漏私有测试配置环境变量（原Go进程一直使用/tmp/chg130-cloud-config）。没有改目标、换键或绕过预览。
+- 已向用户明确说明该重建失误。原生退出App、实证isRunning=false、保留原待核对journal，使用WT_MEDIA_CLOUD_CONFIG_PATH=/tmp/chg130-cloud-config重新执行all --force-restart（/tmp/chg130-bootstrap-environment-configured-all.log）。私有app.toml已只读断言B站enabled=true；不更改正式默认开关、不输出私有配置。重新all在途，尚未计环境/第二批通过。
+
+### 21:21–21:22 正确配置环境与原请求恢复成功
+
+- 带WT_MEDIA_CLOUD_CONFIG_PATH的全新all exit0（/tmp/chg130-bootstrap-environment-configured-all.log），全部基础门禁、admin登录、私有挂载版本核对通过；正常operator01原凭据登录，原生环境三项正常。本轮B站enabled=true，11执行预览can_start=true/no issues。当前Go/前端Cloud d07fe0d、Agent6c7023c、Desktop31fd8e1；实际挂载Sidecar SHA256=f7644145e8a93c116be651ce2de090d8f17cb598ae2f16fc34cb65daab5333ad。
+- 原生计划详情恢复保留的“核对原计划请求”，点击后原请求成功收敛，未新建请求键。实看当前位置批次11、1/2批、第二批执行中、首批失败保留，操作审计记10→11人工确认及完整原原因。正常API读回Plan3rev9/current11，batch11rev6/group1，仅新建任务27/attempt78/running，created1/target1/缺口0；第一批26不重试、不更改冻结文案或目标。
+- 正在下载27/78，勿重启或重复授权。需要证明本次完整自动公开及计划最终目标差额读回后再收口；单条25仍待正式人工核实处理，不能以独立匿名proofPASS冒称已回写。
+
+### 21:24–21:30 安装版批次配置边界走查
+
+- 原生批次列表对已结束12点击复制，进入新建。改名“三角洲·配置边界走查”，切B站出现明确清理资源确认；确认后目标2保持、账号/成片/候选清为0。确认资源明示缺口2、保存配置不建任务/占用、此次新建续编不退第一步。第二步仅内容/保存草稿/下一步，第三步可返回内容配置，保存批次得到13。
+- 13详情实看未开始/待完善、目标2/候选0/缺口2/正式任务0、明确空态而非空表头。点继续配置：平台B站disabled，仍可将目标2改1；确认资源→内容→结果保存修改成功，详情目标1/候选0/正式任务0，两条审计。
+- 点空候选“开始发布”，仅显示“批次已保存，尚无发布候选。请完善配置后开始。”，只有返回/刷新，无最终发布按钮。返回后通过正常终止入口填写原因并确认，13已取消、任务0、空态说明不会生成任务；API复核revision3/candidate0/config.incomplete，完整任务列表中batch13关联0条。未发布额外测试文案或取得占用。
+- 补修真实走查中检查未结束却显示旧失败的问题：WorkEnvPill只在首次结果未到/手动检查中显示中性“正在检查工作环境”，抑制过期阻断/错误；检查结束正常/失败照实展示，aggregateWorkEnv就绪条件及重试/轮询不变。旧初始SSR/状态回归3失败，修后30相关测试PASS2.13秒（/tmp/chg130-environment-checking-before.log、-after.log）；完整Web回归在途，新包尚未部署。27/78仍准备中，不重启。
+
+### 21:33 检查中提示回归与25正常补录
+
+- WorkEnvPill检查中展示修复：完整Web172文件1273测试PASS20.25秒（/tmp/chg130-environment-checking-full-web.log），30定向及diff检查通过。仅显示中性检查中，不改变实际就绪判定或调度；新包待构建/部署，不能把源码回归称已安装走查通过。
+- 原生发布任务25“补录结果”进入原attempt76表单，实际回执ID固定117682791777077；核实结论已公开、原链接/作品ID、实际北京时间20:43:03、完整真实依据及三项已核实条件已逐项检查。正常保存后列表25已发布，补录按钮变查看作品/复制/详情，提示原尝试与占用保留。API读回published/work13/rev15/verification_required=false/published_at2026-11-26T20:43:03+08:00。
+- 明确这是工程师真实Chrome匿名走查、官方元数据和修复后产品匿名proof共同支持的人工补录，不冒称25正式自动回写；不重投25。原26失败与27在途不受影响；27/78仍preparing，21:33下载约27MB。
+
+### 21:35 待核实公开结果的页面提示一致性
+
+- 实际安装版任务25（补录前）、22（仍待核实）verification_required=true，但列表仅显示平台审核中与补录入口，缺少“核验已停止，需要人工处理”的独立提示。保留PRD规定的reviewing业务状态和补录动作，在任务列表、任务详情及批次正式任务表按既有verification_required标记补充“公开结果需人工核实”。不修改状态、统计定义或契约，不把普通审核任务标为人工待办。
+- 相关发布模块24文件196测试PASS7.26秒（/tmp/chg130-verification-label-publication.log），diff检查通过。此为小型展示补充，实际新包页面待在途27/78安全结束后复核；不声称已部署。当前27视频约33MB且仍preparing。检查中提示9a9693b已推送，其完整1273前端测试证据不与本次新标签回归混算。
