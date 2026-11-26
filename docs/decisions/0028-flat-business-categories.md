@@ -12,7 +12,7 @@
 ## Decision
 
 1. `operation_games` 重命名为 `categories`，ID 改为 `BIGINT UNSIGNED AUTO_INCREMENT`。
-2. 类目保持扁平：保存 `type`、`name`、`enabled`、`remark` 和时间字段；首批一级类型由代码固定为 `game/ai/anime`，不增加 `parent_id`、层级、路径或排序字段。
+2. 类目保持扁平：保存 `type`、`name`、`enabled`、`remark` 和时间字段；当前可新建、选择的一级类型由代码固定为 `game`（游戏），`ai/anime` 只保留历史解析兼容，不增加 `parent_id`、层级、路径或排序字段。
 3. 二级含义直接写入 `name`，例如 `游戏.三角洲`、`AI.代充`、`二次元.原神`。后端不解析点号。
 4. `user_game_scopes` 改为 `user_category_scopes`；`media_account_games` 改为 `media_account_categories`；所有 `game_id/game_ids` 改为 `category_id/category_ids`。
 5. 内容挖掘、内容生产和媒体账号统一引用 `category_id`；不保留 `game_id` 兼容列或双写字段。
