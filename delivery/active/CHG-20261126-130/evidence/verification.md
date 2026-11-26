@@ -160,3 +160,11 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 最终重建all退出0；Cloud aa1ec14/Agent22645f5/Desktop31fd8e1，frontend0.1.0+aa1ec14.dirty。新包登录operator01后sidecar校验并启动成功（SHA256 bbd217547af9653a47cf4da517777198fd1cbe185c4bf43dc245d9f956283d8d），工作环境UI明确本机服务已连接/比特浏览器已登录指定账号/执行凭证已配置。启动前一次verify因sidecar尚未启动失败；登录后verify的Cloud/Agent/两个Worker/Scheduler通过，在脚本非所属Agent的BitBrowser探测门禁停止，未冒称该命令全绿，改由新包工作环境正式桥读回验证。日志/tmp/chg130-draft-conflict-environment-verify.log。
 - 新包最终局部复验：独立批次9的开始发布/继续配置/详情/终止四按钮分两行完整可见；计划列表平台下拉含百家号/B站，选择B站查询保留计划3，详情发布平台现为B站且矩阵一致。未触发批次/计划正式执行，不将局部页面复验计为完整E2E通过。
 - Agent22645f5 GitHub verify已completed/success。用户已收到关于窗口51恢复视频是否为可放弃旧测试或需保留稿件的问题，尚未回复；保持原稿，不再次触发投稿。真实平台受理/公开、批次/计划发布、Cloud PR及三运行仓合并和完整最终E2E仍未完成。
+
+
+## 用户重试故障复核与正常内容流程纠正
+
+- 真实API读回task18最新attempt47、task19最新attempt48均failed且submit_started_at=null。轮转执行日志显示47仍在B站恢复未提交视频分支拒绝，48在百度发布入口video_entry_ready的浏览器求值失败；二者发生于14:48，早于22645f5新包14:58启动。不可称已恢复真实发布，也不以重试替代前置问题处理。
+- 用户明确标题、简介按正常发布流程，不使用任意测试文案。本轮通过正式publication/generate逐条重新生成145–150的标题/简介/标签或话题及封面短标题，来源为实际素材标题，随后核对无制作/研发/验收描述、未添加自制授权声明。通过正式cover/render重新渲染双封面，按正常批次configuration及再次确认流程采用到9/10/11；三批读回ready、issues为空，尚未开始执行。
+- 任务18/19已有授权和执行历史，正常Edit接口只允许未授权pending任务；本轮不直接改数据库，不篡改历史，也不再沿用其验收文案发起重试。145/150正常新内容及双封面已准备，尚未另建正式任务或发表。原始生成与采用结果在本机私有normal-publication-content.json、normal-prepared-publication-content.json。
+- 当前仍未解决的外部条件：窗口51存在归属未核实的恢复视频，相关保留/放弃问题尚未答复；受限浏览器页面不得以其他控制技术绕过。百度真实页面故障及B站上传回执首轮缺失不能仅凭隔离测试宣称修复，真实E2E仍待完成。
