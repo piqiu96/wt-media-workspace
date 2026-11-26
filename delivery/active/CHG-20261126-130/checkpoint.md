@@ -33,7 +33,9 @@
 
 ## 下一步与工具边界
 
-1. 跟进最新CI/PR，补最终55安装版和源组合证据；按工具允许范围尝试本次精确公开作品主动浏览器检查，完整私有平台后台/主观听音未证明不能伪造。
+1. 跟进最新CI/PR，补最终55安装版和源组合证据；本次公开页已主动实看精确原稿标题/UID/时间/简介/五标签及01:04正片播放，公开页广告/片尾拖动因CUA窗口/会话异常未完成；本地对应帧已实看。完整私有平台后台/主观听音未证明不能伪造。
 2. 仍需满足CHG验收矩阵，完成各仓main merge commit、本地main确认和最终main新包组合；当前不得DONE/归档。
 3. CUA此前拒绝私有BitBrowser平台页和某次Chrome当前URL；不以临时CDP/Playwright/私有Cookie读取绕过。正常产品Runner/API和隔离测试允许。最新原生起飞走查正常，CUA活动已结束，没有手动接管等待。后续公共原稿若也被工具拒绝，保留具体未验项，不绕过。
 4. 私有证据根相邻.local/m2b/chg130-new-data；API helper /tmp/chg130_api.py（不输出凭据），8188/api/v1；attempt为/publication/:id/attempt。新微光证据weiguang-*，当前public task30/work16/aid117683798410574。起飞在相邻.local/m2b/desktop-review-mount/起飞.app。中文输入用paste。
+
+公开页补充：通过work16正常外链打开默认Chrome后native CUA可读本次新publicURL，BV1pk1EzxEyT；先前IAB超时/Chrome连接器不可用均不当PASS。正片已核对并暂停在01:04/01:54，广告/片尾跳转失败后CUA会话重置；当前没有可用绑定，活动已browser-complete，无接管等待。本次公开页是现有登录Chrome，不冒称工程师匿名走查。勿关闭用户其他Chrome标签。
