@@ -191,3 +191,14 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 新组合完整重建日志/tmp/chg130-stability-cover-environment.log，后续继续同批真实启动验证；此时仍未计为实际投稿成功。
 
 - 新组合Cloud49afaf3/Agent98a9cc1完整重建及原密码登录后，同批次9正常start返回running/revision6，原子创建task20/21，目标2/创建2/缺口0。首次group1仅task20，task21保持pending未授权，实际只有一个Profile时并发5已向下兼容为串行分组。task20/attempt49已由安装包Agent领取preparing。真实投稿结果继续核验，不能计为已公开。
+
+- task20/attempt49已到ready，旧稿提示不再拒绝，实际开始上传；但3笔preupload观测仍name_matches=false/size_matches=false，未获得当前视频匹配回执。尚未确定实际请求差异，不能据此宣称平台上传SDK已兼容。为避免task21重复走相同等待，按正常API暂停batch9并安全取消task20；Cloud读回cancelled/finished、submit_started_at=null，正式Agent结果not_submitted=true/scene_closed=true。此次为明确记录的诊断终止，不计发布成功，不删除失败历史。task21仍pending未执行。
+- 回执身份比较改为读取实际request.url而非响应落点，补充请求method、字段存在及响应查询是否一致的脱敏诊断；隔离单测覆盖响应地址无查询但请求正确、其他文件名拒绝，7项定向及11项隔离浏览器PASS。下一次正式执行需先部署该版本并读回真实诊断。
+
+
+## 百度双入口严格定位故障与上传形状诊断
+
+- 实际task19/attempt48的结构诊断显示#home-statistic-card与.cheetah-popover-inner各有一个可见“发布视频”，原全局get_by_text在后续evaluate触发严格定位错误。Agent159470e改选当前可见展开菜单，兼容唯一入口；没有force点击或随机选first。新增双入口完整填表回归，最终不触发投稿。
+- 百度+B站隔离浏览器58项PASS（/tmp/chg130-entry-browser-suite.log）；Agent全量977项PASS（/tmp/chg130-stability-agent-all.log），B站定向7项PASS（/tmp/chg130-upload-shape-unit.log）。这些不计真实平台发布通过。
+- 部署49a618a后，正常resume批次9进入task21/attempt50，15:48开始执行，当前running/ready、submit_started_at=null。真实preupload诊断response_query_matches=true，name/size仍不匹配，证明改用request.url并未解决实际回执缺失。159470e补充字段计数、文件/元数据类型及数值字节数诊断，不输出原始文件名、URL或凭据；真实差异仍待新版本核实。
+- 新版本只build-dmg（/tmp/chg130-entry-diagnostic-build.log），不为部署打断在途50。task20诊断取消不能计成功；task21及计划3、批次10/11无公开成功，CHG保持VERIFYING。
