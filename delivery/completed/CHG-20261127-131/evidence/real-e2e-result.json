@@ -1,0 +1,27 @@
+{
+  "work_id": "16",
+  "platform_work_id": "117683798410574",
+  "metrics": {
+    "view": 7,
+    "like": 1,
+    "favorite": 2,
+    "coin": 0,
+    "reply": 0,
+    "danmaku": 0,
+    "collected_at": "2026-11-27T02:23:32.883395+08:00",
+    "last_attempt_at": "2026-11-27T02:23:32.727832+08:00",
+    "status": "ready",
+    "last_error": "",
+    "source": "bilibili_public_api"
+  },
+  "public_counts": {
+    "view": 7,
+    "like": 1,
+    "favorite": 2,
+    "coin": 0,
+    "reply": 0,
+    "danmaku": 0
+  },
+  "immutable_work_facts_unchanged": true,
+  "bilibili_works": 5
+}
