@@ -521,3 +521,36 @@ Cloud070d3ae CI run45830769360已success（13:50:49Z），包含Cloud/Web、原�
 
 
 00:51正常创建batch78/task754，material200采用当前策略1016，实际下载广告230741877字节/SHA256=9c24396e88af86a6d14c1cb585b5d9273cf0831ce9a1f135b6f6fb24d25febee，与95精确一致，不用旧成片快照。原Plan4按当前revision/逐格shortfall0，经正常finish接口达成结束，读回ended/achieved/2比2/缺口0/仅复制；28/29为自动原稿核验，不是人工补录。
+
+
+### 新广告153实际合成及普通发布开始
+
+754首次成功output153，1280×720/113033ms/66086609字节；正常视频接口下载文件SHA256=03f9ff5713c8193a280e1d0414e25fa001c13f7f2def03e9b5aaa55c5b08b512与成片事实完全相同。源素材80.6秒＋广告27.033秒＋尾部6秒减三处0.2秒交叠为113.033秒，120为最大时长，不强补时长。execution_timeline四段无intro，ad_start12.03869，source_after_ad从原source_insert12.23869续播，尾部6秒；资源快照广告SHA与95精确一致。实际20秒为微光广告前景/模糊游戏背景，65秒为恢复游戏正片，110秒为正常动漫片尾，均主动打开本地实际帧核对。首次脚本按旧120秒取117秒超过新片实际长度，后按实际时长改110秒，未把抽帧边界当成品故障；不冒称主观听音。
+
+153正常真实AI建议“三角洲行动高燃操作：一穿三兜底名场面合集”，简介/常规游戏标签/封面“一穿三兜底操作”经核对，与素材一穿三主题对应，不使用广告名或研发术语。实际65秒同成片游戏帧正常上传asset7，模板5/6正常渲染4:3及16:9 file113/114，实际两图字形/边界/画面均实看通过。正常创建30并确认执行attempt82，冻结output153、普通声明内容无需标注，自制false；不修改旧150或25内容，无重复创建。当前正常准备/填表，尚未宣称受理或公开。
+
+### PR4711312816：计划换平台残留旧字段
+
+旧实现只清确认，B站→百度残留title/bilibili/space-cover且编辑器无法移除。隔离DB两方向真实FAIL、同平台目标调整对照PASS（/tmp/chg130-plan-platform-reset-before.log）。55ca11c在同结构事务重置换平台批次的完整资源配置/候选数/封面读模型/新目标缺口；目标调整仍保留输入并清确认。已固定校验沿用原规则。新增明确保存后清资源的确认，取消不改原配置。3场景加原骨架约束隔离DB PASS2.03秒，10平台Vue PASS2.58秒，200发布Vue PASS8.37秒，publish四包PASS；完整Web及仅build-dmg后台进行中，不重启在途30。
+
+
+00:58:53任务30/82获得一次提交许可，00:59原受理117683798410574，reviewing/首次检查“原稿件仍在平台处理中”/verification_required=false，无失败。冻结声明内容无需标注、权利false，沿既有Publisher声明选中/表单读回/最终提交体校验，不切回营销。当前等待原自动公开，禁止重启或重复投稿。后台55ca11c只build-dmg不部署。
+
+完整Web并发后台打包时1276项PASS、1项localSettingsWiring导出检查超过5秒，/tmp/chg130-plan-reset-full-web.log；不是断言错误。保留原失败、不放宽测试超时，使用maxWorkers=2重新完整运行，/tmp/chg130-plan-reset-full-web-confirmed.log。
+
+
+限制2个Vitest worker完整复验173文件1277项PASS39.93秒（/tmp/chg130-plan-reset-full-web-confirmed.log），原超时项正常通过，未修改测试断言/超时配置。后台构建与测试资源争用如实记录，非零失败假称全绿。
+
+
+广告音轨客观比对：从文件95与成片153广告中段分别解码8kHz单声道2秒PCM，在±240样本对齐搜索，最佳相关0.9540183/偏移-1样本，匹配新广告音轨；/tmp/chg130-weiguang-ad-audio.log。仅客观验证，不称已完成主观听音。
+
+
+01:04:38原自动检查将30/82正式回写published，原aid117683798410574，实际公开00:59:45，last_check_message=原稿件已公开且可匿名播放，verification_required=false。新广告95→策略1016→合成754/153→真实AI/双封面→普通声明一次投稿→原稿自动公开通过，未人工补录、未二次投稿。完整原monitor见/tmp/chg130-weiguang-publication-monitor.log。无在途发布/合成后才正确配置完整all部署55ca11c，日志/tmp/chg130-weiguang-delivery-environment-all.log，执行中。
+
+
+55ca11c真实正常接口E2E：新建未启动Plan5/批次16、17，先给16保存B站150候选及完整B站字段，再正常结构编辑为两批百度并逐格守恒2条。读回16账号/成片/候选全部清空、candidate_count0、封面读模型空；再通过百度configuration正常保存成功，正式任务0。仅本配置核查完成后正常cancel计划5，读回ended，未启动发布。保留核查证据，不把它计入发布成功。私有收据plan-platform-reset-e2e.json。
+
+
+最终55正确配置完整all exit0（/tmp/chg130-weiguang-delivery-environment-all.log），挂载前端0.1.0+55ca11c.dirty仅原型非本人修改；Agent58f8102/Desktop31fd8e1，sidecarSHA256=5e1340e6747d91e1646f4a0729d1b8d1e05b9fe6cda5eeb81d96b89461308b49。01:10安装版原运营登录后三项环境正常。任务列表30已发布、详情普通声明/准确标题/简介/标签/原UID/实际时间，作品16原aid和来源30/82/153精确一致，点击来源正确回任务30。计划列表原4显示目标达成2/2、5仅核查正常终止、3未达成历史保留。没有残留旧150未保存走查输入。
+
+Cloud55 CI run45863579211 PASS12分15秒，最新代码已通过远程完整验证。主观听音/私有后台及最终main组合依旧未全部满足，不将CHG标DONE。
