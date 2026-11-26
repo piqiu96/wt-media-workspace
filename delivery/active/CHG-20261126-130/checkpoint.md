@@ -1,22 +1,20 @@
 # CHG130 执行检查点
 
-- 唯一状态为change.md的VERIFYING，尚无真实投稿受理或公开成功，不得归档。128/129依赖已合入，单执行器串行；不启动未来CHG。
-- 用户授权自主编码/测试/PR问题修复/真实发布/E2E和最终原生走查，不逐项索要确认。文案必须实际素材→正式AI生成→核对采用→封面渲染，不能任意测试/制作/验收标题简介。
-- 数据重建完成：固定wt_media_cloud，用户仅admin/senior01/operator01且原密码未改；一级新建/选择仅游戏。账号18–21、Profile967–970为1个B站/3个百度，4/4正常；B站18/窗口51，百度19/窗口41（UID6949353902）。未删平台作品。
-- 新广告file56，策略1016（template12 ad_pip_ending v1），短素材195–200/合成批次75/任务746–751全成功，成片145–150；无开头，10–15秒广告画中画、只播广告声音、正片从插入点续播、6秒片尾。画面/客观音轨已核验；129主观听音证据不足，不冒充已听音。
-- 145–150正常AI文案及封面均已重新准备，私有normal-publication-content.json及normal-prepared-publication-content.json保存输入。历史18/19的旧测试文案冻结不可改，不再重试旧文案。19/attempt48有可信未提交/已关闭，已正常abandon释放150，正常新内容创建task22，未直接改SQL。task18仍failed保留。
-- Cloud49afaf3运行：48782b0取消素材准备投影，d3ddb1f操作栏裁切，aa1ec14计划平台硬编码，30d5dc0启动误用百度内容校验，49afaf3不存在的B站竖封面0加锁均已修复。publish模块回归及隔离MySQL事务锁集合[1,2]测试PASS；真实同batch9启动成功，目标2/建2/缺口0，同Profile按组串行。
-- batch9创建task20/21。20/attempt49诊断正常取消，可信not_submitted/scene_closed=true且无submit。21的50/51/53均自然超时为failed/completed，未提交/现场已关闭；不要误称平台已接收。21仍可正常retry。Plan3及10/11未启动，目标2/公开0；两批正确row_keys/revision的真实预检can_start=true且ready/issues=[]/各缺口0。
-- Agent98a9cc1修正旧稿可选“继续编辑”提示误判；不点恢复/丢弃，空白入口正常上传，真正已恢复视频仍保护。旧的用户清理旧稿问题不再是空白入口前置。
-- Agent49a618a取request.url诊断并未解决真实主视频回执缺失；50的response_query_matches=true。d0fb4b8修正普通浏览器检查耗时错误延长超时，只扣真正人工等待。f0c3a5b补全安全HTTP形状诊断并修正异步菜单回退；该包已实际部署/登录。53观测两笔无name/size的200响应无biz_id，另191033字节帧包有URI但无视频ID；71987824字节主视频未捕获，尚未确认主请求实际原因。
-- 百度task22/attempt52先在异步菜单严格定位失败；54首次ready后检测Passport组件而awaiting_human。用户明确窗口41已登录/页面正常；16:42通过原生UI“已处理继续原尝试”恢复同一54，真实video_entry_ready完成，后悬浮菜单收起导致click超时。54最终failed/completed且not_submitted/scene_closed=true、无submit；不是已发布，不再向用户重复要求登录。
-- 最新已提交Agent：f07b507延迟Playwright导入（无Local依赖Cloud bootstrap回归）、按段落读取简介并保留末尾换行、请求发出/失败及固定UI阶段诊断；982全量/14项B站隔离浏览器PASS。caa8193覆盖BrowserContext后台预上传回执、按请求去重及平台Worker投稿同样保护；冻结文件名/大小与最终CID/文件标识校验不变。本机真实Service Worker试验证明Page漏事件而Context能收到，不能仅凭此声称已解决真实B站。
-- 最新Agent5f7e73a：优先稳定首页视频入口，菜单作兼容路径并移除成功路径截图延迟；透明/空白Passport不拦截，短暂组件给750ms自动稳定时间，真正持续可见验证仍沿原attempt处理。透明/瞬态失败→成功回归通过。983全量PASS（/tmp/chg130-context-final-all.log）、51项百度浏览器PASS（/tmp/chg130-baidu-stable-entry-after.log）、15项B站浏览器PASS（/tmp/chg130-context-final-browser.log）。代码已推送现有Agent PR21。
-- 正在完整all --force-restart重建Cloud49afaf3/Agent5f7e73a/Desktop31fd8e1，日志/tmp/chg130-context-entry-environment.log；启动前已再次核实21/53和22/54均安全失败，无在途任务。完成后原密码operator01/operator123登录新包，再正常retry21/22，不沿用旧版本验证结果。不要把build-dmg等同已部署。
-- 运行环境脚本在Desktop接管后再次verify会因“非脚本所属Agent”的BitBrowser探测门禁退出1；不能冒称该命令全绿。全套all门禁与原生工作环境需分别如实记录。launch旧挂载偶有资源忙，正常退出后第二次detach成功，没有强制覆盖挂载。
-- PR：Agent21/Desktop20/Workspace72 open未合并，Cloud尚无PR。最新确认f0c3a5b CI success(run45781606151)，更新tip的CI仍待核实。PR反馈Cloud启动依赖及尾换行已在f07b507修复；旧临时封面副本/最终双封面URL已修。尚未修：B站匿名媒体播放证据未与CID对应播放来源绑定（comment4703765349），真实公开验收前必须补齐，不能冒充全部PR问题已清。
-- GitHub public REST可匿名读CI/Review；HTTPS git凭据无效，但SSH git push成功。gh写接口仍无效，旧二次验证已过期；不提取其他凭据。Chrome巨型Cloud比较表单和IAB比较页曾超时，Cloud PR不得冒称创建。
-- 工具边界：CUA曾明确拒绝BitBrowser平台URL，不用临时CDP/Playwright或其他工具绕过；正常产品任务API/自身业务Runner继续授权测试，tauri://本机页面可走查。无接管等待。用户已答百度正常，不重复索要权限。
-- 运营走查另发现task22封面150预览为黑底文字，需在正式最终内容/封面质量走查核实是否首帧背景问题；不把该缩略图当合成视频本身全黑证据。批次/计划及最终平台主动浏览器走查仍未完成。
-- 下一步：全环境完成→新包登录及正常重试21/22，按真实事件核对Worker是否实际根因、稳定首页入口是否成功；有问题继续修。完成匿名CID播放绑定及PR/CI/Cloud PR→真实单条/独立批次/两批计划→公开读回与最终逐页/新包复验→merge commit入main及组合重建→才可归档。
-- 保留其他会话Cloud web/example及Workspace docs/design六个脏文件，不暂存/还原。私有证据在相邻.local/m2b/chg130-new-data。不得输出凭据或改写正式任务状态造成功。
+- 唯一状态change.md=VERIFYING；128/129已合入，单执行器串行，不启动未来CHG。真实公开与计划闭环未完成，不得归档。
+- 用户授权自主修复/测试/PR/E2E/真实发布。文案必须素材→正式AI→核对采用→封面；不得任写测试/制作标题。用户确认百度41已登录、页面正常，不再重复要求处理41。
+- 数据基线：固定wt_media_cloud，仅admin/senior01/operator01，密码不改；一级新建选择仅游戏。账号18–21/Profile967–970，B站18/#51/UID3706971620379308；百度19/#41/UID6949353902、20/#39/UID4908760199、21/#34/UID6572476037。未删平台作品。
+- 新广告file56，策略1016/template12 ad_pip_ending v1；素材195–200/合成75/任务746–751全部成功，成片145–150。无开头，10–15秒广告画中画、广告声、正片原插入点继续、6秒尾部。画面和客观音轨已核验，129主观听音仍未证明。
+- 私有证据根目录相邻.local/m2b/chg130-new-data；normal-publication-content.json与normal-prepared-publication-content.json保存145–150正常内容及封面。18/19旧测试文案不重试；19已正常abandon，20诊断cancel均有未提交/现场关闭证据。不能直接SQL改业务状态。
+- Cloud49afaf3运行：已修取消素材投影、操作栏裁切、计划平台硬编码、启动误用百度校验、B站不存在竖封面0加锁；模块及隔离MySQL锁集合回归通过。独立B站batch9创建20/21且同Profile串行；计划3/batch10/11仍未启动，正确预检can_start=true/issues=[]/零缺口。
+- 百度22/attempt56真实受理成功：submission1882910900152502022，17:02:42开始提交、17:02:49受理；status=reviewing。稳定首页入口修复有真实效果。后续原稿核验停止，last_check_message提示接口读取需人工核对；尚无可信公开结果，绝不重试22。
+- B站21/attempt57证明9d421ce本次File对象与Vue视频行CID/filename绑定成功，上传完成误拦截已解决；57随后标签输入匹配错误。5e13f70修复标签真实input定位，25项套件中的旧24项通过、984单测通过，CI45791667413成功。新包实际部署SHA256=811db5c34af1c4a17b8acc6fb9c2802d921a1ef27070c092a0a49ee5e7d9b3cc，原生工作环境三项正常。
+- 21/attempt58在5e新包通过上传及标签后，停在二创checkbox检查。58failed/completed、无submit、not_submitted/scene_closed=true，21 revision36。f9aee0e改用官方VideoRecreate._recreate只读状态、用户控件点击，不依赖内部重复input；隔离复现旧代码失败，新25项浏览器+额外未知控件拒绝2项PASS，984全量PASS。572890e补固定类别诊断，不打印私有异常文本，38项相关单测PASS。
+- d4281f9已修PR匿名媒体与原CID播放来源绑定，984全量及30项定向回归PASS；真实B站公开仍未验证，不冒充验收成功。
+- 百度双账号回归正常新内容及4张封面已生成、逐张视觉检查通过；batch12保存后零任务，预检零缺口，17:31:39正常启动创建23/24。首次自测调用缺expected_shortfalls返回409、传完整preview多余字段返回400均为调用错误；使用契约category_id/shortfall后成功，不是产品缺陷。23/attempt59在首页菜单hover超时，可信未提交/已关闭；用户确认#34正常后，通过原生“已经处理，继续原尝试”恢复24/60；17:37:35真实受理，submission1882913089029275698，reviewing，不得重复投稿。23/59仍待新包重试。
+- 572890e包构建完成但未部署；随后完成1f98f70（有网络回执也必须当前File上传完成、提交前强制再查）与09bb371（已结算缓存识别固定封面副本/诊断文件，不放宽未知文件和链接）。三个网络回执绕过用例旧代码均FAIL→修复后PASS；47项浏览器+缓存PASS，986项全量PASS。fbafd6b补原稿核验固定原因/数值状态诊断，42项定向PASS。
+- 最新fbafd6b正在build-dmg：/tmp/chg130-binding-cache-build.log，尚未部署；当前仍Cloud49afaf3/Agent5e13f70/Desktop31fd8e1，无投稿在途。原生环境检查曾启动瞬间不可达、重新检查三项正常；不能把瞬间提示当任务失败。
+- 缓存warning根因已确认：成功百度任务留下cover-upload副本和cover-selection诊断，旧白名单拒绝清理；09bb371及正式工程规格已修，尚待新包真实清理复验。warning未改变受理结果。
+- PR：Agent21/Desktop20/Workspace72、Cloud59(Draft)均已创建未合并。用户回复ok后实际gh auth status验证登录已恢复，Cloud PR59创建成功；不再记录认证阻塞。最新确认572890e CI成功，5e CI成功；Cloud59 CI运行中。新增PR反馈4706058925已由1f98f70修复，仍需最终审查/CI。
+- CUA曾拒绝BitBrowser平台URL，不用临时CDP/Playwright或其他工具绕过；正常业务Runner/API继续授权。tauri原生走查可用；无接管等待。主动平台浏览器走查尚缺，不能声称完成。用户#34答复已按原attempt60继续并受理。
+- 下一步：完成二创修复真实复测21→修真实后续问题；百度23入口超时及22核验停止诊断→24原现场处理；计划3两批完整执行→公开原稿/作品读回→最终逐页及新包组合复验→PR问题/CI/merge commit入main→满足全部验收后归档。
+- 保留其他会话Cloud web/example及Workspace docs/design六个脏文件，不暂存/还原。

@@ -228,3 +228,23 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - Playwright官方Service Workers文档明确后台请求属于BrowserContext事件：https://playwright.dev/python/docs/service-workers 。本机127.0.0.1真实Worker发起预上传形状请求，Page响应为0、Context为1，Playwright1.58.0验证PASS（/tmp/chg130-worker-real-local-browser.log），没有向平台请求。caa8193增加后台回执读取与去重，仍按本次文件名/大小捕获并在最终POST精确核对CID/文件标识；平台Worker外发投稿同样受最终授权保护，不关闭Worker，不跳过原输入证明。单测拒绝其他文件/其他Worker，非Worker后台也覆盖；这只能证明漏监听能力已补，真实平台根因仍待验证。
 - 最新983全量PASS（/tmp/chg130-context-final-all.log）、51项百度浏览器PASS、15项B站浏览器PASS；新组合开始完整all --force-restart（/tmp/chg130-context-entry-environment.log），启动前再次核实无在途任务。未提前计为已部署或真实E2E成功。
 - 剩余PR反馈：匿名可播放媒体须关联原CID的实际播放来源，当前实现仅元数据和媒体时长不足，尚未修复，不宣称全部问题清零。
+
+- 完整all首轮在hdiutil verify报“资源暂时不可用”退出1，未计环境通过。正常卸载本轮旧挂载后从头force-restart重跑，/tmp/chg130-context-entry-environment-retry.log退出0，Cloud/Worker/Scheduler/两个前端/BitBrowser/DMG/登录烟测及挂载源记录通过。新包侧Agent校验SHA256=ad20a958d824987174d8db953244790bc46a983ed4a7d86ce345bcc8e644b80e，5f7e73a；初次打开工作环境处于启动中返回暂时不可达，数秒后正常三项读回。这个短暂启动提示不等于任务失败。原密码登录后正式retry21/22，待本轮真实结果。Agent5f7e73a CI run45786552349 success，Cloud PR正文已准备但写入认证未恢复，仍未创建。
+
+
+## 17:02–17:34真实结果与控件修复
+
+- 百度22/56按正常内容真实受理，回执1882910900152502022；submit_started_at=17:02:42、finished_at=17:02:49，reviewing。用户确认41正常；未再要求登录41、不重复投稿。自动核验后停止提示接口读取需人工核对，公开尚未证明。
+- Agent9d421ce在真实57中证明当前File与Vue视频行同对象、单视频、上传完成及CID/filename，原上传完成误拦截已排除。57随后标签定位失败，5e13f70隔离复现修复；新包部署SHA256=811db5c34af1c4a17b8acc6fb9c2802d921a1ef27070c092a0a49ee5e7d9b3cc，原生登录/工作环境三项正常。58通过标签后在二创内部checkbox检查失败，未提交且现场关闭，未伪造成功。
+- f9aee0e沿官方VideoRecreate._recreate绑定读取状态并通过原控件关闭二创；重复内部input复现旧代码FAIL，新25项B站隔离浏览器PASS（/tmp/chg130-recreate-after.log），另2项新增聚焦用例PASS（/tmp/chg130-recreate-focused.log），984项全量PASS（/tmp/chg130-recreate-unit.log）。不能仅据此声称真实二创已通过。572890e固定错误分类及隐私输出回归38项PASS（/tmp/chg130-diagnostic-categories.log）。
+- d4281f9修复CID公开播放来源绑定：可信原CID播放接口URL/redirect链与实际direct/blob已加载媒体对应；匹配元数据但错误媒体的用例先FAIL后PASS，984全量和30项相关用例PASS，真实公开仍未满足。
+- 两个百度账号回归素材146/147经真实AI生成正常文案，cover96–99四张逐张视觉检查通过。batch12保存ready/not_started；完整预检2行ready/issues=[]/缺口0，17:31:39启动创建23/24；23/59入口hover超时且未提交/已关闭，24/60等待原现场登录验证，异步问询#34。没有冒称批次通过。
+- 最新二创+错误分类源码包构建中/tmp/chg130-recreate-build.log；当前仍运行5e13f70。Agent5e CI45791667413 success，f9 CI45793027383运行中。Cloud PR因gh登录失效仍未创建，SSH推送正常。
+
+
+## 17:36–17:42 原尝试继续与PR收口进展
+
+- 用户确认#34正常后，原生任务24“已经处理，继续原尝试”恢复同一60；UI显示执行中、等待人工0。17:37:29提交，17:37:35受理submission1882913089029275698、reviewing，原账号UID6572476037，未重建尝试或重复投稿。百度22/24均有受理，公开尚未证明。
+- 实际gh auth status恢复成功，Cloud Draft PR59已创建：https://github.com/piqiu96/wt-media-cloud/pull/59 。四仓PR均存在但未合并；Cloud CI仍运行中，572890e Agent CI成功。
+- PR4706058925所述网络回执路径确有漏洞：三个独立隔离浏览器用例（另一个File对象/多视频/未完成）旧代码均FAIL（/tmp/chg130-binding-before.log）。1f98f70要求每次就绪均有当前File完成绑定，最终表单再强制检查；09bb371识别已结算尝试的固定上传副本/诊断文件，原缓存回归先FAIL后PASS。47项浏览器+缓存PASS（/tmp/chg130-binding-cache-after.log），986项全量PASS（/tmp/chg130-binding-cache-unit.log），未知文件/链接保护保持。
+- fbafd6b补百度原稿核验回退的固定原因分类及HTTP/errno数值，不输出账号、Cookie、地址或平台原文；42项相关回归PASS（/tmp/chg130-check-diagnostics.log）。最新组合build-dmg=/tmp/chg130-binding-cache-build.log，仍未部署，不能当最终真实验证通过。

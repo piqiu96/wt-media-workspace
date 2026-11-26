@@ -32,7 +32,7 @@
 1. **Cloud固定平台规则。** 在既有publish模块增加百度/B站能力与规则映射；建议新增只读GET /api/v1/publication/platform-rules（名称为提案，非已存在），输出已开放平台、规则修订、必要字段/限制、封面规格及新建默认。固定注册，不建设通用动态表单/工作流平台。未验收的B站可在指定验收配置中测试，面向普通生产开放须本轮真实闭环通过。
 2. **Cloud提供方先行。** 更新contracts/cloud-api/v1/publication*.openapi.yaml与publication-plan/batch、cloud-agent-api/v1/publications.openapi.yaml、相关content/错误定义，再生成Agent/Desktop消费。内容按平台区分，复用公共资源与确认；扩展B站标题/简介/分区/标签/声明/条件来源与必要封面引用，保持旧百度解释及旧快照。ID/URL按平台分别验证，百度数字ID限制不全局取消；B站稿件标识以实际回执验证后选择稳定canonical标识，保存必要原始回执，不从标题或最新作品猜测。
 3. **Cloud业务实现。** 内容生成/批量配置/封面、保存/编辑、资格/资源盘点、start事务、领取资格、提交前校验、原稿核验/人工resolve、可信作品关联和统计全部消费同一规则。保存零任务/零占用，start一次性任务/占用/授权；平台占用唯一键复用，Profile互斥跨平台，外部IO不进入数据库事务。必要JSON/引用扩展用正式migration和兼容测试，不建第二套任务/计划表。
-4. **Agent平台能力。** 新增platforms/bilibili/publisher及publication_check，复用Publisher/PublishControl与PublicationReference/Observation接口；平台客户端在clients/bilibili，CDP/Cookie在services/browser。runner/bootstrap移除硬编码百度分支但不下放Cloud业务规则。上传/封面/声明和最后表单读回必须成功；最终提交前走原before_submit许可及本地停止复查。
+4. **Agent平台能力。** 新增platforms/bilibili/publisher及publication_check，复用Publisher/PublishControl与PublicationReference/Observation接口；平台客户端在clients/bilibili，CDP/Cookie在services/browser。runner/bootstrap移除硬编码百度分支但不下放Cloud业务规则。上传/封面/声明和最后表单读回必须成功；上传身份同时支持匹配网络响应或当前成功视频与本次所选File对象的精确绑定，不能因缺少特定网络事件拒绝已正常上传的视频；最终提交前走原before_submit许可及本地停止复查。
 5. **一次副作用与核验。** 最后点击后响应不明确保留unknown/reviewing与占用，outbox补报同一attempt，不重放提交；依据原稿件标识核验审核/退回/公开及UID/时间，审核中不算公开。跨批/跨平台共享Profile只允许一处工作，关闭现场需真实依据。
 6. **共用Vue与Desktop。** 任务、批次内容准备/批量配置/详情、计划按规则补字段与按钮；保留原型布局及所有已确认导航。Desktop只消费契约和打包Playwright平台适配，不复制业务前端，不另建本机FFmpeg流程。
 
