@@ -1,10 +1,11 @@
 ---
 id: CHG-20261127-131
 parent: delivery/milestones/M-publishing-operations.md#B站作品指标
-status: VERIFYING
+status: DONE
 depends_on: []
 affected_repos: ["wt-media-cloud", "wt-media-agent", "wt-media-desktop", "wt-media-workspace"]
 risk: M
+merge_commits: {"wt-media-cloud":"ca49da81bd99fef6417cc098b8452e4074692bb1","wt-media-agent":"e7889f98eaa11ee5aaeeea7a0ff5d267fd659a84","wt-media-desktop":"5753a81e9d47d9ade493a08bcc988b4767517e65","wt-media-workspace":"521d2edcf95b15593366207baab29f543d4bd0b6"}
 ---
 
 # CHG-20261127-131：B站作品六项指标
@@ -31,4 +32,6 @@ References: [发布工程](../../../docs/engineering/specs/publishing-management
 - [x] 手动刷新和自动到期由Agent真实API采集并读回，原aid/UID一致，原发布事实不变。
 - [x] 失败/限流/错误UID/字段缺失不写假0，保留最后成功值；重试退避。
 - [x] 角色/类目范围、多领取竞争、租约过期及迟到回报验证通过，历史快照可追溯。
-- [ ] 定向Go/Python/Vue测试、真实HTTP到Cloud到浏览器全流程、独立PR及CI证据完成；不以mock代替真实验收。
+- [x] 定向Go/Python/Vue测试、真实HTTP到Cloud到浏览器全流程、独立PR及CI证据完成；不以mock代替真实验收。
+
+技术交付完成：Cloud PR60、Agent PR22、Desktop PR21已merge commit合入main并本地main核对；Workspace PR73随本记录收口。最终Cloud CI45877466848成功，最新8c0b121自动Code Review无新发现；正式Sidecar/安装版/浏览器和组合测试均通过。CHG130的整体发布签收不由本项代替，用户最终整体验收仍保留。

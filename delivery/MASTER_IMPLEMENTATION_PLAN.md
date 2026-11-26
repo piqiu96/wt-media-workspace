@@ -545,7 +545,7 @@ PLAN 计划闭环：全部批次准备与启动冻结 → 10%推进/批次快捷
 | 目标 | 在完整百度能力上依次扩展B站、小红书，完成三平台任务/批次/计划回归 |
 | 依赖 | 整体验收依赖 M-publishing-plan `DONE`；本轮B站适配在128技术验收且百度、计划main基线核对后开始 |
 | 业务验收 | [后续平台与三平台](milestones/M-publishing-operations.md) |
-| Active CHG | CHG-20261127-131 |
+| Active CHG | None |
 | Evidence | [129广告画中画成片准备](completed/CHG-20261126-129/evidence/verification.md)；B站/小红书真实发布尚未验收 |
 
 候选 CHG：
@@ -709,4 +709,4 @@ Codex 每次必须按 `AGENT-INDEX.md` §4 的**读取顺序**执行——该节
 
 2026-11-06 用户确认的资源与合成闭环增量按 [M4-O](milestones/M4-content-production.md#m4-o-resource-composition-cutover) 及CHG121～125顺序独立交付；已授权清理现有改动后自动继续，在原仓库执行。
 
-2026-11-27用户确认独立新增[B站作品六项指标](active/CHG-20261127-131/change.md)，验收闭环见[作品指标](milestones/M-publishing-operations.md#B站作品指标)，不改变CHG130发布验收范围。
+2026-11-27用户确认独立新增[B站作品六项指标](completed/CHG-20261127-131/change.md)，验收闭环见[作品指标](milestones/M-publishing-operations.md#B站作品指标)，不改变CHG130发布验收范围。

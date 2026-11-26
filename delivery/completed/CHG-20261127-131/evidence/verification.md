@@ -8,7 +8,7 @@
 - Agent `PYTHONPATH=src .../python -m unittest discover -s tests -q`：955项PASS，含六项API parser/身份、缺字段、类型/范围、限流、Cloud claim和轮询token切换测试；Local/Sidecar装配22项PASS。
 - Workspace `verify_m0_config.py`：PASS。
 
-初次提交时的待验项目由下方后续实测承接；当前仅Cloud最新CI及PR合并收尾。
+初次提交时的待验项目由下方后续实测承接；这些项目已完成，见文末最终交付。
 
 ## 真实链路与浏览器
 
@@ -22,7 +22,7 @@
 - 最终定向作品页10项PASS。Web全量168文件1248项PASS（--maxWorkers=2，30.46s）；曾在并行打包时发生既有localSettingsWiring导入测试5秒超时，单独重跑9项PASS，随后全量PASS，未修改超时阈值。
 - Cloud模块全量PASS；Workspace220项PASS；Desktop契约锁同步，配置/架构边界校验PASS。
 
-PR：Cloud60（当前70f0282）、Agent22（ca10699）、Desktop21（仅契约锁）、Workspace73。Agent/Desktop/Workspace CI已PASS，Cloud最新提交CI及最终环境/浏览器恢复仍待最终记录。当前验证组合同时包含未合并130，采集本身只读已有B站公开work；新作品入库继续由130提供，不增加手工导入或冒充新发布。
+PR：Cloud60（当前70f0282）、Agent22（ca10699）、Desktop21（仅契约锁）、Workspace73。四仓CI均已PASS，最终环境和浏览器/安装版恢复均通过。当前验证组合同时包含未合并130，采集本身只读已有B站公开work；新作品入库继续由130提供，不增加手工导入或冒充新发布。
 
 ## 最终源码复验（8c0b121）
 
@@ -38,3 +38,9 @@ PR：Cloud60（当前70f0282）、Agent22（ca10699）、Desktop21（仅契约�
 最终冻结组合完整环境exit0，全部gate PASS；包、源码及SHA见final-environment.json。通过CUA按明确挂载路径选择新包，正常operator01登录并替换本轮测试Desktop会话；环境弹层显示本机服务已连接、比特浏览器已登录指定账号、执行凭证已配置。安装版作品16点击刷新，正式包内Sidecar按生产轮询自动完成，页面成功更新时间02:45，六项仍7/1/2/0/0/0；详情来源/真实UID不变，返回列表状态和更新时间一致。此项不依赖前面的短轮询测试驱动。
 
 名称选择曾打开output目录旧副本；通过进程可执行路径确认并用既有launch-dmg入口重启，最终进程位于desktop-review-mount。没有修改登录逻辑或使用旧包冒充本轮验证。浏览器走查也已完成，临时1440断点已恢复默认。
+
+## 最终交付
+
+Cloud 8c0b121 的完整CI45877466848成功（含原型、迁移重放、release binaries和双Web构建、打包校验）；Agent22、Desktop21和Workspace73检查绿色。Cloud/Agent最新自动Code Review均无新发现。运行仓分别合入main：Cloud ca49da81、Agent e7889f98、Desktop 5753a81e；本地main确认包含功能提交。Workspace的521d2ed是最终验收证据提交，随PR73进入main。
+
+当前新包已正常登录并停留作品列表。只交付B站六项指标，未测试Windows/x86安装包，不改变130的待验事项。

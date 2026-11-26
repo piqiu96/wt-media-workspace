@@ -1078,3 +1078,29 @@ releases:
       macos_arm64: "fresh packaged configuration E2E and walkthrough passed"
     residual_risks:
       - "No execution or publication in CHG107; CHG108/109 and final whole-user acceptance remain pending."
+
+  - release: "chg131-bilibili-work-metrics-20261127"
+    status: verified
+    date: "2026-11-27"
+    scope: bilibili_six_public_work_counters_only
+    environment: local_development
+    components:
+      cloud: "3739e7c (130 + 8c0b121; feature main ca49da81)"
+      local_agent: "079a231 (130 + ca10699; feature main e7889f98)"
+      desktop: "4a2692d (130 + 7f43c38; feature main 5753a81e)"
+    contracts:
+      cloud_api: "v1@2026.11.27.1"
+      cloud_agent_api: "v1@2026.11.27.1"
+      local_agent_api: "v1@2026.11.25.2"
+      minimum_agent_contract_revision: "2026.11.25.2"
+    verification:
+      - "Five real Bilibili works: aid/UID checked, six counters saved, public API readback equal."
+      - "Combined Web 1285, Agent 1001, Cloud modules and isolated MySQL, Workspace 220 PASS; Cloud CI45877466848 and other repository checks PASS."
+      - "Fresh arm64 DMG, signature/manifest/health/login gates and CUA browser/native walkthrough PASS."
+      - "Normal packaged Desktop login and its formal Sidecar refreshed work16 to 02:45; counts7/1/2/0/0/0, publication facts unchanged."
+      - "Controlled rate-limit fault retained counters; real recovery, scroll preservation and list/detail readback PASS."
+    evidence:
+      workspace: "delivery/completed/CHG-20261127-131/evidence/verification.md"
+    residual_risks:
+      - "Windows and macOS x86_64 packages were not built for this metric feature."
+      - "This verifies metrics for existing public works; CHG130 publishing acceptance remains separate."

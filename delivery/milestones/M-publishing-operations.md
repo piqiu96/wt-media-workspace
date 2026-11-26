@@ -1,6 +1,6 @@
 # M-publishing-operations：后续平台与三平台整体回归
 
-- 状态：`IN_PROGRESS`；Active CHG：CHG-20261127-131；没有B站/小红书生产发布验收证据。
+- 状态：`IN_PROGRESS`；Active CHG：None；没有B站/小红书生产发布验收证据。
 - Evidence：[129广告画中画成片准备](../completed/CHG-20261126-129/evidence/verification.md)。
 - 依据：[PRD第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.5、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md)。
 - 依赖：整体验收依赖[M-publishing-plan](M-publishing-plan.md) `DONE`；本轮B站在[M7](M7-batch-publishing.md)的128技术验收及百度、计划main基线核对后实施，整体人工签收放在最终交付后，小红书依赖B站真实验收开放。
@@ -68,4 +68,6 @@
 
 ## B站作品指标
 
-2026-11-27用户确认新增独立闭环[CHG131](../active/CHG-20261127-131/change.md)：已核实公开作品→Agent无CK API核对aid/UID并采集六项累计指标→Cloud持久化最新值和快照→作品列表/详情看到数值、更新时间并可刷新。Local Agent在线时首次、手动和每小时到期刷新；离线显示等待，失败保留旧数和失败提示，未知不冒充0。刷新与投稿结果独立。此项是本次明确新增范围，替代上文对该六项采集的排除；不恢复互动管理/综合看板/其他平台采集。
+2026-11-27用户确认新增独立闭环[CHG131](../completed/CHG-20261127-131/change.md)：已核实公开作品→Agent无CK API核对aid/UID并采集六项累计指标→Cloud持久化最新值和快照→作品列表/详情看到数值、更新时间并可刷新。Local Agent在线时首次、手动和每小时到期刷新；离线显示等待，失败保留旧数和失败提示，未知不冒充0。刷新与投稿结果独立。此项是本次明确新增范围，替代上文对该六项采集的排除；不恢复互动管理/综合看板/其他平台采集。
+
+B站六项指标技术交付已完成：五个真实作品、浏览器与正式安装版Sidecar刷新及异常恢复均验证通过；四仓PR60/22/21/73收口。用户整体发布验收仍待CHG130，不以本项代替。
