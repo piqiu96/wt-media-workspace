@@ -115,3 +115,5 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 
 - 重建环境复核曾发现compose_worker_capacity基础行被清空，Worker因“sql: no rows”退出；已按迁移20261014_059恢复id=1/max_running=2（基础容量，非业务任务），随后重启并重新验证。首次wt chg verify的Cloud全模块、Agent974项、Desktop及Workspace220项测试阶段已运行，环境阶段因该基础行缺失失败；不将首次总命令标为通过，后续仅复核修正后的环境。
 - 新包构建成功，前端来源0.1.0+6a366f7（digest b57ae1f87ac471e87840f0a770a1aec3fe0e4afcb39b8f7b846e61f783c51bf1），DMG位于Desktop target/release/bundle/dmg；未冒充已完成包内UI人工走查。
+
+- 修正基础容量后，local_env.py up --force-restart及verify均退出0；Cloud、文件Worker、合成Worker、合成Scheduler、Agent、BitBrowser、双前端入口、前端来源/新鲜度、DMG与operator01原密码登录烟测全部PASS。日志/tmp/chg130-reset-environment-final.log、/tmp/chg130-reset-final-verify.log。配置治理、Product/Master对齐、Delivery治理检查PASS。已注销临时维护Desktop会话，避免用户登录时被维护会话占用。
