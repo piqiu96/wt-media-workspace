@@ -469,3 +469,13 @@ Cloud070d3ae CI run45830769360已success（13:50:49Z），包含Cloud/Web、原�
 安装版原计划3结束弹窗明确按真实公开结果结束、保留目标和缺口，输入79字真实原因并逐字核对后确认。读回status ended/end_reason unmet，目标2/公开0/缺口2、processed2/2，两批均ended，只有详情，页脚只有返回；原21:22人工推进审计与结束记录保留。失败结束路径PASS，不计正常公开路径通过。
 
 22:22正常POST /compose-tasks source_output_id148/149、remake_confirmed=true，幂等键独立创建batch76/77、task752/753，使用尚未投稿的素材196/199。原策略1016快照/新广告SHA/120秒/6秒尾部不变，新的随机种子，原失败占用与历史不修改。不复制已公开成片反复投递。新任务运行中；成功后按正常AI生成与审阅采用流程再准备新两批计划。为避免黑色首帧封面，已从原未投稿视频60秒提取并实看游戏内容，后续可经正常图片库上传作为同素材封面背景；尚未上传。
+
+
+## 22:47 持续传输被5分钟资源时限截断的修复
+
+- 新合成752已成功为output151；753尝试345源视频准备713898ms成功，fetch_guide恰300109ms后storage_error并自动重试，第二次重新下载源素材。策略只读分类确认广告为公开HTTPS直链、无查询、非file-resource/s3引用；现有DownloadGuide的固定5分钟Client.Timeout命中该真实路径，不是成片校验或平台发布错误。
+- 抽出原HTTP Client配置但仍保持5分钟，加入Go1.25+ testing/synctest虚拟时钟回归：8分钟持续字节传输旧实现FAIL（Client.Timeout while reading body），/tmp/chg130-guide-transfer-before.log，0.682秒，无真实8分钟等待或外部请求。
+- 4922330：单公开资源最大1小时，原任务Context仍可提前取消/截止；在原固定公网连接上每次Read刷新30秒停滞期限，保留10秒连接/握手、30秒响应头、DNS固定/逐跳校验/无代理和500MiB上限。测试持续8分钟完成、父任务90秒取消删除partial、每20秒有数据跨40秒仍通过、30秒停滞退出，及既有非公网/超限拒绝6项PASS0.543秒，/tmp/chg130-guide-transfer-after.log。
+- production/compose/executor/model/repository/service、jobs、storage相关包fresh回归PASS（/tmp/chg130-guide-transfer-regression.log）；完整业务模块Go回归PASS（/tmp/chg130-guide-full-modules.log）。无Schema/Contract变化，不改Worker总截止或发布授权。
+- 正常POST /compose-tasks/753/cancel，cancel_requested=true后实际cancelled，保留尝试345失败和346取消；752已success，无在途发布/合成后才强制正确配置all重建492（/tmp/chg130-guide-fixed-environment-all.log，执行中）。部署后再正常retry753，不修改输入和种子。
+- 已经正常图片库上传原未投稿视频游戏帧：素材196→file100/asset4，199→file101/asset5，可作新成片对应封面背景。前10秒FFmpeg blackdetect未发现持续>=0.5秒黑屏；不以黑色缩略图推断整片黑屏。
