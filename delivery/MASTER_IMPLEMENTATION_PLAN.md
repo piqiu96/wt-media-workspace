@@ -545,7 +545,7 @@ PLAN 计划闭环：全部批次准备与启动冻结 → 10%推进/批次快捷
 | 目标 | 在完整百度能力上依次扩展B站、小红书，完成三平台任务/批次/计划回归 |
 | 依赖 | 整体验收依赖 M-publishing-plan `DONE`；本轮B站适配在128技术验收且百度、计划main基线核对后开始 |
 | 业务验收 | [后续平台与三平台](milestones/M-publishing-operations.md) |
-| Active CHG | None |
+| Active CHG | CHG-20261127-131 |
 | Evidence | [129广告画中画成片准备](completed/CHG-20261126-129/evidence/verification.md)；B站/小红书真实发布尚未验收 |
 
 候选 CHG：

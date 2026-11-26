@@ -1,6 +1,6 @@
 # M-publishing-operations：后续平台与三平台整体回归
 
-- 状态：`IN_PROGRESS`；Active CHG：None；没有B站/小红书生产发布验收证据。
+- 状态：`IN_PROGRESS`；Active CHG：CHG-20261127-131；没有B站/小红书生产发布验收证据。
 - Evidence：[129广告画中画成片准备](../completed/CHG-20261126-129/evidence/verification.md)。
 - 依据：[PRD第六章](../../docs/product/prd/详细文档/第六章_发布管理.md) 6.5、6.8；[发布工程设计](../../docs/engineering/specs/publishing-management.md)。
 - 依赖：整体验收依赖[M-publishing-plan](M-publishing-plan.md) `DONE`；本轮B站在[M7](M7-batch-publishing.md)的128技术验收及百度、计划main基线核对后实施，整体人工签收放在最终交付后，小红书依赖B站真实验收开放。
