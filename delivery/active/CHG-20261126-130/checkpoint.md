@@ -23,3 +23,9 @@
 - 纠正此前旧稿阻塞判断：官方源码证明“继续编辑”是空白上传首页可选旧稿提示，非当前编辑器已恢复。Agent98a9cc1已修复过宽拒绝并推送；不点恢复/不用了，空白入口正常上传，仅实际已加载视频拒绝，保持当前视频唯一回执/最终POST校验。976单测/11隔离浏览器PASS，包重建/tmp/chg130-recovery-banner-build.log。此前询问是否丢弃旧稿不再是空白上传的必要前置，切勿继续以此停工；真实新包投稿/百度故障仍待复验。
 
 - 误拦截修复98a9cc1的新包已构建、挂载、登录并启动，Agent sha256=2de23246daa4a4e08ebaee3332cdeab3b6d6c573183dcf988cd507c01ef530ed，工作环境三项正常；CI verify success。旧稿首页提示不再要求先清理，前述保留/删除问题对空白入口已无依赖。仍需以正常内容进行真实投稿复验，不宣称平台已恢复公开。
+
+- 稳定性继续：发现并修复批次/计划启动校验仍固定百家号，Cloud30d5dc0；实际同一批次9预检从false/content_incomplete变为true/两行ready且无issues。增加B站启动和过期空间封面回归，publish全模块PASS。正在重建新组合/tmp/chg130-stability-platform-environment.log；尚未启动正式批次或计入公开成功。
+
+- 同批次9下一层真实启动404已定位不是权限：事务加锁了B站不存在的PortraitCoverFileID=0。Cloud49afaf3改复用taskCoverIDs锁实际主/第二封面；publish全包和隔离MySQL事务测试PASS。第二轮新组合重建/tmp/chg130-stability-cover-environment.log，尚无新正式任务，待登录新包继续同批执行。
+
+- 15:38新包同批9已成功原子启动，任务20/21，20进入group1/attempt49 preparing，21未分组pending。当前有真实在飞任务，禁止为构建或诊断随意重启执行端；先读回任务状态并安全处理。新组合Cloud49afaf3/Agent98a9cc1，环境日志/tmp/chg130-stability-cover-environment.log。

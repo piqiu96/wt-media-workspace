@@ -178,3 +178,16 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 修复推送现有Agent PR21，安装包重建日志/tmp/chg130-recovery-banner-build.log。尚未以新版本完成真实平台投稿复验，不能把该根因已修复扩大为B站/百度全流程已通过。既有任务18/19继续保留不可变历史，不用旧验收标题重投；待使用已准备正常内容的新流程验证。
 
 - 98a9cc1 GitHub verify已completed/success；新DMG构建及launch-dmg均退出0，已挂载并原密码登录operator01。包内Agent SHA256=2de23246daa4a4e08ebaee3332cdeab3b6d6c573183dcf988cd507c01ef530ed；工作环境UI读回本机服务已连接/比特已登录指定账号/执行凭证已配置。当前运行已切换到误拦截修复包，未使用旧任务验收文案投稿。真实发布复验尚未完成。
+
+
+## 稳定性复验：启动预检平台错用
+
+- 以真实批次9正常内容执行execution-preview，复现配置ready但两候选均content_incomplete/can_start=false。根因是batch_execution.go及plan_execution.go仍调用固定百家号contentValid，导致B站字段被当作百家号非法输入；既有保存校验使用正确平台，因此出现就绪与启动矛盾。
+- Cloud30d5dc0改为使用各批次实际平台contentValidFor，删除无平台的旧包装，避免新调用误用；同步补齐启动时SpaceCoverRender短标题一致性校验。新增真实Service准备任务测试覆盖B站可启动和空间封面过期拒绝；publish Handler/Model/Repository/Service全模块回归PASS。
+- 最新Cloud启动后，以同一批次9/revision5及同样候选读回execution-preview：can_start=true，两行ready=true/issues=[]，目标2/可建2/缺口0。未通过削弱规则或跳过检查使其就绪。新组合重建日志/tmp/chg130-stability-platform-environment.log；正式执行及平台结果继续验证，尚未计为通过。
+
+- 新包实际点击批次9开始发布，预检成功后事务返回404“批次或资源不存在/无权限”，读回仍未启动/0任务。正常API同输入复现，Cloud SQL日志定位operations_files id=0的FOR UPDATE；batch_start.go仍直接将PortraitCoverFileID加入锁集合，B站该值为0，且遗漏SpaceCoverFileID。
+- Cloud49afaf3复用单条任务已有taskCoverIDs，统一主封面及存在的第二封面锁。发布模块全包PASS；新增隔离MySQL事务回归验证B站锁集合精确为[1,2]并在故意终止后回滚，已实际执行PASS。首次命令因测试工作目录导致migrations路径错误失败，补齐WT_MEDIA_CLOUD_HOME后重跑通过，不掩盖初次失败。没有修改固定运行库的业务状态来使启动成功。
+- 新组合完整重建日志/tmp/chg130-stability-cover-environment.log，后续继续同批真实启动验证；此时仍未计为实际投稿成功。
+
+- 新组合Cloud49afaf3/Agent98a9cc1完整重建及原密码登录后，同批次9正常start返回running/revision6，原子创建task20/21，目标2/创建2/缺口0。首次group1仅task20，task21保持pending未授权，实际只有一个Profile时并发5已向下兼容为串行分组。task20/attempt49已由安装包Agent领取preparing。真实投稿结果继续核验，不能计为已公开。
