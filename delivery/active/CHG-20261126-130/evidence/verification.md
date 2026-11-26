@@ -561,3 +561,23 @@ Cloud55 CI run45863579211 PASS12分15秒，最新代码已通过远程完整验�
 IAB直接打开本次原aid超30秒、Chrome连接器不可用；改从安装版work16正常公开链接打开默认Chrome，native CUA成功读取精确av117683798410574（BV1pk1EzxEyT）。实际标题、UID3706971620379308/游戏魔王嘟嘟、00:59:45、简介、五个普通游戏标签均与原task30一致，未显示旧营销声明。页面实际正在播，主动暂停后截图01:04/01:54为正常游戏正片；本轮是现有登录浏览器的主动走查，不称匿名走查，匿名能力由原自动检查实证。
 
 进度条跳广告段时CUA返回windowNotFoundAtPosition；重新读取实际截图仍停01:04。后续窗口Raise/播放器控制调用返回input_required未完成，下一次读取等待289秒后kernel重置/publicChrome变量丢失。没有假称广告/片尾已在公开页跳转通过；二者已有新153本地20/110秒实际画面和音轨客观证据。未读取其他私有标签页或绕过既有拒绝，保留本次公开页供review；工程师私有后台完整走查及主观听音仍未证明。
+
+
+## 2026-11-27 简介可空与取消额外素材来源
+
+用户明确没有有效补充就先不写简介，尤其不需要“素材来源：xx”。核实运行时本来没有自动拼接作者，旧30等署名来自工程师验收准备时的额外操作，不是产品必填；本轮停止该做法并移除本地准备脚本追加步骤，旧冻结/投稿记录不改写。新增正式生成提示：输入只有标题或没有有效补充时description返回空字符串，不重复标题、不凑泛泛介绍、不写来源/作者。百度description仍是必填发布标题。
+
+旧后端将空B站简介拒为model field invalid，旧单条前端拒为空建议，批量公共覆盖跳过空串；新增回归真实FAIL（/tmp/chg130-empty-intro-before.log、/tmp/chg130-empty-intro-web-before.log）。进一步发现批量AI审阅也拒空，修复测试上下文后真实复现错误，/tmp/chg130-empty-intro-batch-before.log。ef52314分别修复可选字段校验、单条显式采用、批量覆盖及批量AI审阅，不默认清掉人工内容；空建议显示不填写简介，输入框提示可留空。203发布Vue PASS7.54秒，含批量实际prepare/review/apply路径与百度空标题拒绝；publish四包PASS，/tmp/chg130-empty-intro-all-publication.log、/tmp/chg130-empty-intro-go-after.log。
+
+正确配置完整all正在重建ef52314，/tmp/chg130-empty-intro-environment-all.log；完整Web限制2worker验证中，/tmp/chg130-empty-intro-full-web.log。真实AI和运行组合核实待完成，不提前称PASS。
+
+
+完整Web174文件1280项PASS37.80秒，/tmp/chg130-empty-intro-full-web.log。首轮真实生成title-only返回description空串通过，但old-filler仍同义改写旧简介，因此不计该场景通过，/tmp/chg130-empty-intro-real-ai.log。继续明确旧简介不是新素材证据、默认留空，仅本次要求提供具体新增信息才写；重新publish Service测试PASS，/tmp/chg130-empty-intro-final-go.log。新最终组合及两个真实场景待重新验证。
+
+
+8214c5c真实正常生成接口复验，两场景均无额外文案要求：仅素材标题→description空串；传入旧公开简介/署名作为待评审草稿→description空串。两条完整item_result字段修订均匹配，原30内容读回完全未变化，未创建/重复投稿。/tmp/chg130-empty-intro-final-real-ai.log，私有收据empty-intro-real-ai.json。服务最终回归PASS0.566秒，前端未再变化，完整174文件1280项PASS仍适用。
+
+首轮ef完整all因执行中提交821源码，最终Freshness门禁检测Compose Scheduler构建早于最新源码而exit1，未宣称环境通过；冻结821后从头正确配置完整all再次重建，/tmp/chg130-empty-intro-final-environment-all.log，待最终结果。
+
+
+最终8214c5c正确配置完整all exit0，/tmp/chg130-empty-intro-final-environment-all.log，挂载前端0.1.0+8214c5c.dirty仅非本人原型修改，Agent58f8102/Desktop31fd8e1。全部基础门禁、双端构建、DMG验证、登录smoke和挂载通过。两个真实AI空简介用例通过；旧已发布30未改，没有新增投稿。最新Cloud821 CI run45868739707待结果，当前小调整已交付到运行包，整体CHG继续VERIFYING。

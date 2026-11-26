@@ -9,7 +9,7 @@
 
 ## 当前源与运行组合
 
-- Cloud55ca11c（含f05baae标题检索、ec79164普通/风格、bb9b9e6副本/源标签清理及55换平台清配置）；Agent58f8102；Desktop31fd8e1。工作分支均chg/CHG-20261126-130。
+- Cloud8214c5c（新增ef52314空简介支持和821旧草稿不算新证据，含55ca11c及f05baae标题检索、ec79164普通/风格、bb9b9e6副本/源标签清理及55换平台清配置）；Agent58f8102；Desktop31fd8e1。工作分支均chg/CHG-20261126-130。
 - 最新正确配置完整all exit0：WT_MEDIA_CLOUD_CONFIG_PATH=/tmp/chg130-cloud-config python3 scripts/dev/local_env.py all --force-restart；日志/tmp/chg130-weiguang-delivery-environment-all.log。挂载前端0.1.0+55ca11c.dirty，dirty仅未提交的他人原型，sidecarSHA256=5e1340e6747d91e1646f4a0729d1b8d1e05b9fe6cda5eeb81d96b89461308b49；最终包原路径target/release/bundle/dmg/起飞_0.1.0-local.31fd8e1950_aarch64.dmg。01:10安装版原运营正常登录，三项工作环境正常。
 - 私有B站测试配置必须保留上述环境变量，默认生产开关仍false。单独verify无Sidecar key的ownership拒绝不是完整all通过证据，不反复重建来绕过保护。
 - 保留Cloud web/example大量非本人改动与Workspace docs/design六文件，不暂存/还原/覆盖；只显式暂存本CHG路径。
@@ -39,3 +39,13 @@
 4. 私有证据根相邻.local/m2b/chg130-new-data；API helper /tmp/chg130_api.py（不输出凭据），8188/api/v1；attempt为/publication/:id/attempt。新微光证据weiguang-*，当前public task30/work16/aid117683798410574。起飞在相邻.local/m2b/desktop-review-mount/起飞.app。中文输入用paste。
 
 公开页补充：通过work16正常外链打开默认Chrome后native CUA可读本次新publicURL，BV1pk1EzxEyT；先前IAB超时/Chrome连接器不可用均不当PASS。正片已核对并暂停在01:04/01:54，广告/片尾跳转失败后CUA会话重置；当前没有可用绑定，活动已browser-complete，无接管等待。本次公开页是现有登录Chrome，不冒称工程师匿名走查。勿关闭用户其他Chrome标签。
+
+## 最新简介调整（已落地）
+
+用户要求B站简介无有效补充留空，不要额外素材来源。Cloud ef52314/8214c5c已提交推送；203发布Vue/Go发布四包PASS，完整Web174文件1280项PASS37.80秒，最终Service回归PASS0.566秒。单条、批量AI审阅和公共覆盖支持空简介；明确采用才清原文，百度标题仍必填。旧来源是工程师验收准备额外拼接，已停止且移除本地准备脚本追加，不改历史冻结/公开记录。
+
+8214c5c真实正常API、无额外要求：title-only与old-filler均返回description空串，原30内容读回未变化；私有收据empty-intro-real-ai.json，日志/tmp/chg130-empty-intro-final-real-ai.log。没有具体信息默认不生成简介，仅本次要求给出标题外的具体补充时才写，避免同义改写旧套话。
+
+正确配置最终完整all exit0，/tmp/chg130-empty-intro-final-environment-all.log，挂载前端0.1.0+8214c5c.dirty（仅原型非本人变更），Agent58f8102/Desktop31fd8e1。821包已更新挂载，脚本门禁/登录smoke全部PASS，未冒称本轮额外原生走查。首轮ef构建因执行中提交821，freshness门禁检测Scheduler早于最新提交而exit1，不计PASS；冻结821后从头重建成功。
+
+最新Cloud821 CI run45868739707待结果；此前55 CI已PASS。本轮无新投稿，仍待原整体CHG剩余走查/main合并与最终main组合，不标DONE。当前App为最新821登录页，CUA本轮未调用，无接管等待。
