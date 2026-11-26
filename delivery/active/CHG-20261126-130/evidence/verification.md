@@ -92,3 +92,12 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - Cloud单条页面46项定向回归PASS，日志`/tmp/chg130-final-detail-ui.log`。Desktop PR20已创建：https://github.com/piqiu96/wt-media-desktop/pull/20 。Agent9b13b70对应CI verify为success；新提交CI/独立审查仍待核对。
 - 期间本机负载实测超过600，隔离浏览器启动/连接也失败；仅清理本轮`wt-publisher-browser-*`测试进程，不终止其他BitBrowser Profile。负载回落后恢复测试。未把资源异常下的超时记为平台业务通过。
 - 当前继续强制重建73a3829组合，尚无真实受理/公开、独立批次、两批计划或最终浏览器验收PASS。
+
+## 当前环境阻断及CI核对（11:09后）
+
+- 最新组合已强制重建并挂载，frontend=`0.1.0+b4372d4.dirty`，Agent源提交73a3829；健康、Worker/Scheduler、两端入口、资源来源、DMG和登录门禁通过，已在新包正常登录。
+- task17 / attempt43在`publication_preparation.py:104`的Profile归属扫描处停止，未打开本次执行现场；Cloud保守投影为`uncertain`，没有稿件回执或公开作品。再次读取BitBrowser完整快照：main_user_id仍为`2c9bc06191effa4e0191f9589996619f`，仅剩窗口41/39/34；原窗口51的Bit Profile ID不在列表。已请求恢复原窗口及登录或提供另一个可用本人B站窗口；不盲目重试未知任务。
+- 随后浏览器工具明确报告Mac已锁定、自动解锁失败。已请求手动解锁，期间不继续CUA操作或伪造浏览器验收。
+- Workspace PR72已由GitHub页面提交并由公开API确认open/非draft：https://github.com/piqiu96/wt-media-workspace/pull/72 。Cloud PR尚未建立，仅准备好表单。
+- Agent73a3829自动审查completed且无finding；其CI verify失败于Test Agent步骤。完整日志下载API无认证返回403（要求仓库管理权限），现有连接器不可用。Desktop31fd8e1与Workspace8f98503对应CI均success。
+- 为定位CI，创建本轮独立干净工作树`/tmp/chg130-agent-ci`，以已安装Python3.12运行`UV_PYTHON=3.12 scripts/bootstrap.sh`、`scripts/test.sh`：974项PASS，脚本退出0且未污染.local。日志`/tmp/chg130-agent-ci-python312.log`。本机3.12未复现Linux CI失败，未宣称CI已修复或通过；解锁后继续读取Actions完整日志定位。
