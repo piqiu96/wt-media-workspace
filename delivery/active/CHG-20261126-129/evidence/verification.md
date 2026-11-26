@@ -19,3 +19,7 @@
 - 任务734资源快照仅source/ad/ending。新任务737种子与734不同；短源738由管理员重试后attempt_count=2再次失败，种子与初次一致，成片ID始终为空。普通运营重试未获授权，沿现有管理权限完成。取消任务739读回cancelled、attempt_count=0、成片ID为空。
 - 追加真实静音采样断言时，探测命令使用“.5”时长被FFmpeg拒绝，修正为“0.5”后通过（/tmp/chg129-silence-real.log）。最新测试提交c223f02。
 - 环境首次verify因提交更新后Compose scheduler新鲜度检查失败而停止，已按完整up --force-restart→build-dmg→verify→launch重跑，日志/tmp/chg129-environment-head.log。
+
+- 最新完整环境up/build-dmg/CHG verify/launch全部通过（/tmp/chg129-environment-head.log），挂载安装版frontend=0.1.0+c223f02.dirty。安装版实际operator01登录后，核对新模板策略详情、手动建单选类目/策略及模板参数。仅正片起止/上限可调，广告URL/位置/宽度/转场固定，无开头字段。关闭弹层返回原任务页。
+- 安装版合成任务列表核对手动/立即/定时/再次制作成功、短源失败和取消记录；成片管理实际显示141和144。点击141下载，下载中心历史显示对应“广告画中画＋片尾”已完成。
+- [成片141四段抽帧](output141-segments.png)按左上0秒、右上12秒、左下20秒、右下38秒呈现正片、广告画中画、恢复正片与片尾；与实际任务冻结时间线一致。浏览器实际播放另有本轮观察，不用抽帧替代真实播放。
