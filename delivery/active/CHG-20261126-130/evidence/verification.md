@@ -202,3 +202,29 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 百度+B站隔离浏览器58项PASS（/tmp/chg130-entry-browser-suite.log）；Agent全量977项PASS（/tmp/chg130-stability-agent-all.log），B站定向7项PASS（/tmp/chg130-upload-shape-unit.log）。这些不计真实平台发布通过。
 - 部署49a618a后，正常resume批次9进入task21/attempt50，15:48开始执行，当前running/ready、submit_started_at=null。真实preupload诊断response_query_matches=true，name/size仍不匹配，证明改用request.url并未解决实际回执缺失。159470e补充字段计数、文件/元数据类型及数值字节数诊断，不输出原始文件名、URL或凭据；真实差异仍待新版本核实。
 - 新版本只build-dmg（/tmp/chg130-entry-diagnostic-build.log），不为部署打断在途50。task20诊断取消不能计成功；task21及计划3、批次10/11无公开成功，CHG保持VERIFYING。
+
+- 旧百度task19/attempt48正式可信结果为not_submitted/scene_closed=true且从未submit；通过正常abandon保留历史并释放成片150，正常AI内容与双封面93/94新建task22/pending未授权，不复投旧测试标题。
+- 原生新包实际读回batch9执行中/第2组、task20已取消、task21执行中/资源核对，任务文案正常且与API一致；Plan3未执行/两批就绪。局部走查不等于最终E2E完成。
+- 发现B站_wait把每轮正常_check耗时也延长到deadline，导致真实等待可超过900秒。失败回归证实预算1秒、单次检查2秒时原实现还检查11次；Agent d0fb4b8只扣除真正人工验证等待，回归变为1次即超时，人工120秒仍可从预算排除。9项定向、11项B站隔离浏览器、979项全量单测PASS（/tmp/chg130-wait-budget-*）。新包只构建，等待在途50安全结束后部署。
+- 本次wt chg verify已通过Cloud回归及Agent977项，但运行环境verify在Desktop已接管的非脚本Agent BitBrowser门禁退出1（/tmp/chg130-stability-delivery-verify.log），不是全绿；未重启在途任务伪造门禁通过。
+
+
+## 新包真实复验暴露的菜单挂载竞争
+
+- d0fb4b8新包构建完成后，首次launch-dmg因旧挂载资源忙失败；原应用退出后正常重试挂载成功，无强制覆盖挂载。原密码登录及原生工作环境读回三项正常；包内Agent SHA256=9592d5322866a1425245d905cf836c30c1418d61b7e0f201b5fe4e4d4d591d56。
+- task21/attempt50自然结束为failed/completed，submit_started_at=null且not_submitted/scene_closed=true；正常原任务retry进入attempt51，不增加任务数。实际name/size不匹配的一笔声明191033字节，预期视频71987824字节，尚不能说明是主视频响应，不能猜测CID。
+- 新正常百度task22/attempt52真实复验仍在video_entry_ready失败，未提交且现场关闭。结构证据显示首页卡片先出现，hover菜单异步挂载；current_entry在菜单出现前把全局同名locator当唯一入口返回，随后变多匹配。e089eb8在首页卡片存在时只等待明确菜单，不提前回退全局；新增延迟挂载回归旧代码确实导航超时，修复通过。首次编写回归误用了仅填字段的helper且断言不存在属性，纠正为完整fill_form后重新跑了失败→成功，未把错误测试当证据。
+- Agent全量980项PASS；首次59项隔离浏览器套件有1项封面响应500ms预算超时，f0c3a5b仅把两个正常完整流程用例改为2秒，生产预算未放宽，完整59项重跑PASS（/tmp/chg130-menu-race-browser-final.log）。源码e089eb8/f0c3a5b，当前只build-dmg（/tmp/chg130-menu-race-build.log），未部署，不能说百度已恢复。
+- e089eb8还补充preupload所有HTTP状态、是否当前视频，以及200响应的安全数值code/biz_id及URI是否存在诊断；此前只观测HTTP200不足以裁定主视频是否被平台拒绝。增加非200响应不接受CID且不泄露查询值的回归。尚需真实读回。
+- 计划批次10/11使用正确row_keys与revision执行正常预检均can_start=true、ready且issues=[]、各目标1/可建1/缺口0。首次省略row_keys请求400属于调用不完整，补齐后通过，不是新服务端缺陷。未启动计划。
+
+
+## PR与真实入口稳定性继续修复
+
+- GitHub公开API确认Agent PR21 head=f0c3a5b、open且mergeable，CI run45781606151 success；并实际读取Review反馈。封面临时副本和双封面URL绑定旧反馈已有修复；P1可选Playwright导入及P2简介末尾换行在f07b507修复。无Playwright的子进程Cloud bootstrap回归、简介两种段落/空行、保留换行正常提交及删掉原换行拒绝均验证。测试初版未模拟Quill文档而取innerText导致空行翻倍，改为独立的段落文档模型；日志隔离规范要求继承LoggingStateTestCase并调用super.setUp，初次两轮测试规范失败已修。最终982项全量、14项B站浏览器PASS，不掩盖初次失败。
+- f0c3a5b真实运行21/attempt53仍在缺少匹配回执后超时，not_submitted/scene_closed=true。HTTP200的两笔无name/size响应均无视频ID，另191033字节请求为frames ZIP，无视频ID；没有看到预期71987824字节主视频证明，不能称已解决或臆测是平台风控。
+- 百度22/54在准备后因Passport组件等待人工；用户明确窗口41已登录且正常。通过新包原生“已经处理，继续原尝试”恢复同一54，API读回running/ready，16:42:48真实video_entry_ready完成；随后click超时，结构证据表明悬浮菜单收起。54未提交且现场关闭，不计为真实发布成功，也不把用户账号归为未登录。
+- 5f7e73a改优先真实首页视频入口，保留菜单兼容路径并移除成功路径诊断截图；透明、空白Passport组件不进入人工处理，真实持续可见组件继续要求原现场处理，短暂组件给750ms正常稳定。透明/瞬态回归旧代码失败、修复后通过，实际菜单之外的稳定入口仍待新包复验。
+- Playwright官方Service Workers文档明确后台请求属于BrowserContext事件：https://playwright.dev/python/docs/service-workers 。本机127.0.0.1真实Worker发起预上传形状请求，Page响应为0、Context为1，Playwright1.58.0验证PASS（/tmp/chg130-worker-real-local-browser.log），没有向平台请求。caa8193增加后台回执读取与去重，仍按本次文件名/大小捕获并在最终POST精确核对CID/文件标识；平台Worker外发投稿同样受最终授权保护，不关闭Worker，不跳过原输入证明。单测拒绝其他文件/其他Worker，非Worker后台也覆盖；这只能证明漏监听能力已补，真实平台根因仍待验证。
+- 最新983全量PASS（/tmp/chg130-context-final-all.log）、51项百度浏览器PASS、15项B站浏览器PASS；新组合开始完整all --force-restart（/tmp/chg130-context-entry-environment.log），启动前再次核实无在途任务。未提前计为已部署或真实E2E成功。
+- 剩余PR反馈：匿名可播放媒体须关联原CID的实际播放来源，当前实现仅元数据和媒体时长不足，尚未修复，不宣称全部问题清零。
