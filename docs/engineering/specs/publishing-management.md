@@ -294,7 +294,7 @@ erDiagram
 
 ### 3.3 发布批次：`publication_batch`
 
-batch保存身份/本人operator/团队/名称/平台/targets_json/config_json/revision/request_key/hash和审计。config_json在本批和所属计划均未首次启动时才可写；所属计划启动即冻结，不能因本批未启动而修改；本批启动后只留追溯快照，不与task维护两份可写内容。task生成在start，不在保存。计划关联plan_id及顺序字段在plan表建立后迁移。
+batch保存身份/本人operator/团队/名称/平台/targets_json/config_json/revision/request_key/hash和审计。config_json在本批和所属计划均未首次启动时才可写；所属计划启动即冻结，不能因本批未启动而修改；本批启动后只留追溯快照，不与task维护两份可写内容。task生成在start，不在保存。已保存批次的平台属于不可修改身份，编辑页锁定平台；新建与复制尚未保存时仍可确认切换平台并重新选择资源与内容。计划关联plan_id及顺序字段在plan表建立后迁移。
 
 执行设置：concurrency_limit、group_interval_seconds、between_group_policy、exception_task_limit。运行控制：首次时间、当前执行组/成员、组结束及下一组时间、paused/pause_id/依据/已确认异常范围、stopping/结束及handoff依据。字段及枚举由提供方Contract定版；支持可恢复暂停与不可逆终止，不沿用“没有批次暂停”。
 
