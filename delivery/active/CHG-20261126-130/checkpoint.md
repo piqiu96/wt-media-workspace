@@ -9,7 +9,11 @@
 - PR：Agent21、Desktop20、Workspace72均open未合并；Cloud尚无PR。Agent73a3829自动审查无新增finding；CI失败已读日志定位为并发测试停留前阻塞心跳的时序问题，7257cc9修正用例，7项/20次重复/974全量PASS，最新7257cc9 CI verify已success（run45752687795）。Desktop31fd8e1、Workspace8f98503 CI通过。
 - 环境：固定原数据库；私有/tmp/chg130-cloud-config仅本轮启用B站，跟踪配置仍默认关闭。重建运行环境日志/tmp/chg130-reset-environment.log；新包已构建，日志/tmp/chg130-reset-build-dmg.log，前端0.1.0+6a366f7。恢复迁移默认基础容量2后，全环境门禁及operator01登录烟测PASS，日志/tmp/chg130-reset-final-verify.log。
 - 浏览器限制：CUA已恢复并实际登录新包，账号页显示4个正常账号。Chrome的Cloud大比较表单仍可能AX超时；不要把API检查当作最终UI走查。
-- 下一步：新广告file56/新策略1016已建，短素材195–200对应批次75/任务746–751；合成与画面/客观音轨已核验，新包已创建任务18并首次授权attempt44（running/preparing）；继续核实平台受理/公开；创建Cloud PR；以新数据完成真实合成→单条/批次/计划→原稿与匿名公开→最终浏览器和新包逐页走查→PR/CI收口→merge commit合入/组合重建→归档。129主观听音证据不足，不得冒充已听音。
+- 下一步：新广告file56/新策略1016已建，短素材195–200对应批次75/任务746–751；合成与画面/客观音轨已核验，新包已创建任务18，attempt44/46均已提交前失败（46为恢复未提交视频保护）；继续核实平台受理/公开；创建Cloud PR；以新数据完成真实合成→单条/批次/计划→原稿与匿名公开→最终浏览器和新包逐页走查→PR/CI收口→merge commit合入/组合重建→归档。129主观听音证据不足，不得冒充已听音。
 - 勿动其他会话Cloud web/example及Workspace docs/design六个脏文件。另有干净CI worktree/tmp/chg130-agent-ci可在无需诊断时清理。Chrome本轮重复Cloud compare表单可在解锁后只关闭本轮重复后台标签，保留一份。
 
 - 最新环境Cloud48782b0/Agent7257cc9/Desktop31fd8e1已重建通过；取消素材准备投影缺陷修复且真实UI读回通过。封面模板5–7和145–150封面已正常渲染；task18现场推荐封面82/空间57。GitHub CLI恢复等待用户验证器验证码（不得记录验证码）；Chrome保留设备授权页及Cloud PR草稿表单。
+
+- 最新事实：独立批次9/计划3（批次10、11）全部配置ready但未启动；任务18/attempt46被平台恢复未提交视频保护拒绝，task19/attempt45为百度首页hover超时，二者submit_started_at均null，无公开作品。切勿盲目重试或覆盖未知归属的恢复视频。Cloud aa1ec14含按钮裁切/平台硬编码修复；Agent22645f5含安全错误提示与关闭响应保护，976单测/10隔离浏览器PASS。新组合已重建并挂载、原密码登录，工作环境三项正常；新包已实际复验批次四按钮完整可见、计划B站筛选与详情平台正确，日志/tmp/chg130-draft-conflict-environment.log；最终平台/视觉走查、Cloud PR及全仓PR合并仍未完成。
+
+- Agent22645f5 CI verify success。窗口51恢复未提交视频的归属/保留问题已询问，尚未答复，原稿未修改。工具层阻止受限浏览器页面，不能因聊天授权绕过；可继续普通代码/日志/隔离测试及本机业务页面。用户未要求暂停，CHG保持VERIFYING。

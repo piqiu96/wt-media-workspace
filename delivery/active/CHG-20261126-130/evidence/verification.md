@@ -144,3 +144,19 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 新包实际从成片145的去发布进入B站快速发布，选择账号18、游戏分区、三项标签、营销信息声明；未勾选自制权利。填写源作者及原链接，现场生成/检查推荐封面并核对空间封面，正式创建新任务18。正常start接口授权后首次attempt44进入running/preparing；尚未取得受理/公开证据。
 - 新数据真实DeepSeek生成标题、简介、标签成功（new-ai-content.json），结果保留来源和营销提示，未臆造战绩或授权。当前任务18采用人工核对的事实文案，未将后台生成成功冒充UI逐项采用。
 - GitHub原账号正常CLI登录恢复仍等待验证器验证码；页面显示Existing access，不新增权限。Cloud PR表单已准备但尚未提交；其余三PR未合并，不能宣称全流程交付完成。
+
+
+## 恢复执行、页面遗留修复与未提交视频保护（2026-11-26）
+
+- 正常API建立独立批次9（146/147）、计划3及顺序批次10/11（148/149）；三批均ready/not_started，正式任务0条。新百度任务19使用150、账号19及双封面80/81，attempt45在首页发布入口hover前提交失败，submit_started_at=null；尚无真实公开证据。
+- 新包真实走查复现并修复批次列表固定操作栏裁切按钮（Cloud d3ddb1f），采用局部换行；18项批次定向测试PASS。计划详情、列表筛选和资源盘点仍硬编码百家号（Cloud aa1ec14），统一读取真实平台；16项计划定向测试及Desktop前端构建PASS。实际走查时计划批次详情能读回真实账号、成片名和时长；新修复仍需新包最终视觉复验。
+- Cloud aa1ec14/Agent1964ca8/Desktop31fd8e1完整重建并挂载，frontend0.1.0+aa1ec14.dirty，日志/tmp/chg130-resumed-environment.log。原密码登录新包成功。正常API读回任务18/attempt44失败且从未进入submit_started后，按原revision重试，未重复建单；新attempt46在浏览器恢复未提交视频时被保护拒绝。日志明确Existing draft分支fill_form:222，submit_started_at仍null，未授权最终POST。
+- 两笔preupload观测name_matches/size_matches均false，来自恢复视频过程；不能当作当前145的视频上传证明，也不足以断言首轮44缺失回执的全部根因。保留旧尝试，不删除或覆盖平台恢复的视频。
+- 用户再次允许访问BitBrowser；工具层仍曾明确拒绝当前页面，禁止以其他浏览器控制技术绕过。受限页面的真实走查尚未完成；普通源代码、任务API读回、执行日志及无外部平台请求的隔离测试可继续。
+- Agent22645f5为恢复视频冲突提供固定、安全、可操作的任务错误消息，仅在能够确认未提交且现场已关闭时使用；未知结果仍走uncertain。任意底层异常文本不出Agent，不泄露URL/凭据。响应读取遇到Playwright关闭异常时保留缺失证明的拒绝行为，不产生异步未处理异常。
+- 新增任务结果脱敏及无投稿测试、响应关闭缺失证明测试、真实隔离浏览器保留恢复视频且不上传/不覆盖/不投稿测试。最终scripts/test.sh 976项PASS，B站隔离浏览器10项PASS；日志/tmp/chg130-existing-draft-final-all-tests.log和/tmp/chg130-existing-draft-final-browser-tests.log。隔离浏览器不计为真实平台验收。
+- 代码已提交并推送现有Agent PR21；新组合重建日志/tmp/chg130-draft-conflict-environment.log，最终运行结果随后核对。Cloud PR尚无，Agent21/Desktop20/Workspace72未合并；GitHub CLI认证仍待二次验证。CHG维持VERIFYING，不提前归档。
+
+- 最终重建all退出0；Cloud aa1ec14/Agent22645f5/Desktop31fd8e1，frontend0.1.0+aa1ec14.dirty。新包登录operator01后sidecar校验并启动成功（SHA256 bbd217547af9653a47cf4da517777198fd1cbe185c4bf43dc245d9f956283d8d），工作环境UI明确本机服务已连接/比特浏览器已登录指定账号/执行凭证已配置。启动前一次verify因sidecar尚未启动失败；登录后verify的Cloud/Agent/两个Worker/Scheduler通过，在脚本非所属Agent的BitBrowser探测门禁停止，未冒称该命令全绿，改由新包工作环境正式桥读回验证。日志/tmp/chg130-draft-conflict-environment-verify.log。
+- 新包最终局部复验：独立批次9的开始发布/继续配置/详情/终止四按钮分两行完整可见；计划列表平台下拉含百家号/B站，选择B站查询保留计划3，详情发布平台现为B站且矩阵一致。未触发批次/计划正式执行，不将局部页面复验计为完整E2E通过。
+- Agent22645f5 GitHub verify已completed/success。用户已收到关于窗口51恢复视频是否为可放弃旧测试或需保留稿件的问题，尚未回复；保持原稿，不再次触发投稿。真实平台受理/公开、批次/计划发布、Cloud PR及三运行仓合并和完整最终E2E仍未完成。
