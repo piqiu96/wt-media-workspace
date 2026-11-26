@@ -1,0 +1,25 @@
+{
+  "environment_exit_code": 0,
+  "cloud_config_path": "/tmp/chg130-cloud-config",
+  "bilibili_enabled": true,
+  "default_statement": "内容无需标注",
+  "dmg": "/Users/aqiuye/Develop/workspace/wt-media/wt-media-desktop/target/release/bundle/dmg/起飞_0.1.0-local.4a2692d3f7_aarch64.dmg",
+  "dmg_sha256": "699247073c5946bffbfa78e95ca9c0142a3f8c5c1418f6067a6014fa9bc81b4c",
+  "sidecar_sha256": "a6abae7582077592b1cce549fddb7360bb46c7540b2274ed8b4623265365b848",
+  "frontend": "0.1.0+3739e7c",
+  "source_review": {
+    "cloud": "3739e7c",
+    "agent": "079a231",
+    "desktop": "4a2692d"
+  },
+  "native_work16_last_update": "2026/11/27 03:03",
+  "native_work16_counts": {
+    "view": 7,
+    "like": 1,
+    "favorite": 2,
+    "coin": 0,
+    "reply": 0,
+    "danmaku": 0
+  },
+  "new_publication_created": false
+}

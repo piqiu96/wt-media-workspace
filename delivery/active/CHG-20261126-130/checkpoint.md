@@ -1,5 +1,15 @@
 # CHG130 执行检查点
 
+## 2026-11-27：指标增量后的当前基线
+
+- CHG131 B站六项指标已技术交付并归档，Cloud60/Agent22/Desktop21/Workspace73全部CI通过并合入main；Cloud/Agent最新自动审查无新问题。原130分支已吸收main，运行代码与已验证130+131组合完全一致，未暂存原型或docs/design他人改动。
+- 当前运行的已冻结组合：Cloud3739e7c（含8214c5c及指标8c0b121）、Agent079a231、Desktop4a2692d。新包0.1.0-local.4a2692d3f7，仍在原target/release/bundle/dmg。源码原目录已吸收main；验证运行进程保留review工作树，勿在服务运行中移除。
+- 必须保留私有B站验收配置：WT_MEDIA_CLOUD_CONFIG_PATH=/tmp/chg130-cloud-config；本次最终完整all exit0，日志/tmp/chg131-preserved-config-final-environment.log，全部门禁通过。规则API已核实B站enabled=true、默认“内容无需标注”，生产默认开关未改。配置重建曾误用默认配置，已恢复原验收配置并从头重建，没有遗留关闭B站的运行进程。
+- 最终新包按挂载全路径选择，operator01正常登录，环境三项正常，正式包内Sidecar手动刷新作品16到03:03；六项7/1/2/0/0/0。原任务30/尝试82/成片153及发布时间不变，当前停留作品列表。最终包和Sidecar SHA见evidence/metrics-foundation-environment.json。只读刷新，没有创建或重投发布任务。
+- 本次增量组合Web1285、Agent1001、Cloud模块及隔离MySQL、Workspace220均PASS；浏览器与正式安装版走查、限流故障注入保留旧值及真实恢复、滚动与返回列表状态同步通过。
+- CHG130继续VERIFYING；此前记录中仍待完成的私有后台完整走查、主观听音及130本身的main/整体验收没有被131代替。后续从这些未完成项继续，不重投已公开稿件。
+
+
 ## 范围与授权
 
 - 唯一状态change.md为VERIFYING；128/129已合入，当前单执行器，无子Agent并行。用户授权编码、自测、PR修复、真实发布/DeepSeek限定内容、完整E2E和主动浏览器/安装包走查，不逐项确认。整体最终验收由用户进行；没有完成条件不能标DONE或提前合并。
