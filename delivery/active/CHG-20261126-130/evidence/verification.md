@@ -119,3 +119,16 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 修正基础容量后，local_env.py up --force-restart及verify均退出0；Cloud、文件Worker、合成Worker、合成Scheduler、Agent、BitBrowser、双前端入口、前端来源/新鲜度、DMG与operator01原密码登录烟测全部PASS。日志/tmp/chg130-reset-environment-final.log、/tmp/chg130-reset-final-verify.log。配置治理、Product/Master对齐、Delivery治理检查PASS。已注销临时维护Desktop会话，避免用户登录时被维护会话占用。
 
 - launch-dmg退出0，已从新DMG挂载并打开起飞.app；挂载来源校验读回frontend=0.1.0+6a366f7.dirty（Cloud另有其他会话原型工作区改动，未纳入本次提交）。这证明新包来源，不代表已完成界面走查。
+
+## 新广告与重新抓取素材（2026-11-26）
+
+- 用户指定三角洲_网站.mp4作为新广告；实读32,861,804字节，26.933333秒，1920×1080 H.264/AAC，SHA256 b730c4fa73d280a7389dd66e0d3b53108432f024ce5afc454f55bc7120247c51。通过正常文件上传API写入file56，未复用旧广告。
+- 最新源环境与DMG强制重建，local_env.py all --force-restart退出0，日志/tmp/chg130-new-ad-environment.log。CUA已正常打开新包并登录operator01，账号页查询显示4账号/4正常，真实UI访问阻断解除。
+- admin创建手动抓取策略44，三角洲类目4、团队1；真实抓取任务96成功：scanned/found/added=20，failed=0。operator01将6条内容转素材189–194。
+- 新策略1016：广告画中画＋片尾模板12/v1，负责人operator01，手动执行，一次最多6条，单输出组1份，B站/百度标签；无开头，广告插入10–15秒，前景宽度0.92，转场0.2秒，成片最长120秒。广告引用明确指向新file56。
+- 建任务前个人素材归属门禁拒绝未加入个人素材的输入；经正常usages接口传strategy_id=1016/operator_id=3建立关系后，创建合成批次74、任务740–745。未直接写业务数据库或伪造下载/成片。
+- 首个源视频实测64分13.83秒、1.4259GB，不适合本轮短片验收；从正常内容搜索接口重新获取三角洲精彩片段，实读CDN元信息和媒体时长选择80.6–243.23秒的6条。导入5条新内容、1条去重，material195–200；创建批次75、任务746–751（创建6/失败0）。长素材相关任务经正常cancel入口取消，保留真实历史，不删除失败证据或冒充完成。
+- 已通过浏览器读取Agent CI失败日志（run45746330323/job139663180469）：test_slow_report_of_one_attempt_does_not_block_other_heartbeat在进入停留屏障前就阻塞同attempt心跳，依赖线程时间片。改为停留后再触发阻塞，新增明确blocked_report事件保证实际阻塞发生，再检测另一个任务心跳；不改发布运行逻辑。Agent7257cc9已推送；7项定向、20次重复及scripts/test.sh 974项均PASS。CI结果待新运行核对。
+- Chrome在Cloud95文件比较表单上出现原生AX超时；已有表单准备不等于Cloud PR已创建。不会宣称已提交或合并。
+
+- Agent7257cc9 GitHub verify已completed/success：run45752687795/job139683954898。抓取策略44已改为手动短素材关键词“三角洲行动 一分钟 精彩瞬间”。批次74六项已读回cancelled；素材189真实准备成功保留，不用于继续旧投稿。新任务746–751继续正式Worker执行。
