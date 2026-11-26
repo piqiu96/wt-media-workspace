@@ -36,3 +36,13 @@
 
 - c2a02c5已提交推送：支持CSS背景和旧img预览、实际解码就绪；等待重新打开编辑器时画布恢复后再核对原指纹。旧CSS及延迟恢复复现均FAIL→相关18项PASS、独立篡改1项PASS、完整34项B站浏览器PASS（/tmp/chg130-cover-preview-final-browser.log，101.140秒）；990全量PASS（/tmp/chg130-cover-preview-unit.log），CI45802700716 success。首轮完整浏览器在测试Worker残留后的Context.route卡住，主动中断exit130，未计PASS；测试专用localhost Worker补unregister清理后完整重跑通过，没有改用户平台Worker。
 - c2包build完成/tmp/chg130-cover-preview-build.log，launch正在/tmp/chg130-cover-preview-launch.log。已实际部署并正常登录/三项环境；sidecar SHA256=3d87b96933172d5a17653b059bb8b58b220fbe99d940640bb4931fd73fa53a72，确认65安全闭合后正常retry21，产生66，18:38执行中，勿重启。勿重试百度已受理或公开任务。
+
+- c2a02c5真实66通过CSS预览，但初次_assert_form字段综合比对失败（632），无submit且现场关闭。具体字段未观察到，不能声称内容或平台被谁改动。
+- 最新eb03e65已提交/推送/部署，sidecar SHA256=b86511a461c48870861e47eb496f49666689cf1ac1b9404e6a8ecd871084c918。补本次授权投稿request的Context.response接收（旧用例FAIL→PASS），表单比对改固定字段名诊断，简介仅字符/换行数量、标签仅数量/trim比较，不输出内容。991全量PASS、18相关（含2浏览器）PASS，CI45804039506 success。build/launch均成功，原密码登录/环境三项正常；正常retry21产生67，18:47当前在途，勿重启。下一看fields诊断修实际剩余字段，不能绕过比对或改写正常标题/简介。
+- 额外真实闭环仍需补：当前18为旧测试标题failed，20为诊断cancelled，均有not_submitted/scene_closed；不可重试坏标题。若需释放145/146给本CHG正常单条/独立批次，只能检查正常abandon是否支持并经原接口释放，不SQL改历史。计划3仍未启动。不要把23/24双账号公开和21反复提交前失败混为B站验收成功。
+
+- eb03e65真实67定位仅tags字段不符：observed_count2/expected_count6、trim不匹配；标题/简介/分区/声明/可见性/封面均匹配。67无submit、已关闭。官方setCustomTag在checkCustomTagLoading时忽略Enter；原快速连填导致丢标签。2b6bc83已提交推送，删除等待数量减少、每条等待已确认标签前缀及清空输入后继续。旧异步校验复现FAIL→完整35项B站浏览器PASS（/tmp/chg130-async-tags-browser.log，105.162秒），19项定向单测PASS；最新build/tmp/chg130-async-tags-build.log正在完成。下一部署后正常retry21（预计68），不要绕过标签/最终POST校验。
+
+- 2b6bc83实际部署并正常登录/环境三项，SHA256=4ee01724bd17b73f6c43563b3e56ee129da7b83db1cc62927166825b6e370e48，CI45805313308成功。真实68已收齐6标签、所有字段匹配，但重开编辑器的显示画布指纹始终不匹配，15秒超时；无submit，已关闭。这是额外显示渲染比较，不是已保存图片或内容变化证据。
+- af196b0已提交推送：保留上传前两图独立验证、本次成功双回执、保存后预览及最终POST精确URL校验，移除重复重开编辑器比较显示像素。隐藏未应用画布不能替换已保存图片；真正上传时覆盖主图、最终交换/无关URL仍拒绝。旧未应用画布用例先超时FAIL→3项聚焦PASS、19定向单测PASS、完整36浏览器98.811秒PASS（/tmp/chg130-saved-covers-browser.log）。build正在/tmp/chg130-saved-covers-build.log，exec11339；尚未部署，下一确认68安全闭合后正常retry21（预计69）。
+- 旧18经原API以原尝试not_submitted/scene_closed可信证据正常abandon，历史保留、释放145；正常AI内容/cover83/84创建单条task25（私有normal-single-create-request.json/normal-single-created.json），pending/rev1/authorized_at=None/attempt=None，尚未启动。20为cancelled，当前Abandon接口仅支持failed，不可伪改状态释放146。可用25完成正常单条；独立batch9保留一条取消负例，百度batch12已2/2达标；plan3两批仍待执行。

@@ -281,3 +281,23 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 新c2包build完成；launch进行中，仍未记真实投稿通过。下一步保持正常内容，从65安全闭合后重试21，不重复百度受理/公开任务。
 
 - c2a02c5新包已实际部署，sidecar SHA256=3d87b96933172d5a17653b059bb8b58b220fbe99d940640bb4931fd73fa53a72；原密码登录、三项环境正常。确认65未提交/现场关闭后正常retry21产生66，18:38执行中；未提前计投稿通过。
+
+
+## 18:39–18:47提交前字段诊断与后台投稿响应
+
+- 真实66在c2包通过CSS预览，后_assert_form综合字段比对失败，无submit/现场关闭；字段尚未观察到，不把猜测当根因。
+- eb03e65补本次授权投稿request的Context.response，旧用例FAIL→991全量及18项相关回归PASS（/tmp/chg130-submit-context-before.log、-unit.log、-final.log）；未宣称真实投稿已遭后台漏回执。字段比对语义不放宽，只增加固定字段名及简介/标签数字形状，不输出内容/凭据。CI45804039506 success。
+- 新包build/launch成功，sidecar SHA256=b86511a461c48870861e47eb496f49666689cf1ac1b9404e6a8ecd871084c918，原密码登录及三项环境正常。确认66安全闭合后正常retry产生67，18:47执行中，勿重启。
+
+
+## 18:48标签丢失根因
+
+- 21/67实际失败仅tags：2条已加入/6条确认，trim不匹配；其他字段一致，无submit、现场已关闭。官方setCustomTag在checkCustomTagLoading时直接返回“校验中”，原连填忽略了异步确认。
+- 2b6bc83逐条等待标签前缀准确读回及输入清空，删除旧标签等待DOM数量减少；不改变确认内容。旧异步校验复现FAIL（/tmp/chg130-async-tags-before.log），完整35项浏览器105.162秒PASS、19项定向单测PASS（/tmp/chg130-async-tags-browser.log、-unit.log）。新包构建中，真实6标签及投稿仍待验证。
+
+
+## 18:55–19:00以已保存图片为核验依据
+
+- 2b6bc83包hash4ee01724bd17b73f6c43563b3e56ee129da7b83db1cc62927166825b6e370e48，环境正常，CI45805313308成功。真实68全部字段包括6标签一致，卡在重开编辑器比较显示画布，仍无submit/现场已关闭。
+- af196b0保留本轮两图独立验证、成功回执、已保存预览、最终POST精确双URL，去掉额外重开显示像素条件。未应用的隐藏画布不会替换已保存图片；初始主图被空间图覆盖、最终URL交换/无关URL继续拒绝。旧用例先FAIL，3聚焦、19定向及完整36浏览器98.811秒PASS（/tmp/chg130-saved-covers-focused.log、-unit.log、-browser.log）。新包构建中，不能提前计投稿成功。
+- 18原尝试无submit且可信未提交/关闭，经正常abandon接口保留历史并释放145。正常AI/cover83/84新建单条25，pending/rev1/未授权无尝试，未重复使用旧坏标题。20 cancelled不满足正常abandon规则，未改SQL或重写取消历史。
