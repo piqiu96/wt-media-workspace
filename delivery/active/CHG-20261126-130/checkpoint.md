@@ -10,7 +10,7 @@
 ## 当前源与运行组合
 
 - Cloud8214c5c（新增ef52314空简介支持和821旧草稿不算新证据，含55ca11c及f05baae标题检索、ec79164普通/风格、bb9b9e6副本/源标签清理及55换平台清配置）；Agent58f8102；Desktop31fd8e1。工作分支均chg/CHG-20261126-130。
-- 最新正确配置完整all exit0：WT_MEDIA_CLOUD_CONFIG_PATH=/tmp/chg130-cloud-config python3 scripts/dev/local_env.py all --force-restart；日志/tmp/chg130-weiguang-delivery-environment-all.log。挂载前端0.1.0+55ca11c.dirty，dirty仅未提交的他人原型，sidecarSHA256=5e1340e6747d91e1646f4a0729d1b8d1e05b9fe6cda5eeb81d96b89461308b49；最终包原路径target/release/bundle/dmg/起飞_0.1.0-local.31fd8e1950_aarch64.dmg。01:10安装版原运营正常登录，三项工作环境正常。
+- 最新正确配置完整all exit0：WT_MEDIA_CLOUD_CONFIG_PATH=/tmp/chg130-cloud-config python3 scripts/dev/local_env.py all --force-restart；日志/tmp/chg130-empty-intro-final-environment-all.log。挂载前端0.1.0+8214c5c.dirty，dirty仅未提交的他人原型，sidecarSHA256=423f03ec6ff3227bc136bf8bd5cb5bd886baaa5b7243becd8429194a7409e7b5；最终包原路径target/release/bundle/dmg/起飞_0.1.0-local.31fd8e1950_aarch64.dmg。821包脚本登录smoke与基础门禁通过；01:10原运营实际三项环境核对属于此前55包，未冒称821额外原生走查。
 - 私有B站测试配置必须保留上述环境变量，默认生产开关仍false。单独verify无Sidecar key的ownership拒绝不是完整all通过证据，不反复重建来绕过保护。
 - 保留Cloud web/example大量非本人改动与Workspace docs/design六文件，不暂存/还原/覆盖；只显式暂存本CHG路径。
 
