@@ -428,3 +428,18 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - Cloud070d3ae前端提示包后台build-dmg成功，/tmp/chg130-status-hints-build.log；sidecarSHA256=c1772e9c0c0a856093f11e550cd0096149dc63395ddc5c1f571fe53d4668912d。该包未部署，后续将含资源顺序修复重新构建，不以旧包代替最终验收。
 
 58f8102已推送，完整Agent997单测PASS46.252秒（/tmp/chg130-cover-expiry-full-unit.log），diff检查通过。未扩大签名期限或复用未经校验文件；当前按正确B站测试配置完整all强制重建。
+
+
+## 21:51 新组合实际启动与原任务重试
+
+- 正确配置命令WT_MEDIA_CLOUD_CONFIG_PATH=/tmp/chg130-cloud-config python3 scripts/dev/local_env.py all --force-restart，exit0；/tmp/chg130-cover-expiry-environment-all.log。Cloud/Agent/Worker/Compose Scheduler/BitBrowser/前端/包资产/CORS/登录/挂载全部门禁PASS。包前端070d3ae.dirty（仅既有原型他人改动）、Agent58f8102、Desktop31fd8e1，sidecarSHA256=6bf6df325d0705f7e1d8ee0dd0d8de83d82e1b45f920045427cf2686ca64947a。
+- 工程师原生登录operator01原凭据，正常替换旧桌面会话；首次环境探测曾显示本机未启动，点击重新检查后确认本机已连接/比特指定账号/凭证已配置。该次请求很快完成，未直接捕捉中性检查中瞬间，不冒称已肉眼验证该过渡。
+- 任务22列表及详情均实看平台审核中/公开结果需人工核实，详情保留已停止核验说明与原回执；不补录未经证明的结果。26只有详情、无重试，25已发布及查看作品，动作匹配事实。
+- 27详情核对原标题/简介/四标签/声明/双封面及78失败历史；从列表确认正常重试，21:51:54领取attempt79，未改内容或创建新任务。21:53只读文件实证cover936766、space-cover1520192均先完整落盘，随后video.mp4.part130521，stage preparing，submit_started_at=null。证明新顺序实际生效；仍需等待完整提交及原稿自动核验。
+
+
+## 21:57 B站单条公开视频片尾与CI
+
+主动Chrome新无痕窗口打开25原aid117682791777077，实看正常标题、UID3706971620379308、20:43:03、营销声明及简介四标签；视频正常播放，00:33实看新广告兑换画面。普通进度条跳01:54，最终截图01:55/02:00为动漫片尾正常解码；先一次到02:00并自动连播推荐视频，未把推荐当原稿，重新打开原aid复核片尾。只关闭本次窗口、保留用户原页面。片尾渲染PASS，不冒称主观听音或Cloud自动回写。
+
+Cloud070d3ae CI run45830769360已success（13:50:49Z），包含Cloud/Web、原型交互、迁移及双前端构建；Agent58f8102 CI跟进中。27/79仍preparing、视频.part7601625，两个封面完整、submit_started_at=null，不重启/重复授权。
