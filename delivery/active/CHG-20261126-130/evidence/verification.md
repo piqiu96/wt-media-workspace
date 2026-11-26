@@ -343,3 +343,16 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 9e77ffb上传输入框disabled初始化旧用例4.200秒FAIL→4.662秒PASS，完整39 B站浏览器106.655秒PASS。等待正常控件启用后只选一次文件，File/CID/实际最终POST仍绑定，不声称已证明25旧失败由disabled引起。
 - 9e/e7/31新组合build/launch exit0，hash64349a47b97bbfba7d1498200c6316f0f764abd97f7ee47617065179743dd730，原生原账号登录及三项环境正常。75正常核实后retry26→queued/rev32；25优先领取76 running，26无新attempt，同Profile仍互斥。现在在途，不重启、不重复授权，不提前计发布成功。
 - 安装版主动未保存计划走查：双平台（三角洲）目标矩阵各1→生成2批→移除百度出现确认→确认后B站一批、目标1/分配1、显示顺序01→返回确认离开，列表仍只有原计划3。没有创建/保存额外计划，不能将此视觉走查冒称实际保存API验收。Cloud e7 CI/自动审查已通过，无未解决findings。
+
+### 20:42 计划中批次暂停的状态投影
+
+- 实际batch10已通过正常入口暂停，26仅queued且无新attempt，计划3却显示waiting_tasks。单条25/76独立在途，未重启或重复授权。
+- 新隔离数据库用例覆盖仅排队/已经领取两种情况。修复前排队子用例FAIL（waiting_tasks而预期batch_paused）、在途子用例PASS；最初测试误用ErrConflict，改为既有ErrUnresolved后复跑，失败记录为/tmp/chg130-batch-pause-projection-before-final.log。
+- 仅调整Cloud计划投影：暂停且没有在途未决任务时显示batch_paused；在途、待处理、未知仍等待任务，核验仍优先。AdvancePlan未放行暂停批次；不改API契约、目标、任务或调度权限。
+- 修复后5项真实隔离DB测试全部PASS（含两个新子用例、计划暂停/恢复/公开收口），5.809秒，/tmp/chg130-batch-pause-projection-after.log。publish四包单测PASS，/tmp/chg130-batch-pause-publish-unit.log；git diff --check通过。只提交两个所属源码文件，保留web/example原有修改。运行后端暂未更新，待76安全结束再部署及原生页面复核。
+
+### 20:42–20:44 正常单条受理与原批次恢复
+
+- 当前9e77ffb包中25/76完成视频及双封面准备。20:42:24绑定本次File到完成视频，20:42:28正常进入一次提交，20:42:31受理aid117682791777077；无更改正常AI标题、简介或四个标签。正常任务读回reviewing/rev13，20:42:49原稿仍处理中；不计公开成功。
+- 主动打开安装版batch10，实看已暂停、26排队、批次暂停阻断、恢复/终止按钮和原操作记录。点击“继续发布”，确认页展示原暂停原因与保留原尝试记录，再确认继续。实看执行中/分组执行、26仍同任务、继续操作审计。20:44后正常领取26/77，不重复建单，第二批仍未建任务；当前不重启Cloud/Agent。
+- Cloud暂停投影修复commit782e0c3已用SSH推送Cloud59。最初HTTPS push停滞，终止该单独push后SSH成功，不修改Git全局配置。源码回归通过不等同已部署页面验证。
