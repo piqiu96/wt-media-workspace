@@ -82,3 +82,13 @@ Cloud增加真实分区选项（完整目录共30项，1001–1027及1029–1031
 - 失败日志中的断开浏览器异常遮蔽原始错误，补充清理失败不遮蔽原异常的定向测试及修复（Agent14c4b24，4项PASS）；Cloud b4372d4修复B站空间封面仍称竖版封面的无障碍名称。正在重建全环境后继续定位。
 - PR审查仍未完成：Agent PR21已建立；连接器返回GitHub连接不可用，原生Chrome Cloud对比表单及备用浏览器均响应超时。未将其记为审查通过。
 - 额外核对到129归档里“听音”勾选与证据不一致：既有证据仅实际播放和PCM相关性，不能证明主观听音；本轮继承该未满足项，最终不得把数值音轨检测冒充主观听感。
+
+## 真实上传故障与PR整改续验
+
+- attempt41保留原始错误后定位到上传文字点击超时；当前官方投稿源码中该文字属于`upload-btn no-events`，改为唯一视频上传组件`.upload-wrp .upload input[type=file]`，6项受控浏览器用例PASS，提交9b13b70。
+- attempt42仍在导航处超时，未进入提交；改为HTTP提交导航成功后等待真实上传控件挂载（单独120秒准备上限），而非等待整个文档资源完成。新增一个故意未完成无关defer资源的真实浏览器用例。
+- [Agent PR21](https://github.com/piqiu96/wt-media-agent/pull/21)两条P2均已落实：临时上传副本在成功和异常路径均清理；只接受本次确认双封面保存期间的两笔实际图片上传回执，按4:3/16:9映射，最终POST逐一精确匹配URL，拒绝交换、陈旧或其他同CDN图片。官方源码核实，图片导出在封面“完成”动作内通过`/x/vu/web/cover/up`提交。
+- Agent73a3829：全量974项单元测试PASS。完整浏览器55项首次54项通过，新增无关资源测试因Python内建回调不支持Playwright包装而报错；修正为lambda后相关9项全部PASS（含原稿公开2项、最终URL交换/替换拒绝、临时文件清理及异步页面挂载）。日志`/tmp/chg130-agent-review-all.log`、`/tmp/chg130-agent-review-browser-all.log`、`/tmp/chg130-review-cover-final.log`。不将初次完整命令记为全绿。
+- Cloud单条页面46项定向回归PASS，日志`/tmp/chg130-final-detail-ui.log`。Desktop PR20已创建：https://github.com/piqiu96/wt-media-desktop/pull/20 。Agent9b13b70对应CI verify为success；新提交CI/独立审查仍待核对。
+- 期间本机负载实测超过600，隔离浏览器启动/连接也失败；仅清理本轮`wt-publisher-browser-*`测试进程，不终止其他BitBrowser Profile。负载回落后恢复测试。未把资源异常下的超时记为平台业务通过。
+- 当前继续强制重建73a3829组合，尚无真实受理/公开、独立批次、两批计划或最终浏览器验收PASS。
