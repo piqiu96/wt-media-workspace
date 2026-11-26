@@ -1,8 +1,9 @@
 ---
 id: CHG-20261126-130
 parent: delivery/milestones/M-publishing-operations.md#B站发布闭环
-status: PLANNED
+status: IMPLEMENTING
 depends_on: ["CHG-20261126-128", "CHG-20261126-129"]
+dependency_merge_commits: {"CHG-20261126-128":{"wt-media-cloud":"eb1355ec1c202eedd4e9cf58d64402ef70d77f08","wt-media-workspace":"134ec829a515d7daee563b58c48945f0cd12ac89"},"CHG-20261126-129":{"wt-media-cloud":"2719e87f620742d2342278aa6449c74200bea799","wt-media-workspace":"c0dc6f13686cf87fcfa5c36b75dfc062abc4be20"}}
 affected_repos: ["wt-media-cloud", "wt-media-agent", "wt-media-desktop", "wt-media-workspace"]
 risk: H
 ---
